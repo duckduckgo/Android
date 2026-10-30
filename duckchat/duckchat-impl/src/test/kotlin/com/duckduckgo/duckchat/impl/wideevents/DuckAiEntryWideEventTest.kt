@@ -1,0 +1,249 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.duckchat.impl.wideevents
+
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
+import com.duckduckgo.app.statistics.wideevents.FlowStatus
+import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
+import kotlin.time.Duration.Companion.milliseconds
+
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
+class DuckAiEntryWideEventTest {
+    @get:Rule
+    val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
+
+    private val client: WideEventClient = mock()
+    private val duckChat: DuckChat = mock()
+    private val feature = FakeFeatureToggleFactory.create(DuckAiEntryWideEventFeature::class.java)
+    private val testee by lazy {
+        DuckAiEntryWideEvent(client, lazy { duckChat }, lazy { feature }, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+    }
+
+    @Before
+    fun setup() = runTest {
+        feature.self().setRawStoredState(Toggle.State(true))
+        whenever(duckChat.isDuckChatUrl(any())).thenAnswer { it.getArgument<android.net.Uri>(0).host == "duck.ai" }
+        whenever(client.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(1L), Result.success(2L))
+        whenever(client.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
+        whenever(client.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
+        whenever(client.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
+        whenever(client.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
+        whenever(client.flowAbort(any())).thenReturn(Result.success(Unit))
+    }
+
+    @Test
+    fun `entry starts with bounded metadata and bucketed intervals`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, hasPrompt = true)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).flowStart(
+            name = eq("duckai_entry"),
+            flowEntryPoint = anyOrNull(),
+            metadata = eq(
+                mapOf(
+                    "source" to "address_bar_prompt",
+                    "has_prompt" to "true",
+                    "chat_state" to "new",
+                    "surface" to "duck_ai_tab",
+                    "prompt_submitted" to "false",
+                    "status_reason" to "app_terminated",
+                ),
+            ),
+            cleanupPolicy = eq(CleanupPolicy.OnProcessStart(false, FlowStatus.Unknown)),
+            samplingProbability = eq(1.0f),
+            definition = any(),
+        )
+        verify(client).intervalStart(1L, "time_in_duckai_ms_bucketed", buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS)
+        verify(client).intervalStart(1L, "time_to_first_prompt_ms_bucketed", buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS)
+    }
+
+    @Test
+    fun `first visible entry URL determines existing chat state only once`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/?chatID=local-only")
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).flowStep(1L, "entry_resolved", metadata = mapOf("chat_state" to "existing"))
+        verify(client, times(1)).flowStep(eq(1L), eq("entry_resolved"), any(), any())
+    }
+
+    @Test
+    fun `prompt is persisted once and entry succeeds on confirmed exit`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+        testee.onPromptSubmitted("other")
+        testee.onPromptSubmitted("tab")
+        testee.onPromptSubmitted("tab")
+        testee.onExitIntent("tab", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        testee.onSelectedTabChanged("other", "https://example.com")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client, times(1)).intervalEnd(1L, "time_to_first_prompt_ms_bucketed")
+        verify(client).flowStep(1L, "prompt_submitted", metadata = mapOf("prompt_submitted" to "true"))
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "new_tab_opened"))
+    }
+
+    @Test
+    fun `new entry finishes previous before starting next`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, false)
+        testee.onEntry(DuckChatEntryPoint.SERP, true)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        inOrder(client) {
+            verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "new_entry"))
+            verify(client).flowStart(eq("duckai_entry"), anyOrNull(), argThat { get("source") == "serp" }, any(), any(), any())
+        }
+    }
+
+    @Test
+    fun `background ends unengaged entry without first prompt interval`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, false)
+        testee.onClose()
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).intervalEnd(1L, "time_in_duckai_ms_bucketed")
+        verify(client, never()).intervalEnd(1L, "time_to_first_prompt_ms_bucketed")
+        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "app_backgrounded"))
+    }
+
+    @Test
+    fun `contextual entry carries prompt and existing chat state`() = runTest {
+        testee.onContextualSheetOpened("tab", true, "https://duck.ai/?chatID=local-only")
+        testee.onPromptSubmitted("tab")
+        testee.onContextualSheetClosed("tab")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).flowStart(
+            eq("duckai_entry"),
+            anyOrNull(),
+            argThat {
+                get("source") == "contextual_chat" && get("surface") == "contextual_sheet" &&
+                    get("has_prompt") == "true" && get("chat_state") == "existing"
+            },
+            any(),
+            any(),
+            any(),
+        )
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "back_or_close"))
+    }
+
+    @Test
+    fun `app landing starts only for Duck ai`() = runTest {
+        testee.onLaunchLandingResolved("tab", "https://example.com")
+        coroutineRule.testScope.advanceUntilIdle()
+        verifyNoInteractions(client)
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/?chatID=local-only")
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client).flowStart(
+            eq("duckai_entry"),
+            anyOrNull(),
+            argThat { get("source") == "app_open" && get("chat_state") == "existing" && get("has_prompt") == "false" },
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun `disabled toggle aborts active entry and prevents another start`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, false)
+        coroutineRule.testScope.advanceUntilIdle()
+        feature.self().setRawStoredState(Toggle.State(false))
+        testee.onEntry(DuckChatEntryPoint.SERP, true)
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).flowAbort(1L)
+        verify(client, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(client, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `same tab navigation cancels exit intent and sheet dismissal cannot close tab entry`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+        testee.onExitIntent("tab", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+        testee.onSelectedTabChanged("tab", "https://duck.ai/?chatID=local-only")
+        testee.onContextualSheetClosed("tab")
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, never()).flowFinish(any(), any(), any())
+        testee.onSelectedTabChanged("tab", "https://example.com")
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "left_duckai", "exit_trigger" to "other_navigation"))
+    }
+
+    @Test
+    fun `repeated selected tab emissions preserve pending exit trigger`() = runTest {
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        testee.onExitIntent("tab", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
+        testee.onSelectedTabChanged("tab", "https://duck.ai/")
+        testee.onSelectedTabChanged("fire", null)
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "left_duckai", "exit_trigger" to "fire_tab_opened"))
+    }
+
+    @Test
+    fun `prompt before page visibility is counted and background succeeds`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, true)
+        testee.onPromptSubmitted("tab")
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client).intervalEnd(1L, "time_to_first_prompt_ms_bucketed")
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "app_backgrounded"))
+    }
+
+    @Test
+    fun `failed start does not create intervals or finish a flow`() = runTest {
+        whenever(client.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.failure(IllegalStateException()))
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, false)
+        testee.onPromptSubmitted("tab")
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, never()).intervalStart(any(), any(), anyOrNull(), anyOrNull())
+        verify(client, never()).flowFinish(any(), any(), any())
+    }
+}

@@ -50,6 +50,7 @@ import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -111,6 +112,7 @@ class RealDuckChatTest {
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
     private val chatSuggestionsStore: ChatSuggestionsStore = mock()
     private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
     private val mockDuckAiModelManager: DuckAiModelManager = mock()
 
     private lateinit var testee: RealDuckChat
@@ -156,6 +158,7 @@ class RealDuckChatTest {
                 chatSuggestionsStore,
                 mockDuckAiTabSessionRepository,
                 mockDuckAiModelManager,
+                lazy { entryWideEvent },
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -657,6 +660,7 @@ class RealDuckChatTest {
             duckAiEnabled = true,
             inputScreenEnabled = true,
         )
+        verify(entryWideEvent).onEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, true)
     }
 
     @Test

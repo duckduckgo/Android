@@ -60,6 +60,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.selectChatSuggestions
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -146,6 +147,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val editPromptSessionStore: EditPromptSessionStore,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val entryWideEvent: Lazy<DuckAiEntryWideEvent>,
     @RegularMode private val regularChatStore: DuckAiChatStore,
     @FireMode private val fireChatStore: DuckAiChatStore,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
@@ -306,6 +308,8 @@ class RealDuckChatJSHelper @Inject constructor(
                         browserInteractionsPlugins.getPlugins().forEach { plugin -> plugin.onAiPromptSubmitted() }
                         if (mode == Mode.FULL && tabId.isNotEmpty()) {
                             duckAiSessionCallback.onPromptSubmitted(tabId)
+                        } else if (mode == Mode.CONTEXTUAL && tabId.isNotEmpty()) {
+                            entryWideEvent.value.onPromptSubmitted(tabId)
                         }
                     }
                     if (it == ReportMetric.USER_DID_CREATE_NEW_CHAT && mode == Mode.FULL && tabId.isNotEmpty()) {
