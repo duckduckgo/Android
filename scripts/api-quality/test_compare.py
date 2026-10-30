@@ -279,3 +279,15 @@ def test_comparison_lists_each_regression_with_its_line_details_and_fix(tmp_path
 
     assert "| API | Line | Details | Fix |" in report and "<!-- task:" not in report
     assert "| `a-api` | [A.kt:4](https://gh/blob/sha/src/A.kt#L4) | `A.x`: public var | Expose a `val`" in report
+
+
+def test_rules_file_matches_the_scorer():
+    import re
+    from pathlib import Path
+
+    from compare import RULES, SHORT_FIXES, load_rules
+
+    scorer = (Path(__file__).parent / "Scorer.java").read_text()
+    scorer_rules = re.search(r"String\[\] RULES = \{([^}]*)\}", scorer).group(1)
+    assert [r["id"] for r in load_rules()] == re.findall(r'"(M\d+)"', scorer_rules)
+    assert all(RULES[rule][0] and RULES[rule][1] and RULES[rule][2] and SHORT_FIXES[rule] for rule in RULES)

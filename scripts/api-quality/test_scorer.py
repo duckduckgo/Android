@@ -136,3 +136,53 @@ def test_only_subtypes_of_the_enclosing_sealed_type_are_cases(tmp_path):
         kinds = {row["declaration"]: row["kind"] for row in csv.DictReader(f)}
     assert kinds["Result.Plain"] == kinds["Result.Qualified"] == "SEALED_CASE"
     assert kinds["Result.Foreign"] == "TYPE"
+
+
+def test_real_prefix_is_an_implementation_name_but_realm_is_not(tmp_path):
+    findings = score(tmp_path, "/** Doc. */\nclass RealFoo\n\n/** Doc. */\nclass Realm\n")
+
+    assert ("M1", "RealFoo", "type name starts with Real") in findings
+    assert not any(declaration == "Realm" for _, declaration, _ in findings)
+
+
+def test_writable_types_beyond_mutable_are_exposed_write_access(tmp_path):
+    findings = score(tmp_path, (
+        "/** Doc. */\ninterface A {\n"
+        "    /** Doc. */\n    val items: ArrayList<String>\n"
+        "    /** Doc. */\n    val counter: AtomicInteger\n"
+        "    /** Doc. */\n    val events: Channel<Int>\n"
+        "    /** Doc. */\n    val bytes: ByteArray\n"
+        "    /** Doc. */\n    val list: List<String>\n"
+        "}\n"
+    ))
+
+    m8 = {declaration for rule, declaration, _ in findings if rule == "M8"}
+    assert m8 == {"A.items", "A.counter"}
+
+
+def test_channel_counts_only_when_it_is_the_coroutines_one(tmp_path):
+    findings = score(tmp_path, (
+        "import kotlinx.coroutines.channels.Channel\n\n"
+        "/** Doc. */\ninterface A {\n"
+        "    /** Doc. */\n    val events: Channel<Int>\n"
+        "    /** Doc. */\n    val outgoing: kotlinx.coroutines.channels.SendChannel<Int>\n"
+        "}\n"
+    ))
+    own = score(tmp_path / "own", "/** Doc. */\ndata class Channel(val id: String)\n\n/** Doc. */\ninterface B {\n    /** Doc. */\n    val channel: Channel\n}\n")
+
+    assert {d for rule, d, _ in findings if rule == "M8"} == {"A.events", "A.outgoing"}
+    assert not any(rule == "M8" for rule, _, _ in own)
+
+
+def test_flavor_source_sets_are_scored_and_test_source_sets_are_not(tmp_path):
+    out = score_run(tmp_path, "/** Doc. */\nclass Main\n")
+    module = tmp_path / "repo" / "foo" / "foo-api" / "src"
+    for source_set, name in (("play", "PlayOnly"), ("testFixtures", "Fixture")):
+        (module / source_set / "kotlin" / "x").mkdir(parents=True)
+        (module / source_set / "kotlin" / "x" / f"{name}.kt").write_text(f"package x\n\nclass {name}\n")
+    subprocess.run([str(SCORE_SH), str(out), "t"], env={**os.environ, "REPO_ROOT": str(tmp_path / "repo")}, check=True,
+                   capture_output=True)
+
+    with open(out / "api-quality-declarations-t.csv", newline="") as f:
+        declarations = {row["declaration"] for row in csv.DictReader(f)}
+    assert {"Main", "PlayOnly"} <= declarations and "Fixture" not in declarations

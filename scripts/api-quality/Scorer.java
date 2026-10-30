@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.psi.KtConstructor;
 import org.jetbrains.kotlin.psi.KtDeclaration;
 import org.jetbrains.kotlin.psi.KtEnumEntry;
 import org.jetbrains.kotlin.psi.KtFile;
+import org.jetbrains.kotlin.psi.KtImportDirective;
 import org.jetbrains.kotlin.psi.KtModifierListOwner;
 import org.jetbrains.kotlin.psi.KtNamedFunction;
 import org.jetbrains.kotlin.psi.KtNullableType;
@@ -64,9 +65,23 @@ public class Scorer {
     static final double KDOC_THRESHOLD = 0.80;
     static final int SIZE_CEILING = 80;
     static final List<String> IMPL_SUFFIXES = List.of("Repository", "Dao", "Entity", "ViewModel", "Impl");
+    /** `Real` is this repo's prefix for implementations (`RealFoo` implements `Foo`). */
+    static final List<String> IMPL_PREFIXES = List.of("Real");
     static final Set<String> NULLABLE_FACTORY_TYPES = Set.of("Intent", "Fragment", "View", "Bundle");
     static final Set<String> UNTYPED_TYPES = Set.of("Any", "Pair", "Triple");
+    /** Writable types whose name doesn't start with `Mutable`, matched by simple name. */
+    static final Set<String> MUTABLE_TYPES = Set.of(
+        "ArrayList", "HashMap", "HashSet", "LinkedHashMap", "LinkedHashSet", "LinkedList", "ConcurrentHashMap",
+        "CopyOnWriteArrayList", "AtomicBoolean", "AtomicInteger", "AtomicLong", "AtomicReference");
+    /**
+     * Writable types whose simple name is also used by other classes (this repo has its own `Channel` data class), so they
+     * only count when the file's imports, or the name as written, point at the library type.
+     */
+    static final Map<String, String> MUTABLE_IMPORTED_TYPES = Map.of(
+        "Channel", "kotlinx.coroutines.channels.Channel",
+        "SendChannel", "kotlinx.coroutines.channels.SendChannel");
     static final String[] RULES = {"M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"};
+    static final int MAX_SCORE = RULES.length;
 
     /** SEALED_CASE: a subtype nested in its sealed parent. Counts for M6 but needs no KDoc, like an enum entry. */
     enum Kind { TYPE, SEALED_CASE, TOP_FUNCTION, TOP_PROPERTY, MEMBER_FUNCTION, MEMBER_PROPERTY }
@@ -121,6 +136,8 @@ public class Scorer {
 
         Disposable disposable = Disposer.newDisposable();
         CompilerConfiguration configuration = new CompilerConfiguration();
+        // The compiler reports diagnostics to the message collector. Files are only parsed, never compiled, so its parse
+        // warnings are discarded rather than printed for every file.
         configuration.put(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.Companion.getNONE());
         KotlinCoreEnvironment environment = KotlinCoreEnvironment.createForProduction(
             disposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES);
@@ -152,7 +169,7 @@ public class Scorer {
                 String name = dir.getFileName().toString();
                 if (!name.endsWith("-api") || dir.toString().contains("/build/") || dir.toString().contains("/.git/")) continue;
                 if (!Files.isRegularFile(dir.resolve("build.gradle")) && !Files.isRegularFile(dir.resolve("build.gradle.kts"))) continue;
-                if (!Files.isDirectory(dir.resolve("src/main"))) {
+                if (sourceSets(dir).isEmpty()) {
                     skippedModules.add(name);
                     continue;
                 }
@@ -162,10 +179,26 @@ public class Scorer {
         return modules;
     }
 
+    /**
+     * `src/main` and any flavor source set (`src/play`, `src/internal`), so flavor-only APIs are scored too; test source
+     * sets aren't API.
+     */
+    static List<Path> sourceSets(Path moduleDir) throws IOException {
+        Path src = moduleDir.resolve("src");
+        if (!Files.isDirectory(src)) return List.of();
+        try (Stream<Path> sets = Files.list(src)) {
+            return sets.filter(Files::isDirectory)
+                .filter(p -> !p.getFileName().toString().toLowerCase().contains("test"))
+                .sorted().toList();
+        }
+    }
+
     static void scan(Module module) throws IOException {
-        List<Path> files;
-        try (Stream<Path> walk = Files.walk(module.dir.resolve("src/main"))) {
-            files = walk.filter(p -> p.toString().endsWith(".kt")).sorted().toList();
+        List<Path> files = new ArrayList<>();
+        for (Path sourceSet : sourceSets(module.dir)) {
+            try (Stream<Path> walk = Files.walk(sourceSet)) {
+                files.addAll(walk.filter(p -> p.toString().endsWith(".kt")).sorted().toList());
+            }
         }
         for (Path path : files) {
             String text = Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n");
@@ -299,6 +332,25 @@ public class Scorer {
         return path.toString();
     }
 
+    /**
+     * True when `user` refers to the class `fqName`: either its full name is written out, or the file imports it by name
+     * or with a wildcard.
+     */
+    static boolean refersTo(KtFile file, KtUserType user, String fqName) {
+        String written = qualifiedName(user);
+        if (written.equals(fqName)) return true;
+        if (!written.equals(fqName.substring(fqName.lastIndexOf('.') + 1))) return false;
+        String packageName = fqName.substring(0, fqName.lastIndexOf('.'));
+        for (KtImportDirective directive : file.getImportDirectives()) {
+            if (directive.getImportedFqName() == null) continue;
+            String imported = directive.getImportedFqName().asString();
+            if (directive.isAllUnder() ? imported.equals(packageName) : imported.equals(fqName) && directive.getAliasName() == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** The type's name as written, without type arguments: `a.b.Result` for `a.b.Result<T>`. */
     static String qualifiedName(KtUserType user) {
         return user.getQualifier() == null ? user.getReferencedName() : qualifiedName(user.getQualifier()) + "." + user.getReferencedName();
@@ -350,6 +402,13 @@ public class Scorer {
         for (String suffix : IMPL_SUFFIXES) {
             if (name.endsWith(suffix)) {
                 addFinding(module, "M1", rel, file, element, name, "type name ends in " + suffix);
+                return;
+            }
+        }
+        for (String prefix : IMPL_PREFIXES) {
+            // An uppercase letter after the prefix keeps legitinate names like `Realm` out.
+            if (name.length() > prefix.length() && name.startsWith(prefix) && Character.isUpperCase(name.charAt(prefix.length()))) {
+                addFinding(module, "M1", rel, file, element, name, "type name starts with " + prefix);
                 return;
             }
         }
@@ -415,7 +474,9 @@ public class Scorer {
             if (!untypedExempt && UNTYPED_TYPES.contains(simple)) {
                 addFinding(module, "M7", rel, file, owner, name, simple + " in " + type);
             }
-            if (simple.startsWith("Mutable") && simple.length() > 7 && Character.isUpperCase(simple.charAt(7))) {
+            boolean mutableNamed = simple.startsWith("Mutable") && simple.length() > 7 && Character.isUpperCase(simple.charAt(7));
+            String library = MUTABLE_IMPORTED_TYPES.get(simple);
+            if (mutableNamed || MUTABLE_TYPES.contains(simple) || (library != null && refersTo(file, user, library))) {
                 addFinding(module, "M8", rel, file, owner, name, simple + " in " + type);
             }
         }
@@ -550,11 +611,12 @@ public class Scorer {
     }
 
     static void writeScorecard(List<Module> modules, String date, Path previous, Path out) throws IOException {
+        String outOf = "/" + MAX_SCORE;
         List<Module> rankedModules = ranked(modules);
         int totalDecls = modules.stream().mapToInt(m -> m.decls.size()).sum();
         int points = modules.stream().mapToInt(Module::score).sum();
-        double unweighted = modules.stream().mapToDouble(m -> m.score() / 8.0).average().orElse(0);
-        double weighted = modules.stream().mapToDouble(m -> m.score() / 8.0 * m.decls.size()).sum() / totalDecls;
+        double unweighted = modules.stream().mapToDouble(m -> m.score() / (double) MAX_SCORE).average().orElse(0);
+        double weighted = modules.stream().mapToDouble(m -> m.score() / (double) MAX_SCORE * m.decls.size()).sum() / totalDecls;
         int floor = modules.stream().filter(m -> !m.name.equals(SIZE_EXCLUDED_FROM_FLOOR)).mapToInt(Module::score).min().orElse(0);
         String floorModules = modules.stream()
             .filter(m -> !m.name.equals(SIZE_EXCLUDED_FROM_FLOOR) && m.score() == floor)
@@ -568,12 +630,14 @@ public class Scorer {
         md.append("| Modules scored | ").append(modules.size()).append(" (").append(skippedModules.size())
             .append(skippedModules.size() == 1 ? " has" : " have").append(" no source: ").append(skippedModules.stream().map(s -> "`" + s + "`").collect(Collectors.joining(", ")))
             .append(") |\n");
-        md.append("| Points | ").append(points).append(" / ").append(modules.size() * 8).append(" |\n");
+        md.append("| Points | ").append(points).append(" / ").append(modules.size() * MAX_SCORE).append(" |\n");
         md.append("| **Weighted average (by declaration count)** | **").append(pct1(weighted)).append("** |\n");
         md.append("| **Unweighted average** | **").append(pct1(unweighted)).append("** |\n");
-        md.append("| **Minimum score, excluding `browser-api`** | **").append(floor).append("/8** (").append(floorModules).append(") |\n");
+        md.append("| **Minimum score, excluding `browser-api`** | **").append(floor).append(outOf).append("** (")
+            .append(floorModules).append(") |\n");
         md.append("| Public declarations | ").append(String.format("%,d", totalDecls)).append(" |\n");
-        md.append("| Modules at 8/8 | ").append(modules.stream().filter(m -> m.score() == 8).count()).append(" |\n\n");
+        long perfect = modules.stream().filter(m -> m.score() == MAX_SCORE).count();
+        md.append("| Modules at ").append(MAX_SCORE).append(outOf).append(" | ").append(perfect).append(" |\n\n");
 
         md.append("### Modules failing each check\n\n| Check | Modules failing |\n|---|---|\n");
         for (String rule : RULES) {
@@ -583,7 +647,7 @@ public class Scorer {
         Map<String, Integer> prev = readPreviousScores(previous);
         md.append("\n## Scores\n\n| Module | Score | Decls | Failing |\n|---|---|---|---|\n");
         for (Module m : rankedModules) {
-            md.append("| `").append(m.name).append("` | ").append(m.score()).append("/8 | ").append(m.decls.size()).append(" | ")
+            md.append("| `").append(m.name).append("` | ").append(m.score()).append(outOf).append(" | ").append(m.decls.size()).append(" | ")
                 .append(m.failing.isEmpty() ? "none" : String.join(", ", m.failing)).append(" |\n");
         }
 
@@ -592,9 +656,10 @@ public class Scorer {
             for (Module m : rankedModules) {
                 Integer before = prev.get(m.name);
                 if (before == null) {
-                    md.append("| `").append(m.name).append("` | new | ").append(m.score()).append("/8 |\n");
+                    md.append("| `").append(m.name).append("` | new | ").append(m.score()).append(outOf).append(" |\n");
                 } else if (before != m.score()) {
-                    md.append("| `").append(m.name).append("` | ").append(before).append("/8 | ").append(m.score()).append("/8 |\n");
+                    md.append("| `").append(m.name).append("` | ").append(before).append(outOf).append(" | ")
+                        .append(m.score()).append(outOf).append(" |\n");
                 }
             }
         }

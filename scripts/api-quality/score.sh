@@ -11,7 +11,9 @@ PREVIOUS="${3:-}"
 
 # Pinned to the Kotlin version of the checkout this script runs from, not the one being scored: Scorer.java is compiled
 # against these jars, and a newer parser still reads older code.
-SCORER_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
+# Defaults to this checkout's root; set it to run a copy of the scorer from outside a checkout, e.g. an older one
+# when measuring a re-baseline.
+SCORER_ROOT="${SCORER_ROOT:-$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)}"
 KOTLIN_VERSION="$(grep '^version.kotlin=' "$SCORER_ROOT/versions.properties" | cut -d= -f2)"
 COROUTINES_VERSION="$(grep '^version.kotlinx.coroutines=' "$SCORER_ROOT/versions.properties" | cut -d= -f2)"
 GRADLE_CACHE="${GRADLE_USER_HOME:-$HOME/.gradle}/caches/modules-2/files-2.1"
