@@ -282,6 +282,33 @@
             }
         ]
     },
+    "m_dbp_optoutjob_removed-identifier-found": {
+        "description": "Fired when a scan marks a stored profile as removed although the same scan found a profile with the same identifier, because the profile's name or profile URL changed.",
+        "owners": ["landomen"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker on which the profile was found",
+                "type": "string"
+            },
+            {
+                "key": "changed_field",
+                "description": "Which part of the stored profile no longer matched the profile found with the same identifier",
+                "type": "string",
+                "enum": ["name", "profile_url", "name_and_profile_url"]
+            },
+            {
+                "key": "optout_status",
+                "description": "Status of the opt-out job before it was marked removed",
+                "type": "string",
+                "enum": ["not_executed", "pending_email_confirmation", "requested", "error"]
+            }
+        ],
+        "expires": "2027-01-31"
+    },
     "m_dbp_engagement_dau": {
         "description": "Pixel for PIR daily active users.",
         "owners": ["karlenDimla", "landomen"],

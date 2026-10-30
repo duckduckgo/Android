@@ -20,6 +20,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
@@ -31,6 +33,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNC
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_REMOVED_IDENTIFIER_FOUND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_LOADED
@@ -432,6 +435,20 @@ interface PirPixelSender {
      * record to be reverted from REMOVED back to REQUESTED.
      */
     fun reportBrokerOptOutProfileReappeared(brokerUrl: String)
+
+    /**
+     * Fired when a stored profile is marked removed although the same scan found a profile with the same
+     * identifier, so only its name or profile URL changed.
+     *
+     * @param brokerUrl The url of the broker where the profile was found.
+     * @param changedField Which part of the match key no longer matched.
+     * @param previousStatus Status of the opt-out job before it was marked removed.
+     */
+    fun reportBrokerOptOutRemovedWithIdentifierFound(
+        brokerUrl: String,
+        changedField: ChangedField,
+        previousStatus: OptOutJobStatus,
+    )
 
     /**
      * Emits a daily pixel to report that the user is eligible to run PIR.
@@ -1130,6 +1147,20 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED, params)
     }
 
+    override fun reportBrokerOptOutRemovedWithIdentifierFound(
+        brokerUrl: String,
+        changedField: ChangedField,
+        previousStatus: OptOutJobStatus,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_CHANGED_FIELD to changedField.toChangedFieldParam(),
+            PARAM_KEY_OPTOUT_STATUS to previousStatus.toOptOutStatusParam(),
+        )
+
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_OPTOUT_REMOVED_IDENTIFIER_FOUND, params)
+    }
+
     override fun reportCanRunPir() {
         enqueueFire(PIR_CAN_RUN_PIR)
     }
@@ -1802,6 +1833,21 @@ class RealPirPixelSender @Inject constructor(
         PirExecutionType.SCHEDULED -> "scheduled"
     }
 
+    private fun ChangedField.toChangedFieldParam(): String = when (this) {
+        ChangedField.NAME -> "name"
+        ChangedField.PROFILE_URL -> "profile_url"
+        ChangedField.NAME_AND_PROFILE_URL -> "name_and_profile_url"
+    }
+
+    private fun OptOutJobStatus.toOptOutStatusParam(): String = when (this) {
+        OptOutJobStatus.NOT_EXECUTED -> "not_executed"
+        OptOutJobStatus.REQUESTED -> "requested"
+        OptOutJobStatus.REMOVED -> "removed"
+        OptOutJobStatus.ERROR -> "error"
+        OptOutJobStatus.PENDING_EMAIL_CONFIRMATION -> "pending_email_confirmation"
+        OptOutJobStatus.REMOVED_BY_USER -> "removed_by_user"
+    }
+
     private fun Long.roundToNearest10Ms(): Long = ((this + 5) / 10) * 10
 
     companion object {
@@ -1821,6 +1867,8 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_FREE_SCAN = "free_scan"
 
         private const val PARAM_KEY_BROKER = "data_broker"
+        private const val PARAM_KEY_CHANGED_FIELD = "changed_field"
+        private const val PARAM_KEY_OPTOUT_STATUS = "optout_status"
         private const val PARAM_KEY_PARENT = "parent"
         private const val PARAM_KEY_STAGE = "stage"
         private const val PARAM_KEY_PATTERN = "pattern"
