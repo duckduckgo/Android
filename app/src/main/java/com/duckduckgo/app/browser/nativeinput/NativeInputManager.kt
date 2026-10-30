@@ -348,7 +348,7 @@ class RealNativeInputManager @Inject constructor(
     override fun handleDuckAiVoiceResult(query: String) {
         val widget = omnibarWidget()
         if (widget != null) {
-            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
+            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
             try {
                 if (!widget.isChatTabSelected()) {
                     widget.selectChatTab()
@@ -358,7 +358,7 @@ class RealNativeInputManager @Inject constructor(
                 widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
             }
         } else {
-            duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.VOICE)
+            duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
         }
     }
 
@@ -1012,7 +1012,7 @@ class RealNativeInputManager @Inject constructor(
         }
         widget.onVoiceChatClick = {
             hideNativeInput(animate = false)
-            duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+            duckChat.openVoiceDuckChat(DuckChatEntryPoint.ADDRESS_BAR_ICON)
         }
     }
 

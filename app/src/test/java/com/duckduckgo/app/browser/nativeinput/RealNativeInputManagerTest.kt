@@ -579,13 +579,32 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenNonBlankDuckAiVoiceResultThenSubmissionUsesVoiceEntryPoint() {
+    fun whenVoiceChatButtonClickedThenUsesAddressBarIconEntryPoint() {
+        val widget = showVoiceTestWidget { _, _ -> }
+
+        widget.onVoiceChatClick!!.invoke()
+
+        verify(duckChat).openVoiceDuckChat(DuckChatEntryPoint.ADDRESS_BAR_ICON)
+    }
+
+    @Test
+    fun whenDictatedPromptArrivesWithoutWidgetThenUsesAddressBarPromptEntryPoint() {
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        testee.init(omnibar, rootView, lifecycleOwner)
+
+        testee.handleDuckAiVoiceResult("dictated prompt")
+
+        verify(duckChat).openDuckChatWithAutoPrompt("dictated prompt", DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+    }
+
+    @Test
+    fun whenNonBlankDuckAiVoiceResultThenSubmissionUsesAddressBarPromptEntryPoint() {
         val entryPoints = mutableListOf<DuckChatEntryPoint>()
         showVoiceTestWidget { _, entryPoint -> entryPoints += entryPoint }
 
         testee.handleDuckAiVoiceResult("voice query")
 
-        assertEquals(listOf(DuckChatEntryPoint.VOICE), entryPoints)
+        assertEquals(listOf(DuckChatEntryPoint.ADDRESS_BAR_PROMPT), entryPoints)
     }
 
     @Test
@@ -600,7 +619,7 @@ class RealNativeInputManagerTest {
         widget.submitMessage("typed query")
 
         assertEquals(
-            listOf(DuckChatEntryPoint.VOICE, DuckChatEntryPoint.ADDRESS_BAR_PROMPT),
+            listOf(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, DuckChatEntryPoint.ADDRESS_BAR_PROMPT),
             entryPoints,
         )
     }
@@ -711,6 +730,7 @@ class RealNativeInputManagerTest {
         context: Context,
         delegate: NativeInputWidget = mock(),
     ) : View(context), NativeInputWidget by delegate {
+        override var onVoiceChatClick: (() -> Unit)? = null
         private var chatTabSelected = false
         private var onChatSubmitted: ((String) -> Unit)? = null
         var chatIdSource: Flow<String?>? = null

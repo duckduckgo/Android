@@ -13573,10 +13573,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewVoiceChatRequestedFromBrowsingMenuThenSourceMatchesViewMode() = runTest {
+        testee.openNewVoiceChat(ViewMode.NewTab)
+        testee.openNewVoiceChat(ViewMode.Browser("https://example.com"))
+        testee.openNewVoiceChat(ViewMode.DuckAI)
+
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_NTP)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_DUCKAI)
+    }
+
+    @Test
     fun whenNewVoiceChatRequestedFromChatMenuThenOpensVoiceChatAndFiresPixels() = runTest {
         testee.openNewVoiceChatFromChatMenu()
 
-        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY, type = Daily())
     }

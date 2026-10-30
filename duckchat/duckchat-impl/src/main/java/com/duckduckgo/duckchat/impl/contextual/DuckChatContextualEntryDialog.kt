@@ -348,7 +348,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             onAskAboutPage = { viewModel.onAttachContextRequested() },
             onPageContextRemoved = { viewModel.onContextRemoved() },
             onVoiceChatRequested = {
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
                 dismiss()
             },
             onVoiceSearchRequested = {

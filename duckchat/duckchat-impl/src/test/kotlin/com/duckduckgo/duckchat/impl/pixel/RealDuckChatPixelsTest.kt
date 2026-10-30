@@ -575,10 +575,35 @@ class RealDuckChatPixelsTest {
 
         val params = mapOf(
             "source" to "address_bar_prompt",
+            "voice_chat" to "false",
             "duck_ai_enabled" to "true",
             "input_screen_enabled" to "true",
             "opens_new_tab" to "false",
             "has_prompt" to "true",
+        )
+        verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_COUNT, params)
+        verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `voice entry preserves the initiating source on count and daily pixels`() = runTest {
+        testee.sendDuckChatEntryPixel(
+            entryPoint = DuckChatEntryPoint.CONTEXTUAL_CHAT,
+            opensNewTab = true,
+            hasPrompt = false,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+            voiceChat = true,
+        )
+        advanceUntilIdle()
+
+        val params = mapOf(
+            "source" to "contextual_chat",
+            "voice_chat" to "true",
+            "duck_ai_enabled" to "true",
+            "input_screen_enabled" to "true",
+            "opens_new_tab" to "true",
+            "has_prompt" to "false",
         )
         verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_COUNT, params)
         verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_DAILY, params, type = Pixel.PixelType.Daily())

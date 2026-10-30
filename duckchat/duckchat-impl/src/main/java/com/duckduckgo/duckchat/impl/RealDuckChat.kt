@@ -791,7 +791,7 @@ class RealDuckChat @Inject constructor(
 
     override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openVoiceDuckChat" }
-        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false, voiceChat = true)
         val parameters = mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE)
         openDuckChat(parameters, forceNewSession = true)
     }
@@ -806,7 +806,16 @@ class RealDuckChat @Inject constructor(
         opensNewTab: Boolean,
         hasPrompt: Boolean,
     ) {
-        entryWideEvent.value.onEntry(entryPoint, hasPrompt, opensNewTab)
+        reportDuckChatEntry(entryPoint, opensNewTab, hasPrompt, voiceChat = false)
+    }
+
+    private fun reportDuckChatEntry(
+        entryPoint: DuckChatEntryPoint,
+        opensNewTab: Boolean,
+        hasPrompt: Boolean,
+        voiceChat: Boolean,
+    ) {
+        entryWideEvent.value.onEntry(entryPoint, hasPrompt, opensNewTab, voiceChat)
         // Lets the tab that ends up hosting this entry attribute itself once it's created/navigated,
         // so a later prompt submission in it can carry this same entry point as its `source`.
         duckAiTabSessionRepository.setPendingEntryPointSource(entryPoint.toPixelValue())
@@ -816,6 +825,7 @@ class RealDuckChat @Inject constructor(
             hasPrompt = hasPrompt,
             duckAiEnabled = isEnabled(),
             inputScreenEnabled = inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
+            voiceChat = voiceChat,
         )
     }
 

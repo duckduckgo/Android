@@ -5949,10 +5949,14 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun openNewVoiceChat(viewMode: ViewMode) {
+        duckChat.openVoiceDuckChat(browsingMenuDuckChatEntryPoint(viewMode))
+    }
+
     fun openNewVoiceChatFromChatMenu() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY, type = Daily())
-        duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        duckChat.openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
     }
 
     fun openNewImageDuckChatFromChatMenu() {
@@ -5981,13 +5985,15 @@ class BrowserTabViewModel @Inject constructor(
 
     /** New Chat from the browsing menu, which is reachable from any view mode. */
     fun openNewDuckChat(viewMode: ViewMode) {
-        val entryPoint = when (viewMode) {
-            ViewMode.NewTab -> DuckChatEntryPoint.BROWSING_MENU_NTP
-            ViewMode.DuckAI -> DuckChatEntryPoint.BROWSING_MENU_DUCKAI
-            else -> DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
-        }
+        val entryPoint = browsingMenuDuckChatEntryPoint(viewMode)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         openNewDuckChatTab(entryPoint, fromDuckAiChat = viewMode == ViewMode.DuckAI)
+    }
+
+    private fun browsingMenuDuckChatEntryPoint(viewMode: ViewMode): DuckChatEntryPoint = when (viewMode) {
+        ViewMode.NewTab -> DuckChatEntryPoint.BROWSING_MENU_NTP
+        ViewMode.DuckAI -> DuckChatEntryPoint.BROWSING_MENU_DUCKAI
+        else -> DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
     }
 
     private fun openNewDuckChatTab(

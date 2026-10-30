@@ -159,6 +159,7 @@ interface DuckChatPixels {
         hasPrompt: Boolean,
         duckAiEnabled: Boolean,
         inputScreenEnabled: Boolean,
+        voiceChat: Boolean = false,
     )
     fun reportContextualSheetOpened()
     fun reportContextualSheetDismissed()
@@ -367,6 +368,7 @@ class RealDuckChatPixels @Inject constructor(
         hasPrompt: Boolean,
         duckAiEnabled: Boolean,
         inputScreenEnabled: Boolean,
+        voiceChat: Boolean,
     ) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT,
@@ -377,6 +379,7 @@ class RealDuckChatPixels @Inject constructor(
                 DuckChatPixelParameters.INPUT_SCREEN_ENABLED to inputScreenEnabled.toString(),
                 DuckChatPixelParameters.OPENS_NEW_TAB to opensNewTab.toString(),
                 DuckChatPixelParameters.HAS_PROMPT to hasPrompt.toString(),
+                DuckChatPixelParameters.VOICE_CHAT to voiceChat.toString(),
             ),
         )
     }
@@ -1748,6 +1751,7 @@ object DuckChatPixelParameters {
     const val INPUT_SCREEN_ENABLED = "input_screen_enabled"
     const val OPENS_NEW_TAB = "opens_new_tab"
     const val HAS_PROMPT = "has_prompt"
+    const val VOICE_CHAT = "voice_chat"
     const val WAS_USED_BEFORE = "was_used_before"
     const val SUGGESTION_ID = "suggestionId"
     const val SELECTION_COUNT = "selection_count"

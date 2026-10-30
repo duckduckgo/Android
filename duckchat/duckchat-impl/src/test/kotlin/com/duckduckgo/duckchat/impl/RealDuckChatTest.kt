@@ -686,16 +686,18 @@ class RealDuckChatTest {
         testee.openDuckChatWithAutoPrompt("!ai", DuckChatEntryPoint.DIRECT_URL)
         testee.openDuckChatWithAutoPrompt("!ai prompt", DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
         testee.openDuckChatWithPrefill("prefill", DuckChatEntryPoint.DIRECT_URL)
-        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        testee.openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
 
         val entryPoints = argumentCaptor<DuckChatEntryPoint>()
         val hasPrompts = argumentCaptor<Boolean>()
+        val voiceChats = argumentCaptor<Boolean>()
         verify(mockDuckChatPixels, times(8)).sendDuckChatEntryPixel(
             entryPoint = entryPoints.capture(),
             opensNewTab = eq(true),
             hasPrompt = hasPrompts.capture(),
             duckAiEnabled = eq(true),
             inputScreenEnabled = eq(true),
+            voiceChat = voiceChats.capture(),
         )
         assertEquals(
             listOf(
@@ -706,10 +708,27 @@ class RealDuckChatTest {
                 DuckChatEntryPoint.DIRECT_URL to false,
                 DuckChatEntryPoint.ADDRESS_BAR_PROMPT to true,
                 DuckChatEntryPoint.DIRECT_URL to false,
-                DuckChatEntryPoint.VOICE to false,
+                DuckChatEntryPoint.DUCK_AI_NEW_CHAT to false,
             ),
             entryPoints.allValues.zip(hasPrompts.allValues),
         )
+        assertEquals(listOf(false, false, false, false, false, false, false, true), voiceChats.allValues)
+        verify(entryWideEvent).onEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, false, true, true)
+    }
+
+    @Test
+    fun whenDigitalAssistantStartsVoiceChatThenBothEventsPreserveSourceAndVoiceFlag() = runTest {
+        testee.openVoiceDuckChat(DuckChatEntryPoint.DIGITAL_ASSISTANT)
+
+        verify(mockDuckChatPixels).sendDuckChatEntryPixel(
+            entryPoint = DuckChatEntryPoint.DIGITAL_ASSISTANT,
+            opensNewTab = true,
+            hasPrompt = false,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+            voiceChat = true,
+        )
+        verify(entryWideEvent).onEntry(DuckChatEntryPoint.DIGITAL_ASSISTANT, false, true, true)
     }
 
     @Test
@@ -743,7 +762,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenVoiceDuckChatCalledThenOpenDuckChatWithVoiceModeUrl() = runTest {
-        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        testee.openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -758,7 +777,7 @@ class RealDuckChatTest {
         val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
 
-        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        testee.openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -963,7 +982,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
-        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        testee.openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,

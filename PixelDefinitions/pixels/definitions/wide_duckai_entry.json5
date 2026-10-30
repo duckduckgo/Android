@@ -64,6 +64,11 @@
                 ]
             },
             {
+                "key": "feature.data.ext.voice_chat",
+                "type": "boolean",
+                "description": "Whether this entry starts a voice chat. Dictated text prompts are false."
+            },
+            {
                 "key": "feature.data.ext.has_prompt",
                 "type": "boolean",
                 "description": "Whether the entry carried a prompt"

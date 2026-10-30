@@ -476,6 +476,11 @@
         "parameters": [
             "appVersion",
             "duckAiEntrySource",
+            {
+                "key": "voice_chat",
+                "type": "boolean",
+                "description": "Whether this entry starts a voice chat. Dictated text prompts are false."
+            },
             { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
             {
                 "key": "input_screen_enabled",
