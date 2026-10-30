@@ -1884,6 +1884,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT("aichat_new_chat_hint_tapped_count"),
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY("aichat_new_chat_hint_tapped_daily"),
     DUCK_CHAT_NEW_CHAT_HINTS_CAP_REACHED("aichat_new_chat_hints_cap_reached"),
+    DUCK_AI_COMBINED_WIDGET_ADDED("m_duck_ai_combined_widget_added"),
+    DUCK_AI_COMBINED_WIDGET_DELETED("m_duck_ai_combined_widget_deleted"),
 }
 
 object DuckChatPixelParameters {
@@ -2207,6 +2209,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_AI_COMBINED_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_AI_COMBINED_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
