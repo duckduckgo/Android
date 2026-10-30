@@ -36,9 +36,9 @@ import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.api.PirScreens.PirDesktopScreen
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
-import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPirDashboard
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPirDesktop
@@ -124,7 +124,7 @@ class PirSettingView @JvmOverloads constructor(
     private fun processCommands(command: Command) {
         when (command) {
             is OpenPirDesktop -> {
-                globalActivityStarter.start(context, PirScreenWithEmptyParams)
+                globalActivityStarter.start(context, PirDesktopScreen)
             }
 
             OpenPirDashboard -> {

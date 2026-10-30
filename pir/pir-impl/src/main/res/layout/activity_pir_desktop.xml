@@ -22,11 +22,11 @@
               android:layout_height="match_parent"
               android:background="@drawable/gradient_light"
               android:orientation="vertical"
-              tools:context=".pir.PirActivity">
+              tools:context=".desktop.PirDesktopActivity">
 
     <include
             android:id="@+id/includeToolbar"
-            layout="@layout/privacy_pro_toolbar"/>
+            layout="@layout/pir_desktop_toolbar"/>
 
     <ScrollView
             android:id="@+id/contentScrollView"

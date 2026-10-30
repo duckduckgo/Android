@@ -51,8 +51,6 @@ dependencies {
     implementation project(path: ':settings-api')
     implementation project(path: ':network-protection-api')
     implementation project(path: ':internal-features-api')
-    implementation project(path: ':macos-api')
-    implementation project(path: ':windows-api')
     implementation project(path: ':downloads-api')
     implementation project(path: ':statistics-api')
     implementation project(':privacy-config-api') // remote feature flag
