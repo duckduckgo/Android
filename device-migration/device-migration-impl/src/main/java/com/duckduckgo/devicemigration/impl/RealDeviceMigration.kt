@@ -25,6 +25,7 @@ import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_MIGRATED
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_IS_NEW_INSTALL
 import com.duckduckgo.di.scopes.AppScope
@@ -72,9 +73,13 @@ class RealDeviceMigration @Inject constructor(
 
     override fun sourceDeviceIsNewInstall(): Boolean? = detection.sourceIsNewInstall
 
-    internal fun markMigrationFlowCompleted() {
-        markerStore.local.edit().putBoolean(KEY_FLOW_PENDING, false).commit()
+    override suspend fun markMigrationFlowCompleted() {
+        withContext(dispatchers.io()) {
+            markerStore.local.edit().putBoolean(KEY_FLOW_PENDING, false).commit()
+        }
     }
+
+    override fun previousDeviceHadSync(): Boolean = markerStore.local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false)
 
     override fun onCreate(owner: LifecycleOwner) {
         val sourceIsNewInstall = detection.sourceIsNewInstall

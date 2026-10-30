@@ -41,5 +41,7 @@ class DeviceMigrationMarkerStore(
         const val KEY_MIGRATED = "migrated"
         const val KEY_FLOW_PENDING = "flowPending"
         const val KEY_SOURCE_IS_NEW_INSTALL = "sourceIsNewInstall"
+        const val KEY_SYNC_RESTORE_DONE = "syncRestoreDone"
+        const val KEY_PREVIOUS_DEVICE_HAD_SYNC = "previousDeviceHadSync"
     }
 }

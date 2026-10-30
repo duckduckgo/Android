@@ -16,8 +16,6 @@
 
 package com.duckduckgo.devicemigration.api
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter
-
 interface DeviceMigration {
     /** True when this install's data arrived through a device-to-device transfer. Fixed for the install's lifetime. */
     suspend fun isMigratedInstall(): Boolean
@@ -27,7 +25,17 @@ interface DeviceMigration {
 
     /** The previous phone's isNewInstall answer on a migrated install, null otherwise. Synchronous: AppBuildConfig.isNewInstall() is. */
     fun sourceDeviceIsNewInstall(): Boolean?
-}
 
-/** Launch params for the screen shown to a migrated install. */
-object DeviceMigrationFlowParams : GlobalActivityStarter.ActivityParams
+    /**
+     * Marks the migration flow as finished, so [isMigrationFlowPending] returns false from now on, in this process and after restarts.
+     * Harmless on an install that is not migrated.
+     */
+    suspend fun markMigrationFlowCompleted()
+
+    /**
+     * True when the previous phone had Sync set up, so the account is being restored silently on this one.
+     * Callers must not offer to create a new Sync account then. False when the install is not migrated.
+     * Cheap and safe to call from any thread. Only meaningful once the Sync restore has run, which happens at app start.
+     */
+    fun previousDeviceHadSync(): Boolean
+}

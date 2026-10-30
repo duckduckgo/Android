@@ -24,6 +24,7 @@ import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.LOCAL_FILE
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.TRANSFERRED_FILE
@@ -122,7 +123,7 @@ class RealDeviceMigrationTest {
     }
 
     @Test
-    fun whenFlowCompletedThenNotPending() = runTest {
+    fun whenFlowCompletedThenNotPendingAndPersistsAcrossInstances() = runTest {
         transferred.edit().putBoolean(KEY_SEEN, true).putBoolean(KEY_IS_NEW_INSTALL, false).commit()
         assertTrue(testee.isMigrationFlowPending())
 
@@ -130,5 +131,34 @@ class RealDeviceMigrationTest {
 
         assertFalse(testee.isMigrationFlowPending())
         assertTrue(testee.isMigratedInstall())
+        val restarted = RealDeviceMigration(
+            markerStore = DeviceMigrationMarkerStore(provider),
+            installTimeComparison = object : InstallTimeComparison {
+                override fun isUnupdatedSinceFirstInstall() = unupdatedSinceFirstInstall
+            },
+            dispatchers = coroutineRule.testDispatcherProvider,
+        )
+        assertFalse(restarted.isMigrationFlowPending())
+        assertTrue(restarted.isMigratedInstall())
+    }
+
+    @Test
+    fun whenNotMigratedThenMarkCompletedIsHarmless() = runTest {
+        testee.markMigrationFlowCompleted()
+
+        assertFalse(testee.isMigrationFlowPending())
+        assertFalse(testee.isMigratedInstall())
+    }
+
+    @Test
+    fun whenNotRecordedThenPreviousDeviceHadSyncFalse() {
+        assertFalse(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenRecordedThenPreviousDeviceHadSyncTrue() {
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true).commit()
+
+        assertTrue(testee.previousDeviceHadSync())
     }
 }

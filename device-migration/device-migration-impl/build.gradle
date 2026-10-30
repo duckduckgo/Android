@@ -36,8 +36,10 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':navigation-api')
     implementation project(path: ':device-migration-api')
+    implementation project(path: ':sync-api')
 
     implementation KotlinX.coroutines.core
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.lifecycle.common
 
     // Testing dependencies
