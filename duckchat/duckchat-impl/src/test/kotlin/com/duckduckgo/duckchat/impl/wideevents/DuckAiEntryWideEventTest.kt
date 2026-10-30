@@ -20,10 +20,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -55,15 +59,31 @@ class DuckAiEntryWideEventTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
 
+    private val inputMode: DuckChatInputModeState = mock()
+    private val pixels: DuckChatPixels = mock()
+    private val tabSessions: DuckAiTabSessionRepository = mock()
     private val client: WideEventClient = mock()
     private val duckChat: DuckChat = mock()
     private val feature = FakeFeatureToggleFactory.create(DuckAiEntryWideEventFeature::class.java)
     private val testee by lazy {
-        DuckAiEntryWideEvent(client, lazy { duckChat }, lazy { feature }, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        DuckAiEntryWideEvent(
+            client,
+            lazy {
+                duckChat
+            },
+            lazy { feature },
+            coroutineRule.testDispatcherProvider,
+            lazy { pixels },
+            lazy { inputMode },
+            tabSessions,
+            coroutineRule.testScope,
+        )
     }
 
     @Before
     fun setup() = runTest {
+        whenever(duckChat.isEnabled()).thenReturn(true)
+        whenever(inputMode.getSelectedInputMode()).thenReturn(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
         feature.self().setRawStoredState(Toggle.State(true))
         whenever(duckChat.isDuckChatUrl(any())).thenAnswer { it.getArgument<android.net.Uri>(0).host == "duck.ai" }
         whenever(client.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(1L), Result.success(2L))
@@ -171,6 +191,93 @@ class DuckAiEntryWideEventTest {
             any(),
         )
         verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "back_or_close"))
+    }
+
+    @Test
+    fun `app open pixel fires once and attributes the landed tab with wide events disabled`() = runTest {
+        feature.self().setRawStoredState(Toggle.State(false))
+        testee.onForeground()
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.APP_OPEN, false, false, true, true)
+        verify(tabSessions).setPendingEntryPointSource("app_open")
+        verify(tabSessions).tryClaimEntryPointSource("tab", "https://duck.ai/")
+        verifyNoInteractions(client)
+    }
+
+    @Test
+    fun `ordinary landing reports one pixel and one wide event`() = runTest {
+        testee.onForeground()
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.APP_OPEN, false, false, true, true)
+        verify(client).flowStart(any(), anyOrNull(), argThat { get("source") == "app_open" }, any(), any(), any())
+        verify(client, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `explicit Duck ai launch and non chat landing do not report app open pixel`() = runTest {
+        testee.onForeground()
+        testee.onLaunchLandingResolved("tab", "https://example.com")
+        testee.onLaunchIntentReceived(opensDuckAi = true)
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        testee.onLaunchIntentHandled()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verifyNoInteractions(pixels)
+    }
+
+    @Test
+    fun `swiping onto Duck ai reports and binds the destination before a prompt`() = runTest {
+        testee.onSelectedTabChanged("old", "https://example.com")
+        testee.onTabSwiped("chat", "https://duck.ai/?chatID=local-only")
+        testee.onSelectedTabChanged("chat", "https://duck.ai/?chatID=local-only")
+        testee.onPromptSubmitted("chat")
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.TAB_SWIPED, false, false, true, true)
+        verify(tabSessions).tryClaimEntryPointSource("chat", "https://duck.ai/?chatID=local-only")
+        verify(
+            client,
+        ).flowStart(any(), anyOrNull(), argThat { get("source") == "tab_swiped" && get("chat_state") == "existing" }, any(), any(), any())
+        verify(client).flowStep(1L, "prompt_submitted", metadata = mapOf("prompt_submitted" to "true"))
+        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "app_backgrounded"))
+    }
+
+    @Test
+    fun `swiping onto web page or same selected tab does not report an entry`() = runTest {
+        testee.onSelectedTabChanged("chat", "https://duck.ai/")
+        testee.onTabSwiped("chat", "https://duck.ai/")
+        testee.onTabSwiped("web", "https://example.com")
+        testee.onTabSwiped("empty", null)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verifyNoInteractions(pixels, client)
+    }
+
+    @Test
+    fun `swiping reports entry pixel while wide event flag is off`() = runTest {
+        feature.self().setRawStoredState(Toggle.State(false))
+        testee.onTabSwiped("chat", "https://duck.ai/")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.TAB_SWIPED, false, false, true, true)
+        verifyNoInteractions(client)
+    }
+
+    @Test
+    fun `app open does not report input screen enabled when Duck ai is disabled`() = runTest {
+        whenever(duckChat.isEnabled()).thenReturn(false)
+        testee.onForeground()
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.APP_OPEN, false, false, false, false)
     }
 
     @Test

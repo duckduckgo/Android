@@ -10,14 +10,7 @@
             "type": "object",
             "required": ["type", "version"],
             "additionalProperties": false,
-            "properties": {
-                "type": {
-                    "const": "android-duckai-entry"
-                },
-                "version": {
-                    "const": "1.0.0"
-                }
-            }
+            "properties": { "type": { "const": "android-duckai-entry" }, "version": { "const": "1.0.0" } }
         },
         "app": {
             "type": "object",
@@ -34,15 +27,8 @@
                     "description": "The version of the app when the event's flow started. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
                     "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
                 },
-                "form_factor": {
-                    "type": "string",
-                    "description": "The form factor of the current device",
-                    "enum": ["phone", "tablet"]
-                },
-                "dev_mode": {
-                    "type": "boolean",
-                    "description": "Whether the app is a debug build"
-                }
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
             }
         },
         "global": {
@@ -50,16 +36,8 @@
             "required": ["platform", "type", "sample_rate"],
             "additionalProperties": false,
             "properties": {
-                "platform": {
-                    "type": "string",
-                    "description": "The platform the app is running on",
-                    "enum": ["Android"]
-                },
-                "type": {
-                    "type": "string",
-                    "description": "The type of software sending the event",
-                    "enum": ["app"]
-                },
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
                 "sample_rate": {
                     "type": "number",
                     "description": "Sample rate for this event, between 0 and 1",
@@ -77,11 +55,7 @@
             "required": ["name", "status", "data"],
             "additionalProperties": false,
             "properties": {
-                "name": {
-                    "type": "string",
-                    "description": "The feature name for this event",
-                    "enum": ["duckai_entry"]
-                },
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["duckai_entry"] },
                 "status": {
                     "type": "string",
                     "description": "The terminal status of the flow",
@@ -131,6 +105,7 @@
                                         "recent_chat_tab_switcher",
                                         "recent_chat_contextual",
                                         "chat_suggestion_input",
+                                        "tab_swiped",
                                         "app_open"
                                     ]
                                 },

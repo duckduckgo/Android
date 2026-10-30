@@ -1667,6 +1667,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             val tabId = tabPagerAdapter.getTabIdAtPosition(newPosition)
             if (tabId != null) {
+                val tab = tabManager.getTabById(tabId)
+                duckAiEntryWideEvent.value.onTabSwiped(tabId, tab?.url)
                 tabManager.switchToTab(tabId)
             }
         }

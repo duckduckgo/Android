@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -29,7 +30,10 @@ import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.toChatIdOrNull
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.toPixelValue
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -48,6 +52,9 @@ class DuckAiEntryWideEvent @Inject constructor(
     private val duckChat: Lazy<DuckChat>,
     private val feature: Lazy<DuckAiEntryWideEventFeature>,
     private val dispatchers: DispatcherProvider,
+    private val pixels: Lazy<DuckChatPixels>,
+    private val inputMode: Lazy<DuckChatInputModeState>,
+    private val tabSessions: DuckAiTabSessionRepository,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
 ) : DuckAiSessionCallback, BrowserLifecycleObserver {
 
@@ -112,7 +119,9 @@ class DuckAiEntryWideEvent @Inject constructor(
         if (!foreground || launchIntentPending || launchOpensDuckAi || explicitEntryReported) return
         val landing = pendingLanding ?: return
         pendingLanding = null
-        start("app_open", false, Surface.DUCK_AI_TAB, landing.tabId, landing.url)
+        explicitEntryReported = true
+        reportImplicitEntry(DuckChatEntryPoint.APP_OPEN, landing.tabId, landing.url)
+        start(DuckChatEntryPoint.APP_OPEN.toPixelValue(), false, Surface.DUCK_AI_TAB, landing.tabId, landing.url)
     }
 
     override fun onDuckAiPageVisible(tabId: String, url: String) = mutate {
@@ -150,6 +159,29 @@ class DuckAiEntryWideEvent @Inject constructor(
             DuckAiSessionExitTrigger.NEW_TAB_OPENED -> ExitTrigger.NEW_TAB_OPENED
             DuckAiSessionExitTrigger.FIRE_TAB_OPENED -> ExitTrigger.FIRE_TAB_OPENED
             DuckAiSessionExitTrigger.OTHER_NAVIGATION -> ExitTrigger.OTHER_NAVIGATION
+        }
+    }
+
+    fun onTabSwiped(tabId: String, url: String?) = mutate {
+        if (tabId == selectedTabId || !isDuckAi(url)) return@mutate
+        explicitEntryReported = true
+        pendingLanding = null
+        reportImplicitEntry(DuckChatEntryPoint.TAB_SWIPED, tabId, url)
+        start(DuckChatEntryPoint.TAB_SWIPED.toPixelValue(), false, Surface.DUCK_AI_TAB, tabId, url)
+    }
+
+    private suspend fun reportImplicitEntry(entryPoint: DuckChatEntryPoint, tabId: String, url: String?) {
+        withContext(dispatchers.io()) {
+            tabSessions.setPendingEntryPointSource(entryPoint.toPixelValue())
+            tabSessions.tryClaimEntryPointSource(tabId, url)
+            val duckAiEnabled = duckChat.value.isEnabled()
+            pixels.value.sendDuckChatEntryPixel(
+                entryPoint = entryPoint,
+                opensNewTab = false,
+                hasPrompt = false,
+                duckAiEnabled = duckAiEnabled,
+                inputScreenEnabled = duckAiEnabled && inputMode.value.getSelectedInputMode() == NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
+            )
         }
     }
 
@@ -198,6 +230,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         excludedTabId: String? = null,
     ) {
         finish("new_entry")
+        if (!withContext(dispatchers.io()) { feature.value.self().isEnabled() }) return
         val flowId = wideEventClient.flowStart(
             name = "duckai_entry",
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false, flowStatus = FlowStatus.Unknown),
@@ -242,7 +275,6 @@ class DuckAiEntryWideEvent @Inject constructor(
                 if (!withContext(dispatchers.io()) { feature.value.self().isEnabled() }) {
                     activeEntry?.let { wideEventClient.flowAbort(it.flowId) }
                     activeEntry = null
-                    return@launch
                 }
                 block()
             }

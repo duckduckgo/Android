@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.api
 
 /** The user-visible surface that initiated an entry into Duck.ai. */
 enum class DuckChatEntryPoint {
+    APP_OPEN,
+    TAB_SWIPED,
     ADDRESS_BAR_PROMPT,
     ADDRESS_BAR_ICON,
     ADDRESS_BAR_SHORTCUT_CHIP,
