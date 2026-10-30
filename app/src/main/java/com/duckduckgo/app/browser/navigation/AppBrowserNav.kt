@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.NativeInputLaunchAction
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -55,7 +56,8 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         context: Context,
         hasSessionActive: Boolean,
         duckChatUrl: String,
-        forceImageGeneration: Boolean,
+        launchAction: NativeInputLaunchAction?,
+        autoFocusInput: Boolean,
         forceLaunchContextual: Boolean,
         textSelection: String?,
     ): Intent {
@@ -67,7 +69,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             duckChatContextual = forceLaunchContextual,
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
-            duckChatForceImageGeneration = forceImageGeneration,
+            duckChatForceImageGeneration = launchAction == NativeInputLaunchAction.IMAGE_GENERATION,
             duckChatTextSelection = textSelection,
         )
     }
