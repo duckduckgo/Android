@@ -19,6 +19,8 @@ package com.duckduckgo.devicemigration.impl
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.statistics.AtbInitializerListener
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_FLOW_PENDING
@@ -56,12 +58,14 @@ private data class Detection(val migrated: Boolean, val sourceIsNewInstall: Bool
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, binding = binding<DeviceMigration>())
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
+@ContributesIntoSet(AppScope::class, binding = binding<AtbInitializerListener>())
 class RealDeviceMigration @Inject constructor(
     private val markerStore: DeviceMigrationMarkerStore,
     private val installTimeComparison: InstallTimeComparison,
     private val deviceMigrationFeature: DeviceMigrationFeature,
+    private val statisticsDataStore: StatisticsDataStore,
     private val dispatchers: DispatcherProvider,
-) : DeviceMigration, MainProcessLifecycleObserver {
+) : DeviceMigration, MainProcessLifecycleObserver, AtbInitializerListener {
 
     // Detection must run once per process, before anything overwrites the transferred marker.
     private val detection: Detection by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { detect() }
@@ -96,6 +100,18 @@ class RealDeviceMigration @Inject constructor(
             .commit()
     }
 
+    // Detection treats an ATB on a fresh package as transferred data, so it must run before this install's first ATB is saved.
+    override suspend fun beforeAtbInit() {
+        detection
+    }
+
+    override fun beforeAtbInitTimeoutMillis(): Long = ATB_INIT_TIMEOUT_MS
+
+    /**
+     * An old phone that never opened a version writing the transferred marker still hands over its data. Until this install's
+     * first detection, an ATB on a package never updated since install can only have come from that transfer: cloud backup is
+     * excluded, and the first ATB of this install is saved only after [beforeAtbInit] has run.
+     */
     private fun detect(): Detection {
         val local = markerStore.local
         if (local.getBoolean(KEY_LAUNCHED, false)) {
@@ -105,18 +121,29 @@ class RealDeviceMigration @Inject constructor(
         }
 
         val transferred = markerStore.transferred
-        if (!transferred.getBoolean(KEY_SEEN, false)) {
-            local.edit().putBoolean(KEY_LAUNCHED, true).commit()
-            return Detection(migrated = false, sourceIsNewInstall = null)
+        if (transferred.getBoolean(KEY_SEEN, false)) {
+            return recordMigrated(source = transferred.getBoolean(KEY_IS_NEW_INSTALL, true))
         }
 
-        val source = transferred.getBoolean(KEY_IS_NEW_INSTALL, true)
-        local.edit()
+        if (installTimeComparison.isUnupdatedSinceFirstInstall() && statisticsDataStore.hasInstallationStatistics) {
+            return recordMigrated(source = false)
+        }
+
+        local.edit().putBoolean(KEY_LAUNCHED, true).commit()
+        return Detection(migrated = false, sourceIsNewInstall = null)
+    }
+
+    private fun recordMigrated(source: Boolean): Detection {
+        markerStore.local.edit()
             .putBoolean(KEY_MIGRATED, true)
             .putBoolean(KEY_FLOW_PENDING, true)
             .putBoolean(KEY_SOURCE_IS_NEW_INSTALL, source)
             .putBoolean(KEY_LAUNCHED, true)
             .commit()
         return Detection(migrated = true, sourceIsNewInstall = source)
+    }
+
+    private companion object {
+        const val ATB_INIT_TIMEOUT_MS = 1_000L
     }
 }

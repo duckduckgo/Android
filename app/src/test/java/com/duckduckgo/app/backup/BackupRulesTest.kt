@@ -78,6 +78,15 @@ class BackupRulesTest {
     }
 
     @Test
+    fun atbStoreIsTransferred() {
+        // Device migration detection falls back to a transferred ATB when the old phone never wrote the migration marker.
+        val atbStore = "sharedpref" to "com.duckduckgo.app.statistics.xml"
+
+        assertTrue(atbStore !in modernRules.section("device-transfer").rules("exclude"))
+        assertTrue(atbStore !in legacyRules.documentElement.rules("exclude"))
+    }
+
+    @Test
     fun encryptedStoresAreExcluded() {
         val excludes = modernRules.section("device-transfer").rules("exclude").toSet()
 

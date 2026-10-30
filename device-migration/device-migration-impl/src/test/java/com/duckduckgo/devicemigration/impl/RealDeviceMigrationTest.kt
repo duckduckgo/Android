@@ -18,6 +18,7 @@ package com.duckduckgo.devicemigration.impl
 
 import android.content.SharedPreferences
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
@@ -37,6 +38,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 
 class RealDeviceMigrationTest {
@@ -51,20 +53,25 @@ class RealDeviceMigrationTest {
     }
     private var unupdatedSinceFirstInstall = true
     private val feature = FakeFeatureToggleFactory.create(DeviceMigrationFeature::class.java)
+    private var hasAtb = false
+    private val statisticsDataStore: StatisticsDataStore = mock {
+        on { hasInstallationStatistics } doAnswer { hasAtb }
+    }
 
     private val transferred get() = provider.getSharedPreferences(TRANSFERRED_FILE)
     private val local get() = provider.getSharedPreferences(LOCAL_FILE)
 
-    private val testee by lazy {
-        RealDeviceMigration(
-            markerStore = DeviceMigrationMarkerStore(provider),
-            installTimeComparison = object : InstallTimeComparison {
-                override fun isUnupdatedSinceFirstInstall() = unupdatedSinceFirstInstall
-            },
-            deviceMigrationFeature = feature,
-            dispatchers = coroutineRule.testDispatcherProvider,
-        )
-    }
+    private val testee by lazy { newInstance() }
+
+    private fun newInstance() = RealDeviceMigration(
+        markerStore = DeviceMigrationMarkerStore(provider),
+        installTimeComparison = object : InstallTimeComparison {
+            override fun isUnupdatedSinceFirstInstall() = unupdatedSinceFirstInstall
+        },
+        deviceMigrationFeature = feature,
+        statisticsDataStore = statisticsDataStore,
+        dispatchers = coroutineRule.testDispatcherProvider,
+    )
 
     private fun onCreate() = testee.onCreate(mock<LifecycleOwner>())
 
@@ -141,14 +148,7 @@ class RealDeviceMigrationTest {
 
         assertFalse(testee.isMigrationFlowPending())
         assertTrue(testee.isMigratedInstall())
-        val restarted = RealDeviceMigration(
-            markerStore = DeviceMigrationMarkerStore(provider),
-            installTimeComparison = object : InstallTimeComparison {
-                override fun isUnupdatedSinceFirstInstall() = unupdatedSinceFirstInstall
-            },
-            deviceMigrationFeature = feature,
-            dispatchers = coroutineRule.testDispatcherProvider,
-        )
+        val restarted = newInstance()
         assertFalse(restarted.isMigrationFlowPending())
         assertTrue(restarted.isMigratedInstall())
     }
@@ -196,5 +196,51 @@ class RealDeviceMigrationTest {
         assertFalse(testee.isMigrationExperienceEnabled())
         assertTrue(testee.isMigratedInstall())
         assertTrue(testee.isMigrationFlowPending())
+    }
+
+    @Test
+    fun whenFreshInstallWithoutMarkersOrAtbThenNotMigrated() = runTest {
+        assertFalse(testee.isMigratedInstall())
+        assertNull(testee.sourceDeviceIsNewInstall())
+    }
+
+    @Test
+    fun whenFreshInstallWithoutMarkersButWithAtbThenMigratedFromEstablishedPhone() = runTest {
+        hasAtb = true
+
+        assertTrue(testee.isMigratedInstall())
+        assertTrue(testee.isMigrationFlowPending())
+        assertEquals(false, testee.sourceDeviceIsNewInstall())
+    }
+
+    @Test
+    fun whenAtbFallbackDetectedThenStillMigratedAfterRestart() = runTest {
+        hasAtb = true
+        assertTrue(testee.isMigratedInstall())
+        onCreate()
+
+        val restarted = newInstance()
+
+        assertTrue(restarted.isMigratedInstall())
+        assertEquals(false, restarted.sourceDeviceIsNewInstall())
+        assertFalse(transferred.getBoolean(KEY_IS_NEW_INSTALL, true))
+    }
+
+    @Test
+    fun whenUpdatedInstallWithoutMarkersButWithAtbThenNotMigrated() = runTest {
+        unupdatedSinceFirstInstall = false
+        hasAtb = true
+
+        assertFalse(testee.isMigratedInstall())
+        assertNull(testee.sourceDeviceIsNewInstall())
+    }
+
+    @Test
+    fun whenAtbWrittenAfterBeforeAtbInitThenFreshInstallNotMigrated() = runTest {
+        testee.beforeAtbInit()
+        hasAtb = true
+
+        assertFalse(testee.isMigratedInstall())
+        assertFalse(newInstance().isMigratedInstall())
     }
 }
