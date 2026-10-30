@@ -99,19 +99,24 @@ class DuckAiWidgetLayoutTest {
 
     private fun current(name: String) = activity.getColor(activity.resources.getIdentifier(name, "color", activity.packageName))
 
-    private fun assertFallbackColors(container: String) {
+    private fun assertFallbackColors(
+        container: String,
+        divider: String,
+    ) {
         assertEquals(current("searchWidgetBackgroundColor"), widgetColor("Background"))
         assertEquals(current("searchWidgetSearchBarBackgroundColor"), widgetColor("SearchBar"))
         assertEquals(current(container), widgetColor("Container"))
+        assertEquals(current(divider), widgetColor("Divider"))
         assertEquals(current("searchWidgetSearchBarHintColor"), widgetColor("Hint"))
+        assertEquals(current("searchWidgetSearchBarTrailingIconColor"), widgetColor("Text"))
         assertEquals(current("searchWidgetSearchBarTrailingIconColor"), widgetColor("OnContainer"))
     }
 
     @Test
     @Config(sdk = [30])
-    fun whenApi30ThenColorsMatchCurrentLightColors() = assertFallbackColors(container = "black9")
+    fun whenApi30ThenColorsMatchCurrentLightColors() = assertFallbackColors(container = "black9", divider = "black12")
 
     @Test
     @Config(sdk = [30], qualifiers = "night")
-    fun whenApi30NightThenColorsMatchCurrentDarkColors() = assertFallbackColors(container = "white9")
+    fun whenApi30NightThenColorsMatchCurrentDarkColors() = assertFallbackColors(container = "white9", divider = "white12")
 }
