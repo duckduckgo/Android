@@ -10259,6 +10259,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -10277,6 +10278,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
             )
             // Not the single-slot command LiveData: a DuckChat reply can be held open for minutes
             // (the edit screen) while the fragment is stopped, so it goes on its own buffered channel.
@@ -10285,6 +10287,33 @@ class BrowserTabViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
             assertCommandNotIssued<Command.SendResponseToJs>()
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageForDuckChatThenPassTabUrlAsPageUrl() =
+        runTest {
+            val serpUrl = "https://duckduckgo.com/?q=test"
+            loadUrl(serpUrl)
+
+            testee.processJsCallbackMessage(
+                DUCK_CHAT_FEATURE_NAME,
+                "openAIChat",
+                "id",
+                data = null,
+                false,
+            ) { "someUrl" }
+
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("openAIChat"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+                any(),
+                any(),
+                eq(serpUrl),
+            )
         }
 
     @Test
@@ -10301,6 +10330,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -10319,6 +10349,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
             )
             testee.duckChatJsResponseFlow.test {
                 expectNoEvents()
@@ -10928,6 +10959,7 @@ class BrowserTabViewModelTest {
                     any(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
