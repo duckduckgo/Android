@@ -12,7 +12,8 @@ Refer to [API Quality Rules and Scores](https://app.asana.com/1/137249556945/pro
 | `score.sh` + `Scorer.java` | Scores the checked-out code | Manual or every workflow            |
 | `compare.py` | Diffs two scorer runs by declaration: new, resolved and moved findings, score changes, and whether it regressed | Every workflow except the scorecard |
 | `asana_sync.py` | Posts the weekly report to Asana and files one Triage task per new finding group | Weekly workflow                     |
-| `asana_task.py` | Creates the one Asana task of a run, or updates it on a re-run | Scorecard and compare workflows     |
+| `asana_task.py` | Creates the one Asana task of a run, or updates it on a re-run | Compare workflow                    |
+| `rules.json` | Each rule's name, why it matters and how to fix it: the single source for the texts in reports, PR comments and Asana tasks | `compare.py`, `asana_sync.py`       |
 
 ## Score your checkout
 
@@ -69,6 +70,7 @@ names the missing ones. Posting uses the existing `ASANA_ACCESS_TOKEN` secret.
 
 ## Definitions
 
+- **Source:** the `.kt` files of every non-test source set of a module: `src/main` and any flavor folder such as `src/play`.
 - **Public:** no `private`, `internal` or `protected` modifier, inside a public parent. `override` members are left out, because
   the contract and KDoc belong to the declaration they override.
 - **Declaration (M6):** each public type (top-level or nested, including type aliases; not companion objects or enum entries),
@@ -81,12 +83,18 @@ names the missing ones. Posting uses the existing `ASANA_ACCESS_TOKEN` secret.
   nothing to document for a check scores 100% on it.
 - **Constructors:** a `val`/`var` parameter is a property, public even behind a private constructor. Other parameters of a
   public constructor are checked by M2, M7 and M8 as `Type.constructor(...)`; enum and sealed class constructors aren't.
+- **M1:** a type name ending in `Repository`, `Dao`, `Entity`, `ViewModel` or `Impl`, or starting with `Real` followed by an
+  uppercase letter (`RealFoo`, not `Realm`).
 - **M2:** `Toggle` anywhere in a signature or supertype, including type arguments such as `List<Toggle>`. A qualified name such
   as `Toggle.State` doesn't count.
 - **M5:** a function whose declared return type is exactly `Intent?`, `Fragment?`, `View?` or `Bundle?`.
 - **M7:** `Any`, `Pair` or `Triple` anywhere in a signature, including type arguments, except `equals(other: Any?)` and
   `readResolve()`.
-- **M8:** a public `var` whose setter is also public, or a `Mutable*` type anywhere in a signature.
+- **M8:** a public `var` whose setter is also public, or a writable type anywhere in a signature: `Mutable*`, the Java
+  mutable collections (`ArrayList`, `HashMap`, `HashSet`, `LinkedHashMap`, `LinkedHashSet`, `LinkedList`, `ConcurrentHashMap`,
+  `CopyOnWriteArrayList`), the `Atomic*` types, and the coroutines `Channel` and `SendChannel`. The last two only count
+  when the file imports them from `kotlinx.coroutines.channels` or writes their full name, since this repo also has its own
+  `Channel` class. Arrays aren't checked: they're the usual type for binary data.
 
 Files are parsed with the Kotlin compiler's own parser, so the same code always gives the same score. There is no symbol
 resolution: types are matched by simple name, and a declaration whose type is inferred isn't checked by M2, M5, M7 or M8.
