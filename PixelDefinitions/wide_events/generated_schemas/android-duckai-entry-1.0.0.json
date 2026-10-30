@@ -166,12 +166,20 @@
                                 },
                                 "exit_trigger": {
                                     "type": "string",
-                                    "description": "Action that left Duck.ai. Present only when status_reason is left_duckai",
-                                    "enum": ["back_or_close", "tab_switched", "new_tab_opened", "fire_tab_opened", "other_navigation"]
+                                    "description": "Action that left Duck.ai. search_started is a submitted web search from the Duck.ai tab; chat_deleted is deletion of the active chat from native history. Present only when status_reason is left_duckai",
+                                    "enum": [
+                                        "back_or_close",
+                                        "tab_switched",
+                                        "new_tab_opened",
+                                        "fire_tab_opened",
+                                        "search_started",
+                                        "other_navigation",
+                                        "chat_deleted"
+                                    ]
                                 },
                                 "status_reason": {
                                     "type": "string",
-                                    "description": "Reason the entry ended",
+                                    "description": "Reason the entry ended: left_duckai and new_entry are SUCCESS regardless of prompt submission; app_backgrounded is CANCELLED; app_terminated is UNKNOWN after process-kill cleanup",
                                     "enum": ["left_duckai", "new_entry", "app_backgrounded", "app_terminated"]
                                 },
                                 "step.entry_resolved": {

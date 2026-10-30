@@ -97,7 +97,7 @@ class DuckAiEntryWideEvent @Inject constructor(
     fun onContextualSheetClosed(tabId: String) = mutate {
         val entry = activeEntry ?: return@mutate
         if (entry.surface == Surface.CONTEXTUAL_SHEET && entry.tabId == tabId) {
-            finish("left_duckai", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+            finish("left_duckai", ExitTrigger.BACK_OR_CLOSE)
         }
     }
 
@@ -132,9 +132,9 @@ class DuckAiEntryWideEvent @Inject constructor(
             return@mutate
         }
         if (entry.tabId != tabId) {
-            finish("left_duckai", entry.exitTrigger ?: DuckAiSessionExitTrigger.TAB_SWITCHED)
+            finish("left_duckai", entry.exitTrigger ?: ExitTrigger.TAB_SWITCHED)
         } else if (entry.surface == Surface.DUCK_AI_TAB && !isDuckAi(url)) {
-            finish("left_duckai", entry.exitTrigger ?: DuckAiSessionExitTrigger.OTHER_NAVIGATION)
+            finish("left_duckai", entry.exitTrigger ?: ExitTrigger.OTHER_NAVIGATION)
         } else if (entry.surface == Surface.DUCK_AI_TAB && !entry.resolved) {
             resolveEntry(entry, entry.tabId ?: return@mutate, url)
         } else if (entry.url != url) {
@@ -144,7 +144,24 @@ class DuckAiEntryWideEvent @Inject constructor(
     }
 
     override fun onExitIntent(tabId: String, trigger: DuckAiSessionExitTrigger) = mutate {
-        activeEntry?.takeIf { it.tabId == tabId && it.exitTrigger == null }?.exitTrigger = trigger
+        activeEntry?.takeIf { it.tabId == tabId && it.exitTrigger == null }?.exitTrigger = when (trigger) {
+            DuckAiSessionExitTrigger.BACK_OR_CLOSE -> ExitTrigger.BACK_OR_CLOSE
+            DuckAiSessionExitTrigger.TAB_SWITCHED -> ExitTrigger.TAB_SWITCHED
+            DuckAiSessionExitTrigger.NEW_TAB_OPENED -> ExitTrigger.NEW_TAB_OPENED
+            DuckAiSessionExitTrigger.FIRE_TAB_OPENED -> ExitTrigger.FIRE_TAB_OPENED
+            DuckAiSessionExitTrigger.OTHER_NAVIGATION -> ExitTrigger.OTHER_NAVIGATION
+        }
+    }
+
+    fun onSearchStarted(tabId: String) = mutate {
+        activeEntry?.takeIf { it.tabId == tabId && it.surface == Surface.DUCK_AI_TAB && it.exitTrigger == null }
+            ?.exitTrigger = ExitTrigger.SEARCH_STARTED
+    }
+
+    fun onChatsDeleted(chatIds: Set<String>) = mutate {
+        val entry = activeEntry ?: return@mutate
+        val chatId = entry.url?.toUri()?.toChatIdOrNull(duckChat.value) ?: return@mutate
+        if (chatId in chatIds) finish("left_duckai", ExitTrigger.CHAT_DELETED)
     }
 
     override fun onPromptSubmitted(tabId: String) = mutate {
@@ -165,7 +182,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         explicitEntryReported = false
         pendingLanding = null
         val trigger = activeEntry?.exitTrigger
-        if (trigger == DuckAiSessionExitTrigger.BACK_OR_CLOSE) {
+        if (trigger == ExitTrigger.BACK_OR_CLOSE) {
             finish("left_duckai", trigger)
         } else {
             finish("app_backgrounded")
@@ -205,13 +222,13 @@ class DuckAiEntryWideEvent @Inject constructor(
         wideEventClient.flowStep(entry.flowId, "entry_resolved", metadata = mapOf("chat_state" to chatState(url)))
     }
 
-    private suspend fun finish(reason: String, trigger: DuckAiSessionExitTrigger? = null) {
+    private suspend fun finish(reason: String, trigger: ExitTrigger? = null) {
         val entry = activeEntry ?: return
         activeEntry = null
         wideEventClient.intervalEnd(entry.flowId, DURATION)
         wideEventClient.flowFinish(
             wideEventId = entry.flowId,
-            status = if (entry.promptSubmitted) FlowStatus.Success else FlowStatus.Cancelled,
+            status = if (reason == "app_backgrounded") FlowStatus.Cancelled else FlowStatus.Success,
             metadata = buildMap {
                 put("status_reason", reason)
                 trigger?.let { put("exit_trigger", it.name.lowercase()) }
@@ -237,6 +254,16 @@ class DuckAiEntryWideEvent @Inject constructor(
     private fun chatState(url: String?): String =
         if (url?.toUri()?.toChatIdOrNull(duckChat.value).isNullOrBlank()) "new" else "existing"
 
+    private enum class ExitTrigger {
+        BACK_OR_CLOSE,
+        TAB_SWITCHED,
+        NEW_TAB_OPENED,
+        FIRE_TAB_OPENED,
+        SEARCH_STARTED,
+        OTHER_NAVIGATION,
+        CHAT_DELETED,
+    }
+
     private enum class Surface(val pixelValue: String) {
         DUCK_AI_TAB("duck_ai_tab"),
         CONTEXTUAL_SHEET("contextual_sheet"),
@@ -252,7 +279,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         val excludedTabId: String?,
         var resolved: Boolean = tabId != null,
         var promptSubmitted: Boolean = false,
-        var exitTrigger: DuckAiSessionExitTrigger? = null,
+        var exitTrigger: ExitTrigger? = null,
     )
 
     private companion object {

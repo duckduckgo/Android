@@ -135,7 +135,7 @@ class DuckAiEntryWideEventTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         inOrder(client) {
-            verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "new_entry"))
+            verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "new_entry"))
             verify(client).flowStart(eq("duckai_entry"), anyOrNull(), argThat { get("source") == "serp" }, any(), any(), any())
         }
     }
@@ -283,7 +283,7 @@ class DuckAiEntryWideEventTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(client).flowStep(1L, "entry_resolved", metadata = mapOf("chat_state" to "new"))
-        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "app_backgrounded"))
+        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "app_backgrounded"))
     }
 
     @Test
@@ -362,7 +362,7 @@ class DuckAiEntryWideEventTest {
         verify(client, never()).flowFinish(any(), any(), any())
         testee.onSelectedTabChanged("tab", "https://example.com")
         coroutineRule.testScope.advanceUntilIdle()
-        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "left_duckai", "exit_trigger" to "other_navigation"))
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "other_navigation"))
     }
 
     @Test
@@ -373,17 +373,64 @@ class DuckAiEntryWideEventTest {
         testee.onSelectedTabChanged("tab", "https://duck.ai/")
         testee.onSelectedTabChanged("fire", null)
         coroutineRule.testScope.advanceUntilIdle()
-        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "left_duckai", "exit_trigger" to "fire_tab_opened"))
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "fire_tab_opened"))
     }
 
     @Test
-    fun `prompt before page visibility is counted and background succeeds`() = runTest {
+    fun `prompt before page visibility is counted and background cancels`() = runTest {
         testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, true)
         testee.onPromptSubmitted("tab")
         testee.onClose()
         coroutineRule.testScope.advanceUntilIdle()
         verify(client).intervalEnd(1L, "time_to_first_prompt_ms_bucketed")
-        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "app_backgrounded"))
+        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "app_backgrounded"))
+    }
+
+    @Test
+    fun `search intent finishes only after active tab navigates away`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+        testee.onSearchStarted("tab")
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, never()).flowFinish(any(), any(), any())
+
+        testee.onSelectedTabChanged("tab", "https://duckduckgo.com/?q=example")
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "search_started"))
+    }
+
+    @Test
+    fun `search in another tab cannot set the active entry exit trigger`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+        testee.onSearchStarted("other")
+        testee.onSelectedTabChanged("tab", "https://example.com")
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "other_navigation"))
+    }
+
+    @Test
+    fun `deleting the active chat ends the entry once without exposing its identifier`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/?chatID=local-only")
+        testee.onChatsDeleted(setOf("local-only"))
+        testee.onSelectedTabChanged("tab", "https://duck.ai/")
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "chat_deleted"))
+        verify(client, times(1)).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `deleting other chats does not end the active entry`() = runTest {
+        testee.onContextualSheetOpened("tab", false, "https://duck.ai/?chatID=local-only")
+        testee.onChatsDeleted(setOf("other"))
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, never()).flowFinish(any(), any(), any())
+
+        testee.onChatsDeleted(setOf("other", "local-only"))
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "chat_deleted"))
     }
 
     @Test
