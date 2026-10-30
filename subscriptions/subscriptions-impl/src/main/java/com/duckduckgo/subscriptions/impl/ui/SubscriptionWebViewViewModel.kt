@@ -27,7 +27,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.pir.api.PirFeature
-import com.duckduckgo.pir.api.dashboard.PirFeatureState.ENABLED
+import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.Experiment
@@ -306,7 +306,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 NETP, LEGACY_FE_NETP -> networkProtectionAccessState.getScreenForCurrentState()?.let { GoToNetP(it) }
                 ITR, LEGACY_FE_ITR, ROW_ITR -> GoToITR
                 PIR, LEGACY_FE_PIR -> {
-                    if (pirFeature.getPirFeatureState() == ENABLED) {
+                    if (pirFeature.getPirFeatureState() is PirFeatureState.Enabled) {
                         GoToPIRDashboard
                     } else {
                         GoToPIR

@@ -106,7 +106,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
         whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
         whenever(onboardingStore.isStepCompleted("itr")).thenReturn(true)
         whenever(onboardingStore.isStepCompleted("duck_ai")).thenReturn(true)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         val testee = createViewModel(
             plugins = listOf(fakePlugin("vpn"), fakePlugin("itr"), fakePlugin("duck_ai")),
             entitlements = listOf(Product.PIR),
@@ -125,7 +125,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenPirCompletedThenRowCompletedAndNotClickable() = runTest {
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         whenever(onboardingStore.isStepCompleted(PIR_ROW_ID)).thenReturn(true)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
 
@@ -139,7 +139,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenHandoffThenPirRowShownButNotClickable() = runTest {
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         val testee = createViewModel(
             plugins = listOf(fakePlugin("vpn")),
             entitlements = listOf(Product.PIR),
@@ -156,7 +156,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenPirStepFinishedEventReceivedThenPirRowBecomesCompleted() = runTest {
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
 
         testee.viewState().test {
@@ -182,7 +182,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenPirEntitledButNotEligibleThenNoPirRow() = runTest {
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Disabled)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
 
         testee.viewState().test {
@@ -193,7 +193,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenPirEligibleButNotEntitledThenNoPirRow() = runTest {
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn")))
 
         testee.viewState().test {

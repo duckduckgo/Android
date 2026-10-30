@@ -29,7 +29,10 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesRemoteFeature(
@@ -92,14 +95,23 @@ class PirRemoteFeatureImpl @Inject constructor(
     override suspend fun getPirFeatureState(): PirFeatureState = withContext(dispatcherProvider.io()) {
         val isEnabled = pirRemoteFeatures.pirBeta().isEnabled()
         if (!isEnabled) {
-            return@withContext PirFeatureState.DISABLED
+            return@withContext PirFeatureState.Disabled
         }
 
         val isRepositoryAvailable = pirRepository.isRepositoryAvailable()
         if (!isRepositoryAvailable) {
-            return@withContext PirFeatureState.NOT_AVAILABLE
+            return@withContext PirFeatureState.NotAvailable
         }
 
-        return@withContext PirFeatureState.ENABLED
+        val hasUserProfile = try {
+            pirRepository.hasValidUserProfileQueries()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(ERROR) { "PIR: Failed to read user profile: $e" }
+            return@withContext PirFeatureState.NotAvailable
+        }
+
+        return@withContext PirFeatureState.Enabled(hasUserProfile = hasUserProfile)
     }
 }
