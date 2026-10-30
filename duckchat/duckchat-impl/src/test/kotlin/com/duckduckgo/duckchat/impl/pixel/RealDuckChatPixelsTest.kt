@@ -529,6 +529,17 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when reportChatHistoryScreenShown from widget then fires count and daily with widget source`() = runTest {
+        testee.reportChatHistoryScreenShown(DuckChatHistorySource.WIDGET)
+
+        advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.ENTRY_SOURCE to "widget")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
     fun `when reportChatHistoryScreenShownFromDeeplink then fires count and daily with deeplink source`() = runTest {
         testee.reportChatHistoryScreenShownFromDeeplink()
 
