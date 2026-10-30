@@ -276,6 +276,9 @@ class BrowserWebViewClient @Inject constructor(
             pageLoadTimeoutWatchdog.onRedirect(url.toString())
         }
         val overridden = shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        if (request.isForMainFrame) {
+            webViewClientListener?.onMainFrameNavigationDecided(loadsInThisTab = !overridden)
+        }
         if (isMainFrameRedirect && overridden) {
             pageLoadTimeoutWatchdog.onNavigationCancelled(url.toString())
         }
@@ -641,6 +644,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
+        webViewClientListener?.onMainFrameNavigationCommitted()
         if (url != null && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) pageLoadTimeoutWatchdog.onCommitted(url)
 
         var wideEventNavigation: Pair<String, Long>? = null
@@ -800,6 +804,9 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
         url?.let { pageLoadTimeoutWatchdog.onFinished(it) }
+
+        // WebView reports the outgoing page's progress for a never-committing (204) navigation, so this can't wait for the progress check below.
+        if (url != null && url != ABOUT_BLANK && url != webView.url) webViewClientListener?.onNavigationFinishedWithoutCommit()
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
