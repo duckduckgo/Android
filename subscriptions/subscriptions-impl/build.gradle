@@ -64,6 +64,7 @@ dependencies {
     implementation project(':pir-api')
     implementation project(':attributed-metrics-api')
     implementation project(':privacy-dashboard-api')
+    implementation project(':device-migration-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core

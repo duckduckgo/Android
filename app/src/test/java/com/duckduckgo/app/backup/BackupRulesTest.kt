@@ -107,6 +107,7 @@ class BackupRulesTest {
             listOf(
                 "sharedpref" to "com.duckduckgo.devicemigration.local.xml",
                 "sharedpref" to "com.duckduckgo.app.devicemigration.cleanup.xml",
+                "sharedpref" to "com.duckduckgo.subscriptions.devicemigration.xml",
                 "sharedpref" to "com.duckduckgo.app.email.settings.xml",
                 "sharedpref" to "com.duckduckgo.app.email.settings.encryptiontest.xml",
                 "sharedpref" to "com.duckduckgo.sync.store.v1.xml",
