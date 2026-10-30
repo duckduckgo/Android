@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
@@ -417,7 +416,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             id = NewUserOnboardingStepIds.NOTIFICATION_PERMISSION,
             pixelName = pixelName,
             precondition = {
-                appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU &&
+                appBuildConfig.sdkInt >= 33 &&
                     !withContext(dispatchers.io()) { notificationManager.areNotificationsEnabled() } &&
                     !sawMigrationFlow()
             },

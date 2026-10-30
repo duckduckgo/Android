@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -71,7 +70,7 @@ class DeviceMigrationPlanProvider @Inject constructor(
         id = NewUserOnboardingStepIds.MIGRATION_NOTIFICATION_PERMISSION,
         dialog = NewUserOnboardingActivityDialog.NotificationPermission,
         precondition = {
-            appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU &&
+            appBuildConfig.sdkInt >= 33 &&
                 !withContext(dispatchers.io()) { notificationManager.areNotificationsEnabled() }
         },
     ) { event ->

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.backup
 
-import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -65,7 +64,7 @@ class BackupRulesTest {
 
     @Test
     fun localMigrationMarkerIsExcluded() {
-        val marker = "sharedpref" to "${DeviceMigrationMarkerStore.LOCAL_FILE}.xml"
+        val marker = "sharedpref" to "com.duckduckgo.devicemigration.local.xml"
 
         assertTrue(modernRules.section("device-transfer").rules("exclude").contains(marker))
         assertTrue(legacyRules.documentElement.rules("exclude").contains(marker))
