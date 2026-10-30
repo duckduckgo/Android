@@ -27,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -48,7 +49,7 @@ class SyncDevicesAttributeMetricTest {
 
     private val attributedMetricClient: AttributedMetricClient = mock()
     private val attributedMetricConfig: AttributedMetricConfig = mock()
-    private val connectedDevicesObserver: ConnectedDevicesObserver = mock()
+    private val connectedDevicesRepository: ConnectedDevicesRepository = mock()
     private val syncToggle = FakeFeatureToggleFactory.create(FakeSyncMetricsConfigFeature::class.java)
     private val lifecycleOwner: LifecycleOwner = mock()
     private val connectedDevicesFlow = MutableStateFlow(0)
@@ -67,14 +68,15 @@ class SyncDevicesAttributeMetricTest {
                 ),
             ),
         )
-        whenever(connectedDevicesObserver.observeConnectedDevicesCount()).thenReturn(connectedDevicesFlow)
+        whenever(connectedDevicesRepository.latestConnectedDeviceCountFlow()).thenReturn(connectedDevicesFlow)
+        whenever(connectedDevicesRepository.latestConnectedDeviceCount()).thenAnswer { connectedDevicesFlow.value }
 
         testee = SyncDevicesAttributeMetric(
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             attributedMetricClient = attributedMetricClient,
             attributedMetricConfig = attributedMetricConfig,
-            connectedDevicesObserver = connectedDevicesObserver,
+            connectedDevicesRepository = connectedDevicesRepository,
         )
     }
 
