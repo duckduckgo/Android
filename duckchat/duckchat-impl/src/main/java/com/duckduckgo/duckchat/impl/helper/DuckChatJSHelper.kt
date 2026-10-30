@@ -526,7 +526,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
                 put(SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS, supportsHomePageChatSuggestions)
                 put(SUPPORTS_BONUS_OFFER, duckChatFeature.duckAiPromoCampaigns().isEnabled())
-                put(SUPPORTS_PROMO_CARDS, true)
+                put(SUPPORTS_PROMO_CARDS, duckChatFeature.duckAiPromoCards().isEnabled())
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
