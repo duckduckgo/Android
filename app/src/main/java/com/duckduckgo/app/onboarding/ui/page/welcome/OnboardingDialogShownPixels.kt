@@ -63,6 +63,8 @@ class OnboardingDialogShownPixels @Inject constructor(private val pixel: Pixel) 
             NewUserOnboardingActivityDialog.ImportPasswords,
             is NewUserOnboardingActivityDialog.ImportComplete,
             NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
+            NewUserOnboardingActivityDialog.MigrationDefaultBrowser,
+            NewUserOnboardingActivityDialog.MigrationAllSet,
             -> Unit
         }
     }

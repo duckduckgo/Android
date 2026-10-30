@@ -86,4 +86,8 @@ sealed interface NewUserOnboardingActivityDialog {
     data class TogglePosition(val options: List<Option>) : NewUserOnboardingActivityDialog
 
     data class DuckAiState(val options: List<Option>) : NewUserOnboardingActivityDialog
+
+    data object MigrationDefaultBrowser : NewUserOnboardingActivityDialog
+
+    data object MigrationAllSet : NewUserOnboardingActivityDialog
 }

@@ -19,22 +19,29 @@ package com.duckduckgo.app.launch
 import android.content.Intent
 import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
+import com.duckduckgo.app.onboarding.orchestrator.DeviceMigrationPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
+import com.duckduckgo.app.onboarding.orchestrator.PendingOnboardingStarter
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingStep
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
+import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -72,6 +79,27 @@ class LaunchViewModelTest {
             ),
         )
     }
+    private val deviceMigration: DeviceMigration = mock {
+        onBlocking { isMigrationFlowPending() }.thenReturn(false)
+    }
+    private val defaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
+    private val notificationManager: NotificationManagerCompat = mock()
+    private val orchestrator = LinearOnboardingOrchestratorImpl()
+    private val pendingOnboardingStarter by lazy {
+        PendingOnboardingStarter(
+            orchestrator = orchestrator,
+            deviceMigration = deviceMigration,
+            deviceMigrationPlanProvider = DeviceMigrationPlanProvider(
+                defaultBrowserDetector = defaultBrowserDetector,
+                appBuildConfig = appBuildConfig,
+                notificationManager = notificationManager,
+                dispatchers = coroutineRule.testDispatcherProvider,
+            ),
+            userStageStore = userStageStore,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+        )
+    }
     private lateinit var testee: LaunchViewModel
 
     @After
@@ -82,11 +110,10 @@ class LaunchViewModelTest {
     @Test
     fun whenOnboardingShouldShowAndReferrerDataReturnsQuicklyThenCommandIsOnboarding() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -100,11 +127,10 @@ class LaunchViewModelTest {
     @Test
     fun whenOnboardingShouldShowAndReferrerDataReturnsButNotInstantlyThenCommandIsOnboarding() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -118,11 +144,10 @@ class LaunchViewModelTest {
     @Test
     fun whenOnboardingShouldShowAndReferrerDataTimesOutThenCommandIsOnboarding() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -143,11 +168,10 @@ class LaunchViewModelTest {
         )
         whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         testee.command.observeForever(mockCommandObserver)
 
@@ -167,11 +191,10 @@ class LaunchViewModelTest {
         )
         whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         testee.command.observeForever(mockCommandObserver)
 
@@ -193,11 +216,10 @@ class LaunchViewModelTest {
         )
         whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()).thenReturn(inProgress)
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
 
         val exception = runCatching { testee.showOnboardingOrHome() }.exceptionOrNull()
@@ -209,11 +231,10 @@ class LaunchViewModelTest {
     fun whenShowOnboardingOrHomeAndNotNewUserThenCommandIsHome() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         testee.command.observeForever(mockCommandObserver)
 
@@ -226,11 +247,10 @@ class LaunchViewModelTest {
     @Test
     fun whenOnboardingShouldNotShowAndReferrerDataReturnsQuicklyThenCommandIsHome() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -243,11 +263,10 @@ class LaunchViewModelTest {
     @Test
     fun whenOnboardingShouldNotShowAndReferrerDataReturnsButNotInstantlyThenCommandIsHome() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -260,11 +279,10 @@ class LaunchViewModelTest {
     @Test
     fun whenOnboardingShouldNotShowAndReferrerDataTimesOutThenCommandIsHome() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -277,11 +295,10 @@ class LaunchViewModelTest {
     @Test
     fun whenReferrerDataTimesOutThenPixelIsSent() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
 
         testee.start(mock<Intent>())
@@ -293,11 +310,10 @@ class LaunchViewModelTest {
     @Test
     fun whenStartThenSeederIsInvokedWithIntentExtras() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         val intent = intentWithExtras(
             "isMaestro" to "true",
@@ -326,11 +342,10 @@ class LaunchViewModelTest {
     @Test
     fun whenSeederThrowsThenStartStillRoutesToHome() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(testScenarioSeeder.seedIfNeeded(anyOrNull())).thenThrow(RuntimeException("seed failed"))
@@ -345,11 +360,10 @@ class LaunchViewModelTest {
     @Test
     fun whenStartThenSeedingCompletesBeforeNavigationCommandIsEmitted() = runTest {
         testee = LaunchViewModel(
-            userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
-            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+            pendingOnboardingStarter = pendingOnboardingStarter,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -361,6 +375,44 @@ class LaunchViewModelTest {
             verify(testScenarioSeeder).seedIfNeeded(anyOrNull())
             verify(mockCommandObserver).onChanged(any<Home>())
         }
+    }
+
+    @Test
+    fun whenEstablishedUserHasMigrationFlowPendingThenCommandIsOnboarding() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(deviceMigration.isMigrationFlowPending()).thenReturn(true)
+        testee = LaunchViewModel(
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            pendingOnboardingStarter = pendingOnboardingStarter,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.start(mock<Intent>())
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(mockCommandObserver).onChanged(any<Onboarding>())
+        verify(newUserOnboardingPlanBootstrapper, never()).startNewUserOnboardingPlan()
+    }
+
+    @Test
+    fun whenEstablishedUserHasNoMigrationFlowPendingThenCommandIsHome() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(deviceMigration.isMigrationFlowPending()).thenReturn(false)
+        testee = LaunchViewModel(
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            pendingOnboardingStarter = pendingOnboardingStarter,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.start(mock<Intent>())
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(mockCommandObserver).onChanged(any<Home>())
+        verify(newUserOnboardingPlanBootstrapper, never()).startNewUserOnboardingPlan()
     }
 
     private fun stepHostedIn(stepHost: LinearOnboardingHost): LinearOnboardingStep = object : LinearOnboardingStep {

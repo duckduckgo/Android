@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -77,6 +78,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -157,6 +159,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     private val passwordImportExperiment: OnboardingPasswordImportExperimentManager = mock()
+    private val deviceMigration: DeviceMigration = mock()
+    private val notificationManager: NotificationManagerCompat = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
@@ -171,7 +175,10 @@ class NewUserOnboardingPlanProviderTest {
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         // Most flows are exercised without the widget prompt; widget tests opt in by clearing this.
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        whenever(appBuildConfig.sdkInt).thenReturn(33)
+        whenever(notificationManager.areNotificationsEnabled()).thenReturn(false)
         runBlocking {
+            whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
             whenever(syncAutoRestore.canRestore()).thenReturn(false)
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
             whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
@@ -206,8 +213,39 @@ class NewUserOnboardingPlanProviderTest {
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
+            deviceMigration = deviceMigration,
+            notificationManager = notificationManager,
             appCoroutineScope = coroutineRule.testScope,
         )
+    }
+
+    @Test
+    fun `when the install was migrated then the intro and notification steps are not shown again`() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+
+        start()
+
+        assertStep(NewUserOnboardingStepIds.INITIAL)
+    }
+
+    @Test
+    fun `when notifications are already granted then the notification step is skipped`() = runTest {
+        whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+        start()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+
+        assertStep(NewUserOnboardingStepIds.INITIAL)
+    }
+
+    @Test
+    fun `when below Android 13 then the notification step is skipped`() = runTest {
+        whenever(appBuildConfig.sdkInt).thenReturn(32)
+        start()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+
+        assertStep(NewUserOnboardingStepIds.INITIAL)
     }
 
     private suspend fun start(

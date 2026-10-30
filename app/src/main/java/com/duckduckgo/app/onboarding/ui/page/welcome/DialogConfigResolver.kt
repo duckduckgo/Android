@@ -270,6 +270,8 @@ class DialogConfigResolver @Inject constructor(
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
         NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
+        NewUserOnboardingActivityDialog.MigrationDefaultBrowser,
+        NewUserOnboardingActivityDialog.MigrationAllSet,
         -> null // command-only: no card to render
     }
 

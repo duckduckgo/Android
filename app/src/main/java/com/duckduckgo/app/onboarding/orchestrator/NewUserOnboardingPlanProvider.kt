@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
+import android.os.Build
 import androidx.annotation.StringRes
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -64,6 +66,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
@@ -123,6 +126,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
+    private val deviceMigration: DeviceMigration,
+    private val notificationManager: NotificationManagerCompat,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
 
@@ -388,9 +393,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         }
 
+    // A migrated install has just been through the device migration flow, which already showed these.
+    private suspend fun isMigratedInstall(): Boolean = deviceMigration.isMigratedInstall()
+
     private fun introAnimationStep(withDuckAi: Boolean = false) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INTRO_ANIMATION,
         pixelName = null,
+        precondition = { !isMigratedInstall() },
         resolveDialog = {
             NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi)
         },
@@ -407,6 +416,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.NOTIFICATION_PERMISSION,
             pixelName = pixelName,
+            precondition = {
+                appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU &&
+                    !withContext(dispatchers.io()) { notificationManager.areNotificationsEnabled() } &&
+                    !isMigratedInstall()
+            },
             resolveDialog = { NewUserOnboardingActivityDialog.NotificationPermission },
             transition = { event ->
                 when {

@@ -567,6 +567,8 @@ class WelcomePageViewModel @Inject constructor(
             is NewUserOnboardingActivityDialog.SingleChoice,
             is NewUserOnboardingActivityDialog.TogglePosition,
             is NewUserOnboardingActivityDialog.DuckAiState,
+            NewUserOnboardingActivityDialog.MigrationDefaultBrowser,
+            NewUserOnboardingActivityDialog.MigrationAllSet,
             -> Unit
         }
     }

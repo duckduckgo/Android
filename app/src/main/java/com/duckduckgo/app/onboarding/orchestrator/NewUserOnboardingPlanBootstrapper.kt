@@ -50,13 +50,22 @@ class NewUserOnboardingPlanBootstrapper @Inject constructor(
      * Starts the orchestrator-driven onboarding plan and returns the resulting [LinearOnboardingState].
      * The caller is responsible for only invoking this for a new user.
      *
-     * A run already in progress is returned as-is without building a plan: [NewUserOnboardingPlanProvider.buildRootPlan]
+     * A new-user run already in progress is returned as-is without building a plan: [NewUserOnboardingPlanProvider.buildRootPlan]
      * is side-effecting (it resets per-run state and enrols experiments), and the orchestrator would discard the plan
      * anyway. This is reachable whenever the launch screen runs again while the process is alive.
+     *
+     * Another flow's run in progress (such as the device migration plan) throws [IllegalStateException] instead, before
+     * any plan is built: the orchestrator cannot start this plan until that run ends, and handing back the other run
+     * would let the caller treat it as new-user onboarding.
      */
     suspend fun startNewUserOnboardingPlan(): LinearOnboardingState.InProgress = mutex.withLock {
         val inProgress = orchestrator.state.value as? LinearOnboardingState.InProgress
-        if (inProgress != null) return@withLock inProgress
+        if (inProgress != null) {
+            check(inProgress.rootPlanId == NewUserOnboardingPlanProvider.ROOT_PLAN_ID) {
+                "Cannot start new user onboarding while ${inProgress.rootPlanId} is in progress"
+            }
+            return@withLock inProgress
+        }
 
         orchestrator.startPlan(
             planProvider.buildRootPlan(
