@@ -33,6 +33,15 @@ interface WideEventFeature {
     fun enqueueWideEventPixels(): Toggle
 
     /**
+     * When enabled, an OnProcessStart flow is only closed by the next start of the process that began it, and every client
+     * operation first waits for this process's initial cleanup sweep. When disabled, cleanup behaves as it did before ownership
+     * was recorded: the main process closes every OnProcessStart flow on startup, whichever process began it, and client
+     * operations never wait for cleanup.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun processScopedCleanup(): Toggle
+
+    /**
      * When enabled, wide events are sent as pixels.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)

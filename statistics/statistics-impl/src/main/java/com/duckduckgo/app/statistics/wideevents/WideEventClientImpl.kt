@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
+import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.statistics.wideevents.WideEventClient.Companion.SAMPLED_OUT_FLOW_ID
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -35,6 +36,8 @@ class WideEventClientImpl @Inject constructor(
     private val wideEventFeature: Lazy<WideEventFeature>,
     private val dispatcherProvider: DispatcherProvider,
     private val random: Random,
+    @ProcessName private val processName: String,
+    private val wideEventCleaner: WideEventCleaner,
 ) : WideEventClient {
     override suspend fun flowStart(
         name: String,
@@ -52,11 +55,12 @@ class WideEventClientImpl @Inject constructor(
         if (random.nextFloat() >= samplingProbability) return Result.success(SAMPLED_OUT_FLOW_ID)
 
         return runCatching {
+            wideEventCleaner.ensureInitialized()
             wideEventRepository.insertWideEvent(
                 name = name,
                 flowEntryPoint = flowEntryPoint,
                 metadata = metadata,
-                cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
+                cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(ownerProcessName = processName),
                 samplingProbability = samplingProbability,
                 metaType = definition.type ?: WideEventMeta.typeFor(name),
                 metaVersion = WideEventMeta.versionFor(definition.version),
@@ -74,6 +78,7 @@ class WideEventClientImpl @Inject constructor(
         if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
 
         return runCatching {
+            wideEventCleaner.ensureInitialized()
             wideEventRepository.addWideEventStep(
                 eventId = wideEventId,
                 step = WideEventRepository.WideEventStep(name = stepName, success = success),
@@ -91,6 +96,7 @@ class WideEventClientImpl @Inject constructor(
         if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
 
         return runCatching {
+            wideEventCleaner.ensureInitialized()
             val (wideEventStatus, statusMetadata) = status.mapToWideEventStatus()
 
             wideEventRepository.setWideEventStatus(
@@ -106,6 +112,7 @@ class WideEventClientImpl @Inject constructor(
         if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
 
         return runCatching {
+            wideEventCleaner.ensureInitialized()
             val deleted = wideEventRepository.deleteWideEvent(wideEventId)
             check(deleted) { "There is no event with given ID" }
         }
@@ -115,6 +122,7 @@ class WideEventClientImpl @Inject constructor(
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
 
         return runCatching {
+            wideEventCleaner.ensureInitialized()
             wideEventRepository.getActiveWideEventIdsByName(name)
         }
     }
@@ -129,6 +137,7 @@ class WideEventClientImpl @Inject constructor(
         if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
 
         return runCatching {
+            wideEventCleaner.ensureInitialized()
             wideEventRepository.startInterval(
                 eventId = wideEventId,
                 name = key,
@@ -146,6 +155,7 @@ class WideEventClientImpl @Inject constructor(
         if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Duration.ZERO)
 
         return runCatching {
+            wideEventCleaner.ensureInitialized()
             wideEventRepository.endInterval(
                 eventId = wideEventId,
                 name = key,
@@ -167,12 +177,13 @@ private fun FlowStatus.mapToWideEventStatus(): Pair<WideEventRepository.WideEven
         FlowStatus.Unknown -> WideEventRepository.WideEventStatus.UNKNOWN to emptyMap()
     }
 
-private fun CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepository.CleanupPolicy {
+private fun CleanupPolicy.mapToRepositoryCleanupPolicy(ownerProcessName: String): WideEventRepository.CleanupPolicy {
     val (wideEventStatus, metadata) = flowStatus.mapToWideEventStatus()
 
     return when (this) {
         is CleanupPolicy.OnProcessStart -> {
             WideEventRepository.CleanupPolicy.OnProcessStart(
+                ownerProcessName = ownerProcessName,
                 ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
                 status = wideEventStatus,
                 metadata = metadata,
