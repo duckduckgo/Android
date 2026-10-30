@@ -36,7 +36,8 @@ interface BrowserNav {
     /**
      * Returns an Intent that opens Duck.ai full screen in a new tab.
      *
-     * @param forceImageGeneration when true, the new tab's native input preselects the image-generation tool.
+     * @param launchAction what the tab's native input does the first time it shows, if anything.
+     * @param autoFocusInput when true, the native input takes focus and raises the keyboard.
      * @param forceLaunchContextual when true, opens the contextual Duck.ai flow instead of a full screen tab.
      * @param textSelection selected page text to attach to the contextual chat, if any.
      */
@@ -44,7 +45,8 @@ interface BrowserNav {
         context: Context,
         hasSessionActive: Boolean = false,
         duckChatUrl: String,
-        forceImageGeneration: Boolean = false,
+        launchAction: NativeInputLaunchAction? = null,
+        autoFocusInput: Boolean = false,
         forceLaunchContextual: Boolean = false,
         textSelection: String? = null,
     ): Intent

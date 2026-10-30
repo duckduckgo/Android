@@ -36,4 +36,5 @@ enum class DuckChatHistorySource {
     CONTEXTUAL_CHAT,
     SIDEBAR,
     TAB_SWITCHER,
+    WIDGET,
 }
