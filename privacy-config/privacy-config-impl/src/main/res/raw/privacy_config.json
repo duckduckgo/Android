@@ -31,11 +31,7 @@
                 }
             },
             "state": "enabled",
-            "features": {
-                "showAdBlockingOmnibarAnimation": {
-                    "state": "enabled"
-                }
-            }
+            "features": {}
         },
         "ampLinks": {
             "exceptions": [

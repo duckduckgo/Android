@@ -37,10 +37,4 @@ interface AdBlockingExtensionFeature {
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun enableContingencyMode(): Toggle
-
-    /**
-     * When enabled, ad blocking animation will show on the omnibar if all other conditions met
-     */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
-    fun showAdBlockingOmnibarAnimation(): Toggle
 }
