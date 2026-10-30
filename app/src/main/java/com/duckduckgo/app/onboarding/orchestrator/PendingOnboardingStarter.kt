@@ -47,10 +47,15 @@ class PendingOnboardingStarter @Inject constructor(
 
     private val mutex = Mutex()
 
-    /** Returns the run the user should be in now, starting it if needed, or null when nothing is owed. */
+    /**
+     * Returns the run the user should be in now, starting it if needed, or null when nothing is owed.
+     *
+     * Also null while another flow's run is in progress: the orchestrator cannot start a plan until it ends, and
+     * whatever is owed is picked up on a later call.
+     */
     suspend fun startPending(): LinearOnboardingState.InProgress? = mutex.withLock {
         val current = orchestrator.state.value as? LinearOnboardingState.InProgress
-        if (current != null && current.rootPlanId in OWNED_PLAN_IDS) return@withLock current
+        if (current != null) return@withLock current.takeIf { it.rootPlanId in OWNED_PLAN_IDS }
 
         when {
             deviceMigration.isMigrationFlowPending() -> startMigrationPlan()
@@ -63,7 +68,7 @@ class PendingOnboardingStarter @Inject constructor(
         orchestrator.startPlan(
             deviceMigrationPlanProvider.buildPlan(onCompleted = { deviceMigration.markMigrationFlowCompleted() }),
         )
-        return (orchestrator.state.value as? LinearOnboardingState.InProgress)?.takeIf { it.rootPlanId == MIGRATION_PLAN_ID }
+        return orchestrator.state.value as? LinearOnboardingState.InProgress
     }
 
     private companion object {

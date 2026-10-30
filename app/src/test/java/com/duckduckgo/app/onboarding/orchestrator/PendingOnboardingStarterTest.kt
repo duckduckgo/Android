@@ -40,6 +40,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -201,6 +202,34 @@ class PendingOnboardingStarterTest {
         verify(newUserPlanProvider, times(1)).buildRootPlan(any(), any())
     }
 
+    @Test
+    fun whenForeignRunInProgressAndNewUserThenNullAndNothingStarted() = runTest {
+        givenStage(AppStage.NEW)
+        val foreign = givenForeignRunInProgress()
+
+        assertNull(testee.startPending())
+
+        assertSame(foreign, orchestrator.state.value)
+        verify(newUserPlanProvider, never()).buildRootPlan(any(), any())
+    }
+
+    @Test
+    fun whenForeignRunInProgressAndFlowPendingThenNullAndStillPending() = runTest {
+        deviceMigration.migrated = true
+        deviceMigration.pending = true
+        val foreign = givenForeignRunInProgress()
+
+        assertNull(testee.startPending())
+
+        assertSame(foreign, orchestrator.state.value)
+        assertTrue(deviceMigration.pending)
+    }
+
+    private suspend fun givenForeignRunInProgress(): LinearOnboardingState {
+        orchestrator.startPlan(singleStepPlan(id = "subscription_onboarding"))
+        return orchestrator.state.value
+    }
+
     private fun newStarter() = PendingOnboardingStarter(
         orchestrator = orchestrator,
         deviceMigration = deviceMigration,
@@ -230,11 +259,13 @@ class PendingOnboardingStarterTest {
         runBlocking { whenever(userStageStore.getUserAppStage()).thenReturn(stage) }
     }
 
-    private fun newUserPlan() = LinearOnboardingPlan(
-        id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+    private fun newUserPlan() = singleStepPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+
+    private fun singleStepPlan(id: String) = LinearOnboardingPlan(
+        id = id,
         steps = listOf(
             object : LinearOnboardingStep {
-                override val id = "new_user_step"
+                override val id = "${id}_step"
                 override val host = LinearOnboardingHost.OnboardingActivity
                 override val precondition: suspend () -> Boolean = { true }
                 override val transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { LinearOnboardingTransition.Stay }

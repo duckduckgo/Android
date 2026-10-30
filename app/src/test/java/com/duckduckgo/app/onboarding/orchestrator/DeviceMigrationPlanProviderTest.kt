@@ -144,8 +144,7 @@ class DeviceMigrationPlanProviderTest {
     }
 
     @Test
-    fun whenNotDefaultEvenIfDialogCountExhaustedThenDefaultStepShown() = runTest {
-        // The provider has no access to the role-dialog shown counter, so only the detector decides.
+    fun `when DuckDuckGo is not the default browser then the default browser step is shown`() = runTest {
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
         startAndReachDefaultBrowserStepPosition()
