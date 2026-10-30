@@ -110,7 +110,7 @@ class DuckAiEntryWideEventTest {
             metadata = eq(
                 mapOf(
                     "source" to "address_bar_prompt",
-                    "voice_chat" to "false",
+                    "voice" to "false",
                     "has_prompt" to "true",
                     "chat_state" to "new",
                     "surface" to "duck_ai_tab",
@@ -128,14 +128,14 @@ class DuckAiEntryWideEventTest {
 
     @Test
     fun `voice flag is scoped to the entry that started voice chat`() = runTest {
-        testee.onEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, hasPrompt = false, voiceChat = true)
+        testee.onEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, hasPrompt = false, voice = true)
         testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, hasPrompt = true)
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(client).flowStart(
             any(),
             anyOrNull(),
-            argThat { get("source") == "duck_ai_new_chat" && get("voice_chat") == "true" && get("has_prompt") == "false" },
+            argThat { get("source") == "duck_ai_new_chat" && get("voice") == "true" && get("has_prompt") == "false" },
             any(),
             any(),
             any(),
@@ -143,7 +143,7 @@ class DuckAiEntryWideEventTest {
         verify(client).flowStart(
             any(),
             anyOrNull(),
-            argThat { get("source") == "address_bar_prompt" && get("voice_chat") == "false" && get("has_prompt") == "true" },
+            argThat { get("source") == "address_bar_prompt" && get("voice") == "false" && get("has_prompt") == "true" },
             any(),
             any(),
             any(),

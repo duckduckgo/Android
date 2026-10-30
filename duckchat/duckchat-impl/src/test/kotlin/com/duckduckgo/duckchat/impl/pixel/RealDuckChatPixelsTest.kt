@@ -575,7 +575,7 @@ class RealDuckChatPixelsTest {
 
         val params = mapOf(
             "source" to "address_bar_prompt",
-            "voice_chat" to "false",
+            "voice" to "false",
             "duck_ai_enabled" to "true",
             "input_screen_enabled" to "true",
             "opens_new_tab" to "false",
@@ -593,13 +593,13 @@ class RealDuckChatPixelsTest {
             hasPrompt = false,
             duckAiEnabled = true,
             inputScreenEnabled = true,
-            voiceChat = true,
+            voice = true,
         )
         advanceUntilIdle()
 
         val params = mapOf(
             "source" to "contextual_chat",
-            "voice_chat" to "true",
+            "voice" to "true",
             "duck_ai_enabled" to "true",
             "input_screen_enabled" to "true",
             "opens_new_tab" to "true",

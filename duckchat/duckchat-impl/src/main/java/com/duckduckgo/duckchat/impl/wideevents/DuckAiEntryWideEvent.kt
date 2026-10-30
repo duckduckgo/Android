@@ -96,7 +96,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         entryPoint: DuckChatEntryPoint,
         hasPrompt: Boolean,
         opensNewTab: Boolean = false,
-        voiceChat: Boolean = false,
+        voice: Boolean = false,
     ) = mutate {
         explicitEntryReported = true
         pendingLanding = null
@@ -105,7 +105,7 @@ class DuckAiEntryWideEvent @Inject constructor(
             hasPrompt,
             Surface.DUCK_AI_TAB,
             excludedTabId = selectedTabId.takeIf { opensNewTab },
-            voiceChat = voiceChat,
+            voice = voice,
         )
     }
 
@@ -257,7 +257,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         tabId: String? = null,
         url: String? = null,
         excludedTabId: String? = null,
-        voiceChat: Boolean = false,
+        voice: Boolean = false,
     ) {
         finish("new_entry")
         if (!withContext(dispatchers.io()) { feature.value.self().isEnabled() }) return
@@ -268,7 +268,7 @@ class DuckAiEntryWideEvent @Inject constructor(
             metadata = mapOf(
                 "source" to source,
                 "has_prompt" to hasPrompt.toString(),
-                "voice_chat" to voiceChat.toString(),
+                "voice" to voice.toString(),
                 "chat_state" to chatState(url),
                 "surface" to surface.pixelValue,
                 "prompt_submitted" to "false",

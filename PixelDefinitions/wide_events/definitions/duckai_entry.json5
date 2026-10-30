@@ -51,9 +51,9 @@
                             "app_open"
                         ]
                     },
-                    "voice_chat": {
+                    "voice": {
                         "type": "string",
-                        "description": "Whether this entry starts a voice chat. Dictated text prompts are false.",
+                        "description": "Whether voice was used to start this entry, including dictated prompts.",
                         "enum": ["true", "false"]
                     },
                     "has_prompt": {

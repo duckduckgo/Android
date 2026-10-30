@@ -64,9 +64,9 @@
                 ]
             },
             {
-                "key": "feature.data.ext.voice_chat",
+                "key": "feature.data.ext.voice",
                 "type": "boolean",
-                "description": "Whether this entry starts a voice chat. Dictated text prompts are false."
+                "description": "Whether voice was used to start this entry, including dictated prompts."
             },
             {
                 "key": "feature.data.ext.has_prompt",

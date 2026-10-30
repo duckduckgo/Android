@@ -697,7 +697,7 @@ class RealDuckChatTest {
             hasPrompt = hasPrompts.capture(),
             duckAiEnabled = eq(true),
             inputScreenEnabled = eq(true),
-            voiceChat = voiceChats.capture(),
+            voice = voiceChats.capture(),
         )
         assertEquals(
             listOf(
@@ -726,7 +726,7 @@ class RealDuckChatTest {
             hasPrompt = false,
             duckAiEnabled = true,
             inputScreenEnabled = true,
-            voiceChat = true,
+            voice = true,
         )
         verify(entryWideEvent).onEntry(DuckChatEntryPoint.DIGITAL_ASSISTANT, false, true, true)
     }

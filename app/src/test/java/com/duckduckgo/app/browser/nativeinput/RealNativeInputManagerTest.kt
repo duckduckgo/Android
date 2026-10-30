@@ -579,12 +579,12 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenVoiceChatButtonClickedThenUsesAddressBarIconEntryPoint() {
+    fun whenVoiceChatButtonClickedThenUsesAddressBarPromptEntryPoint() {
         val widget = showVoiceTestWidget { _, _ -> }
 
         widget.onVoiceChatClick!!.invoke()
 
-        verify(duckChat).openVoiceDuckChat(DuckChatEntryPoint.ADDRESS_BAR_ICON)
+        verify(duckChat).openVoiceDuckChat(DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
     }
 
     @Test

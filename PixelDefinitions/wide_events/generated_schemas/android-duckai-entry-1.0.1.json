@@ -88,6 +88,7 @@
                                         "chat_history_open_chat",
                                         "voice",
                                         "onboarding",
+                                        "onboarding_completion_promo",
                                         "subscription_onboarding",
                                         "direct_url",
                                         "serp",
@@ -105,13 +106,13 @@
                                         "recent_chat_tab_switcher",
                                         "recent_chat_contextual",
                                         "chat_suggestion_input",
-                                        "tab_swiped",
+                                        "tab_swipe",
                                         "app_open"
                                     ]
                                 },
-                                "voice_chat": {
+                                "voice": {
                                     "type": "string",
-                                    "description": "Whether this entry starts a voice chat. Dictated text prompts are false.",
+                                    "description": "Whether voice was used to start this entry, including dictated prompts.",
                                     "enum": ["true", "false"]
                                 },
                                 "has_prompt": {
