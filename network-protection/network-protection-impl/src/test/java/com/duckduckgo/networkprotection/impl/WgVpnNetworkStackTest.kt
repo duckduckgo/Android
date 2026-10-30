@@ -30,6 +30,7 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDnsOrSame
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.portprobing.PortProbeResult
 import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
@@ -163,6 +164,34 @@ class WgVpnNetworkStackTest {
         assertTrue(actual.isSuccess)
         verify(wgTunnelConfig).setTunnelActivePort(443L)
         verify(netpPixels, never()).reportEnableAttemptFailure()
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenPortProbingSwitchesToFallbackPortThenReportSwitchedToFallbackPort() = runTest {
+        givenPortProbingSelects(selectedPort = 51820L)
+
+        wgVpnNetworkStack.onPrepareVpn()
+
+        verify(netpPixels).reportSwitchedToFallbackPort()
+        verify(wgTunnelConfig).setTunnelActivePort(51820L)
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenPortProbingKeepsServerDefaultPortThenDoNotReportSwitchedToFallbackPort() = runTest {
+        givenPortProbingSelects(selectedPort = 443L)
+
+        wgVpnNetworkStack.onPrepareVpn()
+
+        verify(netpPixels, never()).reportSwitchedToFallbackPort()
+    }
+
+    private suspend fun givenPortProbingSelects(selectedPort: Long) {
+        whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
+        vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = true))
+        whenever(wgTunnelConfig.getServerDefaultPort()).thenReturn(443L)
+        whenever(portProbingCoordinator.probeAndSelect()).thenReturn(PortProbeResult(selectedPort = selectedPort, shouldSwitchPort = false))
     }
 
     @SuppressLint("DenyListedApi")
