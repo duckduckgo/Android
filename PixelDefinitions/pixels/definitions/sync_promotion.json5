@@ -9,8 +9,8 @@
             {
                 "key": "source",
                 "type": "string",
-                "description": "The surface where the Sync promotion was shown",
-                "enum": ["bookmarks", "passwords", "ai_chat", "passwords_import", "bookmarks_import"]
+                "description": "The Sync promotion that was shown",
+                "enum": ["bookmarks", "passwords", "ai_chat", "passwords_import", "bookmarks_import", "bookmarks_multi_device"]
             }
         ]
     },
@@ -24,8 +24,8 @@
             {
                 "key": "source",
                 "type": "string",
-                "description": "The surface where the Sync promotion was shown",
-                "enum": ["bookmarks", "passwords", "ai_chat", "passwords_import", "bookmarks_import"]
+                "description": "The Sync promotion that was tapped",
+                "enum": ["bookmarks", "passwords", "ai_chat", "passwords_import", "bookmarks_import", "bookmarks_multi_device"]
             }
         ]
     },
@@ -39,14 +39,59 @@
             {
                 "key": "source",
                 "type": "string",
-                "description": "The surface where the Sync promotion was shown",
-                "enum": ["bookmarks", "passwords", "ai_chat"]
+                "description": "The Sync promotion that was dismissed",
+                "enum": ["bookmarks", "passwords", "ai_chat", "bookmarks_multi_device"]
             },
             {
                 "key": "reason",
                 "type": "string",
                 "description": "Why the Sync promotion was dismissed. Sent for the ai_chat source only",
                 "enum": ["user_tapped", "impression_cap"]
+            }
+        ]
+    },
+    "sync_get_other_devices": {
+        "description": "Fired when the Get DuckDuckGo on other platforms screen is shown to the user.",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the Get DuckDuckGo on other platforms screen was opened from",
+                "enum": ["activating", "not_activated", "activated", "promotion_bookmarks"]
+            }
+        ]
+    },
+    "sync_get_other_devices_copy": {
+        "description": "Fired when the user taps the download link on the Get DuckDuckGo on other platforms screen to copy it.",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the Get DuckDuckGo on other platforms screen was opened from",
+                "enum": ["activating", "not_activated", "activated", "promotion_bookmarks"]
+            }
+        ]
+    },
+    "sync_get_other_devices_share": {
+        "description": "Fired when the user taps Share on the Get DuckDuckGo on other platforms screen.",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the Get DuckDuckGo on other platforms screen was opened from",
+                "enum": ["activating", "not_activated", "activated", "promotion_bookmarks"]
             }
         ]
     }
