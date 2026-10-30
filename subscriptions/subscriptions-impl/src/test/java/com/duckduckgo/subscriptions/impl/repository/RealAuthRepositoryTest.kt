@@ -502,4 +502,55 @@ class RealAuthRepositoryTest {
         assertEquals("ddg-privacy-pro-yearly-renews-us", subscription.pendingPlans[0].productId)
         assertTrue(subscription.hasPendingChange)
     }
+
+    @Test
+    fun whenSaveTokensV2SucceedsThenBothTokensAreStoredAndSerpCookieIsInjected() = runTest {
+        val saved = authRepository.saveTokensV2(
+            accessToken = AccessToken("access", Instant.ofEpochMilli(1_000L)),
+            refreshToken = RefreshToken("refresh", Instant.ofEpochMilli(2_000L)),
+        )
+
+        assertTrue(saved)
+        assertEquals("access", authStore.accessTokenV2)
+        assertEquals(Instant.ofEpochMilli(1_000L), authStore.accessTokenV2ExpiresAt)
+        assertEquals("refresh", authStore.refreshTokenV2)
+        assertEquals(Instant.ofEpochMilli(2_000L), authStore.refreshTokenV2ExpiresAt)
+        assertEquals("access", serpPromo.cookie)
+    }
+
+    @Test
+    fun whenSaveTokensV2CommitFailsThenNothingChanges() = runTest {
+        authStore.accessTokenV2 = "old access"
+        authStore.refreshTokenV2 = "old refresh"
+        authStore.simulateTokenCommitFailure = true
+
+        val saved = authRepository.saveTokensV2(
+            accessToken = AccessToken("access", Instant.ofEpochMilli(1_000L)),
+            refreshToken = RefreshToken("refresh", Instant.ofEpochMilli(2_000L)),
+        )
+
+        assertFalse(saved)
+        assertEquals("old access", authStore.accessTokenV2)
+        assertEquals("old refresh", authStore.refreshTokenV2)
+        assertNull(serpPromo.cookie)
+    }
+
+    @Test
+    fun whenTokenRefreshOutcomesAreRecordedThenHistoryFollowsThem() = runTest {
+        assertEquals(TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null), authRepository.getTokenRefreshHistory())
+
+        authRepository.recordTokenRefreshFailure()
+        authRepository.recordTokenRefreshFailure()
+        assertEquals(TokenRefreshHistory(failureStreak = 2, lastSuccessAt = null), authRepository.getTokenRefreshHistory())
+
+        authRepository.recordTokenRefreshSuccess(at = Instant.ofEpochMilli(5_000L))
+        assertEquals(
+            TokenRefreshHistory(failureStreak = 0, lastSuccessAt = Instant.ofEpochMilli(5_000L), lastSuccessProcess = "main"),
+            authRepository.getTokenRefreshHistory(),
+        )
+
+        authRepository.recordTokenRefreshFailure()
+        authRepository.clearTokenRefreshHistory()
+        assertEquals(TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null), authRepository.getTokenRefreshHistory())
+    }
 }
