@@ -669,7 +669,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -683,7 +683,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -697,7 +697,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -711,7 +711,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test
@@ -725,7 +725,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test
@@ -739,7 +739,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test
