@@ -41,6 +41,9 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
     lateinit var duckAiWidgetConfigurator: DuckAiWidgetConfigurator
 
     @Inject
+    lateinit var duckAiWidgetUpdater: DuckAiWidgetUpdater
+
+    @Inject
     lateinit var pixel: Pixel
 
     @Inject
@@ -70,6 +73,7 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         logcat { "DuckAiWidgetProvider onUpdate" }
+        duckAiWidgetUpdater.startObservingIfNeeded()
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
@@ -95,6 +99,7 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appCoroutineScope.launch {
             duckAiWidgetConfigurator.populateRemoteViews(
                 context = context,
+                appWidgetId = appWidgetId,
                 remoteViews = views,
             )
             appWidgetManager.updateAppWidget(appWidgetId, views)
