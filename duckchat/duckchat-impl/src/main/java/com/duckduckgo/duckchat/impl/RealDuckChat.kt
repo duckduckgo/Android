@@ -806,7 +806,7 @@ class RealDuckChat @Inject constructor(
         opensNewTab: Boolean,
         hasPrompt: Boolean,
     ) {
-        entryWideEvent.value.onEntry(entryPoint, hasPrompt)
+        entryWideEvent.value.onEntry(entryPoint, hasPrompt, opensNewTab)
         // Lets the tab that ends up hosting this entry attribute itself once it's created/navigated,
         // so a later prompt submission in it can carry this same entry point as its `source`.
         duckAiTabSessionRepository.setPendingEntryPointSource(entryPoint.toPixelValue())

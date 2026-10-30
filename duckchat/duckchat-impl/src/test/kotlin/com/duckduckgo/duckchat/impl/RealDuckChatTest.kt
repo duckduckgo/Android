@@ -660,13 +660,14 @@ class RealDuckChatTest {
             duckAiEnabled = true,
             inputScreenEnabled = true,
         )
-        verify(entryWideEvent).onEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, true)
+        verify(entryWideEvent).onEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, true, false)
     }
 
     @Test
     fun whenContextualPromptOpensFullscreenThenContextualEntryIsReportedExactlyOnce() = runTest {
         testee.openDuckChatWithAutoPrompt("contextual prompt", DuckChatEntryPoint.CONTEXTUAL_CHAT)
 
+        verify(entryWideEvent).onEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, true, true)
         verify(mockDuckChatPixels, times(1)).sendDuckChatEntryPixel(
             entryPoint = DuckChatEntryPoint.CONTEXTUAL_CHAT,
             opensNewTab = true,

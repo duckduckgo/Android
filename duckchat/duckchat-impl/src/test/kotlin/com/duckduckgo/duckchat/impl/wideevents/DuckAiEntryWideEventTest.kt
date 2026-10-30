@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -36,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -173,6 +175,7 @@ class DuckAiEntryWideEventTest {
 
     @Test
     fun `app landing starts only for Duck ai`() = runTest {
+        testee.onForeground()
         testee.onLaunchLandingResolved("tab", "https://example.com")
         coroutineRule.testScope.advanceUntilIdle()
         verifyNoInteractions(client)
@@ -186,6 +189,152 @@ class DuckAiEntryWideEventTest {
             any(),
             any(),
         )
+    }
+
+    @Test
+    fun `launch landing followed by explicit entry does not start app open flow`() = runTest {
+        testee.onLaunchLandingResolved("old", "https://duck.ai/")
+        coroutineRule.testScope.advanceUntilIdle()
+        verifyNoInteractions(client)
+
+        testee.onEntry(DuckChatEntryPoint.DEEP_LINK_OTHER, true)
+        testee.onForeground()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(client).flowStart(
+            eq("duckai_entry"),
+            anyOrNull(),
+            argThat { get("source") == "deep_link_other" },
+            any(),
+            any(),
+            any(),
+        )
+        verify(client, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `pending intent prevents app open even after foreground and delayed entry`() = runTest {
+        testee.onLaunchIntentReceived()
+        testee.onLaunchLandingResolved("old", "https://duck.ai/")
+        testee.onForeground()
+        coroutineRule.testScope.advanceUntilIdle()
+        coroutineRule.testScope.advanceTimeBy(5_000)
+        verifyNoInteractions(client)
+
+        testee.onEntry(DuckChatEntryPoint.DEEP_LINK_OTHER, true, opensNewTab = true)
+        testee.onLaunchIntentHandled()
+        testee.onLaunchLandingResolved("old", "https://duck.ai/")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(client).flowStart(
+            eq("duckai_entry"),
+            anyOrNull(),
+            argThat { get("source") == "deep_link_other" },
+            any(),
+            any(),
+            any(),
+        )
+        verify(client, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `Duck ai intent suppresses app open when entry is reported asynchronously`() = runTest {
+        testee.onLaunchIntentReceived(opensDuckAi = true)
+        testee.onLaunchLandingResolved("old", "https://duck.ai/")
+        testee.onLaunchIntentHandled()
+        testee.onForeground()
+        coroutineRule.testScope.advanceUntilIdle()
+        verifyNoInteractions(client)
+
+        testee.onEntry(DuckChatEntryPoint.WIDGET_FAVORITE, false, opensNewTab = true)
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, times(1)).flowStart(any(), anyOrNull(), argThat { get("source") == "widget_favorite" }, any(), any(), any())
+        verify(client, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `ordinary launch starts app open after intent handling and resumes after close`() = runTest {
+        testee.onLaunchIntentReceived()
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        testee.onForeground()
+        coroutineRule.testScope.advanceUntilIdle()
+        verifyNoInteractions(client)
+
+        testee.onLaunchIntentHandled()
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, times(1)).flowStart(any(), anyOrNull(), argThat { get("source") == "app_open" }, any(), any(), any())
+
+        testee.onClose()
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        testee.onForeground()
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, times(2)).flowStart(any(), anyOrNull(), argThat { get("source") == "app_open" }, any(), any(), any())
+    }
+
+    @Test
+    fun `same tab entry can resolve on the previously selected tab`() = runTest {
+        testee.onSelectedTabChanged("tab", "https://duck.ai/")
+        testee.onEntry(DuckChatEntryPoint.DIRECT_URL, true, opensNewTab = false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+        testee.onPromptSubmitted("tab")
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).flowStep(1L, "entry_resolved", metadata = mapOf("chat_state" to "new"))
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "app_backgrounded"))
+    }
+
+    @Test
+    fun `new tab entry ignores old tab callbacks and succeeds after prompt and back`() = runTest {
+        testee.onSelectedTabChanged("old", "https://duck.ai/")
+        testee.onEntry(DuckChatEntryPoint.DEEP_LINK_OTHER, true, opensNewTab = true)
+        testee.onDuckAiPageVisible("old", "https://duck.ai/")
+        testee.onSelectedTabChanged("old", "https://duck.ai/")
+        testee.onSelectedTabChanged("new", null)
+        testee.onSelectedTabChanged("new", "https://duck.ai/?prompt=1")
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, never()).flowFinish(any(), any(), any())
+        verify(client, never()).intervalEnd(1L, "time_in_duckai_ms_bucketed")
+
+        coroutineRule.testScope.advanceTimeBy(14_000)
+        testee.onPromptSubmitted("new")
+        testee.onExitIntent("new", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+        testee.onSelectedTabChanged("old", "https://duck.ai/")
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(client).flowStep(1L, "prompt_submitted", metadata = mapOf("prompt_submitted" to "true"))
+        verify(client).flowStep(1L, "entry_resolved", metadata = mapOf("chat_state" to "new"))
+        verify(client, times(1)).intervalEnd(1L, "time_in_duckai_ms_bucketed")
+        verify(client, times(1)).flowFinish(any(), any(), any())
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "back_or_close"))
+    }
+
+    @Test
+    fun `all entry points opening a new tab ignore prompts and visibility from the old tab`() = runTest {
+        whenever(client.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(1L))
+        DuckChatEntryPoint.entries.forEach { entryPoint ->
+            testee.onSelectedTabChanged("old", "https://duck.ai/")
+            testee.onEntry(entryPoint, true, opensNewTab = true)
+            testee.onPromptSubmitted("old")
+            testee.onDuckAiPageVisible("old", "https://duck.ai/")
+            testee.onSelectedTabChanged("new", "https://duck.ai/")
+            coroutineRule.testScope.advanceUntilIdle()
+            verify(client, never()).flowFinish(any(), any(), any())
+            verify(client, never()).flowStep(any(), eq("prompt_submitted"), any(), any())
+
+            testee.onPromptSubmitted("new")
+            testee.onSelectedTabChanged("old", "https://duck.ai/")
+            testee.onClose()
+            coroutineRule.testScope.advanceUntilIdle()
+            verify(client, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+            verify(client).flowStep(1L, "prompt_submitted", metadata = mapOf("prompt_submitted" to "true"))
+            verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "tab_switched"))
+            clearInvocations(client)
+        }
     }
 
     @Test
@@ -218,6 +367,7 @@ class DuckAiEntryWideEventTest {
 
     @Test
     fun `repeated selected tab emissions preserve pending exit trigger`() = runTest {
+        testee.onForeground()
         testee.onLaunchLandingResolved("tab", "https://duck.ai/")
         testee.onExitIntent("tab", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
         testee.onSelectedTabChanged("tab", "https://duck.ai/")

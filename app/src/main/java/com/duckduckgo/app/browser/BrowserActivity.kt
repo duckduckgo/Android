@@ -134,6 +134,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
@@ -209,6 +210,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject lateinit var duckAiEntryWideEvent: Lazy<DuckAiEntryWideEvent>
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -395,6 +398,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         intent?.sanitize()
+        if (savedInstanceState == null && intent != null && !intent.launchedFromRecents) {
+            trackDuckAiLaunchIntent(intent)
+        }
         logcat(INFO) { "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState" }
         if (savedInstanceState == null) {
             pendingLaunchSource = intent?.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
@@ -662,6 +668,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         logcat(INFO) { "onNewIntent: $intent" }
 
         intent.sanitize()
+        trackDuckAiLaunchIntent(intent)
         setIntent(intent)
         pendingLaunchSource = intent.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
 
@@ -776,6 +783,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             super.onKeyLongPress(keyCode, event)
         }
 
+    private fun trackDuckAiLaunchIntent(intent: Intent) {
+        duckAiEntryWideEvent.value.onLaunchIntentReceived(
+            opensDuckAi = intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
+                intent.intentText?.let { duckChat.isDuckChatUrl(it.toUri()) } == true,
+        )
+    }
+
     private fun launchNewSearchOrQuery(intent: Intent?) {
         logcat(INFO) { "launchNewSearchOrQuery: $intent" }
 
@@ -796,6 +810,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun processIntent(intent: Intent) {
+        try {
+            processLaunchIntent(intent)
+        } finally {
+            duckAiEntryWideEvent.value.onLaunchIntentHandled()
+        }
+    }
+
+    private fun processLaunchIntent(intent: Intent) {
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
             logcat(INFO) { "launch from default browser" }
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)

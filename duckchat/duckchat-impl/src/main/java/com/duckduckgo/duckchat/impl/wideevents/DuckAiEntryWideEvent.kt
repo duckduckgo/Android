@@ -55,12 +55,37 @@ class DuckAiEntryWideEvent @Inject constructor(
     private val coroutineScope = CoroutineScope(appCoroutineScope.coroutineContext + dispatchers.computation().limitedParallelism(1))
     private val mutex = Mutex()
     private var activeEntry: Entry? = null
+    private var selectedTabId: String? = null
+    private var pendingLanding: Landing? = null
+    private var foreground = false
+    private var launchIntentPending = false
+    private var launchOpensDuckAi = false
+    private var explicitEntryReported = false
 
-    fun onEntry(entryPoint: DuckChatEntryPoint, hasPrompt: Boolean) = mutate {
-        start(entryPoint.toPixelValue(), hasPrompt, Surface.DUCK_AI_TAB)
+    fun onLaunchIntentReceived(opensDuckAi: Boolean = false) = mutate {
+        launchIntentPending = true
+        launchOpensDuckAi = opensDuckAi
+    }
+
+    fun onLaunchIntentHandled() = mutate {
+        launchIntentPending = false
+        startPendingLanding()
+    }
+
+    override fun onForeground() = mutate {
+        foreground = true
+        startPendingLanding()
+    }
+
+    fun onEntry(entryPoint: DuckChatEntryPoint, hasPrompt: Boolean, opensNewTab: Boolean = false) = mutate {
+        explicitEntryReported = true
+        pendingLanding = null
+        start(entryPoint.toPixelValue(), hasPrompt, Surface.DUCK_AI_TAB, excludedTabId = selectedTabId.takeIf { opensNewTab })
     }
 
     fun onContextualSheetOpened(tabId: String, hasPrompt: Boolean, url: String?) = mutate {
+        explicitEntryReported = true
+        pendingLanding = null
         start(DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue(), hasPrompt, Surface.CONTEXTUAL_SHEET, tabId, url)
     }
 
@@ -77,21 +102,32 @@ class DuckAiEntryWideEvent @Inject constructor(
     }
 
     override fun onLaunchLandingResolved(tabId: String?, url: String?) = mutate {
-        if (tabId != null && isDuckAi(url)) {
-            start("app_open", false, Surface.DUCK_AI_TAB, tabId, url)
-        }
+        if (explicitEntryReported) return@mutate
+        selectedTabId = tabId
+        pendingLanding = if (tabId != null && isDuckAi(url)) Landing(tabId, url) else null
+        startPendingLanding()
+    }
+
+    private suspend fun startPendingLanding() {
+        if (!foreground || launchIntentPending || launchOpensDuckAi || explicitEntryReported) return
+        val landing = pendingLanding ?: return
+        pendingLanding = null
+        start("app_open", false, Surface.DUCK_AI_TAB, landing.tabId, landing.url)
     }
 
     override fun onDuckAiPageVisible(tabId: String, url: String) = mutate {
         val entry = activeEntry ?: return@mutate
+        if (tabId == entry.excludedTabId) return@mutate
         if (entry.surface == Surface.DUCK_AI_TAB && !entry.resolved && (entry.tabId == null || entry.tabId == tabId) && isDuckAi(url)) {
             resolveEntry(entry, tabId, url)
         }
     }
 
     override fun onSelectedTabChanged(tabId: String?, url: String?) = mutate {
+        selectedTabId = tabId
         val entry = activeEntry ?: return@mutate
         if (entry.tabId == null) {
+            if (tabId == entry.excludedTabId) return@mutate
             if (entry.surface == Surface.DUCK_AI_TAB && tabId != null && isDuckAi(url)) resolveEntry(entry, tabId, url)
             return@mutate
         }
@@ -113,7 +149,7 @@ class DuckAiEntryWideEvent @Inject constructor(
 
     override fun onPromptSubmitted(tabId: String) = mutate {
         val entry = activeEntry ?: return@mutate
-        if (entry.tabId != null && entry.tabId != tabId || entry.promptSubmitted) return@mutate
+        if (tabId == entry.excludedTabId || entry.tabId != null && entry.tabId != tabId || entry.promptSubmitted) return@mutate
         entry.tabId = tabId
         entry.promptSubmitted = true
         wideEventClient.intervalEnd(entry.flowId, FIRST_PROMPT)
@@ -123,6 +159,11 @@ class DuckAiEntryWideEvent @Inject constructor(
     override fun onNewChatCreated(tabId: String) = mutate {}
 
     override fun onClose() = mutate {
+        foreground = false
+        launchIntentPending = false
+        launchOpensDuckAi = false
+        explicitEntryReported = false
+        pendingLanding = null
         val trigger = activeEntry?.exitTrigger
         if (trigger == DuckAiSessionExitTrigger.BACK_OR_CLOSE) {
             finish("left_duckai", trigger)
@@ -131,7 +172,14 @@ class DuckAiEntryWideEvent @Inject constructor(
         }
     }
 
-    private suspend fun start(source: String, hasPrompt: Boolean, surface: Surface, tabId: String? = null, url: String? = null) {
+    private suspend fun start(
+        source: String,
+        hasPrompt: Boolean,
+        surface: Surface,
+        tabId: String? = null,
+        url: String? = null,
+        excludedTabId: String? = null,
+    ) {
         finish("new_entry")
         val flowId = wideEventClient.flowStart(
             name = "duckai_entry",
@@ -145,7 +193,7 @@ class DuckAiEntryWideEvent @Inject constructor(
                 "status_reason" to "app_terminated",
             ),
         ).getOrNull() ?: return
-        activeEntry = Entry(flowId, surface, tabId, url)
+        activeEntry = Entry(flowId, surface, tabId, url, excludedTabId)
         wideEventClient.intervalStart(flowId, DURATION, buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS)
         wideEventClient.intervalStart(flowId, FIRST_PROMPT, buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS)
     }
@@ -194,11 +242,14 @@ class DuckAiEntryWideEvent @Inject constructor(
         CONTEXTUAL_SHEET("contextual_sheet"),
     }
 
+    private data class Landing(val tabId: String, val url: String?)
+
     private class Entry(
         val flowId: Long,
         val surface: Surface,
         var tabId: String?,
         var url: String?,
+        val excludedTabId: String?,
         var resolved: Boolean = tabId != null,
         var promptSubmitted: Boolean = false,
         var exitTrigger: DuckAiSessionExitTrigger? = null,
