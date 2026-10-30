@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.eventhub.impl.di.EventHubDispatcher
+import com.duckduckgo.eventhub.impl.metrics.ExperimentMetricsHandler
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineDispatcher
@@ -70,6 +71,7 @@ class RealEventHubPixelManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @EventHubDispatcher private val pixelDispatcher: CoroutineDispatcher,
     private val eventHubFeature: EventHubFeature,
+    private val metricsHandler: ExperimentMetricsHandler,
 ) : EventHubPixelManager {
 
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
@@ -129,6 +131,12 @@ class RealEventHubPixelManager @Inject constructor(
 
         // Sampled on arrival: an event that arrives just before a period ends belongs to that period, even if it's processed after
         val nowMillis = timeProvider.currentTimeMillis()
+
+        // Checked again once the work runs: switching the hub off may be handled first
+        appCoroutineScope.launch(pixelDispatcher) {
+            if (!isEnabled()) return@launch
+            metricsHandler.onEvent(eventType)
+        }
 
         appCoroutineScope.launch(pixelDispatcher) {
             for (pixelState in repository.getAllPixelStates()) {
