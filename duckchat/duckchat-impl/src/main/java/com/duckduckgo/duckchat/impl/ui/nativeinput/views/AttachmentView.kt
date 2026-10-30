@@ -328,6 +328,13 @@ class AttachmentView(
         )
     }
 
+    /** Starts the camera-capture flow directly, bypassing the attach popup menu — used when it's
+     *  triggered externally (e.g. a widget launch action) rather than by the user tapping the attach button. */
+    fun triggerCameraCapture() {
+        host?.showAttachmentChooser(true)
+        host?.requestCameraCapture(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         nativeInputStateJob?.cancel()
