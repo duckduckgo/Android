@@ -179,6 +179,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(notificationManager.areNotificationsEnabled()).thenReturn(false)
         runBlocking {
             whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
+            whenever(deviceMigration.isMigrationFlowPending()).thenReturn(false)
             whenever(syncAutoRestore.canRestore()).thenReturn(false)
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
             whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
@@ -226,6 +227,18 @@ class NewUserOnboardingPlanProviderTest {
         start()
 
         assertStep(NewUserOnboardingStepIds.INITIAL)
+    }
+
+    @Test
+    fun `when the install was migrated but the migration flow was not shown then the intro step is shown`() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationFlowPending()).thenReturn(true)
+
+        start()
+        assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
     }
 
     @Test

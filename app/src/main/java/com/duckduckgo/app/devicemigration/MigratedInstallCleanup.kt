@@ -65,6 +65,7 @@ class MigratedInstallCleanup @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             if (preferences.getBoolean(KEY_CLEANUP_DONE, false)) return@launch
             if (!deviceMigration.isMigratedInstall()) return@launch
+            if (!deviceMigration.isMigrationExperienceEnabled()) return@launch
 
             try {
                 pendingPixelDao.deleteAll()

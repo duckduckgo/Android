@@ -28,6 +28,8 @@ import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.LOCAL_FILE
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.TRANSFERRED_FILE
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -48,6 +50,7 @@ class RealDeviceMigrationTest {
             prefsByName.getOrPut(name) { InMemorySharedPreferences() }
     }
     private var unupdatedSinceFirstInstall = true
+    private val feature = FakeFeatureToggleFactory.create(DeviceMigrationFeature::class.java)
 
     private val transferred get() = provider.getSharedPreferences(TRANSFERRED_FILE)
     private val local get() = provider.getSharedPreferences(LOCAL_FILE)
@@ -58,6 +61,7 @@ class RealDeviceMigrationTest {
             installTimeComparison = object : InstallTimeComparison {
                 override fun isUnupdatedSinceFirstInstall() = unupdatedSinceFirstInstall
             },
+            deviceMigrationFeature = feature,
             dispatchers = coroutineRule.testDispatcherProvider,
         )
     }
@@ -136,6 +140,7 @@ class RealDeviceMigrationTest {
             installTimeComparison = object : InstallTimeComparison {
                 override fun isUnupdatedSinceFirstInstall() = unupdatedSinceFirstInstall
             },
+            deviceMigrationFeature = feature,
             dispatchers = coroutineRule.testDispatcherProvider,
         )
         assertFalse(restarted.isMigrationFlowPending())
@@ -168,5 +173,22 @@ class RealDeviceMigrationTest {
         local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
 
         assertFalse(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenFeatureEnabledThenMigrationExperienceEnabled() = runTest {
+        feature.self().setRawStoredState(State(enable = true))
+
+        assertTrue(testee.isMigrationExperienceEnabled())
+    }
+
+    @Test
+    fun whenFeatureDisabledThenMigrationExperienceDisabledAndDetectionUnaffected() = runTest {
+        feature.self().setRawStoredState(State(enable = false))
+        transferred.edit().putBoolean(KEY_SEEN, true).commit()
+
+        assertFalse(testee.isMigrationExperienceEnabled())
+        assertTrue(testee.isMigratedInstall())
+        assertTrue(testee.isMigrationFlowPending())
     }
 }

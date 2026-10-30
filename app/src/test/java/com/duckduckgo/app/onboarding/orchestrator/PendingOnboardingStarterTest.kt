@@ -153,6 +153,43 @@ class PendingOnboardingStarterTest {
     }
 
     @Test
+    fun `when the feature is disabled and an established user has the flow pending then nothing starts and the flow stays pending`() = runTest {
+        deviceMigration.migrated = true
+        deviceMigration.pending = true
+        deviceMigration.experienceEnabled = false
+
+        assertNull(testee.startPending())
+
+        assertEquals(LinearOnboardingState.NotStarted, orchestrator.state.value)
+        assertTrue(deviceMigration.pending)
+    }
+
+    @Test
+    fun `when the feature is disabled and a new user has the flow pending then the new user plan starts`() = runTest {
+        givenStage(AppStage.NEW)
+        deviceMigration.migrated = true
+        deviceMigration.pending = true
+        deviceMigration.experienceEnabled = false
+
+        assertEquals(NewUserOnboardingPlanProvider.ROOT_PLAN_ID, testee.startPending()?.rootPlanId)
+        assertTrue(deviceMigration.pending)
+    }
+
+    @Test
+    fun `when the feature is enabled after being disabled then the pending flow runs once`() = runTest {
+        deviceMigration.migrated = true
+        deviceMigration.pending = true
+        deviceMigration.experienceEnabled = false
+        assertNull(testee.startPending())
+
+        deviceMigration.experienceEnabled = true
+        assertEquals(DeviceMigrationPlanProvider.MIGRATION_PLAN_ID, testee.startPending()?.rootPlanId)
+        finishMigrationPlan()
+
+        assertNull(testee.startPending())
+    }
+
+    @Test
     fun `when not migrated and a new user then the new user plan starts`() = runTest {
         givenStage(AppStage.NEW)
 
@@ -277,6 +314,7 @@ class PendingOnboardingStarterTest {
         var migrated = false
         var pending = false
         var sourceNewInstall: Boolean? = null
+        var experienceEnabled = true
 
         override suspend fun isMigratedInstall(): Boolean = migrated
         override suspend fun isMigrationFlowPending(): Boolean = pending
@@ -285,5 +323,6 @@ class PendingOnboardingStarterTest {
             pending = false
         }
         override fun previousDeviceHadSync(): Boolean = false
+        override suspend fun isMigrationExperienceEnabled(): Boolean = experienceEnabled
     }
 }

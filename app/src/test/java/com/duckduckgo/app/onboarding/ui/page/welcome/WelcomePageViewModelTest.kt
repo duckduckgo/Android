@@ -1137,5 +1137,6 @@ class WelcomePageViewModelTest {
             pending = false
         }
         override fun previousDeviceHadSync(): Boolean = false
+        override suspend fun isMigrationExperienceEnabled(): Boolean = true
     }
 }

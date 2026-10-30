@@ -81,6 +81,7 @@ class LaunchViewModelTest {
     }
     private val deviceMigration: DeviceMigration = mock {
         onBlocking { isMigrationFlowPending() }.thenReturn(false)
+        onBlocking { isMigrationExperienceEnabled() }.thenReturn(true)
     }
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val appBuildConfig: AppBuildConfig = mock()
@@ -393,6 +394,26 @@ class LaunchViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Onboarding>())
+        verify(newUserOnboardingPlanBootstrapper, never()).startNewUserOnboardingPlan()
+    }
+
+    @Test
+    fun whenFeatureDisabledAndEstablishedUserHasMigrationFlowPendingThenCommandIsHome() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(deviceMigration.isMigrationFlowPending()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+        testee = LaunchViewModel(
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            pendingOnboardingStarter = pendingOnboardingStarter,
+        )
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.start(mock<Intent>())
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(mockCommandObserver).onChanged(any<Home>())
         verify(newUserOnboardingPlanBootstrapper, never()).startNewUserOnboardingPlan()
     }
 

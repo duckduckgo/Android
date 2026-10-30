@@ -38,4 +38,12 @@ interface DeviceMigration {
      * Cheap and safe to call from any thread.
      */
     fun previousDeviceHadSync(): Boolean
+
+    /**
+     * Remote kill switch for everything a migrated install does on the new phone beyond detection: the migration flow, silent
+     * restores, cleanup of the previous phone's state and suggestions that follow a transfer. While it is false, callers do none
+     * of it and record none of it as done, so turning it on later still runs each piece once. Detection and the answers of
+     * [isMigratedInstall] and [isMigrationFlowPending] do not depend on it.
+     */
+    suspend fun isMigrationExperienceEnabled(): Boolean
 }

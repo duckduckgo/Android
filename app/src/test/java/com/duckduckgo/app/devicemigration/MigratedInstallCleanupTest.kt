@@ -26,6 +26,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -37,6 +38,7 @@ import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -55,6 +57,10 @@ class MigratedInstallCleanupTest {
     private val preferences = InMemorySharedPreferences()
     private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doReturn preferences
+    }
+
+    init {
+        runBlocking { whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(true) }
     }
 
     private val testee = MigratedInstallCleanup(
@@ -150,5 +156,30 @@ class MigratedInstallCleanupTest {
         verify(pagePaintedPixelDao, never()).deleteAll()
         verify(defaultBrowserPromptsAppUsageDao, never()).deleteAll()
         verify(appInstallStore, never()).newDefaultBrowserDialogCount = 0
+    }
+
+    @Test
+    fun whenFeatureDisabledThenNothingClearedAndGuardNotSet() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+
+        testee.onCreate(mock())
+
+        verifyNothingCleared()
+        assertFalse(preferences.getBoolean("cleanupDone", false))
+    }
+
+    @Test
+    fun whenFeatureEnabledAfterBeingDisabledThenClearedOnce() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+        testee.onCreate(mock())
+
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(true)
+        testee.onCreate(mock())
+        testee.onCreate(mock())
+
+        verify(pendingPixelDao, times(1)).deleteAll()
+        assertTrue(preferences.getBoolean("cleanupDone", false))
     }
 }

@@ -80,6 +80,13 @@ class RealSyncAfterDeviceTransferPromptTest {
     }
 
     @Test
+    fun whenFeatureDisabledThenDoesNotShow() = runTest {
+        deviceMigration.experienceEnabled = false
+
+        assertFalse(newPrompt().shouldShow())
+    }
+
+    @Test
     fun whenDismissedThenDoesNotShow() = runTest {
         val prompt = newPrompt()
 
@@ -107,6 +114,7 @@ class RealSyncAfterDeviceTransferPromptTest {
         var migrated = true
         var flowPending = false
         var previousDeviceHadSync = false
+        var experienceEnabled = true
 
         override suspend fun isMigratedInstall(): Boolean = migrated
         override suspend fun isMigrationFlowPending(): Boolean = flowPending
@@ -115,6 +123,7 @@ class RealSyncAfterDeviceTransferPromptTest {
             flowPending = false
         }
         override fun previousDeviceHadSync(): Boolean = migrated && previousDeviceHadSync
+        override suspend fun isMigrationExperienceEnabled(): Boolean = experienceEnabled
     }
 
     private class SingleFileSharedPreferencesProvider : SharedPreferencesProvider {

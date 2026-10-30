@@ -22,6 +22,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
 import com.duckduckgo.sync.api.SyncAutoRestore
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -46,6 +47,10 @@ class MigratedInstallSyncRestorerTest {
     private val local = InMemorySharedPreferences()
     private val provider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doReturn local
+    }
+
+    init {
+        runBlocking { whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(true) }
     }
 
     private val testee = MigratedInstallSyncRestorer(
@@ -134,5 +139,32 @@ class MigratedInstallSyncRestorerTest {
 
         verify(syncAutoRestore, times(1)).restoreSyncAccount()
         assertTrue(local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false))
+    }
+
+    @Test
+    fun whenFeatureDisabledThenNothingHappensAndNothingRecorded() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+
+        startApp()
+
+        verify(syncAutoRestore, never()).canRestore()
+        verify(syncAutoRestore, never()).restoreSyncAccount()
+        assertTrue(local.all.isEmpty())
+    }
+
+    @Test
+    fun whenFeatureEnabledAfterBeingDisabledThenRestoresOnce() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+        startApp()
+
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(true)
+        startApp()
+        startApp()
+
+        verify(syncAutoRestore, times(1)).restoreSyncAccount()
     }
 }

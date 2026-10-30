@@ -72,6 +72,7 @@ class MigratedInstallSubscriptionRestorer @Inject constructor(
             val attempts = preferences.getInt(KEY_RESTORE_ATTEMPTS, 0)
             if (attempts >= MAX_ATTEMPTS) return@launch
             if (!deviceMigration.isMigratedInstall()) return@launch
+            if (!deviceMigration.isMigrationExperienceEnabled()) return@launch
 
             try {
                 if (subscriptionsManager.isSignedIn()) return@launch

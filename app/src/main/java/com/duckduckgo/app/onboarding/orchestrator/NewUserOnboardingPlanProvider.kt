@@ -393,13 +393,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         }
 
-    // A migrated install has just been through the device migration flow, which already showed these.
-    private suspend fun isMigratedInstall(): Boolean = deviceMigration.isMigratedInstall()
+    // The device migration flow already showed these. While the flow is still pending (for example, held back remotely) it has not.
+    private suspend fun sawMigrationFlow(): Boolean = deviceMigration.isMigratedInstall() && !deviceMigration.isMigrationFlowPending()
 
     private fun introAnimationStep(withDuckAi: Boolean = false) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INTRO_ANIMATION,
         pixelName = null,
-        precondition = { !isMigratedInstall() },
+        precondition = { !sawMigrationFlow() },
         resolveDialog = {
             NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi)
         },
@@ -419,7 +419,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             precondition = {
                 appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU &&
                     !withContext(dispatchers.io()) { notificationManager.areNotificationsEnabled() } &&
-                    !isMigratedInstall()
+                    !sawMigrationFlow()
             },
             resolveDialog = { NewUserOnboardingActivityDialog.NotificationPermission },
             transition = { event ->

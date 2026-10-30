@@ -56,6 +56,7 @@ class MigratedInstallSyncRestorer @Inject constructor(
             val local = markerStore.local
             if (local.getBoolean(KEY_SYNC_RESTORE_DONE, false)) return@launch
             if (!deviceMigration.isMigratedInstall()) return@launch
+            if (!deviceMigration.isMigrationExperienceEnabled()) return@launch
 
             try {
                 val hadSync = syncAutoRestore.canRestore()

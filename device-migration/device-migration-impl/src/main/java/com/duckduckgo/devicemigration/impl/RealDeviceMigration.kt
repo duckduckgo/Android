@@ -59,6 +59,7 @@ private data class Detection(val migrated: Boolean, val sourceIsNewInstall: Bool
 class RealDeviceMigration @Inject constructor(
     private val markerStore: DeviceMigrationMarkerStore,
     private val installTimeComparison: InstallTimeComparison,
+    private val deviceMigrationFeature: DeviceMigrationFeature,
     private val dispatchers: DispatcherProvider,
 ) : DeviceMigration, MainProcessLifecycleObserver {
 
@@ -82,6 +83,10 @@ class RealDeviceMigration @Inject constructor(
     // Unknown counts as "had Sync": wrongly offering to create an account is worse than withholding the offer.
     override fun previousDeviceHadSync(): Boolean =
         detection.migrated && markerStore.local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true)
+
+    override suspend fun isMigrationExperienceEnabled(): Boolean = withContext(dispatchers.io()) {
+        deviceMigrationFeature.self().isEnabled()
+    }
 
     override fun onCreate(owner: LifecycleOwner) {
         val sourceIsNewInstall = detection.sourceIsNewInstall

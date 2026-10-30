@@ -49,6 +49,7 @@ class RealSyncAfterDeviceTransferPrompt @Inject constructor(
     override suspend fun shouldShow(): Boolean {
         if (preferences.getBoolean(KEY_DISMISSED, false)) return false
         if (!deviceMigration.isMigratedInstall()) return false
+        if (!deviceMigration.isMigrationExperienceEnabled()) return false
         if (deviceMigration.previousDeviceHadSync()) return false
         if (deviceMigration.isMigrationFlowPending()) return false
         return deviceSyncState.isFeatureEnabled() && !deviceSyncState.isUserSignedInOnDevice()

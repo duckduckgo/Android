@@ -24,8 +24,10 @@ import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBS
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -48,6 +50,10 @@ class MigratedInstallSubscriptionRestorerTest {
     private val preferences = InMemorySharedPreferences()
     private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doReturn preferences
+    }
+
+    init {
+        runBlocking { whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(true) }
     }
 
     private val testee = MigratedInstallSubscriptionRestorer(
@@ -169,5 +175,33 @@ class MigratedInstallSubscriptionRestorerTest {
     private fun startApp() {
         testee.onCreate(mock())
         coroutineTestRule.testScope.advanceUntilIdle()
+    }
+
+    @Test
+    fun whenFeatureDisabledThenNothingHappensAndNoAttemptConsumed() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+        whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
+
+        repeat(5) { startApp() }
+
+        verify(subscriptionsManager, never()).isSignedIn()
+        verify(subscriptionsManager, never()).recoverSubscriptionFromStore(null)
+        assertTrue(preferences.all.isEmpty())
+    }
+
+    @Test
+    fun whenFeatureEnabledAfterBeingDisabledThenRecoversOnce() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+        whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
+        whenever(subscriptionsManager.recoverSubscriptionFromStore(null)).thenReturn(RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR))
+        repeat(5) { startApp() }
+
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(true)
+        startApp()
+        startApp()
+
+        verify(subscriptionsManager, times(1)).recoverSubscriptionFromStore(null)
     }
 }

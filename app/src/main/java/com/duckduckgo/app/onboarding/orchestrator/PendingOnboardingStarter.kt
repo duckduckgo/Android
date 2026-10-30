@@ -33,6 +33,9 @@ import javax.inject.Inject
  * The single place that decides which onboarding run, if any, the app owes the user: the device migration flow
  * first, then the new-user plan.
  *
+ * While the migration experience is switched off remotely the flow is not started but stays pending, so it runs
+ * once if the switch is turned back on.
+ *
  * The migration plan's callback cannot start the new-user plan itself (the orchestrator rejects re-entrant calls
  * from plan callbacks), so whoever observes the migration run ending calls [startPending] again to hand off.
  */
@@ -58,7 +61,7 @@ class PendingOnboardingStarter @Inject constructor(
         if (current != null) return@withLock current.takeIf { it.rootPlanId in OWNED_PLAN_IDS }
 
         when {
-            deviceMigration.isMigrationFlowPending() -> startMigrationPlan()
+            deviceMigration.isMigrationFlowPending() && deviceMigration.isMigrationExperienceEnabled() -> startMigrationPlan()
             userStageStore.isNewUser() -> newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()
             else -> null
         }
