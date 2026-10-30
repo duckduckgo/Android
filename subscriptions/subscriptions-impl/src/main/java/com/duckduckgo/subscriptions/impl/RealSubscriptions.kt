@@ -294,7 +294,7 @@ interface SubscriptionsFeature {
      * When enabled, refreshAccessToken(force = false) returns the stored access token without
      * rotating if that token is still usable. When disabled, every call rotates (previous behaviour).
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun skipValidAccessTokenRefresh(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
