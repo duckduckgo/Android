@@ -1472,6 +1472,24 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when native input disabled and get voice duck chat url then url contains only voice mode param`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals("https://duck.ai/chat?mode=voice-mode&duckai=5", testee.getVoiceDuckChatUrl())
+    }
+
+    @Test
+    fun `when native input enabled and get voice duck chat url then url also contains native input param`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals("https://duck.ai/chat?mode=voice-mode&native-input=true&duckai=5", testee.getVoiceDuckChatUrl())
+    }
+
+    @Test
     fun `when native input enabled and build chat url then url contains both chatID and native input param`() = runTest {
         duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
