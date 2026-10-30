@@ -25,7 +25,6 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
-import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -48,7 +47,6 @@ import javax.inject.Inject
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class MigratedInstallNetpStateCleanup @Inject constructor(
     private val deviceMigration: DeviceMigration,
-    private val networkProtectionPrefs: NetworkProtectionPrefs,
     private val geoswitchingRepository: NetPGeoswitchingRepository,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatchers: DispatcherProvider,
@@ -65,9 +63,7 @@ class MigratedInstallNetpStateCleanup @Inject constructor(
 
             try {
                 if (!deviceMigration.isMigratedInstall()) return@launch
-                val preferredLocation = geoswitchingRepository.getUserPreferredLocation()
-                networkProtectionPrefs.clear()
-                geoswitchingRepository.setUserPreferredLocation(preferredLocation)
+                geoswitchingRepository.clearAllPreferencesExceptUserPreferredLocation()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

@@ -86,6 +86,16 @@ class VpnServiceHeartbeatMonitorWorkerTest {
         verify(deviceShieldPixels).automaticRestart()
     }
 
+    @Test
+    fun whenMigratedInstallCleanupFailsThenVpnNotRestarted() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenAnswer { throw RuntimeException("boom") }
+
+        worker().doWork()
+
+        verify(deviceShieldPixels, never()).suddenKillBySystem()
+        verify(deviceShieldPixels, never()).automaticRestart()
+    }
+
     private fun worker(): VpnServiceHeartbeatMonitorWorker =
         TestListenableWorkerBuilder<VpnServiceHeartbeatMonitorWorker>(context).build().also {
             it.vpnHeartBeatDao = db.vpnHeartBeatDao()

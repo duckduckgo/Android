@@ -37,6 +37,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -153,6 +154,31 @@ class MigratedInstallVpnStateCleanupTest {
 
         startApp()
         assertTrue(db.vpnHeartBeatDao().hearBeats().isEmpty())
+    }
+
+    @Test
+    fun whenMigrationKillSwitchOffThenCleanupStillRuns() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+
+        startApp()
+
+        assertTrue(db.vpnHeartBeatDao().hearBeats().isEmpty())
+        assertNull(db.vpnServiceStateDao().getLastStateStats())
+    }
+
+    @Test
+    fun whenCleanupDoneOrNotNeededThenReportsSuccess() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
+
+        assertTrue(testee.cleanUpIfNeeded())
+    }
+
+    @Test
+    fun whenCleanupFailsThenReportsFailure() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenAnswer { throw RuntimeException("boom") }
+
+        assertFalse(testee.cleanUpIfNeeded())
     }
 
     private fun givenPreviousPhoneState() {

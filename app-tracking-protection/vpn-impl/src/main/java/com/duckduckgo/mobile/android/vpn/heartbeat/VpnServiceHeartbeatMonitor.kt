@@ -110,7 +110,10 @@ class VpnServiceHeartbeatMonitorWorker(
 
     override suspend fun doWork(): Result = withContext(dispatcherProvider.io()) {
         // Can run before the app-start cleanup; a heartbeat carried over from the previous phone would restart a VPN never enabled here
-        migratedInstallVpnStateCleanup.cleanUpIfNeeded()
+        if (!migratedInstallVpnStateCleanup.cleanUpIfNeeded()) {
+            logcat(WARN) { "HB monitor: previous phone VPN state may still be in place, not restarting" }
+            return@withContext Result.success()
+        }
         val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
 
         logcat { "HB monitor checking last HB: $lastHeartBeat" }

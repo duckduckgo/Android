@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.devicemigration
 
+import android.content.SharedPreferences
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -44,10 +45,10 @@ class MigratedInstallNetpStateCleanupTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val deviceMigration: DeviceMigration = mock()
-    private val preferenceFiles = mutableMapOf<String, InMemorySharedPreferences>()
+    private val preferenceFiles = mutableMapOf<String, SharedPreferences>()
     private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doAnswer { invocation ->
-            preferenceFiles.getOrPut(invocation.getArgument(0)) { InMemorySharedPreferences() }
+            preferenceFiles.getOrPut(invocation.getArgument(0)) { RecordingSharedPreferences() }
         }
     }
     private val networkProtectionPrefs = RealNetworkProtectionPrefs(sharedPreferencesProvider)
@@ -57,7 +58,6 @@ class MigratedInstallNetpStateCleanupTest {
 
     private val testee = MigratedInstallNetpStateCleanup(
         deviceMigration = deviceMigration,
-        networkProtectionPrefs = networkProtectionPrefs,
         geoswitchingRepository = geoswitchingRepository,
         sharedPreferencesProvider = sharedPreferencesProvider,
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -134,6 +134,29 @@ class MigratedInstallNetpStateCleanupTest {
         assertFalse(preferenceFiles.getValue(NETP_PREFS_FILE).all.keys.any { it.contains("cleanup", ignoreCase = true) })
     }
 
+    @Test
+    fun whenMigratedInstallThenPreviousPhoneStateReplacedInOneCommittedWrite() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        val netpFile = preferenceFiles.getValue(NETP_PREFS_FILE) as RecordingSharedPreferences
+        netpFile.resetCounts()
+
+        startApp()
+
+        assertEquals(1, netpFile.commits)
+        assertEquals(0, netpFile.applies)
+    }
+
+    @Test
+    fun whenMigrationKillSwitchOffThenCleanupStillRuns() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+
+        startApp()
+
+        assertEquals(-1L, networkProtectionRepository.enabledTimeInMillis)
+        assertEquals(PREFERRED_LOCATION, geoswitchingRepository.getUserPreferredLocation())
+    }
+
     private fun startApp() {
         testee.onCreate(mock())
         coroutineTestRule.testScope.advanceUntilIdle()
@@ -146,5 +169,31 @@ class MigratedInstallNetpStateCleanupTest {
         const val THIS_PHONE_ENABLED_TIME = 2_000L
         val PREVIOUS_PHONE_DATA_VOLUME = DataVolume(receivedBytes = 10, transmittedBytes = 20)
         val PREFERRED_LOCATION = UserPreferredLocation(countryCode = "nl", cityName = "Amsterdam")
+    }
+}
+
+/** Counts how edits are written, to check that a replacement cannot be half applied. */
+private class RecordingSharedPreferences(
+    private val delegate: InMemorySharedPreferences = InMemorySharedPreferences(),
+) : SharedPreferences by delegate {
+    var commits = 0
+        private set
+    var applies = 0
+        private set
+
+    fun resetCounts() {
+        commits = 0
+        applies = 0
+    }
+
+    override fun edit(): SharedPreferences.Editor = object : SharedPreferences.Editor by delegate.edit() {
+        override fun commit(): Boolean {
+            commits++
+            return true
+        }
+
+        override fun apply() {
+            applies++
+        }
     }
 }

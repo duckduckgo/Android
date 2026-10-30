@@ -67,13 +67,16 @@ class MigratedInstallVpnStateCleanup @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) { cleanUpIfNeeded() }
     }
 
-    /** Safe to call from any reader that may run before [onCreate]'s cleanup finishes; returns once it is done or not needed. */
-    suspend fun cleanUpIfNeeded() = withContext(dispatchers.io()) {
+    /**
+     * Safe to call from any reader that may run before [onCreate]'s cleanup finishes; returns once it is done or not needed.
+     * @return false when the cleanup failed, so the previous phone's state may still be in place.
+     */
+    suspend fun cleanUpIfNeeded(): Boolean = withContext(dispatchers.io()) {
         mutex.withLock {
-            if (preferences.getBoolean(KEY_CLEANUP_DONE, false)) return@withLock
+            if (preferences.getBoolean(KEY_CLEANUP_DONE, false)) return@withLock true
 
             try {
-                if (!deviceMigration.isMigratedInstall()) return@withLock
+                if (!deviceMigration.isMigratedInstall()) return@withLock true
                 vpnDatabase.runInTransaction {
                     vpnDatabase.vpnHeartBeatDao().deleteAll()
                     vpnDatabase.vpnServiceStateDao().deleteAll()
@@ -83,9 +86,10 @@ class MigratedInstallVpnStateCleanup @Inject constructor(
                 throw e
             } catch (e: Exception) {
                 logcat(ERROR) { "Migrated install VPN cleanup failed, will retry on next start: ${e.javaClass.simpleName}" }
-                return@withLock
+                return@withLock false
             }
             preferences.edit(commit = true) { putBoolean(KEY_CLEANUP_DONE, true) }
+            true
         }
     }
 
