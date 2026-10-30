@@ -189,6 +189,9 @@ interface DuckChatInternal : DuckChat {
      */
     fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint)
 
+    /** Single source of truth for the URL that opens a Duck.ai voice chat. */
+    fun getVoiceDuckChatUrl(): String
+
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
 
@@ -793,9 +796,11 @@ class RealDuckChat @Inject constructor(
     override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openVoiceDuckChat" }
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false, voice = true)
-        val parameters = mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE)
-        openDuckChat(parameters, forceNewSession = true)
+        openDuckChatUrl(getVoiceDuckChatUrl(), forceNewSession = true)
     }
+
+    override fun getVoiceDuckChatUrl(): String =
+        appendParameters(mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE) + nativeChatInputParameters(), getDuckChatLink())
 
     override fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint) {
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
@@ -827,7 +832,14 @@ class RealDuckChat @Inject constructor(
         forceNewSession: Boolean = false,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
     ) {
-        val url = appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink())
+        openDuckChatUrl(appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink()), forceNewSession, launchAction)
+    }
+
+    private fun openDuckChatUrl(
+        url: String,
+        forceNewSession: Boolean = false,
+        launchAction: NativeInputLaunchAction? = null,
+    ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
                 when {
