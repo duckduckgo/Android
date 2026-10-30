@@ -37,6 +37,7 @@ sealed interface ContentConfig {
         override val title: TextConfig,
         val body1: TextConfig,
         val body2: TextConfig?,
+        @field:DrawableRes val pictogramRes: Int? = null,
     ) : ContentConfig
 
     data class ComparisonChart(

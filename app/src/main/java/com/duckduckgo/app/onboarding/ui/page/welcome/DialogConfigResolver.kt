@@ -265,13 +265,41 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        NewUserOnboardingActivityDialog.MigrationDefaultBrowser -> welcome(
+            content = ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.deviceMigrationDefaultBrowserTitle),
+                body1 = TextConfig.Resource(R.string.deviceMigrationDefaultBrowserBody),
+                body2 = null,
+                pictogramRes = CommonR.drawable.mobile_device_default_96,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.deviceMigrationDefaultBrowserPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingWidgetPromptSecondaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.MigrationDefaultBrowserSkipped),
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.MigrationAllSet -> welcome(
+            content = ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.deviceMigrationAllSetTitle),
+                body1 = TextConfig.Resource(R.string.deviceMigrationAllSetBody1),
+                body2 = TextConfig.Resource(R.string.deviceMigrationAllSetBody2),
+                pictogramRes = R.drawable.ic_success_96,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.deviceMigrationAllSetPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
         NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
-        NewUserOnboardingActivityDialog.MigrationDefaultBrowser,
-        NewUserOnboardingActivityDialog.MigrationAllSet,
         -> null // command-only: no card to render
     }
 

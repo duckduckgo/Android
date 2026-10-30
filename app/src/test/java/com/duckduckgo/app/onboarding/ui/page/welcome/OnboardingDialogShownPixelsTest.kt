@@ -121,4 +121,12 @@ class OnboardingDialogShownPixelsTest {
 
         verifyNoInteractions(pixel)
     }
+
+    @Test
+    fun `fires nothing for the device migration dialogs`() {
+        testee.fireFor(NewUserOnboardingActivityDialog.MigrationDefaultBrowser)
+        testee.fireFor(NewUserOnboardingActivityDialog.MigrationAllSet)
+
+        verifyNoInteractions(pixel)
+    }
 }

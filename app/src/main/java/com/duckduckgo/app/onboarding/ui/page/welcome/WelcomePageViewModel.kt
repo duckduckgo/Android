@@ -27,14 +27,15 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.orchestrator.DeviceMigrationPlanProvider.Companion.MIGRATION_PLAN_ID
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider.Companion.ROOT_PLAN_ID
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
+import com.duckduckgo.app.onboarding.orchestrator.PendingOnboardingStarter
 import com.duckduckgo.app.onboarding.orchestrator.stepIndicatorProgress
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -50,7 +51,6 @@ import com.duckduckgo.onboarding.api.LinearOnboardingHost
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
-import com.duckduckgo.onboarding.api.forPlan
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -58,6 +58,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -74,7 +75,7 @@ import kotlin.time.Duration.Companion.seconds
 @ContributesViewModel(FragmentScope::class)
 class WelcomePageViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
-    private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper,
+    private val pendingOnboardingStarter: PendingOnboardingStarter,
     private val dialogConfigResolver: DialogConfigResolver,
     private val shownPixels: OnboardingDialogShownPixels,
     private val dispatchers: DispatcherProvider,
@@ -138,6 +139,11 @@ class WelcomePageViewModel @Inject constructor(
         ) : Command
         data class ShowQuickSetupSearchOptionsBottomSheet(val initialWithAi: Boolean) : Command
         data object LaunchPasswordImport : Command
+        data class ShowMigrationDefaultBrowserDialog(val intent: Intent) : Command
+        data object OpenMigrationDefaultBrowserSettings : Command
+
+        /** Leaves onboarding for the browser without completing the new-user onboarding pages. */
+        data object FinishToBrowser : Command
     }
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -160,11 +166,16 @@ class WelcomePageViewModel @Inject constructor(
 
     private var importOutcomeJob: Job? = null
 
+    private var migrationDefaultBrowserPromptOpen = false
+
     init {
         start()
     }
 
-    fun onEvent(event: NewUserOnboardingEvent) = emit(event)
+    fun onEvent(event: NewUserOnboardingEvent) {
+        if (event == NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested) requestMigrationDefaultBrowser()
+        emit(event)
+    }
 
     fun onContentInteraction(interaction: ContentInteraction) {
         when (interaction) {
@@ -255,7 +266,7 @@ class WelcomePageViewModel @Inject constructor(
     }
 
     fun notificationPermissionFlowFinished(granted: Boolean?) {
-        if (granted == true) {
+        if (granted == true && !isMigrationRun()) {
             pixel.fire(AppPixelName.NOTIFICATIONS_ENABLED, mapOf(PixelParameter.FROM_ONBOARDING to true.toString()))
         }
         emit(NewUserOnboardingEvent.NotificationPermissionFinished(granted = granted))
@@ -266,7 +277,7 @@ class WelcomePageViewModel @Inject constructor(
      * so this doubles as its shown signal.
      */
     fun notificationRuntimePermissionRequested() {
-        pixel.fire(AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+        if (!isMigrationRun()) pixel.fire(AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
         emit(NewUserOnboardingEvent.Presented)
     }
 
@@ -278,6 +289,19 @@ class WelcomePageViewModel @Inject constructor(
     fun onDefaultBrowserNotSet() {
         recordDefaultBrowserDialogResult(isSet = false)
         emit(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+    }
+
+    /**
+     * The system prompt opened for the migration default-browser step has closed, however it ended: set, cancelled,
+     * another browser chosen, dismissed, back from the system settings, or never launched at all. The step waits
+     * for this, so every outcome has to report here or the user is left on it.
+     */
+    fun onMigrationDefaultBrowserPromptFinished() {
+        migrationDefaultBrowserPromptOpen = false
+        viewModelScope.launch {
+            val isDefault = withContext(dispatchers.io()) { defaultBrowserDetector.isDefaultBrowser() }
+            orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = isDefault))
+        }
     }
 
     fun onAddressBarBottomSheetResult(type: OmnibarType) {
@@ -399,6 +423,21 @@ class WelcomePageViewModel @Inject constructor(
         }
     }
 
+    // Records nothing against the role dialog or onboarding telemetry: this user may have been onboarded years ago.
+    private fun requestMigrationDefaultBrowser() {
+        if (migrationDefaultBrowserPromptOpen) return
+        migrationDefaultBrowserPromptOpen = true
+        viewModelScope.launch {
+            val intent = defaultRoleBrowserDialog.createIntent(context)
+            _commands.send(
+                if (intent != null) Command.ShowMigrationDefaultBrowserDialog(intent) else Command.OpenMigrationDefaultBrowserSettings,
+            )
+        }
+    }
+
+    private fun isMigrationRun(): Boolean =
+        (orchestrator.state.value as? LinearOnboardingState.Started)?.rootPlanId == MIGRATION_PLAN_ID
+
     private fun openDefaultBrowserSettings() {
         viewModelScope.launch { _commands.send(Command.OpenDefaultBrowserSystemSettings) }
     }
@@ -428,10 +467,11 @@ class WelcomePageViewModel @Inject constructor(
 
     private fun start() {
         viewModelScope.launch {
-            if (orchestrator.state.value is LinearOnboardingState.NotStarted) {
-                // Safeguard in case OnboardingActivity is restored after process death and does not route
-                // through LaunchViewModel; restart the plan so onboarding resumes from the top.
-                newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()
+            // OnboardingActivity restored after process death skips LaunchViewModel, so ask again what is owed:
+            // starting the new-user plan unconditionally would onboard an established user from scratch.
+            if (orchestrator.state.value is LinearOnboardingState.NotStarted && pendingOnboardingStarter.startPending() == null) {
+                _commands.send(Command.FinishToBrowser)
+                return@launch
             }
             observeOrchestratorState()
         }
@@ -439,7 +479,8 @@ class WelcomePageViewModel @Inject constructor(
 
     private fun observeOrchestratorState() {
         orchestrator.state
-            .forPlan(NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+            .filterIsInstance<LinearOnboardingState.Started>()
+            .filter { it.rootPlanId in RENDERED_PLAN_IDS }
             .onEach { state ->
                 when (state) {
                     is LinearOnboardingState.InProgress -> {
@@ -453,8 +494,8 @@ class WelcomePageViewModel @Inject constructor(
                                 return@onEach
                             }
                             else -> {
-                                // This view model only drives the new-user onboarding plan; any other host is
-                                // not its screen.
+                                // This view model only drives the new-user and device migration plans; any other
+                                // host is not its screen.
                                 return@onEach
                             }
                         }
@@ -463,16 +504,32 @@ class WelcomePageViewModel @Inject constructor(
                         }
                     }
                     is LinearOnboardingState.Completed -> {
+                        if (state.rootPlanId == MIGRATION_PLAN_ID) {
+                            continueAfterMigration()
+                            return@onEach
+                        }
                         when (val result = state.result as? NewUserOnboardingResult) {
                             is NewUserOnboardingResult.LaunchChat -> _commands.send(Command.FinishAndSubmitChatPrompt(prompt = result.prompt))
                             is NewUserOnboardingResult.LaunchSearch -> _commands.send(Command.FinishAndSubmitSearchQuery(query = result.query))
                             null -> _commands.send(Command.Finish)
                         }
                     }
-                    is LinearOnboardingState.Skipped -> _commands.send(Command.OnboardingSkipped)
+                    is LinearOnboardingState.Skipped -> {
+                        if (state.rootPlanId == MIGRATION_PLAN_ID) continueAfterMigration() else _commands.send(Command.OnboardingSkipped)
+                    }
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * Runs from the state observer rather than the plan's own callback, which cannot start another plan. A new user
+     * still owes the new-user plan, whose states this observer then renders; anyone else goes straight to the browser.
+     */
+    private suspend fun continueAfterMigration() {
+        if (pendingOnboardingStarter.startPending() == null) {
+            _commands.send(Command.FinishToBrowser)
+        }
     }
 
     private suspend fun applyStep(
@@ -496,7 +553,7 @@ class WelcomePageViewModel @Inject constructor(
 
         val config = dialogConfigResolver.resolve(dialog, customAiOnboardingStore.isEnabled())
         if (config != null) {
-            shownPixels.fireFor(dialog)
+            if (state.rootPlanId != MIGRATION_PLAN_ID) shownPixels.fireFor(dialog)
             _viewState.update {
                 it.copy(
                     screen = Screen.Dialog(
@@ -579,5 +636,6 @@ class WelcomePageViewModel @Inject constructor(
 
     private companion object {
         val IMPORT_STATUS_TIMEOUT = 20.seconds
+        val RENDERED_PLAN_IDS = setOf(ROOT_PLAN_ID, MIGRATION_PLAN_ID)
     }
 }

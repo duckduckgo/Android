@@ -499,4 +499,59 @@ class DialogConfigResolverTest {
         secondaryText = null,
         initiallyEnabled = initiallyEnabled,
     )
+
+    @Test
+    fun `resolves the migration default browser dialog with set default and skip ctas`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.MigrationDefaultBrowser, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackground.Pond, config.background)
+        assertEquals(CardEntry.AfterBackgroundTransition, config.cardEntry)
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.deviceMigrationDefaultBrowserTitle),
+                body1 = TextConfig.Resource(R.string.deviceMigrationDefaultBrowserBody),
+                body2 = null,
+                pictogramRes = CommonR.drawable.mobile_device_default_96,
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.deviceMigrationDefaultBrowserPrimaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested),
+            ),
+            config.primaryCta,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingWidgetPromptSecondaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.MigrationDefaultBrowserSkipped),
+            ),
+            config.secondaryCta,
+        )
+    }
+
+    @Test
+    fun `resolves the migration all set dialog with a lets go cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.MigrationAllSet, isCustomAiFlow = true)!!
+
+        assertEquals(OnboardingBackground.Pond, config.background)
+        assertEquals(
+            ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.deviceMigrationAllSetTitle),
+                body1 = TextConfig.Resource(R.string.deviceMigrationAllSetBody1),
+                body2 = TextConfig.Resource(R.string.deviceMigrationAllSetBody2),
+                pictogramRes = R.drawable.ic_success_96,
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.deviceMigrationAllSetPrimaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+            config.primaryCta,
+        )
+        assertNull(config.secondaryCta)
+    }
 }

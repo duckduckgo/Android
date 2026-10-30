@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationManagerCompat
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -28,6 +29,7 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.TestOption
+import com.duckduckgo.app.onboarding.orchestrator.DeviceMigrationPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityAction
 import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
@@ -35,18 +37,25 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
+import com.duckduckgo.app.onboarding.orchestrator.PendingOnboardingStarter
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.OnboardingSkipper
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.welcome.WelcomePageViewModel.Command
 import com.duckduckgo.app.onboarding.ui.page.welcome.WelcomePageViewModel.Screen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStatus
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
@@ -72,6 +81,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -91,7 +101,7 @@ class WelcomePageViewModelTest {
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
-    private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock()
+    private val mockPendingOnboardingStarter: PendingOnboardingStarter = mock()
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockShownPixels: OnboardingDialogShownPixels = mock()
     private val mockImportPasswordsFromGoogle: ImportPasswordsFromGoogle = mock()
@@ -117,16 +127,35 @@ class WelcomePageViewModelTest {
         LinearOnboardingTransition.Stay
     }
 
+    // Migration harness: the real starter, migration plan and bootstrapper over the real orchestrator, so the
+    // tests follow the same plans the app runs.
+    private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockNotificationManager: NotificationManagerCompat = mock()
+    private val mockUserStageStore: UserStageStore = mock()
+    private val mockNewUserPlanProvider: NewUserOnboardingPlanProvider = mock()
+    private val deviceMigration = FakeDeviceMigration()
+
     @Before
     fun setUp() {
-        runBlocking { whenever(customAiOnboardingStore.isEnabled()).thenReturn(false) }
+        runBlocking {
+            whenever(customAiOnboardingStore.isEnabled()).thenReturn(false)
+            // The default harness owes a run that the mock orchestrator never publishes, so nothing renders.
+            whenever(mockPendingOnboardingStarter.startPending()).thenReturn(
+                LinearOnboardingState.InProgress(
+                    rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+                    currentPlan = planAt(NewUserOnboardingActivityDialog.ComparisonChart),
+                    currentStepIndex = 0,
+                ),
+            )
+        }
     }
 
     private fun createViewModel(
         orchestrator: LinearOnboardingOrchestrator = mockOrchestrator,
+        pendingOnboardingStarter: PendingOnboardingStarter = mockPendingOnboardingStarter,
     ): WelcomePageViewModel = WelcomePageViewModel(
         orchestrator = orchestrator,
-        newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+        pendingOnboardingStarter = pendingOnboardingStarter,
         dialogConfigResolver = DialogConfigResolver(mockOnboardingStore),
         shownPixels = mockShownPixels,
         dispatchers = coroutineRule.testDispatcherProvider,
@@ -819,5 +848,294 @@ class WelcomePageViewModelTest {
 
         assertEquals(ImportCompleteContentState.Failed, importCompleteState(testee).value)
         assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Failed)))
+    }
+
+    @Test
+    fun `when nothing is owed after process death then hands off to the browser`() = runTest {
+        givenStage(AppStage.ESTABLISHED)
+        val testee = createMigrationViewModel()
+
+        testee.commands.test {
+            advanceUntilIdle()
+            assertEquals(Command.FinishToBrowser, awaitItem())
+        }
+        assertEquals(LinearOnboardingState.NotStarted, realOrchestrator.state.value)
+        verify(mockNewUserPlanProvider, never()).buildRootPlan(any(), any())
+    }
+
+    @Test
+    fun `when restored after process death with the migration flow pending then the migration plan renders`() = runTest {
+        givenMigrationPending(AppStage.NEW)
+
+        val testee = createMigrationViewModel()
+        advanceUntilIdle()
+
+        assertEquals(DeviceMigrationPlanProvider.MIGRATION_PLAN_ID, (realOrchestrator.state.value as LinearOnboardingState.Started).rootPlanId)
+        assertEquals(Screen.Intro.Play(withDuckAi = false), testee.viewState.value.screen)
+        verify(mockNewUserPlanProvider, never()).buildRootPlan(any(), any())
+    }
+
+    @Test
+    fun `when an established user finishes the migration screens then hands off to the browser without onboarding`() = runTest {
+        givenMigrationPending(AppStage.ESTABLISHED)
+        val testee = createMigrationViewModel()
+        advanceUntilIdle()
+
+        testee.onIntroAnimationFinished()
+        advanceUntilIdle()
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_DEFAULT_BROWSER, (testee.viewState.value.screen as Screen.Dialog).stepId)
+
+        testee.onEvent(NewUserOnboardingEvent.MigrationDefaultBrowserSkipped)
+        advanceUntilIdle()
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_ALL_SET, (testee.viewState.value.screen as Screen.Dialog).stepId)
+
+        testee.commands.test {
+            testee.onEvent(NewUserOnboardingEvent.ContinueClicked)
+            advanceUntilIdle()
+            assertEquals(Command.FinishToBrowser, awaitItem())
+        }
+        assertFalse(deviceMigration.pending)
+        verify(mockNewUserPlanProvider, never()).buildRootPlan(any(), any())
+        verify(mockUserStageStore, never()).stageCompleted(any())
+        verify(mockUserStageStore, never()).moveToStage(any())
+    }
+
+    @Test
+    fun `when the migration plan is skipped then hands off to the browser`() = runTest {
+        givenMigrationPending(AppStage.ESTABLISHED)
+        val testee = createMigrationViewModel()
+        advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+            advanceUntilIdle()
+            assertEquals(Command.FinishToBrowser, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when a new user finishes the migration screens then the new user plan renders next`() = runTest {
+        givenMigrationPending(AppStage.NEW)
+        givenNewUserPlanStartsAt(NewUserOnboardingActivityDialog.Initial)
+        val testee = createMigrationViewModel()
+        advanceUntilIdle()
+        walkToAllSet(testee)
+
+        testee.commands.test {
+            testee.onEvent(NewUserOnboardingEvent.ContinueClicked)
+            advanceUntilIdle()
+            expectNoEvents()
+        }
+
+        assertEquals(NewUserOnboardingPlanProvider.ROOT_PLAN_ID, (realOrchestrator.state.value as LinearOnboardingState.Started).rootPlanId)
+        assertEquals("new_user_first", (testee.viewState.value.screen as Screen.Dialog).stepId)
+    }
+
+    @Test
+    fun `when a new user's plan continues in the browser after the migration screens then hands off to it`() = runTest {
+        givenMigrationPending(AppStage.NEW)
+        givenNewUserPlanStartsInTheBrowser()
+        val testee = createMigrationViewModel()
+        advanceUntilIdle()
+        walkToAllSet(testee)
+
+        testee.commands.test {
+            testee.onEvent(NewUserOnboardingEvent.ContinueClicked)
+            advanceUntilIdle()
+            assertEquals(Command.HandOffToBrowserActivity, awaitItem())
+        }
+    }
+
+    @Test
+    fun `renders the migration default browser and all set screens as cards`() = runTest {
+        givenMigrationPending(AppStage.ESTABLISHED)
+        val testee = createMigrationViewModel()
+        advanceUntilIdle()
+
+        testee.onIntroAnimationFinished()
+        advanceUntilIdle()
+        val defaultBrowser = testee.viewState.value.screen as Screen.Dialog
+        assertEquals(TextConfig.Resource(R.string.deviceMigrationDefaultBrowserTitle), defaultBrowser.config.content.title)
+
+        testee.onEvent(NewUserOnboardingEvent.MigrationDefaultBrowserSkipped)
+        advanceUntilIdle()
+        val allSet = testee.viewState.value.screen as Screen.Dialog
+        assertEquals(TextConfig.Resource(R.string.deviceMigrationAllSetTitle), allSet.config.content.title)
+    }
+
+    @Test
+    fun `set default browser opens the role dialog and moves on once it closes`() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(Intent())
+        val testee = startMigrationAtDefaultBrowser()
+
+        testee.commands.test {
+            testee.onEvent(NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested)
+            advanceUntilIdle()
+            assertTrue(awaitItem() is Command.ShowMigrationDefaultBrowserDialog)
+        }
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_DEFAULT_BROWSER, currentStepId())
+
+        testee.onMigrationDefaultBrowserPromptFinished()
+        advanceUntilIdle()
+
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_ALL_SET, currentStepId())
+    }
+
+    @Test
+    fun `set default browser opens the system default apps settings when there is no role dialog and moves on after`() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(null)
+        val testee = startMigrationAtDefaultBrowser()
+
+        testee.commands.test {
+            testee.onEvent(NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested)
+            advanceUntilIdle()
+            assertEquals(Command.OpenMigrationDefaultBrowserSettings, awaitItem())
+        }
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_DEFAULT_BROWSER, currentStepId())
+
+        testee.onMigrationDefaultBrowserPromptFinished()
+        advanceUntilIdle()
+
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_ALL_SET, currentStepId())
+    }
+
+    @Test
+    fun `asks for the default browser prompt only once while it is open`() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(Intent())
+        val testee = startMigrationAtDefaultBrowser()
+
+        testee.commands.test {
+            testee.onEvent(NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested)
+            advanceUntilIdle()
+            assertTrue(awaitItem() is Command.ShowMigrationDefaultBrowserDialog)
+
+            testee.onEvent(NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested)
+            advanceUntilIdle()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `fires no onboarding pixels and records no default browser dialog on the migration screens`() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(Intent())
+        givenMigrationPending(AppStage.ESTABLISHED, notificationsEnabled = false)
+        val testee = createMigrationViewModel()
+        advanceUntilIdle()
+
+        testee.onIntroAnimationFinished()
+        advanceUntilIdle()
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_NOTIFICATION_PERMISSION, currentStepId())
+        testee.notificationRuntimePermissionRequested()
+        testee.notificationPermissionFlowFinished(granted = true)
+        advanceUntilIdle()
+        testee.onEvent(NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested)
+        advanceUntilIdle()
+        testee.onMigrationDefaultBrowserPromptFinished()
+        advanceUntilIdle()
+        testee.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        advanceUntilIdle()
+
+        verifyNoInteractions(pixel)
+        verifyNoInteractions(mockShownPixels)
+        verifyNoInteractions(mockAppInstallStore)
+        verify(mockDefaultRoleBrowserDialog, never()).dialogShown()
+    }
+
+    private suspend fun startMigrationAtDefaultBrowser(): WelcomePageViewModel {
+        givenMigrationPending(AppStage.ESTABLISHED)
+        val testee = createMigrationViewModel()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onIntroAnimationFinished()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_DEFAULT_BROWSER, currentStepId())
+        return testee
+    }
+
+    private fun currentStepId(): String? = (realOrchestrator.state.value as? LinearOnboardingState.InProgress)?.currentStep?.id
+
+    private fun walkToAllSet(testee: WelcomePageViewModel) {
+        testee.onIntroAnimationFinished()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onEvent(NewUserOnboardingEvent.MigrationDefaultBrowserSkipped)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals(NewUserOnboardingStepIds.MIGRATION_ALL_SET, currentStepId())
+    }
+
+    private fun createMigrationViewModel(): WelcomePageViewModel = createViewModel(
+        orchestrator = realOrchestrator,
+        pendingOnboardingStarter = PendingOnboardingStarter(
+            orchestrator = realOrchestrator,
+            deviceMigration = deviceMigration,
+            deviceMigrationPlanProvider = DeviceMigrationPlanProvider(
+                defaultBrowserDetector = mockDefaultBrowserDetector,
+                appBuildConfig = mockAppBuildConfig,
+                notificationManager = mockNotificationManager,
+                dispatchers = coroutineRule.testDispatcherProvider,
+            ),
+            userStageStore = mockUserStageStore,
+            newUserOnboardingPlanBootstrapper = NewUserOnboardingPlanBootstrapper(
+                orchestrator = realOrchestrator,
+                planProvider = mockNewUserPlanProvider,
+                userStageStore = mockUserStageStore,
+                onboardingSkipper = mock<OnboardingSkipper>(),
+            ),
+        ),
+    )
+
+    private fun givenStage(stage: AppStage) {
+        runBlocking { whenever(mockUserStageStore.getUserAppStage()).thenReturn(stage) }
+    }
+
+    private fun givenMigrationPending(
+        stage: AppStage,
+        notificationsEnabled: Boolean = true,
+    ) {
+        givenStage(stage)
+        deviceMigration.pending = true
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(33)
+        whenever(mockNotificationManager.areNotificationsEnabled()).thenReturn(notificationsEnabled)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+    }
+
+    private fun givenNewUserPlanStartsAt(dialog: NewUserOnboardingActivityDialog) {
+        val plan = LinearOnboardingPlan(
+            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            steps = listOf(
+                NewUserOnboardingActivityStep(
+                    id = "new_user_first",
+                    pixelName = null,
+                    transition = { LinearOnboardingTransition.Stay },
+                    resolveDialog = { dialog },
+                ),
+            ),
+        )
+        runBlocking { whenever(mockNewUserPlanProvider.buildRootPlan(any(), any())).thenReturn(plan) }
+    }
+
+    private fun givenNewUserPlanStartsInTheBrowser() {
+        val plan = LinearOnboardingPlan(
+            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            steps = listOf(
+                NewUserBrowserActivityStep(
+                    id = "duck_ai_demo",
+                    pixelName = null,
+                    transition = { LinearOnboardingTransition.Stay },
+                    resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("x") },
+                ),
+            ),
+        )
+        runBlocking { whenever(mockNewUserPlanProvider.buildRootPlan(any(), any())).thenReturn(plan) }
+    }
+
+    private class FakeDeviceMigration : DeviceMigration {
+        var pending = false
+
+        override suspend fun isMigratedInstall(): Boolean = true
+        override suspend fun isMigrationFlowPending(): Boolean = pending
+        override fun sourceDeviceIsNewInstall(): Boolean? = null
+        override suspend fun markMigrationFlowCompleted() {
+            pending = false
+        }
+        override fun previousDeviceHadSync(): Boolean = false
     }
 }
