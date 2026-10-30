@@ -61,7 +61,7 @@ class NativeInputHostLayoutTest {
         assertSame(stack, (card.parent as View).parent)
         assertEquals(LinearLayout.VERTICAL, stack.orientation)
         assertEquals(1, card.childCount)
-        assertEquals(R.id.inputModeWidget, card.getChildAt(0).id)
+        assertEquals(com.duckduckgo.duckchat.impl.R.id.inputModeWidget, card.getChildAt(0).id)
         assertFalse(stack.clipChildren)
         assertFalse(stack.clipToPadding)
     }

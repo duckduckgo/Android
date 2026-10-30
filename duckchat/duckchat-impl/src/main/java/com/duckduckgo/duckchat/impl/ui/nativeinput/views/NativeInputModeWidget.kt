@@ -99,7 +99,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
 import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.CoroutineScope
@@ -197,6 +196,7 @@ interface NativeInputWidget {
     )
     fun storePendingPrompt(query: String)
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false)
+    fun setOmnibarPosition(isBottom: Boolean)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
     fun setFooterSuppressed(suppressed: Boolean)
@@ -1542,8 +1542,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.setVoiceChatAvailable(voiceChatAvailable)
     }
 
+    override fun setOmnibarPosition(isBottom: Boolean) {
+        (parent as? NativeInputLayout)?.setOmnibarPosition(isBottom)
+    }
+
     override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean) {
         activeTabId = tabId
+        setOmnibarPosition(isBottom)
         doOnAttach {
             viewModel.configure(tabId, isDuckAiMode, isBottom, forceImageGeneration)
             publishGatingSnapshot()
@@ -1628,52 +1633,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyOmnibarShape() {
-        // The contextual sheet's parent card has its rounded shape applied by
-        // ContextualNativeInputManager.applyCardShape(); never overwrite it from here. The
-        // shared per-tab state store can briefly emit a BROWSER state with toggleVisible=false
-        // (e.g. SEARCH_ONLY users when the main widget publishes first), which would otherwise
-        // fall through and reset card.radius to largeShapeCornerRadius on all four corners.
-        // The edit widget's card is fixed by its layout; before configureForEdit lands, SEARCH_ONLY
-        // users briefly emit a BROWSER state that would otherwise leave it pill shaped.
-        if (isContextualWidget || isEditWidget) return
         val state = nativeInputState ?: return
-        val card = parent as? MaterialCardView ?: return
-        val lp = card.layoutParams as? MarginLayoutParams ?: return
-        // Only the top browser search-only omnibar takes the wide-omnibar shape; isBottom is part of this
-        // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
-        val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
-        if (state.isBottom) {
-            val radius = when {
-                !isBrowserSearchOnly -> com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius
-                appBrandDesignUpdateToggles.addressBar().isEnabled() -> com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius
-                else -> com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius
-            }
-            card.radius = card.resources.getDimension(radius)
-        }
-        if (isBrowserSearchOnly && !state.isBottom) {
-            val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
-            val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
-            if (appBrandDesignUpdateToggles.addressBar().isEnabled()) {
-                card.shapeAppearanceModel = card.shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
-            } else {
-                card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
-            }
-            lp.topMargin = targetTopMargin - card.paddingTop
-            lp.marginStart = targetHorizontalMargin - card.paddingLeft
-            lp.marginEnd = targetHorizontalMargin - card.paddingRight
-        } else if (isBrowserSearchOnly && state.isBottom) {
-            // Bottom search-only omnibar: 16dp leading (paddingStart keyline_2 + this keyline_2) and 16dp
-            // trailing (paddingEnd keyline_1 + this) so the field is centred when full-width.
-            lp.marginStart = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-            lp.marginEnd = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal) -
-                card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
-        } else {
-            // Reset the start margin so the omnibar value doesn't leak onto the shared Duck.ai card.
-            // The bottom card keeps keyline_1 (Duck.ai needs 8dp with the wrapper's paddingEnd).
-            lp.marginStart = 0
-            lp.marginEnd = if (state.isBottom) card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1) else 0
-        }
-        card.layoutParams = lp
+        (parent as? NativeInputLayout)?.applyOmnibarShape(state, appBrandDesignUpdateToggles.addressBar().isEnabled())
     }
 
     override fun bindInputEvents(
