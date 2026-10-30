@@ -44,5 +44,6 @@ interface PasswordsScreenPromotionPlugin {
         const val PRIORITY_KEY_IMPORT_PROMO = 50
         const val PRIORITY_KEY_SURVEY = 100
         const val PRIORITY_KEY_SYNC_PROMO = 200
+        const val PRIORITY_KEY_SYNC_MULTI_DEVICE_PROMO = 300
     }
 }
