@@ -31,9 +31,6 @@ interface AdBlockingExtensionFeature {
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
-    fun enabledByDefault(): Toggle
-
     /**
      * When enabled, the feature settings will still be accessible, but no scripts
      * will be injected, and a contingency message will be shown

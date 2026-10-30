@@ -32,9 +32,6 @@
             },
             "state": "enabled",
             "features": {
-                "enabledByDefault": {
-                    "state": "enabled"
-                },
                 "showAdBlockingOmnibarAnimation": {
                     "state": "enabled"
                 }

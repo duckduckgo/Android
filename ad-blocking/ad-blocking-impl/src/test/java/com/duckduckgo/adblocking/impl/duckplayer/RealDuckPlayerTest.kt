@@ -232,18 +232,6 @@ class RealDuckPlayerTest {
     fun whenNotNewInstall_combineDoesNotPersistRolloutDefault() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
-
-        testee.onCreate(mock(LifecycleOwner::class.java))
-
-        verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
-    }
-
-    @Test
-    fun whenNewInstallAndEnabledByDefaultOff_combineDoesNotPersistRolloutDefault() = runTest {
-        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
-        adBlockingExtensionFeature.self().setRawStoredState(State(true))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(false))
 
         testee.onCreate(mock(LifecycleOwner::class.java))
 
@@ -254,7 +242,6 @@ class RealDuckPlayerTest {
     fun whenNewInstallAndKillSwitchOff_combineDoesNotPersistRolloutDefault() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         adBlockingExtensionFeature.self().setRawStoredState(State(false))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
 
         testee.onCreate(mock(LifecycleOwner::class.java))
 
@@ -269,7 +256,6 @@ class RealDuckPlayerTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         storedUserPreferencesFlow.value = StoredUserPreferences(true, null)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
 
         testee.onCreate(mock(LifecycleOwner::class.java))
         advanceUntilIdle()
@@ -284,7 +270,6 @@ class RealDuckPlayerTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         storedUserPreferencesFlow.value = StoredUserPreferences(false, AlwaysAsk)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
 
         testee.onCreate(mock(LifecycleOwner::class.java))
 
