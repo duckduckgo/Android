@@ -24,6 +24,7 @@ import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
@@ -39,6 +40,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -61,6 +63,7 @@ class DuckAiEntryWideEvent @Inject constructor(
     @SuppressLint("AvoidComputationUsage")
     private val coroutineScope = CoroutineScope(appCoroutineScope.coroutineContext + dispatchers.computation().limitedParallelism(1))
     private val mutex = Mutex()
+    private val backgroundVoiceMonitor = ConflatedJob()
     private var activeEntry: Entry? = null
     private var selectedTabId: String? = null
     private var pendingLanding: Landing? = null
@@ -81,6 +84,7 @@ class DuckAiEntryWideEvent @Inject constructor(
 
     override fun onForeground() = mutate {
         foreground = true
+        backgroundVoiceMonitor.cancel()
         startPendingLanding()
     }
 
@@ -120,6 +124,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         val landing = pendingLanding ?: return
         pendingLanding = null
         explicitEntryReported = true
+        if (duckChat.value.isVoiceChatSessionActive(landing.tabId)) return
         reportImplicitEntry(DuckChatEntryPoint.APP_OPEN, landing.tabId, landing.url)
         start(DuckChatEntryPoint.APP_OPEN.toPixelValue(), false, Surface.DUCK_AI_TAB, landing.tabId, landing.url)
     }
@@ -166,8 +171,8 @@ class DuckAiEntryWideEvent @Inject constructor(
         if (tabId == selectedTabId || !isDuckAi(url)) return@mutate
         explicitEntryReported = true
         pendingLanding = null
-        reportImplicitEntry(DuckChatEntryPoint.TAB_SWIPED, tabId, url)
-        start(DuckChatEntryPoint.TAB_SWIPED.toPixelValue(), false, Surface.DUCK_AI_TAB, tabId, url)
+        reportImplicitEntry(DuckChatEntryPoint.TAB_SWIPE, tabId, url)
+        start(DuckChatEntryPoint.TAB_SWIPE.toPixelValue(), false, Surface.DUCK_AI_TAB, tabId, url)
     }
 
     private suspend fun reportImplicitEntry(entryPoint: DuckChatEntryPoint, tabId: String, url: String?) {
@@ -213,8 +218,17 @@ class DuckAiEntryWideEvent @Inject constructor(
         launchOpensDuckAi = false
         explicitEntryReported = false
         pendingLanding = null
-        val trigger = activeEntry?.exitTrigger
-        if (trigger == ExitTrigger.BACK_OR_CLOSE) {
+        val entry = activeEntry
+        val trigger = entry?.exitTrigger
+        val voiceTabId = entry?.tabId?.takeIf { duckChat.value.isVoiceChatSessionActive(it) }
+        if (trigger == null && voiceTabId != null) {
+            backgroundVoiceMonitor += coroutineScope.launch {
+                duckChat.value.activeVoiceChatSessions.first { voiceTabId !in it }
+                mutate {
+                    if (!foreground && activeEntry?.flowId == entry.flowId) finish("app_backgrounded")
+                }
+            }
+        } else if (trigger == ExitTrigger.BACK_OR_CLOSE) {
             finish("left_duckai", trigger)
         } else {
             finish("app_backgrounded")
@@ -256,6 +270,7 @@ class DuckAiEntryWideEvent @Inject constructor(
     }
 
     private suspend fun finish(reason: String, trigger: ExitTrigger? = null) {
+        backgroundVoiceMonitor.cancel()
         val entry = activeEntry ?: return
         activeEntry = null
         wideEventClient.intervalEnd(entry.flowId, DURATION)

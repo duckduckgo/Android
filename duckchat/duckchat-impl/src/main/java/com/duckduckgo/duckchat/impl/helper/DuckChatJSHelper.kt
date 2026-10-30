@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.helper
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
@@ -155,6 +156,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val chatStateStore: ChatStateStore,
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val tabSessions: DuckAiTabSessionRepository,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -303,9 +305,15 @@ class RealDuckChatJSHelper @Inject constructor(
                 val source = data?.optString("source")?.takeIf { it.isNotBlank() }
 
                 reportMetric?.let {
-                    duckChatPixels.sendReportMetricPixel(it, modelTier, source)
-                    if (it == USER_DID_SUBMIT_PROMPT || it == USER_DID_SUBMIT_FIRST_PROMPT) {
-                        browserInteractionsPlugins.getPlugins().forEach { plugin -> plugin.onAiPromptSubmitted() }
+                    val isPrompt = it == USER_DID_SUBMIT_PROMPT || it == USER_DID_SUBMIT_FIRST_PROMPT
+                    val entrySource = if (isPrompt) {
+                        if (mode == Mode.CONTEXTUAL) "contextual_chat" else tabSessions.getEntryPointSource(tabId)
+                    } else {
+                        source
+                    }
+                    duckChatPixels.sendReportMetricPixel(it, modelTier, entrySource)
+                    if (isPrompt) {
+                        browserInteractionsPlugins.getPlugins().forEach { plugin -> plugin.onAiPromptSubmitted(entrySource) }
                         if (mode == Mode.FULL && tabId.isNotEmpty()) {
                             duckAiSessionCallback.onPromptSubmitted(tabId)
                         } else if (mode == Mode.CONTEXTUAL && tabId.isNotEmpty()) {

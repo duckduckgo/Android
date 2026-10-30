@@ -421,6 +421,7 @@ import org.mockito.internal.util.DefaultMockingDetails
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
@@ -5547,6 +5548,85 @@ class BrowserTabViewModelTest {
         assertCommandIssued<HideOnboardingDaxBubbleCta>()
         verify(mockOnboardingInputScreenLaunchTarget).setOpenOnDuckAi()
         assertCommandIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenPromptSubmittedAfterOnboardingCompletionPromoThenEntryAndReturnSessionUsePromoSource() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatAutoPromptURL, null)).thenReturn(duckChatAutoPromptURL)
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        testee.openDuckAiQuery("hello", true, DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+
+        verify(mockDuckChat).reportDuckChatEntry(argThat { name == "ONBOARDING_COMPLETION_PROMO" }, eq(false), eq(true))
+        verify(plugin).onAiPromptSubmitted("onboarding_completion_promo")
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoTabHiddenThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onViewHidden()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoAppStoppedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onViewStopped()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoTabSwipedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onTabSwipedAway()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoPageLoadedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onPageContentStart("https://example.com")
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoThenExplicitEntrySourcesArePreserved() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertEquals(DuckChatEntryPoint.SUGGESTION_ASK_AI, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.SUGGESTION_ASK_AI))
     }
 
     @Test
@@ -13505,7 +13585,7 @@ class BrowserTabViewModelTest {
     fun whenNewImageRequestedFromChatMenuThenOpensImageGenerationAndFiresPixels() = runTest {
         testee.openNewImageDuckChatFromChatMenu()
 
-        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY, type = Daily())
     }

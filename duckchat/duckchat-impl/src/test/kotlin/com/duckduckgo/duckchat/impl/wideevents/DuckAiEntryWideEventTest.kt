@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -64,6 +65,7 @@ class DuckAiEntryWideEventTest {
     private val tabSessions: DuckAiTabSessionRepository = mock()
     private val client: WideEventClient = mock()
     private val duckChat: DuckChat = mock()
+    private val voiceSessions = MutableStateFlow<Set<String>>(emptySet())
     private val feature = FakeFeatureToggleFactory.create(DuckAiEntryWideEventFeature::class.java)
     private val testee by lazy {
         DuckAiEntryWideEvent(
@@ -83,6 +85,8 @@ class DuckAiEntryWideEventTest {
     @Before
     fun setup() = runTest {
         whenever(duckChat.isEnabled()).thenReturn(true)
+        whenever(duckChat.activeVoiceChatSessions).thenReturn(voiceSessions)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenAnswer { it.getArgument<String>(0) in voiceSessions.value }
         whenever(inputMode.getSelectedInputMode()).thenReturn(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
         feature.self().setRawStoredState(Toggle.State(true))
         whenever(duckChat.isDuckChatUrl(any())).thenAnswer { it.getArgument<android.net.Uri>(0).host == "duck.ai" }
@@ -240,11 +244,11 @@ class DuckAiEntryWideEventTest {
         testee.onClose()
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.TAB_SWIPED, false, false, true, true)
+        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.TAB_SWIPE, false, false, true, true)
         verify(tabSessions).tryClaimEntryPointSource("chat", "https://duck.ai/?chatID=local-only")
         verify(
             client,
-        ).flowStart(any(), anyOrNull(), argThat { get("source") == "tab_swiped" && get("chat_state") == "existing" }, any(), any(), any())
+        ).flowStart(any(), anyOrNull(), argThat { get("source") == "tab_swipe" && get("chat_state") == "existing" }, any(), any(), any())
         verify(client).flowStep(1L, "prompt_submitted", metadata = mapOf("prompt_submitted" to "true"))
         verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "app_backgrounded"))
     }
@@ -266,7 +270,7 @@ class DuckAiEntryWideEventTest {
         testee.onTabSwiped("chat", "https://duck.ai/")
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.TAB_SWIPED, false, false, true, true)
+        verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.TAB_SWIPE, false, false, true, true)
         verifyNoInteractions(client)
     }
 
@@ -278,6 +282,44 @@ class DuckAiEntryWideEventTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(pixels).sendDuckChatEntryPixel(DuckChatEntryPoint.APP_OPEN, false, false, false, false)
+    }
+
+    @Test
+    fun `returning to a live voice chat preserves its entry without an app open pixel`() = runTest {
+        voiceSessions.value = setOf("tab")
+        testee.onForeground()
+        testee.onEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+        testee.onClose()
+        testee.onForeground()
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(client, never()).flowFinish(any(), any(), any())
+        verifyNoInteractions(pixels)
+
+        voiceSessions.value = emptySet()
+        testee.onLaunchLandingResolved("tab", "https://duck.ai/")
+        coroutineRule.testScope.advanceUntilIdle()
+        verifyNoInteractions(pixels)
+        verify(client, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `voice ending while backgrounded completes the preserved entry`() = runTest {
+        voiceSessions.value = setOf("tab")
+        testee.onForeground()
+        testee.onEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(client, never()).flowFinish(any(), any(), any())
+
+        voiceSessions.value = emptySet()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).flowFinish(1L, FlowStatus.Cancelled, mapOf("status_reason" to "app_backgrounded"))
     }
 
     @Test

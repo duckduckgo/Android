@@ -103,7 +103,7 @@
         "description": "The Duck.ai entry point: the surface that initiated the entry or prompt submission. Omitted when unknown.",
         "enum": [
             "app_open",
-            "tab_swiped",
+            "tab_swipe",
             "address_bar_prompt",
             "address_bar_icon",
             "address_bar_shortcut_chip",
@@ -116,6 +116,7 @@
             "chat_history_open_chat",
             "voice",
             "onboarding",
+            "onboarding_completion_promo",
             "direct_url",
             "serp",
             "ddg_homepage",

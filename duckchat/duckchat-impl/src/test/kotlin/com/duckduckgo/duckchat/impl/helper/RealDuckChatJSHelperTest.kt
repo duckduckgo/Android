@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
@@ -143,6 +144,7 @@ class RealDuckChatJSHelperTest {
         on { isDuckDuckGoQueryUrl(SERP_URL) } doReturn true
     }
     private val entryWideEvent: DuckAiEntryWideEvent = mock()
+    private val tabSessions: DuckAiTabSessionRepository = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
@@ -172,6 +174,7 @@ class RealDuckChatJSHelperTest {
         chatStateStore = chatStateStore,
         responseWaitWideEvent = mockResponseWaitWideEvent,
         duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        tabSessions = tabSessions,
     )
 
     init {
@@ -2173,6 +2176,37 @@ class RealDuckChatJSHelperTest {
 
         verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted()
         verify(mockBrowserInteractionsPlugin, never()).onInputSubmitted()
+    }
+
+    @Test
+    fun whenPageReportsPromptThenPromptPixelAndReturnSessionUseStoredEntrySource() = runTest {
+        whenever(tabSessions.getEntryPointSource("tab")).thenReturn("onboarding_completion_promo")
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt", "source" to "untrusted-page-source")),
+            mode = Mode.FULL,
+            tabId = "tab",
+        )
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT, source = "onboarding_completion_promo")
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted("onboarding_completion_promo")
+    }
+
+    @Test
+    fun whenContextualPageReportsPromptThenReturnSessionReceivesContextualSource() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt")),
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab",
+        )
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted("contextual_chat")
     }
 
     @Test

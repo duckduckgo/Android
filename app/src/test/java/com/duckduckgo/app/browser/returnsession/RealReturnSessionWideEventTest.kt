@@ -300,7 +300,7 @@ class RealReturnSessionWideEventTest {
             metadata = any(),
             cleanupPolicy = any(),
             samplingProbability = any(),
-            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1))),
+            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2))),
         )
     }
 
