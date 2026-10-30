@@ -27,10 +27,12 @@ import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.LOCAL_FILE
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.TRANSFERRED_FILE
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -54,6 +56,10 @@ class RealDeviceMigrationTest {
     private var unupdatedSinceFirstInstall = true
     private val feature = FakeFeatureToggleFactory.create(DeviceMigrationFeature::class.java)
     private var hasAtb = false
+    private var signedInToSync = false
+    private val deviceSyncState: DeviceSyncState = mock {
+        on { isUserSignedInOnDevice() } doAnswer { signedInToSync }
+    }
     private val statisticsDataStore: StatisticsDataStore = mock {
         on { hasInstallationStatistics } doAnswer { hasAtb }
     }
@@ -70,7 +76,9 @@ class RealDeviceMigrationTest {
         },
         deviceMigrationFeature = feature,
         statisticsDataStore = statisticsDataStore,
+        deviceSyncState = lazyOf(deviceSyncState),
         dispatchers = coroutineRule.testDispatcherProvider,
+        appCoroutineScope = coroutineRule.testScope,
     )
 
     private fun onCreate() = testee.onCreate(mock<LifecycleOwner>())
@@ -174,11 +182,11 @@ class RealDeviceMigrationTest {
     }
 
     @Test
-    fun whenMigratedAndRecordedThenPreviousDeviceHadSyncReturnsRecordedValue() {
+    fun whenMigratedWithoutSyncStampAndNoRestorePayloadThenPreviousDeviceHadSyncIsTrue() {
         transferred.edit().putBoolean(KEY_SEEN, true).putBoolean(KEY_IS_NEW_INSTALL, false).commit()
         local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
 
-        assertFalse(testee.previousDeviceHadSync())
+        assertTrue(testee.previousDeviceHadSync())
     }
 
     @Test
@@ -242,5 +250,69 @@ class RealDeviceMigrationTest {
 
         assertFalse(testee.isMigratedInstall())
         assertFalse(newInstance().isMigratedInstall())
+    }
+
+    @Test
+    fun whenSignedInToSyncThenOnCreateStampsItForTheNextPhone() = runTest {
+        signedInToSync = true
+
+        onCreate()
+
+        assertTrue(transferred.getBoolean(KEY_SIGNED_IN_TO_SYNC, false))
+    }
+
+    @Test
+    fun whenSyncTurnedOffBetweenStartsThenStampRefreshed() = runTest {
+        signedInToSync = true
+        onCreate()
+
+        signedInToSync = false
+        newInstance().onCreate(mock())
+
+        assertFalse(transferred.getBoolean(KEY_SIGNED_IN_TO_SYNC, true))
+    }
+
+    @Test
+    fun whenPreviousPhoneSignedInToSyncAndNoRestorePayloadThenPreviousDeviceHadSync() = runTest {
+        transferFromPhone(signedInToSync = true)
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
+
+        assertTrue(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenPreviousPhoneNotSignedInToSyncButRestorePayloadThenPreviousDeviceHadSync() = runTest {
+        transferFromPhone(signedInToSync = false)
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true).commit()
+
+        assertTrue(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenPreviousPhoneNotSignedInToSyncAndNoRestorePayloadThenPreviousDeviceDidNotHaveSync() = runTest {
+        transferFromPhone(signedInToSync = false)
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
+
+        assertFalse(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenThisPhoneStampsItsOwnSyncStateThenPreviousPhoneStampStillUsed() = runTest {
+        transferFromPhone(signedInToSync = true)
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
+        assertTrue(testee.isMigratedInstall())
+
+        signedInToSync = false
+        onCreate()
+
+        assertTrue(newInstance().previousDeviceHadSync())
+    }
+
+    private fun transferFromPhone(signedInToSync: Boolean) {
+        transferred.edit()
+            .putBoolean(KEY_SEEN, true)
+            .putBoolean(KEY_IS_NEW_INSTALL, false)
+            .putBoolean(KEY_SIGNED_IN_TO_SYNC, signedInToSync)
+            .commit()
     }
 }

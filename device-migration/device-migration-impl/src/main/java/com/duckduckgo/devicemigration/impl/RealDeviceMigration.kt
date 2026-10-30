@@ -18,6 +18,7 @@ package com.duckduckgo.devicemigration.impl
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -29,14 +30,22 @@ import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_MIGRATED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_IS_NEW_INSTALL
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_SIGNED_IN_TO_SYNC
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.DeviceSyncState
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 interface InstallTimeComparison {
     /** True when the package was never updated since its first install. */
@@ -64,7 +73,9 @@ class RealDeviceMigration @Inject constructor(
     private val installTimeComparison: InstallTimeComparison,
     private val deviceMigrationFeature: DeviceMigrationFeature,
     private val statisticsDataStore: StatisticsDataStore,
+    private val deviceSyncState: Lazy<DeviceSyncState>, // break any possible DI dependency cycle
     private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DeviceMigration, MainProcessLifecycleObserver, AtbInitializerListener {
 
     // Detection must run once per process, before anything overwrites the transferred marker.
@@ -84,9 +95,13 @@ class RealDeviceMigration @Inject constructor(
         }
     }
 
+    // Either signal is enough: the previous phone may have been signed in without leaving a restore payload, or the reverse.
     // Unknown counts as "had Sync": wrongly offering to create an account is worse than withholding the offer.
-    override fun previousDeviceHadSync(): Boolean =
-        detection.migrated && markerStore.local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true)
+    override fun previousDeviceHadSync(): Boolean {
+        if (!detection.migrated) return false
+        val local = markerStore.local
+        return local.getBoolean(KEY_SOURCE_SIGNED_IN_TO_SYNC, true) || local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true)
+    }
 
     override suspend fun isMigrationExperienceEnabled(): Boolean = withContext(dispatchers.io()) {
         deviceMigrationFeature.self().isEnabled()
@@ -98,6 +113,18 @@ class RealDeviceMigration @Inject constructor(
             .putBoolean(KEY_SEEN, true)
             .putBoolean(KEY_IS_NEW_INSTALL, installTimeComparison.isUnupdatedSinceFirstInstall() && (sourceIsNewInstall ?: true))
             .commit()
+        // Sync can be turned on or off between starts, so the stamp is refreshed every time. Off the main thread: reading the
+        // Sync account touches encrypted storage.
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                val signedIn = deviceSyncState.value.isUserSignedInOnDevice()
+                markerStore.transferred.edit().putBoolean(KEY_SIGNED_IN_TO_SYNC, signedIn).commit()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logcat(ERROR) { "Could not record Sync state for a future device transfer: ${e.javaClass.simpleName}" }
+            }
+        }
     }
 
     // Detection treats an ATB on a fresh package as transferred data, so it must run before this install's first ATB is saved.
@@ -134,7 +161,14 @@ class RealDeviceMigration @Inject constructor(
     }
 
     private fun recordMigrated(source: Boolean): Detection {
+        val transferred = markerStore.transferred
         markerStore.local.edit()
+            .apply {
+                // Copied now because this phone overwrites the transferred stamp with its own state on every start.
+                if (transferred.contains(KEY_SIGNED_IN_TO_SYNC)) {
+                    putBoolean(KEY_SOURCE_SIGNED_IN_TO_SYNC, transferred.getBoolean(KEY_SIGNED_IN_TO_SYNC, true))
+                }
+            }
             .putBoolean(KEY_MIGRATED, true)
             .putBoolean(KEY_FLOW_PENDING, true)
             .putBoolean(KEY_SOURCE_IS_NEW_INSTALL, source)
