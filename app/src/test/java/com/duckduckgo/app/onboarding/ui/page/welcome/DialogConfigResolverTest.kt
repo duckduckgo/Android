@@ -541,7 +541,7 @@ class DialogConfigResolverTest {
                 title = TextConfig.Resource(R.string.deviceMigrationAllSetTitle),
                 body1 = TextConfig.Resource(R.string.deviceMigrationAllSetBody1),
                 body2 = TextConfig.Resource(R.string.deviceMigrationAllSetBody2),
-                pictogramRes = R.drawable.ic_success_96,
+                pictogramRes = R.drawable.team_96,
             ),
             config.content,
         )
