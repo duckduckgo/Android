@@ -106,4 +106,33 @@ class MigratedInstallSyncRestorerTest {
         verify(syncAutoRestore, times(1)).canRestore()
         verify(syncAutoRestore, never()).restoreSyncAccount()
     }
+
+    @Test
+    fun whenRestoreThrowsThenHadSyncStaysTrueAndNotRepeated() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+        whenever(syncAutoRestore.restoreSyncAccount()).thenThrow(RuntimeException())
+
+        startApp()
+        startApp()
+
+        assertTrue(local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false))
+        verify(syncAutoRestore, times(1)).restoreSyncAccount()
+    }
+
+    @Test
+    fun whenCanRestoreThrowsThenNothingRecordedAndRetriedNextStart() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(syncAutoRestore.canRestore()).thenThrow(RuntimeException())
+
+        startApp()
+
+        assertFalse(local.contains(KEY_PREVIOUS_DEVICE_HAD_SYNC))
+
+        doReturn(true).whenever(syncAutoRestore).canRestore()
+        startApp()
+
+        verify(syncAutoRestore, times(1)).restoreSyncAccount()
+        assertTrue(local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false))
+    }
 }

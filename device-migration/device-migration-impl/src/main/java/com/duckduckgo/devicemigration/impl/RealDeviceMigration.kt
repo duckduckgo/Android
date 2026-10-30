@@ -79,7 +79,9 @@ class RealDeviceMigration @Inject constructor(
         }
     }
 
-    override fun previousDeviceHadSync(): Boolean = markerStore.local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false)
+    // Unknown counts as "had Sync": wrongly offering to create an account is worse than withholding the offer.
+    override fun previousDeviceHadSync(): Boolean =
+        detection.migrated && markerStore.local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true)
 
     override fun onCreate(owner: LifecycleOwner) {
         val sourceIsNewInstall = detection.sourceIsNewInstall

@@ -33,9 +33,9 @@ interface DeviceMigration {
     suspend fun markMigrationFlowCompleted()
 
     /**
-     * True when the previous phone had Sync set up, so the account is being restored silently on this one.
-     * Callers must not offer to create a new Sync account then. False when the install is not migrated.
-     * Cheap and safe to call from any thread. Only meaningful once the Sync restore has run, which happens at app start.
+     * True when the previous phone had Sync set up, or when that is not known yet, so callers never offer to create a new
+     * Sync account that would duplicate the one being restored silently. False when the install is not migrated.
+     * Cheap and safe to call from any thread.
      */
     fun previousDeviceHadSync(): Boolean
 }
