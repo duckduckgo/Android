@@ -63,4 +63,9 @@
 
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
+    <!-- New tab page card suggesting Sync after a device transfer -->
+    <string name="syncAfterDeviceTransferTitle">Oh before I forget…</string>
+    <string name="syncAfterDeviceTransferBodyLoss">If you lose this phone, your data doesn’t have to go with it.</string>
+    <string name="syncAfterDeviceTransferBodyEncryption">Sync and Backup keeps an encrypted copy that only you can access.</string>
+    <string name="syncAfterDeviceTransferTurnOnSync">Turn on Sync</string>
 </resources>

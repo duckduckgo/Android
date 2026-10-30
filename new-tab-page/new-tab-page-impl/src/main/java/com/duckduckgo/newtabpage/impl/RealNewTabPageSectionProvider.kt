@@ -20,7 +20,6 @@ import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
@@ -69,22 +68,15 @@ class RealNewTabPageSectionProvider @Inject constructor(
             }
         }
 
-        val sections = mutableListOf<NewTabPageSectionPlugin>()
         val enabledPlugins = newTabPageSections.getPlugins().filter { it.isUserEnabled() }
 
-        val indonesiaSection = enabledPlugins.find { it.name == NewTabPageSection.INDONESIA_MESSAGE.name }
-        if (indonesiaSection != null) {
-            sections.add(indonesiaSection)
-        }
-
-        val rmfSection = enabledPlugins.find { it.name == NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name }
-        if (rmfSection != null) {
-            sections.add(rmfSection)
-        }
+        // Sections the user cannot reorder (messages such as remote messages) come first, in plugin priority order.
+        val reorderableSections = newTabSectionsSettingsPlugins.getPlugins().map { it.name }.toSet()
+        val sections = enabledPlugins.filterNot { it.name in reorderableSections }.toMutableList()
 
         newTabSettingsStore.sectionSettings.forEach { userSetting ->
             val sectionPlugin = enabledPlugins.find { it.name == userSetting }
-            if (sectionPlugin != null) {
+            if (sectionPlugin != null && sectionPlugin !in sections) {
                 sections.add(sectionPlugin)
             }
         }

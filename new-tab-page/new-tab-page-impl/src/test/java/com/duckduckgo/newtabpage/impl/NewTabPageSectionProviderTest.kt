@@ -17,10 +17,13 @@
 package com.duckduckgo.newtabpage.impl
 
 import app.cash.turbine.test
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.newtabpage.api.NewTabPageSection
+import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -175,5 +178,76 @@ class NewTabPageSectionProviderTest {
                 assertTrue(it[4].name == NewTabPageSection.SHORTCUTS.name)
             }
         }
+    }
+
+    @Test
+    fun whenSectionWithoutSettingIsEnabledThenItIsShownAboveUserSectionsInPluginOrder() = runTest {
+        testee = RealNewTabPageSectionProvider(
+            sectionPlugins(
+                FakeEnabledSectionPlugin(NewTabPageSection.INDONESIA_MESSAGE.name, true),
+                FakeEnabledSectionPlugin(MESSAGE_WITHOUT_SETTING, true),
+                FakeEnabledSectionPlugin(NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name, true),
+                FakeEnabledSectionPlugin(NewTabPageSection.APP_TRACKING_PROTECTION.name, true),
+                FakeEnabledSectionPlugin(NewTabPageSection.FAVOURITES.name, true),
+                FakeEnabledSectionPlugin(NewTabPageSection.SHORTCUTS.name, true),
+            ),
+            activeSectionSettingsPlugins,
+            newTabSettingsStore,
+        )
+
+        testee.provideSections().test {
+            assertEquals(
+                listOf(
+                    NewTabPageSection.INDONESIA_MESSAGE.name,
+                    MESSAGE_WITHOUT_SETTING,
+                    NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name,
+                    NewTabPageSection.APP_TRACKING_PROTECTION.name,
+                    NewTabPageSection.FAVOURITES.name,
+                    NewTabPageSection.SHORTCUTS.name,
+                ),
+                expectMostRecentItem().map { it.name },
+            )
+        }
+    }
+
+    @Test
+    fun whenSectionWithoutSettingIsNotEnabledThenItIsNotShown() = runTest {
+        testee = RealNewTabPageSectionProvider(
+            sectionPlugins(
+                FakeEnabledSectionPlugin(MESSAGE_WITHOUT_SETTING, false),
+                FakeEnabledSectionPlugin(NewTabPageSection.FAVOURITES.name, true),
+            ),
+            activeSectionSettingsPlugins,
+            newTabSettingsStore,
+        )
+
+        testee.provideSections().test {
+            assertEquals(listOf(NewTabPageSection.FAVOURITES.name), expectMostRecentItem().map { it.name })
+        }
+    }
+
+    @Test
+    fun whenUserDisabledASectionWithASettingThenItIsNotShownAsAMessage() = runTest {
+        whenever(newTabSettingsStore.sectionSettings).thenReturn(listOf(NewTabPageSection.SHORTCUTS.name))
+        testee = RealNewTabPageSectionProvider(
+            sectionPlugins(
+                FakeEnabledSectionPlugin(NewTabPageSection.FAVOURITES.name, true),
+                FakeEnabledSectionPlugin(NewTabPageSection.SHORTCUTS.name, true),
+            ),
+            activeSectionSettingsPlugins,
+            newTabSettingsStore,
+        )
+
+        testee.provideSections().test {
+            assertEquals(listOf(NewTabPageSection.SHORTCUTS.name), expectMostRecentItem().map { it.name })
+        }
+    }
+
+    private fun sectionPlugins(vararg plugins: NewTabPageSectionPlugin) = object : ActivePluginPoint<NewTabPageSectionPlugin> {
+        override suspend fun getPlugins(): Collection<NewTabPageSectionPlugin> = plugins.toList()
+    }
+
+    private companion object {
+        const val MESSAGE_WITHOUT_SETTING = "MESSAGE_WITHOUT_SETTING"
     }
 }
