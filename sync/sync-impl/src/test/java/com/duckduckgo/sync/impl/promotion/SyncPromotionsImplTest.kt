@@ -96,6 +96,12 @@ class SyncPromotionsImplTest {
     }
 
     @Test
+    fun whenCouldShowBookmarkPromoButRedesignFlagEnabledThenCannotShowPromo() = runTest {
+        syncPromotionFeature.leveragePromosRedesign().setRawStoredState(State(enable = true))
+        assertFalse(testee.canShowBookmarksPromotion(savedBookmarks = 5))
+    }
+
+    @Test
     fun whenCouldShowBookmarkPromoButSyncFlagDisabledThenCannotShowPromo() = runTest {
         configureSyncFeatureFlagState(state = false)
         assertFalse(testee.canShowBookmarksPromotion(savedBookmarks = 5))
@@ -158,5 +164,6 @@ class SyncPromotionsImplTest {
         syncPromotionFeature.self().setRawStoredState(State(enable = true))
         syncPromotionFeature.bookmarks().setRawStoredState(State(enable = true))
         syncPromotionFeature.passwords().setRawStoredState(State(enable = true))
+        syncPromotionFeature.leveragePromosRedesign().setRawStoredState(State(enable = false))
     }
 }
