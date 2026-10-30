@@ -30,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -47,13 +48,18 @@ class SyncPasswordsSetUpPromotionViewModelTest {
     private val promotionDataStore = FakeSyncPromotionDataStore()
     private val pixel: Pixel = mock()
 
-    private val testee = SyncPasswordsSetUpPromotionViewModel(
-        connectedDevicesRepository = mock<ConnectedDevicesRepository> {
-            on { latestConnectedDeviceCountFlow() } doReturn connectedDeviceCount
-        },
-        promotionDataStore = promotionDataStore,
-        pixel = pixel,
-    )
+    private lateinit var testee: SyncPasswordsSetUpPromotionViewModel
+
+    @Before
+    fun setUp() {
+        testee = SyncPasswordsSetUpPromotionViewModel(
+            connectedDevicesRepository = mock<ConnectedDevicesRepository> {
+                on { latestConnectedDeviceCountFlow() } doReturn connectedDeviceCount
+            },
+            promotionDataStore = promotionDataStore,
+            pixel = pixel,
+        )
+    }
 
     @Test
     fun `when impression is recorded then fire displayed pixel`() = runTest {
@@ -68,6 +74,21 @@ class SyncPasswordsSetUpPromotionViewModelTest {
         testee.recordImpression()
 
         verify(pixel, times(1)).fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, mapOf("source" to "passwords"))
+    }
+
+    @Test
+    fun `when impression is recorded then record promotion impression`() = runTest {
+        testee.recordImpression()
+
+        assertEquals(1L, promotionDataStore.getPromoImpressionCount(PasswordsScreen))
+    }
+
+    @Test
+    fun `when impression is recorded again then record promotion impression once`() = runTest {
+        testee.recordImpression()
+        testee.recordImpression()
+
+        assertEquals(1L, promotionDataStore.getPromoImpressionCount(PasswordsScreen))
     }
 
     @Test

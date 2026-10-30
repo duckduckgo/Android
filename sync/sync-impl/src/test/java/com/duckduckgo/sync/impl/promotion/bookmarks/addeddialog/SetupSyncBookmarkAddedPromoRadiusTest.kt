@@ -25,6 +25,7 @@ import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.SyncStateMonitor
+import com.duckduckgo.sync.impl.promotion.FakeSyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
@@ -79,6 +80,7 @@ class SetupSyncBookmarkAddedPromoRadiusTest {
                     dispatchers = coroutineTestRule.testDispatcherProvider,
                     activity = activity,
                     syncPromotions = syncPromotions,
+                    promotionDataStore = FakeSyncPromotionDataStore(),
                     syncStateMonitor = syncStateMonitor,
                     syncPixels = mock(),
                     appBrandDesignUpdateToggles = toggles,
