@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.settings.views
+package com.duckduckgo.pir.impl.settings
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -25,15 +25,15 @@ import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.Command.OpenPirDesktop
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled.Type
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled.Type.DASHBOARD
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled.Type.DESKTOP
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPirDesktop
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type.DASHBOARD
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type.DESKTOP
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +50,7 @@ import javax.inject.Inject
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class PirSettingViewModel @Inject constructor(
-    private val pixelSender: SubscriptionPixelSender,
+    private val pixelSender: PirPixelSender,
     private val subscriptions: Subscriptions,
     private val pirFeature: PirFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -83,7 +83,7 @@ class PirSettingViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     fun onPir(type: Type) {
-        pixelSender.reportAppSettingsPirClick()
+        pixelSender.reportAppSettingsClick()
 
         viewModelScope.launch {
             val command = when (type) {

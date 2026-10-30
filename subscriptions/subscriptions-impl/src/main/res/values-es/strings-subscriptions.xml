@@ -94,7 +94,6 @@
     <string name="purchaseError">Tenemos problemas para conectar. Inténtalo de nuevo más tarde.</string>
 
     <!-- PIR Settings-->
-    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
