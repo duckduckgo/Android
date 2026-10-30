@@ -38,6 +38,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose' apply false
     id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
+    id 'androidx.baselineprofile' apply false
 }
 
 // Proprietary DuckSans font swap. See https://app.asana.com/1/137249556945/project/1207908166761516/task/1213686706814504
@@ -320,10 +321,39 @@ fladle {
             localResultsDir.set("perfResults")
             flakyTestAttempts.set(0)
         }
+        startupTests {
+            serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
+            flankVersion.set("21.+")
+            useOrchestrator.set(false)
+            recordVideo.set(false)
+            testTimeout.set("45m")
+            debugApk.set(project.provider {
+                def dir = rootProject.file("app/build/outputs/apk/internal/release")
+                def apks = dir.exists() ? (dir.listFiles() ?: []).findAll { it.name.endsWith("-internal-release.apk") } : []
+                apks.isEmpty() ? new File(dir, "missing-internal-release.apk").absolutePath : apks.first().absolutePath
+            })
+            instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
+            additionalTestApks.set([])
+            testTargets.set(
+                    findProperty("ftlStartupMethods")
+                            ? findProperty("ftlStartupMethods").toString().split(",").collect { "class com.duckduckgo.macrobenchmark.StartupBenchmark#${it.trim()}".toString() }
+                            : ["class com.duckduckgo.macrobenchmark.StartupBenchmark"]
+            )
+            devices.set([["model": findProperty("ftlDeviceModel") ?: "shiba", "version": findProperty("ftlDeviceVersion") ?: "34"]])
+            environmentVariables.set([
+                    "additionalTestOutputDir"        : "/sdcard/Download",
+                    "no-isolated-storage"            : "true",
+                    "androidx.benchmark.suppressErrors": "EMULATOR",
+            ])
+            directoriesToPull.set(["/sdcard/Download"])
+            filesToDownload.set([".*/sdcard/Download/.*"])
+            localResultsDir.set("startupResults")
+            flakyTestAttempts.set(0)
+        }
     }
 }
 
-tasks.matching { it.name == "execFlankPerfTests" }.configureEach {
+tasks.matching { it.name == "execFlankPerfTests" || it.name == "execFlankStartupTests" }.configureEach {
     doFirst {
         if (!file(config.debugApk.get()).exists()) {
             throw new GradleException("No internalRelease APK in app/build/outputs/apk/internal/release — run :app:assembleInternalRelease first")
