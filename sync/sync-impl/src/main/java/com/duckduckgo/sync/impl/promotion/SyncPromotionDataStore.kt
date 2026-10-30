@@ -32,8 +32,10 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.C
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsImport
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -46,22 +48,36 @@ interface SyncPromotionDataStore {
     suspend fun getTimeSinceLastPromoImpression(promotionType: PromotionType): Duration?
     suspend fun clearPromoHistory(promotionType: PromotionType)
 
-    sealed interface PromotionType {
-        object BookmarksScreen : PromotionType
-        object BookmarksScreenMultiDevice : PromotionType
-        object PasswordsScreen : PromotionType
-        object BookmarksImport : PromotionType
-        object PasswordsImport : PromotionType
-        object BookmarkAddedDialog : PromotionType
-        object ChatTabPage : PromotionType
+    enum class PromotionType {
+        BookmarksScreen,
+        BookmarksScreenMultiDevice,
+        PasswordsScreen,
+        BookmarksImport,
+        PasswordsImport,
+        BookmarkAddedDialog,
+        ChatTabPage,
     }
 }
 
-@ContributesBinding(AppScope::class)
+/**
+ * Additional operations for internal builds, used by the promotion debug screen.
+ */
+interface InternalSyncPromotionDataStore : SyncPromotionDataStore {
+    suspend fun getPromoDismissTime(promotionType: PromotionType): Instant?
+    suspend fun setPromoDismissTime(promotionType: PromotionType, time: Instant)
+    suspend fun clearPromoDismissal(promotionType: PromotionType)
+    suspend fun getLastPromoImpressionTime(promotionType: PromotionType): Instant?
+    suspend fun setLastPromoImpressionTime(promotionType: PromotionType, time: Instant)
+    suspend fun clearPromoImpressions(promotionType: PromotionType)
+    suspend fun clearAllPromoHistory()
+}
+
+@ContributesBinding(AppScope::class, binding = binding<SyncPromotionDataStore>())
+@ContributesBinding(AppScope::class, binding = binding<InternalSyncPromotionDataStore>())
 class SyncPromotionDataStoreImpl @Inject constructor(
     @SyncPromotion private val dataStore: DataStore<Preferences>,
     private val currentTimeProvider: CurrentTimeProvider,
-) : SyncPromotionDataStore {
+) : InternalSyncPromotionDataStore {
 
     override suspend fun hasPromoBeenDismissed(promotionType: PromotionType): Boolean {
         val key = promotionType.dismissKey()
@@ -102,6 +118,44 @@ class SyncPromotionDataStoreImpl @Inject constructor(
             it.remove(impressionKey)
             it.remove(lastImpressionKey)
         }
+    }
+
+    override suspend fun getPromoDismissTime(promotionType: PromotionType): Instant? {
+        val key = promotionType.dismissKey()
+        return dataStore.data.map { it[key] }.firstOrNull()?.let(Instant::ofEpochMilli)
+    }
+
+    override suspend fun setPromoDismissTime(promotionType: PromotionType, time: Instant) {
+        val key = promotionType.dismissKey()
+        dataStore.edit { it[key] = time.toEpochMilli() }
+    }
+
+    override suspend fun clearPromoDismissal(promotionType: PromotionType) {
+        val key = promotionType.dismissKey()
+        dataStore.edit { it.remove(key) }
+    }
+
+    override suspend fun getLastPromoImpressionTime(promotionType: PromotionType): Instant? {
+        val key = promotionType.lastImpressionKey()
+        return dataStore.data.map { it[key] }.firstOrNull()?.let(Instant::ofEpochMilli)
+    }
+
+    override suspend fun setLastPromoImpressionTime(promotionType: PromotionType, time: Instant) {
+        val key = promotionType.lastImpressionKey()
+        dataStore.edit { it[key] = time.toEpochMilli() }
+    }
+
+    override suspend fun clearPromoImpressions(promotionType: PromotionType) {
+        val impressionKey = promotionType.impressionsKey()
+        val lastImpressionKey = promotionType.lastImpressionKey()
+        dataStore.edit {
+            it.remove(impressionKey)
+            it.remove(lastImpressionKey)
+        }
+    }
+
+    override suspend fun clearAllPromoHistory() {
+        dataStore.edit { it.clear() }
     }
 
     private fun PromotionType.dismissKey(): Preferences.Key<Long> {

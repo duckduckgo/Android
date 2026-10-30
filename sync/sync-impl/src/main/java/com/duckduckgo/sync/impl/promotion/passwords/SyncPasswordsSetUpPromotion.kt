@@ -16,10 +16,10 @@
 
 package com.duckduckgo.sync.impl.promotion.passwords
 
-import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.impl.promotion.SyncPromotionAppInstall
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionFeature
@@ -42,7 +42,7 @@ class RealSyncPasswordsSetUpPromotion @Inject constructor(
     private val syncPromotionFeature: SyncPromotionFeature,
     private val promotionDataStore: SyncPromotionDataStore,
     private val dispatchers: DispatcherProvider,
-    private val appInstall: AppInstall,
+    private val appInstall: SyncPromotionAppInstall,
 ) : SyncPasswordsSetUpPromotion {
 
     override suspend fun canShowPromotion(savedPasswords: Int): Boolean {
