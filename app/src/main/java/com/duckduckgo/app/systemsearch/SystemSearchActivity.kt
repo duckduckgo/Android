@@ -435,7 +435,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     }
 
                     is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                        viewModel.onDuckAiRequested(result.query, DuckChatEntryPoint.SYSTEM_SEARCH)
+                        viewModel.onDuckAiRequested(result.query, DuckChatEntryPoint.SYSTEM_SEARCH, voice = true)
                     }
                 }
             } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {

@@ -1425,8 +1425,8 @@ class BrowserTabFragment :
                 },
                 onChatSuggestionSelected = { chatUrl -> viewModel.openDuckAiChatById(chatUrl) },
                 duckAiEntryPointResolver = viewModel::resolveDuckAiEntryPoint,
-                onDuckAiQuerySubmitted = { query, entryPoint ->
-                    viewModel.openDuckAiQuery(query, autoPrompt = true, entryPoint = entryPoint)
+                onDuckAiQuerySubmitted = { query, entryPoint, voice ->
+                    viewModel.openDuckAiQuery(query, autoPrompt = true, entryPoint = entryPoint, voice = voice)
                 },
                 onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
                 onChatHistoryShortcutClicked = {

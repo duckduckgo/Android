@@ -204,7 +204,7 @@ class DuckAiEntryWideEventTest {
 
     @Test
     fun `contextual entry carries prompt and existing chat state`() = runTest {
-        testee.onContextualSheetOpened("tab", true, "https://duck.ai/?chatID=local-only")
+        testee.onContextualSheetOpened("tab", true, "https://duck.ai/?chatID=local-only", voice = true)
         testee.onPromptSubmitted("tab")
         testee.onContextualSheetClosed("tab")
         coroutineRule.testScope.advanceUntilIdle()
@@ -214,7 +214,7 @@ class DuckAiEntryWideEventTest {
             anyOrNull(),
             argThat {
                 get("source") == "contextual_chat" && get("surface") == "contextual_sheet" &&
-                    get("has_prompt") == "true" && get("chat_state") == "existing"
+                    get("has_prompt") == "true" && get("chat_state") == "existing" && get("voice") == "true"
             },
             any(),
             any(),

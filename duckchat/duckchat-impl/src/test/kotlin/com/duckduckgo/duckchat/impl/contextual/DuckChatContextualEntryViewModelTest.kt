@@ -98,6 +98,16 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
+    fun whenDictatedPromptSubmittedThenVoiceAttributionIsStored() = runTest {
+        viewModel.start("tab-1")
+        viewModel.onPromptSubmitted(samplePrompt, voice = true)
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertTrue(captor.firstValue.voice)
+    }
+
+    @Test
     fun whenPromptSubmittedThenStoredWithAttachedContextAndHandsOff() = runTest {
         viewModel.start("tab-1")
         viewModel.onPageContextReceived(validContext)

@@ -708,9 +708,9 @@ class RealDuckChat @Inject constructor(
         openDuckChat(emptyMap())
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) {
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
-        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = stripBang(query).isNotEmpty())
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = stripBang(query).isNotEmpty(), voice = voice)
         val parameters = addChatParameters(query, autoPrompt = true, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
@@ -802,14 +802,6 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun reportDuckChatEntry(
-        entryPoint: DuckChatEntryPoint,
-        opensNewTab: Boolean,
-        hasPrompt: Boolean,
-    ) {
-        reportDuckChatEntry(entryPoint, opensNewTab, hasPrompt, voice = false)
-    }
-
-    private fun reportDuckChatEntry(
         entryPoint: DuckChatEntryPoint,
         opensNewTab: Boolean,
         hasPrompt: Boolean,

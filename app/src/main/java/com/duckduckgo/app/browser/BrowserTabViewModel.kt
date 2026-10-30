@@ -5894,6 +5894,7 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         autoPrompt: Boolean,
         entryPoint: DuckChatEntryPoint,
+        voice: Boolean = false,
     ) {
         val duckAiUrl = duckChat.getDuckChatUrl(query, autoPrompt)
         val hasPrompt = hasAutoSubmittedPrompt(duckAiUrl)
@@ -5906,6 +5907,7 @@ class BrowserTabViewModel @Inject constructor(
             url = duckAiUrl,
             entryPoint = resolvedEntryPoint,
             hasPrompt = hasPrompt,
+            voice = voice,
         )
     }
 
@@ -5939,9 +5941,10 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         entryPoint: DuckChatEntryPoint,
         hasPrompt: Boolean,
+        voice: Boolean = false,
     ) {
         val opensNewTab = currentBrowserViewState().browserShowing
-        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = opensNewTab, hasPrompt = hasPrompt)
+        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = opensNewTab, hasPrompt = hasPrompt, voice = voice)
         if (!opensNewTab) {
             submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
         } else {

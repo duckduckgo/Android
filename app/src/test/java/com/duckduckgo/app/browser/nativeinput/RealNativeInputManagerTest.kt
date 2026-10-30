@@ -594,7 +594,32 @@ class RealNativeInputManagerTest {
 
         testee.handleDuckAiVoiceResult("dictated prompt")
 
-        verify(duckChat).openDuckChatWithAutoPrompt("dictated prompt", DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+        verify(duckChat).openDuckChatWithAutoPrompt("dictated prompt", DuckChatEntryPoint.ADDRESS_BAR_PROMPT, voice = true)
+    }
+
+    @Test
+    fun whenDictationIsFollowedByTypingThenVoiceFlagDoesNotLeak() {
+        val flags = mutableListOf<Boolean>()
+        showVoiceTestWidget(onVoiceFlag = { flags += it }) { _, _ -> }
+        testee.handleDuckAiVoiceResult("dictated prompt")
+
+        val widget = showVoiceTestWidget(onVoiceFlag = { flags += it }) { _, _ -> }
+        widget.selectChatTab()
+        widget.submitMessage("typed prompt")
+
+        assertEquals(listOf(true, false), flags)
+    }
+
+    @Test
+    fun whenBlankDictationThenNextTypedPromptIsNotVoice() {
+        val flags = mutableListOf<Boolean>()
+        val widget = showVoiceTestWidget(onVoiceFlag = { flags += it }) { _, _ -> }
+        testee.handleDuckAiVoiceResult("")
+        testee.handleDuckAiVoiceResult("   ")
+        widget.selectChatTab()
+        widget.submitMessage("typed prompt")
+
+        assertEquals(listOf(false), flags)
     }
 
     @Test
@@ -663,6 +688,7 @@ class RealNativeInputManagerTest {
 
     private fun showVoiceTestWidget(
         currentTabUrl: Flow<String?> = emptyFlow(),
+        onVoiceFlag: (Boolean) -> Unit = {},
         onDuckAiQuerySubmitted: (String, DuckChatEntryPoint) -> Unit,
     ): TestNativeInputWidget {
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
@@ -693,7 +719,10 @@ class RealNativeInputManagerTest {
                 onSearchSubmitted = {},
                 onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
-                onDuckAiQuerySubmitted = onDuckAiQuerySubmitted,
+                onDuckAiQuerySubmitted = { query, entryPoint, voice ->
+                    onVoiceFlag(voice)
+                    onDuckAiQuerySubmitted(query, entryPoint)
+                },
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),

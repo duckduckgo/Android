@@ -270,6 +270,32 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `dictated entry prompt retains voice attribution when sheet opens`() = runTest {
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null, voice = true))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null, voice = true)
+    }
+
+    @Test
+    fun `dictated entry prompt retains voice attribution when sheet reopens`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null, voice = true))
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null, voice = true)
+    }
+
+    @Test
     fun `onSheetOpened reports the sheet opened even for an entry-dialog hand-off`() = runTest {
         val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
         whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null))
@@ -831,12 +857,13 @@ class DuckChatContextualWebViewViewModelTest {
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat(entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
-        override fun openDuckChatWithAutoPrompt(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun openDuckChatWithAutoPrompt(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint, voice: Boolean) = Unit
         override fun openDuckChatWithPrefill(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
         override fun reportDuckChatEntry(
             entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint,
             opensNewTab: Boolean,
             hasPrompt: Boolean,
+            voice: Boolean,
         ) = Unit
         override fun getDuckChatUrl(
             query: String,

@@ -109,10 +109,10 @@ class DuckAiEntryWideEvent @Inject constructor(
         )
     }
 
-    fun onContextualSheetOpened(tabId: String, hasPrompt: Boolean, url: String?) = mutate {
+    fun onContextualSheetOpened(tabId: String, hasPrompt: Boolean, url: String?, voice: Boolean = false) = mutate {
         explicitEntryReported = true
         pendingLanding = null
-        start(DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue(), hasPrompt, Surface.CONTEXTUAL_SHEET, tabId, url)
+        start(DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue(), hasPrompt, Surface.CONTEXTUAL_SHEET, tabId, url, voice = voice)
     }
 
     fun onContextualSheetUrlResolved(tabId: String, url: String?) = mutate {

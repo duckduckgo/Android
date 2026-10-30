@@ -717,6 +717,21 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenDictatedPromptOpensDuckAiThenBothEventsCarryVoiceAndPreserveSource() = runTest {
+        testee.openDuckChatWithAutoPrompt("dictated prompt", DuckChatEntryPoint.SYSTEM_SEARCH, voice = true)
+
+        verify(mockDuckChatPixels).sendDuckChatEntryPixel(
+            entryPoint = DuckChatEntryPoint.SYSTEM_SEARCH,
+            opensNewTab = true,
+            hasPrompt = true,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+            voice = true,
+        )
+        verify(entryWideEvent).onEntry(DuckChatEntryPoint.SYSTEM_SEARCH, true, true, true)
+    }
+
+    @Test
     fun whenDigitalAssistantStartsVoiceChatThenBothEventsPreserveSourceAndVoiceFlag() = runTest {
         testee.openVoiceDuckChat(DuckChatEntryPoint.DIGITAL_ASSISTANT)
 
