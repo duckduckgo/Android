@@ -1,0 +1,60 @@
+{
+  "rules": [
+    {
+      "id": "M1",
+      "name": "No implementation-detail types",
+      "why": "A public type is named `*Repository`, `*Dao`, `*Entity`, `*ViewModel` or `*Impl`, or starts with `Real`. The name describes how something is stored or implemented today, not what a caller can do.",
+      "fix": "Expose a capability interface named for what callers need.",
+      "short_fix": "Name it for what callers can do, or hide it behind a capability interface."
+    },
+    {
+      "id": "M2",
+      "name": "No `Toggle` in the public surface",
+      "why": "A public declaration exposes `Toggle`. Every consumer can then read raw flag state, and the flag can't be removed without a breaking change.",
+      "fix": "Move the `@ContributesRemoteFeature` interface to `-impl`, and expose the decision, or nothing, from `-api`.",
+      "short_fix": "Move the toggle interface to `-impl`; expose only the decision."
+    },
+    {
+      "id": "M3",
+      "name": "Top-level declarations documented",
+      "why": "A public type or top-level function has no KDoc, so consumers have to read `-impl` to learn what it's for.",
+      "fix": "Add a sentence or two of KDoc: what it's for and who should use it.",
+      "short_fix": "Add a KDoc line saying what it's for."
+    },
+    {
+      "id": "M4",
+      "name": "Members documented",
+      "why": "A public function or property has no KDoc; its signature alone doesn't say how to use it.",
+      "fix": "Add KDoc saying what the member does.",
+      "short_fix": "Add a KDoc line saying what it does."
+    },
+    {
+      "id": "M5",
+      "name": "No nullable factory returns",
+      "why": "A public function returns `Intent?`, `Fragment?`, `View?` or `Bundle?`, which hands a failure the API already detected to the caller without saying why.",
+      "fix": "Take every argument needed so it can't fail, or return a sealed result type.",
+      "short_fix": "Make it unable to fail, or return a sealed result."
+    },
+    {
+      "id": "M6",
+      "name": "Within the size ceiling",
+      "why": "The module has more than 80 public declarations: it covers several responsibilities, and every consumer depends on more than it uses.",
+      "fix": "Split it by who calls it, grouped by shared callers.",
+      "short_fix": "Split the module by who calls it."
+    },
+    {
+      "id": "M7",
+      "name": "No untyped or positional types",
+      "why": "`Any`, `Pair` or `Triple` is in a public signature. `Any` turns type errors into runtime crashes; `Pair` and `Triple` drop the names of what's returned.",
+      "fix": "Name the thing: a data class or a sealed hierarchy.",
+      "short_fix": "Use a named data class or sealed type."
+    },
+    {
+      "id": "M8",
+      "name": "No exposed write access",
+      "why": "A public `var`, or a writable type in a signature (`Mutable*`, Java collections like `ArrayList`, `Atomic*`, or a coroutines `Channel`), lets any consumer change state its owning module is responsible for.",
+      "fix": "Use a `val` plus a function named for the intent; narrow `MutableStateFlow` to `StateFlow` at the boundary.",
+      "short_fix": "Expose a `val` or a read-only type; add a function for writes."
+    }
+  ]
+}

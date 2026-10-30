@@ -24,10 +24,11 @@ from dataclasses import dataclass, field
 FLOOR_EXCLUDED_MODULE = "browser-api"
 MAX_DETAILED_FINDINGS = 200
 PR_COMMENT_MARKER = "<!-- api-quality-check -->"
+RULES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rules.json")
 # Filled in by asana_sync.py, which can count the Asana tasks; a dash where nothing posts.
 AWAITING_TRIAGE_CELL = "— <!-- awaiting-triage -->"
 # O1's proposed goals for 2027-06-30, from the objective; shown next to the weekly numbers.
-GOALS = {"weighted": "75%", "unweighted": "90%", "floor": "5/8", "awaiting_triage": "0"}
+GOALS = {"weighted": "75%", "unweighted": "90%", "floor": "5", "awaiting_triage": "0"}
 
 
 @dataclass(frozen=True)
@@ -74,9 +75,9 @@ class Run:
         return {
             "modules": len(modules),
             "points": sum(m.score for m in modules),
-            "max_points": len(modules) * 8,
-            "weighted": sum(m.score / 8 * m.declarations for m in modules) / total_decls if total_decls else 0.0,
-            "unweighted": sum(m.score / 8 for m in modules) / len(modules) if modules else 0.0,
+            "max_points": len(modules) * MAX_SCORE,
+            "weighted": sum(m.score / MAX_SCORE * m.declarations for m in modules) / total_decls if total_decls else 0.0,
+            "unweighted": sum(m.score / MAX_SCORE for m in modules) / len(modules) if modules else 0.0,
             "floor": floor,
             "floor_modules": sorted(m.module for m in floor_candidates if m.score == floor),
             "declarations": total_decls,
@@ -173,50 +174,16 @@ def diff_runs(before: Run, after: Run) -> Diff:
     )
 
 
-RULES = {
-    "M1": ("No implementation-detail types",
-           "A public type is named `*Repository`, `*Dao`, `*Entity`, `*ViewModel` or `*Impl`. The name describes how something "
-           "is stored today, not what a caller can do.",
-           "Expose a capability interface named for what callers need."),
-    "M2": ("No `Toggle` in the public surface",
-           "A public declaration exposes `Toggle`. Every consumer can then read raw flag state, and the flag can't be removed "
-           "without a breaking change.",
-           "Move the `@ContributesRemoteFeature` interface to `-impl`, and expose the decision, or nothing, from `-api`."),
-    "M3": ("Top-level declarations documented",
-           "A public type or top-level function has no KDoc, so consumers have to read `-impl` to learn what it's for.",
-           "Add a sentence or two of KDoc: what it's for and who should use it."),
-    "M4": ("Members documented",
-           "A public function or property has no KDoc; its signature alone doesn't say how to use it.",
-           "Add KDoc saying what the member does."),
-    "M5": ("No nullable factory returns",
-           "A public function returns `Intent?`, `Fragment?`, `View?` or `Bundle?`, which hands a failure the API already "
-           "detected to the caller without saying why.",
-           "Take every argument needed so it can't fail, or return a sealed result type."),
-    "M6": ("Within the size ceiling",
-           "The module has more than 80 public declarations: it covers several responsibilities, and every consumer depends "
-           "on more than it uses.",
-           "Split it by who calls it, grouped by shared callers."),
-    "M7": ("No untyped or positional types",
-           "`Any`, `Pair` or `Triple` is in a public signature. `Any` turns type errors into runtime crashes; `Pair` and "
-           "`Triple` drop the names of what's returned.",
-           "Name the thing: a data class or a sealed hierarchy."),
-    "M8": ("No exposed write access",
-           "A public `var` or a `Mutable*` type lets any consumer change state its owning module is responsible for.",
-           "Use a `val` plus a function named for the intent; narrow `MutableStateFlow` to `StateFlow` at the boundary."),
-}
+def load_rules(path=RULES_PATH):
+    with open(path) as f:
+        return json.load(f)["rules"]
 
 
-# One line each, for the PR comment; the Asana finding tasks use the fuller RULES text.
-SHORT_FIXES = {
-    "M1": "Name it for what callers can do, or hide it behind a capability interface.",
-    "M2": "Move the toggle interface to `-impl`; expose only the decision.",
-    "M3": "Add a KDoc line saying what it's for.",
-    "M4": "Add a KDoc line saying what it does.",
-    "M5": "Make it unable to fail, or return a sealed result.",
-    "M6": "Split the module by who calls it.",
-    "M7": "Use a named data class or sealed type.",
-    "M8": "Expose a `val` or a read-only type; add a function for writes.",
-}
+# rules.json is the single source of the rule texts; the Asana rules task links to it.
+_rules = load_rules()
+RULES = {r["id"]: (r["name"], r["why"], r["fix"]) for r in _rules}
+SHORT_FIXES = {r["id"]: r["short_fix"] for r in _rules}
+MAX_SCORE = len(RULES)
 
 
 def detail_md(detail):
@@ -258,7 +225,7 @@ def moved_in(diff: Diff):
 
 
 def score_drop_text(module, b, a, diff: Diff):
-    text = f"Score {b.score}/8 → {a.score}/8"
+    text = f"Score {b.score}/{MAX_SCORE} → {a.score}/{MAX_SCORE}"
     sources = moved_in(diff)[module]
     if sources:
         text += (f", from findings moved in from {', '.join(f'`{m}`' for m in sorted(sources))}: possibly existing API "
@@ -295,7 +262,7 @@ def pct(value):
 
 
 def score_change_row(module, b, a):
-    return f"| `{module}` | {f'{b.score}/8' if b else 'new'} | {f'{a.score}/8' if a else 'removed'} |"
+    return f"| `{module}` | {f'{b.score}/{MAX_SCORE}' if b else 'new'} | {f'{a.score}/{MAX_SCORE}' if a else 'removed'} |"
 
 
 def rules_line(rules_url):
@@ -313,7 +280,8 @@ def summary_table(before: Run, after: Run, diff: Diff, baseline: Run = None, wee
     rows = [
         ["Score, weighted by declarations"] + [pct(f["weighted"]) for f in fleets] + [GOALS["weighted"]],
         ["Score, average per module"] + [pct(f["unweighted"]) for f in fleets] + [GOALS["unweighted"]],
-        [f"Lowest module score, excluding `{FLOOR_EXCLUDED_MODULE}`"] + [f"{f['floor']}/8" for f in fleets] + [GOALS["floor"]],
+        [f"Lowest module score, excluding `{FLOOR_EXCLUDED_MODULE}`"] + [f"{f['floor']}/{MAX_SCORE}" for f in fleets]
+        + [f"{GOALS['floor']}/{MAX_SCORE}"],
         ["New findings"] + blanks + [str(len(diff.new)), ""],
         ["Resolved findings"] + blanks + [str(len(diff.resolved)), ""],
     ]
