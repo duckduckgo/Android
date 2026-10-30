@@ -49,7 +49,7 @@ import org.jetbrains.kotlin.psi.KtTypeReference;
 import org.jetbrains.kotlin.psi.KtUserType;
 
 /**
- * Scores every -api module against the mechanical checks M1-M8. See README.
+ * Scores every -api module against the mechanical checks. See README.
  *
  * Parses with the Kotlin compiler's own PSI rather than text matching, so visibility, KDoc placement and
  * signature types are read exactly as the compiler sees them and the same source always gives the same score.

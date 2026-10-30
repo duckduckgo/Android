@@ -2,7 +2,7 @@
 
 [AOI:Android API Standards](https://app.asana.com/1/137249556945/project/1218312816344693/list/1218311445762235) 
 
-Scores every `-api` module against the mechanical checks M1–M8 of the API quality rules, compares runs, and publishes the
+Scores every `-api` module against the mechanical checks of the API quality rules, compares runs, and publishes the
 weekly report.
 
 Refer to [API Quality Rules and Scores](https://app.asana.com/1/137249556945/project/1218312816344693/task/1218312816344701?focus=true) on Asana for more information and full list of checks.
