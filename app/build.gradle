@@ -456,6 +456,9 @@ dependencies {
     playImplementation project(':persistent-storage-impl')
     fdroidImplementation project(':persistent-storage-dummy-impl')
 
+    implementation project(':device-migration-api')
+    implementation project(':device-migration-impl')
+
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
