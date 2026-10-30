@@ -85,6 +85,17 @@ class BackupRulesTest {
         assertTrue("missing: ${expected - excludes}", excludes.containsAll(expected))
     }
 
+    @Test
+    fun vpnUserChoicesAreTransferred() {
+        val excludes = modernRules.section("device-transfer").rules("exclude").toSet()
+
+        val vpnUserChoices = setOf(
+            "database" to "vpn.db",
+            "file" to "harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1",
+        )
+        assertTrue("excluded: ${vpnUserChoices intersect excludes}", (vpnUserChoices intersect excludes).isEmpty())
+    }
+
     private fun parse(name: String): org.w3c.dom.Document =
         DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(File("src/main/res/xml/$name"))
 
@@ -108,6 +119,8 @@ class BackupRulesTest {
                 "sharedpref" to "com.duckduckgo.app.devicemigration.cleanup.xml",
                 "sharedpref" to "com.duckduckgo.subscriptions.devicemigration.xml",
                 "sharedpref" to "com.duckduckgo.sync.devicemigration.xml",
+                "sharedpref" to "com.duckduckgo.mobile.android.vpn.devicemigration.cleanup.xml",
+                "sharedpref" to "com.duckduckgo.networkprotection.devicemigration.cleanup.xml",
                 "sharedpref" to "com.duckduckgo.app.email.settings.xml",
                 "sharedpref" to "com.duckduckgo.app.email.settings.encryptiontest.xml",
                 "sharedpref" to "com.duckduckgo.sync.store.v1.xml",
@@ -137,7 +150,6 @@ class BackupRulesTest {
                 "sharedpref" to "com.duckduckgo.mobile.atp.cohort.prefs.xml",
                 "file" to "harmony_prefs/com.duckduckgo.mobile.android.vpn.feature.registry.v1",
                 "file" to "harmony_prefs/com.duckduckgo.vpn.tunnel.config.v1",
-                "file" to "harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1",
                 "file" to "harmony_prefs/com.duckduckgo.netp.store.waitlist",
                 "file" to "harmony_prefs/com.duckduckgo.android.atp.onboarding.store",
                 "file" to "harmony_prefs/com.duckduckgo.mobile.android.vpn.service.notification.v1",
@@ -146,7 +158,6 @@ class BackupRulesTest {
                 "file" to "harmony_prefs/com.duckduckgo.mobile.atp.cohort.prefs",
                 "file" to "harmony_prefs/com.duckduckgo.networkprotection.internal.connectionclass.v1",
                 "file" to "harmony_prefs/network.type.collector.file.v1",
-                "database" to "vpn.db",
                 "root" to "app_webview/Profiles/Fire",
             )
     }

@@ -24,6 +24,8 @@
     <exclude domain="sharedpref" path="com.duckduckgo.app.devicemigration.cleanup.xml"/>
     <exclude domain="sharedpref" path="com.duckduckgo.subscriptions.devicemigration.xml"/>
     <exclude domain="sharedpref" path="com.duckduckgo.sync.devicemigration.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.vpn.devicemigration.cleanup.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.networkprotection.devicemigration.cleanup.xml"/>
     <exclude domain="sharedpref" path="com.duckduckgo.app.email.settings.xml"/>
     <exclude domain="sharedpref" path="com.duckduckgo.app.email.settings.encryptiontest.xml"/>
     <exclude domain="sharedpref" path="com.duckduckgo.sync.store.v1.xml"/>
@@ -53,7 +55,6 @@
     <exclude domain="sharedpref" path="com.duckduckgo.mobile.atp.cohort.prefs.xml"/>
     <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.android.vpn.feature.registry.v1"/>
     <exclude domain="file" path="harmony_prefs/com.duckduckgo.vpn.tunnel.config.v1"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1"/>
     <exclude domain="file" path="harmony_prefs/com.duckduckgo.netp.store.waitlist"/>
     <exclude domain="file" path="harmony_prefs/com.duckduckgo.android.atp.onboarding.store"/>
     <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.android.vpn.service.notification.v1"/>
@@ -62,6 +63,5 @@
     <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.atp.cohort.prefs"/>
     <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.internal.connectionclass.v1"/>
     <exclude domain="file" path="harmony_prefs/network.type.collector.file.v1"/>
-    <exclude domain="database" path="vpn.db"/>
     <exclude domain="root" path="app_webview/Profiles/Fire"/>
 </full-backup-content>

@@ -41,4 +41,7 @@ interface VpnHeartBeatDao {
 
     @Query("select * from vpn_heartbeat")
     fun hearBeats(): List<HeartBeatEntity>
+
+    @Query("DELETE FROM vpn_heartbeat")
+    fun deleteAll()
 }
