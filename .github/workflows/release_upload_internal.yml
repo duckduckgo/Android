@@ -19,7 +19,7 @@ env:
 jobs:
   create-tag:
     name: Generate and upload bundle to Play Store Internal track
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
@@ -46,7 +46,7 @@ jobs:
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Set up git config
