@@ -522,6 +522,23 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenConfigureDuckAiModeAndWebSearchActionThenWebSearchToolSelectedForTab() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = NativeInputLaunchAction.WEB_SEARCH)
+
+        assertEquals(
+            Tool.WEB_SEARCH.rawValue,
+            nativeInputStateProvider.stateForTab("tab-1").value.selectedTool,
+        )
+    }
+
+    @Test
+    fun whenConfigureDuckAiModeAndCameraCaptureActionThenNoToolSelected() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = NativeInputLaunchAction.CAMERA_CAPTURE)
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
     fun whenConfigureDuckAiModeAndNotForceImageGenerationThenNoToolSelected() = runTest {
         testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open())
 
