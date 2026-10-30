@@ -394,10 +394,16 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
         try {
             migrationDefaultBrowserPrompt.launch(intent)
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "Cannot open the default browser prompt: ${e.asLog()}" }
-            // Nothing launched, so no result will arrive to move the step on.
-            viewModel.onMigrationDefaultBrowserPromptFinished()
+            onMigrationDefaultBrowserPromptNotLaunched(e)
+        } catch (e: SecurityException) {
+            onMigrationDefaultBrowserPromptNotLaunched(e)
         }
+    }
+
+    private fun onMigrationDefaultBrowserPromptNotLaunched(e: Exception) {
+        logcat(WARN) { "Cannot open the default browser prompt: ${e.asLog()}" }
+        // Nothing launched, so no result will arrive to move the step on.
+        viewModel.onMigrationDefaultBrowserPromptFinished()
     }
 
     @SuppressLint("InlinedApi")

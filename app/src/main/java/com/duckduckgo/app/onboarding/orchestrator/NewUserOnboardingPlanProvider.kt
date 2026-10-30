@@ -858,7 +858,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         id = NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT,
         // No shown pixel of its own; the confirmed result belongs to the set-default pixel (started on the comparison-chart step).
         pixelName = null,
-        precondition = { defaultRoleBrowserDialog.shouldShowDialog() },
+        precondition = { defaultRoleBrowserDialog.shouldShowDialog() && !sawMigrationFlow() },
         resolveDialog = { NewUserOnboardingActivityDialog.DefaultBrowserPrompt },
         transition = { event ->
             when {

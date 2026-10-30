@@ -139,6 +139,7 @@ class BackupRulesTest {
                 "sharedpref" to "com.duckduckgo.adclick.impl.pixels.xml",
                 "file" to "harmony_prefs/com.duckduckgo.subscriptions.store",
                 "file" to "harmony_prefs/com.duckduckgo.pir.impl.store.secure",
+                "file" to "harmony_prefs/com.duckduckgo.securestorage.store_v2",
                 "file" to "harmony_prefs/com.duckduckgo.securestorage.store_v3",
                 "file" to "fire_mode_duck_ai_files",
                 "database" to "secure_storage_database_encrypted.db",

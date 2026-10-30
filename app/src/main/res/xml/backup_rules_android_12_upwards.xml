@@ -44,6 +44,7 @@
         <exclude domain="sharedpref" path="com.duckduckgo.adclick.impl.pixels.xml"/>
         <exclude domain="file" path="harmony_prefs/com.duckduckgo.subscriptions.store"/>
         <exclude domain="file" path="harmony_prefs/com.duckduckgo.pir.impl.store.secure"/>
+        <exclude domain="file" path="harmony_prefs/com.duckduckgo.securestorage.store_v2"/>
         <exclude domain="file" path="harmony_prefs/com.duckduckgo.securestorage.store_v3"/>
         <exclude domain="file" path="fire_mode_duck_ai_files"/>
         <exclude domain="database" path="secure_storage_database_encrypted.db"/>

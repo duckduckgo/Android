@@ -242,6 +242,18 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when the install was migrated then the default browser step is not shown again`() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        start()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
     fun `when notifications are already granted then the notification step is skipped`() = runTest {
         whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
         start()
