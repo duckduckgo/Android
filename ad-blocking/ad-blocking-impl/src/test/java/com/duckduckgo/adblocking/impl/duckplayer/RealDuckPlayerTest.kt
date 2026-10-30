@@ -252,7 +252,7 @@ class RealDuckPlayerTest {
     // coroutineRule.testScope); the fresh runTest scope keeps its own Job so the collector isn't policed for completion.
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun whenNewInstallAndRolloutOnAndNoStoredMode_combinePersistsDisabled() = runTest(coroutineRule.testDispatcher) {
+    fun whenNewInstallAndNoStoredMode_combinePersistsDisabled() = runTest(coroutineRule.testDispatcher) {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         storedUserPreferencesFlow.value = StoredUserPreferences(true, null)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
@@ -266,7 +266,7 @@ class RealDuckPlayerTest {
     }
 
     @Test
-    fun whenNewInstallAndRolloutOnButStoredModeAlreadySet_combineDoesNotOverwrite() = runTest {
+    fun whenNewInstallAndStoredModeAlreadySet_combineDoesNotOverwrite() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         storedUserPreferencesFlow.value = StoredUserPreferences(false, AlwaysAsk)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
