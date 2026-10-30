@@ -32,18 +32,18 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
 
-interface SetUpSyncBookmarksPromotion {
+interface SyncBookmarksSetUpPromotion {
     suspend fun canShowPromotion(savedBookmarks: Int): Boolean
 }
 
-@ContributesBinding(AppScope::class, binding = binding<SetUpSyncBookmarksPromotion>())
-class RealSetUpSyncBookmarksPromotion @Inject constructor(
+@ContributesBinding(AppScope::class, binding = binding<SyncBookmarksSetUpPromotion>())
+class RealSyncBookmarksSetUpPromotion @Inject constructor(
     private val syncState: DeviceSyncState,
     private val syncPromotionFeature: SyncPromotionFeature,
     private val promotionDataStore: SyncPromotionDataStore,
     private val dispatchers: DispatcherProvider,
     private val appInstall: AppInstall,
-) : SetUpSyncBookmarksPromotion {
+) : SyncBookmarksSetUpPromotion {
 
     override suspend fun canShowPromotion(savedBookmarks: Int): Boolean {
         if (savedBookmarks == 0) return false

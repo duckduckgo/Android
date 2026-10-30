@@ -23,8 +23,8 @@ import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.promotion.FakeSyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
-import com.duckduckgo.sync.impl.promotion.bookmarks.SetUpSyncBookmarksPromotionViewModel.Command.DismissPromotion
-import com.duckduckgo.sync.impl.promotion.bookmarks.SetUpSyncBookmarksPromotionViewModel.Command.LaunchSyncSetup
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksSetUpPromotionViewModel.Command.DismissPromotion
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksSetUpPromotionViewModel.Command.LaunchSyncSetup
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -39,7 +39,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
-class SetUpSyncBookmarksPromotionViewModelTest {
+class SyncBookmarksSetUpPromotionViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -47,7 +47,7 @@ class SetUpSyncBookmarksPromotionViewModelTest {
     private val promotionDataStore = FakeSyncPromotionDataStore()
     private val pixel: Pixel = mock()
 
-    private val testee = SetUpSyncBookmarksPromotionViewModel(
+    private val testee = SyncBookmarksSetUpPromotionViewModel(
         connectedDevicesRepository = mock<ConnectedDevicesRepository> {
             on { latestConnectedDeviceCountFlow() } doReturn connectedDeviceCount
         },

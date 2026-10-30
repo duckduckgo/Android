@@ -33,7 +33,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 
-class RealSetUpSyncBookmarksPromotionTest {
+class RealSyncBookmarksSetUpPromotionTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -47,7 +47,7 @@ class RealSetUpSyncBookmarksPromotionTest {
     // AppInstall properties
     private var installAge: Duration? = null
 
-    private val testee = RealSetUpSyncBookmarksPromotion(
+    private val testee = RealSyncBookmarksSetUpPromotion(
         syncState = mock {
             on { isFeatureEnabled() } doAnswer { isSyncEnabled }
             on { isUserSignedInOnDevice() } doAnswer { isUserSignedIn }

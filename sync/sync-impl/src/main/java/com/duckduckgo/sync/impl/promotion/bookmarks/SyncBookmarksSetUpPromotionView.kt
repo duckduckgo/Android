@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl.promotion.bookmarks
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -33,23 +32,20 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.android.support.AndroidSupportInjection
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin
 import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin.Callback
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
-import com.duckduckgo.sync.impl.databinding.ViewSetUpSyncBookmarksPromotionBinding
+import com.duckduckgo.sync.impl.databinding.ViewSyncBookmarksSetUpPromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
-import com.duckduckgo.sync.impl.promotion.bookmarks.SetUpSyncBookmarksPromotionViewModel.Command
-import com.duckduckgo.sync.impl.promotion.bookmarks.SetUpSyncBookmarksPromotionViewModel.Command.DismissPromotion
-import com.duckduckgo.sync.impl.promotion.bookmarks.SetUpSyncBookmarksPromotionViewModel.Command.LaunchSyncSetup
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksSetUpPromotionViewModel.Command
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksSetUpPromotionViewModel.Command.DismissPromotion
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksSetUpPromotionViewModel.Command.LaunchSyncSetup
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
-import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.firstOrNull
@@ -59,22 +55,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesIntoSet(scope = AppScope::class)
-class SetUpSyncBookmarksPromotionPlugin @Inject constructor(
-    private val promotion: SetUpSyncBookmarksPromotion,
-) : BookmarksScreenPromotionPlugin {
-
-    override suspend fun getView(context: Context, numberSavedBookmarks: Int): View? {
-        return if (promotion.canShowPromotion(numberSavedBookmarks)) {
-            SetUpSyncBookmarksPromotionView(context)
-        } else {
-            null
-        }
-    }
-}
-
 @InjectWith(ViewScope::class)
-class SetUpSyncBookmarksPromotionView @JvmOverloads constructor(
+class SyncBookmarksSetUpPromotionView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -86,10 +68,10 @@ class SetUpSyncBookmarksPromotionView @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val binding: ViewSetUpSyncBookmarksPromotionBinding by viewBinding()
+    private val binding: ViewSyncBookmarksSetUpPromotionBinding by viewBinding()
 
-    private val viewModel: SetUpSyncBookmarksPromotionViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SetUpSyncBookmarksPromotionViewModel::class.java]
+    private val viewModel: SyncBookmarksSetUpPromotionViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SyncBookmarksSetUpPromotionViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
@@ -130,7 +112,7 @@ class SetUpSyncBookmarksPromotionView @JvmOverloads constructor(
 }
 
 @ContributesViewModel(ViewScope::class)
-class SetUpSyncBookmarksPromotionViewModel @Inject constructor(
+class SyncBookmarksSetUpPromotionViewModel @Inject constructor(
     private val connectedDevicesRepository: ConnectedDevicesRepository,
     private val promotionDataStore: SyncPromotionDataStore,
     private val pixel: Pixel,
