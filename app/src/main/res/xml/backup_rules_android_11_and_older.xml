@@ -47,5 +47,20 @@
     <exclude domain="database" path="anr_database.db"/>
     <exclude domain="database" path="crash_anr_internal_database.db"/>
     <exclude domain="database" path="sync.db"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.app.tracking.conn.loss.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.vpn.prefs.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.android.atp.onboarding.store.xml"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.android.vpn.feature.registry.v1"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.vpn.tunnel.config.v1"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.netp.store.waitlist"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.android.atp.onboarding.store"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.android.vpn.service.notification.v1"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.dialog.access.revoked.store.v1"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.cohort.prefs.v1"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.atp.cohort.prefs"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.internal.connectionclass.v1"/>
+    <exclude domain="file" path="harmony_prefs/network.type.collector.file.v1"/>
+    <exclude domain="database" path="vpn.db"/>
     <exclude domain="root" path="app_webview/Profiles/Fire"/>
 </full-backup-content>
