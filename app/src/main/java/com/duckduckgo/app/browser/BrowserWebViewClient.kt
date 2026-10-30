@@ -288,6 +288,8 @@ class BrowserWebViewClient @Inject constructor(
 
     fun onTabForegrounded() = pageLoadTimeoutWatchdog.onForegrounded()
 
+    fun onDownloadStarted() = pageLoadTimeoutWatchdog.onDownloadStarted()
+
     fun destroy() {
         pageLoadTimeoutWatchdog.onNavigatedAway()
         pageLoadTimeoutsJob.cancel()

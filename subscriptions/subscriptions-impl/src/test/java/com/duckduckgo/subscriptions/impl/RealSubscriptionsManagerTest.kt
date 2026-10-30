@@ -79,6 +79,8 @@ import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -420,6 +422,18 @@ class RealSubscriptionsManagerTest {
         verify(authClient).getTokens(any(), any(), any())
 
         assertNotEquals(accountExternalId, authDataStore.externalId)
+    }
+
+    @Test
+    fun whenPurchaseFlowIfSubscriptionFailsWith401ThenDoNotRequestLogout() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionFails(httpResponseCode = 401)
+        givenCreateAccountSucceeds()
+
+        purchase()
+        advanceUntilIdle()
+
+        verify(authClient, never()).tryLogout(any())
     }
 
     @Test
@@ -1343,6 +1357,10 @@ class RealSubscriptionsManagerTest {
         assertNull(authRepository.getSubscription())
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender).reportAuthV2InvalidRefreshTokenSignedOut()
+
+        // Access token is invalid, so call to /logout can't succeed anyway.
+        advanceUntilIdle()
+        verify(authClient, never()).tryLogout(any())
     }
 
     @Test
@@ -1364,6 +1382,10 @@ class RealSubscriptionsManagerTest {
         assertNull(authRepository.getRefreshTokenV2())
         assertNull(authRepository.getAccount())
         assertNull(authRepository.getSubscription())
+
+        // Account doesn't exist, so there is no point in notifying BE about logout.
+        advanceUntilIdle()
+        verify(authClient, never()).tryLogout(any())
 
         // Store login has 0 chance of success when account doesn't exist, so there should be no attempt.
         verify(authClient, never()).authorize(any())
@@ -1497,6 +1519,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenTokenRefreshesRunConcurrentlyThenTheyDoNotOverlap() = runTest {
         givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
         givenValidateV2TokensSucceeds()
         whenever(authClient.getJwks()).thenReturn("fake jwks")
 
@@ -1521,6 +1544,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenCallerIsCancelledMidRefreshThenRefreshCompletes() = runTest {
         givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
         givenValidateV2TokensSucceeds()
         whenever(authClient.getJwks()).thenReturn("fake jwks")
 
@@ -1541,6 +1565,97 @@ class RealSubscriptionsManagerTest {
 
         assertEquals("refreshed access token", authRepository.getAccessTokenV2()?.jwt)
         verify(tokenRefreshWideEvent).onSuccess()
+    }
+
+    @Test
+    fun whenRefreshAccessTokenAndStoredTokenIsUsableThenReturnsStoredTokenWithoutRotating() = runTest {
+        val lockHandle = FakeLockHandle()
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(lockHandle))
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+        val storedAccessToken = authRepository.getAccessTokenV2()
+
+        val result = subscriptionsManager.refreshAccessToken()
+
+        assertEquals(storedAccessToken, result)
+        verify(authClient, never()).getTokens(any<String>())
+        verify(crossProcessLock).acquire(any(), any())
+        assertTrue(lockHandle.closed)
+        verify(tokenRefreshWideEvent).onSkipped()
+        verify(tokenRefreshWideEvent, never()).onSuccess()
+        verify(tokenRefreshWideEvent, never()).onFailure(any())
+    }
+
+    @Test
+    fun whenCrossProcessLockAcquisitionFailsAndStoredTokenIsUsableThenRefreshAccessTokenSkips() = runTest {
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.failure(timeoutCancellationException()))
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+        val storedAccessToken = authRepository.getAccessTokenV2()
+
+        val result = subscriptionsManager.refreshAccessToken()
+
+        assertEquals(storedAccessToken, result)
+        verify(authClient, never()).getTokens(any<String>())
+        verify(tokenRefreshWideEvent).onSkipped()
+        verify(tokenRefreshWideEvent, never()).onSuccess()
+    }
+
+    @Test
+    fun whenRefreshAccessTokenForcedAndStoredTokenIsUsableThenRotates() = runTest {
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token", newRefreshToken = "new refresh token")
+
+        val result = subscriptionsManager.refreshAccessToken(force = true)
+
+        assertEquals("new access token", result.jwt)
+        assertEquals("new refresh token", authRepository.getRefreshTokenV2()?.jwt)
+        verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
+        verify(tokenRefreshWideEvent).onSuccess()
+    }
+
+    @Test
+    fun whenConcurrentRefreshesWithExpiredTokenThenRotatesOnceAndBothReturnNewToken() = runTest {
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val results = listOf(
+            async { subscriptionsManager.refreshAccessToken() },
+            async { subscriptionsManager.refreshAccessToken() },
+        ).awaitAll()
+
+        assertEquals(listOf("new access token", "new access token"), results.map { it.jwt })
+        verify(authClient, times(1)).getTokens(any<String>())
+    }
+
+    @Test
+    fun whenSkipValidAccessTokenRefreshDisabledAndStoredTokenIsUsableThenRefreshAccessTokenRotates() = runTest {
+        givenSkipValidAccessTokenRefreshEnabled(false)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.refreshAccessToken()
+
+        assertEquals("new access token", result.jwt)
+        verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
+        verify(tokenRefreshWideEvent).onSuccess()
+    }
+
+    @Test
+    fun whenGetAccessTokenAndStoredTokenIsExpiredThenReturnsRefreshedToken() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+        verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
     }
 
     @Test
@@ -1624,6 +1739,16 @@ class RealSubscriptionsManagerTest {
         givenUrlPortalFails()
 
         assertNull(subscriptionsManager.getPortalUrl())
+    }
+
+    @Test
+    fun whenSignOutThenRequestLogoutWithAccessToken() = runTest {
+        givenUserIsSignedIn()
+
+        subscriptionsManager.signOut()
+        advanceUntilIdle()
+
+        verify(authClient).tryLogout(FAKE_ACCESS_TOKEN_V2)
     }
 
     @Test
@@ -2802,6 +2927,7 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertEquals(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = true), awaitItem())
 
+            verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
             verify(pixelSender).reportSubscriptionSwitch()
             verify(pixelSender, never()).reportPurchaseSuccess(any())
             verify(pixelSender, never()).reportSubscriptionActivated()
@@ -2829,6 +2955,7 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertEquals(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = false), awaitItem())
 
+            verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
             verify(pixelSender, never()).reportSubscriptionSwitch()
             verify(pixelSender).reportPurchaseSuccess(isFreeTrial = false)
             verify(pixelSender).reportSubscriptionActivated()
@@ -2858,6 +2985,11 @@ class RealSubscriptionsManagerTest {
     @SuppressLint("DenyListedApi")
     private fun givenBlackFridayFeatureFlagEnabled(value: Boolean) {
         subscriptionsFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenSkipValidAccessTokenRefreshEnabled(value: Boolean) {
+        subscriptionsFeature.skipValidAccessTokenRefresh().setRawStoredState(State(remoteEnableState = value))
     }
 
     @SuppressLint("DenyListedApi")

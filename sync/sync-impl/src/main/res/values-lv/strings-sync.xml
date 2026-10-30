@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Atcelt</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Iestatīt Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Atbloķē ierīci, lai iestatītu Sync &amp; Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Piekļūsti savām parolēm mobilajās ierīcēs un datorā.</string>
+    <string name="sync_passwords_import_promo_primary_button">Ieslēgt Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Piekļūsti savām grāmatzīmēm mobilajās ierīcēs un datorā.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Ieslēgt Sync &amp; Backup</string>
 </resources>

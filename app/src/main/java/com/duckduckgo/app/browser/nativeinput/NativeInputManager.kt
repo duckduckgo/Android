@@ -246,8 +246,11 @@ class RealNativeInputManager @Inject constructor(
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
-        return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
+        return widgetView.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget) as? NativeInputWidget
     }
+
+    // The contextual sheet's widget shares the id and also lives under rootView, so look inside the omnibar wrapper only.
+    private fun omnibarWidget(): NativeInputWidget? = rootView.findViewById<View?>(R.id.inputModeRoot)?.let(::widgetFrom)
 
     override fun init(
         omnibar: Omnibar,
@@ -290,7 +293,7 @@ class RealNativeInputManager @Inject constructor(
             }
             .launchIn(lifecycleOwner.lifecycleScope)
         voiceSearchAvailability.observeVoiceSearchAvailability()
-            .onEach { widgetFrom(rootView)?.let { widget -> updateVoiceButtons(widget) } }
+            .onEach { omnibarWidget()?.let { widget -> updateVoiceButtons(widget) } }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
@@ -302,13 +305,13 @@ class RealNativeInputManager @Inject constructor(
 
     override fun isChatTabSelected(): Boolean {
         if (!::rootView.isInitialized) return false
-        val widget = widgetFrom(rootView) ?: return false
+        val widget = omnibarWidget() ?: return false
         return widget.isChatTabSelected()
     }
 
     override fun hasInputFocus(): Boolean {
         if (!::rootView.isInitialized) return false
-        return widgetFrom(rootView)?.hasInputFocus() == true
+        return omnibarWidget()?.hasInputFocus() == true
     }
 
     override fun setPickingImage(picking: Boolean) {
@@ -319,30 +322,30 @@ class RealNativeInputManager @Inject constructor(
 
     override fun setText(text: String) {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.text = text
     }
 
     override fun refreshChatSuggestions() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.refreshChatSuggestions()
     }
 
     override fun onChatDeleteConfirmed() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.onChatDeleteConfirmed()
     }
 
     override fun onChatDeleteCancelled() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.onChatDeleteCancelled()
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
-        val widget = widgetFrom(rootView)
+        val widget = omnibarWidget()
         if (widget != null) {
             widget.nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
             try {
@@ -496,7 +499,7 @@ class RealNativeInputManager @Inject constructor(
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
         if (!::rootView.isInitialized) return
         if (isExiting) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         val widgetRoot = widgetRoot
 
         if (omnibarController.isDuckAiMode()) {
@@ -590,7 +593,7 @@ class RealNativeInputManager @Inject constructor(
             return
         }
 
-        if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(R.id.inputModeWidget) != null) return
+        if (omnibarController.isDuckAiMode() && omnibarWidget() != null) return
 
         animator.cancelAnimation()
         isExiting = false
@@ -822,20 +825,20 @@ class RealNativeInputManager @Inject constructor(
 
     private fun createWidgetView(layoutInflater: LayoutInflater, isBottom: Boolean): View {
         val view = layoutInflater.inflate(R.layout.input_mode_widget_card_view, rootView, false)
+        widgetFrom(view)?.setOmnibarPosition(isBottom)
         applyPositionChrome(view, isBottom)
         return view
     }
 
     /**
-     * One layout serves both positions; the per-position chrome that used to live in the two wrapper
-     * XMLs is set here from [isBottom]: the row's side paddings, the card's background/elevation/
-     * compat-padding/resting margins, the input field's content padding, and the inline nav buttons'
-     * gravity and margins. The card's shape and horizontal insets stay state-driven inside the widget
-     * (applyOmnibarShape); the leading fire is gated on bottom by the widget itself.
+     * One layout serves both positions; the per-position placement that used to live in the two wrapper
+     * XMLs is set here from [isBottom]: the row's side paddings, the card's resting margins, the inline nav
+     * buttons' gravity and margins, and the footer's bottom margin. The card's surface is set before attachment,
+     * since attaching starts state collection before configure runs. Its shape and horizontal insets stay
+     * state-driven (the card's applyOmnibarShape); the leading fire is gated on bottom by the widget itself.
      */
     private fun applyPositionChrome(view: View, isBottom: Boolean) {
-        val card = view.findViewById<MaterialCardView>(R.id.inputModeWidgetCard) ?: return
-        val widget = view.findViewById<View>(R.id.inputModeWidget) ?: return
+        val card = view.findViewById<View>(R.id.inputModeWidgetCard) ?: return
         val buttons = view.findViewById<View>(R.id.inlineNavButtonsContainer) ?: return
         // The card sits in the row LinearLayout, nested inside the footer dock, so reach it via the card
         // rather than the root's first child (which is the dock).
@@ -845,19 +848,12 @@ class RealNativeInputManager @Inject constructor(
         val keyline1 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         val keyline2 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         footer?.updateLayoutParams<MarginLayoutParams> { bottomMargin = if (isBottom) keyline2 else 0 }
-        // Resolve the card background against the card's own context, not the root's: the card carries the
-        // daxInputModeCardThemeOverlay (android:theme), which in a Fire Tab remaps daxColorSurface/Window to
-        // the fire card colour. Reading it off the root would paint the non-fire colour.
         if (isBottom) {
             row.setPaddingRelative(keyline2, 0, keyline1, 0)
-            card.setCardBackgroundColor(card.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
-            card.cardElevation = 3f.toPx()
-            card.setUseCompatPadding(false)
             card.updateLayoutParams<MarginLayoutParams> {
                 topMargin = keyline2
                 bottomMargin = keyline2
             }
-            widget.setPaddingRelative(keyline1, keyline2, keyline1, keyline2)
             buttons.updateLayoutParams<LinearLayout.LayoutParams> {
                 gravity = Gravity.BOTTOM
                 marginStart = (-8f).toPx().toInt()
@@ -865,14 +861,9 @@ class RealNativeInputManager @Inject constructor(
             }
         } else {
             row.setPaddingRelative(0, 0, 0, 0)
-            card.setCardBackgroundColor(card.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
-            card.cardElevation = 6f.toPx()
-            card.setUseCompatPadding(true)
             card.updateLayoutParams<MarginLayoutParams> {
                 topMargin = (-9f).toPx().toInt()
             }
-            val vertical = 4f.toPx().toInt()
-            widget.setPaddingRelative(keyline1, vertical, keyline1, vertical)
             buttons.updateLayoutParams<LinearLayout.LayoutParams> {
                 gravity = Gravity.TOP
                 marginStart = (-12f).toPx().toInt()
@@ -1131,7 +1122,7 @@ class RealNativeInputManager @Inject constructor(
     /** The toggle-row back arrow is the inverse of the nav bar: it fills in as the back affordance only
      *  while the nav bar is hidden, so exactly one back arrow shows at a time. */
     private fun syncBackArrowToNavBar() {
-        widgetFrom(rootView)?.setNavBarVisible(navBarShown == true)
+        omnibarWidget()?.setNavBarVisible(navBarShown == true)
     }
 
     /** On the user's first keystroke (empty to non-empty), latches the nav bar off for the rest of this input session and slide it out. */

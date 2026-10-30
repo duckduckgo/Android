@@ -198,6 +198,26 @@ enum class SubscriptionPixel(
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
     ),
+    SUBSCRIPTION_SETTINGS_WITHDRAWAL_CLICK(
+        baseName = "subscription_settings_withdrawal_click",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_SHOWN(
+        baseName = "subscription_settings_withdrawal_dialog_shown",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_CONFIRM_CLICK(
+        baseName = "subscription_settings_withdrawal_dialog_confirm_click",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_DISMISS(
+        baseName = "subscription_settings_withdrawal_dialog_dismissed",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
     SUBSCRIPTION_PRICE_MONTHLY_CLICK(
         baseName = "m_privacy-pro_offer_monthly-price_click",
         type = Count,

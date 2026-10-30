@@ -324,4 +324,16 @@
     <string name="importBookmarksErrorGenericMessage">Něco se pokazilo</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Zkontroluj svoje připojení k internetu a zkus to znovu.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import dokončen!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Vydrž — nech tohle okno otevřené. Nemělo by to trvat déle než minutu nebo dvě.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google tě může požádat o zadání hesla.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google ti pošle e-mail s potvrzením, že se tvoje data exportovala. Nemusíš nic dělat.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import dokončen!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importováno záložek: <b>%1$d</b>]]></string>
+
 </resources>

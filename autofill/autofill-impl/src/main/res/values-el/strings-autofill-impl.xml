@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Κάτι πήγε λάθος</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Βεβαιωθείτε ότι είστε συνδεδεμένοι στο διαδίκτυο και προσπαθήστε ξανά.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Η εισαγωγή ολοκληρώθηκε!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Κάντε λίγη υπομονή — διατηρήστε αυτό το παράθυρο ανοιχτό. Δεν θα χρειαστούν περισσότερα από ένα ή δύο λεπτά.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Η Google ίσως σας ζητήσει τον κωδικό πρόσβασής σας.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Η Google θα σας στείλει email για να επιβεβαιώσει ότι έγινε εξαγωγή των δεδομένων σας. Δεν χρειάζεται να κάνετε τίποτα.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Η εισαγωγή ολοκληρώθηκε!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Σελιδοδείκτες που εισήχθησαν: <b>%1$d</b>]]></string>
+
 </resources>

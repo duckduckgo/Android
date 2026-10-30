@@ -1,0 +1,127 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.subscriptions.impl.withdrawal
+
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.ActiveOfferType
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
+import com.duckduckgo.subscriptions.impl.services.WithdrawResponse
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult.Success
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
+import dev.zacsweers.metro.ContributesBinding
+import retrofit2.HttpException
+import java.math.BigDecimal
+import javax.inject.Inject
+
+interface SubscriptionWithdrawal {
+    /**
+     * Whether [subscription] is the kind that can be withdrawn from.
+     */
+    fun isWithdrawable(subscription: Subscription): Boolean
+
+    /** Returns the withdrawal available to the user, or null if there is none. */
+    suspend fun getEligibility(): WithdrawalEligibility?
+
+    /** Withdraws the user from their subscription. Safe to call again after a failure. */
+    suspend fun withdraw(): WithdrawalResult
+}
+
+sealed class WithdrawalResult {
+    /** [refund] is null when the refunded amount is unknown. */
+    data class Success(val refund: Refund?) : WithdrawalResult()
+
+    /** The subscription can no longer be withdrawn from. */
+    data object NotEligible : WithdrawalResult()
+
+    data object Failed : WithdrawalResult()
+}
+
+data class Refund(
+    val amount: BigDecimal,
+    val currency: String,
+)
+
+data class WithdrawalEligibility(
+    val eligibleUntil: Long,
+    val refundAmount: BigDecimal,
+    val refundCurrency: String,
+)
+
+@ContributesBinding(AppScope::class)
+class RealSubscriptionWithdrawal @Inject constructor(
+    private val subscriptionsService: SubscriptionsService,
+    private val subscriptionsManager: SubscriptionsManager,
+    private val subscriptionsFeature: SubscriptionsFeature,
+) : SubscriptionWithdrawal {
+
+    override fun isWithdrawable(subscription: Subscription): Boolean {
+        return subscriptionsFeature.subscriptionWithdrawal().isEnabled() &&
+            subscription.platform.equals(STRIPE_PLATFORM, ignoreCase = true) &&
+            subscription.isActive() &&
+            ActiveOfferType.TRIAL !in subscription.activeOffers
+    }
+
+    override suspend fun getEligibility(): WithdrawalEligibility? {
+        val response = runCatching { subscriptionsService.withdrawalEligibility() }.getOrNull() ?: return null
+        if (!response.eligible) return null
+
+        val eligibleUntil = response.eligibleUntil ?: return null
+        val refundAmount = response.refundAmount?.toBigDecimalOrNull() ?: return null
+        val refundCurrency = response.refundCurrency?.takeIf { it.isNotBlank() } ?: return null
+
+        return WithdrawalEligibility(
+            eligibleUntil = eligibleUntil,
+            refundAmount = refundAmount,
+            refundCurrency = refundCurrency,
+        )
+    }
+
+    override suspend fun withdraw(): WithdrawalResult {
+        val refund = try {
+            subscriptionsService.withdraw().toRefund()
+        } catch (e: HttpException) {
+            return if (e.code() == HTTP_CONFLICT) WithdrawalResult.NotEligible else WithdrawalResult.Failed
+        } catch (e: JsonDataException) {
+            // The withdrawal succeeded even though the response couldn't be read
+            null
+        } catch (e: JsonEncodingException) {
+            null
+        } catch (e: Exception) {
+            return WithdrawalResult.Failed
+        }
+
+        // A withdrawn account has nothing left to manage on this device
+        subscriptionsManager.signOut()
+
+        return Success(refund)
+    }
+
+    private fun WithdrawResponse.toRefund(): Refund? {
+        val amount = refundedAmount?.toBigDecimalOrNull() ?: return null
+        val currency = currency?.takeIf { it.isNotBlank() } ?: return null
+        return Refund(amount = amount, currency = currency.uppercase())
+    }
+
+    private companion object {
+        private const val STRIPE_PLATFORM = "stripe"
+        private const val HTTP_CONFLICT = 409
+    }
+}

@@ -297,13 +297,14 @@ class NativeInputLayoutCoordinator(
                 return
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
+            val widgetTopInWindow = IntArray(2).also { widgetView.getLocationInWindow(it) }[1]
             val widgetBottomInWindow = anchorLocation[1] + anchor.height
             val anchorBottomInWindow = contentAnchorBottom(
                 isBottom = isBottom,
                 widgetBottomInWindow = widgetBottomInWindow,
                 visibleFooterExtent = visibleFooterExtent(widgetBottomInWindow),
             )
-            applyOffsetWithBottom(anchorTopInWindow = anchorLocation[1], anchorBottomInWindow = anchorBottomInWindow)
+            applyOffsetWithBottom(anchorTopInWindow = widgetTopInWindow, anchorBottomInWindow = anchorBottomInWindow)
         }
 
         // Called from the animators' onUpdate before the layout pass. Projects the card's visual bottom

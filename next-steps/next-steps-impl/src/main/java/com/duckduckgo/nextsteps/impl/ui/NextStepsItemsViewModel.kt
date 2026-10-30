@@ -28,12 +28,13 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
+import com.duckduckgo.nextsteps.impl.NextStepsTelemetry
+import com.duckduckgo.nextsteps.impl.isNextStepsForNewTabPage
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
-import com.duckduckgo.remote.messaging.api.Surface
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -59,6 +60,7 @@ class NextStepsItemsViewModel @Inject constructor(
     private val itemsStore: NextStepsItemsStore,
     private val completionChecks: PluginPoint<NextStepCompletionCheck>,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val telemetry: NextStepsTelemetry,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -85,9 +87,14 @@ class NextStepsItemsViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val refresh = MutableSharedFlow<Unit>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST).apply { tryEmit(Unit) }
 
-    private var pendingCompletionItemId: String? = null
+    /** The card whose CTA this tab tapped. Its completion animates the card out unless the host was stopped meanwhile. */
+    private data class PendingCompletion(
+        val cardId: String,
+        val animate: Boolean = true,
+    )
+
+    private var pendingCompletion: PendingCompletion? = null
     private var animatingCompletionItemId: String? = null
-    private var dismissedMessageId: String? = null
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -121,18 +128,18 @@ class NextStepsItemsViewModel @Inject constructor(
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        pendingCompletionItemId = null
+        pendingCompletion = pendingCompletion?.copy(animate = false)
     }
 
     fun onViewDetached() {
         sectionJob?.cancel()
         sectionJob = null
-        pendingCompletionItemId = null
+        pendingCompletion = null
         animatingCompletionItemId = null
     }
 
     fun onPrimaryActionClicked() {
-        pendingCompletionItemId = null
+        pendingCompletion = null
         val item = _viewState.value.items.firstOrNull() ?: return
         val nextCommand = when (val action = item.primaryAction) {
             is Action.DefaultBrowser -> {
@@ -147,8 +154,11 @@ class NextStepsItemsViewModel @Inject constructor(
             is Action.Navigation -> Command.LaunchScreen(action.value, action.additionalParameters?.get("payload").orEmpty())
             else -> null
         } ?: return
-        pendingCompletionItemId = item.id
-        viewModelScope.launch { command.send(nextCommand) }
+        pendingCompletion = PendingCompletion(item.id)
+        viewModelScope.launch {
+            telemetry.onCtaClicked(item.id)
+            command.send(nextCommand)
+        }
     }
 
     fun onDefaultBrowserDialogShown() {
@@ -157,23 +167,35 @@ class NextStepsItemsViewModel @Inject constructor(
 
     fun onFrontCardDismissed() {
         val dismissedId = _viewState.value.items.firstOrNull()?.id ?: return
-        removeFrontCard()
-        viewModelScope.launch(dispatchers.io()) { itemsStore.addDismissedItemId(dismissedId) }
+        val remaining = removeFrontCard()
+        viewModelScope.launch {
+            telemetry.onCardDismissed(dismissedId)
+            withContext(dispatchers.io()) { itemsStore.addDismissedItemId(dismissedId) }
+            onFrontCardRemoved(remaining)
+        }
     }
 
     fun onFrontCardCompletionAnimated() {
         val completingId = animatingCompletionItemId ?: return
         animatingCompletionItemId = null
         if (_viewState.value.items.firstOrNull()?.id != completingId) return
-        removeFrontCard()
+        val remaining = removeFrontCard()
+        viewModelScope.launch { onFrontCardRemoved(remaining) }
     }
 
-    private fun removeFrontCard() {
-        pendingCompletionItemId = null
+    private fun removeFrontCard(): ViewState {
+        pendingCompletion = null
         animatingCompletionItemId = null
-        val remaining = _viewState.updateAndGet { state -> state.copy(items = state.items.drop(1)) }
-        if (remaining.items.isEmpty()) {
-            remaining.message?.let { dismissMessage(it) }
+        return _viewState.updateAndGet { state -> state.copy(items = state.items.drop(1)) }
+    }
+
+    private suspend fun onFrontCardRemoved(remaining: ViewState) {
+        val message = remaining.message ?: return
+        val promotedCard = remaining.items.firstOrNull()
+        if (promotedCard == null) {
+            dismissMessage(message)
+        } else {
+            telemetry.onFrontCardShown(message.id, promotedCard.id, remaining.items.ids())
         }
     }
 
@@ -184,27 +206,26 @@ class NextStepsItemsViewModel @Inject constructor(
         val configItems = (message?.content as? Content.ActionableItems)?.listItems?.filterIsInstance<CardItem.ListItem>() ?: return emptyList()
         val checks = completionChecks.getPlugins().associateBy { it.itemId }
         val supportedItems = configItems.filter { it.id in checks }
-        val completedIds = completedItemIds(supportedItems, checks)
+        val completedIds = refreshCompletedItemIds(supportedItems, checks)
         val remaining = supportedItems.filter { it.id !in completedIds && it.id !in dismissedIds }
         val onScreen = _viewState.value.items
         val isNewMessage = _viewState.value.message?.id != message.id
         return if (onScreen.isEmpty() || isNewMessage) {
             loadItems(message, remaining)
         } else {
-            refreshOnScreenItems(onScreen, remaining, completedIds)
+            refreshOnScreenItems(message, onScreen, remaining, completedIds)
         }
     }
 
-    private suspend fun completedItemIds(
+    private suspend fun refreshCompletedItemIds(
         items: List<CardItem.ListItem>,
         checks: Map<String, NextStepCompletionCheck>,
     ): Set<String> = withContext(dispatchers.io()) {
         val completedBefore = itemsStore.completedItemIds()
-        val completedNow = items
-            .filter { it.id !in completedBefore && checks.getValue(it.id).isComplete() }
-            .map { it.id }
-            .toSet()
+        val idsToCheck = items.map { it.id } - completedBefore
+        val completedNow = idsToCheck.filter { checks.getValue(it).isComplete() }.toSet()
         if (completedNow.isNotEmpty()) {
+            telemetry.onCardsCompleted(completedNow)
             itemsStore.addCompletedItemIds(completedNow)
         }
         completedBefore + completedNow
@@ -217,23 +238,36 @@ class NextStepsItemsViewModel @Inject constructor(
         if (remaining.isEmpty()) return@withContext emptyList()
         val visible = remaining.sortedByOrder(itemsStore.itemOrder()).rotatedIfDue()
         itemsStore.saveItemOrder(visible.map { it.id })
-        visible.firstOrNull()?.let { recordImpression(message, it.id) }
+        if (visible.isNotEmpty()) {
+            countImpressionForRotationAndRmf(message, visible.first().id)
+            telemetry.onFrontCardShown(message.id, visible.first().id, visible.ids())
+        }
         visible
     }
 
     private fun refreshOnScreenItems(
+        message: RemoteMessage,
         onScreen: List<CardItem.ListItem>,
         remaining: List<CardItem.ListItem>,
         completedIds: Set<String>,
     ): List<CardItem.ListItem> {
         val ordered = remaining.sortedByOrder(onScreen.map { it.id })
         val front = onScreen.first()
-        if (front.id == pendingCompletionItemId && front.id in completedIds) {
-            pendingCompletionItemId = null
-            animatingCompletionItemId = front.id
-            command.trySend(Command.AnimateFrontCardCompletion)
+        pendingCompletion?.takeIf { it.cardId == front.id && front.id in completedIds }?.let { completed ->
+            pendingCompletion = null
+            if (completed.animate) {
+                animatingCompletionItemId = front.id
+                command.trySend(Command.AnimateFrontCardCompletion)
+            }
         }
-        return if (front.id == animatingCompletionItemId) listOf(front) + ordered.filter { it.id != front.id } else ordered
+        if (front.id == animatingCompletionItemId) {
+            return listOf(front) + ordered.filter { it.id != front.id }
+        } else if (front.id !in ordered.ids()) {
+            ordered.firstOrNull()?.let { promotedCard ->
+                viewModelScope.launch { telemetry.onFrontCardShown(message.id, promotedCard.id, ordered.ids()) }
+            }
+        }
+        return ordered
     }
 
     private fun List<CardItem.ListItem>.sortedByOrder(order: List<String>): List<CardItem.ListItem> =
@@ -242,7 +276,7 @@ class NextStepsItemsViewModel @Inject constructor(
     private fun List<CardItem.ListItem>.rotatedIfDue(): List<CardItem.ListItem> =
         if (size > 1 && itemsStore.frontImpressions(first().id) >= ROTATION_IMPRESSIONS) drop(1) + first() else this
 
-    private suspend fun recordImpression(
+    private suspend fun countImpressionForRotationAndRmf(
         message: RemoteMessage,
         frontItemId: String,
     ) {
@@ -252,15 +286,16 @@ class NextStepsItemsViewModel @Inject constructor(
         remoteMessageModel.onMessageShown(message)
     }
 
+    private fun List<CardItem.ListItem>.ids(): Set<String> = map { it.id }.toSet()
+
     private fun dismissMessage(message: RemoteMessage) {
-        if (dismissedMessageId != message.id) {
-            dismissedMessageId = message.id
-            viewModelScope.launch { remoteMessageModel.onMessageDismissed(message) }
+        viewModelScope.launch {
+            if (itemsStore.markMessageDismissed(message.id)) {
+                telemetry.onAllCardsDone()
+                remoteMessageModel.onMessageDismissed(message)
+            }
         }
     }
-
-    private fun RemoteMessage.isNextStepsForNewTabPage(): Boolean =
-        content is Content.ActionableItems && surfaces.contains(Surface.NEW_TAB_PAGE)
 
     private companion object {
         const val ROTATION_IMPRESSIONS = 5

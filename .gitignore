@@ -111,6 +111,10 @@ PixelDefinitions/pixels/pixel_processing_results/*
 /pageload-results.json
 PixelDefinitions/node_modules/
 
+# Python
+__pycache__/
+*.pyc
+
 # LLM
 .claude/settings.local.json
 /.claude/worktrees/*

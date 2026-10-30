@@ -354,10 +354,10 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         val result = viewMode.importResult
         with(binding.importSuccess) {
             val imported = getString(R.string.importPasswordsProcessingResultDialogResultPasswordsImported, result.savedCredentials)
-            successImportedRow.setPrimaryText(imported.html(binding.root.context))
+            successTitle.text = imported.html(binding.root.context)
             val failed = getString(R.string.importPasswordsProcessingResultDialogResultDuplicatesSkipped, result.numberSkipped)
             successFailedRow.setPrimaryText(failed.html(binding.root.context))
-            successFailedRow.isVisible = result.numberSkipped > 0
+            successResults.isVisible = result.numberSkipped > 0
 
             if (successPromoContainer.isEmpty()) {
                 val promo = viewMode.promo?.createView(requireContext(), promoCallback)
@@ -365,6 +365,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
                 successPromoContainer.isVisible = promo != null
             }
             val hasPromo = successPromoContainer.isVisible
+            successIcon.isVisible = !hasPromo
             successDoneButton.isVisible = !hasPromo
             successDoneSecondaryButton.isVisible = hasPromo
         }
