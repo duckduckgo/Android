@@ -115,17 +115,20 @@ class WgVpnNetworkStack @Inject constructor(
         }
     }
 
-    private suspend fun probeAndSelectPort(config: Config): Config {
+    private suspend fun probeAndSelectPort(config: Config): Config = runCatching {
         val result = portProbingCoordinator.value.probeAndSelect()
             ?: return config.also { logcat { "Port probing: skipping (not enough ports)" } }
 
-        return if (result.selectedPort != config.currentEndpointPort()) {
+        if (result.selectedPort != config.currentEndpointPort()) {
             logcat { "Port probing: switching to ${result.selectedPort}" }
             config.replacingEndpointPort(result.selectedPort)
         } else {
             logcat { "Port probing: keeping port ${result.selectedPort}" }
             config
         }
+    }.getOrElse {
+        logcat(ERROR) { "Port probing failed, keeping current port: ${it.asLog()}" }
+        config
     }
 
     private fun withServerDefaultPort(config: Config): Config {

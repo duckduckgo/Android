@@ -30,6 +30,7 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDnsOrSame
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
@@ -65,6 +66,9 @@ class WgVpnNetworkStackTest {
 
     @Mock
     private lateinit var netpPixels: NetworkProtectionPixels
+
+    @Mock
+    private lateinit var portProbingCoordinator: PortProbingCoordinator
 
     private fun Config.success(): Result<Config> {
         return Result.success(this)
@@ -131,7 +135,7 @@ class WgVpnNetworkStackTest {
             mock(),
             netPSettingsLocalConfig,
             vpnRemoteFeatures,
-            lazy { mock() }, // portProbingCoordinator
+            lazy { portProbingCoordinator },
         )
     }
 
@@ -145,6 +149,20 @@ class WgVpnNetworkStackTest {
         assertNotNull(actual)
         assertEquals(wgConfig.toTunnelConfig(), actual)
         verify(netpPixels).reportEnableAttempt()
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenPortProbingThrowsThenOnPrepareVpnSucceedsWithCurrentPort() = runTest {
+        whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
+        vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = true))
+        whenever(portProbingCoordinator.probeAndSelect()).thenThrow(IllegalStateException("probe failed"))
+
+        val actual = wgVpnNetworkStack.onPrepareVpn()
+
+        assertTrue(actual.isSuccess)
+        verify(wgTunnelConfig).setTunnelActivePort(443L)
+        verify(netpPixels, never()).reportEnableAttemptFailure()
     }
 
     @SuppressLint("DenyListedApi")
