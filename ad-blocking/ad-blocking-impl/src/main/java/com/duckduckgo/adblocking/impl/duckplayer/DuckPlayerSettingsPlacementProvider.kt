@@ -18,7 +18,6 @@ package com.duckduckgo.adblocking.impl.duckplayer
 
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
@@ -54,12 +53,12 @@ class RealDuckPlayerSettingsPlacementProvider @Inject constructor(
         combine(
             duckPlayer.observeDuckPlayerState(),
             duckPlayerFeature.standaloneSettings().enabled(),
-            statusChecker.settingsPlacementFlow(),
-        ) { duckPlayerState, standaloneSettings, adBlockingPlacement ->
+            statusChecker.observeSettingsVisible(),
+        ) { duckPlayerState, standaloneSettings, adBlockingSettingsVisible ->
             when {
                 duckPlayerState == DISABLED -> DuckPlayerSettingsPlacement.Hidden
                 standaloneSettings -> DuckPlayerSettingsPlacement.Standalone
-                adBlockingPlacement == SettingsPlacement.Hidden -> DuckPlayerSettingsPlacement.Standalone
+                !adBlockingSettingsVisible -> DuckPlayerSettingsPlacement.Standalone
                 else -> DuckPlayerSettingsPlacement.InAdBlocking
             }
         }

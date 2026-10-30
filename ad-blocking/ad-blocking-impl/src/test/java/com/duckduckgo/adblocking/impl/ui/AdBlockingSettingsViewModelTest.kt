@@ -86,8 +86,7 @@ class AdBlockingSettingsViewModelTest {
         )
     }
 
-    private fun setToggles(uxImprovements: Boolean, contingency: Boolean) {
-        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(remoteEnableState = uxImprovements))
+    private fun setToggles(contingency: Boolean) {
         feature.enableContingencyMode().setRawStoredState(Toggle.State(remoteEnableState = contingency))
     }
 
@@ -215,9 +214,9 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenContingencyModeAndUxImprovementsOnThenIsContingencyMode() = runTest {
+    fun whenContingencyModeOnThenIsContingencyMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
 
         createViewModel().viewState.test {
             assertTrue(expectMostRecentItem().isContingencyMode)
@@ -225,19 +224,9 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenContingencyModeOnButUxImprovementsOffThenNotContingencyMode() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setToggles(uxImprovements = false, contingency = true)
-
-        createViewModel().viewState.test {
-            assertFalse(expectMostRecentItem().isContingencyMode)
-        }
-    }
-
-    @Test
     fun whenContingencyModeOffThenNotContingencyMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setToggles(uxImprovements = true, contingency = false)
+        setToggles(contingency = false)
 
         createViewModel().viewState.test {
             assertFalse(expectMostRecentItem().isContingencyMode)

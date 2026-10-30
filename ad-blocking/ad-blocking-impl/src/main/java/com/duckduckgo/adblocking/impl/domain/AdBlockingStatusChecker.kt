@@ -45,11 +45,11 @@ interface AdBlockingStatusChecker {
     fun observeCanInject(): Flow<Boolean>
 
     /**
-     * Emits where (or whether) the ad blocking entry should be shown in settings and re-emits when
-     * it changes (e.g. after a remote privacy config download). This is the single source of truth
-     * for the entry's placement across the settings screen.
+     * Emits whether the ad blocking entry should be shown in settings and re-emits when it changes
+     * (e.g. after a remote privacy config download). This is the single source of truth for the
+     * entry's visibility across the settings screen.
      */
-    fun settingsPlacementFlow(): Flow<SettingsPlacement>
+    fun observeSettingsVisible(): Flow<Boolean>
 
     /**
      * Emits the current [AdBlockingState], distinguishing whether ad blocking is enabled because
@@ -80,15 +80,6 @@ sealed interface AdBlockingState {
          */
         data object WithoutPixelConsent : Enabled
     }
-}
-
-/**
- * Where the ad blocking entry is rendered in settings.
- */
-sealed interface SettingsPlacement {
-    data object Protections : SettingsPlacement
-    data object Other : SettingsPlacement
-    data object Hidden : SettingsPlacement
 }
 
 @SingleIn(AppScope::class)
@@ -128,17 +119,7 @@ class RealAdBlockingStatusChecker @Inject constructor(
             killSwitchOn && !contingencyModeOn && state is AdBlockingState.Enabled
         }
 
-    override fun settingsPlacementFlow(): Flow<SettingsPlacement> =
-        combine(
-            feature.self().enabled(),
-            feature.adBlockingUXImprovements().enabled(),
-        ) { killSwitchOn, uxImprovementsEnabled ->
-            when {
-                !killSwitchOn -> SettingsPlacement.Hidden
-                uxImprovementsEnabled -> SettingsPlacement.Protections
-                else -> SettingsPlacement.Other
-            }
-        }
+    override fun observeSettingsVisible(): Flow<Boolean> = feature.self().enabled()
 
     override fun observeState(): Flow<AdBlockingState> =
         combine(

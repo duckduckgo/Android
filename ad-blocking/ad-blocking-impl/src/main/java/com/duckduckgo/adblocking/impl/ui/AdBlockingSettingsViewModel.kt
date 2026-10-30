@@ -89,16 +89,15 @@ class AdBlockingSettingsViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = combine(
         statusChecker.observeState(),
         duckPlayer.observeUserPreferences(),
-        feature.adBlockingUXImprovements().enabled(),
         feature.enableContingencyMode().enabled(),
         duckPlayerSettingsPlacementProvider.placementFlow(),
-    ) { state, duckPlayerPreferences, uxImprovements, contingencyModeOn, duckPlayerSettingsPlacement ->
+    ) { state, duckPlayerPreferences, contingencyModeOn, duckPlayerSettingsPlacement ->
         ViewState(
             isEnabled = state is AdBlockingState.Enabled,
             disabledUntilRelaunch = state is AdBlockingState.Disabled.UntilRelaunch,
             showConsentDescription = state !is AdBlockingState.Enabled.Default &&
                 state !is AdBlockingState.Enabled.WithoutPixelConsent,
-            isContingencyMode = uxImprovements && contingencyModeOn,
+            isContingencyMode = contingencyModeOn,
             duckPlayerMode = duckPlayerPreferences.privatePlayerMode,
             duckPlayerSection = when (duckPlayerSettingsPlacement) {
                 DuckPlayerSettingsPlacement.InAdBlocking -> DuckPlayerSection.Entry

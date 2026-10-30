@@ -35,9 +35,6 @@
                 "enabledByDefault": {
                     "state": "enabled"
                 },
-                "adBlockingUXImprovements": {
-                    "state": "enabled"
-                },
                 "showAdBlockingOmnibarAnimation": {
                     "state": "enabled"
                 }

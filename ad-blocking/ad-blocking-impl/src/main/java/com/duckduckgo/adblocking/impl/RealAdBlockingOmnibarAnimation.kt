@@ -43,7 +43,7 @@ class RealAdBlockingOmnibarAnimation @Inject constructor(
             lastAnimatedVideoId = null
             return AdBlockingAnimation.Skip
         }
-        if (!adBlockingFeature.showAdBlockingOmnibarAnimation().isEnabled() || !adBlockingFeature.adBlockingUXImprovements().isEnabled()) {
+        if (!adBlockingFeature.showAdBlockingOmnibarAnimation().isEnabled()) {
             return AdBlockingAnimation.Skip
         }
         if (!statusChecker.canInject()) return AdBlockingAnimation.Skip

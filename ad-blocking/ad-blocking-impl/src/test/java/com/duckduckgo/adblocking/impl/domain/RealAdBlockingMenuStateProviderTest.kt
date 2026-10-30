@@ -36,16 +36,13 @@ import org.mockito.kotlin.mock
 class RealAdBlockingMenuStateProviderTest {
 
     private val killSwitchFlow = MutableStateFlow(true)
-    private val phase2Flow = MutableStateFlow(true)
     private val contingencyFlow = MutableStateFlow(false)
     private val stateFlow = MutableStateFlow<AdBlockingState>(AdBlockingState.Enabled.WithPixelConsent)
 
     private val selfToggle: Toggle = mock { on { enabled() } doReturn killSwitchFlow }
-    private val phase2Toggle: Toggle = mock { on { enabled() } doReturn phase2Flow }
     private val contingencyToggle: Toggle = mock { on { enabled() } doReturn contingencyFlow }
     private val feature: AdBlockingExtensionFeature = mock {
         on { self() } doReturn selfToggle
-        on { adBlockingUXImprovements() } doReturn phase2Toggle
         on { enableContingencyMode() } doReturn contingencyToggle
     }
     private val statusChecker: AdBlockingStatusChecker = mock {
@@ -65,13 +62,6 @@ class RealAdBlockingMenuStateProviderTest {
     @Test
     fun whenNonYoutubeUrlThenHidden() = runTest {
         assertEquals(AdBlockingMenuState.Hidden, provider.observe(nonYoutubeUrl).first())
-    }
-
-    @Test
-    fun whenPhase2FlagOffThenHidden() = runTest {
-        phase2Flow.value = false
-
-        assertEquals(AdBlockingMenuState.Hidden, provider.observe(youtubeUrl).first())
     }
 
     @Test
