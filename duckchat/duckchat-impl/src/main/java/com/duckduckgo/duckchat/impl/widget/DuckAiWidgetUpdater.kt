@@ -19,25 +19,73 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** Re-renders the placed Duck.ai widget when the remote config changes, since that can enable or disable Duck.ai. */
+/**
+ * Keeps the Duck.ai widget in sync with what it renders: it follows the regular-mode chat store while an instance is
+ * placed (collection stops itself once the last instance is gone) and is re-rendered when the remote config changes,
+ * since that can enable or disable Duck.ai.
+ */
+@SingleIn(AppScope::class)
+@ContributesIntoSet(
+    scope = AppScope::class,
+    binding = binding<MainProcessLifecycleObserver>(),
+)
 @ContributesIntoSet(
     scope = AppScope::class,
     binding = binding<PrivacyConfigCallbackPlugin>(),
 )
 class DuckAiWidgetUpdater @Inject constructor(
     private val context: Context,
-) : PrivacyConfigCallbackPlugin {
+    private val chats: DuckAiChatsWidgetChats,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
+
+    private var observeJob = ConflatedJob()
+
+    override fun onStart(owner: LifecycleOwner) {
+        startObservingIfNeeded()
+    }
 
     override fun onPrivacyConfigDownloaded() {
-        val manager = AppWidgetManager.getInstance(context) ?: return
-        val ids = manager.getAppWidgetIds(ComponentName(context, DuckAiWidgetProvider::class.java))?.takeIf { it.isNotEmpty() } ?: return
+        refresh()
+    }
 
+    fun startObservingIfNeeded() {
+        if (observeJob.isActive || widgetIds().isEmpty()) return
+
+        observeJob += appCoroutineScope.launch {
+            // The first emission is the state the widget has just rendered.
+            chats.observeChats().drop(1).collect {
+                if (widgetIds().isEmpty()) {
+                    cancel()
+                } else {
+                    refresh()
+                }
+            }
+        }
+    }
+
+    private fun widgetIds(): IntArray {
+        val manager = AppWidgetManager.getInstance(context) ?: return IntArray(0)
+        return manager.getAppWidgetIds(ComponentName(context, DuckAiWidgetProvider::class.java)) ?: IntArray(0)
+    }
+
+    private fun refresh() {
+        val ids = widgetIds().takeIf { it.isNotEmpty() } ?: return
         val intent = Intent(context, DuckAiWidgetProvider::class.java).apply {
             action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
