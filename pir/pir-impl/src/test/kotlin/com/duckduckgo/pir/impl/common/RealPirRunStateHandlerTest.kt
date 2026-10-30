@@ -35,6 +35,8 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepI
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
@@ -44,8 +46,6 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOu
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.pixels.PirStage.OTHER
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
-import com.duckduckgo.pir.impl.scheduling.RemovedProfileWithIdentifierFound
-import com.duckduckgo.pir.impl.scheduling.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse.ScriptAddressCityState

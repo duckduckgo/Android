@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_APP_SETTINGS_CLICK
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
@@ -105,7 +106,6 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
-import com.duckduckgo.pir.impl.scheduling.RemovedProfileWithIdentifierFound.ChangedField
 import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
