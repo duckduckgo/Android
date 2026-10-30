@@ -102,7 +102,7 @@ class SubscriptionWebViewViewModelTest {
     @Before
     fun setup() = runTest {
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Disabled)
         runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
         viewModel = SubscriptionWebViewViewModel(
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
@@ -1060,7 +1060,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsPirAndPirDisabledThenCommandSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Disabled)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -1075,7 +1075,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsPirAndPirNotAvailableThenCommandSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.NOT_AVAILABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.NotAvailable)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -1090,7 +1090,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsPirAndPirEnabledThenCommandSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -1105,7 +1105,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsLegacyPirAndPirDisabledThenCommandSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Disabled)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -1120,7 +1120,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsLegacyPirAndPirNotAvailableThenCommandSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.NOT_AVAILABLE)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.NotAvailable)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -1135,7 +1135,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsLegacyPirAndPirEnabledThenCommandSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -1309,7 +1309,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowAndPirDisabledThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Disabled)
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
@@ -1325,7 +1325,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowAndPirEnabledThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 

@@ -102,7 +102,7 @@ class PirSettingView @JvmOverloads constructor(
             when (viewState.pirState) {
                 is Enabled -> {
                     isVisible = true
-                    setStatus(isOn = true)
+                    setStatus(isOn = viewState.pirState.isOn)
                     setLeadingIconResource(R.drawable.identity_blocked_pir_color_24)
                     isClickable = true
                     binding.pirSettings.setClickListener { viewModel.onPir(viewState.pirState.type) }

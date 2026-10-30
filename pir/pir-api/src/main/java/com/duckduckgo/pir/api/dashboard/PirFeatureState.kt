@@ -17,21 +17,23 @@
 package com.duckduckgo.pir.api.dashboard
 
 /**
- * Represents the state of the PIR (Private Information Retrieval) feature.
+ * Represents the state of the PIR (Personal Information Removal) feature.
  */
-enum class PirFeatureState {
+sealed interface PirFeatureState {
     /**
      * The PIR feature is enabled and available for use.
+     *
+     * @property hasUserProfile true when the user has a current PIR profile on this device, the one shown on the PIR dashboard
      */
-    ENABLED,
+    data class Enabled(val hasUserProfile: Boolean) : PirFeatureState
 
     /**
      * The PIR feature is disabled and cannot be used.
      */
-    DISABLED,
+    data object Disabled : PirFeatureState
 
     /**
-     * The PIR feature is enabled but not available.
+     * The PIR feature is enabled but not available, so whether a profile is stored is unknown.
      */
-    NOT_AVAILABLE,
+    data object NotAvailable : PirFeatureState
 }

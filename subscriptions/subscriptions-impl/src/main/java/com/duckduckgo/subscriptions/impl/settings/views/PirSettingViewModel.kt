@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
@@ -39,6 +40,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -61,6 +63,7 @@ class PirSettingViewModel @Inject constructor(
         data object ShowPirUnavailableDialog : Command()
     }
 
+    private val pirStateJob = ConflatedJob()
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
     data class ViewState(val pirState: PirState = PirState.Hidden) {
@@ -68,7 +71,7 @@ class PirSettingViewModel @Inject constructor(
         sealed class PirState {
 
             data object Hidden : PirState()
-            data class Enabled(val type: Type) : PirState() {
+            data class Enabled(val type: Type, val isOn: Boolean) : PirState() {
                 enum class Type {
                     DESKTOP,
                     DASHBOARD,
@@ -90,9 +93,9 @@ class PirSettingViewModel @Inject constructor(
                 DESKTOP -> OpenPirDesktop
                 DASHBOARD -> {
                     when (pirFeature.getPirFeatureState()) {
-                        PirFeatureState.ENABLED -> Command.OpenPirDashboard
-                        PirFeatureState.DISABLED -> OpenPirDesktop
-                        PirFeatureState.NOT_AVAILABLE -> Command.ShowPirUnavailableDialog
+                        is PirFeatureState.Enabled -> Command.OpenPirDashboard
+                        PirFeatureState.Disabled -> OpenPirDesktop
+                        PirFeatureState.NotAvailable -> Command.ShowPirUnavailableDialog
                     }
                 }
             }
@@ -100,10 +103,11 @@ class PirSettingViewModel @Inject constructor(
         }
     }
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
 
-        subscriptions.getEntitlementStatus().map { entitledProducts -> entitledProducts.contains(PIR) }
+        pirStateJob += subscriptions.getEntitlements().map { entitlements -> entitlements.any { it.product == PIR.value } }
+            .distinctUntilChanged()
             .onEach { hasValidEntitlement ->
 
                 val subscriptionStatus = subscriptions.getSubscriptionStatus()
@@ -113,6 +117,11 @@ class PirSettingViewModel @Inject constructor(
                 _viewState.update { it.copy(pirState = pirState) }
             }
             .launchIn(viewModelScope)
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        pirStateJob.cancel()
     }
 
     private suspend fun getPirState(
@@ -138,14 +147,11 @@ class PirSettingViewModel @Inject constructor(
             SubscriptionStatus.GRACE_PERIOD,
             -> {
                 if (hasValidEntitlement) {
-                    val type = when (pirFeature.getPirFeatureState()) {
-                        PirFeatureState.ENABLED,
-                        PirFeatureState.NOT_AVAILABLE,
-                        -> DASHBOARD
-
-                        PirFeatureState.DISABLED -> DESKTOP
+                    when (val pirFeatureState = pirFeature.getPirFeatureState()) {
+                        is PirFeatureState.Enabled -> PirState.Enabled(DASHBOARD, isOn = pirFeatureState.hasUserProfile)
+                        PirFeatureState.NotAvailable -> PirState.Enabled(DASHBOARD, isOn = false)
+                        PirFeatureState.Disabled -> PirState.Enabled(DESKTOP, isOn = true)
                     }
-                    PirState.Enabled(type)
                 } else {
                     PirState.Hidden
                 }

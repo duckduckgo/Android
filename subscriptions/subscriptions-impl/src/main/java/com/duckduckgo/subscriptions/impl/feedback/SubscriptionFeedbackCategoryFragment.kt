@@ -100,7 +100,7 @@ class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layo
 
     private suspend fun isPirCategoryAvailable(): Boolean {
         val subscription = authRepository.getSubscription() ?: return false
-        return (pirFeature.getPirFeatureState() == PirFeatureState.ENABLED || subscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US))
+        return (pirFeature.getPirFeatureState() is PirFeatureState.Enabled || subscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US))
     }
 
     private suspend fun isDuckAiAvailable(): Boolean = withContext(dispatcherProvider.io()) {

@@ -44,7 +44,7 @@ class SubscriptionOnboardingProgress @Inject constructor(
             .map { it.stepId }
 
         val entitled = Product.PIR in subscriptions.getEntitlementStatus().firstOrNull().orEmpty()
-        val showPir = entitled && pirFeature.getPirFeatureState() == PirFeatureState.ENABLED
+        val showPir = entitled && pirFeature.getPirFeatureState() is PirFeatureState.Enabled
         val allStepIds = if (showPir) stepIds + PIR_ROW_ID else stepIds
 
         if (allStepIds.isEmpty()) return 0

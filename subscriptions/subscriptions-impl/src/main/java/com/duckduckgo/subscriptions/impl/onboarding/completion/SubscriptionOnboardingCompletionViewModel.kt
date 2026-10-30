@@ -128,7 +128,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
                 }
             }
 
-        val showPir = pirEntitled && pirFeature.getPirFeatureState() == PirFeatureState.ENABLED
+        val showPir = pirEntitled && pirFeature.getPirFeatureState() is PirFeatureState.Enabled
         val rows = if (showPir) stepRows + pirRow() else stepRows
         val percentage = rows.completionPercentage()
 

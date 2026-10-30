@@ -93,7 +93,7 @@ class SubscriptionOnboardingProgressTest {
         whenever(onboardingStore.isStepCompleted("itr")).thenReturn(true)
         whenever(onboardingStore.isStepCompleted("duck_ai")).thenReturn(true)
         whenever(onboardingStore.isStepCompleted(PIR_ROW_ID)).thenReturn(false)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         val progress = createProgress(
             plugins = listOf(fakePlugin("vpn"), fakePlugin("itr"), fakePlugin("duck_ai")),
             entitlements = listOf(Product.PIR),
@@ -105,7 +105,7 @@ class SubscriptionOnboardingProgressTest {
     @Test
     fun whenPirEntitledButNotEligibleThenPirNotCounted() = runTest {
         whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Disabled)
         val progress = createProgress(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
 
         assertEquals(100, progress.completionPercentage())
@@ -114,7 +114,7 @@ class SubscriptionOnboardingProgressTest {
     @Test
     fun whenPirEligibleButNotEntitledThenPirNotCounted() = runTest {
         whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.Enabled(hasUserProfile = false))
         val progress = createProgress(plugins = listOf(fakePlugin("vpn")))
 
         assertEquals(100, progress.completionPercentage())
