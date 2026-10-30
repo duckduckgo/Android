@@ -2126,5 +2126,19 @@
                 "enum": [1, 2, 3]
             }
         ]
+    },
+    "m_duck_ai_combined_widget_added": {
+        "description": "Triggered when the Duck.ai combined (prompt bar and actions) home-screen widget is added",
+        "owners": ["gpaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck_ai_combined_widget_deleted": {
+        "description": "Triggered when the Duck.ai combined (prompt bar and actions) home-screen widget is removed",
+        "owners": ["gpaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

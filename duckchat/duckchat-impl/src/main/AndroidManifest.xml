@@ -66,5 +66,18 @@
             android:name=".ui.DuckChatVoiceMicrophoneService"
             android:exported="false"
             android:foregroundServiceType="microphone" />
+
+        <receiver
+            android:name=".widget.DuckAiCombinedWidget"
+            android:enabled="false"
+            android:exported="false"
+            android:label="@string/duckAiCombinedWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/duck_ai_combined_widget_info" />
+        </receiver>
     </application>
 </manifest>

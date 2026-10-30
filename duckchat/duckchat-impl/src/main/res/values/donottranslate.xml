@@ -44,4 +44,12 @@
     <!-- Duck.ai on/off, shown in the onboarding Duck.ai state choice -->
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
+
+    <!-- Duck.ai widget: copy not final yet -->
+    <string name="duckAiCombinedWidgetLabel">Duck.ai</string>
+    <string name="duckAiCombinedWidgetDescription">Start a private chat with Duck.ai or jump straight into voice, image or camera.</string>
+    <string name="duckAiCombinedWidgetHint" instruction="Placeholder text shown in the prompt bar of the Duck.ai combined home-screen widget">Chat privately with Duck.ai</string>
+    <string name="duckAiCombinedWidgetVoiceAction" instruction="Label of the pill button that starts a voice chat with Duck.ai in the combined home-screen widget">Voice</string>
+    <string name="duckAiCombinedWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the combined home-screen widget">Image</string>
+    <string name="duckAiCombinedWidgetCameraAction" instruction="Label of the pill button that opens the camera to start a Duck.ai chat in the combined home-screen widget">Camera</string>
 </resources>
