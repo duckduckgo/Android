@@ -22,6 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.toKey
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
@@ -32,7 +34,6 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus.ERROR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus.MATCHES_FOUND
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus.NO_MATCH_FOUND
-import com.duckduckgo.pir.impl.scheduling.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import dev.zacsweers.metro.ContributesBinding
@@ -270,24 +271,6 @@ interface JobRecordUpdater {
      * @param extractedProfileId The id of the [ExtractedProfile] to be marked as removed by user
      */
     suspend fun markRecordsAsRemovedByUser(extractedProfileId: Long)
-}
-
-/**
- * A stored profile marked removed although the same scan found a profile with the same identifier, so only its name
- * or profile URL changed. Apple and Windows match profiles on the identifier alone, so they would have kept it.
- *
- * @property changedField Which part of the match key no longer matched.
- * @property previousStatus Status of the opt-out job before it was marked removed.
- */
-data class RemovedProfileWithIdentifierFound(
-    val changedField: ChangedField,
-    val previousStatus: OptOutJobStatus,
-) {
-    enum class ChangedField {
-        NAME,
-        PROFILE_URL,
-        NAME_AND_PROFILE_URL,
-    }
 }
 
 @ContributesBinding(AppScope::class)
