@@ -111,6 +111,9 @@ interface PlayBillingManager {
      * See [LatestPurchaseResult] for the meaning of each outcome.
      */
     suspend fun getLatestPurchase(): LatestPurchaseResult
+
+    /** Whether the billing client is connected, i.e. whether [getLatestPurchase] can give a confirmed answer. */
+    val isReady: Boolean
 }
 
 @SingleIn(AppScope::class)
@@ -143,6 +146,9 @@ class RealPlayBillingManager @Inject constructor(
 
     override val productsFlow: Flow<List<ProductDetails>>
         get() = _products.asStateFlow()
+
+    override val isReady: Boolean
+        get() = billingClient.ready
 
     // Active Purchases
     override var purchases = emptyList<Purchase>()

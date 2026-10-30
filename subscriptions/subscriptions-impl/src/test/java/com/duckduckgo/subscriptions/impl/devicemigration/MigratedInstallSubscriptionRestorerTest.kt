@@ -20,12 +20,16 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
+import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND_ERROR
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -40,6 +44,7 @@ class MigratedInstallSubscriptionRestorerTest {
 
     private val deviceMigration: DeviceMigration = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
+    private val playBillingManager: PlayBillingManager = mock { on { isReady } doReturn true }
     private val preferences = InMemorySharedPreferences()
     private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doReturn preferences
@@ -48,6 +53,7 @@ class MigratedInstallSubscriptionRestorerTest {
     private val testee = MigratedInstallSubscriptionRestorer(
         deviceMigration = deviceMigration,
         subscriptionsManager = subscriptionsManager,
+        playBillingManager = playBillingManager,
         sharedPreferencesProvider = sharedPreferencesProvider,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
@@ -57,10 +63,10 @@ class MigratedInstallSubscriptionRestorerTest {
     fun whenMigratedAndNotSignedInThenRecoverFromStoreCalledOnce() = runTest {
         whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
         whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
-        whenever(subscriptionsManager.recoverSubscriptionFromStore(null)).thenReturn(RecoverSubscriptionResult.Failure("none"))
+        whenever(subscriptionsManager.recoverSubscriptionFromStore(null)).thenReturn(RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR))
 
-        testee.onCreate(mock())
-        testee.onCreate(mock())
+        startApp()
+        startApp()
 
         verify(subscriptionsManager, times(1)).recoverSubscriptionFromStore(null)
     }
@@ -70,7 +76,7 @@ class MigratedInstallSubscriptionRestorerTest {
         whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
         whenever(subscriptionsManager.isSignedIn()).thenReturn(true)
 
-        testee.onCreate(mock())
+        startApp()
 
         verify(subscriptionsManager, never()).recoverSubscriptionFromStore(null)
     }
@@ -80,20 +86,88 @@ class MigratedInstallSubscriptionRestorerTest {
         whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
         whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
 
-        testee.onCreate(mock())
+        startApp()
 
         verify(subscriptionsManager, never()).recoverSubscriptionFromStore(null)
     }
 
     @Test
-    fun whenRecoverFailsThenNotRetried() = runTest {
+    fun whenRecoverIsInconclusiveThenRetriedOnNextStart() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
+        whenever(subscriptionsManager.recoverSubscriptionFromStore(null))
+            .thenReturn(RecoverSubscriptionResult.Failure("Store login error: PurchaseInfoNotAvailable: billing_client_not_ready"))
+
+        startApp()
+        startApp()
+
+        verify(subscriptionsManager, times(2)).recoverSubscriptionFromStore(null)
+    }
+
+    @Test
+    fun whenRecoverThrowsThenRetriedOnNextStart() = runTest {
         whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
         whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
         whenever(subscriptionsManager.recoverSubscriptionFromStore(null)).thenAnswer { throw RuntimeException("boom") }
 
-        testee.onCreate(mock())
-        testee.onCreate(mock())
+        startApp()
+        startApp()
+
+        verify(subscriptionsManager, times(2)).recoverSubscriptionFromStore(null)
+    }
+
+    @Test
+    fun whenRecoverSucceedsThenNotAttemptedAgain() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
+        whenever(subscriptionsManager.recoverSubscriptionFromStore(null)).thenReturn(RecoverSubscriptionResult.Success(mock()))
+
+        startApp()
+        startApp()
 
         verify(subscriptionsManager, times(1)).recoverSubscriptionFromStore(null)
+    }
+
+    @Test
+    fun whenInconclusiveRepeatedlyThenAttemptsCappedAtThree() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
+        whenever(subscriptionsManager.recoverSubscriptionFromStore(null)).thenReturn(RecoverSubscriptionResult.Failure("transient"))
+
+        repeat(5) { startApp() }
+
+        verify(subscriptionsManager, times(3)).recoverSubscriptionFromStore(null)
+    }
+
+    @Test
+    fun whenBillingBecomesReadyThenRecoverCalled() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
+        whenever(playBillingManager.isReady).thenReturn(false, false, true)
+        whenever(subscriptionsManager.recoverSubscriptionFromStore(null)).thenReturn(RecoverSubscriptionResult.Success(mock()))
+
+        startApp()
+
+        verify(subscriptionsManager, times(1)).recoverSubscriptionFromStore(null)
+    }
+
+    @Test
+    fun whenBillingNeverReadyThenNoRecoverAndAttemptCounted() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(subscriptionsManager.isSignedIn()).thenReturn(false)
+        whenever(playBillingManager.isReady).thenReturn(false)
+
+        repeat(4) { startApp() }
+
+        verify(subscriptionsManager, never()).recoverSubscriptionFromStore(null)
+        verify(playBillingManager, atLeast(3)).isReady
+        whenever(playBillingManager.isReady).thenReturn(true)
+        startApp()
+        verify(subscriptionsManager, never()).recoverSubscriptionFromStore(null)
+    }
+
+    private fun startApp() {
+        testee.onCreate(mock())
+        coroutineTestRule.testScope.advanceUntilIdle()
     }
 }

@@ -24,23 +24,31 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND_ERROR
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * The subscription's keystore-encrypted store is not transferred, so after a device transfer the user looks signed out even though
- * a Play purchase is still tied to their Google account. This restores it silently, once.
- * The attempt is recorded before the call so a failing or hanging restore is never retried on every start.
+ * a Play purchase is still tied to their Google account. This restores it silently.
+ * Play Billing connects asynchronously at startup, so the restore waits for it and only counts as finished on a definitive answer;
+ * transient failures are retried on later app starts, up to [MAX_ATTEMPTS], counted before each attempt so a process kill still counts.
  * The guard preference file is excluded from transfer, otherwise a chained transfer would skip the restore.
  */
 @SingleIn(AppScope::class)
@@ -48,6 +56,7 @@ import javax.inject.Inject
 class MigratedInstallSubscriptionRestorer @Inject constructor(
     private val deviceMigration: DeviceMigration,
     private val subscriptionsManager: SubscriptionsManager,
+    private val playBillingManager: PlayBillingManager,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -59,27 +68,57 @@ class MigratedInstallSubscriptionRestorer @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.io()) {
-            if (preferences.getBoolean(KEY_RESTORE_ATTEMPTED, false)) return@launch
+            if (preferences.getBoolean(KEY_RESTORE_DONE, false)) return@launch
+            val attempts = preferences.getInt(KEY_RESTORE_ATTEMPTS, 0)
+            if (attempts >= MAX_ATTEMPTS) return@launch
             if (!deviceMigration.isMigratedInstall()) return@launch
-
-            preferences.edit(commit = true) { putBoolean(KEY_RESTORE_ATTEMPTED, true) }
 
             try {
                 if (subscriptionsManager.isSignedIn()) return@launch
-                when (subscriptionsManager.recoverSubscriptionFromStore()) {
-                    is RecoverSubscriptionResult.Success -> logcat(INFO) { "Subscription restored after device transfer" }
-                    is RecoverSubscriptionResult.Failure -> logcat(INFO) { "No subscription restored after device transfer" }
+
+                preferences.edit(commit = true) { putInt(KEY_RESTORE_ATTEMPTS, attempts + 1) }
+
+                if (!awaitBillingReady()) {
+                    logcat(WARN) { "Play Billing not ready, subscription restore after device transfer will retry on next start" }
+                    return@launch
+                }
+
+                when (val result = subscriptionsManager.recoverSubscriptionFromStore()) {
+                    is RecoverSubscriptionResult.Success -> {
+                        logcat(INFO) { "Subscription restored after device transfer" }
+                        markDone()
+                    }
+                    is RecoverSubscriptionResult.Failure -> if (result.message == SUBSCRIPTION_NOT_FOUND_ERROR) {
+                        logcat(INFO) { "No subscription to restore after device transfer" }
+                        markDone()
+                    } else {
+                        logcat(WARN) { "Subscription restore after device transfer was inconclusive, will retry on next start" }
+                    }
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                logcat(ERROR) { "Subscription restore after device transfer failed: ${e.message}" }
+                logcat(ERROR) { "Subscription restore after device transfer failed: ${e.javaClass.simpleName}" }
             }
         }
     }
 
+    private suspend fun awaitBillingReady(): Boolean =
+        withTimeoutOrNull(BILLING_READY_TIMEOUT) {
+            while (!playBillingManager.isReady) delay(BILLING_POLL_INTERVAL)
+            true
+        } ?: false
+
+    private fun markDone() {
+        preferences.edit(commit = true) { putBoolean(KEY_RESTORE_DONE, true) }
+    }
+
     private companion object {
         const val PREFERENCES_FILE_NAME = "com.duckduckgo.subscriptions.devicemigration"
-        const val KEY_RESTORE_ATTEMPTED = "restoreAttempted"
+        const val KEY_RESTORE_DONE = "restoreDone"
+        const val KEY_RESTORE_ATTEMPTS = "restoreAttempts"
+        const val MAX_ATTEMPTS = 3
+        val BILLING_READY_TIMEOUT = 30.seconds
+        val BILLING_POLL_INTERVAL = 500.milliseconds
     }
 }
