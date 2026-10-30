@@ -92,17 +92,19 @@ class RealReinstallDetector @Inject constructor(
     // It runs in the app scope, so a cancelled caller only stops waiting; the check still saves its answer.
     // Not reentrant: the check must not call isAppReinstall(). Started lazily rather than built in a `by lazy` block, because
     // the flag write it launches waits on it too and could otherwise re-enter the initializer.
-    private val reinstallCheck: Deferred<Boolean> = appCoroutineScope.async(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
-        runCatching { savedAppReinstallValue() ?: detectAndSaveAppReinstall() }.getOrDefault(false)
+    private val reinstallCheck: Deferred<CheckOutcome> = appCoroutineScope.async(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        runCatching {
+            val savedValue = savedAppReinstallValue()
+            if (savedValue != null) {
+                CheckOutcome(savedValue, answerSaved = true)
+            } else {
+                detectAndSaveAppReinstall()
+            }
+        }.getOrDefault(CheckOutcome(isReinstall = false, answerSaved = false))
     }
 
     // Keeps the two flag writers (after a new-install check, and on app start) from calling Block Store at once
     private val installSeenFlagWriteMutex = Mutex()
-
-    // A failed save leaves the answer readable in memory, so reading preferences again can't tell it from one that reached
-    // disk. Set before the shared check completes.
-    @Volatile
-    private var answerSaveFailed = false
 
     override fun onCreate(owner: LifecycleOwner) {
         if (sdkInt >= 30) return
@@ -115,16 +117,16 @@ class RealReinstallDetector @Inject constructor(
         }
     }
 
-    override suspend fun isAppReinstall(): Boolean = reinstallCheck.await()
+    override suspend fun isAppReinstall(): Boolean = reinstallCheck.await().isReinstall
 
-    private suspend fun detectAndSaveAppReinstall(): Boolean =
+    private suspend fun detectAndSaveAppReinstall(): CheckOutcome =
         if (sdkInt < 30) {
             detectAndSaveWithBlockStore()
         } else {
-            runCatching { detectAndSaveWithDownloadsFolder() }.getOrDefault(false)
+            runCatching { detectAndSaveWithDownloadsFolder() }.getOrDefault(CheckOutcome(isReinstall = false, answerSaved = false))
         }
 
-    private suspend fun detectAndSaveWithBlockStore(): Boolean {
+    private suspend fun detectAndSaveWithBlockStore(): CheckOutcome {
         val readStartedAt = currentTimeProvider.elapsedRealtime()
         val installSeen = callBlockStore { persistentStorage.retrieve(InstallSeenPersistentStorageKey) }
         val readDurationMillis = currentTimeProvider.elapsedRealtime() - readStartedAt
@@ -152,7 +154,7 @@ class RealReinstallDetector @Inject constructor(
         }
 
         // Saved even when Block Store failed, so every caller gets the same answer for this install instead of retrying a slow call
-        val answerSaved = runCatching { saveAppReinstallValue(isReinstall) }.getOrDefault(false)
+        val answerSaved = saveAppReinstallValue(isReinstall)
 
         if (isReinstall) {
             runCatching { preferences.edit(commit = true) { putBoolean(INSTALL_SEEN_FLAG_STORED_KEY, true) } }
@@ -160,7 +162,7 @@ class RealReinstallDetector @Inject constructor(
             // Written outside the check: the answer is already saved, so callers shouldn't also wait for a second Block Store call
             appCoroutineScope.launch(dispatcherProvider.io()) { storeInstallSeenFlagIfMissing() }
         }
-        return isReinstall
+        return CheckOutcome(isReinstall, answerSaved)
     }
 
     private fun readDurationBucket(durationMillis: Long): String = when {
@@ -179,11 +181,10 @@ class RealReinstallDetector @Inject constructor(
     }
 
     // Only safe once this install's answer is on disk: otherwise, after a restart, the flag alone would make this install look
-    // like a reinstall. Waiting for the shared check means a check still saving its answer has finished, and recorded whether
-    // the save failed.
+    // like a reinstall. Waiting for the shared check means a check still saving its answer has finished, and its result says
+    // whether the save reached disk.
     private suspend fun canStoreInstallSeenFlag(): Boolean {
-        reinstallCheck.await()
-        val answerSaved = savedAppReinstallValueOrNull() != null && !answerSaveFailed
+        val answerSaved = reinstallCheck.await().answerSaved
         val flagStored = runCatching { preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false) }.getOrDefault(false)
         return answerSaved && !flagStored
     }
@@ -209,32 +210,23 @@ class RealReinstallDetector @Inject constructor(
         Result.failure(e)
     }
 
-    private fun savedAppReinstallValueOrNull(): Boolean? = runCatching { savedAppReinstallValue() }.getOrNull()
-
     private fun savedAppReinstallValue(): Boolean? =
         if (preferences.contains(APP_REINSTALLED_KEY)) preferences.getBoolean(APP_REINSTALLED_KEY, false) else null
 
     /**
      * @return false if the answer may not have reached disk. Android keeps it readable in memory even then.
      */
-    private fun saveAppReinstallValue(isReinstall: Boolean): Boolean {
-        val saved = try {
-            preferences.edit().putBoolean(APP_REINSTALLED_KEY, isReinstall).commit()
-        } catch (e: Exception) {
-            answerSaveFailed = true
-            throw e
-        }
-        if (!saved) answerSaveFailed = true
-        return saved
-    }
+    private fun saveAppReinstallValue(isReinstall: Boolean): Boolean = runCatching {
+        preferences.edit().putBoolean(APP_REINSTALLED_KEY, isReinstall).commit()
+    }.getOrDefault(false)
 
     // The answer is saved before the folder is created. If only the folder were written, the next launch would find it and
     // answer "reinstall" for a new install; if only the answer is saved, a later reinstall goes undetected, which is the lesser harm.
-    private fun detectAndSaveWithDownloadsFolder(): Boolean {
+    private fun detectAndSaveWithDownloadsFolder(): CheckOutcome {
         val ddgDirectoryExists = getDownloadsDirectory().list()?.asList().orEmpty().contains(DDG_DOWNLOADS_DIRECTORY)
         val saved = saveAppReinstallValue(ddgDirectoryExists)
         if (!ddgDirectoryExists && saved) createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
-        return ddgDirectoryExists
+        return CheckOutcome(ddgDirectoryExists, saved)
     }
 
     private fun getDownloadsDirectory(): File {
@@ -260,6 +252,8 @@ class RealReinstallDetector @Inject constructor(
             }
         }
     }
+
+    private class CheckOutcome(val isReinstall: Boolean, val answerSaved: Boolean)
 
     companion object {
         // Existing installs saved their answer under this file and key, so neither can change
