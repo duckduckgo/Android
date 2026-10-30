@@ -661,6 +661,21 @@ class RealJobRecordUpdaterTest {
         }
 
     @Test
+    fun whenMarkRemovedProfileWhoseIdentifierIsOnlyFoundOnAnAlreadyStoredProfileThenReturnsNothing() =
+        runTest {
+            val storedSplitProfile = testExtractedProfile1.copy(dbId = 101L, profileUrl = "https://example.com/profile/100?ref=2")
+            val newProfiles = listOf(testExtractedProfile1.copy(dbId = 0L))
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(listOf(testExtractedProfile1, storedSplitProfile))
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(101L))
+                .thenReturn(testOptOutJobRecord.copy(extractedProfileId = 101L, status = OptOutJobStatus.REQUESTED))
+
+            val result = toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            assertEquals(emptyList<RemovedProfileWithIdentifierFound>(), result)
+        }
+
+    @Test
     fun whenMarkRemovedProfileWithEmptyIdentifierThenReturnsNothing() =
         runTest {
             val storedProfile = testExtractedProfile1.copy(identifier = "")

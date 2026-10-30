@@ -65,11 +65,52 @@ class PirDatabaseMigration17To18Test {
         }
     }
 
+    @Test
+    fun whenMigratingFrom17To18ThenReRequestedOptOutGetsFirstRequestedDateFromItsFormSubmittedDate() {
+        testHelper.createDatabase(TEST_DB_NAME, 17).use { db ->
+            insertOptOutJobRecord(
+                db,
+                extractedProfileId = 1,
+                status = "REQUESTED",
+                optOutRequestedDate = 3000,
+                optOutFormSubmittedDate = 1000,
+            )
+        }
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 18, true).use { db ->
+            db.query("SELECT optOutFirstRequestedDate FROM pir_optout_job_record WHERE extractedProfileId = 1").use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertEquals(1000L, cursor.getLong(0))
+            }
+        }
+    }
+
+    @Test
+    fun whenMigratingFrom17To18ThenSubmittedButNeverRequestedOptOutHasNoFirstRequestedDate() {
+        testHelper.createDatabase(TEST_DB_NAME, 17).use { db ->
+            insertOptOutJobRecord(
+                db,
+                extractedProfileId = 1,
+                status = "PENDING_EMAIL_CONFIRMATION",
+                optOutRequestedDate = 0,
+                optOutFormSubmittedDate = 1000,
+            )
+        }
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 18, true).use { db ->
+            db.query("SELECT optOutFirstRequestedDate FROM pir_optout_job_record WHERE extractedProfileId = 1").use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertTrue(cursor.isNull(0))
+            }
+        }
+    }
+
     private fun insertOptOutJobRecord(
         db: SupportSQLiteDatabase,
         extractedProfileId: Long,
         status: String,
         optOutRequestedDate: Long,
+        optOutFormSubmittedDate: Long? = null,
     ) {
         db.execSQL(
             """
@@ -80,7 +121,7 @@ class PirDatabaseMigration17To18Test {
                  reporting_twentyOneDayConfirmationReportSentDateMs, reporting_fortyTwoDayConfirmationReportSentDateMs)
             VALUES
                 ($extractedProfileId, 'broker.example', 1, '$status', 1, 1000,
-                 $optOutRequestedDate, NULL, 0, 0, 100,
+                 $optOutRequestedDate, ${optOutFormSubmittedDate ?: "NULL"}, 0, 0, 100,
                  0, 0, 0, 0)
             """.trimIndent(),
         )

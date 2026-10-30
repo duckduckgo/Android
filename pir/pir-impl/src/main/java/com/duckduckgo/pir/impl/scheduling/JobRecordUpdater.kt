@@ -423,7 +423,17 @@ class RealJobRecordUpdater @Inject constructor(
                 logcat { "PIR-JOB-RECORD: Removed Profiles $removedExtractedProfiles" }
 
                 val profileQuery = repository.getUserProfileQuery(profileQueryId)
-                val newProfilesByIdentifier = newExtractedProfiles.filter { it.identifier.isNotEmpty() }.associateBy { it.identifier }
+                val storedKeys =
+                    storedExtractedProfiles
+                        .asSequence()
+                        .map { it.toKey() }
+                        .toHashSet()
+                // Only profiles that aren't stored yet count: a stored one means its split was reported when it first appeared,
+                // and a broker alternating between two URLs would otherwise report it again on every scan.
+                val newProfilesByIdentifier =
+                    newExtractedProfiles
+                        .filter { it.identifier.isNotEmpty() && it.toKey() !in storedKeys }
+                        .associateBy { it.identifier }
                 removedExtractedProfiles.mapNotNull { extractedProfile ->
                     val previousRecord = updateOptOutJobRecordAsRemoved(
                         profileQuery = profileQuery,

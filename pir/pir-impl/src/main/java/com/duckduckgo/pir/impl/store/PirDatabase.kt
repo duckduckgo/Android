@@ -111,13 +111,15 @@ abstract class PirDatabase : RoomDatabase() {
 }
 
 /**
- * The first request date was never stored before v18, so already-requested opt-outs start from their latest
- * request date: the closest value we have. Opt-outs that were never requested keep a null date.
+ * The first request date was never stored before v18. The form submission date (v16) is set only once, so it is the
+ * closest value where it exists; older opt-outs fall back to their latest request date, which re-requests overwrite.
+ * Opt-outs that were never requested keep a null date.
  */
 class PirDatabaseMigration17To18Spec : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
         db.execSQL(
-            "UPDATE pir_optout_job_record SET optOutFirstRequestedDate = optOutRequestedDate WHERE optOutRequestedDate != 0",
+            "UPDATE pir_optout_job_record SET optOutFirstRequestedDate = COALESCE(optOutFormSubmittedDate, optOutRequestedDate) " +
+                "WHERE optOutRequestedDate != 0",
         )
     }
 }

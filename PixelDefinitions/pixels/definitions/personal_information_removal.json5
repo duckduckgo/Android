@@ -283,7 +283,7 @@
         ]
     },
     "m_dbp_optoutjob_removed-identifier-found": {
-        "description": "Fired when a scan marks a stored profile as removed although the same scan found a profile with the same identifier, because the profile's name or profile URL changed. Other platforms match profiles on the identifier alone and would not count this as a removal. Not fired again for opt-out jobs that are already removed.",
+        "description": "Fired when a scan marks a stored profile as removed although the same scan found a profile with the same identifier, because the profile's name or profile URL changed.",
         "owners": ["landomen"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
