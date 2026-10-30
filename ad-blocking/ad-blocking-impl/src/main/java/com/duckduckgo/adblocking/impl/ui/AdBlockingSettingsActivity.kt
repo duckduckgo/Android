@@ -24,7 +24,7 @@ import androidx.core.view.isVisible
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
-import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsV2Binding
+import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
@@ -38,10 +38,10 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AdBlockingSettingsV2NoParams::class)
-class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
+@ContributeToActivityStarter(AdBlockingSettingsNoParams::class)
+class AdBlockingSettingsActivity : BaseAdBlockingSettingsActivity() {
 
-    private val binding: ActivityAdBlockingSettingsV2Binding by viewBinding()
+    private val binding: ActivityAdBlockingSettingsBinding by viewBinding()
 
     override val toolbar: Toolbar get() = binding.includeToolbar.toolbar
     override val blockAdsToggle: OneLineListItem get() = binding.blockAdsToggle
