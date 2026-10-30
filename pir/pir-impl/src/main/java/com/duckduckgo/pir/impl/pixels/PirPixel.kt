@@ -379,6 +379,10 @@ enum class PirPixel(
         baseName = "m_dbp_notification_sent_first_scan_complete",
         type = Count,
     ),
+    PIR_APP_SETTINGS_CLICK(
+        baseName = "m_privacy-pro_app-settings_personal-information-removal_click",
+        type = Count,
+    ),
     ;
 
     constructor(

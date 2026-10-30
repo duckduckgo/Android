@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.settings.views
+package com.duckduckgo.pir.impl.settings
 
 import android.content.Context
 import android.util.AttributeSet
@@ -37,15 +37,15 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.api.PirScreens.PirDesktopScreen
-import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPirDashboard
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPirDesktop
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Disabled
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
+import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.databinding.ViewPirSettingsBinding
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.Command
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.Command.OpenPirDashboard
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.Command.OpenPirDesktop
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Disabled
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Hidden
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -103,7 +103,7 @@ class PirSettingView @JvmOverloads constructor(
                 is Enabled -> {
                     isVisible = true
                     setStatus(isOn = true)
-                    setLeadingIconResource(R.drawable.identity_blocked_pir_color_24)
+                    setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.identity_blocked_pir_color_24)
                     isClickable = true
                     binding.pirSettings.setClickListener { viewModel.onPir(viewState.pirState.type) }
                 }

@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.settings.views
+package com.duckduckgo.pir.impl.settings
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Disabled
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled.Type
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Hidden
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -29,11 +34,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Disabled
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -49,7 +49,7 @@ class PirSettingViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val subscriptionPixelSender: SubscriptionPixelSender = mock()
+    private val pirPixelSender: PirPixelSender = mock()
     private val subscriptions: Subscriptions = mock()
     private val pirFeature: PirFeature = mock()
     private lateinit var pirSettingsViewModel: PirSettingViewModel
@@ -57,7 +57,7 @@ class PirSettingViewModelTest {
     @Before
     fun before() {
         pirSettingsViewModel = PirSettingViewModel(
-            subscriptionPixelSender,
+            pirPixelSender,
             subscriptions,
             pirFeature,
         )
@@ -66,7 +66,7 @@ class PirSettingViewModelTest {
     @Test
     fun `when onPir then report app settings pixel sent`() = runTest {
         pirSettingsViewModel.onPir(Type.DESKTOP)
-        verify(subscriptionPixelSender).reportAppSettingsPirClick()
+        verify(pirPixelSender).reportAppSettingsClick()
     }
 
     @Test
