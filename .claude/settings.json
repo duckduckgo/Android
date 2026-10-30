@@ -9,6 +9,15 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/android-gradle-quiet.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/no-new-comments.py\""
+          }
+        ]
       }
     ]
   }
