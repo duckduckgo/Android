@@ -44,8 +44,11 @@ interface ConnectedDevicesRepository {
      *
      * An [Error] keeps the code it failed with: an HTTP status or server error code when the server rejected the request, and
      * [AccountErrorCodes.GENERIC_ERROR] for everything else, such as no connection, an empty response, or missing credentials.
+     *
+     * Pass [reportAccountErrorPixel] true for fetches the user asked for, so failures fire sync account error pixels. Fetches nobody asked
+     * for, such as a background sync, keep the default so those pixels only count failures the user can see.
      */
-    fun getConnectedDevices(): Result<List<ConnectedDevice>>
+    fun getConnectedDevices(reportAccountErrorPixel: Boolean = false): Result<List<ConnectedDevice>>
 
     /**
      * Lets callers observe how many devices are on the sync account, this one included, without fetching the device list.
@@ -93,7 +96,7 @@ class RealConnectedDevicesRepository @Inject constructor(
         }
     }
 
-    override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
+    override fun getConnectedDevices(reportAccountErrorPixel: Boolean): Result<List<ConnectedDevice>> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "Token Empty")
         val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
@@ -101,9 +104,9 @@ class RealConnectedDevicesRepository @Inject constructor(
 
         val userId = syncStore.userId
         val result = if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            getConnectedDevicesV2(token, primaryKey)
+            getConnectedDevicesV2(token, primaryKey, reportAccountErrorPixel)
         } else {
-            getConnectedDevicesLegacy(token, primaryKey)
+            getConnectedDevicesLegacy(token, primaryKey, reportAccountErrorPixel)
         }
         // A fetch can still be in flight when the user signs out or switches account. Comparing the user id covers both: sign-out clears
         // it and a switch replaces it, so we never undo the reset to 0 or write the old account's count over the new one.
@@ -117,15 +120,16 @@ class RealConnectedDevicesRepository @Inject constructor(
     private fun getConnectedDevicesV2(
         token: String,
         primaryKey: String,
+        reportAccountErrorPixel: Boolean,
     ): Result<List<ConnectedDevice>> {
         val publishSnapshot = deviceInfoPublishWatcher.snapshot()
         return when (val result = syncApi.getDevices(token)) {
-            is Error -> result.alsoFireAccountErrorPixel()
+            is Error -> result.alsoFireAccountErrorPixel(reportAccountErrorPixel)
             is Success -> {
                 val entriesV2 = result.data.entriesV2
                 val devices = if (entriesV2 != null) {
                     val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId, publishSnapshot)
-                    logoutFailedV2Devices(decryptResult.undecryptable)
+                    logoutFailedV2Devices(decryptResult.undecryptable, reportAccountErrorPixel)
                     fireUnifiedDeviceListReadPixels(decryptResult)
                     if (decryptResult.keyUnavailableReason == AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL) {
                         repairAccountInfoDdgWrap()
@@ -134,7 +138,7 @@ class RealConnectedDevicesRepository @Inject constructor(
                     decryptResult.decrypted.map { it.toConnectedDevice() }
                 } else {
                     // entries_v2 missing
-                    decryptLegacyEntries(result.data.entries, primaryKey)
+                    decryptLegacyEntries(result.data.entries, primaryKey, reportAccountErrorPixel)
                 }
                 finishWith(devices)
             }
@@ -230,24 +234,29 @@ class RealConnectedDevicesRepository @Inject constructor(
         }
     }
 
-    private fun logoutFailedV2Devices(deviceIds: List<String>) {
+    private fun logoutFailedV2Devices(
+        deviceIds: List<String>,
+        reportAccountErrorPixel: Boolean,
+    ) {
         val thisDeviceId = syncStore.deviceId
         deviceIds.forEach { id ->
-            if (id != thisDeviceId) remoteDeviceLogout.logout(id)
+            if (id != thisDeviceId) remoteDeviceLogout.logout(id, reportAccountErrorPixel)
         }
     }
 
     private fun getConnectedDevicesLegacy(
         token: String,
         primaryKey: String,
+        reportAccountErrorPixel: Boolean,
     ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
-        is Error -> result.alsoFireAccountErrorPixel()
-        is Success -> finishWith(decryptLegacyEntries(result.data.entries, primaryKey))
+        is Error -> result.alsoFireAccountErrorPixel(reportAccountErrorPixel)
+        is Success -> finishWith(decryptLegacyEntries(result.data.entries, primaryKey, reportAccountErrorPixel))
     }
 
     private fun decryptLegacyEntries(
         devices: List<Device>,
         primaryKey: String,
+        reportAccountErrorPixel: Boolean,
     ): List<ConnectedDevice> = devices.mapNotNull { device ->
         try {
             val decryptedDeviceName = nativeLib.decryptData(device.deviceName, primaryKey).decryptedData
@@ -262,9 +271,9 @@ class RealConnectedDevicesRepository @Inject constructor(
                 deviceType = decryptedDeviceType,
             )
         } catch (throwable: Throwable) {
-            throwable.asErrorResult().alsoFireAccountErrorPixel()
+            throwable.asErrorResult().alsoFireAccountErrorPixel(reportAccountErrorPixel)
             if (syncStore.deviceId != device.deviceId) {
-                remoteDeviceLogout.logout(device.deviceId)
+                remoteDeviceLogout.logout(device.deviceId, reportAccountErrorPixel)
             }
             null
         }
@@ -279,8 +288,8 @@ class RealConnectedDevicesRepository @Inject constructor(
 
     private fun finishWith(devices: List<ConnectedDevice>): Result<List<ConnectedDevice>> = Success(devices.sortedByDescending { it.thisDevice })
 
-    private fun Error.alsoFireAccountErrorPixel(): Error {
-        syncPixels.fireSyncAccountErrorPixel(this, SyncAccountOperation.GENERIC)
+    private fun Error.alsoFireAccountErrorPixel(reportAccountErrorPixel: Boolean): Error {
+        if (reportAccountErrorPixel) syncPixels.fireSyncAccountErrorPixel(this, SyncAccountOperation.GENERIC)
         return this
     }
 }
