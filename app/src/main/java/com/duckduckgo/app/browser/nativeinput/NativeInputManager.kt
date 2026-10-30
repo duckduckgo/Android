@@ -51,7 +51,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.DuckChatLaunch
+import com.duckduckgo.app.tabs.NativeInputLaunchAction
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
@@ -163,7 +163,8 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode? = null,
-        launch: DuckChatLaunch = DuckChatLaunch.Open(),
+        launchAction: NativeInputLaunchAction? = null,
+        autoFocusInput: Boolean = false,
         textSelection: String? = null,
     )
 
@@ -636,7 +637,8 @@ class RealNativeInputManager @Inject constructor(
         query: String,
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode?,
-        launch: DuckChatLaunch,
+        launchAction: NativeInputLaunchAction?,
+        autoFocusInput: Boolean,
         textSelection: String?,
     ) {
         if (!::rootView.isInitialized) return
@@ -707,7 +709,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId, launch, textSelection)
+        attachWidget(widgetView, navBarView, isBottom, tabId, launchAction, autoFocusInput, textSelection)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -728,7 +730,7 @@ class RealNativeInputManager @Inject constructor(
                 widgetView,
                 lifecycleOwner,
                 currentTabUrl,
-                armOnAttach = launch !is DuckChatLaunch.ImageGeneration && textSelection == null,
+                armOnAttach = launchAction != DuckChatLaunchAction.ImageGeneration && textSelection == null,
             )
         }
         lifecycleOwner.lifecycleScope.launch {
@@ -1524,7 +1526,8 @@ class RealNativeInputManager @Inject constructor(
         navBarView: View?,
         isBottom: Boolean,
         tabId: String,
-        launch: DuckChatLaunch,
+        launchAction: NativeInputLaunchAction?,
+        autoFocusInput: Boolean,
         textSelection: String?,
     ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
@@ -1558,7 +1561,7 @@ class RealNativeInputManager @Inject constructor(
                 tabId = tabId,
                 isDuckAiMode = omnibarController.isDuckAiMode(),
                 isBottom = isBottom,
-                launch = launch,
+                launchAction = launchAction,
             )
             textSelection?.let { bindTextSelections(tabId, it) }
         }
@@ -1574,7 +1577,7 @@ class RealNativeInputManager @Inject constructor(
         // finishes before the enter morph.
         pendingEnterOwnsAnimating = enterStarted
 
-        if (launch is DuckChatLaunch.ImageGeneration) {
+        if (autoFocusInput || launchAction == NativeInputLaunchAction.IMAGE_GENERATION) {
             widgetView.doOnAttach {
                 if (widgetRoot === widgetView) {
                     widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
