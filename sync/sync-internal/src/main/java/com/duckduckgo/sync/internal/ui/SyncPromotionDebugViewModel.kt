@@ -30,6 +30,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.B
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsImport
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreenMultiDevice
 import com.duckduckgo.sync.internal.promotion.InternalSyncPromotionAppInstall
 import com.duckduckgo.sync.internal.ui.SyncPromotionDebugViewModel.Command.ShowMessage
 import kotlinx.coroutines.channels.Channel
@@ -146,6 +147,7 @@ class SyncPromotionDebugViewModel @Inject constructor(
         BookmarksScreen -> "Bookmarks screen"
         BookmarksScreenMultiDevice -> "Bookmarks screen (multi-device)"
         PasswordsScreen -> "Passwords screen"
+        PasswordsScreenMultiDevice -> "Passwords screen (multi-device)"
         BookmarksImport -> "Bookmarks import"
         PasswordsImport -> "Passwords import"
         BookmarkAddedDialog -> "Bookmark added dialog"

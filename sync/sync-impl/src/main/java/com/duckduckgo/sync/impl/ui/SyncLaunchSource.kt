@@ -25,6 +25,7 @@ enum class SyncLaunchSource(val value: String) {
     PromotionBookmarks("promotion_bookmarks"),
     PromotionBookmarksMultiDevice("promotion_bookmarks_multi_device"),
     PromotionPasswords("promotion_passwords"),
+    PromotionPasswordsMultiDevice("promotion_passwords_multi_device"),
     PromotionBookmarkAddedDialog("promotion_bookmark_added_dialog"),
     PromotionAiChat("promotion_ai_chat"),
     PromotionPasswordsImport("promotion_passwords_import"),

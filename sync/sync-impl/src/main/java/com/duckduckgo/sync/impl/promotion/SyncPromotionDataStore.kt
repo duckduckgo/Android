@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.B
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsImport
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreenMultiDevice
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.firstOrNull
@@ -52,6 +53,7 @@ interface SyncPromotionDataStore {
         BookmarksScreen,
         BookmarksScreenMultiDevice,
         PasswordsScreen,
+        PasswordsScreenMultiDevice,
         BookmarksImport,
         PasswordsImport,
         BookmarkAddedDialog,
@@ -164,6 +166,7 @@ class SyncPromotionDataStoreImpl @Inject constructor(
             BookmarksScreen -> bookmarksScreenPromoDismissedKey
             BookmarksScreenMultiDevice -> bookmarksScreenMultiDevicePromoDismissedKey
             PasswordsScreen -> passwordsPromoDismissedKey
+            PasswordsScreenMultiDevice -> passwordsMultiDevicePromoDismissedKey
             ChatTabPage -> chatTabPagePromoDismissedKey
             BookmarksImport -> bookmarksImportPromoDismissedKey
             PasswordsImport -> passwordsImportPromoDismissedKey
@@ -176,6 +179,7 @@ class SyncPromotionDataStoreImpl @Inject constructor(
             BookmarksScreen -> bookmarksScreenPromoImpressionsKey
             BookmarksScreenMultiDevice -> bookmarksScreenMultiDevicePromoImpressionsKey
             PasswordsScreen -> passwordsPromoImpressionsKey
+            PasswordsScreenMultiDevice -> passwordsMultiDevicePromoImpressionsKey
             ChatTabPage -> chatTabPagePromoImpressionsKey
             BookmarksImport -> bookmarksImportPromoImpressionsKey
             PasswordsImport -> passwordsImportPromoImpressionsKey
@@ -188,6 +192,7 @@ class SyncPromotionDataStoreImpl @Inject constructor(
             BookmarksScreen -> bookmarksScreenPromoLastImpressionKey
             BookmarksScreenMultiDevice -> bookmarksScreenMultiDevicePromoLastImpressionKey
             PasswordsScreen -> passwordsPromoLastImpressionKey
+            PasswordsScreenMultiDevice -> passwordsMultiDevicePromoLastImpressionKey
             ChatTabPage -> chatTabPagePromoLastImpressionKey
             BookmarksImport -> bookmarksImportPromoLastImpressionKey
             PasswordsImport -> passwordsImportPromoLastImpressionKey
@@ -207,6 +212,9 @@ class SyncPromotionDataStoreImpl @Inject constructor(
         private val passwordsPromoDismissedKey = longPreferencesKey("passwords_promo_dismissed")
         private val passwordsPromoImpressionsKey = longPreferencesKey("passwords_promo_impressions")
         private val passwordsPromoLastImpressionKey = longPreferencesKey("passwords_promo_last_impression")
+        private val passwordsMultiDevicePromoDismissedKey = longPreferencesKey("passwords_multi_device_promo_dismissed")
+        private val passwordsMultiDevicePromoImpressionsKey = longPreferencesKey("passwords_multi_device_promo_impressions")
+        private val passwordsMultiDevicePromoLastImpressionKey = longPreferencesKey("passwords_multi_device_promo_last_impression")
         private val chatTabPagePromoDismissedKey = longPreferencesKey("chat_tab_page_promo_dismissed")
         private val chatTabPagePromoImpressionsKey = longPreferencesKey("chat_tab_page_promo_impressions")
         private val chatTabPagePromoLastImpressionKey = longPreferencesKey("chat_tab_page_promo_last_impression")
