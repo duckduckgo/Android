@@ -38,7 +38,7 @@
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="${appIcon}"
         android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"

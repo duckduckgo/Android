@@ -16,9 +16,33 @@
   -->
 
 <full-backup-content>
-    <exclude domain="file" path="."/>
-    <exclude domain="database" path="."/>
-    <exclude domain="sharedpref" path="."/>
-    <exclude domain="external" path="."/>
-    <exclude domain="root" path="."/>
+    <include domain="file" path="." requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="." requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="." requireFlags="deviceToDeviceTransfer"/>
+    <include domain="root" path="." requireFlags="deviceToDeviceTransfer"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.devicemigration.local.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.app.email.settings.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.app.email.settings.encryptiontest.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.sync.store.v1.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.securestorage.store.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.app.fire.unsentpixels.settings.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.feature.toggles.pixels.prefs.xml"/>
+    <exclude domain="sharedpref" path="com.duckduckgo.adclick.impl.pixels.xml"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.subscriptions.store"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.pir.impl.store.secure"/>
+    <exclude domain="file" path="harmony_prefs/com.duckduckgo.securestorage.store_v3"/>
+    <exclude domain="file" path="fire_mode_duck_ai_files"/>
+    <exclude domain="database" path="secure_storage_database_encrypted.db"/>
+    <exclude domain="database" path="pir_encrypted.db"/>
+    <exclude domain="database" path="pir_decrypted.db"/>
+    <exclude domain="database" path="fire_mode.db"/>
+    <exclude domain="database" path="fire_mode_duck_ai.db"/>
+    <exclude domain="database" path="pixels.db"/>
+    <exclude domain="database" path="wide_events.db"/>
+    <exclude domain="database" path="event_hub_pixel_state.db"/>
+    <exclude domain="database" path="crash_database.db"/>
+    <exclude domain="database" path="anr_database.db"/>
+    <exclude domain="database" path="crash_anr_internal_database.db"/>
+    <exclude domain="database" path="sync.db"/>
+    <exclude domain="root" path="app_webview/Profiles/Fire"/>
 </full-backup-content>
