@@ -8,13 +8,5 @@
     "op": "replace",
     "path": "/features/adBlockingExtension/minSupportedVersion",
     "value": 0
-  },
-  {
-    "op": "add",
-    "path": "/features/adBlockingExtension/features/enabledByDefault",
-    "value": {
-      "state": "enabled",
-      "minSupportedVersion": 0
-    }
   }
 ]

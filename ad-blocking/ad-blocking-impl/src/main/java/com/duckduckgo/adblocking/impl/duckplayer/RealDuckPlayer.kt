@@ -148,10 +148,9 @@ class RealDuckPlayer @Inject constructor(
             combine(
                 duckPlayerFeatureRepository.observeUserPreferences(),
                 adBlockingExtensionFeature.self().enabled(),
-                adBlockingExtensionFeature.enabledByDefault().enabled(),
-                ::Triple,
-            ).collect { (stored, selfEnabled, enabledByDefault) ->
-                applyAdBlockingRolloutDefaultIfEligible(stored, selfEnabled, enabledByDefault)
+                ::Pair,
+            ).collect { (stored, selfEnabled) ->
+                applyNewInstallDuckPlayerDefaultIfEligible(stored, selfEnabled)
             }
         }
     }
@@ -160,15 +159,13 @@ class RealDuckPlayer @Inject constructor(
         loadToMemory()
     }
 
-    private suspend fun applyAdBlockingRolloutDefaultIfEligible(
+    private suspend fun applyNewInstallDuckPlayerDefaultIfEligible(
         stored: StoredUserPreferences,
         selfEnabled: Boolean,
-        enabledByDefault: Boolean,
     ) {
         if (!appBuildConfig.isNewInstall()) return
         if (stored.privatePlayerMode != null) return
         if (!selfEnabled) return
-        if (!enabledByDefault) return
         duckPlayerFeatureRepository.setUserPreferences(
             UserPreferences(
                 overlayInteracted = stored.overlayInteracted,
