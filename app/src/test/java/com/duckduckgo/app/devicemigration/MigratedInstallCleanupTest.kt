@@ -17,7 +17,10 @@
 package com.duckduckgo.app.devicemigration
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsDataStoreMock
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.UserType
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -26,8 +29,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -54,6 +59,7 @@ class MigratedInstallCleanupTest {
     private val pagePaintedPixelDao: PagePaintedPixelDao = mock()
     private val defaultBrowserPromptsAppUsageDao: DefaultBrowserPromptsAppUsageDao = mock()
     private val appInstallStore: AppInstallStore = mock()
+    private var promptsDataStore = previousPhonePrompts(Stage.STAGE_2)
     private val preferences = InMemorySharedPreferences()
     private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doReturn preferences
@@ -63,13 +69,14 @@ class MigratedInstallCleanupTest {
         runBlocking { whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(true) }
     }
 
-    private val testee = MigratedInstallCleanup(
+    private val testee get() = MigratedInstallCleanup(
         deviceMigration = deviceMigration,
         pendingPixelDao = pendingPixelDao,
         pageLoadedPixelDao = pageLoadedPixelDao,
         pagePaintedPixelDao = pagePaintedPixelDao,
         defaultBrowserPromptsAppUsageDao = defaultBrowserPromptsAppUsageDao,
         appInstallStore = appInstallStore,
+        defaultBrowserPromptsDataStore = promptsDataStore,
         sharedPreferencesProvider = sharedPreferencesProvider,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
@@ -182,4 +189,75 @@ class MigratedInstallCleanupTest {
         verify(pendingPixelDao, times(1)).deleteAll()
         assertTrue(preferences.getBoolean("cleanupDone", false))
     }
+
+    @Test
+    fun whenMigratedThenDefaultBrowserPromptsFromPreviousPhoneRestart() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+
+        testee.onCreate(mock())
+
+        assertEquals(Stage.NOT_STARTED, promptsDataStore.stage.first())
+        assertFalse(promptsDataStore.showSetAsDefaultPopupMenuItem.first())
+        assertFalse(promptsDataStore.highlightPopupMenu.first())
+        assertFalse(promptsDataStore.showSetAsDefaultMessage.first())
+    }
+
+    @Test
+    fun whenMigratedAndPromptsStoppedOnPreviousPhoneThenStageKept() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        promptsDataStore = previousPhonePrompts(Stage.STOPPED)
+
+        testee.onCreate(mock())
+
+        assertEquals(Stage.STOPPED, promptsDataStore.stage.first())
+    }
+
+    @Test
+    fun whenNotMigratedThenDefaultBrowserPromptsKept() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
+
+        testee.onCreate(mock())
+
+        assertEquals(Stage.STAGE_2, promptsDataStore.stage.first())
+        assertTrue(promptsDataStore.showSetAsDefaultMessage.first())
+    }
+
+    @Test
+    fun whenMigratedAndNotCleanedYetThenPending() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+
+        assertTrue(testee.isPending())
+    }
+
+    @Test
+    fun whenMigratedAndCleanedThenNotPending() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        val cleanup = testee
+        cleanup.onCreate(mock())
+
+        assertFalse(cleanup.isPending())
+    }
+
+    @Test
+    fun whenNotMigratedThenNotPending() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
+
+        assertFalse(testee.isPending())
+    }
+
+    @Test
+    fun whenFeatureDisabledThenNotPending() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(false)
+
+        assertFalse(testee.isPending())
+    }
+
+    private fun previousPhonePrompts(stage: Stage) = DefaultBrowserPromptsDataStoreMock(
+        initialStage = stage,
+        userType = UserType.EXISTING,
+        initialShowPopupMenuItem = true,
+        initialHighlightPopupMenuIcon = true,
+        initialShowSetAsDefaultMessage = true,
+    )
 }

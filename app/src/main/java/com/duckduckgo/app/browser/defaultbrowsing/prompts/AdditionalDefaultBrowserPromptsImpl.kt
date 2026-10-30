@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
+import com.duckduckgo.app.devicemigration.MigratedInstallCleanup
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -108,6 +109,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val pixel: Pixel,
     private val nextStepsSetAsDefaultPromptMetrics: NextStepsSetAsDefaultPromptMetrics,
     private val nextSteps: NextSteps,
+    private val migratedInstallCleanup: MigratedInstallCleanup,
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, ModalEvaluator, PrivacyConfigCallbackPlugin {
 
@@ -205,6 +207,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
         logcat { "evaluate: default browser remote flag enabled = $isEnabled" }
         if (!isEnabled) {
+            return@withLock ModalEvaluator.EvaluationResult.Skipped
+        }
+
+        if (migratedInstallCleanup.isPending()) {
+            logcat { "evaluate: prompt state still comes from the previous phone, skipping evaluation" }
             return@withLock ModalEvaluator.EvaluationResult.Skipped
         }
 

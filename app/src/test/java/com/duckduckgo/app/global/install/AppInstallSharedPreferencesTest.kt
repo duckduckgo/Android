@@ -20,14 +20,21 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class AppInstallSharedPreferencesTest {
@@ -38,15 +45,95 @@ class AppInstallSharedPreferencesTest {
     private lateinit var testee: AppInstallSharedPreferences
 
     private val context: Context = ApplicationProvider.getApplicationContext()
+    private val deviceMigration: DeviceMigration = mock()
+    private val defaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val preferenceFiles = mutableMapOf<String, InMemorySharedPreferences>()
+    private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
+        on { getSharedPreferences(any(), any(), any()) } doAnswer { invocation ->
+            preferenceFiles.getOrPut(invocation.getArgument(0)) { InMemorySharedPreferences() }
+        }
+    }
 
     @Before
     fun setup() {
         context.getSharedPreferences(AppInstallSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }
-        testee = AppInstallSharedPreferences(
-            context = context,
-            appCoroutineScope = coroutineTestRule.testScope,
-            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-        )
+        testee = newInstance()
+    }
+
+    private fun newInstance() = AppInstallSharedPreferences(
+        context = context,
+        appCoroutineScope = coroutineTestRule.testScope,
+        dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        sharedPreferencesProvider = sharedPreferencesProvider,
+        deviceMigration = lazyOf(deviceMigration),
+        defaultBrowserDetector = lazyOf(defaultBrowserDetector),
+    )
+
+    // Written by an instance that does not see a migrated install, as the previous phone would have.
+    private fun transferDefaultBrowserHistory() {
+        whenever(deviceMigration.sourceDeviceIsNewInstall()).thenReturn(null)
+        newInstance().defaultBrowser = true
+        testee = newInstance()
+    }
+
+    private fun migratedInstall() {
+        whenever(deviceMigration.sourceDeviceIsNewInstall()).thenReturn(false)
+    }
+
+    @Test
+    fun whenMigratedInstallAndNotDefaultHereThenPreviousPhoneDefaultBrowserHistoryIsDropped() {
+        transferDefaultBrowserHistory()
+        migratedInstall()
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        assertFalse(testee.defaultBrowser)
+        assertFalse(testee.wasEverDefaultBrowser)
+    }
+
+    @Test
+    fun whenMigratedInstallAndAlreadyDefaultHereThenDefaultBrowserHistoryMatchesThisPhone() {
+        transferDefaultBrowserHistory()
+        migratedInstall()
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        assertTrue(testee.defaultBrowser)
+        assertTrue(testee.wasEverDefaultBrowser)
+    }
+
+    @Test
+    fun whenNotMigratedInstallThenDefaultBrowserHistoryKept() {
+        transferDefaultBrowserHistory()
+        whenever(deviceMigration.sourceDeviceIsNewInstall()).thenReturn(null)
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        assertTrue(testee.defaultBrowser)
+        assertTrue(testee.wasEverDefaultBrowser)
+    }
+
+    @Test
+    fun whenMigratedInstallHistoryAlreadyResetThenHistoryRecordedOnThisPhoneKept() {
+        transferDefaultBrowserHistory()
+        migratedInstall()
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        assertFalse(testee.wasEverDefaultBrowser)
+
+        testee.defaultBrowser = true
+        testee.defaultBrowser = false
+
+        val restarted = newInstance()
+        assertFalse(restarted.defaultBrowser)
+        assertTrue(restarted.wasEverDefaultBrowser)
+    }
+
+    @Test
+    fun resetGuardIsStoredInTheFileExcludedFromTransfer() {
+        transferDefaultBrowserHistory()
+        migratedInstall()
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        testee.defaultBrowser
+
+        assertTrue(preferenceFiles.getValue(MIGRATED_INSTALL_FILE).all.isNotEmpty())
     }
 
     @Test
@@ -117,5 +204,9 @@ class AppInstallSharedPreferencesTest {
 
         assertFalse(testee.defaultBrowser)
         assertTrue(testee.wasEverDefaultBrowser)
+    }
+
+    private companion object {
+        const val MIGRATED_INSTALL_FILE = "com.duckduckgo.app.devicemigration.cleanup"
     }
 }

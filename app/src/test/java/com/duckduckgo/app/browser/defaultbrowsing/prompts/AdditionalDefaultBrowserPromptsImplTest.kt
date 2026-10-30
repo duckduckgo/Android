@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.UserType
+import com.duckduckgo.app.devicemigration.MigratedInstallCleanup
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -119,6 +120,8 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
     private lateinit var fakeUserAppStageFlow: MutableSharedFlow<AppStage>
 
+    private val migratedInstallCleanupMock: MigratedInstallCleanup = mock(MigratedInstallCleanup::class.java)
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -132,6 +135,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         fakeUserAppStageFlow = MutableSharedFlow()
         whenever(userStageStoreMock.userAppStageFlow()).thenReturn(fakeUserAppStageFlow)
         runBlocking { whenever(nextStepsMock.isSectionActive()).thenReturn(false) }
+        runBlocking { whenever(migratedInstallCleanupMock.isPending()).thenReturn(false) }
     }
 
     @Test
@@ -285,6 +289,21 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onSystemDefaultBrowserDialogCanceled(trigger = PROMPT)
 
         assertTrue(actualUpdates.isEmpty())
+    }
+
+    @Test
+    fun `evaluate - if migrated install cleanup has not run yet, then skip without changing the previous phone stage`() = runTest {
+        dataStoreMock = createDataStoreFake(initialStage = Stage.STAGE_1, userType = UserType.EXISTING)
+        whenever(migratedInstallCleanupMock.isPending()).thenReturn(true)
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
+        val testee = createTestee()
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
+        verify(dataStoreMock, never()).storeStage(any())
+        verify(defaultBrowserPromptsAppUsageRepositoryMock, never()).recordAppUsedNow()
     }
 
     @Test
@@ -911,6 +930,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         userBrowserProperties: UserBrowserProperties = userBrowserPropertiesMock,
         pixel: Pixel = pixelMock,
         moshi: Moshi = moshiMock,
+        migratedInstallCleanup: MigratedInstallCleanup = migratedInstallCleanupMock,
     ) = AdditionalDefaultBrowserPromptsImpl(
         appCoroutineScope = appCoroutineScope,
         dispatchers = dispatchers,
@@ -926,6 +946,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         pixel = pixel,
         nextStepsSetAsDefaultPromptMetrics = nextStepsSetAsDefaultPromptMetricsMock,
         nextSteps = nextStepsMock,
+        migratedInstallCleanup = migratedInstallCleanup,
         moshi = moshi,
     )
 

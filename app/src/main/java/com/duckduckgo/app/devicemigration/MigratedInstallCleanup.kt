@@ -19,6 +19,9 @@ package com.duckduckgo.app.devicemigration
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_STARTED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -34,10 +37,15 @@ import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
+
+/** Preferences that describe this phone only; the backup rules exclude this file from a device transfer. */
+internal const val MIGRATED_INSTALL_PREFERENCES_FILE = "com.duckduckgo.app.devicemigration.cleanup"
 
 /**
  * Pixel queues and default-browser prompt state describe the previous phone, so they are dropped once after a device transfer.
@@ -52,13 +60,14 @@ class MigratedInstallCleanup @Inject constructor(
     private val pagePaintedPixelDao: PagePaintedPixelDao,
     private val defaultBrowserPromptsAppUsageDao: DefaultBrowserPromptsAppUsageDao,
     private val appInstallStore: AppInstallStore,
+    private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
     private val preferences by lazy {
-        sharedPreferencesProvider.getSharedPreferences(PREFERENCES_FILE_NAME, false, false)
+        sharedPreferencesProvider.getSharedPreferences(MIGRATED_INSTALL_PREFERENCES_FILE, false, false)
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -72,6 +81,7 @@ class MigratedInstallCleanup @Inject constructor(
                 pageLoadedPixelDao.deleteAll()
                 pagePaintedPixelDao.deleteAll()
                 defaultBrowserPromptsAppUsageDao.deleteAll()
+                restartDefaultBrowserPrompts()
                 appInstallStore.newDefaultBrowserDialogCount = 0
             } catch (e: CancellationException) {
                 throw e
@@ -83,8 +93,24 @@ class MigratedInstallCleanup @Inject constructor(
         }
     }
 
+    /** True while the previous phone's state is still in place on a migrated install that will clean it up. */
+    suspend fun isPending(): Boolean = withContext(dispatchers.io()) {
+        !preferences.getBoolean(KEY_CLEANUP_DONE, false) &&
+            deviceMigration.isMigratedInstall() &&
+            deviceMigration.isMigrationExperienceEnabled()
+    }
+
+    // A stage the user stopped is kept: it may be their "do not ask again" choice.
+    private suspend fun restartDefaultBrowserPrompts() {
+        if (defaultBrowserPromptsDataStore.stage.firstOrNull() != STOPPED) {
+            defaultBrowserPromptsDataStore.storeStage(NOT_STARTED)
+        }
+        defaultBrowserPromptsDataStore.storeShowSetAsDefaultPopupMenuItemState(false)
+        defaultBrowserPromptsDataStore.storeHighlightPopupMenuState(false)
+        defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
+    }
+
     private companion object {
-        const val PREFERENCES_FILE_NAME = "com.duckduckgo.app.devicemigration.cleanup"
         const val KEY_CLEANUP_DONE = "cleanupDone"
     }
 }
