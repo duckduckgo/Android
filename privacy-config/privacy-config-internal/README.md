@@ -95,12 +95,15 @@ Loads from the hourly refresh or from Developer Settings log no line. The ETag i
 if the server omits it. A failed SET_URL download keeps the selected override for the
 next command or manual load.
 
-### Known issue: DNS after a cold start
+### Known issue: no network in the background on Android 17
 
-If the broadcast cold-starts the app process, the emulator may fail DNS resolution
-for the first request. A hostname URL, including the production URL loaded by RESET,
-can then log `CONFIG_OVERRIDE_FAILED ... reason=download_failed`. Running with the app in the
-foreground avoids it; otherwise re-send the command.
+Android 17 (SDK 37) enables the UID background firewall chain. An app that the
+broadcast starts in the background, and that has not been in the foreground since
+boot, has no network at all: `localhost` and raw IP addresses included, not only DNS.
+Both commands then log `CONFIG_OVERRIDE_FAILED ... reason=download_failed`, and RESET
+fails against the production URL too. Open the app once (it can be closed or
+force-stopped again afterwards), then send the command. Android 15 and earlier
+deliver the command to a cold-started app without this restriction.
 
 ## Local remote config patches
 
