@@ -224,6 +224,7 @@ import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
+import com.duckduckgo.app.browser.pdf.RealPdfPageContextProvider
 import com.duckduckgo.app.browser.progressbar.NavigationProgressState
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -395,6 +396,7 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
+import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -597,6 +599,8 @@ class BrowserTabViewModel @Inject constructor(
     private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
     private val brokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
+    private val pdfPageContextProvider: RealPdfPageContextProvider,
+    private val pdfPageContextResolver: PdfPageContextResolver,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
     private val newDownloadState: NewDownloadState,
@@ -1281,6 +1285,7 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     public override fun onCleared() {
         pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextProvider.hide(tabId)
         newTabPageModalPresenterRegistry.unregister(this)
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
@@ -2061,6 +2066,8 @@ class BrowserTabViewModel @Inject constructor(
         if (duckChat.isVoiceChatSessionActive(tabId)) {
             duckChat.endVoiceChatSession(tabId)
         }
+        pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextProvider.hide(tabId)
         pdfDownloadJob.cancel()
         suggestRedirectJob.cancel()
         badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
@@ -2687,6 +2694,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun pageCleared() {
         pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextProvider.hide(tabId)
         logcat(VERBOSE) { "Page cleared: $url" }
         site = null
         onSiteChanged()
@@ -2716,6 +2724,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onPageLoadTimeout() {
         val state = currentBrowserViewState()
+        if (pdfPageContextResolver.isEnabled() && state.currentPdfCachedUri != null) return
         val canShowError = state.browserShowing &&
             state.sslError == NONE &&
             !state.maliciousSiteBlocked &&
@@ -4478,7 +4487,10 @@ class BrowserTabViewModel @Inject constructor(
                         currentPdfCachedUri = result.uri,
                         currentPdfFileName = pdfTitle,
                     )
+                    pageContextJSHelper.cancelCollection(tabId)
+                    pdfPageContextProvider.show(tabId, result.uri, pdfTitle, url)
                     command.value = ShowPdfInTab(url, result.uri)
+                    if (pdfPageContextResolver.isEnabled()) collectPageContext()
                     if (customTab == null && pdfDownloadTooltipDataStore.canShow()) {
                         pdfDownloadTooltipDataStore.incrementShownCount()
                         command.value = Command.ShowPdfDownloadTooltip
@@ -4528,6 +4540,8 @@ class BrowserTabViewModel @Inject constructor(
         currentWebViewTitle: String?,
         currentWebViewCertificate: SslCertificate? = null,
     ) {
+        pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextProvider.hide(tabId)
         if (currentBrowserViewState().currentPdfCachedUri == null) return
         browserViewState.value = currentBrowserViewState().copy(
             currentPdfCachedUri = null,
@@ -5215,7 +5229,7 @@ class BrowserTabViewModel @Inject constructor(
         context: Context? = null,
         getWebViewUrl: () -> String?,
     ) {
-        logcat { "jsCallback $featureName $method $data" }
+        logcat { "jsCallback $featureName $method" }
 
         when (method) {
             "webShare" ->
@@ -5334,6 +5348,7 @@ class BrowserTabViewModel @Inject constructor(
 
             PAGE_CONTEXT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
+                    if (pdfPageContextResolver.isEnabled() && pdfPageContextProvider.get(tabId, false) != null) return@launch
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
                         val enrichedContext = duckChatJSHelper.enrichPageContextIfPossible(tabId, pageContext)
@@ -6034,8 +6049,22 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun isPdfPageContextEnabled(): Boolean = pdfPageContextResolver.isEnabled()
+
+    fun restorePdfPageContext(uri: Uri?, title: String, url: String) {
+        pdfPageContextProvider.show(tabId, uri, title, url)
+        browserViewState.value = currentBrowserViewState().copy(currentPdfCachedUri = uri, currentPdfFileName = title)
+    }
+
     fun collectPageContext() {
         viewModelScope.launch {
+            if (pdfPageContextResolver.isEnabled()) {
+                val context = pdfPageContextResolver.resolve(tabId, null, includeData = false)
+                if (context != null) {
+                    command.value = Command.PageContextReceived(tabId, context)
+                    return@launch
+                }
+            }
             val subscriptionEvent = pageContextJSHelper.collectPageContext(tabId)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }

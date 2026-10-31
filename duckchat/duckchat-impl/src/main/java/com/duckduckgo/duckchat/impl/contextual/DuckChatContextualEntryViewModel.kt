@@ -90,7 +90,13 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     }
 
     fun onPageContextReceived(serializedPageContext: String) {
-        if (!isContextValid(serializedPageContext)) return
+        if (!isContextValid(serializedPageContext)) {
+            if (PdfPageContextResolver.isPdf(serializedPageContext)) {
+                latestValidPageContext = null
+                _viewState.update { it.copy(attachedContext = null, latestPageContext = serializedPageContext) }
+            }
+            return
+        }
         latestValidPageContext = serializedPageContext
         _viewState.update { it.copy(latestPageContext = serializedPageContext) }
         // The dialog is only shown from "Ask about page", so attach regardless of the auto-attach feature
@@ -187,7 +193,8 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     private fun isContextValid(serializedPageContext: String): Boolean {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return false
-        return json.optString("title").isNotBlank() && json.optString("content").isNotBlank()
+        return json.optString("title").isNotBlank() && json.optBoolean("attachable", true) &&
+            (json.optString("content").isNotBlank() || json.optString("mimeType") == PdfPageContextResolver.PDF_MIME_TYPE)
     }
 
     fun onDismiss() {

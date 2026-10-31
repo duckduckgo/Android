@@ -696,6 +696,7 @@ class BrowserTabViewModelTest {
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
+    private val pdfPageContextResolver: com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver = mock()
     private val mockPageContextJSHelper: PageContextJSHelper = mock()
     private val mockTabPageContextRepository: TabPageContextRepository = mock()
 
@@ -975,6 +976,8 @@ class BrowserTabViewModelTest {
 
         testee =
             BrowserTabViewModel(
+                pdfPageContextProvider = mock(),
+                pdfPageContextResolver = pdfPageContextResolver,
                 statisticsUpdater = mockStatisticsUpdater,
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
@@ -10500,6 +10503,19 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPageLoadTimesOutWhileBrowserIsNotShowingThenNoErrorIsShown() = runTest {
         loadUrl("https://example.com", isBrowserShowing = false)
+
+        testee.onPageLoadTimeout()
+
+        assertEquals(OMITTED, browserViewState().browserError)
+        assertCommandNotIssued<Command.WebViewError>()
+    }
+
+    @Test
+    fun whenHiddenWebViewTimesOutWhilePdfContextIsVisibleThenPdfRemainsAvailable() = runTest {
+        loadUrl("https://example.com/document.pdf")
+        testee.browserViewState.value = browserViewState().copy(currentPdfCachedUri = Uri.parse("file:///cache/document.pdf"))
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        clearInvocations(mockCommandObserver)
 
         testee.onPageLoadTimeout()
 

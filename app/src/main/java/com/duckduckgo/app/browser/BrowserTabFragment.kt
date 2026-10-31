@@ -2153,6 +2153,7 @@ class BrowserTabFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.CollectPageContext -> {
+                        if (isHidden) return@onEach
                         viewModel.collectPageContext()
                     }
 
@@ -5135,12 +5136,24 @@ class BrowserTabFragment :
      */
     override fun onSaveInstanceState(bundle: Bundle) {
         viewModel.saveWebViewState(webView, tabId)
+        if (isPdfVisible() && viewModel.isPdfPageContextEnabled()) {
+            bundle.putString("pdfContextUrl", viewModel.url)
+            bundle.putString("pdfContextTitle", viewModel.browserViewState.value?.currentPdfFileName)
+            bundle.putString("pdfContextUri", viewModel.browserViewState.value?.currentPdfCachedUri?.toString())
+        }
         super.onSaveInstanceState(bundle)
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.restoreWebViewState(webView, omnibar.getText())
+            val pdfUrl = bundle?.getString("pdfContextUrl")
+            if (pdfUrl != null && viewModel.isPdfPageContextEnabled()) {
+                val uri = bundle.getString("pdfContextUri")?.let { Uri.parse(it) }
+                val title = bundle.getString("pdfContextTitle").orEmpty()
+                viewModel.restorePdfPageContext(uri, title, pdfUrl)
+                if (uri != null) showPdf(pdfUrl, uri)
+            }
         }
         viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)

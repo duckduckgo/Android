@@ -76,6 +76,7 @@ class TabDataRepository(
     private val duckChatContextualDataStore: DuckChatContextualDataStore,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
+    private val pdfPageContextProvider: com.duckduckgo.app.browser.pdf.RealPdfPageContextProvider,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val pageTitleFetcher: PageTitleFetcher,
 ) : TabRepository, TabAtomicOperations {
@@ -376,6 +377,7 @@ class TabDataRepository(
         siteData.remove(tab.tabId)
         tabVisitedSitesRepository.clearTab(tab.tabId)
         nativeInputStatePublisher.clearTab(tab.tabId)
+        pdfPageContextProvider.hide(tab.tabId)
     }
 
     override suspend fun deleteTabs(tabIds: List<String>) {
@@ -386,6 +388,7 @@ class TabDataRepository(
         tabIds.forEach {
             tabVisitedSitesRepository.clearTab(it)
             nativeInputStatePublisher.clearTab(it)
+            pdfPageContextProvider.hide(it)
         }
     }
 
@@ -397,6 +400,7 @@ class TabDataRepository(
         }
         tabVisitedSitesRepository.clearTab(tabId)
         nativeInputStatePublisher.clearTab(tabId)
+        pdfPageContextProvider.hide(tabId)
     }
 
     override suspend fun deleteSelectedBlankTabAndSelectTarget(
@@ -412,6 +416,7 @@ class TabDataRepository(
         clearAllSiteData(listOf(currentTabId))
         tabVisitedSitesRepository.clearTab(currentTabId)
         nativeInputStatePublisher.clearTab(currentTabId)
+        pdfPageContextProvider.hide(currentTabId)
         true
     }
 
@@ -460,6 +465,7 @@ class TabDataRepository(
         deletableTabIds.forEach {
             tabVisitedSitesRepository.clearTab(it)
             nativeInputStatePublisher.clearTab(it)
+            pdfPageContextProvider.hide(it)
         }
 
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
@@ -494,10 +500,12 @@ class TabDataRepository(
         }
         tabVisitedSitesRepository.clearTab(tabId)
         nativeInputStatePublisher.clearTab(tabId)
+        pdfPageContextProvider.hide(tabId)
     }
 
     override suspend fun deleteAll() = withContext(dispatchers.io()) {
         logcat(INFO) { "Deleting tabs right now" }
+        tabsDao.tabs().forEach { pdfPageContextProvider.hide(it.tabId) }
         tabsDao.deleteAllTabs()
         webViewPreviewPersister.deleteAll()
         faviconManager.deleteAllTemp()

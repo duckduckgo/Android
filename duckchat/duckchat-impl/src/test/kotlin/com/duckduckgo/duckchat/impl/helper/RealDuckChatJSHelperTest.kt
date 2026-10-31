@@ -143,6 +143,7 @@ class RealDuckChatJSHelperTest {
     }
 
     private val testee = RealDuckChatJSHelper(
+        pdfPageContextResolver = mock(),
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
