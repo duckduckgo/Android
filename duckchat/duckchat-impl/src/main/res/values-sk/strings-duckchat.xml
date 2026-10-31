@@ -412,4 +412,5 @@
     <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Prepis</string>
     <!-- Duck.ai attachment privacy footer -->
     <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Súbory sa automaticky kontrolujú ohľadom nelegálneho obsahu. Označené čety majú obmedzené uchovávanie údajov. <annotation type="learn_more_link">Zistiť viac</annotation></string>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Zhrň tento dokument</string>
 </resources>
