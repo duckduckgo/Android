@@ -36,16 +36,14 @@ import java.util.Locale
 class RealStripeTierOptionsProviderTest {
 
     private val subscriptionsService: SubscriptionsService = mock()
-    private val regionProvider: StripeProductsRegionProvider = mock()
     private lateinit var defaultLocale: Locale
 
-    private val provider = RealStripeTierOptionsProvider(subscriptionsService, regionProvider)
+    private val provider = RealStripeTierOptionsProvider(subscriptionsService)
 
     @Before
-    fun setup() = runTest {
+    fun setup() {
         defaultLocale = Locale.getDefault()
         Locale.setDefault(Locale.US)
-        whenever(regionProvider.region()).thenReturn("us")
     }
 
     @After
@@ -54,7 +52,7 @@ class RealStripeTierOptionsProviderTest {
     }
 
     @Test
-    fun whenGetTierProductsThenRequestStripeProductsForRegion() = runTest {
+    fun whenGetTierProductsThenRequestUsStripeProducts() = runTest {
         givenProducts()
 
         provider.getTierProducts(includeProTier = true)

@@ -49,12 +49,11 @@ data class StripeTierOption(
 @ContributesBinding(AppScope::class)
 class RealStripeTierOptionsProvider @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
-    private val regionProvider: StripeProductsRegionProvider,
 ) : StripeTierOptionsProvider {
 
     override suspend fun getTierProducts(includeProTier: Boolean): List<StripeTierProduct> {
         val response = runCatching {
-            subscriptionsService.tierProducts(region = regionProvider.region(), platform = STRIPE_PLATFORM)
+            subscriptionsService.tierProducts(region = US_REGION, platform = STRIPE_PLATFORM)
         }.getOrElse { return emptyList() }
 
         return response.products
@@ -84,5 +83,6 @@ class RealStripeTierOptionsProvider @Inject constructor(
 
     companion object {
         const val STRIPE_PLATFORM = "stripe"
+        private const val US_REGION = "us"
     }
 }
