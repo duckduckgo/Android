@@ -116,7 +116,7 @@ private object DaxPrimaryButtonDefaults {
     @Composable
     fun rippleConfiguration(): RippleConfiguration {
         val color = adsColorButtonPrimaryContainerPressed
-        return remember(color) { RippleConfiguration(color = color) }
+        return remember(color) { daxRippleConfiguration(color) }
     }
 }
 

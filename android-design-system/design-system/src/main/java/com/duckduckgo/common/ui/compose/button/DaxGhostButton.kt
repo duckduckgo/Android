@@ -30,8 +30,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.duckduckgo.common.ui.compose.theme.Blue20
-import com.duckduckgo.common.ui.compose.theme.Blue30_20
-import com.duckduckgo.common.ui.compose.theme.Blue50_12
+import com.duckduckgo.common.ui.compose.theme.Blue30
+import com.duckduckgo.common.ui.compose.theme.Blue50
 import com.duckduckgo.common.ui.compose.theme.Blue70
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -81,9 +81,9 @@ private object DaxGhostButtonDefaults {
 
     val adsColorButtonGhostContainerPressed: Color
         @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue30_20
+            Blue30
         } else {
-            Blue50_12
+            Blue50
         }
 
     val adsColorButtonGhostText: Color
@@ -111,7 +111,7 @@ private object DaxGhostButtonDefaults {
     @Composable
     fun rippleConfiguration(): RippleConfiguration {
         val color = adsColorButtonGhostContainerPressed
-        return remember(color) { RippleConfiguration(color = color) }
+        return remember(color) { daxRippleConfiguration(color) }
     }
 }
 

@@ -130,7 +130,7 @@ private object DaxDestructiveGhostSecondaryButtonDefaults {
     @Composable
     fun rippleConfiguration(): RippleConfiguration {
         val color = adsColorButtonDestructiveGhostSecondaryContainerPressed
-        return remember(color) { RippleConfiguration(color = color) }
+        return remember(color) { daxRippleConfiguration(color) }
     }
 }
 
