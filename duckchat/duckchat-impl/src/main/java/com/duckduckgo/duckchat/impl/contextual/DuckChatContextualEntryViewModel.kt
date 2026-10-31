@@ -125,8 +125,8 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         submit(prompt, carriesTermsConsent = false)
     }
 
-    fun onPromptSubmitted(prompt: NativeInputPrompt) {
-        submit(prompt)
+    fun onPromptSubmitted(prompt: NativeInputPrompt, voice: Boolean = false) {
+        submit(prompt, voice = voice)
     }
 
     private fun fireUnifiedInputPromptSubmitted() {
@@ -148,6 +148,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private fun submit(
         prompt: NativeInputPrompt,
         carriesTermsConsent: Boolean = true,
+        voice: Boolean = false,
     ) {
         val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
         selectionsJson?.length()?.takeIf { it > 0 }?.let {
@@ -161,6 +162,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
                 serializedPageContext = _viewState.value.attachedContext?.serialized,
                 selectionsJson = selectionsJson,
                 carriesTermsConsent = carriesTermsConsent,
+                voice = voice,
             ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()

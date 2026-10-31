@@ -4,7 +4,7 @@
         "owners": ["malmstein"],
         "meta": {
             "type": "android-duckai-entry",
-            "version": "0.0"
+            "version": "0.1"
         },
         "feature": {
             "name": "duckai_entry",
@@ -50,6 +50,11 @@
                             "tab_swipe",
                             "app_open"
                         ]
+                    },
+                    "voice": {
+                        "type": "string",
+                        "description": "Whether voice was used to start this entry, including dictated prompts.",
+                        "enum": ["true", "false"]
                     },
                     "has_prompt": {
                         "type": "string",

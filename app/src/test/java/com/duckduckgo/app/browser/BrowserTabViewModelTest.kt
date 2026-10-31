@@ -5563,7 +5563,7 @@ class BrowserTabViewModelTest {
 
         testee.openDuckAiQuery("hello", true, DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
-        verify(mockDuckChat).reportDuckChatEntry(argThat { name == "ONBOARDING_COMPLETION_PROMO" }, eq(false), eq(true))
+        verify(mockDuckChat).reportDuckChatEntry(argThat { name == "ONBOARDING_COMPLETION_PROMO" }, eq(false), eq(true), eq(false))
         verify(plugin).onAiPromptSubmitted("onboarding_completion_promo")
     }
 
@@ -11345,7 +11345,7 @@ class BrowserTabViewModelTest {
             assertCommandIssued<Command.OpenInNewTab> {
                 assertEquals(duckChatURL, query)
             }
-            verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any())
+            verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any(), any())
         }
 
     @Test
@@ -11360,7 +11360,7 @@ class BrowserTabViewModelTest {
         }
         verify(mockDuckChat).getDuckChatUrl(eq("hello"), eq(true), any())
         verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, opensNewTab = true, hasPrompt = true)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any())
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any(), any())
     }
 
     @Test
@@ -11413,6 +11413,16 @@ class BrowserTabViewModelTest {
         testee.openDuckAiChatById(chatUrl)
 
         assertCommandNotIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenDictatedPromptOpensDuckAiThenEntryRetainsSourceAndVoiceFlag() = runTest {
+        setBrowserShowing(true)
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
+
+        testee.openDuckAiQuery("hello", true, DuckChatEntryPoint.ADDRESS_BAR_PROMPT, voice = true)
+
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, opensNewTab = true, hasPrompt = true, voice = true)
     }
 
     @Test
@@ -13573,10 +13583,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewVoiceChatRequestedFromBrowsingMenuThenSourceMatchesViewMode() = runTest {
+        testee.openNewVoiceChat(ViewMode.NewTab)
+        testee.openNewVoiceChat(ViewMode.Browser("https://example.com"))
+        testee.openNewVoiceChat(ViewMode.DuckAI)
+
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_NTP)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_DUCKAI)
+    }
+
+    @Test
     fun whenNewVoiceChatRequestedFromChatMenuThenOpensVoiceChatAndFiresPixels() = runTest {
         testee.openNewVoiceChatFromChatMenu()
 
-        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY, type = Daily())
     }
