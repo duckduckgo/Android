@@ -18,6 +18,11 @@
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
 
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Sync bookmarks with your Desktop app.</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button">Sync Bookmarks</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button">Get Desktop App</string>
+
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
 
