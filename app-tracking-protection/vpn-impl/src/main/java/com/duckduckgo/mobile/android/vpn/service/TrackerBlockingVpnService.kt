@@ -317,6 +317,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
+        val restartInPlace = restarting && appTpRemoteFeatures.restartInPlace().isEnabled()
 
         if (!restarting) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
@@ -327,52 +328,80 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: skipping service callbacks while restarting" }
         }
 
-        // Create a null route tunnel so that leaks can't scape
-        val nullTun = createNullRouteTempTunnel()?.let {
-            if (!it.waitForTunnelUpOrTimeout()) {
-                logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
-                null
-            } else {
-                it
-            }
-        }
-        if (nullTun == null) {
-            logcat(ERROR) { "VPN log: Failed to establish the null TUN interface" }
-            deviceShieldPixels.vpnEstablishNullTunInterfaceError()
-            stopVpn(VpnStopReason.ERROR, false)
-            return@withContext
-        }
-
-        vpnEnableWideEvent.onNullTunnelCreated()
-
-        activeTun?.let {
-            logcat { "VPN log: restarting the tunnel" }
-            updateNetworkStackUponRestart()
-            it
-        }
-        activeTun = nullTun
-
-        val tunnelConfig = vpnNetworkStack.onPrepareVpn().getOrNull().also {
-            if (it != null) {
-                activeTun = createTunnelInterface(it)
-                activeTun?.let { tun ->
-                    if (!tun.waitForTunnelUpOrTimeout()) {
-                        activeTun = null
-                    }
+        // An in-place restart prepares the next stack and establishes the new tunnel while the current tunnel is
+        // still up. Nothing reads the current tunnel once its stack is stopped, so it keeps traffic blackholed
+        // until Android hands over to the new tunnel and no temporary null-route tunnel is needed.
+        val handover = if (restartInPlace) {
+            VpnNetworkStackHandover(
+                current = vpnNetworkStack,
+                next = vpnNetworkStackProvider.provideNetworkStack(),
+            ).also { handover ->
+                logcat { "VPN log: in-place restart, ${if (handover.isSameStack) "reusing" else "switching to"} ${handover.next.name}" }
+                if (!handover.isSameStack) {
+                    handover.next.onCreateVpnWithErrorReporting()
                 }
-            } else {
-                logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
+            }
+        } else {
+            null
+        }
+
+        if (handover == null) {
+            // Create a null route tunnel so that leaks can't scape
+            val nullTun = createNullRouteTempTunnel()?.let {
+                if (!it.waitForTunnelUpOrTimeout()) {
+                    logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
+                    null
+                } else {
+                    it
+                }
+            }
+            if (nullTun == null) {
+                logcat(ERROR) { "VPN log: Failed to establish the null TUN interface" }
+                deviceShieldPixels.vpnEstablishNullTunInterfaceError()
                 stopVpn(VpnStopReason.ERROR, false)
                 return@withContext
             }
+
+            vpnEnableWideEvent.onNullTunnelCreated()
+
+            if (restarting) {
+                logcat { "VPN log: restarting the tunnel" }
+                updateNetworkStackUponRestart()
+            }
+            activeTun = nullTun
         }
 
-        if (activeTun == null) {
-            logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
-            deviceShieldPixels.vpnEstablishTunInterfaceError()
+        val nextNetworkStack = handover?.next ?: vpnNetworkStack
+        val tunnelConfig = nextNetworkStack.onPrepareVpn().getOrNull()
+        if (tunnelConfig == null) {
+            logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
+            handover?.abort()
             stopVpn(VpnStopReason.ERROR, false)
             return@withContext
         }
+
+        val newTun = createTunnelInterface(tunnelConfig)?.let { tun ->
+            if (tun.waitForTunnelUpOrTimeout()) {
+                tun
+            } else {
+                runCatching { tun.close() }
+                null
+            }
+        }
+        if (newTun == null) {
+            logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
+            deviceShieldPixels.vpnEstablishTunInterfaceError()
+            handover?.abort()
+            stopVpn(VpnStopReason.ERROR, false)
+            return@withContext
+        }
+
+        handover?.let {
+            it.switch()
+            vpnNetworkStack = it.next
+        }
+        // Closes the tunnel this one replaces: the null-route tunnel, or the previous tunnel on an in-place restart
+        activeTun = newTun
 
         vpnEnableWideEvent.onVpnPrepared()
 
