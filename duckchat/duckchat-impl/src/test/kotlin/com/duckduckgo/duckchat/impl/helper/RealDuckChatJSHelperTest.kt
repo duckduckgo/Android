@@ -147,6 +147,7 @@ class RealDuckChatJSHelperTest {
     private val tabSessions: DuckAiTabSessionRepository = mock()
 
     private val testee = RealDuckChatJSHelper(
+        pdfPageContextResolver = mock(),
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
