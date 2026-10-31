@@ -34,8 +34,10 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResoluti
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
 import com.duckduckgo.sync.impl.API_CODE
+import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
@@ -61,8 +63,10 @@ class RealSyncEngine @Inject constructor(
     private val syncApiClient: SyncApiClient,
     private val syncScheduler: SyncScheduler,
     private val syncStateRepository: SyncStateRepository,
+    private val connectedDevicesRepository: ConnectedDevicesRepository,
     private val syncPixels: SyncPixels,
     private val syncStore: SyncStore,
+    private val syncFeature: SyncFeature,
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder,
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
@@ -120,6 +124,7 @@ class RealSyncEngine @Inject constructor(
             patchLocalChanges(it, REMOTE_WINS)
         }
         syncStateRepository.updateSyncState(SUCCESS)
+        refreshConnectedDevices(ACCOUNT_CREATION)
     }
 
     private fun performSync(trigger: SyncTrigger) {
@@ -143,6 +148,7 @@ class RealSyncEngine @Inject constructor(
 
             logcat { "Sync-Engine: Sync finished" }
             syncStateRepository.updateSyncState(SUCCESS)
+            refreshConnectedDevices(trigger)
         }
     }
 
@@ -179,6 +185,22 @@ class RealSyncEngine @Inject constructor(
                 logcat { "Sync-Engine: $changes changes to update $changes" }
                 patchLocalChanges(changes, LOCAL_WINS)
             }
+        }
+    }
+
+    private fun refreshConnectedDevices(trigger: SyncTrigger) {
+        val shouldRefresh = when (trigger) {
+            ACCOUNT_CREATION, ACCOUNT_LOGIN -> true
+            APP_OPEN, BACKGROUND_SYNC -> syncFeature.refreshConnectedDevicesOnSync().isEnabled()
+            DATA_CHANGE, FEATURE_READ -> false
+        }
+        if (!shouldRefresh) return
+
+        logcat { "Sync-Engine: refreshing connected devices after $trigger" }
+        kotlin.runCatching {
+            connectedDevicesRepository.getConnectedDevices(reportAccountErrorPixel = false)
+        }.onFailure { error ->
+            logcat { "Sync-Engine: error refreshing connected devices: $error" }
         }
     }
 
