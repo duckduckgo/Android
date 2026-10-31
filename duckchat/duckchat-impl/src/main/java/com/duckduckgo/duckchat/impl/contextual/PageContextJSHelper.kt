@@ -16,10 +16,22 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import android.os.SystemClock
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels
+import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.ContextType
+import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Reason
+import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 interface PageContextJSHelper {
@@ -31,11 +43,20 @@ interface PageContextJSHelper {
         tabId: String,
     ): String?
 
-    fun collectPageContext(): SubscriptionEventData
+    fun cancelCollection(tabId: String)
+
+    fun collectPageContext(tabId: String = "", trigger: Trigger = Trigger.TAB_CONTENT): SubscriptionEventData
 }
 
 @ContributesBinding(AppScope::class)
-class RealPageContextJSHelper @Inject constructor() : PageContextJSHelper {
+class RealPageContextJSHelper @Inject constructor(
+    private val pixels: PageContextExtractionPixels,
+    private val feature: DuckChatFeature,
+    @AppCoroutineScope private val scope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
+) : PageContextJSHelper {
+    private data class Request(val started: Long, val trigger: Trigger)
+    private val requests = ConcurrentHashMap<String, Request>()
     override suspend fun processPageContext(
         featureName: String,
         method: String,
@@ -47,13 +68,41 @@ class RealPageContextJSHelper @Inject constructor() : PageContextJSHelper {
         }
 
         val serializedPageData = data?.optString(KEY_SERIALIZED_PAGE_DATA, null)
+        requests.remove(tabId)?.let { request ->
+            val json = serializedPageData?.let { runCatching { JSONObject(it) }.getOrNull() }
+            val reason = when {
+                serializedPageData.isNullOrBlank() -> Reason.EMPTY_CONTENT
+                json == null -> Reason.DESERIALIZE_FAILED
+                json.optString("content").isBlank() -> Reason.EMPTY_CONTENT
+                else -> null
+            }
+            if (reason == null) {
+                pixels.success(ContextType.MARKDOWN)
+            } else {
+                pixels.failed(reason, request.trigger, ContextType.MARKDOWN, SystemClock.elapsedRealtime() - request.started)
+            }
+        }
         if (!serializedPageData.isNullOrBlank()) {
             return serializedPageData
         }
         return null
     }
 
-    override fun collectPageContext(): SubscriptionEventData {
+    override fun cancelCollection(tabId: String) {
+        requests.remove(tabId)
+    }
+
+    override fun collectPageContext(tabId: String, trigger: Trigger): SubscriptionEventData {
+        if (feature.pdfPageContext().isEnabled()) {
+            val request = Request(SystemClock.elapsedRealtime(), trigger)
+            requests[tabId] = request
+            scope.launch(dispatchers.io()) {
+                delay(30_000)
+                if (requests.remove(tabId, request) && feature.pdfPageContext().isEnabled()) {
+                    pixels.failed(Reason.TIMEOUT, trigger, ContextType.MARKDOWN)
+                }
+            }
+        }
         return SubscriptionEventData(
             PAGE_CONTEXT_FEATURE_NAME,
             SUBSCRIPTION_COLLECT,

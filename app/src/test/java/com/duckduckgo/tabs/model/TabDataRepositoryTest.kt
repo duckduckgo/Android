@@ -1130,6 +1130,7 @@ class TabDataRepositoryTest {
             contextualDataStore,
             tabVisitedSitesRepository,
             nativeInputStatePublisher,
+            mock(),
             duckAiTabSessionRepository,
             pageTitleFetcher,
         )

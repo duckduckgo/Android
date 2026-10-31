@@ -82,6 +82,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore: DuckChatContextualDataStore,
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
+            pdfPageContextProvider: com.duckduckgo.app.browser.pdf.RealPdfPageContextProvider,
             duckAiTabSessionRepository: DuckAiTabSessionRepository,
             pageTitleFetcher: PageTitleFetcher,
         ): TabDataRepository = TabDataRepository(
@@ -99,6 +100,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore = duckChatContextualDataStore,
             tabVisitedSitesRepository = tabVisitedSitesRepository,
             nativeInputStatePublisher = nativeInputStatePublisher,
+            pdfPageContextProvider = pdfPageContextProvider,
             duckAiTabSessionRepository = duckAiTabSessionRepository,
             pageTitleFetcher = pageTitleFetcher,
         )
@@ -121,6 +123,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore: DuckChatContextualDataStore,
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
+            pdfPageContextProvider: com.duckduckgo.app.browser.pdf.RealPdfPageContextProvider,
             duckAiTabSessionRepository: DuckAiTabSessionRepository,
             pageTitleFetcher: PageTitleFetcher,
         ): TabDataRepository = TabDataRepository(
@@ -138,6 +141,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore = duckChatContextualDataStore,
             tabVisitedSitesRepository = tabVisitedSitesRepository,
             nativeInputStatePublisher = nativeInputStatePublisher,
+            pdfPageContextProvider = pdfPageContextProvider,
             duckAiTabSessionRepository = duckAiTabSessionRepository,
             pageTitleFetcher = pageTitleFetcher,
         )

@@ -218,7 +218,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun renderViewState(state: DuckChatContextualEntryViewModel.ViewState) {
         val context = state.attachedContext
         if (context != null) {
-            binding.entryNativeInputWidget.setPageContext(context.title, context.url)
+            binding.entryNativeInputWidget.setPageContext(context.title, context.url, context.mimeType)
         } else {
             binding.entryNativeInputWidget.clearPageContext()
         }
@@ -277,7 +277,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureQuickAction() {
         binding.entryPromptQuickAction.setOnClickListener {
             if (viewModel.viewState.value.attachedContext == null) return@setOnClickListener
-            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(R.string.duckAIContextualPromptSummarize), null, null, null, null, null))
+            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(summarizePromptResource()), null, null, null, null, null))
         }
     }
 
@@ -311,7 +311,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached ->
-                        viewModel.onPageContextReceived(command.pageContext)
+                        if (command.tabId == tabId) viewModel.onPageContextReceived(command.pageContext)
 
                     is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished ->
                         // The dialog may have opened while the page was still loading, so the initial
@@ -379,7 +379,15 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         }
     }
 
+    private fun summarizePromptResource(): Int =
+        if (viewModel.viewState.value.attachedContext?.mimeType == PdfPageContextResolver.PDF_MIME_TYPE) {
+            R.string.duckAIContextualPromptSummarizeDocument
+        } else {
+            R.string.duckAIContextualPromptSummarize
+        }
+
     private fun updateQuickActionVisibility() {
+        binding.entryPromptQuickAction.setText(summarizePromptResource())
         // Summarize acts on the attached page, and suggestions take its place when present.
         val show = viewModel.viewState.value.attachedContext != null && !binding.entrySuggestionsView.hasContent()
         binding.entryPromptQuickAction.visibility = if (show) View.VISIBLE else View.GONE

@@ -382,7 +382,7 @@ class DuckChatContextualWebViewFragment :
                                             viewModel.viewState.value.tabId,
                                             browserMode,
                                         )?.let { response ->
-                                            logcat { "JS Helper: response $response" }
+                                            logcat { "JS Helper: response ready" }
                                             withContext(dispatcherProvider.main()) {
                                                 contentScopeScripts.onResponse(response)
                                             }
@@ -622,7 +622,9 @@ class DuckChatContextualWebViewFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
-                        viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                        if (command.tabId == viewModel.viewState.value.tabId) {
+                            viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                        }
                     }
 
                     DuckChatContextualSharedViewModel.Command.ReloadChat -> {
@@ -660,6 +662,7 @@ class DuckChatContextualWebViewFragment :
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
             binding.contextualNativeInputWidget.setPageContext(
                 title = viewState.contextTitle,
+                mimeType = viewState.contextMimeType,
                 url = viewState.contextUrl,
             )
         } else {

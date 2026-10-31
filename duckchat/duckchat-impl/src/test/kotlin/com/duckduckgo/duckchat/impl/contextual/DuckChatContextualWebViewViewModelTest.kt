@@ -55,6 +55,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -78,6 +79,7 @@ class DuckChatContextualWebViewViewModelTest {
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val pdfPageContextResolver: PdfPageContextResolver = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val duckChatFeature: DuckChatFeature = mock()
     private val termsConsent: DuckAiTermsConsent = mock()
@@ -110,6 +112,77 @@ class DuckChatContextualWebViewViewModelTest {
             SubscriptionEventData(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, "submitNewChatAction", JSONObject()),
         )
         testee = buildViewModel()
+    }
+
+    @Test
+    fun `removing PDF during manual attachment prevents sending bytes`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<String?>()
+        whenever(
+            pdfPageContextResolver.resolve(
+                "tab-1",
+                pdf,
+                true,
+                com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger.USER_REQUEST,
+            ),
+        ).doSuspendableAnswer { pending.await() }
+        testee.onPageContextReceived("tab-1", pdf)
+        testee.subscriptionEventDataFlow.test {
+            awaitItem()
+            testee.addPageContext()
+            testee.removePageContext()
+            pending.complete(JSONObject(pdf).put("data", "JVBERi0=").toString())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `failed PDF submission restores prompt for retry`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        testee.onPageContextReceived("tab-1", pdf)
+        testee.addPageContext()
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        testee.onPageContextReceived("tab-1", pdf)
+        testee.commands.test {
+            testee.onPromptSent("Explain this document")
+            val command = awaitItem() as DuckChatContextualWebViewViewModel.Command.ChangeSheetState
+            assertEquals("Explain this document", command.prefillNativeInput)
+        }
+    }
+
+    @Test
+    fun `PDF metadata with automatic attachment off is pushed without bytes`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        whenever(
+            pdfPageContextResolver.resolve(
+                "tab-1",
+                pdf,
+                false,
+                com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger.AUTO,
+            ),
+        ).thenReturn(pdf)
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            val context = awaitItem().params.getJSONObject("pageContext")
+            assertEquals("document.pdf", context.getString("title"))
+            assertFalse(context.has("data"))
+        }
+        assertFalse(testee.viewState.value.showContext)
+        assertEquals("application/pdf", testee.viewState.value.contextMimeType)
+    }
+
+    @Test
+    fun `oversized PDF removes a previously attached web page`() = runTest {
+        testee.onPageContextReceived("tab-1", serializedPageData)
+        val pdf = """{"title":"large.pdf","url":"https://example.com/large.pdf","mimeType":"application/pdf","attachable":false}"""
+        testee.onPageContextReceived("tab-1", pdf)
+        assertFalse(testee.viewState.value.showContext)
+        assertEquals("large.pdf", testee.viewState.value.contextTitle)
+        testee.addPageContext()
+        assertFalse(testee.viewState.value.showContext)
     }
 
     @Test
@@ -799,6 +872,7 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     private fun buildViewModel() = DuckChatContextualWebViewViewModel(
+        pdfPageContextResolver = pdfPageContextResolver,
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
         duckChatInternal = duckChatInternal,

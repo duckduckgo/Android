@@ -30,6 +30,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
     featureName = "aiChat",
 )
 interface DuckChatFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun pdfPageContext(): Toggle
+
     /**
      * @return `true` when the remote config has the global "aiChat" feature flag enabled
      * If the remote feature is not present defaults to `false`

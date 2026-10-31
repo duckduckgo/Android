@@ -42,11 +42,13 @@ import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
+import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
@@ -136,6 +138,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiSessionCallback: DuckAiSessionCallback,
     private val termsConsent: DuckAiTermsConsent,
+    private val pdfPageContextResolver: PdfPageContextResolver,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -289,7 +292,22 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_PAGE_CONTEXT -> {
                 id?.let {
                     val reason = data?.optString(REASON) ?: REASON_USER_ACTION
-                    logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
+                    if (pdfPageContextResolver.isEnabled()) {
+                        val includeData = reason == REASON_USER_ACTION || (reason == REASON_INIT && duckChat.isAutomaticContextAttachmentEnabled())
+                        val resolved = pdfPageContextResolver.resolve(
+                            tabId,
+                            pageContext.takeIf { it.isNotEmpty() },
+                            includeData,
+                            if (reason == REASON_USER_ACTION) Trigger.USER_REQUEST else Trigger.AUTO,
+                        )
+                        if (resolved == null || PdfPageContextResolver.isPdf(resolved)) {
+                            return if (resolved == null) {
+                                getEmptyPageContextResponse(featureName, method, it)
+                            } else {
+                                getPageContextResponse(featureName, method, it, resolved, tabId)
+                            }
+                        }
+                    }
                     if (pageContext.isNotEmpty()) {
                         when (reason) {
                             REASON_USER_ACTION -> {

@@ -124,6 +124,7 @@ class RealDuckChatJSHelperTest {
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockTermsConsent: DuckAiTermsConsent = mock()
     private val testee = RealDuckChatJSHelper(
+        pdfPageContextResolver = mock(),
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
