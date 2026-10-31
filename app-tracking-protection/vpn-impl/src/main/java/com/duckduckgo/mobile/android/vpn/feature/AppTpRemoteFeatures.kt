@@ -68,6 +68,9 @@ interface AppTpRemoteFeatures {
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun restartInPlace(): Toggle
 
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun restartWideEvent(): Toggle
+
     @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment001(): Toggle
 

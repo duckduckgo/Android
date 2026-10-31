@@ -1,0 +1,87 @@
+// Wide event pixel for VPN service restart monitoring (in-place vs legacy restart)
+{
+    "wide_vpn-restart": {
+        "description": "TrackerBlockingVpnService restarts its tunnel while the service keeps running, e.g. after a reconfiguration, a network change or a VPN feature being toggled. Sampled at 10% of restarts.",
+        "owners": ["aitorvs"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["vpn-restart"]
+            },
+            {
+                "key": "feature.data.ext.restart_mode",
+                "description": "in_place when the running tunnel is swapped under the live service (restartInPlace toggle on), legacy when the service tears the network stack down and rebuilds it behind a null-route tunnel",
+                "enum": ["in_place", "legacy"]
+            },
+            {
+                "key": "feature.data.ext.network_stack",
+                "description": "Network stack the restart brings up: the running one, or the new one when a VPN feature was toggled on or off",
+                "enum": ["apptp", "netp", "other"]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Phase that failed. Only present on FAILURE events.",
+                "enum": ["null_tunnel_failed", "network_stack_prepare_failed", "tunnel_establish_failed", "network_stack_start_failed"]
+            },
+            {
+                "key": "feature.data.ext.restart_duration_ms_bucketed",
+                "description": "Duration of the whole restart, from the restart request until the network stack is running on the new tunnel, in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+            },
+            {
+                "key": "feature.data.ext.network_stack_prepare_duration_ms_bucketed",
+                "description": "Duration of preparing the network stack configuration (for NetP this includes registration and port probing), in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+            },
+            {
+                "key": "feature.data.ext.tunnel_establish_duration_ms_bucketed",
+                "description": "Duration of establishing the new TUN interface and waiting for it to come up, in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+            },
+            {
+                "key": "feature.data.ext.network_stack_switch_duration_ms_bucketed",
+                "description": "Duration of stopping the running network stack (and destroying and recreating it on the legacy path), in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+            },
+            {
+                "key": "feature.data.ext.network_stack_start_duration_ms_bucketed",
+                "description": "Duration of starting the network stack on the new tunnel, in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+            },
+            {
+                "key": "feature.data.ext.step.network_stack_prepare",
+                "description": "Parameter present if the network stack configuration was prepared successfully",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.tunnel_establish",
+                "description": "Parameter present if the new TUN interface was established successfully",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.network_stack_switch",
+                "description": "Parameter present if the running network stack was stopped (and replaced) successfully",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.network_stack_start",
+                "description": "Parameter present if the network stack started on the new tunnel successfully",
+                "enum": ["true"]
+            }
+        ]
+    }
+}

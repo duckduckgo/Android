@@ -1,0 +1,83 @@
+{
+    "android-vpn-restart": {
+        "description": "TrackerBlockingVpnService restarts its tunnel while the service keeps running, e.g. after a reconfiguration, a network change or a VPN feature being toggled. Sampled at 10% of restarts.",
+        "owners": ["aitorvs"],
+        "meta": {
+            "type": "android-vpn-restart",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "vpn-restart",
+            "status": ["SUCCESS", "FAILURE", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "restart_mode": {
+                        "type": "string",
+                        "description": "in_place when the running tunnel is swapped under the live service (restartInPlace toggle on), legacy when the service tears the network stack down and rebuilds it behind a null-route tunnel",
+                        "enum": ["in_place", "legacy"]
+                    },
+                    "network_stack": {
+                        "type": "string",
+                        "description": "Network stack the restart brings up: the running one, or the new one when a VPN feature was toggled on or off",
+                        "enum": ["apptp", "netp", "other"]
+                    },
+                    "failure_reason": {
+                        "type": "string",
+                        "description": "Phase that failed. Only present on FAILURE events.",
+                        "enum": [
+                            "null_tunnel_failed",
+                            "network_stack_prepare_failed",
+                            "tunnel_establish_failed",
+                            "network_stack_start_failed"
+                        ]
+                    },
+                    "restart_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration of the whole restart, from the restart request until the network stack is running on the new tunnel, in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+                    },
+                    "network_stack_prepare_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration of preparing the network stack configuration (for NetP this includes registration and port probing), in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+                    },
+                    "tunnel_establish_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration of establishing the new TUN interface and waiting for it to come up, in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+                    },
+                    "network_stack_switch_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration of stopping the running network stack (and destroying and recreating it on the legacy path), in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+                    },
+                    "network_stack_start_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration of starting the network stack on the new tunnel, in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "100", "250", "500", "1000", "2000", "5000", "10000", "30000"]
+                    },
+                    "step.network_stack_prepare": {
+                        "type": "string",
+                        "description": "Parameter present if the network stack configuration was prepared successfully",
+                        "enum": ["true"]
+                    },
+                    "step.tunnel_establish": {
+                        "type": "string",
+                        "description": "Parameter present if the new TUN interface was established successfully",
+                        "enum": ["true"]
+                    },
+                    "step.network_stack_switch": {
+                        "type": "string",
+                        "description": "Parameter present if the running network stack was stopped (and replaced) successfully",
+                        "enum": ["true"]
+                    },
+                    "step.network_stack_start": {
+                        "type": "string",
+                        "description": "Parameter present if the network stack started on the new tunnel successfully",
+                        "enum": ["true"]
+                    }
+                }
+            }
+        }
+    }
+}
