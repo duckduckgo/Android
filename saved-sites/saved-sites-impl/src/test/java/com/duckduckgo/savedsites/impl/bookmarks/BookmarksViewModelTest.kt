@@ -525,7 +525,7 @@ class BookmarksViewModelTest {
 
         testee.onSortingModeSelected(NAME)
 
-        val sortedElements = testee.itemsToDisplay.value
+        val sortedElements = testee.itemsToDisplay.value!!
         assertEquals((sortedElements[0] as BookmarkItem).bookmark, bookmarkAs)
         assertEquals((sortedElements[1] as BookmarkItem).bookmark, bookmarkCnn)
         assertEquals((sortedElements[2] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderNews)
@@ -563,7 +563,7 @@ class BookmarksViewModelTest {
 
         testee.onSortingModeSelected(MANUAL)
 
-        val sortedElements = testee.itemsToDisplay.value
+        val sortedElements = testee.itemsToDisplay.value!!
         assertEquals((sortedElements[0] as BookmarkItem).bookmark, bookmarkAs)
         assertEquals((sortedElements[1] as BookmarkItem).bookmark, bookmarkReddit)
         assertEquals((sortedElements[2] as BookmarkItem).bookmark, bookmarkCnn)
