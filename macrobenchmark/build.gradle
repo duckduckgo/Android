@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.test'
+    id 'androidx.baselineprofile'
 }
 
 apply from: "$rootDir/code-formatting.gradle"
@@ -45,10 +46,9 @@ kotlin {
     jvmToolchain(21)
 }
 
-// Only build/keep the `release` variant (targets :app internalRelease); disable the rest.
 androidComponents {
     beforeVariants(selector().all()) { variant ->
-        variant.enable = variant.buildType == "release"
+        variant.enable = variant.buildType in ["release", "nonMinifiedRelease", "benchmarkRelease"]
     }
 }
 

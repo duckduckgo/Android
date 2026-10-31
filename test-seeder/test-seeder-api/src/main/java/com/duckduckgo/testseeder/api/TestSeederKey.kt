@@ -53,4 +53,8 @@ enum class TestSeederKey(val key: String, val description: String) {
         "userAllowList",
         "Comma-separated domains to replace the user allow list with (protections off). Empty value clears the list.",
     ),
+    SKIP_ONBOARDING(
+        "skipOnboarding",
+        "Marks onboarding as completed before launch routing, so no skip button is needed. Value: true",
+    ),
 }
