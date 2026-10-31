@@ -8915,7 +8915,7 @@ class BrowserTabViewModelTest {
 
             testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
 
-            verify(mockPageContextJSHelper).collectPageContext()
+            verify(mockPageContextJSHelper).collectPageContext(any(), any())
         }
 
     @Test
@@ -8926,7 +8926,7 @@ class BrowserTabViewModelTest {
 
             testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
 
-            verify(mockPageContextJSHelper, never()).collectPageContext()
+            verify(mockPageContextJSHelper, never()).collectPageContext(any(), any())
         }
 
     @Test
@@ -13940,7 +13940,7 @@ class BrowserTabViewModelTest {
             subscriptionName = "collect",
             params = JSONObject(),
         )
-        whenever(mockPageContextJSHelper.collectPageContext()).thenReturn(expectedEvent)
+        whenever(mockPageContextJSHelper.collectPageContext(any(), any())).thenReturn(expectedEvent)
 
         testee.collectPageContext()
 

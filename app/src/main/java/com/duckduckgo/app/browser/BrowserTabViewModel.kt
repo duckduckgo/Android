@@ -1280,6 +1280,7 @@ class BrowserTabViewModel @Inject constructor(
 
     @VisibleForTesting
     public override fun onCleared() {
+        pageContextJSHelper.cancelCollection(tabId)
         newTabPageModalPresenterRegistry.unregister(this)
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
@@ -2685,6 +2686,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun pageCleared() {
+        pageContextJSHelper.cancelCollection(tabId)
         logcat(VERBOSE) { "Page cleared: $url" }
         site = null
         onSiteChanged()
@@ -2706,6 +2708,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onMainFrameLoadStarted(navigationId: Long) {
+        pageContextJSHelper.cancelCollection(tabId)
         pageLoadNavigationId = navigationId
         hasExitedFixedProgress = false
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
@@ -6033,7 +6036,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun collectPageContext() {
         viewModelScope.launch {
-            val subscriptionEvent = pageContextJSHelper.collectPageContext()
+            val subscriptionEvent = pageContextJSHelper.collectPageContext(tabId)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }
