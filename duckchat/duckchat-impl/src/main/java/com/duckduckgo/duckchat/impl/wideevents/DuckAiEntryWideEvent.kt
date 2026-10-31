@@ -40,7 +40,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -223,7 +223,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         val voiceTabId = entry?.tabId?.takeIf { duckChat.value.isVoiceChatSessionActive(it) }
         if (trigger == null && voiceTabId != null) {
             backgroundVoiceMonitor += coroutineScope.launch {
-                duckChat.value.activeVoiceChatSessions.first { voiceTabId !in it }
+                duckChat.value.activeVoiceChatSessions.firstOrNull { voiceTabId !in it } ?: return@launch
                 mutate {
                     if (!foreground && activeEntry?.flowId == entry.flowId) finish("app_backgrounded")
                 }

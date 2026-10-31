@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -304,6 +305,20 @@ class DuckAiEntryWideEventTest {
         coroutineRule.testScope.advanceUntilIdle()
         verifyNoInteractions(pixels)
         verify(client, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `voice session stream completing without a voice end preserves the entry`() = coroutineRule.testScope.runTest {
+        voiceSessions.value = setOf("tab")
+        whenever(duckChat.activeVoiceChatSessions).thenReturn(flowOf(setOf("tab")))
+        testee.onForeground()
+        testee.onEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, false)
+        testee.onDuckAiPageVisible("tab", "https://duck.ai/")
+
+        testee.onClose()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client, never()).flowFinish(any(), any(), any())
     }
 
     @Test
