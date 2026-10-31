@@ -23,6 +23,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -48,6 +49,7 @@ class ChatHistoryRepositoryTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
     private val chatStore: DuckAiChatStore = mock()
     private val context: Context = mock()
     private val duckChatSyncRepository: DuckChatSyncRepository = mock()
@@ -68,6 +70,7 @@ class ChatHistoryRepositoryTest {
             syncEngine = syncEngine,
             chatExportWriter = chatExportWriter,
             browserMode = BrowserMode.REGULAR,
+            entryWideEvent = lazy { entryWideEvent },
         )
     }
 
@@ -184,15 +187,26 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `deleteChat delegates to store`() = runTest {
+    fun `deleteChat reports successful deletion`() = runTest {
+        whenever(chatStore.deleteChat("abc")).thenReturn(true)
         repository.deleteChat("abc")
         verify(chatStore).deleteChat("abc")
+        verify(entryWideEvent).onChatsDeleted(setOf("abc"))
     }
 
     @Test
-    fun `deleteAllChats delegates to store`() = runTest {
+    fun `deleteAllChats reports deleted chat identifiers`() = runTest {
+        whenever(chatStore.getChats()).thenReturn(listOf(chat(chatId = "abc", title = "Hello")))
         repository.deleteAllChats()
         verify(chatStore).deleteAllChats()
+        verify(entryWideEvent).onChatsDeleted(setOf("abc"))
+    }
+
+    @Test
+    fun `missing chat is not reported as deleted`() = runTest {
+        whenever(chatStore.deleteChat("missing")).thenReturn(false)
+        repository.deleteChat("missing")
+        verify(entryWideEvent, never()).onChatsDeleted(any())
     }
 
     @Test

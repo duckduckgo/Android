@@ -25,10 +25,11 @@ class DuckAiSessionCallbackDispatcherTest {
 
     private val session: RealDuckAiSessionWideEvent = mock()
     private val responseWait: DuckAiResponseWaitWideEventImpl = mock()
-    private val testee = DuckAiSessionCallbackDispatcher(session, responseWait)
+    private val entry: DuckAiEntryWideEvent = mock()
+    private val testee = DuckAiSessionCallbackDispatcher(session, responseWait, entry)
 
     @Test
-    fun `when each callback is called then both receivers get it in order`() {
+    fun `when each callback is called then all receivers get it in order`() {
         testee.onLaunchLandingResolved("tab", "https://duck.ai")
         testee.onDuckAiPageVisible("tab", "https://duck.ai")
         testee.onSelectedTabChanged("tab", "https://duck.ai")
@@ -36,19 +37,25 @@ class DuckAiSessionCallbackDispatcherTest {
         testee.onPromptSubmitted("tab")
         testee.onNewChatCreated("tab")
 
-        inOrder(session, responseWait) {
+        inOrder(session, responseWait, entry) {
             verify(session).onLaunchLandingResolved("tab", "https://duck.ai")
             verify(responseWait).onLaunchLandingResolved("tab", "https://duck.ai")
+            verify(entry).onLaunchLandingResolved("tab", "https://duck.ai")
             verify(session).onDuckAiPageVisible("tab", "https://duck.ai")
             verify(responseWait).onDuckAiPageVisible("tab", "https://duck.ai")
+            verify(entry).onDuckAiPageVisible("tab", "https://duck.ai")
             verify(session).onSelectedTabChanged("tab", "https://duck.ai")
             verify(responseWait).onSelectedTabChanged("tab", "https://duck.ai")
+            verify(entry).onSelectedTabChanged("tab", "https://duck.ai")
             verify(session).onExitIntent("tab", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
             verify(responseWait).onExitIntent("tab", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+            verify(entry).onExitIntent("tab", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
             verify(session).onPromptSubmitted("tab")
             verify(responseWait).onPromptSubmitted("tab")
+            verify(entry).onPromptSubmitted("tab")
             verify(session).onNewChatCreated("tab")
             verify(responseWait).onNewChatCreated("tab")
+            verify(entry).onNewChatCreated("tab")
         }
     }
 }

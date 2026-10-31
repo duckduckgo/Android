@@ -27,35 +27,42 @@ import javax.inject.Inject
 class DuckAiSessionCallbackDispatcher @Inject constructor(
     private val session: RealDuckAiSessionWideEvent,
     private val responseWait: DuckAiResponseWaitWideEventImpl,
+    private val entry: DuckAiEntryWideEvent,
 ) : DuckAiSessionCallback {
 
     override fun onLaunchLandingResolved(tabId: String?, url: String?) {
         session.onLaunchLandingResolved(tabId, url)
         responseWait.onLaunchLandingResolved(tabId, url)
+        entry.onLaunchLandingResolved(tabId, url)
     }
 
     override fun onDuckAiPageVisible(tabId: String, url: String) {
         session.onDuckAiPageVisible(tabId, url)
         responseWait.onDuckAiPageVisible(tabId, url)
+        entry.onDuckAiPageVisible(tabId, url)
     }
 
     override fun onSelectedTabChanged(tabId: String?, url: String?) {
         session.onSelectedTabChanged(tabId, url)
         responseWait.onSelectedTabChanged(tabId, url)
+        entry.onSelectedTabChanged(tabId, url)
     }
 
     override fun onExitIntent(tabId: String, trigger: DuckAiSessionExitTrigger) {
         session.onExitIntent(tabId, trigger)
         responseWait.onExitIntent(tabId, trigger)
+        entry.onExitIntent(tabId, trigger)
     }
 
     override fun onPromptSubmitted(tabId: String) {
         session.onPromptSubmitted(tabId)
         responseWait.onPromptSubmitted(tabId)
+        entry.onPromptSubmitted(tabId)
     }
 
     override fun onNewChatCreated(tabId: String) {
         session.onNewChatCreated(tabId)
         responseWait.onNewChatCreated(tabId)
+        entry.onNewChatCreated(tabId)
     }
 }

@@ -24,6 +24,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -61,6 +62,7 @@ class RealChatHistoryRepository @Inject constructor(
     private val syncEngine: SyncEngine,
     private val chatExportWriter: ChatExportWriter,
     private val browserMode: BrowserMode,
+    private val entryWideEvent: Lazy<DuckAiEntryWideEvent>,
 ) : ChatHistoryRepository {
 
     private val chatExporter = ChatExporter()
@@ -72,11 +74,17 @@ class RealChatHistoryRepository @Inject constructor(
             .map { chats -> chats.map(::toChatHistoryItem) }
 
     override suspend fun deleteChat(chatId: String) {
-        withContext(dispatchers.io()) { chatStore.deleteChat(chatId) }
+        withContext(dispatchers.io()) {
+            if (chatStore.deleteChat(chatId)) entryWideEvent.value.onChatsDeleted(setOf(chatId))
+        }
     }
 
     override suspend fun deleteAllChats() {
-        withContext(dispatchers.io()) { chatStore.deleteAllChats() }
+        withContext(dispatchers.io()) {
+            val chatIds = chatStore.getChats().map { it.chatId }.toSet()
+            chatStore.deleteAllChats()
+            entryWideEvent.value.onChatsDeleted(chatIds)
+        }
     }
 
     override suspend fun renameChat(chatId: String, newTitle: String): Boolean =

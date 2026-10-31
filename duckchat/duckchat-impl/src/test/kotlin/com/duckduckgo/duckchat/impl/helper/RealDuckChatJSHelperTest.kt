@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
@@ -53,6 +54,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -141,6 +143,8 @@ class RealDuckChatJSHelperTest {
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock {
         on { isDuckDuckGoQueryUrl(SERP_URL) } doReturn true
     }
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
+    private val tabSessions: DuckAiTabSessionRepository = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
@@ -162,6 +166,7 @@ class RealDuckChatJSHelperTest {
         editPromptSessionStore = mockEditPromptSessionStore,
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
         duckAiSessionCallback = mockDuckAiSessionCallback,
+        entryWideEvent = lazy { entryWideEvent },
         regularChatStore = mockRegularChatStore,
         fireChatStore = mockFireChatStore,
         duckAiChatHistoryFeature = fakeChatHistoryFeature,
@@ -169,6 +174,7 @@ class RealDuckChatJSHelperTest {
         chatStateStore = chatStateStore,
         responseWaitWideEvent = mockResponseWaitWideEvent,
         duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        tabSessions = tabSessions,
     )
 
     init {
@@ -2173,6 +2179,37 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenPageReportsPromptThenPromptPixelAndReturnSessionUseStoredEntrySource() = runTest {
+        whenever(tabSessions.getEntryPointSource("tab")).thenReturn("onboarding_completion_promo")
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt", "source" to "untrusted-page-source")),
+            mode = Mode.FULL,
+            tabId = "tab",
+        )
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT, source = "onboarding_completion_promo")
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted("onboarding_completion_promo")
+    }
+
+    @Test
+    fun whenContextualPageReportsPromptThenReturnSessionReceivesContextualSource() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt")),
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab",
+        )
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted("contextual_chat")
+    }
+
+    @Test
     fun whenReportMetricWithFirstSubmittedPromptThenNotifiesAiPromptSubmittedOnly() = runTest {
         val data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt"))
 
@@ -2204,7 +2241,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenReportMetricWithSubmittedPromptInContextualModeThenPromptSubmittedNotReported() = runTest {
+    fun whenReportMetricWithSubmittedPromptInContextualModeThenOnlyEntryPromptIsReported() = runTest {
         val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
 
         testee.processJsCallbackMessage(
@@ -2216,6 +2253,22 @@ class RealDuckChatJSHelperTest {
             tabId = "tab-1",
         )
 
+        verify(mockDuckAiSessionCallback, never()).onPromptSubmitted(any())
+        verify(entryWideEvent).onPromptSubmitted("tab-1")
+    }
+
+    @Test
+    fun whenFirstPromptMetricInContextualModeThenEntryPromptIsReported() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt")),
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(entryWideEvent).onPromptSubmitted("tab-1")
         verify(mockDuckAiSessionCallback, never()).onPromptSubmitted(any())
     }
 

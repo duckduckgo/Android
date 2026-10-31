@@ -100,6 +100,7 @@ class NativeInputCallbacks(
         selectionsJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
+    val duckAiEntryPointResolver: (DuckChatEntryPoint) -> DuckChatEntryPoint = { it },
     val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint) -> Unit = { _, _ -> },
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
@@ -685,6 +686,7 @@ class RealNativeInputManager @Inject constructor(
         callbacks: NativeInputCallbacks,
     ) {
         val widget = widgetFrom(widgetView) ?: return
+        widget.duckAiEntryPointResolver = callbacks.duckAiEntryPointResolver
         val onSearchTextChanged: (String) -> Unit = { text ->
             if (omnibarController.isDuckAiMode() && text.isBlank()) {
                 callbacks.onClearAutocomplete()
