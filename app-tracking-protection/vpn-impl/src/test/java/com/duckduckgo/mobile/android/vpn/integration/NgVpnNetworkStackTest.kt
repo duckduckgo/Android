@@ -24,6 +24,7 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.api.AddressRR
 import com.duckduckgo.vpn.network.api.DnsRR
@@ -105,6 +106,26 @@ class NgVpnNetworkStackTest {
         ngVpnNetworkStack.onCreateVpn()
 
         verify(vpnNetwork, times(2)).create()
+    }
+
+    @Test
+    fun whenOnStopVpnForRestartThenRecreateVpnNetwork() {
+        ngVpnNetworkStack.onCreateVpn()
+
+        ngVpnNetworkStack.onStopVpn(VpnStopReason.RESTART)
+
+        verify(vpnNetwork).destroy(111)
+        verify(vpnNetwork, times(2)).create()
+    }
+
+    @Test
+    fun whenOnStopVpnForOtherReasonThenKeepVpnNetwork() {
+        ngVpnNetworkStack.onCreateVpn()
+
+        ngVpnNetworkStack.onStopVpn(VpnStopReason.SELF_STOP())
+
+        verify(vpnNetwork, never()).destroy(any())
+        verify(vpnNetwork, times(1)).create()
     }
 
     @Test

@@ -143,7 +143,13 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
-        return stopNative()
+        val stopped = stopNative()
+        // The native layer keeps its session table across stop/start and nothing here clears it (NetGuard calls
+        // jni_clear for this), so a restart that keeps this stack must not carry the old tunnel's sessions over.
+        if (reason == VpnStopReason.RESTART) {
+            onCreateVpn()
+        }
+        return stopped
     }
 
     override fun onDestroyVpn(): Result<Unit> {
