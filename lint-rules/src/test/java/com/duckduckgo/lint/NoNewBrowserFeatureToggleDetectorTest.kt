@@ -33,7 +33,7 @@ class NoNewBrowserFeatureToggleDetectorTest {
                     """
                 package com.duckduckgo.browser.feature.toggles
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "androidBrowserConfig")
@@ -60,7 +60,7 @@ class NoNewBrowserFeatureToggleDetectorTest {
                     """
                 package com.duckduckgo.browser.feature.toggles
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "androidBrowserConfig")
@@ -93,7 +93,7 @@ class NoNewBrowserFeatureToggleDetectorTest {
                     """
                 package com.duckduckgo.browser.feature.toggles
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "someOtherFeature")
@@ -129,7 +129,7 @@ class NoNewBrowserFeatureToggleDetectorTest {
                     """
                 package com.duckduckgo.browser.feature.toggles
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "sneakyFeature")
@@ -161,7 +161,7 @@ class NoNewBrowserFeatureToggleDetectorTest {
                     """
                 package com.duckduckgo.myfeature.impl
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "myFeature")
@@ -202,7 +202,7 @@ class NoNewBrowserFeatureToggleDetectorTest {
     companion object {
         private val REMOTE_FEATURE_ANNOTATION_STUB = kt(
             """
-            package com.duckduckgo.anvil.annotations
+            package com.duckduckgo.codegen.annotations
 
             import kotlin.reflect.KClass
 

@@ -29,15 +29,15 @@ import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2_
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP_DEVICE_AUTH_NOT_ENROLLED
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SyncSetupWideEvent {
-    suspend fun onFlowStarted(source: String? = null)
+    suspend fun onFlowStarted(launchSource: SyncLaunchSource = SyncLaunchSource.Other)
     suspend fun onDeviceAuthNotEnrolled()
     suspend fun onEnrollDeviceAuthDialogShown()
     suspend fun onUserAuthSuccess()
@@ -56,7 +56,7 @@ interface SyncSetupWideEvent {
     suspend fun onSyncRestoreStarted()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class SyncSetupWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -68,7 +68,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     private var cachedFlowId: Long? = null
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        syncFeature.get().sendSyncSetupWideEvent().isEnabled()
+        syncFeature.value.sendSyncSetupWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {
@@ -81,7 +81,7 @@ class SyncSetupWideEventImpl @Inject constructor(
         return cachedFlowId
     }
 
-    override suspend fun onFlowStarted(source: String?) {
+    override suspend fun onFlowStarted(launchSource: SyncLaunchSource) {
         if (!isFeatureEnabled()) return
 
         getCurrentWideEventId()?.let { existingId ->
@@ -94,7 +94,7 @@ class SyncSetupWideEventImpl @Inject constructor(
 
         cachedFlowId = wideEventClient.flowStart(
             name = FLOW_NAME,
-            flowEntryPoint = source,
+            flowEntryPoint = launchSource.value,
             metadata = buildMap {
                 put(KEY_USER_AUTH_REQUIRED, buildConfig.isAuthRequired.toString())
                 putAll(uiMetadata())
@@ -255,7 +255,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     private fun uiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
 
     private fun flowMetadata(): Map<String, String> = buildMap {
-        val feature = syncFeature.get()
+        val feature = syncFeature.value
         val flowVersion = if (feature.canUseV2ConnectFlow().isEnabled()) {
             if (feature.canUseExchangeV2Point1().isEnabled()) {
                 FLOW_VERSION_V2_1

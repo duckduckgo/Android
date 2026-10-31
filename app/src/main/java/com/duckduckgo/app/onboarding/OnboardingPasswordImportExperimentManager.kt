@@ -22,8 +22,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -37,8 +38,8 @@ interface OnboardingPasswordImportExperimentManager {
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = OnboardingPasswordImportExperimentManager::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<OnboardingPasswordImportExperimentManager>())
+@SingleIn(AppScope::class)
 class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
     private val toggles: OnboardingPasswordImportToggles,
     private val importPasswordsFromGoogle: ImportPasswordsFromGoogle,

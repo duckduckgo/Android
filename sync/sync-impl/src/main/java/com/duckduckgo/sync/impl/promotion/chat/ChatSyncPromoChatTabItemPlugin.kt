@@ -19,8 +19,8 @@ package com.duckduckgo.sync.impl.promotion.chat
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.di.scopes.AppScope
@@ -31,6 +31,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
 import com.duckduckgo.sync.impl.databinding.DialogChatSyncPromoBinding
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
@@ -109,7 +110,7 @@ private class ChatTabPluginAdapterListener(
             val dialog = ChatSyncPromoBottomSheetDialog(
                 context = context,
                 onScanQrCodeClicked = {
-                    activityStarter.start(context, SyncActivityWithAnotherDevice(source = "promotion_ai_chat"))
+                    activityStarter.start(context, SyncActivityWithAnotherDevice(source = SyncLaunchSource.PromotionAiChat.value))
                 },
             )
             dialog.setOnDismissListener { isDialogShowing = false }

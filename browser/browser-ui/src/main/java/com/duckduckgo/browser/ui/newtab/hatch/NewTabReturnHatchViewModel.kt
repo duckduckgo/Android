@@ -22,7 +22,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
@@ -31,6 +30,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -133,16 +133,14 @@ class NewTabReturnHatchViewModel @Inject constructor(
     // repository (burned, closed, or purged), so every live ViewModel instance stays in sync without
     // per-instance burn tracking. For a Fire target, visibility tracks the fire repo's flowTabs,
     // while the activity-mode repo supplies the tabs count shown in the tab button.
-    // The tabs button shows only when native input is enabled AND the address bar isn't search-only.
-    // In search-only the hatch mirrors the legacy chrome, which has no tabs entry here.
+    // The tabs button shows only when the address bar isn't search-only, which has no tabs entry here.
     // It is also hidden when the nav bar flag is on: those users get a tabs button in the input-mode
     // nav bar instead, so the hatch shouldn't duplicate it.
     private val shouldShowTabsButton: Flow<Boolean> = combine(
-        duckChat.observeNativeInputFieldUserSettingEnabled(),
         duckChatInputModeState.inputModeCapability,
         duckChat.observeNativeInputNavBarEnabled(),
-    ) { nativeInputEnabled, capability, navBarEnabled ->
-        nativeInputEnabled && capability != NativeInputState.InputMode.SEARCH_ONLY && !navBarEnabled
+    ) { capability, navBarEnabled ->
+        capability != NativeInputState.InputMode.SEARCH_ONLY && !navBarEnabled
     }
 
     val viewState = snapshotTarget.flatMapLatest { target ->

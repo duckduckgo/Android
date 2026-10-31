@@ -22,10 +22,10 @@ import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class TriedDuckAiDuringOnboardingAttributeMatcherPlugin @Inject constructor(
     private val onboardingStore: OnboardingStore,
 ) : AttributeMatcherPlugin {
@@ -37,7 +37,7 @@ class TriedDuckAiDuringOnboardingAttributeMatcherPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class TriedDuckAiDuringOnboardingMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
     override fun map(
         key: String,

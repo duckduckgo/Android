@@ -261,6 +261,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Import hesel z Googlu</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Zařízení vás může požádat o potvrzení zadáním PIN kódu, hesla nebo vzoru.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Import z Googlu</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vybrat soubor CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importovat z prohlížeče na počítači</string>
@@ -292,8 +293,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Přenes si hesla&lt;br /&gt;z Googlu do DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Rychle a bezpečně importuj svá hesla do DuckDuckGo. Google tě může požádat o zadání hesla.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Rychle a bezpečně importuj svá hesla do DuckDuckGo. Zařízení tě může požádat o potvrzení zadáním PIN kódu, hesla nebo vzoru.</string>
     <string name="passwords_import_promo_action">Import z Googlu</string>
     <string name="passwords_import_promo_in_browser_title">Přenes si hesla z Googlu do DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importuj si hesla z Googlu do DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Už se znovu neptat</string>
     <string name="passwords_import_promo_in_settings_title">Import hesel z Googlu</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Skrýt</string>
@@ -320,5 +323,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Něco se pokazilo</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Zkontroluj svoje připojení k internetu a zkus to znovu.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import dokončen!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Vydrž — nech tohle okno otevřené. Nemělo by to trvat déle než minutu nebo dvě.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google tě může požádat o zadání hesla.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google ti pošle e-mail s potvrzením, že se tvoje data exportovala. Nemusíš nic dělat.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import dokončen!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importováno záložek: <b>%1$d</b>]]></string>
 
 </resources>

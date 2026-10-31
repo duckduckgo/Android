@@ -44,7 +44,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:importantForAccessibility="no"
-                android:src="@drawable/youtube_clean_128" />
+                android:src="@drawable/ad_blocking_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/adBlockingHeaderTitle"
@@ -53,8 +53,26 @@
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:gravity="center"
-                android:text="@string/ad_blocking_settings_title"
+                android:text="@string/ad_blocking_settings_title_v2"
                 app:typography="h2" />
+
+            <com.duckduckgo.common.ui.view.StatusIndicatorView
+                android:id="@+id/adBlockingStatusIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/keyline_1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/adBlockingHeaderDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:gravity="center"
+                android:text="@string/ad_blocking_settings_header_description"
+                app:textType="secondary"
+                app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
@@ -69,6 +87,17 @@
                 app:primaryText="@string/ad_blocking_settings_toggle_title"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/blockAdsToggleUntilRelaunch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:visibility="gone"
+                app:primaryText="@string/ad_blocking_settings_toggle_title"
+                app:secondaryText="@string/ad_blocking_settings_disabled_until_relaunch"
+                app:showSwitch="true"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/adBlockingDescription"
                 android:layout_width="match_parent"
@@ -79,7 +108,18 @@
                 app:textType="secondary"
                 app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/contingencyModeItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:visibility="gone"
+                app:primaryText="@string/ad_blocking_settings_toggle_title"
+                app:secondaryText="@string/contingencyMessageContent"
+                app:trailingIcon="@drawable/ic_exclamation_yellow_24"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckPlayerEntry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,6 +135,15 @@
                 android:text="@string/ad_blocking_settings_duck_player_description"
                 app:textType="secondary"
                 app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                android:id="@+id/duckPlayerSettingsLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/ad_blocking_settings_duck_player_link"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
         </LinearLayout>
 

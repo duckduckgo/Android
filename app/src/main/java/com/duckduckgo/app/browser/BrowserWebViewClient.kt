@@ -276,11 +276,22 @@ class BrowserWebViewClient @Inject constructor(
             pageLoadTimeoutWatchdog.onRedirect(url.toString())
         }
         val overridden = shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        if (request.isForMainFrame) {
+            webViewClientListener?.onMainFrameNavigationDecided(loadsInThisTab = !overridden)
+        }
         if (isMainFrameRedirect && overridden) {
             pageLoadTimeoutWatchdog.onNavigationCancelled(url.toString())
         }
         return overridden
     }
+
+    fun onUserInitiatedLoad() = pageLoadTimeoutWatchdog.onUserInitiatedLoad()
+
+    fun onTabBackgrounded() = pageLoadTimeoutWatchdog.onBackgrounded()
+
+    fun onTabForegrounded() = pageLoadTimeoutWatchdog.onForegrounded()
+
+    fun onDownloadStarted() = pageLoadTimeoutWatchdog.onDownloadStarted()
 
     fun destroy() {
         pageLoadTimeoutWatchdog.onNavigatedAway()
@@ -633,6 +644,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
+        webViewClientListener?.onMainFrameNavigationCommitted()
         if (url != null && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) pageLoadTimeoutWatchdog.onCommitted(url)
 
         var wideEventNavigation: Pair<String, Long>? = null
@@ -793,6 +805,9 @@ class BrowserWebViewClient @Inject constructor(
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
         url?.let { pageLoadTimeoutWatchdog.onFinished(it) }
 
+        // WebView reports the outgoing page's progress for a never-committing (204) navigation, so this can't wait for the progress check below.
+        if (url != null && url != ABOUT_BLANK && url != webView.url) webViewClientListener?.onNavigationFinishedWithoutCommit()
+
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             pageLoadTraceMarker.onPageFinished(url, webView.progress)
@@ -903,7 +918,8 @@ class BrowserWebViewClient @Inject constructor(
                     loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 }
                 // The request waits here, so this always runs before the load can commit.
-                if (request.isForMainFrame && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) {
+                if (request.isForMainFrame && !request.isSpeculativeLoad() && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) {
+                    if (request.hasGesture()) pageLoadTimeoutWatchdog.onUserInitiatedLoad()
                     pageLoadTimeoutWatchdog.onMainFrameRequest(request.url.toString())
                 }
                 webView.url
@@ -916,6 +932,20 @@ class BrowserWebViewClient @Inject constructor(
                 webViewClientListener,
             )
         }
+
+    // Speculative loads (prefetch/prerender) never commit, so they must not arm the page-load watchdog.
+    private fun WebResourceRequest.isSpeculativeLoad(): Boolean {
+        val headers = requestHeaders ?: return false
+        return headers.any { (name, value) ->
+            val purpose = value.trim()
+            when {
+                name.equals("Sec-Purpose", ignoreCase = true) ->
+                    purpose.startsWith("prefetch", ignoreCase = true) || purpose.startsWith("prerender", ignoreCase = true)
+                name.equals("Purpose", ignoreCase = true) -> purpose.equals("prefetch", ignoreCase = true)
+                else -> false
+            }
+        }
+    }
 
     override fun onRenderProcessGone(
         view: WebView?,

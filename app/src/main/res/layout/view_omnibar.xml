@@ -174,20 +174,6 @@
                                     app:tint="?attr/daxColorPrimaryIcon" />
 
                                 <ImageView
-                                    android:id="@+id/backIcon"
-                                    android:layout_width="@dimen/toolbarIcon"
-                                    android:layout_height="@dimen/toolbarIcon"
-                                    android:layout_gravity="center"
-                                    android:background="@drawable/selectable_item_rounded_corner_background"
-                                    android:contentDescription="@string/back"
-                                    android:gravity="center"
-                                    android:padding="@dimen/keyline_2"
-                                    android:scaleType="center"
-                                    android:src="@drawable/ic_arrow_left_small_24"
-                                    android:visibility="gone"
-                                    app:tint="?attr/daxColorPrimaryIcon" />
-
-                                <ImageView
                                     android:id="@+id/globeIcon"
                                     android:layout_width="@dimen/toolbarIcon"
                                     android:layout_height="@dimen/toolbarIcon"
@@ -298,16 +284,16 @@
                                 android:layout_width="0dp"
                                 android:layout_height="0dp"
                                 android:background="@null"
+                                android:cursorVisible="false"
+                                android:enabled="false"
+                                android:focusable="false"
+                                android:focusableInTouchMode="false"
                                 android:fontFamily="sans-serif"
                                 android:hint="@string/search"
-                                android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
                                 android:inputType="textUri|textNoSuggestions"
                                 android:maxLines="1"
-                                android:selectAllOnFocus="true"
                                 android:textColor="?attr/daxColorPrimaryText"
-                                android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
                                 android:textColorHint="?attr/daxColorSecondaryText"
-                                android:textCursorDrawable="@drawable/text_cursor"
                                 android:textSize="16sp"
                                 android:textStyle="normal"
                                 android:useBoundsForWidth="false"
@@ -324,21 +310,6 @@
                                 android:layout_marginEnd="@dimen/keyline_0"
                                 android:minWidth="8dp"
                                 app:layout_constraintEnd_toEndOf="parent">
-
-                                <ImageView
-                                    android:id="@+id/clearTextButton"
-                                    android:layout_width="@dimen/toolbarIcon"
-                                    android:layout_height="@dimen/toolbarIcon"
-                                    android:background="@drawable/selectable_item_rounded_corner_background"
-                                    android:contentDescription="@string/clearButtonContentDescription"
-                                    android:scaleType="center"
-                                    android:src="@drawable/ic_close_circle_small_secondary_24"
-                                    android:visibility="gone"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
-                                    app:layout_constraintTop_toTopOf="parent"
-                                    app:tint="?attr/daxColorPrimaryIcon"
-                                    tools:visibility="visible" />
 
                                 <ImageView
                                     android:id="@+id/voiceSearchButton"
@@ -392,7 +363,6 @@
                                 android:clickable="true"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
-                                android:visibility="gone"
                                 app:layout_constraintBottom_toBottomOf="@id/omnibarTextInput"
                                 app:layout_constraintEnd_toEndOf="@id/omnibarTextInput"
                                 app:layout_constraintStart_toStartOf="@id/omnibarTextInput"

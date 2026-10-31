@@ -66,9 +66,9 @@ class SharedPreferencesProviderImplTest {
         vpnPreferencesProvider = SharedPreferencesProviderImpl(
             context = context,
             dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
-            pixelLazy = { mock() },
-            dataStoreProviderFeatureLazy = { mock() },
-            crashLogger = { crashLogger },
+            pixelLazy = lazy { mock() },
+            dataStoreProviderFeatureLazy = lazy { mock() },
+            crashLogger = lazy { crashLogger },
         )
     }
 

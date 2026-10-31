@@ -22,9 +22,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.ui.AdBlockingProtectionsSettingsEntryViewModel.Command.OpenSettings
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -67,12 +66,8 @@ class AdBlockingProtectionsSettingsEntryViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        viewStateJob += statusChecker.settingsPlacementFlow()
-            .onEach { placement ->
-                _viewState.update {
-                    it.copy(isVisible = placement == SettingsPlacement.Protections)
-                }
-            }
+        viewStateJob += statusChecker.observeSettingsVisible()
+            .onEach { isVisible -> _viewState.update { it.copy(isVisible = isVisible) } }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }

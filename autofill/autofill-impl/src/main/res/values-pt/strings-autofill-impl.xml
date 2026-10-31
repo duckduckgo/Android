@@ -249,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importar palavras-passe do Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">O Google pode pedir-te para iniciares sessão ou introduzires a tua palavra-passe para confirmação.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">O teu dispositivo pode pedir-te para introduzires o teu PIN, palavra-passe ou padrão para confirmar.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importar do Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Escolher um ficheiro CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importar do navegador para computadores</string>
@@ -280,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Traz as tuas palavras-passe do&lt;br /&gt;Google para o DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Importa a tuas palavras-passe para o DuckDuckGo de forma rápida e segura. O Google pode pedir-te para introduzires a tua palavra-passe.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Importa as tuas palavras-passe para o DuckDuckGo de forma rápida e segura. O teu dispositivo pode pedir-te para introduzires o teu PIN, palavra-passe ou padrão para confirmar.</string>
     <string name="passwords_import_promo_action">Importar do Google</string>
     <string name="passwords_import_promo_in_browser_title">Traz as tuas palavras-passe do Google para o DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importa as tuas palavras-passe do Google para o DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Não perguntar novamente</string>
     <string name="passwords_import_promo_in_settings_title">Importar palavras-passe do Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ocultar</string>
@@ -308,5 +311,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Ocorreu um erro</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Certifica-te de que tens ligação à Internet e tente novamente.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Importação concluída!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Aguarda — mantém esta janela aberta. Não deve demorar mais do que um ou dois minutos.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">O Google pode pedir-te a palavra-passe.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">A Google vai enviar-te um e-mail a confirmar que os teus dados foram exportados. Não precisas de fazer nada.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Importação concluída!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Marcadores importados: <b>%1$d</b>]]></string>
 
 </resources>

@@ -21,10 +21,10 @@ import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.reinstalls.REINSTALL_VARIANT
 import com.duckduckgo.feature.toggles.api.Toggle.State.Target
 import com.duckduckgo.feature.toggles.api.Toggle.TargetMatcherPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ReturningUserToggleTargetMatcher @Inject constructor(
     private val variantManager: VariantManager,
 ) : TargetMatcherPlugin {

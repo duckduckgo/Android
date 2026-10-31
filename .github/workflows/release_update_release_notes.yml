@@ -19,7 +19,7 @@ env:
 jobs:
   update-release-notes:
     name: Update release notes in Play Store and Github
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -54,7 +54,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}

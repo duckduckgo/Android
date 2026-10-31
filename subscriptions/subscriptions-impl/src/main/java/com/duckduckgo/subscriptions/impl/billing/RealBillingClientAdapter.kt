@@ -38,8 +38,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_CRASH_ERROR
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
@@ -51,7 +51,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealBillingClientAdapter @Inject constructor(
     private val context: Context,
     private val coroutineDispatchers: DispatcherProvider,

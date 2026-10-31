@@ -28,19 +28,20 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = JsonToMatchingAttributeMapper::class,
+    binding = binding<JsonToMatchingAttributeMapper>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = AttributeMatcherPlugin::class,
+    binding = binding<AttributeMatcherPlugin>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RMFSubscriptionStatusMatchingAttribute @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {

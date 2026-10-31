@@ -36,12 +36,12 @@ import com.duckduckgo.common.ui.store.ThemingSharedPreferences
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 abstract class StoreModule {
 

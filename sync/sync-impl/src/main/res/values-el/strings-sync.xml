@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Χρησιμοποιήστε αυτόν τον κωδικό για να ανακτήσετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή — κρατήστε τον ασφαλή.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Απενεργοποίηση και διαγραφή δεδομένων διακομιστή</string>
+    <string name="sync_simplified_settings_turn_off_item">Απενεργοποίηση Sync &amp; Backup</string>
     <string name="sync_simplified_settings_storage_permission_message">Η αποθήκευση του PDF ανάκτησης απαιτεί άδεια αποθήκευσης</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Όλες οι συσκευές που χρησιμοποιούν το Sync &amp; Backup θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σας θα διαγραφούν από τον διακομιστή.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων διακομιστή</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Ακύρωση</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Δεν μπορείς να αναιρέσεις αυτήν την ενέργεια.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Όλες οι συσκευές που χρησιμοποιούν το Sync &amp; Backup θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σου θα διαγραφούν από τον διακομιστή.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Οριστική διαγραφή</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Ακύρωση</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Κατάργηση του %1$s από το Sync &amp; Backup;</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου σε άλλες συσκευές.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Διαγραφή και των δεδομένων διακομιστή;</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Απενεργοποίηση του Sync &amp; Backup και διαγραφή όλων των συγχρονισμένων δεδομένων από τον διακομιστή και απενεργοποίηση του κωδικού ανάκτησής σου.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Αφαίρεση συσκευής</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Απενεργοποίηση του Sync &amp; Backup;</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Όλες οι συσκευές που χρησιμοποιούν το Sync &amp; Backup θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σου θα διαγραφούν από τον διακομιστή.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Απενεργοποίηση και διαγραφή δεδομένων διακομιστή</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Κατάργηση του %1$s από το Sync &amp; Backup;</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου. Οι σελιδοδείκτες, τα δεδομένα αυτόματης συμπλήρωσης και οι συνομιλίες στο Duck.ai θα παραμείνουν στις συσκευές σου.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Αφαίρεση</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Ακύρωση</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Ασφαλίστε τη συσκευή σας για να χρησιμοποιείτε τη λειτουργία Sync &amp; Backup</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Συγχρονισμός αυτής της συσκευής με κοντινό υπολογιστή.</string>
     <string name="sync_simplified_setup_header_body">Θα σας βοηθήσουμε να συγχρονίσεις τις συσκευές σας.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Έχεις άλλη συσκευή κοντά; Συγχρόνισε τις συσκευές σου.</string>
+    <string name="sync_simplified_setup_header_body_v2">Δεν έχεις άλλη συσκευή αυτή τη στιγμή; Συγχρόνισε μόνο αυτή τη συσκευή και συγχρόνισε με άλλη αργότερα.</string>
     <string name="sync_simplified_setup_primary_button">Συγχρονισμός με άλλη συσκευή</string>
     <string name="sync_simplified_setup_secondary_button">Συγχρονισμός μόνο αυτής της συσκευής</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Σύνδεση...</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Σάρωση κωδικού QR για συγχρονισμό</string>
     <string name="sync_simplified_scanner_camera_header_body">Ανοίξτε το <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo για υπολογιστή</annotation></b>\n<annotation type="gap">\n</annotation>και μεταβείτε στο <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Συγχρονισμός με άλλη συσκευή</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Είμαι έτοιμος για σάρωση</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Το κατάλαβα</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Δυστυχώς, ο κωδικός που σαρώθηκε δεν είναι έγκυρος.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Απαιτείται άδεια κάμερας</string>
     <string name="sync_simplified_scanner_no_permission_body">Μεταβείτε στις ρυθμίσεις της συσκευής σας και παρέχετε σε αυτήν την εφαρμογή άδεια πρόσβασης στην κάμερά σας.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Μεταβείτε στις Ρυθμίσεις</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">Το DuckDuckGo χρειάζεται πρόσβαση στην κάμερά σου.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">Απαιτούνται άδειες πρόσβασης στην κάμερα για τη σάρωση του κωδικού QR.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Αλλαγή δικαιωμάτων</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Μη διαθέσιμη κάμερα</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Συγχρονισμός αυτής της συσκευής</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Αυτή η συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας αν την αφαιρέσετε.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Αυτή η συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας αν αυτό απενεργοποιηθεί.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου σε άλλες συσκευές αν αυτό απενεργοποιηθεί.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου σε άλλες συσκευές.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Επεξεργασία ονόματος</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Αφαίρεση</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Ακύρωση</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Κατάργηση του %1$s από το Sync &amp; Backup;</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου. Οι σελιδοδείκτες, τα δεδομένα αυτόματης συμπλήρωσης και οι συνομιλίες στο Duck.ai θα παραμείνουν στις συσκευές σου.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Απενεργοποίηση του Sync &amp; Backup;</string>
@@ -446,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Ακύρωση</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Ρύθμιση του Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Ξεκλειδώστε τη συσκευή για να ρυθμίσετε τη λειτουργία Sync &amp; Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Αποκτήστε πρόσβαση στους κωδικούς πρόσβασής σας από κινητό και υπολογιστή.</string>
+    <string name="sync_passwords_import_promo_primary_button">Ενεργοποίηση Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Απόκτησε πρόσβαση στους σελιδοδείκτες σας από κινητό και υπολογιστή.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Ενεργοποίηση Sync &amp; Backup</string>
 </resources>

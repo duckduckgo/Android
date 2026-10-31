@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -24,9 +24,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.browsermode.impl'
-    anvil {
-        generateDaggerFactories = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -35,15 +32,14 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
 
     implementation project(path: ':browser-api')
     implementation project(path: ':browser-mode-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':di')
 
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation AndroidX.webkit
     implementation AndroidX.lifecycle.common

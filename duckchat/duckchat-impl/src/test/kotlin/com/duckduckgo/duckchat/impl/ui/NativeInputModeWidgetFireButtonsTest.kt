@@ -20,7 +20,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowLeadingFireButton
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowTrailingFireButton
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -46,35 +45,9 @@ class NativeInputModeWidgetFireButtonsTest {
     }
 
     @Test
-    fun `trailing fire is hidden in duck ai context`() {
-        assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI).shouldShowTrailingFireButton())
-        assertFalse(stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI).shouldShowTrailingFireButton())
-    }
-
-    @Test
-    fun `trailing fire is shown in browser context`() {
-        assertTrue(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.BROWSER).shouldShowTrailingFireButton())
-        assertTrue(stateOf(InputMode.SEARCH_ONLY, InputContext.BROWSER).shouldShowTrailingFireButton())
-    }
-
-    @Test
-    fun `trailing fire is shown in duck ai contextual context`() {
-        assertTrue(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL).shouldShowTrailingFireButton())
-        assertTrue(stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI_CONTEXTUAL).shouldShowTrailingFireButton())
-    }
-
-    @Test
-    fun `no fire buttons in edit mode`() {
+    fun `leading fire is hidden in edit mode`() {
         val state = stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI)
         assertFalse(state.shouldShowLeadingFireButton(isEditing = true))
-    }
-
-    @Test
-    fun `trailing fire is hidden in edit mode even when otherwise shown`() {
-        val state = stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.BROWSER)
-
-        assertTrue(state.shouldShowTrailingFireButton(isEditing = false))
-        assertFalse(state.shouldShowTrailingFireButton(isEditing = true))
     }
 
     private fun stateOf(inputMode: InputMode, inputContext: InputContext): NativeInputState =

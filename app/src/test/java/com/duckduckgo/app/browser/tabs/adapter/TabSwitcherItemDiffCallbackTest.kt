@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -68,4 +69,26 @@ class TabSwitcherItemDiffCallbackTest {
         assertTrue(bundle!!.containsKey(DIFF_KEY_TITLE))
         assertFalse(bundle.containsKey(DIFF_KEY_URL))
     }
+
+    @Test
+    fun `when rich duck ai card is unchanged then contents are the same`() {
+        assertTrue(callback.areContentsTheSame(duckAiTab(isRichDuckAiCard = true), duckAiTab(isRichDuckAiCard = true)))
+    }
+
+    @Test
+    fun `when rich duck ai card turns on then no payload so the view type can change`() {
+        assertFalse(callback.areContentsTheSame(duckAiTab(isRichDuckAiCard = false), duckAiTab(isRichDuckAiCard = true)))
+        assertNull(callback.getChangePayload(duckAiTab(isRichDuckAiCard = false), duckAiTab(isRichDuckAiCard = true)))
+    }
+
+    @Test
+    fun `when rich duck ai card turns off then no payload so the view type can change`() {
+        assertNull(callback.getChangePayload(duckAiTab(isRichDuckAiCard = true), duckAiTab(isRichDuckAiCard = false)))
+    }
+
+    private fun duckAiTab(isRichDuckAiCard: Boolean) = DuckAiTab(
+        entity = TabEntity(tabId = "1", url = "https://duck.ai/chat", position = 0),
+        isActive = false,
+        isRichDuckAiCard = isRichDuckAiCard,
+    )
 }

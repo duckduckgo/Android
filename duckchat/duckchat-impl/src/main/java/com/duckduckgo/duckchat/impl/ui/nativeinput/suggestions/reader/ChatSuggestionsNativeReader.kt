@@ -38,25 +38,10 @@ class ChatSuggestionsNativeReader @Inject constructor(
 ) : ChatSuggestionsReader {
 
     override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> {
-        val maxSuggestions = feature.maxHistoryCount()
-        val cutoffDays = feature.recentDaysCutoff()
-        val recentCutoff = if (cutoffDays > 0) {
-            LocalDateTime.now().minusDays(cutoffDays.toLong()).toLocalDate().atStartOfDay()
-        } else {
-            LocalDateTime.MIN
-        }
         val typeIconEnabled = duckChatFeature.chatSuggestionTypeIcon().isEnabled()
 
         return store.getChats()
-            .filter { chat ->
-                if (query.isEmpty()) {
-                    chat.pinned || parseLastEdit(chat.lastEdit) >= recentCutoff
-                } else {
-                    chat.title.contains(query, ignoreCase = true)
-                }
-            }
-            .sortedWith(compareByDescending<DuckAiChat> { it.pinned }.thenByDescending { parseLastEdit(it.lastEdit) })
-            .take(maxSuggestions)
+            .selectChatSuggestions(query, maxSuggestions = feature.maxHistoryCount(), recentDaysCutoff = feature.recentDaysCutoff())
             .map { chat ->
                 ChatSuggestion(
                     chatId = chat.chatId,
@@ -69,13 +54,40 @@ class ChatSuggestionsNativeReader @Inject constructor(
     }
 
     override fun tearDown() = Unit // no WebView to clean up
+}
 
-    private fun parseLastEdit(lastEditStr: String): LocalDateTime {
-        if (lastEditStr.isEmpty()) return LocalDateTime.MIN
-        return try {
-            LocalDateTime.ofInstant(Instant.parse(lastEditStr), ZoneId.systemDefault())
-        } catch (_: DateTimeParseException) {
-            LocalDateTime.MIN
+/**
+ * The selection rules for Duck.ai chat suggestions read from native storage, shared by every surface that lists them
+ * (omnibar autocomplete and the duckduckgo.com homepage). Without a query: pinned chats plus chats edited since the start
+ * of the day [recentDaysCutoff] days ago (no cutoff when it is not positive). With a query: chats whose title contains it.
+ * Pinned first, then newest first, capped at [maxSuggestions] in total.
+ */
+internal fun List<DuckAiChat>.selectChatSuggestions(
+    query: String,
+    maxSuggestions: Int,
+    recentDaysCutoff: Int,
+): List<DuckAiChat> {
+    val recentCutoff = if (recentDaysCutoff > 0) {
+        LocalDateTime.now().minusDays(recentDaysCutoff.toLong()).toLocalDate().atStartOfDay()
+    } else {
+        LocalDateTime.MIN
+    }
+    return filter { chat ->
+        if (query.isEmpty()) {
+            chat.pinned || parseLastEdit(chat.lastEdit) >= recentCutoff
+        } else {
+            chat.title.contains(query, ignoreCase = true)
         }
+    }
+        .sortedWith(compareByDescending<DuckAiChat> { it.pinned }.thenByDescending { parseLastEdit(it.lastEdit) })
+        .take(maxSuggestions)
+}
+
+private fun parseLastEdit(lastEditStr: String): LocalDateTime {
+    if (lastEditStr.isEmpty()) return LocalDateTime.MIN
+    return try {
+        LocalDateTime.ofInstant(Instant.parse(lastEditStr), ZoneId.systemDefault())
+    } catch (_: DateTimeParseException) {
+        LocalDateTime.MIN
     }
 }

@@ -23,8 +23,8 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualTimeProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -58,7 +58,7 @@ interface DuckAiSelectionJourneyWideEvent {
     fun onJourneyEnded(tabId: String, reason: SelectionTerminalReason)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiSelectionJourneyWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,

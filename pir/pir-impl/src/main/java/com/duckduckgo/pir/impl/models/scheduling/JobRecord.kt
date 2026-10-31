@@ -106,6 +106,13 @@ sealed class JobRecord(
         val deprecated: Boolean = false,
         val dateCreatedInMillis: Long = 0L,
     ) : JobRecord(brokerName, userProfileId) {
+        /**
+         * Whether this broker has already been scanned successfully for this profile query. Scanning the
+         * same pair again is a maintenance scan, which only a user who can also run opt-outs gets.
+         */
+        val hasTerminalResult: Boolean
+            get() = status == ScanJobStatus.NO_MATCH_FOUND || status == ScanJobStatus.MATCHES_FOUND
+
         enum class ScanJobStatus {
             /** Scan has not been executed yet and should be executed when possible */
             NOT_EXECUTED,

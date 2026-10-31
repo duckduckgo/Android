@@ -22,6 +22,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -36,17 +37,27 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.DUCK_AI_LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.RICH_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_RICH_DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemKey
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemState
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemView
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class TabSwitcherAdapterTest {
@@ -58,6 +69,8 @@ class TabSwitcherAdapterTest {
     private val dispatchers: DispatcherProvider = mock()
     private val trackerCountAnimator: TrackerCountAnimator = mock()
     private val addressDisplayFormatter: AddressDisplayFormatter = mock()
+    private val duckAiTabGridItemView: DuckAiTabGridItemView = mock()
+    private val duckAiTabGridItemRenderer: DuckAiTabGridItemRenderer = mock()
 
     private lateinit var adapter: TabSwitcherAdapter
 
@@ -71,6 +84,7 @@ class TabSwitcherAdapterTest {
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
             addressDisplayFormatter = addressDisplayFormatter,
+            duckAiTabGridItemRenderer = duckAiTabGridItemRenderer,
         )
     }
 
@@ -124,6 +138,72 @@ class TabSwitcherAdapterTest {
         adapter.updateData(listOf(SelectableTab(entity, isSelected = false, isDuckAi = false)))
         adapter.onLayoutTypeChanged(LIST)
         assertEquals(LIST_TAB, adapter.getItemViewType(0))
+    }
+
+    // --- Rich Duck.ai grid card routing ---
+
+    @Test
+    fun `DuckAiTab as rich card in grid mode returns RICH_DUCK_AI_GRID`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(listOf(DuckAiTab(entity, isActive = false, isRichDuckAiCard = true)))
+        adapter.onLayoutTypeChanged(GRID)
+        assertEquals(RICH_DUCK_AI_GRID, adapter.getItemViewType(0))
+    }
+
+    @Test
+    fun `DuckAiTab as rich card in list mode ignores rich card and returns DUCK_AI_LIST`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(listOf(DuckAiTab(entity, isActive = false, isRichDuckAiCard = true)))
+        adapter.onLayoutTypeChanged(LIST)
+        assertEquals(DUCK_AI_LIST, adapter.getItemViewType(0))
+    }
+
+    @Test
+    fun `SelectableTab with duck ai flag as rich card in grid mode returns SELECTABLE_RICH_DUCK_AI_GRID`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(
+            listOf(SelectableTab(entity, isSelected = false, isDuckAi = true, isRichDuckAiCard = true)),
+        )
+        adapter.onLayoutTypeChanged(GRID)
+        assertEquals(SELECTABLE_RICH_DUCK_AI_GRID, adapter.getItemViewType(0))
+    }
+
+    @Test
+    fun `SelectableTab with duck ai flag as rich card in list mode ignores rich card and returns SELECTABLE_DUCK_AI_LIST`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(
+            listOf(SelectableTab(entity, isSelected = false, isDuckAi = true, isRichDuckAiCard = true)),
+        )
+        adapter.onLayoutTypeChanged(LIST)
+        assertEquals(SELECTABLE_DUCK_AI_LIST, adapter.getItemViewType(0))
+    }
+
+    @Test
+    fun `rich card is bound with its tab key and the host title and screenshot`() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        whenever(duckAiTabGridItemView.view).thenReturn(FrameLayout(context))
+        whenever(lifecycleOwner.lifecycle).thenReturn(LifecycleRegistry(lifecycleOwner))
+        whenever(duckAiTabGridItemRenderer.create(any(), any())).thenReturn(duckAiTabGridItemView)
+        whenever(webViewPreviewPersister.fullPathForFile("1", "preview.jpg")).thenReturn("/previews/1/preview.jpg")
+        val entity = TabEntity("1", url = "https://duck.ai/?chatID=abc", position = 0, tabPreviewFile = "preview.jpg", viewed = false)
+        adapter.updateData(listOf(DuckAiTab(entity, isActive = false, title = "Host title", isRichDuckAiCard = true)))
+        adapter.onLayoutTypeChanged(GRID)
+
+        val holder = adapter.onCreateViewHolder(FrameLayout(context), RICH_DUCK_AI_GRID)
+        adapter.onBindViewHolder(holder, 0)
+
+        verify(duckAiTabGridItemView).bind(
+            key = eq(DuckAiTabGridItemKey(tabId = "1", url = "https://duck.ai/?chatID=abc")),
+            state = eq(
+                DuckAiTabGridItemState(
+                    isUnread = true,
+                    selection = DuckAiTabGridItemState.Selection.None,
+                    title = "Host title",
+                    screenshotPath = "/previews/1/preview.jpg",
+                ),
+            ),
+            callbacks = any(),
+        )
     }
 
     // --- NormalTab routing unchanged ---

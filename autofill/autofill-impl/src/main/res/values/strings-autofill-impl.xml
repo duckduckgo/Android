@@ -245,6 +245,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Import Passwords From Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google may ask you to sign in or enter your password to confirm.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Your device may ask you to enter your PIN, password, or pattern to confirm.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Import From Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Choose a CSV file</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Import from Desktop Browser</string>
@@ -276,8 +277,10 @@
 
     <string name="passwords_import_promo_title" instruction="The 'br' is a forced line break for English. It does not need to be included in translations.">Bring your passwords from&lt;br /&gt;Google to DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Quickly and securely import your passwords to DuckDuckGo. Google may ask you to enter your password.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Quickly and securely import your passwords to DuckDuckGo. Your device may ask you to enter your PIN, password, or pattern to confirm.</string>
     <string name="passwords_import_promo_action">Import From Google</string>
     <string name="passwords_import_promo_in_browser_title">Bring your passwords from Google to DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Import your passwords from Google to DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Don\'t Ask Again</string>
     <string name="passwords_import_promo_in_settings_title">Import Passwords from Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Hide</string>
@@ -304,5 +307,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Something went wrong</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Please make sure you\'re connected to the internet and try again.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import complete!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Hang tight — keep this window open. It shouldn’t take more than a minute or two.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google may ask for your password.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google will email you confirming your data has been exported. You don’t need to do anything.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import complete!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported">Bookmarks imported: <![CDATA[<b>%1$d</b>]]></string>
 
 </resources>

@@ -25,22 +25,25 @@ data class Violation(val message: String, val location: String? = null) {
 /**
  * Validates the AI config topology.
  *
- * Claude Code loads CLAUDE.md and every `.md` under `.claude/rules/` at session start, so a rule
- * without a `paths:` glob costs context in every session. `.claude/docs/` is not loaded at all — a doc
- * is only ever read because something already in context told Claude to read it. That makes two
+ * AGENTS.md holds the project instructions for every agent; CLAUDE.md only imports it, because Claude
+ * Code reads CLAUDE.md. Claude Code also loads every `.md` under `.claude/rules/` at session start, so a
+ * rule without a `paths:` glob costs context in every session. `.claude/docs/` is not loaded at all — a
+ * doc is only ever read because something already in context told the agent to read it. That makes two
  * invariants worth enforcing mechanically: no doc is unreachable, and no pointer dangles.
  */
 class AiConfigChecker(private val repoRoot: File) {
 
+    private val agentsMd = File(repoRoot, "AGENTS.md")
     private val claudeMd = File(repoRoot, "CLAUDE.md")
     private val rulesDir = File(repoRoot, ".claude/rules")
     private val docsDir = File(repoRoot, ".claude/docs")
     private val skillsDir = File(repoRoot, ".claude/skills")
 
     fun check(): List<Violation> {
-        if (!claudeMd.exists()) return listOf(Violation("CLAUDE.md not found at repo root"))
+        if (!agentsMd.exists()) return listOf(Violation("AGENTS.md not found at repo root"))
         val modules = discoverModules()
-        return checkDocsAreReachable() +
+        return checkClaudeMdImportsAgentsMd() +
+            checkDocsAreReachable() +
             checkConfigReferences() +
             checkFrontmatter() +
             checkSkills() +
@@ -57,17 +60,26 @@ class AiConfigChecker(private val repoRoot: File) {
             ?: emptyList()
 
     /**
+     * Instructions written into CLAUDE.md would reach Claude but no other agent, so it must stay a bare
+     * import of AGENTS.md.
+     */
+    private fun checkClaudeMdImportsAgentsMd(): List<Violation> {
+        if (claudeMd.exists() && claudeMd.readText().trim() == "@AGENTS.md") return emptyList()
+        return listOf(Violation("CLAUDE.md must contain only `@AGENTS.md`: write project instructions in AGENTS.md so every agent reads them"))
+    }
+
+    /**
      * Nothing loads `.claude/docs/`, so a doc that no always-loaded file points at is dead weight: it
-     * will never be read. "Always loaded" is CLAUDE.md plus the rules, since a rule reaches context
+     * will never be read. "Always loaded" is AGENTS.md plus the rules, since a rule reaches context
      * either unconditionally or via its `paths:` glob.
      */
     private fun checkDocsAreReachable(): List<Violation> {
-        val referenced = (listOf(claudeMd) + rules()).flatMap { configReferencesIn(it).map { ref -> ref.value } }.toSet()
+        val referenced = (listOf(agentsMd) + rules()).flatMap { configReferencesIn(it).map { ref -> ref.value } }.toSet()
         return docs()
             .filter { ".claude/docs/${it.name}" !in referenced }
             .map {
                 Violation(
-                    "Unreachable doc: .claude/docs/${it.name} is not referenced from CLAUDE.md or any rule, so it will never be read",
+                    "Unreachable doc: .claude/docs/${it.name} is not referenced from AGENTS.md or any rule, so it will never be read",
                 )
             }
     }
@@ -78,7 +90,7 @@ class AiConfigChecker(private val repoRoot: File) {
      */
     private fun checkConfigReferences(): List<Violation> {
         val violations = mutableListOf<Violation>()
-        for (file in listOf(claudeMd) + rules() + docs() + skills()) {
+        for (file in listOf(agentsMd) + rules() + docs() + skills()) {
             for (ref in configReferencesIn(file)) {
                 if (!File(repoRoot, ref.value).exists()) {
                     violations += Violation(
@@ -114,7 +126,7 @@ class AiConfigChecker(private val repoRoot: File) {
             frontmatterKeys(file).forEach { key ->
                 violations += Violation(
                     "Inert frontmatter in .claude/docs/${file.name}: '$key:' does nothing — docs are not loaded by Claude Code, " +
-                        "they are read because CLAUDE.md or a rule points at them",
+                        "they are read because AGENTS.md or a rule points at them",
                 )
             }
         }
@@ -136,18 +148,18 @@ class AiConfigChecker(private val repoRoot: File) {
     }
 
     /**
-     * CLAUDE.md intentionally states no tool version numbers — versions live in the build files and are
+     * AGENTS.md intentionally states no tool version numbers — versions live in the build files and are
      * pointed to, not restated, so they cannot go stale. Flag any known tool name immediately followed by
-     * a semver. Scoped to CLAUDE.md: rules and docs legitimately carry example versions.
+     * a semver. Scoped to AGENTS.md: rules and docs legitimately carry example versions.
      */
     private fun checkVolatileFacts(): List<Violation> {
         val violations = mutableListOf<Violation>()
-        forEachProseLine(claudeMd) { line, lineNo ->
+        forEachProseLine(agentsMd) { line, lineNo ->
             VOLATILE_FACT_REGEX.findAll(line).forEach { m ->
                 violations += Violation(
-                    "Restated tool version in CLAUDE.md: '${m.value.trim()}' — remove it and point to the source of truth " +
+                    "Restated tool version in AGENTS.md: '${m.value.trim()}' — remove it and point to the source of truth " +
                         "(versions live in the build files)",
-                    "CLAUDE.md:$lineNo",
+                    "AGENTS.md:$lineNo",
                 )
             }
         }
@@ -160,7 +172,7 @@ class AiConfigChecker(private val repoRoot: File) {
 
     private fun checkDanglingReferences(modules: Set<String>): List<Violation> {
         val violations = mutableListOf<Violation>()
-        for (file in listOf(claudeMd) + rules() + docs()) {
+        for (file in listOf(agentsMd) + rules() + docs()) {
             for (ref in extractReferences(file)) {
                 if (shouldIgnore(ref.value)) continue
                 val resolved = when (ref.kind) {

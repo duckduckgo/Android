@@ -503,7 +503,7 @@ class TabDataRepository(
         pdfPageContextProvider.hide(tabId)
     }
 
-    override suspend fun deleteAll() {
+    override suspend fun deleteAll() = withContext(dispatchers.io()) {
         logcat(INFO) { "Deleting tabs right now" }
         tabsDao.tabs().forEach { pdfPageContextProvider.hide(it.tabId) }
         tabsDao.deleteAllTabs()

@@ -249,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Google\'dan Şifreleri İçe Aktar</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Cihazın, onaylamak için PIN\'ini, şifreni veya desenini girmeni isteyebilir.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Google\'dan İçe Aktar</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Bir CSV dosyası seç</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Masaüstü Tarayıcısından İçe Aktar</string>
@@ -280,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Şifrelerinizi Google\'dan&lt;br /&gt;DuckDuckGo\'ya getirin</string>
     <string name="passwords_import_promo_subtitle">Şifrelerinizi hızlı ve güvenli bir şekilde DuckDuckGo\'ya aktarın. Google sizden şifrenizi girmenizi isteyebilir.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Şifrelerini hızlı ve güvenli bir şekilde DuckDuckGo\'ya aktar. Cihazın, onaylamak için PIN\'ini, şifreni veya desenini girmeni isteyebilir.</string>
     <string name="passwords_import_promo_action">Google\'dan İçe Aktar</string>
     <string name="passwords_import_promo_in_browser_title">Şifrelerinizi Google\'dan DuckDuckGo\'ya taşıyın</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Şifrelerini Google\'dan DuckDuckGo\'ya aktar</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Bir Daha Sorma</string>
     <string name="passwords_import_promo_in_settings_title">Google\'dan Şifreleri İçe Aktar</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Gizle</string>
@@ -308,5 +311,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Bir hata oluştu</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Lütfen internete bağlı olduğunuzdan emin olun ve tekrar deneyin.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">İçe aktarma tamamlandı!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Biraz bekle — bu pencereyi açık tut. Bir iki dakikadan fazla sürmez.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google şifreni isteyebilir.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google, verilerinin dışa aktarıldığını onaylayan bir e-posta gönderecek. Hiçbir şey yapmana gerek yok.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">İçe aktarma tamamlandı!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[İçe aktarılan yer işaretleri: <b>%1$d</b>]]></string>
 
 </resources>

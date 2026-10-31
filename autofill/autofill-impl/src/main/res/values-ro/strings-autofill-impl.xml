@@ -255,6 +255,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importă parole de la Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Dispozitivul îți poate cere să completezi codul PIN, parola sau modelul de deblocare pentru confirmare.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importă din Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Alege un fișier CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importă din browserul pentru desktop</string>
@@ -286,8 +287,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Importă parolele tale din&lt;br /&gt;Google în DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Importă-ți parolele rapid și în siguranță în DuckDuckGo. Google îți poate cere să completezi parola.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Importă-ți parolele rapid și în siguranță în DuckDuckGo. Dispozitivul îți poate cere să completezi codul PIN, parola sau modelul de deblocare pentru confirmare.</string>
     <string name="passwords_import_promo_action">Importă din Google</string>
     <string name="passwords_import_promo_in_browser_title">Importă parolele tale din Google în DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importă-ți parolele din Google în DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Nu întreba din nou</string>
     <string name="passwords_import_promo_in_settings_title">Importă parole de la Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ascunde</string>
@@ -314,5 +317,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Ceva nu a funcționat corect</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Asigură-te că ești conectat la internet și încearcă din nou.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import finalizat!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Așteaptă puțin – ține această fereastră deschisă. Nu ar trebui să dureze mai mult de un minut sau două.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google îți poate cere parola.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google îți va trimite un e-mail ca să confirme că datele tale au fost exportate. Nu trebuie să faci nimic.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import finalizat!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Marcaje importate: <b>%1$d</b>]]></string>
 
 </resources>

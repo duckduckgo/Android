@@ -261,6 +261,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Uvozi gesla iz Googla</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google vas bo morda prosil, da se prijavite ali vnesete geslo za potrditev.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Vaša naprava vas bo morda prosila, da vnesete kodo PIN, geslo ali vzorec za potrditev.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Uvozi iz Googla</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Izberite datoteko CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Uvoz iz namiznega brskalnika</string>
@@ -292,8 +293,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Prenesite gesla iz&lt;br /&gt;Googla v DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Hitro in varno uvozite svoja gesla v DuckDuckGo. Google vas bo morda prosil, da vnesete geslo.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Hitro in varno uvozite svoja gesla v DuckDuckGo. Vaša naprava vas bo morda prosila, da za potrditev vnesete kodo PIN, geslo ali vzorec.</string>
     <string name="passwords_import_promo_action">Uvozi iz Googla</string>
     <string name="passwords_import_promo_in_browser_title">Prenesite gesla iz Googla v DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Uvozite gesla iz Googla v DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Ne vprašaj več</string>
     <string name="passwords_import_promo_in_settings_title">Uvozi gesla iz Googla</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Skrij se</string>
@@ -320,5 +323,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Nekaj je šlo narobe</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Prepričajte se, da je vzpostavljena povezava z internetom, in poskusite znova.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Uvoz je dokončan!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Počakajte – to okno pustite odprto. Ne bi smelo trajati več kot minuto ali dve.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google vas bo morda prosil za geslo.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google vam bo poslal e-poštno sporočilo s potrditvijo, da so bili vaši podatki izvoženi. Ni vam treba storiti ničesar.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Uvoz je dokončan!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Uvoženi zaznamki: <b>%1$d</b>]]></string>
 
 </resources>

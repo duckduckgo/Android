@@ -27,8 +27,8 @@ import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -37,7 +37,7 @@ interface NetPExclusionListRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealNetPExclusionListRepository @Inject constructor(
     private val manualExclusionListRepository: NetPManualExclusionListRepository,
     private val autoExcludeAppsRepository: AutoExcludeAppsRepository,

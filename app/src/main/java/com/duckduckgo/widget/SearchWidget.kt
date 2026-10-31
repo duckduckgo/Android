@@ -63,7 +63,7 @@ open class SearchWidget(
 
     private fun inject(context: Context) {
         val application = context.applicationContext as DuckDuckGoApplication
-        application.daggerAppComponent.inject(this)
+        application.appComponent.inject(this)
     }
 
     override fun onEnabled(context: Context) {

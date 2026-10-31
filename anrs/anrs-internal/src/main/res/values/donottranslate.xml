@@ -27,4 +27,6 @@
     <string name="crashpad_trigger_plugin_subtitle">Force a native crash via Crashpad (app will terminate)</string>
     <string name="crashpad_upload_plugin_title">Request upload for pending reports</string>
     <string name="crashpad_upload_plugin_subtitle">Marks all pending minidumps for immediate upload by the handler</string>
+    <string name="trigger_anr_plugin_title">Trigger ANR</string>
+    <string name="trigger_anr_plugin_subtitle">Block the main thread for 10 seconds to trigger an ANR</string>
 </resources>

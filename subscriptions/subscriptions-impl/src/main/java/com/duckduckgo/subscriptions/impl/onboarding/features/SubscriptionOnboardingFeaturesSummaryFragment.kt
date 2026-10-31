@@ -23,7 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -77,7 +77,6 @@ class SubscriptionOnboardingFeaturesSummaryFragment :
         subscriptionOnboardingFeaturesAi.isVisible = viewState.aiVisible
         subscriptionOnboardingFeaturesPIR.isVisible = viewState.pirVisible
 
-        // A divider shows only when a visible row precedes another visible row below it.
         onboardingSubscriptionFeaturesDivider1.isVisible =
             viewState.vpnVisible && (viewState.itrVisible || viewState.aiVisible || viewState.pirVisible)
         onboardingSubscriptionFeaturesDivider2.isVisible =

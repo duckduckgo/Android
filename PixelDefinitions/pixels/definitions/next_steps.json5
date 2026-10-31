@@ -1,0 +1,153 @@
+{
+    "next_steps_section_shown_unique": {
+        "description": "Fires once per RMF message ID per install, the first time its stacked setup cards are rendered on the new tab page. The message ID is used only for local deduplication and is not sent.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["impression"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "next_steps_card_cta_clicked": {
+        "description": "Fires when the front setup card CTA is tapped and resolves to a launch command. Carries how often the card had been in front, so the per-impression pixel is not needed.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "card",
+                "type": "string",
+                "description": "Setup card identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day within the current carousel, bucketed: calendar days on which a card was shown, starting at 0 for each new carousel. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the current carousel was first shown, bucketed; resets to 0 for each new carousel. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "impressionsSoFar",
+                "type": "string",
+                "description": "Times this card has been the front card on this install, bucketed. Zero means the card was never in front.",
+                "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
+            }
+        ]
+    },
+    "next_steps_card_removed": {
+        "description": "Fires once per setup card when it leaves the stack or is found already done: completed after its CTA was tapped, dismissed with the close button, finished elsewhere while in the stack, or already complete before the current section first rendered, with completion reporting deduplicated across sections.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "card",
+                "type": "string",
+                "description": "Setup card identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day within the current carousel, bucketed: calendar days on which a card was shown, starting at 0 for each new carousel. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the current carousel was first shown, bucketed; resets to 0 for each new carousel. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the card is gone: completed after its CTA was the last one tapped, dismissed with the close button, finished elsewhere while in the stack without a CTA tap, or already complete before the current section first rendered.",
+                "enum": ["completed", "dismissed", "finished_elsewhere", "already_complete"]
+            },
+            {
+                "key": "impressionsSoFar",
+                "type": "string",
+                "description": "Times this card has been the front card on this install, bucketed. Zero means the card was never in front.",
+                "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
+            }
+        ]
+    },
+    "next_steps_card_daily_impressions": {
+        "description": "Reports bucketed impressions for one eligible setup card and local day. Finalized on card retirement, a later impression day, or carousel end; classified by the recorded impressions.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["impression", "user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "card",
+                "type": "string",
+                "description": "Setup card identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day within the current carousel, bucketed: calendar days on which a card was shown, starting at 0 for each new carousel. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the current carousel was first shown, bucketed; resets to 0 for each new carousel. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "impressions",
+                "type": "string",
+                "description": "Number of front-card impressions for this card on the recorded local day, bucketed. Zero denotes an eligible card that never reached the front.",
+                "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
+            }
+        ]
+    },
+    "next_steps_cards_dismissed": {
+        "description": "Fires when the stacked setup cards end: the user completed or dismissed every card, or RMF took the message out of the active slot (auto-dismiss, replacement by another message, config removal) while cards were still open.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day within the current carousel, bucketed: calendar days on which a card was shown, starting at 0 for each new carousel. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the current carousel was first shown, bucketed; resets to 0 for each new carousel. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the cards ended: every card completed or dismissed by the user, or RMF removed the message.",
+                "enum": ["all_cards_done", "auto"]
+            },
+            {
+                "key": "completed",
+                "type": "string",
+                "description": "Cards completed while the stack was on screen, by CTA or elsewhere. Cards already complete before the first render are not counted.",
+                "enum": ["0", "1", "2", "3"]
+            },
+            {
+                "key": "dismissed",
+                "type": "string",
+                "description": "Cards the user closed with the X while the stack was on screen.",
+                "enum": ["0", "1", "2", "3"]
+            }
+        ]
+    }
+}

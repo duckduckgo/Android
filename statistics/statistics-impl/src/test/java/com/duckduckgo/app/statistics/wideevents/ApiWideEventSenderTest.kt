@@ -32,10 +32,14 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -472,6 +476,20 @@ class ApiWideEventSenderTest {
     }
 
     @Test
+    fun `when event has stored app version then stored app version is sent`() = runTest {
+        val event = createWideEvent(
+            id = 750L,
+            name = "some-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            appVersion = "5.100.0",
+        )
+
+        apiWideEventSender.sendWideEvent(event)
+
+        verify(wideEventService).sendWideEvent(argThat { app.version == "5.100.0" })
+    }
+
+    @Test
     fun `when event is the first daily occurrence then it is included in request`() = runTest {
         val event = createWideEvent(
             id = 800L,
@@ -526,6 +544,23 @@ class ApiWideEventSenderTest {
         return HttpException(Response.error<String>(code, responseBody))
     }
 
+    @Test
+    fun `when event has process-start policy then its owner is not sent`() = runTest {
+        val event = createWideEvent(
+            id = 1L,
+            name = "flow",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            cleanupPolicy = PROCESS_START_CLEANUP_POLICY,
+        )
+
+        apiWideEventSender.sendWideEvent(event)
+
+        val requestCaptor = argumentCaptor<WideEventRequest>()
+        verify(wideEventService).sendWideEvent(requestCaptor.capture())
+        assertNull(requestCaptor.firstValue.feature.data)
+        assertFalse(requestCaptor.firstValue.toString().contains(PROCESS_START_CLEANUP_POLICY.ownerProcessName))
+    }
+
     private fun createWideEvent(
         id: Long,
         name: String,
@@ -537,6 +572,8 @@ class ApiWideEventSenderTest {
         metaType: String = "android-$name",
         metaVersion: String = "1.0.0",
         isFirstDailyOccurrence: Boolean = false,
+        appVersion: String = "5.123.0",
+        cleanupPolicy: WideEventRepository.CleanupPolicy = DEFAULT_CLEANUP_POLICY,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -545,15 +582,27 @@ class ApiWideEventSenderTest {
         metadata = metadata,
         flowEntryPoint = flowEntryPoint,
         activeIntervals = emptyList(),
-        cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
-            duration = Duration.ofHours(1),
-            status = WideEventRepository.WideEventStatus.UNKNOWN,
-            metadata = emptyMap(),
-        ),
+        cleanupPolicy = cleanupPolicy,
         createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
         samplingProbability = samplingProbability,
         metaType = metaType,
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
+        appVersion = appVersion,
     )
+
+    private companion object {
+        val DEFAULT_CLEANUP_POLICY = WideEventRepository.CleanupPolicy.OnTimeout(
+            duration = Duration.ofHours(1),
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = emptyMap(),
+        )
+
+        val PROCESS_START_CLEANUP_POLICY = WideEventRepository.CleanupPolicy.OnProcessStart(
+            ownerProcessName = "main",
+            ignoreIfIntervalTimeoutPresent = false,
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = emptyMap(),
+        )
+    }
 }

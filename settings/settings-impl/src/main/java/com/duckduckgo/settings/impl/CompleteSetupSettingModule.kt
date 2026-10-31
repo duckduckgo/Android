@@ -16,7 +16,7 @@
 
 package com.duckduckgo.settings.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 

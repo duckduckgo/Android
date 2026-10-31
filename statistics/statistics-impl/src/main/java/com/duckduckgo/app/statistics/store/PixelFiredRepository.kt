@@ -19,7 +19,7 @@ package com.duckduckgo.app.statistics.store
 import com.duckduckgo.app.statistics.model.DailyPixelFired
 import com.duckduckgo.app.statistics.model.UniquePixelFired
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.LocalDate
 import java.time.ZoneOffset
 import javax.inject.Inject

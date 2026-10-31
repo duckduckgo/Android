@@ -1,5 +1,7 @@
 package com.duckduckgo.subscriptions.impl.messaging
 
+import android.webkit.WebBackForwardList
+import android.webkit.WebHistoryItem
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -19,6 +21,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -64,6 +67,11 @@ class SubscriptionMessagingInterfaceTest {
         }
     }
 
+    @Before
+    fun setUp() {
+        givenBridgeOriginCheck(enabled = true)
+    }
+
     @Test
     fun `when process unknown message do nothing`() = runTest {
         givenInterfaceIsRegistered()
@@ -104,7 +112,7 @@ class SubscriptionMessagingInterfaceTest {
 
     @Test
     fun `when process interface not registered do nothing`() = runTest {
-        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+        givenUrl("https://duckduckgo.com/test")
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscription","id":"myId","params":{}}
@@ -541,7 +549,7 @@ class SubscriptionMessagingInterfaceTest {
     @Test
     fun `when process and feature selected message if url not in allow listed domains then do nothing`() = runTest {
         messagingInterface.register(webView, callback)
-        whenever(webView.url).thenReturn("https://duckduckgo.example.com")
+        givenUrl("https://duckduckgo.example.com")
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"featureSelected","params":{}}
@@ -624,7 +632,7 @@ class SubscriptionMessagingInterfaceTest {
     fun `when process and faq clicked then callback executed`() = runTest {
         val jsMessageCallback: JsMessageCallback = mock()
         messagingInterface.register(webView, jsMessageCallback)
-        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+        givenUrl("https://duckduckgo.com/test")
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsWelcomeFaqClicked","id":"myId","params":{}}
@@ -639,7 +647,7 @@ class SubscriptionMessagingInterfaceTest {
     fun `when process and add email clicked then callback executed`() = runTest {
         val jsMessageCallback: JsMessageCallback = mock()
         messagingInterface.register(webView, jsMessageCallback)
-        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+        givenUrl("https://duckduckgo.com/test")
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsWelcomeAddEmailClicked","id":"myId","params":{}}
@@ -661,7 +669,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -675,7 +683,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -689,7 +697,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -703,7 +711,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test
@@ -717,7 +725,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test
@@ -731,7 +739,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test
@@ -912,9 +920,49 @@ class SubscriptionMessagingInterfaceTest {
         verifyNoInteractions(jsMessageHelper)
     }
 
+    @Test
+    fun `when process and get access token while url reports a pending navigation to an allowed domain then do nothing`() = runTest {
+        messagingInterface.register(webView, callback)
+        givenUrl("https://duckduckgo.com/test", committedUrl = "https://third-party.test/")
+        givenAccessTokenIsSuccess()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getAccessToken","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verifyNoInteractions(jsMessageHelper)
+    }
+
+    @Test
+    fun `when origin check is disabled and url reports a pending navigation then get access token returns response`() = runTest {
+        givenBridgeOriginCheck(enabled = false)
+        messagingInterface.register(webView, callback)
+        givenUrl("https://duckduckgo.com/test", committedUrl = "https://third-party.test/")
+        givenAccessTokenIsSuccess()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getAccessToken","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(jsMessageHelper).sendJsResponse(any(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
+    }
+
     private fun givenInterfaceIsRegistered() {
         messagingInterface.register(webView, callback)
-        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+        givenUrl("https://duckduckgo.com/test")
+    }
+
+    private fun givenUrl(url: String?, committedUrl: String? = url) {
+        val currentItem: WebHistoryItem = mock()
+        whenever(currentItem.url).thenReturn(committedUrl)
+        val backForwardList: WebBackForwardList = mock()
+        whenever(backForwardList.currentItem).thenReturn(currentItem)
+        whenever(webView.url).thenReturn(url)
+        whenever(webView.copyBackForwardList()).thenReturn(backForwardList)
     }
 
     private suspend fun givenSubscriptionIsActive() {
@@ -937,6 +985,12 @@ class SubscriptionMessagingInterfaceTest {
 
     private suspend fun givenAccessTokenIsFailure() {
         whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure(message = "something happened"))
+    }
+
+    private fun givenBridgeOriginCheck(enabled: Boolean) {
+        val toggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
+        whenever(toggle.isEnabled()).thenReturn(enabled)
+        whenever(subscriptionsFeature.bridgeOriginCheck()).thenReturn(toggle)
     }
 
     private fun givenDuckAiPlus(enabled: Boolean) {

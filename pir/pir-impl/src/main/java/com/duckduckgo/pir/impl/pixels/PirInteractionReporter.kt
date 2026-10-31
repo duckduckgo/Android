@@ -20,8 +20,8 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -36,13 +36,17 @@ import kotlin.random.Random
  * Reports user-interacted DAU/WAU/MAU pixels for PIR. Unlike [PirEngagementReporter] (which reports
  * product-active users on a scheduled tick and is gated on profile existence), this is driven by the
  * user opening the PIR dashboard. Opening the dashboard is itself the interaction, so there is no
- * active-user gate. Day/week/month deduplication is done with the same elapsed-time pattern.
+ * active-user gate: a free user who has not saved a profile yet is counted too. Day/week/month
+ * deduplication is done with the same elapsed-time pattern, shared across paid and free users.
  */
 interface PirInteractionReporter {
-    suspend fun attemptFirePixel()
+    /**
+     * @param isAuthenticated whether the user viewing the dashboard holds an active subscription that includes PIR
+     */
+    suspend fun attemptFirePixel(isAuthenticated: Boolean)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPirInteractionReporter @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
@@ -53,47 +57,56 @@ class RealPirInteractionReporter @Inject constructor(
 
     private val mutex = Mutex()
 
-    override suspend fun attemptFirePixel() {
+    override suspend fun attemptFirePixel(isAuthenticated: Boolean) {
         withContext(dispatcherProvider.io()) {
             val nowMs = currentTimeProvider.currentTimeMillis()
-            attemptToFireDauPixel(nowMs)
-            attemptToFireWauPixel(nowMs)
-            attemptToFireMauPixel(nowMs)
+            attemptToFireDauPixel(nowMs, isAuthenticated)
+            attemptToFireWauPixel(nowMs, isAuthenticated)
+            attemptToFireMauPixel(nowMs, isAuthenticated)
         }
     }
 
-    private suspend fun attemptToFireDauPixel(nowMs: Long) {
+    private suspend fun attemptToFireDauPixel(
+        nowMs: Long,
+        isAuthenticated: Boolean,
+    ) {
         if (!hasDateElapsed(DIFF_DATE_DAU, pirRepository.getLastPirInteractionDauPixelTimeMs(), nowMs)) return
 
         delayToReduceSessioning()
 
         mutex.withLock {
             if (!hasDateElapsed(DIFF_DATE_DAU, pirRepository.getLastPirInteractionDauPixelTimeMs(), nowMs)) return@withLock
-            pirPixelSender.reportInteractionDAU()
+            pirPixelSender.reportInteractionDAU(isAuthenticated)
             pirRepository.setLastPirInteractionDauPixelTimeMs(nowMs)
         }
     }
 
-    private suspend fun attemptToFireWauPixel(nowMs: Long) {
+    private suspend fun attemptToFireWauPixel(
+        nowMs: Long,
+        isAuthenticated: Boolean,
+    ) {
         if (!hasDateElapsed(DIFF_DATE_WAU, pirRepository.getLastPirInteractionWauPixelTimeMs(), nowMs)) return
 
         delayToReduceSessioning()
 
         mutex.withLock {
             if (!hasDateElapsed(DIFF_DATE_WAU, pirRepository.getLastPirInteractionWauPixelTimeMs(), nowMs)) return@withLock
-            pirPixelSender.reportInteractionWAU()
+            pirPixelSender.reportInteractionWAU(isAuthenticated)
             pirRepository.setLastPirInteractionWauPixelTimeMs(nowMs)
         }
     }
 
-    private suspend fun attemptToFireMauPixel(nowMs: Long) {
+    private suspend fun attemptToFireMauPixel(
+        nowMs: Long,
+        isAuthenticated: Boolean,
+    ) {
         if (!hasDateElapsed(DIFF_DATE_MAU, pirRepository.getLastPirInteractionMauPixelTimeMs(), nowMs)) return
 
         delayToReduceSessioning()
 
         mutex.withLock {
             if (!hasDateElapsed(DIFF_DATE_MAU, pirRepository.getLastPirInteractionMauPixelTimeMs(), nowMs)) return@withLock
-            pirPixelSender.reportInteractionMAU()
+            pirPixelSender.reportInteractionMAU(isAuthenticated)
             pirRepository.setLastPirInteractionMauPixelTimeMs(nowMs)
         }
     }

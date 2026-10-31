@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
@@ -46,6 +47,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2AlreadyPairedError
@@ -108,6 +110,7 @@ class DisplayQrCodeViewModelTest {
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val qrEncoder = mock<QREncoder>()
     private val clipboard = mock<ClipboardInteractor>()
+    private val switchedAccountDetector = mock<SwitchedAccountDetector>()
 
     @Before
     fun setup() {
@@ -117,7 +120,7 @@ class DisplayQrCodeViewModelTest {
         whenever(accountRepository.getAccountInfo()).thenReturn(AccountInfo(isSignedIn = false))
     }
 
-    private fun createTestee(source: String? = null) = DisplayQrCodeViewModel(
+    private fun createTestee(source: SyncLaunchSource = SyncLaunchSource.Other) = DisplayQrCodeViewModel(
         syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
         launchSource = source,
         accountRepository = accountRepository,
@@ -126,6 +129,7 @@ class DisplayQrCodeViewModelTest {
         syncFeature = syncFeature,
         qrEncoder = qrEncoder,
         clipboard = clipboard,
+        switchedAccountDetector = switchedAccountDetector,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -170,7 +174,7 @@ class DisplayQrCodeViewModelTest {
         whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
         whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
 
-        val testee = createTestee(source = "foo")
+        val testee = createTestee(source = SyncLaunchSource.PromotionBookmarks)
 
         testee.commands.test {
             val command = awaitItem()
@@ -183,8 +187,8 @@ class DisplayQrCodeViewModelTest {
 
             cancel()
         }
-        verify(pixels).fireSignupConnectPixel("foo")
-        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, null, null, null)
+        verify(pixels).fireSignupConnectPixel(SyncLaunchSource.PromotionBookmarks)
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SyncLaunchSource.PromotionBookmarks, null, null, null)
     }
 
     @Test
@@ -261,7 +265,7 @@ class DisplayQrCodeViewModelTest {
 
             cancel()
         }
-        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, null, null, null)
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, SyncLaunchSource.Other, null, null, null)
         verify(pixels, never()).fireLoginPixel()
         verify(pixels, never()).fireSignupConnectPixel(anyOrNull())
     }
@@ -337,7 +341,7 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, SetupPath.PAIRING, null, null)
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, SyncLaunchSource.Other, SetupPath.PAIRING, null, null)
     }
 
     @Test
@@ -568,7 +572,37 @@ class DisplayQrCodeViewModelTest {
             cancel()
         }
         verify(pixels).fireLoginPixel()
-        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SetupPath.PAIRING, null, null)
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SyncLaunchSource.Other, SetupPath.PAIRING, null, null)
+    }
+
+    @Test
+    fun `when the screen opens then the account before pairing is recorded`() = runTest {
+        givenV2Enabled()
+
+        createTestee()
+
+        verify(switchedAccountDetector).onPairingStarted()
+    }
+
+    @Test
+    fun `when the v2 login completes then the switched account tracker is notified`() = runTest {
+        givenV2Enabled()
+        givenThisConnectedDevice()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
+
+        createTestee()
+
+        verify(switchedAccountDetector).onPaired()
+    }
+
+    @Test
+    fun `when v2 pairing fails then the switched account tracker is not notified`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.Failed("boom")))
+
+        createTestee()
+
+        verify(switchedAccountDetector, never()).onPaired()
     }
 
     @Test
@@ -662,7 +696,15 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(pixels).fireSyncSetupFailed(SYNC_CONNECT, SetupFailureReason.UNEXPECTED_FAILURE, SetupPath.PAIRING, null, null, null)
+        verify(pixels).fireSyncSetupFailed(
+            SYNC_CONNECT,
+            SyncLaunchSource.Other,
+            SetupFailureReason.UNEXPECTED_FAILURE,
+            SetupPath.PAIRING,
+            null,
+            null,
+            null,
+        )
     }
 
     @Test
@@ -672,7 +714,7 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(pixels).fireSyncSetupAbandoned(SYNC_CONNECT, CancellationReason.CONFIRMATION_DENIED)
+        verify(pixels).fireSyncSetupAbandoned(SYNC_CONNECT, SyncLaunchSource.Other, CancellationReason.CONFIRMATION_DENIED)
     }
 
     @Test
@@ -682,7 +724,7 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(pixels, never()).fireSyncSetupFailed(any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+        verify(pixels, never()).fireSyncSetupFailed(any(), anyOrNull(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
     }
 
     @Test

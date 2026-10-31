@@ -13,6 +13,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
@@ -25,6 +26,7 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -37,7 +39,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(AndroidJUnit4::class)
 class RealMaliciousSiteBlockerWebViewIntegrationTest {
@@ -183,6 +187,43 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
         val result = testee.shouldIntercept(request, maliciousUri) {}
         assertEquals(Ignored, result)
+    }
+
+    @Test
+    fun `shouldInterceptRequest skips the io dispatch for subresources that are neither mainframe nor iframe`() = runTest {
+        val io = CountingDispatcher(coroutineRule.testDispatcher)
+        val countingTestee = RealMaliciousSiteBlockerWebViewIntegration(
+            maliciousSiteProtection,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            mockSettingsDataStore,
+            dispatchers = object : DispatcherProvider by coroutineRule.testDispatcherProvider {
+                override fun io(): CoroutineDispatcher = io
+            },
+            appCoroutineScope = coroutineRule.testScope,
+            isMainProcess = true,
+            exemptedUrlsHolder = mockExemptedUrlsHolder,
+            pixel = mockPixel,
+        )
+        whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
+        val subresource = mock(WebResourceRequest::class.java)
+        whenever(subresource.url).thenReturn(maliciousUri)
+        whenever(subresource.isForMainFrame).thenReturn(false)
+        whenever(subresource.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "image", "Referer" to maliciousUri.toString()))
+        val iframe = mock(WebResourceRequest::class.java)
+        whenever(iframe.url).thenReturn(maliciousUri)
+        whenever(iframe.isForMainFrame).thenReturn(false)
+        whenever(iframe.requestHeaders).thenReturn(mapOf("Sec-Fetch-Dest" to "iframe", "Referer" to maliciousUri.toString()))
+        io.dispatchChecks = 0
+
+        assertEquals(Ignored, countingTestee.shouldIntercept(subresource, maliciousUri) {})
+        assertEquals(0, io.dispatchChecks)
+        verifyNoInteractions(maliciousSiteProtection)
+
+        assertEquals(
+            MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = true),
+            countingTestee.shouldIntercept(iframe, maliciousUri) {},
+        )
+        assertTrue(io.dispatchChecks > 0)
     }
 
     @Test
@@ -365,4 +406,16 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         fakeAndroidBrowserConfigFeature.enableMaliciousSiteProtection().setRawStoredState(State(enabled))
         testee.onPrivacyConfigDownloaded()
     }
+}
+
+/** Runs work in place on [delegate] while counting how often coroutines ask to switch onto it. */
+private class CountingDispatcher(private val delegate: CoroutineDispatcher) : CoroutineDispatcher() {
+    var dispatchChecks = 0
+
+    override fun isDispatchNeeded(context: CoroutineContext): Boolean {
+        dispatchChecks++
+        return false
+    }
+
+    override fun dispatch(context: CoroutineContext, block: Runnable) = delegate.dispatch(context, block)
 }

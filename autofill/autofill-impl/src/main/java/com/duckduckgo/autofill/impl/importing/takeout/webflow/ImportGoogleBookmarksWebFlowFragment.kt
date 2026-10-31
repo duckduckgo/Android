@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -32,7 +33,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
 import androidx.webkit.WebViewCompat
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -55,6 +55,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.NoCredentialsAvailable
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToConfirmFlowCancellation
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.FirstPageLoading
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.Initializing
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.LoadingWebPage
@@ -67,6 +68,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubTy
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
@@ -148,6 +150,7 @@ class ImportGoogleBookmarksWebFlowFragment :
         initialiseToolbar()
         configureWebView()
         configureBackButtonHandler()
+        configureInProgressCancelListener()
 
         observeViewState()
         observeCommands()
@@ -177,6 +180,7 @@ class ImportGoogleBookmarksWebFlowFragment :
                     is LoadingWebPage -> loadFirstWebpage(viewState.url)
                     is NavigatingBack -> binding?.webView?.goBack()
                     is Initializing -> {}
+                    is FirstPageLoading -> {}
                     is ShowWebPage -> hideImportProgressDialog()
                     is HideWebPage -> showImportProgressDialog()
                 }
@@ -235,6 +239,8 @@ class ImportGoogleBookmarksWebFlowFragment :
     private fun configureWebView() {
         binding?.webView?.let { webView ->
             webView.webViewClient = ImportGoogleBookmarksWebFlowWebViewClient(this)
+            // we let the activity's background show through so the page matches the status bar strip in both designs
+            webView.setBackgroundColor(Color.TRANSPARENT)
             configureWebViewSettings(webView)
             configureDownloadInterceptor(webView)
             configureAutofill(webView)
@@ -338,6 +344,12 @@ class ImportGoogleBookmarksWebFlowFragment :
     private fun initialiseToolbar() {
         with(getToolbar()) {
             setNavigationOnClickListener { askUserToConfirmCancellation() }
+        }
+    }
+
+    private fun configureInProgressCancelListener() {
+        setFragmentResultListener(ImportGoogleBookmarksInProgressRedesignFragment.RESULT_KEY_CANCEL) { _, _ ->
+            askUserToConfirmCancellation()
         }
     }
 

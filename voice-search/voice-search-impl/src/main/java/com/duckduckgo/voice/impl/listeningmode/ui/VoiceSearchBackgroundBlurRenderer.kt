@@ -23,7 +23,7 @@ import android.os.Build
 import android.view.View
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface VoiceSearchBackgroundBlurRenderer {

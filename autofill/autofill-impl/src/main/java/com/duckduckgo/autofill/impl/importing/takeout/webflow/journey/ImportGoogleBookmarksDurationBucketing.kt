@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.importing.takeout.webflow.journey
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

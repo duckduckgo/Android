@@ -43,10 +43,22 @@ class DaxContextMenuContentDetectorTest {
         """,
     ).indented()
 
+    private val sectionHeaderStub = kotlin(
+        """
+        package com.duckduckgo.common.ui.compose.listitem
+        import com.duckduckgo.common.ui.compose.contextmenu.DaxContextMenuScope
+        fun DaxSectionHeader(
+            title: String,
+            overflowMenuContent: (DaxContextMenuScope.() -> Unit)? = null,
+        ) {}
+        """,
+    ).indented()
+
     private fun caller(body: String) = kotlin(
         """
         package com.test
         import com.duckduckgo.common.ui.compose.contextmenu.*
+        import com.duckduckgo.common.ui.compose.listitem.*
         fun Text(text: String) {}
         fun Button(text: String) {}
         fun Column(content: () -> Unit) {}
@@ -55,7 +67,7 @@ class DaxContextMenuContentDetectorTest {
     ).indented()
 
     private fun run(body: String) = lint()
-        .files(scopeStubs, caller(body))
+        .files(scopeStubs, sectionHeaderStub, caller(body))
         .issues(DaxContextMenuContentDetector.INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE)
         .run()
 
@@ -89,6 +101,21 @@ class DaxContextMenuContentDetectorTest {
     @Test
     fun whenIconButtonContentMixesAllowedAndArbitraryThenWarning() {
         run("""DaxContextMenuIconButton(iconPainter = 0, content = { DaxIconItem("x"); Button("x") })""").expectWarningCount(1)
+    }
+
+    @Test
+    fun whenSectionHeaderOverflowMenuContentUsesScopeMemberThenNoWarning() {
+        run("""DaxSectionHeader(title = "x", overflowMenuContent = { DaxDefaultItem("x") })""").expectClean()
+    }
+
+    @Test
+    fun whenSectionHeaderOverflowMenuContentUsesArbitraryComposableThenWarning() {
+        run("""DaxSectionHeader(title = "x", overflowMenuContent = { Text("x") })""").expectWarningCount(1)
+    }
+
+    @Test
+    fun whenSectionHeaderTrailingLambdaUsesArbitraryComposableThenWarning() {
+        run("""DaxSectionHeader(title = "x") { Text("x") }""").expectWarningCount(1)
     }
 
     @Test

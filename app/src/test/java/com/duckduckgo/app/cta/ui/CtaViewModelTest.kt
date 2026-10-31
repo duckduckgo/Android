@@ -38,6 +38,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.FakeContextualOnboardingTimeLimit
 import com.duckduckgo.app.onboarding.RealDuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -74,7 +75,6 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -164,14 +164,11 @@ class CtaViewModelTest {
 
     private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
 
+    private val fakeContextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit()
+
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
-
-    private val showInputScreenFlow = MutableStateFlow(true)
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock {
-        on { showInputScreen } doReturn showInputScreenFlow
-    }
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
@@ -245,8 +242,8 @@ class CtaViewModelTest {
             linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
                 on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
             },
-            duckAiFeatureState = mockDuckAiFeatureState,
             onboardingPixelSender = mockOnboardingPixelSender,
+            contextualOnboardingTimeLimit = fakeContextualOnboardingTimeLimit,
         )
     }
 
@@ -1148,7 +1145,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenDuckAiOnboardingFlowAndDuckAiEndNotShownThenRefreshCtaOnHomeSuppressedEvenIfSubscriptionAvailable() = runTest {
+    fun whenDuckAiOnboardingFlowAndDuckAiEndNotShownThenRefreshCtaOnHomeShowsDuckAiEndEvenIfSubscriptionAvailable() = runTest {
         givenDaxOnboardingActive()
         givenDuckAiOnboardingFlowArmed()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_FIRE_BUTTON)).thenReturn(true)
@@ -1163,7 +1160,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertNull(value)
+        assertTrue(value is DaxDuckAiEndBubbleCta)
     }
 
     @Test
@@ -1303,6 +1300,197 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
         assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaThenContextualOnboardingTimeLimitIsChecked() = runTest {
+        givenDaxOnboardingActive()
+
+        testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertEquals(1, fakeContextualOnboardingTimeLimit.timeLimitChecks)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndTrackersBlockedNotShownThenReturnTrackersBlockedCta() = runTest {
+        givenOnboardingEndedByTimeLimit()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertTrue(value is DaxTrackersBlockedContextualCta)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndTrackersBlockedAlreadyShownThenReturnNull() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndNoTrackersBlockedThenReturnNull() = runTest {
+        givenOnboardingEndedByTimeLimit()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site(url = "http://www.wikipedia.com"),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndTipsHiddenThenTrackersBlockedCtaNotReturned() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndContextualCtaSuppressedThenTrackersBlockedCtaNotReturned() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        canShowContextualCta = false
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenOnboardingEndedByTimeLimitAndBrokenSitePromptDueThenReturnBrokenSitePrompt() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(true)
+        val site = siteWithBlockedTrackers()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS),
+            brokenSitePromptUrl = site.url,
+        )
+
+        assertTrue(value is BrokenSitePromptDialogCta)
+    }
+
+    @Test
+    fun whenOnboardingCompletedByUserAndTrackersBlockedNotShownThenReturnNull() = runTest {
+        givenDaxOnboardingCompleted()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteWithBlockedTrackers(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingFlowActiveOnDuckAiSiteThenReturnDuckAiFireButtonCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site(url = "https://duck.ai"),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertTrue(value is DaxDuckAiFireButtonContextualCta)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingFlowEndedOnDuckAiSiteThenDuckAiFireButtonCtaNotReturned() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site(url = "https://duck.ai"),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingFlowEndedThenDuckAiEndCtaNotReturnedOnHome() = runTest {
+        givenOnboardingEndedByTimeLimit()
+        givenCanShowDuckAiEndCta()
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull(value)
+    }
+
+    private suspend fun givenOnboardingEndedByTimeLimit() {
+        givenUserIsEstablished()
+        fakeContextualOnboardingTimeLimit.onboardingEndedByTimeLimit = true
+    }
+
+    private fun siteWithBlockedTrackers(): Site {
+        val trackingEvent = TrackingEvent(
+            documentUrl = "test.com",
+            trackerUrl = "test.com",
+            categories = null,
+            entity = TdsEntity("test", "test", 9.0),
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+        )
+        return site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
     }
 
     private suspend fun givenDaxOnboardingActive() {
@@ -1737,13 +1925,12 @@ class CtaViewModelTest {
         verify(mockDuckChat, never()).setInputScreenUserSetting(any())
     }
 
-    // region DAX_DUCK_AI_END home bubble (nativeInputField path)
+    // region DAX_DUCK_AI_END home bubble
 
     @Test
-    fun whenNativeInputActiveAndCanShowDuckAiEndCtaThenHomeCtaIsBrandDesignBubble() = runTest {
+    fun whenCanShowDuckAiEndCtaThenHomeCtaIsBrandDesignBubble() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
 
         val cta = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1759,7 +1946,6 @@ class CtaViewModelTest {
     fun whenCanShowDuckAiEndCtaOnSegmentedAiPathThenHomeCtaCarriesTheAiPath() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val cta = testee.refreshCta(
@@ -1776,26 +1962,9 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenInputScreenEnabledAndCanShowDuckAiEndCtaThenHomeCtaIsNullSoLegacyInputScreenFlowOwnsIt() = runTest {
+    fun whenCanShowDuckAiEndCtaThenInputScreenUserSettingEnabledJustInTime() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = true
-
-        val cta = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertNull(cta)
-    }
-
-    @Test
-    fun whenNativeInputActiveAndCanShowDuckAiEndCtaThenInputScreenUserSettingEnabledJustInTime() = runTest {
-        givenDaxOnboardingActive()
-        givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
 
         testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1805,23 +1974,6 @@ class CtaViewModelTest {
         )
 
         verify(mockDuckChat).setInputScreenUserSetting(true)
-    }
-
-    @Test
-    fun whenInputScreenEnabledAndCanShowDuckAiEndCtaThenGetHomeCtaDoesNotApplyInputScreenUserSetting() = runTest {
-        givenDaxOnboardingActive()
-        givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = true
-
-        testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        // The legacy input-screen path applies the toggle in prepareAndMarkDuckAiEndCtaForInputScreen, not here.
-        verify(mockDuckChat, never()).setInputScreenUserSetting(any())
     }
 
     @Test

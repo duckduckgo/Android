@@ -17,13 +17,18 @@
 package com.duckduckgo.networkprotection.impl.failure
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.portprobing.PortProbeResult
+import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
 import com.wireguard.config.Config
 import com.wireguard.crypto.KeyPair
 import kotlinx.coroutines.test.runTest
@@ -64,6 +69,11 @@ class FailureRecoveryHandlerTest {
     @Mock
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
 
+    @Mock
+    private lateinit var portProbingCoordinator: PortProbingCoordinator
+
+    private lateinit var vpnRemoteFeatures: VpnRemoteFeatures
+
     private lateinit var failureRecoveryHandler: FailureRecoveryHandler
 
     private val keys = KeyPair()
@@ -97,6 +107,8 @@ class FailureRecoveryHandlerTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java)
+        vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = false))
 
         failureRecoveryHandler = FailureRecoveryHandler(
             vpnFeaturesRegistry,
@@ -105,6 +117,8 @@ class FailureRecoveryHandlerTest {
             currentTimeProvider,
             networkProtectionPixels,
             coroutineTestRule.testDispatcherProvider,
+            vpnRemoteFeatures,
+            portProbingCoordinator,
         )
     }
 
@@ -272,6 +286,88 @@ class FailureRecoveryHandlerTest {
         verify(networkProtectionPixels, times(2)).reportFailureRecoveryStarted()
         verify(networkProtectionPixels, times(2)).reportFailureRecoveryCompletedWithServerUnhealthy()
     }
+
+    @Test
+    fun whenFailureRecoveryAndServerDidNotChangeAndPortFallbackDisabledThenDoNotProbePorts() = runTest {
+        givenFailureRecoveryReturnsSameServer()
+
+        failureRecoveryHandler.onTunnelFailure(coroutineTestRule.testScope, TimeUnit.MINUTES.toSeconds(3))
+
+        verifyNoInteractions(portProbingCoordinator)
+        verify(wgTunnel, never()).markTunnelHealthy()
+        verify(vpnFeaturesRegistry, never()).refreshFeature(NetPVpnFeature.NETP_VPN)
+    }
+
+    @Test
+    fun whenFailureRecoveryAndServerDidNotChangeAndDifferentPortSelectedThenRefreshNetp() = runTest {
+        vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = true))
+        givenFailureRecoveryReturnsSameServer()
+        whenever(portProbingCoordinator.probeAndSelect()).thenReturn(portProbeResult(shouldSwitchPort = true))
+
+        failureRecoveryHandler.onTunnelFailure(coroutineTestRule.testScope, TimeUnit.MINUTES.toSeconds(3))
+
+        verify(portProbingCoordinator).probeAndSelect()
+        verify(wgTunnel).markTunnelUnhealthy()
+        verify(wgTunnel).markTunnelHealthy()
+        verify(wgTunnelConfig, never()).setWgConfig(any())
+        verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerHealthy()
+    }
+
+    @Test
+    fun whenFailureRecoveryAndServerDidNotChangeAndSamePortSelectedThenDoNothing() = runTest {
+        vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = true))
+        givenFailureRecoveryReturnsSameServer()
+        whenever(portProbingCoordinator.probeAndSelect()).thenReturn(portProbeResult(shouldSwitchPort = false))
+
+        failureRecoveryHandler.onTunnelFailure(coroutineTestRule.testScope, TimeUnit.MINUTES.toSeconds(3))
+
+        verify(portProbingCoordinator).probeAndSelect()
+        verify(wgTunnel, never()).markTunnelHealthy()
+        verify(vpnFeaturesRegistry, never()).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerHealthy()
+    }
+
+    @Test
+    fun whenFailureRecoveryAndServerDidNotChangeAndProbingSkippedThenDoNothing() = runTest {
+        vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = true))
+        givenFailureRecoveryReturnsSameServer()
+        whenever(portProbingCoordinator.probeAndSelect()).thenReturn(null)
+
+        failureRecoveryHandler.onTunnelFailure(coroutineTestRule.testScope, TimeUnit.MINUTES.toSeconds(3))
+
+        verify(portProbingCoordinator).probeAndSelect()
+        verify(wgTunnel, never()).markTunnelHealthy()
+        verify(vpnFeaturesRegistry, never()).refreshFeature(NetPVpnFeature.NETP_VPN)
+    }
+
+    @Test
+    fun whenFailureRecoveryAndServerChangedAndPortFallbackEnabledThenDoNotProbePorts() = runTest {
+        vpnRemoteFeatures.endpointPortFallback().setRawStoredState(Toggle.State(enable = true))
+        val newConfig = getWgConfig(updatedServerDataDifferentServer)
+        whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(TimeUnit.MINUTES.toSeconds(20))
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
+
+        failureRecoveryHandler.onTunnelFailure(coroutineTestRule.testScope, TimeUnit.MINUTES.toSeconds(3))
+
+        verifyNoInteractions(portProbingCoordinator)
+        verify(wgTunnelConfig).setWgConfig(newConfig)
+        verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
+    }
+
+    private suspend fun givenFailureRecoveryReturnsSameServer() {
+        whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(TimeUnit.MINUTES.toSeconds(20))
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(getWgConfig(defaultServerData)))
+    }
+
+    private fun portProbeResult(shouldSwitchPort: Boolean) = PortProbeResult(
+        selectedPort = 51820L,
+        shouldSwitchPort = shouldSwitchPort,
+    )
 
     private fun getWgConfig(serverData: WgServerData): Config {
         return Config.parse(

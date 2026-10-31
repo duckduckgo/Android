@@ -24,6 +24,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import kotlinx.coroutines.test.runTest
@@ -61,7 +62,7 @@ class SyncSetupWideEventImplTest {
 
         wideEvent = SyncSetupWideEventImpl(
             wideEventClient = wideEventClient,
-            syncFeature = { syncFeature },
+            syncFeature = lazy { syncFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
             buildConfig = buildConfig,
         )
@@ -79,6 +80,7 @@ class SyncSetupWideEventImplTest {
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
+            flowEntryPoint = "other",
             metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to protocol.value),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
@@ -92,11 +94,11 @@ class SyncSetupWideEventImplTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
-        wideEvent.onFlowStarted(source = "settings")
+        wideEvent.onFlowStarted(launchSource = SyncLaunchSource.PromotionPasswords)
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
-            flowEntryPoint = "settings",
+            flowEntryPoint = "promotion_passwords",
             metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to protocol.value),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )

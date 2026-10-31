@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
 import com.duckduckgo.remote.messaging.api.Content.MessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
+import com.duckduckgo.remote.messaging.api.JsonActionType.ADD_WIDGET
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_CREDENTIAL_PROVIDER
@@ -148,6 +149,7 @@ sealed class Content(val messageType: MessageType) {
         SPLIT_BAR_SETTINGS("SplitBarSettings"),
         BOOKMARKS_IMPORT("BookmarksImport"),
         NEW_TAB_OPTIONS("NewTabOptions"),
+        PIR("PIR"),
         ;
 
         companion object {
@@ -192,6 +194,7 @@ sealed class Action(
     ) : Action(JsonActionType.SURVEY.jsonValue, value, additionalParameters)
 
     data object DefaultCredentialProvider : Action(DEFAULT_CREDENTIAL_PROVIDER.jsonValue, "", null)
+    data class AddWidget(override val value: String) : Action(ADD_WIDGET.jsonValue, value, null)
 }
 
 sealed class CardItem {

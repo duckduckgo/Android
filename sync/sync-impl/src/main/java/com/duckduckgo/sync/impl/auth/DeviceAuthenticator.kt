@@ -25,7 +25,8 @@ import com.duckduckgo.sync.impl.auth.AuthPrompt.Verify
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -130,7 +131,7 @@ interface DeviceAuthenticator {
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = DeviceAuthenticator::class)
+@ContributesBinding(AppScope::class, binding = binding<DeviceAuthenticator>())
 class RealDeviceAuthenticator @Inject constructor(
     private val deviceAuthChecker: SupportedDeviceAuthChecker,
     private val gracePeriod: DeviceAuthorizationGracePeriod,

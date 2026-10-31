@@ -27,8 +27,8 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -48,7 +48,7 @@ interface FavoritesDisplayModeSettingsRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealFavoritesDisplayModeSettingsRepository @Inject constructor(
     private val savedSitesSettingsStore: SavedSitesSettingsStore,
     private val syncableSetting: DisplayModeSyncableSetting,

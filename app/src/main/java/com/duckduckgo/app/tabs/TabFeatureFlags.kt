@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.tabs
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -52,4 +52,17 @@ interface TabManagerFeatureFlags {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiChatsMenu(): Toggle
+
+    /**
+     * The Duck.ai "+" menu shows a "New Tab" header, drops the "New" prefix from its items, renames New Tab to Search
+     * (opening on the Search input in the current browser mode) and removes New Fire Tab.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlusMenuUpdate(): Toggle
+
+    /**
+     * Shows Duck.ai tabs in the tab switcher grid as a rich card instead of the tab preview.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun richDuckAiGridTabItem(): Toggle
 }

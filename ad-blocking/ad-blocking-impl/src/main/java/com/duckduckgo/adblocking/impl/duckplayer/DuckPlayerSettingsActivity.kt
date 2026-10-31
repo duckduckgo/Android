@@ -32,9 +32,9 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityDuckPlayerSettingsBinding
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsViewModel.ViewState
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
@@ -183,8 +183,8 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
                 with(binding) {
                     duckPlayerModeSelector.isEnabled = true
                     duckPlayerDisabledSection.isVisible = false
-                    openDuckPlayerInNewTabToggle.isVisible =
-                        viewState.privatePlayerMode != Disabled && viewState.openDuckPlayerInNewTab != Unavailable
+                    openDuckPlayerInNewTabToggle.isVisible = viewState.openDuckPlayerInNewTab != Unavailable
+                    openDuckPlayerInNewTabToggle.isEnabled = viewState.privatePlayerMode != Disabled
                     openDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab is On)
                     setDuckPlayerSectionVisibility(true)
                 }

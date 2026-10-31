@@ -114,7 +114,7 @@ jobs:
         run: |
           python3 perf-benchmarks/pageload_benchmark.py \
             --results-dir pageload-artifacts \
-            --device ftl-mediumphone-api31 \
+            --device ftl-pixel9-api36 \
             --github-action-run-id "${{ github.run_id }}" \
             --git-commit-sha "${{ github.sha }}" \
             ${{ github.event_name == 'schedule' && '--report-pixel' || '' }}
@@ -131,7 +131,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}

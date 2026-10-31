@@ -19,15 +19,8 @@ package com.duckduckgo.subscriptions.impl.onboarding
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
 
-/**
- * Events fed into the subscription onboarding orchestrator. Steps report through
- * [com.duckduckgo.subscriptions.api.SubscriptionOnboardingController]; the host ViewModel translates those into
- * [StepFinished] for the current step, which advances the plan. The toolbar / system back becomes [BackPressed].
- */
 sealed interface SubscriptionOnboardingEvent : LinearOnboardingEvent {
-    /** The current step finished with [outcome] (completed vs skipped). */
     data class StepFinished(val stepId: String, val outcome: SubscriptionOnboardingStepOutcome) : SubscriptionOnboardingEvent
 
-    /** The user asked to go back (toolbar up arrow or system back). */
     data object BackPressed : SubscriptionOnboardingEvent
 }

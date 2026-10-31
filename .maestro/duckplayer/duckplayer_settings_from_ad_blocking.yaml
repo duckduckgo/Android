@@ -1,0 +1,36 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Open Duck Player Settings from Ad Blocking"
+tags:
+  - duckplayer
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+
+      - scrollUntilVisible:
+          element:
+            id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
+          direction: DOWN
+
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
+
+      - scrollUntilVisible:
+          element:
+            text: "Ad Blocking"
+          direction: DOWN
+
+      - tapOn:
+          text: "Ad Blocking"
+
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/duckPlayerSettingsLink"
+
+      - assertVisible:
+          text: "Open YouTube Videos in Duck Player"

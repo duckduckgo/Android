@@ -23,8 +23,9 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
@@ -37,8 +38,8 @@ import javax.inject.Inject
  * All interpretation lives in the coordinator; this class is just an adapter from the tab repository's Flow to that API.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 class BrowserSessionTabObserver @Inject constructor(
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val browserModeStateHolder: BrowserModeStateHolder,

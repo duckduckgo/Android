@@ -51,7 +51,6 @@ import com.duckduckgo.adblocking.api.AdBlockingOmnibarAnimationProvider
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -226,6 +225,7 @@ import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.pdf.RealPdfPageContextProvider
+import com.duckduckgo.app.browser.progressbar.NavigationProgressState
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
@@ -358,6 +358,7 @@ import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -441,7 +442,6 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -691,7 +691,6 @@ class BrowserTabViewModel @Inject constructor(
       Useful if user has done something that would result in a strange UX to then show the picker
       This only prevents against automatically showing; if the user taps on an autofill field directly, the dialog can still show
      */
-    private var canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
     val url: String?
         get() = site?.url
@@ -710,45 +709,33 @@ class BrowserTabViewModel @Inject constructor(
      * Always-on autocomplete pipeline tied to the omnibar's text. Kept in sync with the
      * omnibar via [onOmnibarTextRendered] so the native-input widget can restore the
      * omnibar's autocomplete results when it closes — even if in-widget typing temporarily
-     * overwrote [autoCompleteStateFlow]. Gated on the native-input user setting so that
-     * users without the widget don't pay for a duplicate pipeline.
+     * overwrote [autoCompleteStateFlow].
      */
     private val omnibarTextStateFlow = MutableStateFlow("")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     internal val omnibarAutocompleteCache: StateFlow<AutoCompleteResult> =
-        duckChat.observeNativeInputFieldUserSettingEnabled()
-            .catch { t ->
-                logcat(WARN) { "Native input setting flow failed: ${t.asLog()}" }
-                emit(false)
-            }
-            .flatMapLatest { isNativeInputEnabled ->
-                if (!isNativeInputEnabled) {
-                    flowOf(AutoCompleteResult("", emptyList()))
+        omnibarTextStateFlow
+            .debounce(300)
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                // Skip page URLs — omnibarViewState emits on every navigation, and
+                // running the fetch against full URLs would be both wasteful and
+                // wrong (the autocomplete API expects user-typed queries).
+                val isQueryLike = query.isNotBlank() &&
+                    !UriString.isWebUrl(query) &&
+                    !duckPlayer.isDuckPlayerUri(query)
+                if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
+                    flowOf(AutoCompleteResult(query, emptyList()))
                 } else {
-                    omnibarTextStateFlow
-                        .debounce(300)
-                        .distinctUntilChanged()
-                        .flatMapLatest { query ->
-                            // Skip page URLs — omnibarViewState emits on every navigation, and
-                            // running the fetch against full URLs would be both wasteful and
-                            // wrong (the autocomplete API expects user-typed queries).
-                            val isQueryLike = query.isNotBlank() &&
-                                !UriString.isWebUrl(query) &&
-                                !duckPlayer.isDuckPlayerUri(query)
-                            if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
-                                flowOf(AutoCompleteResult(query, emptyList()))
-                            } else {
-                                // Catch inside flatMapLatest so a failed fetch only drops this query's
-                                // result — without it, .catch + stateIn(Eagerly) would terminate the
-                                // pipeline for the ViewModel's lifetime (no equivalent of the existing
-                                // pipeline's ConflatedJob restart).
-                                autoComplete.autoComplete(query)
-                                    .catch { t ->
-                                        logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
-                                        emit(AutoCompleteResult(query, emptyList()))
-                                    }
-                            }
+                    // Catch inside flatMapLatest so a failed fetch only drops this query's
+                    // result — without it, .catch + stateIn(Eagerly) would terminate the
+                    // pipeline for the ViewModel's lifetime (no equivalent of the existing
+                    // pipeline's ConflatedJob restart).
+                    autoComplete.autoComplete(query)
+                        .catch { t ->
+                            logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
+                            emit(AutoCompleteResult(query, emptyList()))
                         }
                 }
             }
@@ -818,7 +805,7 @@ class BrowserTabViewModel @Inject constructor(
     // Needed for PageLoadWideEvent: it identifies which page load the progress events belong to.
     private var pageLoadNavigationId: Long? = null
     private var hasExitedFixedProgress = false
-    private var hasCompletedPageLoad = false
+    private var navigationState = NavigationProgressState()
 
     private var allowlistRefreshTriggerJob: Job? = null
     private var refreshTriggerJob: Job? = null
@@ -826,8 +813,8 @@ class BrowserTabViewModel @Inject constructor(
 
     /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
      * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
-     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only to skip
-     * confirmation prompts (in [appLinkClicked] and for non-HTTP app links), never the launch carve-out. */
+     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for links back to the
+     * caller (skipping confirmation prompts, or overriding "Never" in Open Links in Apps), never the launch carve-out. */
     private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
@@ -1633,6 +1620,8 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 site?.nextUrl = urlToNavigate
+                // Submitted query/URL loads bypass WebView, open the gate here
+                onNavigationIntent(urlToNavigate)
                 command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
@@ -1759,9 +1748,11 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun willOverrideUrl(newUrl: String) {
         site?.nextUrl = newUrl
+        // Link tap: shouldOverrideUrlLoading fires here, well before pageStarted, open the gate now
+        navigationState = navigationState.onNavigationRequested(isStartProgressAtIntentEnabled())
         logcat { "SSLError: willOverride is $newUrl" }
         navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
-        val previousSiteStillLoading = currentLoadingViewState().isLoading
+        val previousSiteStillLoading = currentLoadingViewState().isLoading && !isAwaitingCommitAtIntent()
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()
         }
@@ -2080,6 +2071,7 @@ class BrowserTabViewModel @Inject constructor(
         pdfDownloadJob.cancel()
         suggestRedirectJob.cancel()
         badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
+        onNavigationAbandoned()
         site = null
         onSiteChanged()
         webNavigationState = null
@@ -2099,7 +2091,7 @@ class BrowserTabViewModel @Inject constructor(
                 queryOrFullUrl = "",
                 forceExpand = true,
             )
-        loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+        finishLoading()
 
         deleteTabPreview(tabId)
     }
@@ -2140,8 +2132,6 @@ class BrowserTabViewModel @Inject constructor(
         webNavigationState = newWebNavigationState
 
         if (!currentBrowserViewState().browserShowing) return
-
-        canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
         browserViewState.value =
             currentBrowserViewState().copy(
@@ -2213,8 +2203,112 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onPageContentStart(url: String) {
-        hasCompletedPageLoad = false
+        navigationState = navigationState.onNavigationCommitted()
         showWebContent()
+    }
+
+    override fun onMainFrameNavigationDecided(loadsInThisTab: Boolean) {
+        if (!isStartProgressAtIntentEnabled()) return
+        if (loadsInThisTab) onNavigationPendingCommit() else onNavigationAbandoned()
+    }
+
+    // Released here, not in pageStarted: it is posted and can land after the next navigation became pending.
+    override fun onMainFrameNavigationCommitted() {
+        navigationState = navigationState.releasePendingNavigation()
+    }
+
+    override fun onNavigationFinishedWithoutCommit() = onNavigationAbandoned()
+
+    private fun isStartProgressAtIntentEnabled() =
+        progressBarUpgradeFeature.behaviourUpdate().isEnabled() && progressBarUpgradeFeature.startProgressAtIntent().isEnabled()
+
+    // Pending state is only meaningful with the flag on, so every read goes through here
+    private fun isAwaitingCommitAtIntent() = navigationState.isAwaitingCommitAtIntent(isStartProgressAtIntentEnabled())
+
+    // User tapped a link or submitted a URL that will load in this tab
+    private fun onNavigationIntent(url: String) {
+        if (!isStartProgressAtIntentEnabled()) return
+        if (!isSameDocumentNavigation(url)) {
+            navigationState = navigationState.onNavigationRequested(isStartProgressAtIntentEnabled())
+            onNavigationPendingCommit()
+        }
+    }
+
+    // The navigation is confirmed to load in this tab: show the bar until it commits
+    private fun onNavigationPendingCommit() {
+        val startAtIntent = isStartProgressAtIntentEnabled()
+        navigationState = navigationState.onNavigationPendingCommit(startAtIntent)
+        if (!startAtIntent) return
+        currentLoadingViewState().onIntentStart()?.let { loadingViewState.value = it }
+    }
+
+    // The navigation won't commit in this tab (external app, download, SSL warning, timeout, home), so end the bar we started
+    private fun onNavigationAbandoned() {
+        val awaitingCommit = isAwaitingCommitAtIntent()
+        navigationState = navigationState.onNavigationAbandoned()
+        if (!awaitingCommit) return
+        val loading = currentLoadingViewState()
+        val ended = loading.onNavigationAbandoned()
+        when {
+            ended != null -> loadingViewState.value = ended
+            // The outgoing page finished while its progress was held back, so nothing else will end its bar
+            loading.isLoading && navigationState.hasCompletedPageLoad -> finishLoading(finalProgress = 100)
+        }
+    }
+
+    private fun startLoading(
+        initialProgress: Int,
+        url: String = currentLoadingViewState().url,
+        trackersAnimationEnabled: Boolean = currentLoadingViewState().trackersAnimationEnabled,
+    ) {
+        loadingViewState.value = currentLoadingViewState().copy(
+            isLoading = true,
+            progress = initialProgress,
+            url = url,
+            trackersAnimationEnabled = trackersAnimationEnabled,
+        )
+    }
+
+    // Leaves progress untouched unless finalProgress is given
+    private fun finishLoading(
+        finalProgress: Int = currentLoadingViewState().progress,
+        url: String = currentLoadingViewState().url,
+        trackersAnimationEnabled: Boolean = currentLoadingViewState().trackersAnimationEnabled,
+    ) {
+        loadingViewState.value = currentLoadingViewState().copy(
+            isLoading = false,
+            progress = finalProgress,
+            url = url,
+            trackersAnimationEnabled = trackersAnimationEnabled,
+        )
+    }
+
+    private fun resetLoading() {
+        loadingViewState.value = LoadingViewState()
+    }
+
+    private fun updateLoadingProgress(
+        isLoading: Boolean,
+        progress: Int,
+    ) {
+        // Before the commit these events belong to the outgoing page, so they must not move or complete the bar started at intent
+        if (isAwaitingCommitAtIntent()) return
+        loadingViewState.value = currentLoadingViewState().copy(isLoading = isLoading, progress = progress, url = site?.url ?: "")
+    }
+
+    // Stale progress=100 from the previous page would trigger tracker animations before the new page's progress events arrive
+    private fun resetCompletedProgress() {
+        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && currentLoadingViewState().progress == 100) {
+            loadingViewState.value = currentLoadingViewState().copy(progress = 0)
+        }
+    }
+
+    // A fragment-only change is same-document: no commit follows, so a bar started for it would never end
+    private fun isSameDocumentNavigation(target: String): Boolean {
+        val current = url ?: return false
+        // The converter can return a scheme-less URL, which the WebView loads as http
+        val absoluteTarget = if (target.contains("://")) target else "http://$target"
+        return absoluteTarget.contains('#') && absoluteTarget.substringBefore('#') == current.substringBefore('#')
     }
 
     private fun showBlankContentfNewContentDelayed() {
@@ -2386,7 +2480,7 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
-        hasCompletedPageLoad = false
+        navigationState = navigationState.onPageChanged()
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -2637,6 +2731,7 @@ class BrowserTabViewModel @Inject constructor(
             (state.browserError == OMITTED || state.browserError == LOADING)
         if (!canShowError) return
 
+        onNavigationAbandoned()
         errorPagePendingDismissal = false
         browserViewState.value = state.copy(
             browserError = TIMEOUT,
@@ -2676,7 +2771,7 @@ class BrowserTabViewModel @Inject constructor(
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
-        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && hasCompletedPageLoad) return
+        if (navigationState.ignoresProgress(progressBarUpgradeFeature.behaviourUpdate().isEnabled())) return
 
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
@@ -2695,10 +2790,10 @@ class BrowserTabViewModel @Inject constructor(
             pageLoadNavigationId?.let { pageLoadWideEvent.onProgressChanged(tabId, it) }
         }
 
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = reportedProgress, url = site?.url ?: "")
+        updateLoadingProgress(isLoading, reportedProgress)
 
         if (newProgress == 100) {
-            hasCompletedPageLoad = true
+            navigationState = navigationState.onPageLoadCompleted()
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
@@ -2795,14 +2890,8 @@ class BrowserTabViewModel @Inject constructor(
                 maliciousSiteBlocked = false,
             )
         navigationStateChanged(webViewNavigationState)
-        hasCompletedPageLoad = false
-
-        // Reset progress so stale progress=100 from the previous page doesn't
-        // trigger tracker animations before the new page's progress events arrive
-        val progress = currentLoadingViewState()
-        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && progress.progress == 100) {
-            loadingViewState.value = progress.copy(progress = 0)
-        }
+        navigationState = navigationState.onNavigationCommitted()
+        resetCompletedProgress()
 
         command.value = Command.PageStarted
     }
@@ -2931,16 +3020,14 @@ class BrowserTabViewModel @Inject constructor(
                 pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
                 command.value = BypassMaliciousSiteWarning(siteUrl, feed)
                 val documentUrlString = siteUrl.toString()
-                loadingViewState.value =
-                    currentLoadingViewState().copy(
-                        isLoading = true,
-                        trackersAnimationEnabled = true,
-                        /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
-                         * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
-                         * showing in case the URL was blocked locally and therefore never started to show*/
-                        progress = 20,
-                        url = documentUrlString,
-                    )
+                startLoading(
+                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                     * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                     * showing in case the URL was blocked locally and therefore never started to show*/
+                    initialProgress = 20,
+                    url = documentUrlString,
+                    trackersAnimationEnabled = true,
+                )
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
                         omnibarText = if (isFullUrlEnabled.value) {
@@ -2951,7 +3038,6 @@ class BrowserTabViewModel @Inject constructor(
                             )
                         },
                         queryOrFullUrl = documentUrlString,
-                        isEditing = false,
                         navigationChange = true,
                     )
             }
@@ -3006,6 +3092,7 @@ class BrowserTabViewModel @Inject constructor(
                 handler.cancel()
             } else {
                 badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
+                onNavigationAbandoned()
                 browserViewState.value =
                     currentBrowserViewState().copy(
                         browserShowing = false,
@@ -3660,7 +3747,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun initializeDefaultViewStates() {
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState()
-        loadingViewState.value = LoadingViewState()
+        resetLoading()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
@@ -3928,7 +4015,6 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?, reportLandingFocus: Boolean = true) {
         val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
-            duckAiFeatureState.showInputScreen.value ||
             currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
             (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
@@ -4046,13 +4132,17 @@ class BrowserTabViewModel @Inject constructor(
         isForMainFrame: Boolean,
         hasGesture: Boolean,
     ): Boolean {
+        val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
+        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled &&
+            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true))
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink,
             hasGesture,
             customTab?.clientPackage,
-            appSettingsPreferencesStore.appLinksEnabled,
+            appLinksEnabled,
             !appSettingsPreferencesStore.showAppLinksPrompt,
+            trustedCallerOverridesDisabledAppLinks,
         ) { appLinkClicked(appLink) }
     }
 
@@ -4100,10 +4190,14 @@ class BrowserTabViewModel @Inject constructor(
         appLinksHandler.setUserQueryState(false)
     }
 
-    private fun trustedCallerPackage(): String? {
-        if (!customTabsFeature.handleTrustedCallers().isEnabled() || !customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) {
-            return null
-        }
+    private fun trustedCallerPackage(
+        nonHttpLink: Boolean,
+        overridingDisabledAppLinks: Boolean,
+    ): String? {
+        val enabled = customTabsFeature.handleTrustedCallers().isEnabled() &&
+            (!nonHttpLink || customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) &&
+            (!overridingDisabledAppLinks || customTabsFeature.handleTrustedCallersWhenAppLinksDisabled().isEnabled())
+        if (!enabled) return null
         return customTab?.let { it.clientPackage ?: it.referrerPackage }
     }
 
@@ -4115,19 +4209,37 @@ class BrowserTabViewModel @Inject constructor(
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
             if (!appSettingsPreferencesStore.appLinksEnabled) {
-                appLink.fallbackUrl?.let { fallbackUrl ->
-                    command.value = NavigationCommand.Navigate(fallbackUrl, getUrlHeaders(fallbackUrl))
+                val trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
+                if (trustedCallerPackage != null) {
+                    command.value = HandleNonHttpAppLink(
+                        nonHttpAppLink = appLink,
+                        headers = getUrlHeaders(appLink.fallbackUrl),
+                        showConfirmation = false,
+                        trustedCallerPackage = trustedCallerPackage,
+                        finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                        trustedCallerOnly = true,
+                    )
+                    return
                 }
+                navigateToFallbackUrl(appLink.fallbackUrl)
                 return
             }
             command.value = HandleNonHttpAppLink(
                 nonHttpAppLink = appLink,
                 headers = getUrlHeaders(appLink.fallbackUrl),
                 showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
-                trustedCallerPackage = trustedCallerPackage(),
+                trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false),
                 finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
             )
         }
+    }
+
+    fun onTrustedCallerLaunchUnavailable(fallbackUrl: String?) {
+        navigateToFallbackUrl(fallbackUrl)
+    }
+
+    private fun navigateToFallbackUrl(fallbackUrl: String?) {
+        fallbackUrl?.let { command.value = NavigationCommand.Navigate(it, getUrlHeaders(it)) }
     }
 
     fun onPrintSelected() {
@@ -4283,7 +4395,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun invalidateBrowsingActions() {
         globalLayoutState.value = Invalidated
-        loadingViewState.value = LoadingViewState()
+        resetLoading()
         findInPageViewState.value = FindInPageViewState()
     }
 
@@ -4327,6 +4439,7 @@ class BrowserTabViewModel @Inject constructor(
         requestUserConfirmation: Boolean,
         isBlobDownloadWebViewFeatureEnabled: Boolean,
     ) {
+        onNavigationAbandoned()
         if (url.startsWith("blob:")) {
             if (isBlobDownloadWebViewFeatureEnabled) {
                 postMessageToConvertBlobToDataUri(webView, url)
@@ -4353,12 +4466,12 @@ class BrowserTabViewModel @Inject constructor(
         forceRefresh: Boolean = false,
     ) {
         if (!forceRefresh) command.value = Command.ExpandOmnibar
-        loadingViewState.value = currentLoadingViewState().copy(isLoading = true, progress = FIXED_PROGRESS)
+        startLoading(initialProgress = FIXED_PROGRESS)
         pdfDownloadJob += viewModelScope.launch {
             // downloadToCache wraps its own work in withContext(io); viewModelScope.launch
             // defaults to Main, so we stay on Main for the LiveData updates below.
             val result = inlinePdfHandler.downloadToCache(url, forceRefresh = forceRefresh, browserMode = browserMode)
-            loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
+            finishLoading(finalProgress = 100)
             when (result) {
                 is PdfDownloadResult.Success -> {
                     val pdfTitle = inlinePdfHandler.extractFileName(url)
@@ -4678,7 +4791,6 @@ class BrowserTabViewModel @Inject constructor(
         resetTrackersCount()
         refreshBrowserError()
         resetAutoConsent()
-        canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
 
     override fun handleCloakedAmpLink(initialUrl: String) {
@@ -4746,6 +4858,8 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         errorCode: String,
     ) {
+        // An error page replaces the load: reopen the gate and end the pending navigation
+        navigationState = navigationState.onErrorReceived(isStartProgressAtIntentEnabled())
         if (errorType != OMITTED) {
             errorPagePendingDismissal = false
             browserViewState.value =
@@ -4818,13 +4932,7 @@ class BrowserTabViewModel @Inject constructor(
             logcat { "Received MaliciousSiteWarning for $url, feed: $feed, exempted: false, clientSideHit: $clientSideHit" }
 
             viewModelScope.launch(dispatchers.main()) {
-                loadingViewState.value =
-                    currentLoadingViewState().copy(
-                        isLoading = false,
-                        progress = 100,
-                        url = siteUrlString,
-                        trackersAnimationEnabled = false,
-                    )
+                finishLoading(finalProgress = 100, url = siteUrlString, trackersAnimationEnabled = false)
 
                 browserViewState.value =
                     browserStateModifier.copyForMaliciousSiteWarningShowing(currentBrowserViewState(), maliciousSiteStatus)
@@ -4833,7 +4941,6 @@ class BrowserTabViewModel @Inject constructor(
                     currentOmnibarViewState().copy(
                         omnibarText = if (isFullUrlEnabled.value) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
                         queryOrFullUrl = siteUrlString,
-                        isEditing = false,
                     )
 
                 command.value =
@@ -4846,7 +4953,6 @@ class BrowserTabViewModel @Inject constructor(
                     currentOmnibarViewState().copy(
                         omnibarText = if (isFullUrlEnabled.value) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
                         queryOrFullUrl = siteUrlString,
-                        isEditing = false,
                     )
                 loadingViewState.value =
                     currentLoadingViewState().copy(
@@ -4909,13 +5015,6 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchAutofillSettings(privacyProtectionEnabled = !currentBrowserViewState().isPrivacyProtectionDisabled)
     }
 
-    fun cancelPendingAutofillRequestToChooseCredentials() {
-        canAutofillSelectCredentialsDialogCanAutomaticallyShow = false
-    }
-
-    fun canAutofillSelectCredentialsDialogCanAutomaticallyShow(): Boolean =
-        canAutofillSelectCredentialsDialogCanAutomaticallyShow && !currentOmnibarViewState().isEditing
-
     fun onShowUserCredentialsSaved(it: LoginCredentials) {
         viewModelScope.launch(dispatchers.main()) {
             command.value =
@@ -4943,17 +5042,17 @@ class BrowserTabViewModel @Inject constructor(
             when {
                 // 400 errors
                 statusCode == HTTP_STATUS_CODE_BAD_REQUEST_ERROR ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY,
                     )
                 // all 4xx errors apart from 400
                 statusCode / 100 == HTTP_STATUS_CODE_CLIENT_ERROR_PREFIX ->
-                    httpErrorPixels.get().updateCountPixel(
+                    httpErrorPixels.value.updateCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY,
                     )
                 // all 5xx errors
                 statusCode / 100 == HTTP_STATUS_CODE_SERVER_ERROR_PREFIX ->
-                    httpErrorPixels.get().update5xxCountPixel(
+                    httpErrorPixels.value.update5xxCountPixel(
                         HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY,
                         statusCode,
                     )
@@ -5205,6 +5304,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             DUCK_CHAT_FEATURE_NAME -> {
+                val pageUrl = url
                 viewModelScope.launch(dispatchers.io()) {
                     val response = duckChatJSHelper.processJsCallbackMessage(
                         featureName,
@@ -5213,6 +5313,7 @@ class BrowserTabViewModel @Inject constructor(
                         data,
                         tabId = tabId,
                         browserMode = browserMode,
+                        pageUrl = pageUrl,
                     )
                     withContext(dispatchers.main()) {
                         response?.let {
@@ -5424,7 +5525,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onSSLCertificateWarningAction(
         action: Action,
         url: String,
-        activeCustomTab: Boolean = false,
+        activeCustomTab: Boolean,
     ) {
         when (action) {
             is Action.Shown -> {
@@ -5476,7 +5577,7 @@ class BrowserTabViewModel @Inject constructor(
                     queryOrFullUrl = "",
                     forceExpand = true,
                 )
-            loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+            finishLoading()
             browserViewState.value =
                 currentBrowserViewState().copy(
                     showPrivacyShield = HighlightableButton.Visible(enabled = false),
@@ -5723,7 +5824,7 @@ class BrowserTabViewModel @Inject constructor(
         URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(text)
 
     fun onNewTabShown() {
-        newTabPixels.get().fireNewTabDisplayed()
+        newTabPixels.value.fireNewTabDisplayed()
     }
 
     fun handleMenuRefreshAction() {
@@ -5971,29 +6072,21 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDuckChatOmnibarButtonClicked(
         query: String?,
-        hasFocus: Boolean,
         isNtp: Boolean,
     ) {
         viewModelScope.launch {
             command.value = HideKeyboardForChat
         }
 
-        if (!duckAiFeatureState.showInputScreen.value) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
-        }
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
 
-        when {
-            // Contextual chat is about the page you're viewing, so on a page it's only offered from
-            // the unfocused omnibar: once focused (composing), fall through to full-screen Duck.ai.
-            // The NTP omnibar is focused from the start, so there the menu hangs off an empty query
-            // instead, and only when it carries the Chats entry alongside New Chat.
-            duckAiFeatureState.showContextualMode.value &&
-                if (isNtp) query.isNullOrBlank() else !hasFocus -> {
-                command.value = Command.ShowDuckAIContextualMode(tabId, url)
-            }
-
-            else -> openDuckChatFromOmnibar(query, hasFocus, isNtp)
+        // On the NTP the menu hangs off an empty query, and only when it carries the Chats entry
+        // alongside New Chat.
+        if (duckAiFeatureState.showContextualMode.value && (!isNtp || query.isNullOrBlank())) {
+            command.value = Command.ShowDuckAIContextualMode(tabId, url)
+        } else {
+            openDuckChatFromOmnibar(query)
         }
     }
 
@@ -6001,33 +6094,13 @@ class BrowserTabViewModel @Inject constructor(
      * Opens Duck.ai straight from the address bar icon. Also the fallback when the NTP menu declines
      * to show, so that path keeps behaving exactly as it did before the menu existed.
      */
-    fun openDuckChatFromOmnibar(
-        query: String?,
-        hasFocus: Boolean,
-        isNtp: Boolean,
-    ) {
-        val (url, submittedAiPrompt) = when {
-            hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false) to false
-            hasFocus && queryUrlPredictor.isUrl(query ?: "") -> (query ?: "") to false
-            hasFocus -> duckChat.getDuckChatUrl(query ?: "", true) to !query.isNullOrBlank()
-            else -> duckChat.getDuckChatUrl(query ?: "", false) to false
-        }
-        if (duckChat.isDuckChatUrl(url.toUri())) {
-            if (submittedAiPrompt) {
-                browserInteractionsPlugins.getPlugins().forEach {
-                    it.onAiPromptSubmitted(source = DuckChatEntryPoint.ADDRESS_BAR_ICON.name.lowercase())
-                }
-            }
-            duckChat.reportDuckChatEntry(
-                DuckChatEntryPoint.ADDRESS_BAR_ICON,
-                opensNewTab = false,
-                hasPrompt = submittedAiPrompt,
-            )
-            submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
-        } else {
-            // The typed-URL branch above: genuinely a URL submission, not a Duck.ai one.
-            onUserSubmittedQuery(url)
-        }
+    fun openDuckChatFromOmnibar(query: String?) {
+        duckChat.reportDuckChatEntry(
+            DuckChatEntryPoint.ADDRESS_BAR_ICON,
+            opensNewTab = false,
+            hasPrompt = false,
+        )
+        submitQuery(duckChat.getDuckChatUrl(query ?: "", false), QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
     }
 
     fun onVpnMenuClicked() {

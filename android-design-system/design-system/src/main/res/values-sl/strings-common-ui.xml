@@ -32,6 +32,7 @@
     <string name="removeAll">Odstrani vse</string>
     <string name="undo">Razveljavi</string>
     <string name="cancel">Preklic</string>
+    <string name="done">Končano</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Vedno vklopljeno</string>

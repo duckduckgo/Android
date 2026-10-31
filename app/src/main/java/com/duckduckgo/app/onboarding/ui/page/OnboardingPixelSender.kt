@@ -34,8 +34,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -78,6 +78,8 @@ sealed interface OnboardingPixelAction {
     data class PreferencesClicked(val selections: Map<OnboardingPreference, Boolean>) : OnboardingPixelAction
 
     data class SingleChoiceClicked(val optionId: String) : OnboardingPixelAction
+
+    data class TimeLimitReached(val byAppOpens: Boolean) : OnboardingPixelAction
 }
 
 /**
@@ -128,7 +130,7 @@ interface OnboardingPixelSender {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealOnboardingPixelSender @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
@@ -214,6 +216,9 @@ class RealOnboardingPixelSender @Inject constructor(
 
             is OnboardingPixelAction.SingleChoiceClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, action.optionId)
+
+            is OnboardingPixelAction.TimeLimitReached ->
+                fireStep(pixelName, PIXEL_EVENT_REACHED, if (action.byAppOpens) VALUE_APP_OPENS else VALUE_DAYS, includeValueInTag = false)
         }
     }
 
@@ -389,6 +394,7 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val PIXEL_EVENT_SHOWN = "shown"
         private const val PIXEL_EVENT_CLICKED = "clicked"
         private const val PIXEL_EVENT_CONFIRMED = "confirmed"
+        private const val PIXEL_EVENT_REACHED = "reached"
 
         private const val INSTALL_TYPE_NEW = "new"
         private const val INSTALL_TYPE_REINSTALL = "reinstall"
@@ -426,6 +432,8 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val VALUE_NOT_ADDED = "not_added"
         private const val VALUE_GRANTED = "granted"
         private const val VALUE_DENIED = "denied"
+        private const val VALUE_DAYS = "days"
+        private const val VALUE_APP_OPENS = "app-opens"
         private const val SEARCH_ONLY = "search_only"
         private const val SEARCH_PLUS_DUCKAI = "search_plus_duckai"
 

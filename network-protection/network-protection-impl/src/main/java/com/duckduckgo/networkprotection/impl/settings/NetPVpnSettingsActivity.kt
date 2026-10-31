@@ -24,9 +24,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -50,7 +50,6 @@ import kotlin.math.absoluteValue
 
 @InjectWith(
     scope = ActivityScope::class,
-    delayGeneration = true, // VpnSettingPlugin can be contributed from other modules
 )
 @ContributeToActivityStarter(NetPVpnSettingsScreenNoParams::class, screenName = "vpn.settings")
 class NetPVpnSettingsActivity : DuckDuckGoActivity() {

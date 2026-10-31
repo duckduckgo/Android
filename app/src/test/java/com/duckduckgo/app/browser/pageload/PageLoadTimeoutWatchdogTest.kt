@@ -357,6 +357,190 @@ class PageLoadTimeoutWatchdogTest {
     }
 
     @Test
+    fun whenPageIsVisibleThenSamePageRequestDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFirstContentVisible(URL)
+        advanceToSeconds(5)
+
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToSeconds(60)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenPageIsFinishedThenSamePageRequestWithTrailingSlashDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest("$URL/")
+        watchdog.onMainFrameRequest(URL.trimEnd('/'))
+
+        advanceToSeconds(60)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenUserInitiatedLoadAnnouncedThenSamePageRequestArms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenUserInitiatedLoadIsConsumedThenLaterSamePageRequestDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToSeconds(60)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenPageIsLoadedThenDifferentUrlRequestArms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest("https://other.example.com/")
+        watchdog.onCommitted("https://other.example.com/")
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
+    }
+
+    @Test
+    fun whenLoadedPageIsLeftForAnotherThenReturnsToItWatchdogArms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onMainFrameRequest("https://other.example.com/")
+        watchdog.onEngineError()
+
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onCommitted(URL)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
+    }
+
+    @Test
+    fun whenPageIsLoadedThenDifferentUrlRequestNeverCommitsThenNoTimeout() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest("https://other.example.com/")
+
+        advanceToSeconds(120)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenPageIsLoadedThenUserInitiatedRequestNeverCommitsThenTimesOut() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest("https://other.example.com/")
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenPageIsLoadedThenUserInitiatedRedirectNeverCommitsThenTimesOut() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest("https://other.example.com/")
+        watchdog.onRedirect(HOP_1)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenNoPageWasDisplayedThenRequestNeverCommitsThenTimesOut() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onMainFrameRequest(OTHER_URL)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenSuppressedRequestIsFollowedByUserInitiatedHangThenItTimesOut() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onMainFrameRequest("https://other.example.com/")
+        advanceToSeconds(60)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(OTHER_URL)
+
+        advanceToSeconds(60 + 45)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenSamePageRequestRepeatsBeforeAnyContentThenClockRestarts() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(10)
+        watchdog.onMainFrameRequest(URL)
+
+        advanceToMs(54_999)
+        assertTrue(timeouts.isEmpty())
+        advanceToMs(55_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenPageIsLoadedThenSamePageCommitDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onCommitted(URL)
+
+        advanceToSeconds(120)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenUserInitiatedLoadIsServedWithoutRequestThenCommitArms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onCommitted(URL)
+
+        advanceToMs(45_000)
+        assertEquals(listOf(TimedOut(COMMITTED_NO_CONTENT)), timeouts)
+    }
+
+    @Test
+    fun whenUserInitiatedLoadIsServedWithoutRequestThenContentVisibleDisarms() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+
+        watchdog.onUserInitiatedLoad()
+        watchdog.onCommitted(URL)
+        watchdog.onFirstContentVisible(URL)
+
+        advanceToMs(120_000)
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
     fun whenNothingIsArmedThenCommitArmsAsFallback() = watchdogTest { watchdog ->
         advanceToSeconds(10)
         watchdog.onCommitted(URL)
@@ -413,6 +597,18 @@ class PageLoadTimeoutWatchdogTest {
         watchdog.onNavigatedAway()
 
         advanceToSeconds(120)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenUserInitiatedRequestBecomesDownloadThenNoTimeout() = watchdogTest { watchdog ->
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(1)
+        watchdog.onDownloadStarted()
+
+        advanceToSeconds(60)
 
         assertTrue(timeouts.isEmpty())
     }
@@ -505,6 +701,102 @@ class PageLoadTimeoutWatchdogTest {
         watchdog.onFinished(URL)
 
         assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenBackgroundedThenNoTimeoutWhileBackgrounded() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(5)
+        watchdog.onBackgrounded()
+
+        advanceToSeconds(65)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenForegroundedThenClockRestartsAndTimesOutFortyFiveSecondsLater() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(20)
+        watchdog.onBackgrounded()
+        advanceToSeconds(100)
+        watchdog.onForegrounded()
+
+        advanceToMs(100_000 + 44_999)
+        assertTrue(timeouts.isEmpty())
+
+        advanceToMs(100_000 + 45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenFinishedWhileBackgroundedThenForegroundingFiresNothing() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onBackgrounded()
+        advanceToSeconds(10)
+        watchdog.onFinished(URL)
+        watchdog.onForegrounded()
+
+        advanceToSeconds(200)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenMainFrameRequestedWhileBackgroundedThenClockStartsOnlyWhenForegrounded() = watchdogTest { watchdog ->
+        watchdog.onBackgrounded()
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(120)
+        assertTrue(timeouts.isEmpty())
+
+        watchdog.onForegrounded()
+        advanceToMs(120_000 + 44_999)
+        assertTrue(timeouts.isEmpty())
+
+        advanceToMs(120_000 + 45_000)
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenSameUrlRequestedAgainAfterFinishWhileBackgroundedThenItDoesNotArm() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onBackgrounded()
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onForegrounded()
+
+        advanceToSeconds(200)
+
+        assertTrue(timeouts.isEmpty())
+    }
+
+    @Test
+    fun whenUserInitiatedSameUrlRequestedWhileBackgroundedThenItArmsOnlyWhenForegrounded() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onFinished(URL)
+        watchdog.onBackgrounded()
+        watchdog.onUserInitiatedLoad()
+        watchdog.onMainFrameRequest(URL)
+        advanceToSeconds(200)
+        assertTrue(timeouts.isEmpty())
+
+        watchdog.onForegrounded()
+        advanceToSeconds(400)
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
+    }
+
+    @Test
+    fun whenBackgroundedAndForegroundedTwiceThenOnlyOneTimeoutFires() = watchdogTest { watchdog ->
+        watchdog.onMainFrameRequest(URL)
+        watchdog.onBackgrounded()
+        watchdog.onBackgrounded()
+        watchdog.onForegrounded()
+        watchdog.onForegrounded()
+
+        advanceToSeconds(200)
+
+        assertEquals(listOf(TimedOut(NOT_COMMITTED)), timeouts)
     }
 
     private inner class VirtualTimeProvider : CurrentTimeProvider {

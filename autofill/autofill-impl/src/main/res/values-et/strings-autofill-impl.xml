@@ -249,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Impordi paroolid Google\'ist</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Sinu seade võib paluda sul kinnitamiseks sisestada PIN-koodi, parooli või lukustusmustrit.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Impordi Google\'ist</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vali CSV-fail</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Impordi töölaua brauserist</string>
@@ -280,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Too oma paroolid Google\'ist DuckDuckGo\'sse</string>
     <string name="passwords_import_promo_subtitle">Impordi oma paroolid kiiresti ja turvaliselt DuckDuckGosse. Google võib paluda sul oma parooli sisestada.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Impordi oma paroolid kiiresti ja turvaliselt DuckDuckGo-sse. Sinu seade võib paluda sul kinnitamiseks sisestada PIN-koodi, parooli või lukustusmustrit.</string>
     <string name="passwords_import_promo_action">Impordi Google\'ist</string>
     <string name="passwords_import_promo_in_browser_title">Too oma paroolid Google\'ist DuckDuckGo\'sse</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Impordi oma paroolid Google\'ist DuckDuckGo-sse</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Ära enam küsi</string>
     <string name="passwords_import_promo_in_settings_title">Impordi paroolid Google\'ist</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Peida</string>
@@ -308,5 +311,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Midagi läks valesti</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Veenduge, et olete internetiga ühendatud ja proovige uuesti.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import on lõpetatud!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Ole kannatlik – hoia see aken avatuna. See ei tohiks võtta rohkem kui minut või kaks.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google võib küsida sinu parooli.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google saadab sulle e-kirja, mis kinnitab, et sinu andmed on eksporditud. Sa ei pea midagi tegema.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import on lõpetatud!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Imporditud järjehoidjaid: <b>%1$d</b>]]></string>
 
 </resources>

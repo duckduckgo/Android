@@ -20,9 +20,9 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -57,6 +57,7 @@ import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
@@ -83,6 +84,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -130,6 +132,10 @@ class SyncActivityViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
 
+    // We hide the settings while a deep link starts a Sync flow, so they don't flash before the flow's screen covers them.
+    // It lives outside viewState because signedOutState() would reset it.
+    private val isContentHidden = MutableStateFlow(false)
+
     val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
 
     init {
@@ -143,6 +149,8 @@ class SyncActivityViewModel @Inject constructor(
     fun viewState(): Flow<ViewState> =
         viewState.onStart {
             observeState()
+        }.combine(isContentHidden) { state, isContentHidden ->
+            state.copy(isContentHidden = isContentHidden)
         }.flowOn(dispatchers.io())
 
     private fun observeState() {
@@ -242,6 +250,7 @@ class SyncActivityViewModel @Inject constructor(
         val autoRestoreEnabled: Boolean = false,
         val isThisDeviceSyncing: Boolean = false,
         val isImprovedSyncFlow: Boolean = false,
+        val isContentHidden: Boolean = false,
     )
 
     sealed class SetupFlows {
@@ -284,7 +293,10 @@ class SyncActivityViewModel @Inject constructor(
         data object ShowDeviceUnsupported : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
-        data class ShowPreviousSessionReady(val syncEntryPoint: SyncEntryPoint) : Command()
+        data class ShowPreviousSessionReady(
+            val syncEntryPoint: SyncEntryPoint,
+            val isAuthRequired: Boolean,
+        ) : Command()
         data class LaunchOriginalFlow(
             val syncEntryPoint: SyncEntryPoint,
             val isImprovedSyncFlow: Boolean,
@@ -294,8 +306,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onSyncWithAnotherDevice() {
         viewModelScope.launch(dispatchers.io()) {
             if (syncAutoRestore.canRestore()) {
-                withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncSetup) {
-                    command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE))
+                if (isImprovedSyncFlow()) {
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE, isAuthRequired = true))
+                } else {
+                    withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncSetup) {
+                        command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE, isAuthRequired = false))
+                    }
                 }
             } else {
                 withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED) {
@@ -313,14 +329,22 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onSyncThisDevice(source: String? = null) {
+    fun onSyncThisDevice(launchSource: SyncLaunchSource = SyncLaunchSource.Other) {
         syncPixels.fireBackupThisDeviceTapped()
+        startSyncThisDevice(launchSource)
+    }
+
+    private fun startSyncThisDevice(launchSource: SyncLaunchSource) {
         viewState.update { it.setThisDeviceSyncInProgress() }
         viewModelScope.launch(dispatchers.io()) {
-            syncSetupWideEvent.onFlowStarted(source)
+            syncSetupWideEvent.onFlowStarted(launchSource)
             if (syncAutoRestore.canRestore()) {
-                withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncThisDevice) {
-                    command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT))
+                if (isImprovedSyncFlow()) {
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = true))
+                } else {
+                    withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncThisDevice) {
+                        command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = false))
+                    }
                 }
             } else {
                 if (isImprovedSyncFlow()) {
@@ -338,8 +362,12 @@ class SyncActivityViewModel @Inject constructor(
         syncPixels.fireRecoverSyncDataTapped()
         viewModelScope.launch(dispatchers.io()) {
             if (syncAutoRestore.canRestore()) {
-                withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncSetup) {
-                    command.send(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA))
+                if (isImprovedSyncFlow()) {
+                    command.send(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA, isAuthRequired = true))
+                } else {
+                    withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, flow = AuthFlow.SyncSetup) {
+                        command.send(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA, isAuthRequired = false))
+                    }
                 }
             } else {
                 if (isImprovedSyncFlow()) {
@@ -524,6 +552,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onScreenExit() {
+        isContentHidden.value = false
         val current = viewState.value
         val initial = initialAutoRestoreEnabled
         if (!autoRestoreAvailable || initial == null) {
@@ -681,6 +710,8 @@ class SyncActivityViewModel @Inject constructor(
         flow: AuthFlow = AuthFlow.Default,
         action: suspend () -> Unit,
     ) {
+        // We show the settings because the prompt would otherwise appear over a blank screen.
+        isContentHidden.value = false
         val response = deviceAuthenticator.authenticate(source, request) { event ->
             viewModelScope.launch {
                 when (event) {
@@ -790,6 +821,17 @@ class SyncActivityViewModel @Inject constructor(
                         command.send(Command.DeepLinkIntoSetup(parsed, syncAccountRepository.isSignedIn()))
                     }
                 }
+            }
+        }
+    }
+
+    fun processSourceDeepLink(launchSource: SyncLaunchSource) {
+        isContentHidden.value = true
+        viewModelScope.launch(dispatchers.io()) {
+            when {
+                syncAccountRepository.isSignedIn() -> onAddAnotherDevice()
+                SetupFlows.CreateAccountFlow in disabledSetupFlows() -> isContentHidden.value = false
+                else -> startSyncThisDevice(launchSource)
             }
         }
     }

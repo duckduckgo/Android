@@ -1,0 +1,109 @@
+{
+    "wide_duckai-response-wait": {
+        "description": "Captures how long a user waits on a Duck.ai response in the full Duck.ai tab, whether they leave while it is pending, and whether they come back to it. Not sampled: every flow is recorded.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["feature_lifecycle", "user_interaction", "scheduled"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
+            {
+                "key": "feature.name",
+                "type": "string",
+                "description": "Feature identifier for this wide event",
+                "enum": ["duckai-response-wait"]
+            },
+            {
+                "key": "feature.data.ext.reasoning_effort",
+                "type": "string",
+                "description": "Reasoning effort selected for the prompt. Present only when an effort was selected",
+                "enum": ["none", "minimal", "low", "medium", "high"]
+            },
+            {
+                "key": "feature.data.ext.used_reasoning",
+                "type": "boolean",
+                "description": "Whether the prompt used reasoning (low, medium or high effort). Present from the start of the flow"
+            },
+            {
+                "key": "feature.data.ext.used_extended_reasoning",
+                "type": "boolean",
+                "description": "Whether the prompt used extended reasoning (medium or high effort). Present from the start of the flow"
+            },
+            {
+                "key": "feature.data.ext.user_requested_image_generation",
+                "type": "boolean",
+                "description": "Whether the user selected the image generation tool for the prompt. Present from the start of the flow"
+            },
+            {
+                "key": "feature.data.ext.user_requested_web_search",
+                "type": "boolean",
+                "description": "Whether the user selected the web search tool for the prompt. Present from the start of the flow"
+            },
+            {
+                "key": "feature.data.ext.status_reason",
+                "type": "string",
+                "description": "Reason the flow ended. The flow follows the chat, not the tab it was sent from. watched when the user stayed on the chat until the response finished, returned when the user came back to the chat after leaving, not_returned when the user never came back before the flow expired, stopped when the user tapped stop while the response was generating. Present on every event",
+                "enum": ["watched", "returned", "not_returned", "stopped"]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "type": "string",
+                "description": "Reason the flow failed. not_returned when the user never came back to the chat before the flow expired. Only present on FAILURE events",
+                "enum": ["not_returned"]
+            },
+            {
+                "key": "feature.data.ext.step.left",
+                "type": "boolean",
+                "description": "Parameter present when the user left the chat while the response was still loading"
+            },
+            {
+                "key": "feature.data.ext.left_via",
+                "type": "string",
+                "description": "How the user left the chat. Present only when step.left is present",
+                "enum": ["app_backgrounded", "tab_switched", "new_tab_opened", "back_or_close", "fire_tab_opened", "other_navigation"]
+            },
+            {
+                "key": "feature.data.ext.step.response_ready_while_away",
+                "type": "boolean",
+                "description": "Parameter present when the response finished while the user was away from the tab. Best effort: absent when the page only reports the finished response after the user is back, for example while the app was in the background"
+            },
+            {
+                "key": "feature.data.ext.step.returned",
+                "type": "boolean",
+                "description": "Parameter present when the user came back to the chat after leaving, in the same tab or another one"
+            },
+            {
+                "key": "feature.data.ext.step.prompt_after_return",
+                "type": "boolean",
+                "description": "Parameter present when the user submitted another prompt or regenerated a response in the same chat after returning"
+            },
+            {
+                "key": "feature.data.ext.prompt_to_leave_ms_bucketed",
+                "type": "string",
+                "description": "Time from prompt submission to the user leaving the tab, bucketed (lower end of bucket, in ms). -1 when the measured duration was negative. Present only when step.left is present",
+                "enum": ["-1", "0", "2000", "5000", "10000", "20000", "30000"]
+            },
+            {
+                "key": "feature.data.ext.leave_to_return_ms_bucketed",
+                "type": "string",
+                "description": "Time from the user leaving the tab to coming back, bucketed (lower end of bucket, in ms). -1 when the measured duration was negative. Present only when step.returned is present",
+                "enum": ["-1", "0", "5000", "10000", "30000", "60000", "300000", "900000", "3600000"]
+            },
+            {
+                "key": "feature.data.ext.ready_to_return_ms_bucketed",
+                "type": "string",
+                "description": "Time from the response finishing while the user was away to the user coming back, bucketed (lower end of bucket, in ms). -1 when the measured duration was negative. Present only when the response finished while away and the user returned",
+                "enum": ["-1", "0", "5000", "10000", "30000", "60000", "300000", "900000", "3600000"]
+            }
+        ]
+    }
+}

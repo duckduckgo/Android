@@ -17,6 +17,11 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_E
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_CONFIRM_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_DISMISS
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_SHOWN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SWITCH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import org.junit.Assert.*
 import org.junit.Assume.assumeFalse
@@ -34,6 +39,7 @@ class SubscriptionPixelTest(
         assumeFalse(
             pixel in listOf(
                 PURCHASE_SUCCESS_ORIGIN,
+                SUBSCRIPTION_SWITCH,
                 SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH,
                 FREE_TRIAL_START,
                 FREE_TRIAL_VPN_ACTIVATION,
@@ -48,6 +54,10 @@ class SubscriptionPixelTest(
                 SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR,
                 SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION,
                 SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED,
+                SUBSCRIPTION_SETTINGS_WITHDRAWAL_CLICK,
+                SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_SHOWN,
+                SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_CONFIRM_CLICK,
+                SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_DISMISS,
             ),
         )
 
@@ -61,6 +71,7 @@ class SubscriptionPixelTest(
         assumeFalse(
             pixel in listOf(
                 PURCHASE_SUCCESS_ORIGIN,
+                SUBSCRIPTION_SWITCH,
                 SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED,
                 SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR,
                 SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION,

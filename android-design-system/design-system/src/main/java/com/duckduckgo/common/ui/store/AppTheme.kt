@@ -21,8 +21,8 @@ import android.content.res.Configuration
 import android.util.Log
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface AppTheme {
@@ -30,7 +30,7 @@ interface AppTheme {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class BrowserAppTheme @Inject constructor(
     private val context: Context,
     private val themeDataStore: ThemingDataStore,

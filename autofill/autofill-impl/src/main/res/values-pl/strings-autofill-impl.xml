@@ -261,6 +261,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuj hasła z Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Twoje urządzenie może poprosić o podanie kodu PIN, hasła lub wzoru w celu potwierdzenia.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importuj z Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Wybierz plik CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuj z przeglądarki komputerowej</string>
@@ -292,8 +293,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Przenieś swoje hasła z&lt;br /&gt;Google do DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Szybko i bezpiecznie importuj hasła do DuckDuckGo. Google może poprosić o wpisanie hasła.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Szybko i bezpiecznie zaimportuj hasła do DuckDuckGo. Twoje urządzenie może poprosić o podanie kodu PIN, hasła lub wzoru w celu potwierdzenia.</string>
     <string name="passwords_import_promo_action">Importuj z Google</string>
     <string name="passwords_import_promo_in_browser_title">Przenieś hasła z Google do DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Zaimportuj hasła z Google do DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Nie pytaj ponownie</string>
     <string name="passwords_import_promo_in_settings_title">Importuj hasła z Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ukryj</string>
@@ -320,5 +323,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Wystąpił błąd</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Upewnij się, że masz połączenie z internetem, i spróbuj ponownie.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import zakończony!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Jeszcze chwila – pozostaw to okno otwarte. Nie powinno to zająć więcej niż minutę lub dwie.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google może poprosić o podanie hasła.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google wyśle Ci e-mail z potwierdzeniem, że Twoje dane zostały wyeksportowane. Nie musisz nic robić.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import zakończony!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Zaimportowane zakładki: <b>%1$d</b>]]></string>
 
 </resources>

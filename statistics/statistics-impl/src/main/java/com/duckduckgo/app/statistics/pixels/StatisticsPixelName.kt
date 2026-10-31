@@ -20,7 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 enum class StatisticsPixelName(override val pixelName: String) : PixelName {
@@ -28,13 +28,18 @@ enum class StatisticsPixelName(override val pixelName: String) : PixelName {
     RETENTION_SEGMENTS("m_retention_segments"),
 
     ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT("timeout_atb_pre_initializer_plugin"),
+
+    WIDE_EVENTS_CLEANUP_FAILURE_COUNT("wide_events_cleanup_failure_c"),
+    WIDE_EVENTS_CLEANUP_FAILURE_DAILY("wide_events_cleanup_failure_d"),
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AtbInitializerPluginPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             StatisticsPixelName.ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT.pixelName to PixelParameter.removeAtb(),
+            StatisticsPixelName.WIDE_EVENTS_CLEANUP_FAILURE_COUNT.pixelName to PixelParameter.removeAtb(),
+            StatisticsPixelName.WIDE_EVENTS_CLEANUP_FAILURE_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

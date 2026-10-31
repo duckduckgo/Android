@@ -19,8 +19,8 @@ package com.duckduckgo.duckchat.impl.helper
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CompletableDeferred
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -54,7 +54,7 @@ interface EditPromptSessionStore {
     fun clear(sessionId: String)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealEditPromptSessionStore @Inject constructor() : EditPromptSessionStore {
 

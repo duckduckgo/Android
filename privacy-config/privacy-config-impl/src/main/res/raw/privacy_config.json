@@ -2,6 +2,37 @@
     "readme": "https://github.com/duckduckgo/privacy-configuration",
     "version": 1652275711516,
     "features": {
+        "adBlockingExtension": {
+            "exceptions": [],
+            "settings": {
+                "version": "2026.10.19",
+                "enabledByDefault": false,
+                "scriptlets": {
+                    "scriptlets/isolated/ublock-filters.js": {
+                        "url": "https://staticcdn.duckduckgo.com/extensions/content-blocker/scriptlets/e72f0dfdf569af74a5224cc60b0604c0e21bfb9c6f9d919c8aa9800a5166ed25.js",
+                        "signature": "MEUCIAthpoKjgPUQK8AzArYBJgS7BnHzBKajxLRqEF3Yr07OAiEAvuuFxb+lf4PkCtp1Km+4HIpUlQOKX5sP+fRxEQ9tdpc="
+                    },
+                    "scriptlets/main/ublock-filters.js": {
+                        "url": "https://staticcdn.duckduckgo.com/extensions/content-blocker/scriptlets/f9427825f8c0b6f76689264f8f2617501514d16c51915f275b6dd5eb450fcc4a.js",
+                        "signature": "MEUCIQCr+IOqu3XPeTGLaOrU+BDtrQCy4xVV6VA409Bx8AJIaQIgQLs2lIWLy4ElLfTOXuiVUbna+4pDEJm8in3phPIKmPc="
+                    },
+                    "scriptlets/main/ublock-experimental.js": {
+                        "url": "https://staticcdn.duckduckgo.com/extensions/content-blocker/scriptlets/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.js",
+                        "signature": "MEQCIBa7cEEfSbBpscPjm1z4AOGh4rPcB843qa/QflqXorcrAiAx77wKvRFycXUhINjF2e85/nv0/F5RCtdElsZwqHs/1Q=="
+                    },
+                    "scriptlets/isolated/ublock-experimental.js": {
+                        "url": "https://staticcdn.duckduckgo.com/extensions/content-blocker/scriptlets/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.js",
+                        "signature": "MEYCIQCnBGVxWzJ9qiq6CDxKWAlxmP6MhDCZ7sBFQRL9xG8/0QIhAOFREeAmyRJ/H7pdAMfKNb2TK8iNjFpANI2fJ87/J2cW"
+                    },
+                    "rules/youtube.json": {
+                        "url": "https://staticcdn.duckduckgo.com/extensions/content-blocker/scriptlets/2337db6aa7466667595226f780b6590779db3007ac0a65ef3833f89610c92824.json",
+                        "signature": "MEUCIGd/xYOH6wsy3PurPzGeM9XtZmXmFFWayZGOA64mOaT3AiEAlRcQZWZQWfyTkB4f/dHt5sqcqttdQE3nKyPRauHIZ9U="
+                    }
+                }
+            },
+            "state": "enabled",
+            "features": {}
+        },
         "ampLinks": {
             "exceptions": [
                 {
@@ -167,8 +198,37 @@
             ]
         },
         "fingerprintingBattery": {
-            "exceptions": [],
-            "state": "disabled"
+            "exceptions": [
+                {
+                    "domain": "litebluesso.usps.gov"
+                },
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                },
+                {
+                    "domain": "coinbase.com"
+                }
+            ],
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "fingerprintingCanvas": {
             "settings": {
@@ -211,70 +271,199 @@
             "state": "disabled"
         },
         "fingerprintingHardware": {
+            "settings": {
+                "keyboard": {
+                    "type": "undefined"
+                },
+                "hardwareConcurrency": {
+                    "type": "number",
+                    "value": 8
+                },
+                "deviceMemory": {
+                    "type": "number",
+                    "value": 4
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            },
             "exceptions": [
                 {
-                    "domain": "accounts.nintendo.com",
-                    "reason": "broken login"
+                    "domain": "www.ticketmaster.com"
                 },
                 {
-                    "domain": "gamestop.com",
-                    "reason": "broken add to cart"
+                    "domain": "gamestop.com"
                 },
                 {
-                    "domain": "godaddy.com",
-                    "reason": "adwall"
+                    "domain": "godaddy.com"
                 },
                 {
-                    "domain": "play.geforcenow.com",
-                    "reason": "site breakage"
+                    "domain": "fedex.com"
                 },
                 {
-                    "domain": "realestate.com.au",
-                    "reason": "Site not loading"
+                    "domain": "litebluesso.usps.gov"
                 },
                 {
-                    "domain": "secureserver.net",
-                    "reason": "adwall"
+                    "domain": "realestate.com.au"
                 },
                 {
-                    "domain": "stadia.google.com",
-                    "reason": "site breakage"
+                    "domain": "secureserver.net"
                 },
                 {
-                    "domain": "hyatt.com",
-                    "reason": "site breakage"
+                    "domain": "proton.me"
+                },
+                {
+                    "domain": "nordstrom.com"
+                },
+                {
+                    "domain": "xfinity.com"
+                },
+                {
+                    "domain": "centerwellpharmacy.com"
+                },
+                {
+                    "domain": "go365.com"
+                },
+                {
+                    "domain": "humana.com"
+                },
+                {
+                    "domain": "target.com"
+                },
+                {
+                    "domain": "bankofamerica.com"
+                },
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                },
+                {
+                    "domain": "coinbase.com"
                 }
             ],
-            "state": "disabled"
+            "state": "enabled"
         },
         "fingerprintingScreenSize": {
+            "settings": {
+                "availTop": {
+                    "type": "number",
+                    "value": 0
+                },
+                "availLeft": {
+                    "type": "number",
+                    "value": 0
+                },
+                "colorDepth": {
+                    "type": "number",
+                    "value": 24
+                },
+                "pixelDepth": {
+                    "type": "number",
+                    "value": 24
+                },
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            },
             "exceptions": [
                 {
-                    "domain": "gamestop.com",
-                    "reason": "broken add to cart"
+                    "domain": "fedex.com"
                 },
                 {
-                    "domain": "godaddy.com",
-                    "reason": "adwall"
+                    "domain": "gamestop.com"
                 },
                 {
-                    "domain": "hyatt.com",
-                    "reason": "Site not loading"
+                    "domain": "godaddy.com"
                 },
                 {
-                    "domain": "realestate.com.au",
-                    "reason": "Site not loading"
+                    "domain": "litebluesso.usps.gov"
                 },
                 {
-                    "domain": "secureserver.net",
-                    "reason": "adwall"
+                    "domain": "secureserver.net"
+                },
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                },
+                {
+                    "domain": "youtube.com"
+                },
+                {
+                    "domain": "tracfone.com"
+                },
+                {
+                    "domain": "coinbase.com"
                 }
             ],
-            "state": "disabled"
+            "state": "enabled"
         },
         "fingerprintingTemporaryStorage": {
-            "exceptions": [],
-            "state": "disabled"
+            "exceptions": [
+                {
+                    "domain": "fedex.com"
+                },
+                {
+                    "domain": "litebluesso.usps.gov"
+                },
+                {
+                    "domain": "tattoogenius.art"
+                },
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                },
+                {
+                    "domain": "ticketmaster.com"
+                },
+                {
+                    "domain": "coinbase.com"
+                }
+            ],
+            "state": "enabled",
+            "settings": {
+                "conditionalChanges": [
+                    {
+                        "condition": {
+                            "injectName": "android-adsjs"
+                        },
+                        "patchSettings": [
+                            {
+                                "op": "add",
+                                "path": "/additionalCheck",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         "googleRejected": {
             "exceptions": [],
@@ -303,8 +492,25 @@
             "exceptions": []
         },
         "navigatorInterface": {
-            "exceptions": [],
-            "state": "disabled"
+            "exceptions": [
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                }
+            ],
+            "settings": {
+                "privilegedDomains": [
+                    {
+                        "domain": "duckduckgo.com"
+                    },
+                    {
+                        "domain": "duck.co"
+                    }
+                ]
+            },
+            "state": "enabled"
         },
         "referrer": {
             "exceptions": [

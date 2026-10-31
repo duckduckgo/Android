@@ -40,15 +40,15 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 abstract class TabRepositoryModule {
 
     @Binds
@@ -65,7 +65,7 @@ abstract class TabRepositoryModule {
     companion object {
 
         @Provides
-        @SingleInstanceIn(AppScope::class)
+        @SingleIn(AppScope::class)
         @RegularMode
         fun provideRegularTabRepository(
             @RegularMode tabsDao: TabsDao,
@@ -106,7 +106,7 @@ abstract class TabRepositoryModule {
         )
 
         @Provides
-        @SingleInstanceIn(AppScope::class)
+        @SingleIn(AppScope::class)
         @FireMode
         fun provideFireTabRepository(
             @FireMode tabsDao: TabsDao,

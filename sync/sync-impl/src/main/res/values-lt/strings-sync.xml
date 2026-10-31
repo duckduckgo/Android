@@ -306,6 +306,7 @@
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Naudokite šį kodą duomenims atkurti, jei prarastumėte prieigą prie šio įrenginio. Saugokite šį kodą.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Po 18 mėnesių neaktyvumo negalima atkurti „Sync &amp; Backup“ duomenų. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="sync_simplified_settings_delete_account_item">Išjungti ir ištrinti duomenis serveryje</string>
+    <string name="sync_simplified_settings_turn_off_item">Išjungti „Sync &amp; Backup“</string>
     <string name="sync_simplified_settings_storage_permission_message">Išsaugoti atkūrimo PDF reikia saugojimo leidimo</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
 
@@ -320,6 +321,26 @@
     <string name="sync_simplified_settings_delete_server_data_dialog_body">Visi įrenginiai, naudojantys „Sync &amp; Backup“, bus atjungti, o jūsų sinchronizuoti duomenys bus ištrinti iš serverio.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Ištrinti duomenis serveryje</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Atšaukti</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Šio veiksmo anuliuoti negalima.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Visi įrenginiai, naudojantys „Sync &amp; Backup“, bus atjungti, o jūsų sinchronizuoti duomenys bus ištrinti iš serverio.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Ištrinti visam laikui</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button_v2">Atšaukti</string>
+
+    <!-- Sync settings screen: turn off sheet -->
+    <string name="sync_simplified_settings_turn_off_sheet_remove_title" instruction="Placeholder is a device name. e.g., Samsung S23">Ar šalinti įrenginį „ %1$s“ iš „Sync &amp; Backup“?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_body" instruction="Placeholder is a device name. e.g., Samsung S23">Įrenginys „%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų kituose įrenginiuose.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item">Ar ištrinti duomenis ir serveryje?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_item_hint">Išjungia „Sync &amp; Backup“ ir ištrina visus sinchronizuotus duomenis iš serverio bei deaktyvuoja jūsų atkūrimo kodą.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_remove_primary_button">Šalinti įrenginį</string>
+    <string name="sync_simplified_settings_turn_off_sheet_title">Ar išjungti „Sync &amp; Backup“?</string>
+    <string name="sync_simplified_settings_turn_off_sheet_body">Visi įrenginiai, naudojantys „Sync &amp; Backup“, bus atjungti, o jūsų sinchronizuoti duomenys bus ištrinti iš serverio.</string>
+    <string name="sync_simplified_settings_turn_off_sheet_primary_button_delete">Išjungti ir ištrinti duomenis serveryje</string>
+
+    <!-- Sync settings screen: turn off this device dialog -->
+    <string name="sync_simplified_settings_turn_off_device_dialog_title" instruction="Placeholder is a device name. e.g., Samsung S23">Ar šalinti įrenginį „ %1$s“ iš „Sync &amp; Backup“?</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">Įrenginys „%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų. Žymės, automatinio pildymo duomenys ir „Duck.ai“ pokalbiai liks jūsų įrenginiuose.</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_primary_button">Šalinti</string>
+    <string name="sync_simplified_settings_turn_off_device_dialog_secondary_button">Atšaukti</string>
 
     <!-- Sync settings screen: require device passcode dialog -->
     <string name="sync_simplified_settings_require_passcode_dialog_title">Apsaugokite savo įrenginį, kad galėtumėte naudoti „Sync &amp; Backup“</string>
@@ -329,6 +350,8 @@
     <!-- Sync This Device screen -->
     <string name="sync_simplified_setup_header_headline">Sinchronizuokite šį įrenginį su netoliese esančiu kompiuteriu.</string>
     <string name="sync_simplified_setup_header_body">Padėsime sinchronizuoti įrenginius.</string>
+    <string name="sync_simplified_setup_header_headline_v2">Ar netoliese turite kitą įrenginį? Sinchronizuokite savo įrenginius.</string>
+    <string name="sync_simplified_setup_header_body_v2">Dabar neturite kito įrenginio? Sinchronizuokite tik šį įrenginį, o su kitu įrenginiu sinchronizuosite vėliau.</string>
     <string name="sync_simplified_setup_primary_button">Sinchronizuoti su kitu įrenginiu</string>
     <string name="sync_simplified_setup_secondary_button">Sinchronizuoti tik šį įrenginį</string>
     <string name="sync_simplified_setup_secondary_button_syncing">Jungiamasi...</string>
@@ -353,10 +376,14 @@
     <string name="sync_simplified_scanner_camera_header_headline">Nuskaitykite QR kodą, kad sinchronizuotumėte</string>
     <string name="sync_simplified_scanner_camera_header_body">Atidarykite <annotation type="icon">￼</annotation> <b><annotation type="highlight">„DuckDuckGo“ kompiuteriui</annotation></b>\n<annotation type="gap">\n</annotation>ir eikite į <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinchronizuoti su kitu įrenginiu</annotation></string>
     <string name="sync_simplified_scanner_camera_primary_button">Galima nuskaityti</string>
+    <string name="sync_simplified_scanner_camera_primary_button_v2">Supratau</string>
     <string name="sync_simplified_scanner_camera_invalid_code_message">Deja, nuskaitytas kodas yra netinkamas.</string>
     <string name="sync_simplified_scanner_no_permission_headline">Būtinas leidimas naudotis kamera</string>
     <string name="sync_simplified_scanner_no_permission_body">Eikite į savo įrenginio nustatymus ir suteikite šiai programai leidimą pasiekti kamerą.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button">Eikite į „Nustatymai“</string>
+    <string name="sync_simplified_scanner_no_permission_headline_v2">„DuckDuckGo“ reikia pasiekti jūsų kamerą.</string>
+    <string name="sync_simplified_scanner_no_permission_body_v2">QR kodui nuskaityti reikia leidimo naudoti kamerą.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button_v2">Keisti leidimus</string>
     <string name="sync_simplified_scanner_no_hardware_headline">Kamera nepasiekiama</string>
 
     <!-- Scanner screen: manual entry tab -->
@@ -411,6 +438,8 @@
     <string name="sync_simplified_edit_device_sync_this_device_item">Sinchronizuoti šį įrenginį</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device">Pašalinus šį įrenginį, jis nebegalės pasiekti jūsų sinchronizuotų duomenų.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device">Jeigu išjungsite, šis įrenginys nebegalės pasiekti jūsų sinchronizuotų duomenų.</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Įrenginys „%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų kituose įrenginiuose, jei tai bus išjungta.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Įrenginys „%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų kituose įrenginiuose.</string>
 
     <!-- Edit Device screen: edit name dialog -->
     <string name="sync_simplified_edit_device_edit_name_dialog_title">Redaguoti pavadinimą</string>
@@ -422,6 +451,8 @@
     <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Šalinti</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Atšaukti</string>
+    <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Ar šalinti įrenginį „ %1$s“ iš „Sync &amp; Backup“?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Įrenginys „%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų. Žymės, automatinio pildymo duomenys ir „Duck.ai“ pokalbiai liks jūsų įrenginiuose.</string>
 
     <!-- Edit Device screen: turn off sync dialog -->
     <string name="sync_simplified_edit_device_turn_off_dialog_title">Ar išjungti „Sync &amp; Backup“?</string>
@@ -446,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Atšaukti</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Nustatyti „Sync &amp; Backup“</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Atrakinkite įrenginį, kad galėtumėte nustatyti funkciją „Sync &amp; Backup“.</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Pasiek savo slaptažodžius mobiliajame įrenginyje ir kompiuteryje.</string>
+    <string name="sync_passwords_import_promo_primary_button">Įjunk „Sync &amp; Backup“</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Pasiek savo žymeles mobiliajame įrenginyje ir kompiuteryje.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Įjunk „Sync &amp; Backup“</string>
 </resources>

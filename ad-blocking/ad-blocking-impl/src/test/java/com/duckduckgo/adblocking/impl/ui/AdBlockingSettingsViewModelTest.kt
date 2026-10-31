@@ -28,8 +28,11 @@ import com.duckduckgo.adblocking.impl.AdBlockingPixelNames
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
+import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
+import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -64,14 +67,26 @@ class AdBlockingSettingsViewModelTest {
     private val sessionStore = RealAdBlockingSessionStore()
     private val pixel: Pixel = mock()
     private val duckPlayer: DuckPlayer = mock()
+    private val duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider = mock()
 
-    private fun createViewModel(duckPlayerMode: PrivatePlayerMode = AlwaysAsk): AdBlockingSettingsViewModel {
+    private fun createViewModel(
+        duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
+        duckPlayerSettingsPlacement: DuckPlayerSettingsPlacement = DuckPlayerSettingsPlacement.InAdBlocking,
+    ): AdBlockingSettingsViewModel {
         whenever(duckPlayer.observeUserPreferences()).thenReturn(flowOf(userPreferences(duckPlayerMode)))
-        return AdBlockingSettingsViewModel(statusChecker, feature, repository, sessionStore, pixel, duckPlayer)
+        whenever(duckPlayerSettingsPlacementProvider.placementFlow()).thenReturn(flowOf(duckPlayerSettingsPlacement))
+        return AdBlockingSettingsViewModel(
+            statusChecker,
+            feature,
+            repository,
+            sessionStore,
+            pixel,
+            duckPlayer,
+            duckPlayerSettingsPlacementProvider,
+        )
     }
 
-    private fun setToggles(uxImprovements: Boolean, contingency: Boolean) {
-        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(remoteEnableState = uxImprovements))
+    private fun setToggles(contingency: Boolean) {
         feature.enableContingencyMode().setRawStoredState(Toggle.State(remoteEnableState = contingency))
     }
 
@@ -161,9 +176,47 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenContingencyModeAndUxImprovementsOnThenIsContingencyMode() = runTest {
+    fun whenDuckPlayerSettingsInAdBlockingThenShowsEntry() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setToggles(uxImprovements = true, contingency = true)
+
+        createViewModel(duckPlayerSettingsPlacement = DuckPlayerSettingsPlacement.InAdBlocking).viewState.test {
+            assertEquals(DuckPlayerSection.Entry, expectMostRecentItem().duckPlayerSection)
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerSettingsStandaloneThenShowsLink() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+
+        createViewModel(duckPlayerSettingsPlacement = DuckPlayerSettingsPlacement.Standalone).viewState.test {
+            assertEquals(DuckPlayerSection.Link, expectMostRecentItem().duckPlayerSection)
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerSettingsHiddenThenShowsNoDuckPlayerSection() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+
+        createViewModel(duckPlayerSettingsPlacement = DuckPlayerSettingsPlacement.Hidden).viewState.test {
+            assertEquals(DuckPlayerSection.None, expectMostRecentItem().duckPlayerSection)
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerClickedThenOpensDuckPlayerSettings() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        val viewModel = createViewModel(duckPlayerSettingsPlacement = DuckPlayerSettingsPlacement.Standalone)
+
+        viewModel.commands.test {
+            viewModel.onDuckPlayerClicked()
+            assertEquals(AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenContingencyModeOnThenIsContingencyMode() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setToggles(contingency = true)
 
         createViewModel().viewState.test {
             assertTrue(expectMostRecentItem().isContingencyMode)
@@ -171,19 +224,9 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenContingencyModeOnButUxImprovementsOffThenNotContingencyMode() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setToggles(uxImprovements = false, contingency = true)
-
-        createViewModel().viewState.test {
-            assertFalse(expectMostRecentItem().isContingencyMode)
-        }
-    }
-
-    @Test
     fun whenContingencyModeOffThenNotContingencyMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setToggles(uxImprovements = true, contingency = false)
+        setToggles(contingency = false)
 
         createViewModel().viewState.test {
             assertFalse(expectMostRecentItem().isContingencyMode)

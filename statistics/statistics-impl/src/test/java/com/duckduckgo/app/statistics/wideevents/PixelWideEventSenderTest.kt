@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -143,6 +145,27 @@ class PixelWideEventSenderTest {
     }
 
     @Test
+    fun `when event has stored app version then stored app version is sent`() = runTest {
+        val event = createWideEvent(
+            id = 790L,
+            name = "some-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            appVersion = "5.100.0",
+        )
+
+        pixelWideEventSender.sendWideEvent(event)
+
+        listOf("wide_some-event_c", "wide_some-event_d").forEach { pixelName ->
+            verify(pixel).enqueueFire(
+                pixelName = eq(pixelName),
+                parameters = argThat { get("app.version") == "5.100.0" },
+                encodedParameters = any(),
+                type = any(),
+            )
+        }
+    }
+
+    @Test
     fun `when event is the first daily occurrence then count and daily pixels report it`() = runTest {
         val event = createWideEvent(
             id = 456L,
@@ -194,6 +217,30 @@ class PixelWideEventSenderTest {
         )
     }
 
+    @Test
+    fun `when event has process-start policy then its owner is not sent`() = runTest {
+        val event = createWideEvent(
+            id = 1L,
+            name = "flow",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            cleanupPolicy = PROCESS_START_CLEANUP_POLICY,
+        )
+
+        pixelWideEventSender.sendWideEvent(event)
+
+        val parametersCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParametersCaptor = argumentCaptor<Map<String, String>>()
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_flow_c"),
+            parameters = parametersCaptor.capture(),
+            encodedParameters = encodedParametersCaptor.capture(),
+            type = any(),
+        )
+        val sent = parametersCaptor.firstValue + encodedParametersCaptor.firstValue
+        assertFalse(sent.values.any { it.contains(PROCESS_START_CLEANUP_POLICY.ownerProcessName) })
+        assertFalse(sent.keys.any { it.contains("owner") })
+    }
+
     private fun createWideEvent(
         id: Long,
         name: String,
@@ -205,6 +252,8 @@ class PixelWideEventSenderTest {
         metaType: String = "android-$name",
         metaVersion: String = "1.0.0",
         isFirstDailyOccurrence: Boolean = false,
+        appVersion: String = "5.123.0",
+        cleanupPolicy: WideEventRepository.CleanupPolicy = DEFAULT_CLEANUP_POLICY,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -213,16 +262,27 @@ class PixelWideEventSenderTest {
         metadata = metadata,
         flowEntryPoint = flowEntryPoint,
         activeIntervals = emptyList(),
-        cleanupPolicy =
-        WideEventRepository.CleanupPolicy.OnTimeout(
-            duration = Duration.ofHours(1),
-            status = WideEventRepository.WideEventStatus.UNKNOWN,
-            metadata = emptyMap(),
-        ),
+        cleanupPolicy = cleanupPolicy,
         createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
         samplingProbability = samplingProbability,
         metaType = metaType,
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
+        appVersion = appVersion,
     )
+
+    private companion object {
+        val DEFAULT_CLEANUP_POLICY = WideEventRepository.CleanupPolicy.OnTimeout(
+            duration = Duration.ofHours(1),
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = emptyMap(),
+        )
+
+        val PROCESS_START_CLEANUP_POLICY = WideEventRepository.CleanupPolicy.OnProcessStart(
+            ownerProcessName = "main",
+            ignoreIfIntervalTimeoutPresent = false,
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = emptyMap(),
+        )
+    }
 }

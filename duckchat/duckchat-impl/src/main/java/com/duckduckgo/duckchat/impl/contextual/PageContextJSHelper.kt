@@ -26,7 +26,7 @@ import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.ContextTyp
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Reason
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

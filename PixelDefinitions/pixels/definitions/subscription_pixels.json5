@@ -181,6 +181,13 @@
             "freeTrial"
         ]
     },
+    "subscription_switch": {
+        "description": "Fired when a switch of an active subscription to another plan is confirmed by the backend after Google Play billing completes.",
+        "owners": ["nalcalag"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_privacy-pro_app_subscription_active_d": {
         "description": "Fired once daily on app start for an active subscription",
         "owners": ["lmac012"],
@@ -314,6 +321,34 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_settings_withdrawal_click": {
+        "description": "The user tapped 'Withdraw from Contract' in Subscription Settings.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_settings_withdrawal_dialog_shown": {
+        "description": "The withdrawal confirmation dialog was shown after the user tapped 'Withdraw from Contract' in Subscription Settings.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_settings_withdrawal_dialog_confirm_click": {
+        "description": "The user tapped 'Confirm Withdrawal' in the withdrawal confirmation dialog.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_settings_withdrawal_dialog_dismissed": {
+        "description": "The user closed the withdrawal confirmation dialog without withdrawing by tapping 'Keep Subscription'.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion"]
     }
 }

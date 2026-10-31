@@ -34,7 +34,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -102,7 +102,7 @@ class SubscriptionExpirationReminderNotificationSpecification(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: SubscriptionExpirationReminderNotification,

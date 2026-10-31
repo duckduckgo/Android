@@ -23,7 +23,7 @@ import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 /**
@@ -31,7 +31,7 @@ import javax.inject.Inject
  * This prevents a race condition in which DuckChat's cache has not been updated before RMF evaluation takes place
  * upon a cold start-up.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class IsDuckAiEnabledAttributeMatcherPlugin @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
@@ -45,7 +45,7 @@ class IsDuckAiEnabledAttributeMatcherPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class IsDuckAiEnabledMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
     override fun map(
         key: String,

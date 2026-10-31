@@ -223,6 +223,7 @@ sealed class Command {
         val showConfirmation: Boolean = true,
         val trustedCallerPackage: String? = null,
         val finishCustomTabOnTrustedCallerLaunch: Boolean = false,
+        val trustedCallerOnly: Boolean = false,
     ) : Command()
 
     class ShowAppLinkPrompt(
@@ -487,7 +488,7 @@ sealed class Command {
     /**
      * Finishes only the [CustomTabActivity] (not the whole task). Used when the custom tab is being
      * dismissed while another activity (e.g. the Duck Chat host) is being launched into the same task,
-     * where [CloseCustomTab]'s `finishAndRemoveTask()` would tear down that activity too.
+     * where [CloseCustomTab] could close that activity too.
      */
     data object FinishCustomTab : Command()
 

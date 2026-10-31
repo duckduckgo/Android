@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.impl.ui
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,6 +34,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
@@ -56,6 +56,7 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -68,6 +69,7 @@ import com.duckduckgo.duckchat.impl.pixel.InputSubmitMethod
 import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.history.api.NavigationHistory
@@ -128,6 +130,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val inputOutcomeTracker: InputOutcomeTracker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    chatStateStore: ChatStateStore,
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -303,7 +307,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         addressBarEntryPoint: DuckChatEntryPoint,
         submitMethod: InputSubmitMethod,
     ) {
-        val tool = getSelectedTool()?.let { Tool.from(it) }
+        val rawTool = getSelectedTool()
+        val tool = rawTool?.let { Tool.from(it) }
         val selectedToolParam = when (tool) {
             Tool.IMAGE_GENERATION -> "image_generation"
             Tool.WEB_SEARCH -> "web_search"
@@ -311,10 +316,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         val inputState = currentInputState()
         val surface = currentSurface(inputState)
+        val reasoningEffort = getResolvedReasoningEffort()
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
             modelId = getSelectedModelId(),
-            reasoningEffort = getResolvedReasoningEffort(),
+            reasoningEffort = reasoningEffort,
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
             hasText = hasText,
@@ -330,6 +336,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             null -> {}
         }
         inputOutcomeTracker.promptSubmitted(submitMethod)
+        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onNativePromptSubmitted(it, browserMode, reasoningEffort, rawTool) }
     }
 
     fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat(currentSurface())
@@ -341,7 +348,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun fireVoiceSearchTapped() = duckChatPixels.fireVoiceSearchTapped(currentSurface())
 
-    fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped(currentSurface())
+    fun fireStopGenerationTapped() {
+        val surface = currentSurface()
+        duckChatPixels.fireStopGenerationTapped(surface)
+        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onStopTapped(it) }
+    }
+
+    // The edit screen's synthetic key never matches a tab, so a flow started under it could only expire unwatched.
+    private fun activeDuckAiTabId(surface: DuckChatPixelSurface): String? =
+        activeTabId.value?.takeIf { surface == DuckChatPixelSurface.DUCK_AI && it.isNotEmpty() && !it.startsWith(EDIT_STATE_KEY_PREFIX) }
 
     fun fireClearPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarClearButtonPressed(isSearchMode)
     fun fireKeyboardGoPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarKeyboardGoPressed(isSearchMode)
@@ -493,21 +508,19 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { it.duckAiFireButtonHighlighted }
         .distinctUntilChanged()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val chatState: Flow<ChatState> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> chatStateStore.stateFor(tabId) }
+
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
-        duckChatInternal.chatState,
+        chatState,
         activeChatId,
         interactionLock,
         duckAiFireButtonHighlighted,
     ) { state, chatState, chatId, lock, fireHighlighted ->
-        // chatState is a global signal, not scoped to any one tab — the edit widget has no chat of
-        // its own streaming, so it must never inherit whatever the real tab is doing. Read
-        // synchronously rather than folded into the combine's inputs, so this Flow's shape is
-        // otherwise identical to the pre-edit-mode code (a prior version spliced a derived Flow in
-        // here instead and shipped a regression in the real, non-edit composer's toggle state).
-        val isEditWidget = activeTabId.value?.startsWith(EDIT_STATE_KEY_PREFIX) == true
         state.copy(
-            isChatStreaming = !isEditWidget && (chatState == ChatState.STREAMING || chatState == ChatState.LOADING),
+            isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
             chatId = chatId,
             interactionLock = lock,
             duckAiFireButtonHighlighted = fireHighlighted,
@@ -542,9 +555,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                 }
         }
     }
-
-    // Kept for the widget's observeChatState() which handles HIDE/SHOW/READY root-visibility transitions.
-    val chatState: Flow<ChatState> = duckChatInternal.chatState
 
     val isPaidTier: Flow<Boolean> = subscriptions.getEntitlementStatus()
         .map { entitlements -> entitlements.any { it == Product.DuckAiPlus } }

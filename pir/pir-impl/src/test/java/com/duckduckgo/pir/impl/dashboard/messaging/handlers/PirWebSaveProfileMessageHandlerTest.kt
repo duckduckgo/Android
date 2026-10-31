@@ -21,8 +21,15 @@ import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
+import com.duckduckgo.pir.impl.checker.DisabledReason
+import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
+import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages.SAVE_PROFILE
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
@@ -30,12 +37,16 @@ import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -45,6 +56,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -68,11 +80,25 @@ class PirWebSaveProfileMessageHandlerTest {
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val mockJobRecordUpdater: JobRecordUpdater = mock()
     private val mockSubscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics = mock()
+    private val mockPirWorkHandler: PirWorkHandler = mock()
+    private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
+    private val mockFreemiumToggle: Toggle = mock()
+    private val mockPirFreemiumDataStore: PirFreemiumDataStore = mock()
+    private val mockPirScanCompleteNotifier: PirScanCompleteNotifier = mock()
+    private val mockBrokerJsonUpdater: BrokerJsonUpdater = mock()
+    private val mockUseBundledBrokerJsonsToggle: Toggle = mock()
     private val testScope = TestScope()
 
     @Before
     fun setUp() = runTest {
         whenever(mockRepository.getAllUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockPirRemoteFeatures.freemium()).thenReturn(mockFreemiumToggle)
+        whenever(mockPirRemoteFeatures.useBundledBrokerJsons()).thenReturn(mockUseBundledBrokerJsonsToggle)
+        whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(true)
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(listOf("broker"))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)),
+        )
 
         testee = PirWebSaveProfileMessageHandler(
             pirWebProfileStateHolder = mockPirWebProfileStateHolder,
@@ -84,6 +110,11 @@ class PirWebSaveProfileMessageHandlerTest {
             appCoroutineScope = testScope,
             jobRecordUpdater = mockJobRecordUpdater,
             subscriptionOnboardingExperimentMetrics = mockSubscriptionOnboardingExperimentMetrics,
+            pirWorkHandler = mockPirWorkHandler,
+            pirRemoteFeatures = mockPirRemoteFeatures,
+            pirFreemiumDataStore = mockPirFreemiumDataStore,
+            pirScanCompleteNotifier = mockPirScanCompleteNotifier,
+            brokerJsonUpdater = mockBrokerJsonUpdater,
         )
     }
 
@@ -652,6 +683,375 @@ class PirWebSaveProfileMessageHandlerTest {
             age = 35,
             deprecated = false,
         )
+    }
+
+    @Test
+    fun whenSaveSucceedsAndUserCannotRunOptOutsAndFreemiumEnabledThenStoresActivationBeforeStartingScan() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then the scan service resolves eligibility again, so activation has to be stored first
+        inOrder(mockPirFreemiumDataStore, mockContext) {
+            verify(mockPirFreemiumDataStore).activate(any())
+            verify(mockContext).startForegroundService(any())
+        }
+    }
+
+    @Test
+    fun whenSaveSucceedsAndUserCanAlreadyRunOptOutsThenDoesNotStoreActivation() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+        verifyStartAndScheduleInitialScan(PirExecutionType.MANUAL_INITIAL)
+    }
+
+    @Test
+    fun whenSaveSucceedsAndUserCannotRunOptOutsButFreemiumDisabledThenDoesNotStoreActivation() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(false)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenSaveFailsThenDoesNotStoreActivation() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(false)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenFreemiumActivatesThenFirstProfileSavedTimestampIsStored() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)))
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(false)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(1_700_000_000_000L)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirFreemiumDataStore).activate(1_700_000_000_000L)
+    }
+
+    @Test
+    fun whenAlreadyActivatedThenFirstProfileSavedTimestampIsNotOverwritten() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)))
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenSavingProfileAsFreeUserThenScanOnlyWorkIsScheduled() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)),
+            flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockScanScheduler).scheduleScanOnlyWork()
+        verify(mockScanScheduler, never()).scheduleScans()
+    }
+
+    @Test
+    fun whenSavingProfileAsSubscriberThenFullWorkIsScheduled() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockScanScheduler).scheduleScans()
+        verify(mockScanScheduler, never()).scheduleScanOnlyWork()
+    }
+
+    @Test
+    fun whenSaveSucceedsAndRepositoryUnavailableThenDoesNotStoreActivation() = runTest {
+        // Given a subscriber resolves to REPOSITORY_UNAVAILABLE, which must not be read as a free user
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenSaveSucceedsAndEntitlementLostThenDoesNotStoreActivation() = runTest {
+        // Given a subscriber whose plan does not include PIR
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenSaveSucceedsAndPirFeatureDisabledThenDoesNotStoreActivation() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenSaveSucceedsAndEligibilityNotEmittedThenDoesNotStoreActivation() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(emptyFlow())
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenSavingProfileAsFreeUserThenScanCompleteNotificationIsMarkedPendingBeforeStartingScan() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)),
+            flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then the run that finishes this scan takes the flag, so it has to be marked before the scan starts
+        inOrder(mockPirScanCompleteNotifier, mockContext) {
+            verify(mockPirScanCompleteNotifier).onInitialScanStarted()
+            verify(mockContext).startForegroundService(any())
+        }
+    }
+
+    @Test
+    fun whenSavingProfileAsSubscriberThenScanCompleteNotificationIsMarkedPendingBeforeStartingScan() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        inOrder(mockPirScanCompleteNotifier, mockContext) {
+            verify(mockPirScanCompleteNotifier).onInitialScanStarted()
+            verify(mockContext).startForegroundService(any())
+        }
+    }
+
+    @Test
+    fun whenFreeUserEditsProfileThenScanCompleteNotificationIsMarkedPending() = runTest {
+        // Given an already activated free user with a saved profile
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(listOf(createProfileQuery(id = 1)))
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirScanCompleteNotifier).onInitialScanStarted()
+        val intentCaptor = argumentCaptor<Intent>()
+        verify(mockContext).startForegroundService(intentCaptor.capture())
+        assertEquals(PirExecutionType.MANUAL_EDIT_PROFILE.name, intentCaptor.firstValue.getStringExtra("extra_execution_type"))
+    }
+
+    @Test
+    fun whenSavingProfileAndRunModeCannotBeResolvedThenScanCompleteNotificationIsNotMarkedPending() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
+    }
+
+    @Test
+    fun whenSaveFailsThenScanCompleteNotificationIsNotMarkedPending() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(false)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirScanCompleteNotifier, never()).onInitialScanStarted()
+    }
+
+    @Test
+    fun whenSavingProfileWithNoBrokersStoredThenBrokerDataIsUpdatedBeforeRespondingSuccess() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(emptyList())
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then the dashboard reads the scan total from stored brokers as soon as the save succeeds
+        val inOrder = inOrder(mockBrokerJsonUpdater, mockJsMessaging)
+        inOrder.verify(mockBrokerJsonUpdater).update()
+        inOrder.verify(mockJsMessaging).onResponse(any())
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenSavingProfileWithBrokersAlreadyStoredThenBrokerDataIsNotUpdated() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(listOf("broker"))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockBrokerJsonUpdater, never()).update()
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenSavingProfileWithNoBrokersStoredAndBundledBrokersDisabledThenBrokerDataIsStillUpdated() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(false)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then the toggle only governs the bundled fallback, never the network fetch
+        verify(mockBrokerJsonUpdater).update()
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenSaveFailsThenBrokerDataIsNotUpdated() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(false)
+        whenever(mockRepository.getAllActiveBrokers()).thenReturn(emptyList())
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockBrokerJsonUpdater, never()).update()
+        verifyResponse(jsMessage, false, mockJsMessaging)
+    }
+
+    private suspend fun givenSuccessfulProfileSave() {
+        val currentYear = 2025
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.of(currentYear, 6, 15, 10, 30))
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(listOf(createProfileQuery()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
     }
 
     private fun verifyStartAndScheduleInitialScan(expectedExecutionType: PirExecutionType) {

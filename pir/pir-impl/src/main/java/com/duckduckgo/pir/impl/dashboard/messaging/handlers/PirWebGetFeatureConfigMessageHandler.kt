@@ -26,7 +26,8 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.PIR_DASHBOARD
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -35,9 +36,9 @@ import javax.inject.Inject
 /**
  * Handles the getFeatureConfig message from Web which is used to retrieve the client capabilities.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = ActivityScope::class,
-    boundType = PirWebJsMessageHandler::class,
+    binding = binding<PirWebJsMessageHandler>(),
 )
 class PirWebGetFeatureConfigMessageHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
@@ -60,7 +61,7 @@ class PirWebGetFeatureConfigMessageHandler @Inject constructor(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.GetFeatureConfigResponse(
                     useUnifiedFeedback = useUnifiedFeedback,
-                    isBeta = true,
+                    isBeta = false,
                 ),
             )
         }

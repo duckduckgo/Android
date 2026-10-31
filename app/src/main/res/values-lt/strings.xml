@@ -1041,4 +1041,5 @@
     <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Nepavyko rasti serverio su nurodytu prieglobos vardu.</string>
     <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Šio serverio sertifikatas negalioja. Gali būti, kad jungiesi prie serverio, apsimetančio <b>%1$s</b>, o tai gali kelti pavojų tavo konfidencialiai informacijai.]]></string>
     <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Galbūt turėjai omenyje <annotation type="redirect_link">^1</annotation>?</string>
+    <string name="webViewErrorTimeout" instruction="Message shown when a website is taking too long to load">Šis puslapis įkeliamas per ilgai.</string>
 </resources>

@@ -35,6 +35,6 @@
     <string name="duck_player_info_modal_button">Разбрах!</string>
     <string name="duck_player_unavailable">Duck Player не е достъпен</string>
     <string name="duck_player_unavailable_learn_more">Научете повече</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Отваряне на видеоклипове от YouTube в Duck Player</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Отворете Duck Player в нов раздел</string>
+    <string name="duck_player_open_videos_setting">Отваряне на видеоклипове от YouTube в Duck Player</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Отворете Duck Player в нов раздел</string>
 </resources>

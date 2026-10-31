@@ -21,13 +21,13 @@ import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import io.reactivex.Completable
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PagePaintedOfflinePixelSender @Inject constructor(
     private val dao: PagePaintedPixelDao,
     private val pixelSender: PixelSender,

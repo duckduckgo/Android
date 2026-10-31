@@ -18,16 +18,16 @@ package com.duckduckgo.app.browser.threatprotection
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.listitem.SettingsListItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(100)
 class ThreatProtectionSettingsTitle @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

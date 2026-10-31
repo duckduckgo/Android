@@ -16,11 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.feature
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
  * This is the class that represents the aiChat feature flags
@@ -86,18 +85,9 @@ interface DuckChatFeature {
     fun standaloneMigration(): Toggle
 
     /**
-     * @return `true` when the Native Input Field should be used instead of the web-based input.
-     * If the remote feature is not present defaults to `true`.
-     */
-    @InternalAlwaysEnabled
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun nativeInputField(): Toggle
-
-    /**
      * @return `true` when Duck.ai should use the native chat input integration
      * (the `native-input` URL param plus the `supportsNativeChatInput` /
-     * `supportsNativePrompt` JS flags). Has no effect unless [nativeInputField]
-     * is also enabled. When disabled, Duck.ai contextual and full modes fall
+     * `supportsNativePrompt` JS flags). When disabled, Duck.ai contextual and full modes fall
      * back to the web input.
      * If the remote feature is not present defaults to `true`.
      */
@@ -236,9 +226,9 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the Duck.ai contextual sheet's initial INPUT state should use the native
-     * unified input widget as its composer. Gated together with [nativeChatInput] (and
-     * [nativeInputField]): when this is off but native chat input is on, the contextual sheet uses
-     * the legacy input for INPUT mode while still using the native widget in WEBVIEW (in-chat) mode.
+     * unified input widget as its composer. Gated together with [nativeChatInput]: when this is off
+     * but native chat input is on, the contextual sheet uses the legacy input for INPUT mode while
+     * still using the native widget in WEBVIEW (in-chat) mode.
      * When native chat input is off, this has no effect (everything falls back to legacy/web input).
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
@@ -257,6 +247,13 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendDuckAiSessionWideEvent(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai response wait wide event should be sent
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendDuckAiResponseWaitWideEvent(): Toggle
 
     /**
      * @return `true` when the updated Duck.ai model and reasoning pickers are enabled: models grouped
@@ -305,6 +302,20 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeToSConsent(): Toggle
+
+    /**
+     * @return `true` when the native input shows the privacy disclaimer for image and file attachments.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun attachmentPrivacyDisclaimer(): Toggle
+
+    /**
+     * @return `true` when the duckduckgo.com homepage may list the user's Duck.ai chats via `getAIChats`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun homepageChatSuggestions(): Toggle
 
     /**
      * @return `true` when Duck.ai promo campaigns are supported. Exposed to Duck.ai as `supportsBonusOffer`.

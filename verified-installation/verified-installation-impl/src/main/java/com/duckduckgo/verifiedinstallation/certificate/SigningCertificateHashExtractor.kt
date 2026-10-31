@@ -22,7 +22,7 @@ import android.content.pm.PackageManager
 import android.content.pm.Signature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.security.MessageDigest
 import javax.inject.Inject
 

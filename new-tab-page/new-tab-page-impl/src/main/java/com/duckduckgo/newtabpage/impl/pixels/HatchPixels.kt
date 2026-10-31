@@ -24,15 +24,15 @@ import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAG
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_AFTER_IDLE_DAILY
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_USER_INITIATED
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_USER_INITIATED_DAILY
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface HatchPixels {
     fun fireReturnToPageTapped(afterIdle: Boolean)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealHatchPixels @Inject constructor(
     private val pixel: Pixel,

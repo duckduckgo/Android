@@ -24,10 +24,10 @@ import com.duckduckgo.app.statistics.user_segments.RealUsageHistory.SegmentKey.K
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 
 interface UsageHistory {
@@ -128,10 +128,10 @@ private class RealUsageHistory(
 }
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 class SegmentStoreModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideSegmentStore(
         sharedPreferencesProvider: SharedPreferencesProvider,
         dispatcherProvider: DispatcherProvider,

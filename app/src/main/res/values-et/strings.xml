@@ -1005,4 +1005,5 @@
     <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Määratud hostinimega serverit ei leitud.</string>
     <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Selle serveri sertifikaat on vale. Võimalik, et lood ühenduse serveriga, mis teeskleb olevat <b>%1$s</b> ja see võib sinu konfidentsiaalse teabe ohtu seada.]]></string>
     <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Kas sa mõtlesid seda: <annotation type="redirect_link">^1</annotation>?</string>
+    <string name="webViewErrorTimeout" instruction="Message shown when a website is taking too long to load">Selle lehe laadimine võtab liiga kaua aega.</string>
 </resources>

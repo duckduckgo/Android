@@ -23,15 +23,16 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
 import com.wireguard.config.Config
 import com.wireguard.config.InetNetwork
 import com.wireguard.config.Interface
 import com.wireguard.config.Peer
 import com.wireguard.crypto.KeyPair
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -92,11 +93,31 @@ interface WgTunnelConfig {
     fun clearWgConfig()
 
     fun setWgConfig(config: Config)
+
+    /**
+     * @return the endpoint port the tunnel was last configured with, or 0 if none
+     */
+    fun getTunnelActivePort(): Long
+
+    /**
+     * @param port the endpoint port the tunnel is being configured with
+     */
+    fun setTunnelActivePort(port: Long)
+
+    /**
+     * @return all ports advertised by the current server
+     */
+    fun getServerAdvertisedPorts(): List<Long>
+
+    /**
+     * @return the server's default port
+     */
+    fun getServerDefaultPort(): Long
 }
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = WgTunnelConfig::class,
+    binding = binding<WgTunnelConfig>(),
 )
 class RealWgTunnelConfig @Inject constructor(
     @InternalApi private val wgTunnelStore: WgTunnelStore,
@@ -111,16 +132,35 @@ class RealWgTunnelConfig @Inject constructor(
 
     override fun clearWgConfig() {
         wgTunnelStore.wireguardConfig = null
+
+        wgTunnelStore.activePort = 0L
     }
 
     override fun setWgConfig(config: Config) {
         wgTunnelStore.wireguardConfig = config
+        wgTunnelStore.activePort = 0L
+    }
+
+    override fun getTunnelActivePort(): Long {
+        return wgTunnelStore.activePort
+    }
+
+    override fun setTunnelActivePort(port: Long) {
+        wgTunnelStore.activePort = port
+    }
+
+    override fun getServerAdvertisedPorts(): List<Long> {
+        return wgTunnelStore.advertisedPorts
+    }
+
+    override fun getServerDefaultPort(): Long {
+        return wgTunnelStore.serverDefaultPort
     }
 }
 
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = WgTunnel::class,
+    binding = binding<WgTunnel>(),
 )
 class RealWgTunnel @Inject constructor(
     private val wgServerApi: WgServerApi,
@@ -218,6 +258,11 @@ class RealWgTunnel @Inject constructor(
             logcat(ERROR) { "Error registering public key" }
         }.getOrThrow()
 
+        // Store port information
+        wgTunnelStore.advertisedPorts = serverData.ports
+        val defaultPort = serverData.publicEndpoint.substringAfterLast(":").toLongOrNull() ?: 0L
+        wgTunnelStore.serverDefaultPort = defaultPort
+
         return Config.Builder()
             .setInterface(
                 Interface.Builder()
@@ -283,14 +328,38 @@ class WgTunnelStore constructor(
             prefs.edit(commit = true) { putLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, value) }
         }
 
+    var activePort: Long
+        get() = prefs.getLong(KEY_ACTIVE_PORT, 0L)
+        set(value) {
+            prefs.edit(commit = true) { putLong(KEY_ACTIVE_PORT, value) }
+        }
+
+    var advertisedPorts: List<Long>
+        get() {
+            val portsString = prefs.getString(KEY_ADVERTISED_PORTS, null)
+            return portsString?.split(",")?.mapNotNull { it.toLongOrNull() } ?: emptyList()
+        }
+        set(value) {
+            prefs.edit(commit = true) { putString(KEY_ADVERTISED_PORTS, value.joinToString(",")) }
+        }
+
+    var serverDefaultPort: Long
+        get() = prefs.getLong(KEY_SERVER_DEFAULT_PORT, 0L)
+        set(value) {
+            prefs.edit(commit = true) { putLong(KEY_SERVER_DEFAULT_PORT, value) }
+        }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.vpn.tunnel.config.v1"
         private const val KEY_WG_CONFIG = "wg_config_key"
         private const val KEY_WG_PRIVATE_KEY_LAST_UPDATE = "wg_private_key_last_update"
+        private const val KEY_ACTIVE_PORT = "wg_active_port"
+        private const val KEY_ADVERTISED_PORTS = "wg_advertised_ports"
+        private const val KEY_SERVER_DEFAULT_PORT = "wg_server_default_port"
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object WgTunnelStoreModule {
     @Provides

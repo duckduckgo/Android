@@ -28,7 +28,7 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadEr
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadError.EMPTY_CONFIG_ERROR
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadError.STORE_ERROR
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.WARN
 import logcat.logcat
 import retrofit2.HttpException

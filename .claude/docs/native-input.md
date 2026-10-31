@@ -14,6 +14,7 @@ building on anything the widget wires by hand.
 | Widget + `NativeInputWidget` interface | `duckchat/duckchat-impl/.../NativeInputModeWidget.kt` |
 | Widget ViewModel (state writer, most pixels) | `duckchat/duckchat-impl/.../NativeInputModeWidgetViewModel.kt` |
 | Widget body layout (containers live here) | `duckchat/duckchat-impl/.../view_native_input_mode_switch_widget.xml` |
+| Card every host wraps the widget in, styled per surface | `duckchat/duckchat-impl/.../NativeInputLayout.kt` |
 | `NativeInputPlugin`, plugin point, `NativeInputHost` | `duckchat/duckchat-impl/.../NativeInputPlugin.kt` |
 | Control plugins (one per control) | `duckchat/duckchat-impl/.../StopStreamingNativeInputPlugin.kt` and siblings in that package |
 | State contract (`-api`) | `duckchat/duckchat-api/.../NativeInputState.kt`, `NativeInputStateProvider.kt`, `NativeInputStatePublisher.kt` |
@@ -30,7 +31,7 @@ building on anything the widget wires by hand.
 
 | Host | Configured with | Notes |
 |---|---|---|
-| Omnibar (top / bottom) | `configure(tabId, isDuckAiMode, isBottom)` | `NativeInputManager` inflates the single wrapper and sets per-position chrome in `applyPositionChrome`. Duck.ai mode is always bottom. |
+| Omnibar (top / bottom) | `configure(tabId, isDuckAiMode, isBottom)` | `NativeInputManager` inflates the single wrapper and sets per-position placement in `applyPositionChrome`; the card styles itself from its surface. Duck.ai mode is always bottom. |
 | Contextual Duck.ai sheet | `configureContextual(tabId)` | Shares the browser tab's state slot with the omnibar widget; the widget forces `DUCK_AI_CONTEXTUAL` and never reshapes the card. |
 | Edit-message screen | `configureForEdit(sessionId)` | Publishes under a synthetic key (`edit:<sessionId>`), so it never overwrites the real tab. Must not touch shared browser state. |
 
@@ -114,13 +115,13 @@ exclusive. General plugin-point mechanics: `.claude/docs/plugin-system.md`.
 | Buffer writes that can arrive before `configure*` | `activeTabId` is null until configured. A setter fed by a `distinctUntilChanged` source must buffer into a `pending*` field and replay in `replayPendingState`, or the value is lost for good. `configureForEdit` does not replay. |
 | Guard injected members | `configure*`, `setWidgetPosition` and `applyDefaultTogglePosition` run inside `doOnAttach`; ViewModel setters check `isAttachedToWindow`. See `.claude/docs/lateinit-hazards.md`. |
 | The widget reads `viewModel.state`, plugins read the provider | The provider seeds unknown tabs with `NativeInputState.zero()`; the widget avoids rendering that placeholder. |
-| Keep the omnibar wrapper a `LinearLayout` | `applyOmnibarShape` positions the card with negative margins. A `ConstraintLayout` clamps them and the focused card drops below the unfocused omnibar. |
-| Resolve card-themed attrs against `card.context` | The card carries `android:theme="?attr/daxInputModeCardThemeOverlay"`, which remaps `daxColorSurface`/`daxColorWindow` in Fire Tabs. Resolving off the root's context paints the non-fire colour. |
+| Wrap the widget in `NativeInputLayout` | A host never builds its own card around the widget. The footer dock finds the card by type, and the omnibar animator and manager find it by `inputModeWidgetCard`; the card's look belongs to its surface, the host only places it. |
+| Keep the omnibar wrapper a `LinearLayout` | `NativeInputLayout.applyOmnibarShape` positions the card with negative margins. A `ConstraintLayout` clamps them and the focused card drops below the unfocused omnibar. |
+| Resolve card-themed attrs against `card.context` | `NativeInputLayout` applies `daxInputModeCardThemeOverlay` to its own context, which remaps `daxColorSurface`/`daxColorWindow` in Fire Tabs. Resolving off the root's context paints the non-fire colour. |
 | Contextual and omnibar widgets share one tab slot | Gate context-specific rendering on the host (`isContextualSurface()`, `isEditSurface()`), not on `inputContext` alone. |
 | The edit widget must not write shared browser state | No `selectedMode`/`inputQuery` pushes, ignores global `ChatState`, never launches the edit screen itself. |
 | Bottom-pinned input and insets | Use `EdgeToEdgeHandler.applyNavigationBarInsetsAsMargin` (`common/common-utils/.../EdgeToEdgeHandler.kt`); hand-rolled inset maths leaves the input behind the IME or nav bar on recent target SDKs. |
 | Removing or renaming a layout or id | Also compile instrumented tests: `./gradlew :app:compilePlayDebugAndroidTestKotlin`. Unit-test runs do not compile `androidTest`. |
-| Misleading name | `observeNativeInputFieldUserSettingEnabled()` returns the remote `nativeInputField` flag, not a user setting. |
 
 ## Talking to the Duck.ai frontend
 
@@ -137,17 +138,16 @@ change that compiles can still break or silently do nothing on the other side.
 
 ## Feature flags
 
-The master switches default on, so "it's behind a flag" is not a reason for thin coverage. Check
-`DuckChatFeature.kt` and `NativeInputOmnibarFeature.kt` for current defaults.
+Native input itself has no flag: the omnibar's `omnibarTextInput` is display-only and its click catcher always
+routes a tap to the native input. The flags below gate Duck.ai-side integrations and default on, so "it's behind a flag" is not a reason for thin coverage. Check
+`DuckChatFeature.kt` for current defaults.
 
 | Flag | Gates |
 |---|---|
-| `aiChat.nativeInputField` | Native input at all (master switch). |
 | `aiChat.nativeChatInput` | Native composer on Duck.ai pages (`native-input=true` param). |
 | `aiChat.contextualNativeInput` | Native input in the contextual sheet. |
 | `aiChat.nativePromptEditing` | Edit-message screen. |
 | `aiChat.nativeInputNavBar` | Persistent nav bar above the top omnibar input. |
-| `nativeInputOmnibar.nativeInputSearchOnly` | Native input for search-only users. |
 | `pluginPointNativeInput` + each plugin `featureName` | Individual controls (remote kill switches). |
 
 ## Testing
@@ -171,16 +171,14 @@ change needs them, check the linked task first.
 
 | Still hand-wired | Direction | Task |
 |---|---|---|
-| Fire, tabs, menu and back: `onFireButtonTapped`, `onBackPressed`, `setNavBarVisible`, `bindTabCount`, the leading fire found by walking ancestors | Plugins contributed from `:app`, placed via host-resolved slots | https://app.asana.com/0/0/1218750568353646/f |
-| Onboarding lock rendered by the widget (`setInteractionLocked`) | Each plugin renders its own locked state from `interactionLock` | https://app.asana.com/0/0/1218750257810051/f |
-| Card chrome duplicated in every host layout, shaped by `applyOmnibarShape` and `applyPositionChrome` | One card owned and styled inside the widget | https://app.asana.com/0/0/1217275429788919/f |
-| Remote flags gating native input | Hardcode on and delete once rolled out | https://app.asana.com/0/0/1216509602671179/f |
-| Legacy focused state in `OmnibarLayout` | Omnibar becomes display-only; the widget owns all text input | https://app.asana.com/0/0/1215373984475612/f |
 | `DuckChat` god-interface in `duckchat-api` | Split into single-responsibility `DuckAi*` interfaces | https://app.asana.com/0/0/1215641620311419/f |
 
-Known dead or stale code, safe to remove alongside the work above: the in-widget trailing fire, tab count and
-menu buttons (`inputModeMainButtonsContainer`) are never shown because every host calls `hideMainButtons()`;
-`setFloatingSubmitContainer` only hosts the new-line button.
+Browser controls stay with the host by design and are not becoming plugins: the leading fire (found by walking
+ancestors), both back arrows, and the fire, tabs and menu `:app` draws beside the card and in the nav bar, wired
+through `onFireButtonTapped`, `onBackPressed` and `setNavBarVisible`.
+
+Known dead or stale code, safe to remove alongside the work above: `setFloatingSubmitContainer` only hosts the
+new-line button.
 
 Older PRs, proposals and docs reference things that no longer exist. Do not build against them:
 `NativeInputHost.getInputState()` and `getPromptContribution()` (replaced by the state store),

@@ -18,6 +18,7 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import androidx.annotation.MainThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -39,8 +40,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -155,6 +156,10 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     // feature state on every inbound message, and a flag change takes effect on the next WebView anyway.
     @Volatile
     private var optimizedProcessing: Boolean = false
+
+    // Sampled at attach for the same reason as optimizedProcessing.
+    @Volatile
+    private var checkSenderHost: Boolean = true
 
     override val context: String = "contentScopeScripts"
     override val callbackName: String = coreContentScopeScripts.callbackName
@@ -310,7 +315,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             val jsMessage = adapter.fromJson(message)
             val domain =
                 runBlocking(dispatcherProvider.main()) {
-                    webView.url?.toUri()?.host
+                    if (checkSenderHost && jsMessage != null && jsMessage.featureName in domainRestrictedFeatures) {
+                        webView.senderHost()
+                    } else {
+                        webView.url?.toUri()?.host
+                    }
                 }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
@@ -353,6 +362,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         this.registration = Registration(webView, jsMessageCallback)
         drainQueue()
         this.optimizedProcessing = contentScopeScriptsFeature.optimizeContentScopeMessaging().isEnabled()
+        this.checkSenderHost = contentScopeScriptsFeature.bridgeOriginCheck().isEnabled()
         webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
 
         appCoroutineScope.launch(dispatcherProvider.io()) { domainRestrictedFeatures }
@@ -400,6 +410,19 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         val host = url ?: return false
         val eTld = host.toTldPlusOne()
         return allowedDomains.contains(host) || (eTld != null && allowedDomains.contains(eTld))
+    }
+
+    /**
+     * The host of the document sending messages, or null when the WebView can't tell. While a navigation is pending,
+     * [WebView.getUrl] can already report its destination even though the previous document is still running and still
+     * sending messages; the committed back/forward entry keeps naming that previous document until the navigation
+     * commits. Only a host both agree on is the sender's.
+     */
+    @MainThread
+    private fun WebView.senderHost(): String? {
+        val host = url?.toUri()?.host ?: return null
+        val committedHost = copyBackForwardList().currentItem?.url?.toUri()?.host
+        return host.takeIf { it == committedHost }
     }
 
     private fun sendMethodNotFoundError(

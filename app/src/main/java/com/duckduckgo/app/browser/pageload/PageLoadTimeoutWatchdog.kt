@@ -21,9 +21,9 @@ import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -47,8 +47,17 @@ interface PageLoadTimeoutWatchdog {
     /**
      * The engine requested the main-frame document at [url]. Every navigation produces exactly one such request,
      * so it arms a fresh clock and supersedes the previous navigation.
+     *
+     * It does not arm when the page at [url] already showed content or finished and the user did not start the load
+     * with [onUserInitiatedLoad]: the page requested itself again (auto-submitted form, auto-refresh) and the user already sees it.
      */
     fun onMainFrameRequest(url: String)
+
+    /**
+     * The user started a load or reload (refresh, pull-to-refresh, omnibar, back/forward). The next main-frame request is watched
+     * even if it targets the page that is already loaded.
+     */
+    fun onUserInitiatedLoad()
 
     /**
      * The main-frame navigation was redirected to [url]. The running clock is kept.
@@ -85,6 +94,21 @@ interface PageLoadTimeoutWatchdog {
      */
     fun onNavigatedAway()
 
+    /**
+     * The main-frame request was handed to the download listener, so no page is going to load.
+     */
+    fun onDownloadStarted()
+
+    /**
+     * The tab is no longer visible. The clock stops, and a load that is still pending is not timed out while backgrounded.
+     */
+    fun onBackgrounded()
+
+    /**
+     * The tab is visible again. A load still pending gets a fresh clock.
+     */
+    fun onForegrounded()
+
     sealed interface Event {
         data class TimedOut(val phase: Phase) : Event
         data class Recovered(val elapsedSinceTimeoutMs: Long) : Event
@@ -117,10 +141,24 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     private var url: String? = null
     private var committed = false
     private var pendingRedirectUrl: String? = null
+    private var loadedUrl: String? = null
+    private var pageDisplayed = false
+    private var userInitiatedArm = false
+    private var userInitiatedLoadPending = false
     private var timedOutAt = 0L
+    private var backgrounded = false
 
     override fun onMainFrameRequest(url: String) {
-        if (url.isWeb()) arm(url, committed = false) else disarm()
+        val userInitiated = consumeUserInitiatedLoad()
+        when {
+            !url.isWeb() -> disarm()
+            !userInitiated && isLoaded(url) -> Unit
+            else -> arm(url, committed = false, userInitiated = userInitiated)
+        }
+    }
+
+    override fun onUserInitiatedLoad() {
+        userInitiatedLoadPending = true
     }
 
     override fun onRedirect(url: String) {
@@ -130,7 +168,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
                 this.url = url
                 pendingRedirectUrl = url
             }
-            state == State.IDLE -> arm(url, committed = false)
+            state == State.IDLE -> arm(url, committed = false, userInitiated = false)
             else -> Unit
         }
     }
@@ -142,7 +180,10 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     // Back/forward served from cache produce no request, hence the fallback arm.
     override fun onCommitted(url: String) {
         when (state) {
-            State.IDLE -> if (url.isWeb()) arm(url, committed = true)
+            State.IDLE -> {
+                val userInitiated = consumeUserInitiatedLoad()
+                if (url.isWeb() && (userInitiated || !isLoaded(url))) arm(url, committed = true, userInitiated = userInitiated)
+            }
             State.ARMED -> if (isCurrent(url)) {
                 this.url = url
                 committed = true
@@ -159,11 +200,30 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
 
     override fun onNavigatedAway() = disarm()
 
-    private fun arm(url: String, committed: Boolean) {
+    override fun onDownloadStarted() = disarm()
+
+    override fun onBackgrounded() {
+        backgrounded = true
+        watchJob.cancel()
+    }
+
+    override fun onForegrounded() {
+        if (!backgrounded) return
+        backgrounded = false
+        if (state == State.ARMED) startWatching()
+    }
+
+    private fun arm(url: String, committed: Boolean, userInitiated: Boolean) {
+        loadedUrl = null
+        userInitiatedArm = userInitiated
         state = State.ARMED
         this.url = url
         this.committed = committed
         pendingRedirectUrl = null
+        if (backgrounded) watchJob.cancel() else startWatching()
+    }
+
+    private fun startWatching() {
         watchJob += scope.launch(dispatchers.main()) { watch() }
     }
 
@@ -171,6 +231,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         watchJob.cancel()
         state = State.IDLE
         url = null
+        loadedUrl = null
         pendingRedirectUrl = null
     }
 
@@ -180,7 +241,13 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
             eventChannel.trySend(Event.Recovered(currentTimeProvider.elapsedRealtime() - timedOutAt))
         }
         disarm()
+        loadedUrl = url
+        pageDisplayed = true
     }
+
+    private fun consumeUserInitiatedLoad(): Boolean = userInitiatedLoadPending.also { userInitiatedLoadPending = false }
+
+    private fun isLoaded(url: String): Boolean = loadedUrl?.normalized() == url.normalized()
 
     // Signals of a superseded load carry its URL, so they are told apart by comparing it with the latest URL of the current navigation.
     // Two loads of the same URL cannot be told apart.
@@ -202,6 +269,10 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     }
 
     private fun timeOut() {
+        if (pageDisplayed && !committed && !userInitiatedArm) {
+            disarm()
+            return
+        }
         state = State.TIMED_OUT
         val phase = if (committed) Phase.COMMITTED_NO_CONTENT else Phase.NOT_COMMITTED
         timedOutAt = currentTimeProvider.elapsedRealtime()

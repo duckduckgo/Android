@@ -842,6 +842,201 @@ class BrowserWebViewClientTest {
         }
 
     @Test
+    fun whenAppLinkHopHaltsNavigationAfterWebHopThenWillOverrideUrlOnlyCalledForWebHop() =
+        runTest {
+            val webUrl = "http://example.com/hop1"
+            val appLinkUrl = "http://app.example.com/hop2"
+            val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = appLinkUrl)
+            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(Web(webUrl), appLink)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+            whenever(webResourceRequest.isRedirect).thenReturn(false)
+            whenever(webResourceRequest.url).thenReturn(webUrl.toUri())
+            whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
+            val mockClientProvider: ClientBrandHintProvider = mock()
+            whenever(mockClientProvider.shouldChangeBranding(any())).thenReturn(false)
+            testee.clientProvider = mockClientProvider
+            doNothing().whenever(listener).willOverrideUrl(any())
+            whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            openInNewTabFlow.emit(Off)
+
+            assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+            whenever(webResourceRequest.isRedirect).thenReturn(true)
+            whenever(webResourceRequest.url).thenReturn(appLinkUrl.toUri())
+            assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+
+            verify(listener, times(1)).willOverrideUrl(webUrl)
+            verify(listener, never()).willOverrideUrl(appLinkUrl)
+            inOrder(listener) {
+                verify(listener).onMainFrameNavigationDecided(true)
+                verify(listener).onMainFrameNavigationDecided(false)
+            }
+            verify(listener).handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+            verify(listener, never()).openLinkInNewTab(any())
+            verify(listener, never()).onPageLoadTimeout()
+        }
+
+    @Test
+    fun whenOnPageStartedThenNavigationCommittedNotifiedBeforePageStarted() =
+        runTest {
+            testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+            inOrder(listener) {
+                verify(listener).onMainFrameNavigationCommitted()
+                verify(listener).pageStarted(any(), any())
+            }
+        }
+
+    @Test
+    fun whenOnPageStartedForAboutBlankThenNavigationCommittedNotified() {
+        testee.onPageStarted(webView, "about:blank", null)
+
+        verify(listener).onMainFrameNavigationCommitted()
+    }
+
+    @Test
+    fun whenOnPageFinishedForUrlOtherThanCommittedPageThenNavigationFinishedWithoutCommitNotifiedEvenIfProgressNotComplete() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn("https://outgoing.example.com/")
+        whenever(mockWebView.progress).thenReturn(0)
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedForUrlOtherThanCommittedPageWithCompleteProgressThenNavigationFinishedWithoutCommitNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn("https://outgoing.example.com/")
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedForCommittedPageThenNavigationFinishedWithoutCommitNotNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener, never()).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedForAboutBlankThenNavigationFinishedWithoutCommitNotNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+
+        testee.onPageFinished(mockWebView, "about:blank")
+
+        verify(listener, never()).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedWithNoCommittedPageThenNavigationFinishedWithoutCommitNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(null)
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        verify(listener).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenOnPageFinishedWithNullUrlThenNavigationFinishedWithoutCommitNotNotified() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+
+        testee.onPageFinished(mockWebView, null)
+
+        verify(listener, never()).onNavigationFinishedWithoutCommit()
+    }
+
+    @Test
+    fun whenMainFrameWebUrlLoadsInTabThenNavigationDecidedAsLoadingInThisTab() {
+        givenMainFrameRequestRoutedTo(Web(EXAMPLE_URL))
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener, times(1)).onMainFrameNavigationDecided(true)
+        verify(listener, never()).onMainFrameNavigationDecided(false)
+    }
+
+    @Test
+    fun whenMainFrameAppLinkHandledExternallyThenNavigationDecidedAsLeavingThisTab() {
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        givenMainFrameRequestRoutedTo(appLink)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener, times(1)).onMainFrameNavigationDecided(false)
+        verify(listener, never()).onMainFrameNavigationDecided(true)
+    }
+
+    @Test
+    fun whenMainFrameEmailLinkThenNavigationDecidedAsLeavingThisTab() {
+        givenMainFrameRequestRoutedTo(SpecialUrlDetector.UrlType.Email("mailto:someone@example.com"))
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener, times(1)).onMainFrameNavigationDecided(false)
+        verify(listener, never()).onMainFrameNavigationDecided(true)
+    }
+
+    @Test
+    fun whenMainFrameNonHttpAppLinkHandledThenNavigationDecidedAsLeavingThisTab() {
+        givenMainFrameRequestRoutedTo(SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL))
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener, times(1)).onMainFrameNavigationDecided(false)
+        verify(listener, never()).onMainFrameNavigationDecided(true)
+    }
+
+    @Test
+    fun whenMainFrameOpensInNewTabThenNavigationDecidedAsLeavingThisTab() =
+        runTest {
+            openInNewTabFlow.emit(On)
+            givenMainFrameRequestRoutedTo(SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink(EXAMPLE_URL.toUri()))
+            whenever(mockDuckPlayer.shouldOpenDuckPlayerInNewTab()).thenReturn(On)
+
+            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+            verify(listener).openLinkInNewTab(EXAMPLE_URL.toUri())
+            verify(listener, times(1)).onMainFrameNavigationDecided(false)
+            verify(listener, never()).onMainFrameNavigationDecided(true)
+        }
+
+    @Test
+    fun whenSubFrameRequestThenNavigationNeverDecided() {
+        givenMainFrameRequestRoutedTo(Web(EXAMPLE_URL))
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        verify(listener, never()).onMainFrameNavigationDecided(any())
+    }
+
+    private fun givenMainFrameRequestRoutedTo(urlType: SpecialUrlDetector.UrlType) {
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        testee.clientProvider = mock()
+    }
+
+    @Test
     fun whenAppLinkDetectedAndIsHandledThenReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
@@ -2255,6 +2450,35 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenUserInitiatedLoadThenWatchdogIsTold() {
+        testee.onUserInitiatedLoad()
+
+        verify(mockPageLoadTimeoutWatchdog).onUserInitiatedLoad()
+    }
+
+    @Test
+    fun whenTabBackgroundedThenWatchdogIsBackgrounded() {
+        testee.onTabBackgrounded()
+
+        verify(mockPageLoadTimeoutWatchdog).onBackgrounded()
+    }
+
+    @Test
+    fun whenDownloadStartedThenWatchdogIsNotifiedOfDownload() {
+        testee.onDownloadStarted()
+
+        verify(mockPageLoadTimeoutWatchdog).onDownloadStarted()
+        verify(mockPageLoadTimeoutWatchdog, never()).onNavigatedAway()
+    }
+
+    @Test
+    fun whenTabForegroundedThenWatchdogIsForegrounded() {
+        testee.onTabForegrounded()
+
+        verify(mockPageLoadTimeoutWatchdog).onForegrounded()
+    }
+
+    @Test
     fun whenOnPageStartedCalledThenWatchdogIsToldTheNavigationCommitted() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
 
@@ -2436,6 +2660,84 @@ class BrowserWebViewClientTest {
         testee.shouldInterceptRequest(webView, webResourceRequest)
 
         verify(mockPageLoadTimeoutWatchdog).onMainFrameRequest(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenMainFrameRequestIsSecPurposePrefetchThenWatchdogIsNotTold() {
+        assertSpeculativeMainFrameRequestIsIgnored("Sec-Purpose" to "prefetch")
+    }
+
+    @Test
+    fun whenMainFrameRequestIsSecPurposePrefetchPrerenderThenWatchdogIsNotTold() {
+        assertSpeculativeMainFrameRequestIsIgnored("sec-purpose" to "Prefetch;prerender")
+    }
+
+    @Test
+    fun whenMainFrameRequestIsLegacyPurposePrefetchThenWatchdogIsNotTold() {
+        assertSpeculativeMainFrameRequestIsIgnored("Purpose" to "prefetch")
+    }
+
+    @Test
+    fun whenMainFrameRequestHasUnrelatedHeadersThenWatchdogIsToldTheRequestedUrl() {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.requestHeaders).thenReturn(mapOf("Accept" to "text/html"))
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog).onMainFrameRequest(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenMainFrameRequestHasGestureThenWatchdogIsMarkedUserInitiatedBeforeTheRequest() {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(true)
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        val inOrder = inOrder(mockPageLoadTimeoutWatchdog)
+        inOrder.verify(mockPageLoadTimeoutWatchdog).onUserInitiatedLoad()
+        inOrder.verify(mockPageLoadTimeoutWatchdog).onMainFrameRequest(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenMainFrameRequestHasNoGestureThenWatchdogIsNotMarkedUserInitiated() {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onUserInitiatedLoad()
+        verify(mockPageLoadTimeoutWatchdog).onMainFrameRequest(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenSpeculativeMainFrameRequestHasGestureThenWatchdogIsNotMarkedUserInitiated() {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(true)
+        whenever(webResourceRequest.requestHeaders).thenReturn(mapOf("Sec-Purpose" to "prefetch"))
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onUserInitiatedLoad()
+    }
+
+    private fun assertSpeculativeMainFrameRequestIsIgnored(header: Pair<String, String>) {
+        whenever(webResourceRequest.method).thenReturn("GET")
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.requestHeaders).thenReturn(mapOf(header))
+
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+
+        verify(mockPageLoadTimeoutWatchdog, never()).onMainFrameRequest(any())
     }
 
     @Test

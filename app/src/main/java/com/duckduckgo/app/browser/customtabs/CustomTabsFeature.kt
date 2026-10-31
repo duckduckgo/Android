@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.customtabs
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -53,9 +53,15 @@ interface CustomTabsFeature {
     fun handleTrustedCallersNonHttpLinks(): Toggle
 
     /**
-     * When enabled, a custom tab survives the user switching to another app (e.g. to fetch a 2FA code) and coming
-     * back: the tab is kept with the app that opened it instead of in a hidden DDG task that the system discards.
-     * When disabled, custom tabs launch as before.
+     * When enabled together with [handleTrustedCallers] (and [handleTrustedCallersNonHttpLinks] for non-HTTP links),
+     * links that return to the verified custom tab caller can open even when "Open Links in Apps" is set to "Never".
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun handleTrustedCallersWhenAppLinksDisabled(): Toggle
+
+    /**
+     * When enabled, a custom tab survives the user switching to another app (e.g. to fetch a 2FA code).
+     * When disabled, it runs in a hidden task that the system may discard.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun keepCustomTabOnAppSwitch(): Toggle

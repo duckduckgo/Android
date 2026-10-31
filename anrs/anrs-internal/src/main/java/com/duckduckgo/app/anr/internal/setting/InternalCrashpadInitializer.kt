@@ -23,7 +23,7 @@ import com.duckduckgo.app.anr.ndk.CrashpadInitializer
 import com.duckduckgo.app.anr.ndk.DefaultCrashpadInitializer
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class, replaces = [DefaultCrashpadInitializer::class])
