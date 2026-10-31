@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.rmf
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.promo.PromoCampaignRepository
+import com.duckduckgo.duckchat.impl.promo.data.PromoCampaignRepository
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
