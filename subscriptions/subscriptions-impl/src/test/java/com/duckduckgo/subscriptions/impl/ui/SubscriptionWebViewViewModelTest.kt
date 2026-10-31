@@ -9,6 +9,7 @@ import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.pir.api.PirFeature
@@ -45,6 +46,7 @@ import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboa
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.stripe.StripePlansHandler
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
@@ -68,6 +70,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -96,6 +99,7 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler = mock()
     private val paywallUrlResolver: PaywallUrlResolver = mock()
     private val subscriptionOnboardingStore = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
+    private val stripePlansHandler: StripePlansHandler = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -116,6 +120,7 @@ class SubscriptionWebViewViewModelTest {
             subscriptionExpirationReminderScheduler = subscriptionExpirationReminderScheduler,
             paywallUrlResolver = paywallUrlResolver,
             subscriptionOnboardingStore = subscriptionOnboardingStore,
+            stripePlansHandler = stripePlansHandler,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
@@ -2461,6 +2466,105 @@ class SubscriptionWebViewViewModelTest {
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndStripeHandlesSubscriptionThenSendStripeTierOptions() = runTest {
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        val stripeOptions = SubscriptionTierOptionsJson(platform = "stripe", products = emptyList())
+        whenever(stripePlansHandler.getTierOptions()).thenReturn(stripeOptions)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+
+            assertEquals("id", response.id)
+            assertEquals(stripeOptions, tierJsonAdapter.fromJson(response.params.toString()))
+        }
+        verify(subscriptionsManager, never()).getSubscriptionOffer()
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndStripeDoesNotHandleSubscriptionThenStripeTierOptionsNotRequested() = runTest {
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(false)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("android", tierJsonAdapter.fromJson(response.params.toString())?.platform)
+        }
+        verify(stripePlansHandler, never()).getTierOptions()
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionThenSendRedirectEvent() = runTest {
+        givenActiveSubscription(platform = "stripe")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        val redirectEvent = SubscriptionEventData("useSubscription", "onPurchaseUpdate", JSONObject("""{"type":"redirect"}"""))
+        whenever(stripePlansHandler.getRedirectEvent()).thenReturn(redirectEvent)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject("""{"id":"stripe-yearly"}"""))
+
+            assertEquals(Command.SendJsEvent(redirectEvent), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionAndNoRedirectEventThenReturnFailure() = runTest {
+        givenActiveSubscription(platform = "stripe")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        whenever(stripePlansHandler.getRedirectEvent()).thenReturn(null)
+
+        viewModel.currentPurchaseViewState.test {
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
+
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject("""{"id":"stripe-yearly"}"""))
+
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeDoesNotHandleSubscriptionThenRedirectEventNotRequested() = runTest {
+        givenActiveSubscription(platform = "google")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(false)
+
+        viewModel.processJsCallbackMessage(
+            "test",
+            "subscriptionChangeSelected",
+            "id",
+            JSONObject("""{"id":"${SubscriptionsConstants.YEARLY_PLAN_US}"}"""),
+        )
+
+        verify(stripePlansHandler, never()).getRedirectEvent()
+    }
+
+    @Test
+    fun whenCompleteStripePaymentThenNotifyHandlerAndRespondToJs() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "completeStripePayment", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+
+            assertEquals("id", response.id)
+            assertEquals("completeStripePayment", response.method)
+        }
+        verify(stripePlansHandler).onPlanChangeCompleted()
+    }
+
+    private fun givenActiveSubscription(platform: String) = runBlocking {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = platform,
+                activeOffers = listOf(),
+            ),
+        )
     }
 
     private fun givenSubscriptionStatus(subscriptionStatus: SubscriptionStatus) = runBlocking {
