@@ -317,6 +317,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
@@ -334,7 +335,6 @@ import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -755,7 +755,7 @@ class BrowserTabViewModelTest {
     private val fakeCustomErrorPagesFeature = FakeFeatureToggleFactory.create(CustomErrorPagesFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
-    private val mockDuckAiEntryWideEvent: DuckAiEntryWideEvent = mock()
+    private val mockDuckAiEntryCallback: DuckAiEntryCallback = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockBrowserMenuAcknowledgement: BrowserMenuAcknowledgement = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
@@ -1103,7 +1103,7 @@ class BrowserTabViewModelTest {
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
-                duckAiEntryWideEvent = lazy { mockDuckAiEntryWideEvent },
+                duckAiEntryCallback = lazy { mockDuckAiEntryCallback },
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
             )
 
@@ -1419,7 +1419,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("cats")
 
-        verify(mockDuckAiEntryWideEvent).onSearchStarted("abc")
+        verify(mockDuckAiEntryCallback).onSearchStarted("abc")
     }
 
     @Test
@@ -1430,7 +1430,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("cats")
 
-        verify(mockDuckAiEntryWideEvent, never()).onSearchStarted(any())
+        verify(mockDuckAiEntryCallback, never()).onSearchStarted(any())
     }
 
     @Test

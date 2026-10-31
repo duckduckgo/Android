@@ -384,6 +384,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
@@ -401,7 +402,6 @@ import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -617,7 +617,7 @@ class BrowserTabViewModel @Inject constructor(
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
     private val customErrorPagesFeature: CustomErrorPagesFeature,
     private val duckAiSessionCallback: DuckAiSessionCallback,
-    private val duckAiEntryWideEvent: Lazy<DuckAiEntryWideEvent>,
+    private val duckAiEntryCallback: Lazy<DuckAiEntryCallback>,
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
 ) : ViewModel(),
     WebViewClientListener,
@@ -1682,7 +1682,7 @@ class BrowserTabViewModel @Inject constructor(
             browserInteractionsPlugins.getPlugins().forEach { it.onUrlSubmitted() }
         } else {
             if (url?.let { duckChat.isDuckChatUrl(it.toUri()) } == true) {
-                duckAiEntryWideEvent.value.onSearchStarted(tabId)
+                duckAiEntryCallback.value.onSearchStarted(tabId)
             }
             browserInteractionsPlugins.getPlugins().forEach { it.onSearchSubmitted() }
         }

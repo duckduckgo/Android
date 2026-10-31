@@ -129,12 +129,12 @@ import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.DuckAiContextualChat
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
-import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
@@ -211,7 +211,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
-    @Inject lateinit var duckAiEntryWideEvent: Lazy<DuckAiEntryWideEvent>
+    @Inject lateinit var duckAiEntryCallback: Lazy<DuckAiEntryCallback>
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -784,7 +784,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
     private fun trackDuckAiLaunchIntent(intent: Intent) {
-        duckAiEntryWideEvent.value.onLaunchIntentReceived(
+        duckAiEntryCallback.value.onLaunchIntentReceived(
             opensDuckAi = intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
                 intent.intentText?.let { duckChat.isDuckChatUrl(it.toUri()) } == true,
         )
@@ -813,7 +813,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         try {
             processLaunchIntent(intent)
         } finally {
-            duckAiEntryWideEvent.value.onLaunchIntentHandled()
+            duckAiEntryCallback.value.onLaunchIntentHandled()
         }
     }
 
@@ -1668,7 +1668,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             val tabId = tabPagerAdapter.getTabIdAtPosition(newPosition)
             if (tabId != null) {
                 val tab = tabManager.getTabById(tabId)
-                duckAiEntryWideEvent.value.onTabSwiped(tabId, tab?.url)
+                duckAiEntryCallback.value.onTabSwiped(tabId, tab?.url)
                 tabManager.switchToTab(tabId)
             }
         }

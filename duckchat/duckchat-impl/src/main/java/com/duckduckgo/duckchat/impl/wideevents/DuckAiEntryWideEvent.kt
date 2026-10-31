@@ -27,6 +27,7 @@ import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
@@ -36,6 +37,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.toPixelValue
+import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -48,6 +50,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<DuckAiEntryCallback>())
 @ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 class DuckAiEntryWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -58,7 +61,7 @@ class DuckAiEntryWideEvent @Inject constructor(
     private val inputMode: Lazy<DuckChatInputModeState>,
     private val tabSessions: DuckAiTabSessionRepository,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
-) : DuckAiSessionCallback, BrowserLifecycleObserver {
+) : DuckAiSessionCallback, DuckAiEntryCallback, BrowserLifecycleObserver {
 
     @SuppressLint("AvoidComputationUsage")
     private val coroutineScope = CoroutineScope(appCoroutineScope.coroutineContext + dispatchers.computation().limitedParallelism(1))
@@ -72,12 +75,12 @@ class DuckAiEntryWideEvent @Inject constructor(
     private var launchOpensDuckAi = false
     private var explicitEntryReported = false
 
-    fun onLaunchIntentReceived(opensDuckAi: Boolean = false) = mutate {
+    override fun onLaunchIntentReceived(opensDuckAi: Boolean) = mutate {
         launchIntentPending = true
         launchOpensDuckAi = opensDuckAi
     }
 
-    fun onLaunchIntentHandled() = mutate {
+    override fun onLaunchIntentHandled() = mutate {
         launchIntentPending = false
         startPendingLanding()
     }
@@ -167,7 +170,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         }
     }
 
-    fun onTabSwiped(tabId: String, url: String?) = mutate {
+    override fun onTabSwiped(tabId: String, url: String?) = mutate {
         if (tabId == selectedTabId || !isDuckAi(url)) return@mutate
         explicitEntryReported = true
         pendingLanding = null
@@ -190,7 +193,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         }
     }
 
-    fun onSearchStarted(tabId: String) = mutate {
+    override fun onSearchStarted(tabId: String) = mutate {
         activeEntry?.takeIf { it.tabId == tabId && it.surface == Surface.DUCK_AI_TAB && it.exitTrigger == null }
             ?.exitTrigger = ExitTrigger.SEARCH_STARTED
     }
