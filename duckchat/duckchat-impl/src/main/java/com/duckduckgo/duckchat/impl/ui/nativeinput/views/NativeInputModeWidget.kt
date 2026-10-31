@@ -187,7 +187,7 @@ interface NativeInputWidget {
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
-    fun setPageContext(title: String, url: String)
+    fun setPageContext(title: String, url: String, mimeType: String = "")
     fun clearPageContext()
     fun getPageContext(): PageContextAttachment?
     fun setContextualAttachmentActions(
@@ -1474,8 +1474,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentViewModel?.getFileAttachmentsJson()
 
-    override fun setPageContext(title: String, url: String) {
-        val attachment = PageContextAttachment(title = title, url = url, tabId = activeTabId)
+    override fun setPageContext(title: String, url: String, mimeType: String) {
+        val attachment = PageContextAttachment(title = title, url = url, tabId = activeTabId, mimeType = mimeType)
         pendingPageContext = attachment
         attachmentViewModel?.setPageContext(attachment)
     }

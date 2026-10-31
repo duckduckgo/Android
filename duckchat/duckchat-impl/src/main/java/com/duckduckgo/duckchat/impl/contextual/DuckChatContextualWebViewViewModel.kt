@@ -174,6 +174,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val showContext: Boolean = false,
         val contextUrl: String = "",
         val contextTitle: String = "",
+        val contextMimeType: String = "",
         val tabId: String = "",
         val userRemovedContext: Boolean = false,
         val isFireButtonEnabled: Boolean = false,
@@ -633,6 +634,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 showContext = true,
                 userRemovedContext = false,
                 contextTitle = json.optString("title"),
+                contextMimeType = json.optString("mimeType"),
                 contextUrl = json.optString("url"),
             )
         }
@@ -719,6 +721,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             _viewState.update {
                 it.copy(
                     contextTitle = title,
+                    contextMimeType = json.optString("mimeType"),
                     contextUrl = url,
                     tabId = tabId,
                     showContext = showContext,

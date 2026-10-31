@@ -45,7 +45,7 @@ class PageContextAttachmentView @JvmOverloads constructor(
 
     fun current(): PageContextAttachment? = attachment
 
-    fun faviconView(): ImageView? = faviconView
+    fun faviconView(): ImageView? = faviconView.takeUnless { attachment?.mimeType == "application/pdf" }
 
     fun show(attachment: PageContextAttachment, onRemoved: () -> Unit) {
         this.attachment = attachment
@@ -54,6 +54,7 @@ class PageContextAttachmentView @JvmOverloads constructor(
         itemView.findViewById<DaxTextView>(R.id.pageContextTitle).text = attachment.title
         itemView.findViewById<ImageView>(R.id.pageContextRemove).setOnClickListener { onRemoved() }
         faviconView = itemView.findViewById(R.id.pageContextFavicon)
+        if (attachment.mimeType == "application/pdf") faviconView?.setImageResource(R.drawable.document_pdf_color_24)
         addView(itemView)
         show()
     }

@@ -659,6 +659,7 @@ class DuckChatContextualWebViewFragment :
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
             binding.contextualNativeInputCard.widget.setPageContext(
                 title = viewState.contextTitle,
+                mimeType = viewState.contextMimeType,
                 url = viewState.contextUrl,
             )
         } else {
