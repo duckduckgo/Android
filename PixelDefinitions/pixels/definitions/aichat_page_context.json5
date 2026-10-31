@@ -1,0 +1,86 @@
+{
+    "m_aichat_page_context_extraction_success": {
+        "description": "Fired when Duck.ai page-context extraction produced usable content for the current page",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "context_type",
+                "description": "Which carrier the page was handed over in: pdf for a document tab, markdown for a regular web page.",
+                "type": "string",
+                "enum": ["pdf", "markdown"]
+            }
+        ]
+    },
+    "m_aichat_page_context_extraction_failed": {
+        "description": "Fired when Duck.ai page-context extraction was attempted but produced no usable content",
+        "owners": ["malmstein"],
+        "triggers": ["exception"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "description": "Why extraction produced no usable content.",
+                "type": "string",
+                "enum": [
+                    "empty_content",
+                    "deserialize_failed",
+                    "script_error",
+                    "timeout",
+                    "no_webview",
+                    "post_failed",
+                    "tab_evicted",
+                    "document_unavailable"
+                ]
+            },
+            {
+                "key": "trigger",
+                "description": "What initiated the extraction attempt.",
+                "type": "string",
+                "enum": ["auto", "navigation", "user_request", "tab_content"]
+            },
+            {
+                "key": "latency",
+                "description": "Bucketed request-to-result time. Present only when a result arrived.",
+                "type": "string",
+                "enum": ["under_1s", "1_to_5s", "over_5s"]
+            },
+            {
+                "key": "context_type",
+                "description": "Which carrier the page was handed over in: pdf for a document tab, markdown for a regular web page.",
+                "type": "string",
+                "enum": ["pdf", "markdown"]
+            }
+        ]
+    },
+    "m_aichat_page_context_extraction_prevented": {
+        "description": "Fired when Duck.ai page-context extraction was skipped because the current page is not attachable (blocklisted media type or a native special page)",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction", "page_load"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "category",
+                "description": "The prevention category: a blocklist media category key from aiPageContextBlocklist, internalPage for native special pages (nil URL, about:blank, Duck.ai), documentTooLarge for a PDF over the size ceiling native will hand across the JS bridge, or localFile for a page loaded from disk (file://), which is excluded from page context.",
+                "type": "string",
+                "enum": ["pdf", "image", "video", "audio", "internalPage", "documentTooLarge", "localFile"]
+            },
+            {
+                "key": "reason",
+                "description": "Always non_attachable; the page cannot be attached.",
+                "type": "string",
+                "enum": ["non_attachable"]
+            },
+            {
+                "key": "trigger",
+                "description": "What initiated the extraction attempt.",
+                "type": "string",
+                "enum": ["auto", "navigation", "user_request", "tab_content"]
+            }
+        ]
+    }
+}

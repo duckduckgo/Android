@@ -23,11 +23,40 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 
 @RunWith(AndroidJUnit4::class)
 class RealPageContextJSHelperTest {
 
-    private val testee = RealPageContextJSHelper()
+    private val testee = RealPageContextJSHelper(
+        org.mockito.kotlin.mock(),
+        org.mockito.kotlin.mock { on { pdfPageContext() } doReturn org.mockito.kotlin.mock() },
+        org.mockito.kotlin.mock(),
+        org.mockito.kotlin.mock(),
+    )
+
+    @Test
+    fun `successful markdown collection reports markdown carrier`() = runTest {
+        val pixels = org.mockito.kotlin.mock<com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels>()
+        val toggle = org.mockito.kotlin.mock<com.duckduckgo.feature.toggles.api.Toggle> { on { isEnabled() } doReturn true }
+        val feature = org.mockito.kotlin.mock<com.duckduckgo.duckchat.impl.feature.DuckChatFeature> {
+            on { pdfPageContext() } doReturn toggle
+        }
+        val dispatchers = org.mockito.kotlin.mock<com.duckduckgo.common.utils.DispatcherProvider>()
+        org.mockito.kotlin.whenever(dispatchers.io()).thenReturn(kotlinx.coroutines.test.UnconfinedTestDispatcher(testScheduler))
+        val helper = RealPageContextJSHelper(pixels, feature, backgroundScope, dispatchers)
+        helper.collectPageContext("tab")
+        helper.processPageContext(
+            "pageContext",
+            "collectionResult",
+            JSONObject().put(
+                "serializedPageData",
+                """{"title":"Page","content":"Markdown"}""",
+            ),
+            "tab",
+        )
+        org.mockito.kotlin.verify(pixels).success(com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.ContextType.MARKDOWN)
+    }
 
     @Test
     fun whenNonCollectionResultMethodThenReturnsNull() = runTest {
