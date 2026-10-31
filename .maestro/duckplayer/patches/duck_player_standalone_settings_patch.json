@@ -1,0 +1,10 @@
+[
+  {
+    "op": "add",
+    "path": "/features/duckPlayer/features/standaloneSettings",
+    "value": {
+      "state": "enabled",
+      "minSupportedVersion": 0
+    }
+  }
+]
