@@ -330,6 +330,7 @@
                     "promotion_ai_chat",
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
                     "other"
                 ]
             },
@@ -395,6 +396,7 @@
                     "promotion_ai_chat",
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
                     "other"
                 ]
             },
@@ -500,6 +502,7 @@
                     "promotion_ai_chat",
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
                     "other"
                 ]
             },
