@@ -22,19 +22,27 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.onboarding.ContextualOnboardingTimeLimit
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.ComposeOnboardingDialogsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class OnboardingDevSettingsViewModelTest {
@@ -47,6 +55,8 @@ class OnboardingDevSettingsViewModelTest {
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val ctaViewModel: CtaViewModel = mock()
     private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit = mock()
+    private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator = mock()
+    private val composeOnboardingDialogsStore: ComposeOnboardingDialogsStore = mock()
 
     private val requiredCtas = listOf(
         CtaId.DAX_INTRO,
@@ -71,6 +81,13 @@ class OnboardingDevSettingsViewModelTest {
         ctaViewModel = ctaViewModel,
         contextualOnboardingTimeLimit = contextualOnboardingTimeLimit,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        replayer = PreBrowserOnboardingReplayer(
+            linearOnboardingOrchestrator = linearOnboardingOrchestrator,
+            userStageStore = userStageStore,
+            settingsDataStore = settingsDataStore,
+            composeOnboardingDialogsStore = composeOnboardingDialogsStore,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+        ),
     )
 
     @Test
@@ -250,5 +267,31 @@ class OnboardingDevSettingsViewModelTest {
         testee.onCtaDismissedToggled(CtaId.DAX_INTRO, isDismissed = false)
 
         verify(dismissedCtaDao).delete(CtaId.DAX_INTRO)
+    }
+
+    @Test
+    fun whenReplayingThenAwaitPlanAbortBeforeResettingStageAndLaunchingWithoutClearingCtas() = runTest {
+        val abortCompleted = CompletableDeferred<Unit>()
+        whenever(linearOnboardingOrchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked))
+            .doSuspendableAnswer { abortCompleted.await() }
+
+        testee.commands.test {
+            testee.replayPreBrowserOnboarding()
+            assertTrue(testee.viewState.value.replaying)
+            verify(userStageStore, never()).moveToStage(any())
+            verifyNoInteractions(settingsDataStore)
+            expectNoEvents()
+
+            testee.replayPreBrowserOnboarding()
+            verify(linearOnboardingOrchestrator).onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+            abortCompleted.complete(Unit)
+
+            assertEquals(OnboardingDevSettingsViewModel.Command.ReplayPreBrowserOnboarding, awaitItem())
+            verify(userStageStore).moveToStage(AppStage.NEW)
+            verify(settingsDataStore).hideTips = false
+            verify(composeOnboardingDialogsStore).useComposeDialogs = false
+            verifyNoInteractions(dismissedCtaDao)
+            expectNoEvents()
+        }
     }
 }
