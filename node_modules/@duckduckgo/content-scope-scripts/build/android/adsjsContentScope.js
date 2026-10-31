@@ -5438,14 +5438,14 @@
       const field = { key, path: fieldPath, value };
       if (spec.when !== void 0) field.when = compilePredicate(spec.when, "value", `${fieldPath}.when`, scope.hooks);
       if (spec.buckets !== void 0) {
-        const buckets = spec.buckets;
-        if (!isPlainObject(buckets) || objectKeys(buckets).length === 0) {
-          throw new ConfigParseError(`${fieldPath}.buckets`, "`buckets` takes an object of at least one bucket");
-        }
-        field.buckets = objectKeys(buckets).map((name) => [
-          name,
-          compilePredicate(buckets[name], "value", `${fieldPath}.buckets.${name}`, scope.hooks)
-        ]);
+        const buckets = (
+          /** @type {Array<{ name: string, is: unknown }>} */
+          spec.buckets
+        );
+        field.buckets = buckets.map(({ name, is }, i) => {
+          const path2 = `${fieldPath}.buckets.${i}.is`;
+          return { name, is: compilePredicate(is, "value", path2, scope.hooks), path: path2 };
+        });
       }
       return field;
     });
@@ -5878,10 +5878,10 @@
       if (held !== true) return OMIT;
     }
     if (field.buckets) {
-      for (const [name, bucket] of field.buckets) {
-        const held = test2(bucket, `${field.path}.buckets.${name}`);
+      for (const bucket of field.buckets) {
+        const held = test2(bucket.is, bucket.path);
         if (isFailure(held)) return held;
-        if (held) return name;
+        if (held) return bucket.name;
       }
       return isFailure(value) ? value : OMIT;
     }
