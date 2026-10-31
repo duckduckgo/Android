@@ -28,7 +28,7 @@ interface StripeProductsRegionProvider {
 @ContributesBinding(AppScope::class)
 class RealStripeProductsRegionProvider @Inject constructor() : StripeProductsRegionProvider {
 
-    //us hardcoded until Stripe International launches
+    // us hardcoded until Stripe International launches
     override suspend fun region(): String = US_REGION
 
     companion object {
