@@ -44,6 +44,7 @@ what you remember of it.
 | `.claude/docs/architecture.md` | **planning or implementing** any new code, refactoring, or module changes — `-api`/`-impl` structure, DI scopes, navigation, coroutine job patterns |
 | `.claude/docs/android-design-system.md` | **planning or implementing** any UI — which ADS component to use, colors, spacing; raw Android/Material widgets are lint-blocked |
 | `.claude/docs/contributions.md` | **planning** a change that touches a `-api` surface or spans multiple modules — it needs an approved API Proposal and/or Tech Design, and that has to be raised before implementation, not at PR time. Also read it when naming a branch, writing a commit, or opening a PR |
+| `.claude/docs/compose-hosting.md` | adding `ComposeView` or `setContent` anywhere, or a Compose lint error blocks the build — where Compose hosts are allowed and how an approved production reference is listed in `lint.xml` |
 | `.claude/docs/lateinit-hazards.md` | writing or reviewing any `lateinit var`, especially `@Inject lateinit var` in a View |
 | `.claude/docs/plugin-system.md` | declaring a plugin point or contributing a plugin (`PluginPoint` / `ActivePluginPoint`) |
 | `.claude/docs/native-input.md` | **changing** the native input (`NativeInputModeWidget`, its plugins and footers, `NativeInputManager`, the contextual sheet or the edit screen) — adding a control, state-store rules, host gotchas, and the refactor still in flight |
