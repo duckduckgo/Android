@@ -163,11 +163,6 @@ enum class SubscriptionPixel(
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
     ),
-    APP_SETTINGS_PIR_CLICK(
-        baseName = "m_privacy-pro_app-settings_personal-information-removal_click",
-        type = Count,
-        includedParameters = setOf(ATB, APP_VERSION),
-    ),
     APP_SETTINGS_IDTR_CLICK(
         baseName = "m_privacy-pro_app-settings_identity-theft-restoration_click",
         type = Count,

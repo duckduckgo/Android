@@ -19,6 +19,9 @@
     <string name="pirFeatureName" translatable="false">Personal Information Removal</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
+    <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
+    <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
+    <string name="pirStorageUnavailableDialogButton">Got It</string>
     <string name="pirNotificationMessageInProgress">Your scan is in progress…</string>
     <string name="pirNotificationTitleComplete">Scan complete!</string>
     <string name="pirNotificationMessageComplete">DuckDuckGo has started the process to remove records matching your personal info online. See what we found…</string>
