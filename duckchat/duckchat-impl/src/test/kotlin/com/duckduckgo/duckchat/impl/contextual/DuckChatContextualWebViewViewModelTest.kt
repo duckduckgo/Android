@@ -34,6 +34,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -78,6 +79,7 @@ class DuckChatContextualWebViewViewModelTest {
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val duckChatFeature: DuckChatFeature = mock()
     private val termsConsent: DuckAiTermsConsent = mock()
@@ -122,6 +124,7 @@ class DuckChatContextualWebViewViewModelTest {
             assertTrue(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.LoadUrl)
             cancelAndIgnoreRemainingEvents()
         }
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", false, null)
         assertEquals("tab-1", testee.viewState.value.tabId)
         verify(duckChatPixels).reportContextualSheetOpened()
     }
@@ -276,6 +279,7 @@ class DuckChatContextualWebViewViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(duckChatPixels).reportContextualSheetOpened()
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null)
     }
 
     @Test
@@ -298,6 +302,8 @@ class DuckChatContextualWebViewViewModelTest {
 
         verify(duckChatPixels).reportContextualSheetSessionRestored()
         verify(duckChatPixels).reportContextualSheetOpened()
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", false, null)
+        verify(entryWideEvent).onContextualSheetUrlResolved("tab-1", chatUrl)
     }
 
     @Test
@@ -572,6 +578,7 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels).reportContextualSheetDismissed()
+        verify(entryWideEvent).onContextualSheetClosed("tab-1")
     }
 
     @Test
@@ -815,6 +822,7 @@ class DuckChatContextualWebViewViewModelTest {
         textSelectionRepository = textSelectionRepository,
         termsConsent = termsConsent,
         browserMode = BrowserMode.REGULAR,
+        entryWideEvent = entryWideEvent,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
