@@ -394,4 +394,5 @@
         <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d time</item>
         <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d timer</item>
     </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Sammenfat dette dokument</string>
 </resources>
