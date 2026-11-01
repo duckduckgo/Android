@@ -13,6 +13,7 @@ signatures are not repeated here.
 Lint fails the build on all of these (`lint-rules/src/main/java/com/duckduckgo/lint/ui/`):
 
 - Raw `Button`, `TextView`, `SwitchView` in XML
+- `ComposeView` or `setContent` outside the places listed in `.claude/docs/compose-hosting.md`
 - `style=` on any ADS component; a custom style not prefixed `Widget.DuckDuckGo.`
 - `@color/` references in XML — use `?attr/daxColor*` so both themes work
 - A plain `View` used as a divider

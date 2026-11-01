@@ -73,7 +73,7 @@ class NoSetContentDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/MainActivity.kt:9: Error: Compose is not yet approved to be used in production. The setContent function should not be used in Activities until Compose usage is officially approved for the codebase. [NoSetContentUsage]
+                src/com/example/test/MainActivity.kt:9: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. setContent in an Activity is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoSetContentUsage]
                         setContent {
                         ^
                 1 errors, 0 warnings
@@ -120,7 +120,7 @@ class NoSetContentDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/BrowserActivity.kt:10: Error: Compose is not yet approved to be used in production. The setContent function should not be used in Activities until Compose usage is officially approved for the codebase. [NoSetContentUsage]
+                src/com/example/test/BrowserActivity.kt:10: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. setContent in an Activity is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoSetContentUsage]
                         setContent {
                         ^
                 1 errors, 0 warnings
@@ -234,10 +234,10 @@ class NoSetContentDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/MainActivity.kt:11: Error: Compose is not yet approved to be used in production. The setContent function should not be used in Activities until Compose usage is officially approved for the codebase. [NoSetContentUsage]
+                src/com/example/test/MainActivity.kt:11: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. setContent in an Activity is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoSetContentUsage]
                             setContent {
                             ^
-                src/com/example/test/MainActivity.kt:15: Error: Compose is not yet approved to be used in production. The setContent function should not be used in Activities until Compose usage is officially approved for the codebase. [NoSetContentUsage]
+                src/com/example/test/MainActivity.kt:15: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. setContent in an Activity is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoSetContentUsage]
                             setContent {
                             ^
                 2 errors, 0 warnings
@@ -275,7 +275,7 @@ class NoSetContentDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/BaseActivity.kt:10: Error: Compose is not yet approved to be used in production. The setContent function should not be used in Activities until Compose usage is officially approved for the codebase. [NoSetContentUsage]
+                src/com/example/test/BaseActivity.kt:10: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. setContent in an Activity is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoSetContentUsage]
                         setContent {
                         ^
                 1 errors, 0 warnings
