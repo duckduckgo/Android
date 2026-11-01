@@ -481,7 +481,7 @@ class DuckChatContextualWebViewFragment :
             onPageContextRemoved = { viewModel.removePageContext() },
             onVoiceChatRequested = {
                 viewModel.onContextualClose()
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
             },
             onVoiceSearchRequested = {
                 activity?.hideKeyboard()

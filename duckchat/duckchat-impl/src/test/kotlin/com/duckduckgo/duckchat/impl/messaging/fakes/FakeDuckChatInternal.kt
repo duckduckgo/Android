@@ -65,11 +65,11 @@ class FakeDuckChatInternal(
         openDuckChatCalls += 1
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) { }
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) { }
 
     override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) { }
 
-    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean) { }
+    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean, voice: Boolean) { }
 
     override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"

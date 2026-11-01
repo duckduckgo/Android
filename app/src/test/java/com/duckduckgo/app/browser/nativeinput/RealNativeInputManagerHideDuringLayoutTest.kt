@@ -117,7 +117,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
                 onSearchSubmitted = {},
                 onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
-                onDuckAiQuerySubmitted = { _, _ -> },
+                onDuckAiQuerySubmitted = { _, _, _ -> },
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),

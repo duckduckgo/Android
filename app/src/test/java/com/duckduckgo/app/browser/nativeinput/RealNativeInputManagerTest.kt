@@ -579,13 +579,57 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenNonBlankDuckAiVoiceResultThenSubmissionUsesVoiceEntryPoint() {
+    fun whenVoiceChatButtonClickedThenUsesAddressBarPromptEntryPoint() {
+        val widget = showVoiceTestWidget { _, _ -> }
+
+        widget.onVoiceChatClick!!.invoke()
+
+        verify(duckChat).openVoiceDuckChat(DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+    }
+
+    @Test
+    fun whenDictatedPromptArrivesWithoutWidgetThenUsesAddressBarPromptEntryPoint() {
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        testee.init(omnibar, rootView, lifecycleOwner)
+
+        testee.handleDuckAiVoiceResult("dictated prompt")
+
+        verify(duckChat).openDuckChatWithAutoPrompt("dictated prompt", DuckChatEntryPoint.ADDRESS_BAR_PROMPT, voice = true)
+    }
+
+    @Test
+    fun whenDictationIsFollowedByTypingThenVoiceFlagDoesNotLeak() {
+        val flags = mutableListOf<Boolean>()
+        showVoiceTestWidget(onVoiceFlag = { flags += it }) { _, _ -> }
+        testee.handleDuckAiVoiceResult("dictated prompt")
+
+        val widget = showVoiceTestWidget(onVoiceFlag = { flags += it }) { _, _ -> }
+        widget.selectChatTab()
+        widget.submitMessage("typed prompt")
+
+        assertEquals(listOf(true, false), flags)
+    }
+
+    @Test
+    fun whenBlankDictationThenNextTypedPromptIsNotVoice() {
+        val flags = mutableListOf<Boolean>()
+        val widget = showVoiceTestWidget(onVoiceFlag = { flags += it }) { _, _ -> }
+        testee.handleDuckAiVoiceResult("")
+        testee.handleDuckAiVoiceResult("   ")
+        widget.selectChatTab()
+        widget.submitMessage("typed prompt")
+
+        assertEquals(listOf(false), flags)
+    }
+
+    @Test
+    fun whenNonBlankDuckAiVoiceResultThenSubmissionUsesAddressBarPromptEntryPoint() {
         val entryPoints = mutableListOf<DuckChatEntryPoint>()
         showVoiceTestWidget { _, entryPoint -> entryPoints += entryPoint }
 
         testee.handleDuckAiVoiceResult("voice query")
 
-        assertEquals(listOf(DuckChatEntryPoint.VOICE), entryPoints)
+        assertEquals(listOf(DuckChatEntryPoint.ADDRESS_BAR_PROMPT), entryPoints)
     }
 
     @Test
@@ -600,7 +644,7 @@ class RealNativeInputManagerTest {
         widget.submitMessage("typed query")
 
         assertEquals(
-            listOf(DuckChatEntryPoint.VOICE, DuckChatEntryPoint.ADDRESS_BAR_PROMPT),
+            listOf(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, DuckChatEntryPoint.ADDRESS_BAR_PROMPT),
             entryPoints,
         )
     }
@@ -644,6 +688,7 @@ class RealNativeInputManagerTest {
 
     private fun showVoiceTestWidget(
         currentTabUrl: Flow<String?> = emptyFlow(),
+        onVoiceFlag: (Boolean) -> Unit = {},
         onDuckAiQuerySubmitted: (String, DuckChatEntryPoint) -> Unit,
     ): TestNativeInputWidget {
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
@@ -674,7 +719,10 @@ class RealNativeInputManagerTest {
                 onSearchSubmitted = {},
                 onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
-                onDuckAiQuerySubmitted = onDuckAiQuerySubmitted,
+                onDuckAiQuerySubmitted = { query, entryPoint, voice ->
+                    onVoiceFlag(voice)
+                    onDuckAiQuerySubmitted(query, entryPoint)
+                },
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),
@@ -711,6 +759,7 @@ class RealNativeInputManagerTest {
         context: Context,
         delegate: NativeInputWidget = mock(),
     ) : View(context), NativeInputWidget by delegate {
+        override var onVoiceChatClick: (() -> Unit)? = null
         private var chatTabSelected = false
         private var onChatSubmitted: ((String) -> Unit)? = null
         var chatIdSource: Flow<String?>? = null

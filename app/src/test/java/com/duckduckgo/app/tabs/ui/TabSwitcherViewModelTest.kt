@@ -440,7 +440,7 @@ class TabSwitcherViewModelTest {
     fun whenExistingRegularTabSelectedThenEntryPointNotReported() = runTest {
         testee.onTabSelected("abc")
 
-        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any())
+        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any(), any())
     }
 
     @Test
