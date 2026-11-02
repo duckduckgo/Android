@@ -28,6 +28,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -52,19 +53,28 @@ class RealStripeTierOptionsProviderTest {
     }
 
     @Test
-    fun whenGetTierProductsThenRequestUsStripeProducts() = runTest {
+    fun whenGetTierProductsWithoutCountryThenRequestUsStripeProducts() = runTest {
         givenProducts()
 
-        provider.getTierProducts(includeProTier = true)
+        provider.getTierProducts(includeProTier = true, country = null)
 
-        verify(subscriptionsService).tierProducts(region = "us", platform = "stripe")
+        verify(subscriptionsService).tierProducts(platform = "stripe", region = "us", country = null)
+    }
+
+    @Test
+    fun whenGetTierProductsWithCountryThenRequestStripeProductsForCountry() = runTest {
+        givenProducts()
+
+        provider.getTierProducts(includeProTier = true, country = "DE")
+
+        verify(subscriptionsService).tierProducts(platform = "stripe", region = null, country = "DE")
     }
 
     @Test
     fun whenGetTierProductsThenMapProductsAndFormatPrices() = runTest {
         givenProducts(plusProduct())
 
-        val products = provider.getTierProducts(includeProTier = true)
+        val products = provider.getTierProducts(includeProTier = true, country = null)
 
         assertEquals(1, products.size)
         val product = products.first()
@@ -87,7 +97,7 @@ class RealStripeTierOptionsProviderTest {
             ),
         )
 
-        val products = provider.getTierProducts(includeProTier = true)
+        val products = provider.getTierProducts(includeProTier = true, country = null)
 
         assertEquals("9.99 XYZ1", products.first().options.first().displayPrice)
     }
@@ -96,7 +106,7 @@ class RealStripeTierOptionsProviderTest {
     fun whenProTierNotIncludedThenProProductIsFilteredOut() = runTest {
         givenProducts(plusProduct(), proProduct())
 
-        val products = provider.getTierProducts(includeProTier = false)
+        val products = provider.getTierProducts(includeProTier = false, country = null)
 
         assertEquals(listOf("plus"), products.map { it.tier })
     }
@@ -105,7 +115,7 @@ class RealStripeTierOptionsProviderTest {
     fun whenProTierIncludedThenAllProductsReturned() = runTest {
         givenProducts(plusProduct(), proProduct())
 
-        val products = provider.getTierProducts(includeProTier = true)
+        val products = provider.getTierProducts(includeProTier = true, country = null)
 
         assertEquals(listOf("plus", "pro"), products.map { it.tier })
     }
@@ -114,20 +124,20 @@ class RealStripeTierOptionsProviderTest {
     fun whenProductHasNoBillingCyclesThenItIsSkipped() = runTest {
         givenProducts(plusProduct(billingCycles = emptyList()), proProduct())
 
-        val products = provider.getTierProducts(includeProTier = true)
+        val products = provider.getTierProducts(includeProTier = true, country = null)
 
         assertEquals(listOf("pro"), products.map { it.tier })
     }
 
     @Test
     fun whenRequestFailsThenReturnEmptyList() = runTest {
-        whenever(subscriptionsService.tierProducts(any(), any())).thenThrow(RuntimeException())
+        whenever(subscriptionsService.tierProducts(any(), anyOrNull(), anyOrNull())).thenThrow(RuntimeException())
 
-        assertTrue(provider.getTierProducts(includeProTier = true).isEmpty())
+        assertTrue(provider.getTierProducts(includeProTier = true, country = null).isEmpty())
     }
 
     private suspend fun givenProducts(vararg products: TierProductResponse) {
-        whenever(subscriptionsService.tierProducts(any(), any())).thenReturn(TierProductsResponse(products.toList()))
+        whenever(subscriptionsService.tierProducts(any(), anyOrNull(), anyOrNull())).thenReturn(TierProductsResponse(products.toList()))
     }
 
     private fun plusProduct(
