@@ -461,6 +461,40 @@ class SyncThisDeviceViewModelTest {
     }
 
     @Test
+    fun `when syncing this device is in progress then choosing to sync with another device is ignored`() = runTest {
+        deviceAuthenticator.suspendResponse()
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
+            testee.onSyncWithAnotherDeviceClicked()
+            expectNoEvents()
+
+            assertEquals(1, deviceAuthenticator.requests.size)
+            verify(syncPixels, never()).fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when syncing this device was cancelled then choosing to sync with another device starts that flow`() = runTest {
+        deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
+            deviceAuthenticator.response = Response.Allowed.UserAuthenticated
+            testee.onSyncWithAnotherDeviceClicked()
+            assertIs<SyncWithAnotherDevice>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
     fun `when authentication fails while syncing this device then an auth error is shown`() = runTest {
         deviceAuthenticator.response = Response.Failed("reason")
 
