@@ -69,6 +69,24 @@ class PixelRequestLimitUpdaterTest {
     }
 
     @Test
+    fun whenVpnProcessCreatedThenRemoteLimitApplied() {
+        givenRemoteLimit(1)
+
+        testee.onVpnProcessCreated()
+
+        assertEquals(1, testee.dispatcher.maxRequestsPerHost)
+    }
+
+    @Test
+    fun whenPirProcessCreatedThenRemoteLimitApplied() {
+        givenRemoteLimit(1)
+
+        testee.onPirProcessCreated()
+
+        assertEquals(1, testee.dispatcher.maxRequestsPerHost)
+    }
+
+    @Test
     fun whenNoRemoteSettingsThenDefaultLimitKept() {
         testee.onCreate(lifecycleOwner)
 

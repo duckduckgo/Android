@@ -19,6 +19,8 @@ package com.duckduckgo.app.statistics.api
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -34,10 +36,19 @@ import javax.inject.Inject
  * Owns the pixel Dispatcher and keeps its per-host limit in sync with remote config.
  * The limit is applied in the background on app start and whenever a new privacy config arrives, so building the pixel client never reads
  * feature flags and a new remote value takes effect without a restart.
+ * The VPN and PIR processes send pixels too but never download the config, so they only read the limit when the process starts.
  */
 @ContributesIntoSet(
     scope = AppScope::class,
     binding = binding<MainProcessLifecycleObserver>(),
+)
+@ContributesIntoSet(
+    scope = AppScope::class,
+    binding = binding<VpnProcessLifecycleObserver>(),
+)
+@ContributesIntoSet(
+    scope = AppScope::class,
+    binding = binding<PirProcessLifecycleObserver>(),
 )
 @ContributesIntoSet(
     scope = AppScope::class,
@@ -48,11 +59,19 @@ class PixelRequestLimitUpdater @Inject constructor(
     private val concurrencyLimitFeature: PixelConcurrencyLimitFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
+) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, PirProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     val dispatcher = Dispatcher().apply { maxRequestsPerHost = PixelRequestLimit.DEFAULT_MAX_REQUESTS_PER_HOST }
 
     override fun onCreate(owner: LifecycleOwner) {
+        updateLimit()
+    }
+
+    override fun onVpnProcessCreated() {
+        updateLimit()
+    }
+
+    override fun onPirProcessCreated() {
         updateLimit()
     }
 
