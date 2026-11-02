@@ -142,17 +142,18 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var authPromptRenderer: AuthPromptRenderer
 
+    private val startSyncFlowParams
+        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)
+
     private val launchSource
-        get() = SyncLaunchSource.from(
-            intent.getActivityParams(SyncActivityStartSyncFlow::class.java)?.source
-                ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source,
-        )
+        get() = startSyncFlowParams?.source
+            ?: SyncLaunchSource.from(intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source)
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
 
     private val shouldDeepLinkStartSync
-        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java) != null
+        get() = startSyncFlowParams != null
 
     private val isAnotherDeviceSync
         get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
@@ -335,7 +336,10 @@ class SyncActivity : DuckDuckGoActivity() {
                     // We can't rely solely on the view state for that, because it arrives asynchronously and misses the first frame.
                     // Multi-device promotions keep the settings visible, because their flows start from the settings of a syncing user.
                     binding.root.isInvisible = !isMultiDevicePromotion
-                    viewModel.processSourceDeepLink(launchSource)
+                    when (startSyncFlowParams?.start) {
+                        SyncFlowStart.AskSyncWithDesktop -> viewModel.processSyncWithDesktopDeepLink(launchSource)
+                        else -> viewModel.processSourceDeepLink(launchSource)
+                    }
                 }
                 isAnotherDeviceSync -> viewModel.onSyncWithAnotherDevice()
             }

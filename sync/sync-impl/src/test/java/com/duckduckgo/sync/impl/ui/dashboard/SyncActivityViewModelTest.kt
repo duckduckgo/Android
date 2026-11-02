@@ -340,13 +340,37 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenLaunchedFromBookmarkAddedMultiDevicePromotionAndSignedInThenEmitCommandAskSyncWithDesktop() = runTest {
+    fun whenAskedToSyncWithDesktopAndSignedInThenEmitCommandAskSyncWithDesktop() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.commands().test {
+            testee.processSyncWithDesktopDeepLink(launchSource = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice)
+            awaitItem().assertCommandType(Command.AskSyncWithDesktop::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAskedToSyncWithDesktopAndNotSignedInThenEmitCommandIntroCreateAccount() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSyncWithDesktopDeepLink(launchSource = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice)
+            awaitItem().assertCommandType(IntroCreateAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromBookmarkAddedMultiDevicePromotionAndSignedInThenEmitCommandAddAnotherDevice() = runTest {
         givenUserHasDeviceAuthentication(true)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands().test {
             testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice)
-            awaitItem().assertCommandType(Command.AskSyncWithDesktop::class)
+            awaitItem().assertCommandType(Command.AddAnotherDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
