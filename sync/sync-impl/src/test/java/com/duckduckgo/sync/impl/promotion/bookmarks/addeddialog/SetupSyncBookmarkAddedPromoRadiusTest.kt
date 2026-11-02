@@ -62,6 +62,8 @@ class SetupSyncBookmarkAddedPromoRadiusTest {
         toggles.radius().setRawStoredState(State(enable = radiusEnabled))
         val syncPromotions = mock<SyncPromotions>()
         whenever(syncPromotions.canShowBookmarkAddedDialogPromotion()).thenReturn(true)
+        val setUpPromotion = mock<SyncBookmarkAddedSetUpPromotion>()
+        whenever(setUpPromotion.canShowPromotion()).thenReturn(false)
         val syncStateMonitor = mock<SyncStateMonitor>()
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
 
@@ -84,6 +86,7 @@ class SetupSyncBookmarkAddedPromoRadiusTest {
                     syncStateMonitor = syncStateMonitor,
                     syncPixels = mock(),
                     appBrandDesignUpdateToggles = toggles,
+                    setUpPromotion = setUpPromotion,
                 )
                 val ripple = checkNotNull(promo.getView()).background as RippleDrawable
                 val mask = ripple.findDrawableByLayerId(android.R.id.mask) as GradientDrawable

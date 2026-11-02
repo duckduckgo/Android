@@ -17,7 +17,8 @@
                     "passwords_import",
                     "bookmarks_import",
                     "bookmarks_multi_device",
-                    "passwords_multi_device"
+                    "passwords_multi_device",
+                    "bookmark_added_dialog"
                 ]
             }
         ]
@@ -40,7 +41,8 @@
                     "passwords_import",
                     "bookmarks_import",
                     "bookmarks_multi_device",
-                    "passwords_multi_device"
+                    "passwords_multi_device",
+                    "bookmark_added_dialog"
                 ]
             }
         ]
@@ -56,7 +58,7 @@
                 "key": "source",
                 "type": "string",
                 "description": "The Sync promotion that was dismissed",
-                "enum": ["bookmarks", "passwords", "ai_chat", "bookmarks_multi_device", "passwords_multi_device"]
+                "enum": ["bookmarks", "passwords", "ai_chat", "bookmarks_multi_device", "passwords_multi_device", "bookmark_added_dialog"]
             },
             {
                 "key": "reason",
