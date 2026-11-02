@@ -181,6 +181,7 @@ import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
 import com.duckduckgo.app.browser.print.CachedPdfPrintDocumentAdapter
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.browser.progressbar.MainFrameCommitNavigationClient
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.suggestredirect.RedirectSuggestion
@@ -4212,6 +4213,7 @@ class BrowserTabFragment :
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
+            MainFrameCommitNavigationClient.install(it, viewModel::onMainFrameCommitted)
             it.clearSslPreferences()
 
             it.settings.apply {

@@ -805,6 +805,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private var allowlistRefreshTriggerJob: Job? = null
     private var refreshTriggerJob: Job? = null
+    private var challengeHoldCutoffJob: Job? = null
     private var brokenSiteReportTriggerJob: Job? = null
 
     /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
@@ -2201,7 +2202,42 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onMainFrameNavigationDecided(loadsInThisTab: Boolean) {
         if (!isStartProgressAtIntentEnabled()) return
-        if (loadsInThisTab) onNavigationPendingCommit() else onNavigationAbandoned()
+        if (loadsInThisTab) {
+            challengeHoldCutoffJob?.cancel()
+            forgetChallengePage()
+            onNavigationPendingCommit()
+        } else {
+            onNavigationAbandoned()
+        }
+    }
+
+    fun onMainFrameCommitted(statusCode: Int) {
+        if (!isHoldProgressOnChallengeEnabled()) return
+        navigationState = navigationState.onMainFrameCommitted(statusCode)
+    }
+
+    // Without the commit callback a stale flag would hold a normal page; the next commit's response decides again
+    private fun forgetChallengePage() {
+        navigationState = navigationState.forgetChallengePage()
+    }
+
+    private fun isHoldProgressOnChallengeEnabled() =
+        isStartProgressAtIntentEnabled() && progressBarUpgradeFeature.holdProgressOnChallengePage().isEnabled()
+
+    // A held bar has no page left to complete it, so every path that ends the held page's story must come through here
+    private fun releaseHeldBar() {
+        challengeHoldCutoffJob?.cancel()
+        val wasHeld = navigationState.isHeld
+        navigationState = navigationState.releaseHold()
+        if (wasHeld && currentLoadingViewState().isLoading) finishLoading(finalProgress = 100)
+    }
+
+    private fun scheduleChallengeHoldCutoff() {
+        challengeHoldCutoffJob?.cancel()
+        challengeHoldCutoffJob = viewModelScope.launch {
+            delay(CHALLENGE_HOLD_CUTOFF_MS)
+            releaseHeldBar()
+        }
     }
 
     // Released here, not in pageStarted: it is posted and can land after the next navigation became pending.
@@ -2221,6 +2257,9 @@ class BrowserTabViewModel @Inject constructor(
     private fun onNavigationIntent(url: String) {
         if (!isStartProgressAtIntentEnabled()) return
         if (!isSameDocumentNavigation(url)) {
+            challengeHoldCutoffJob?.cancel()
+            forgetChallengePage()
+            navigationState = navigationState.releaseHold()
             navigationState = navigationState.onNavigationRequested(isStartProgressAtIntentEnabled())
             onNavigationPendingCommit()
         }
@@ -2236,6 +2275,7 @@ class BrowserTabViewModel @Inject constructor(
 
     // The navigation won't commit in this tab (external app, download, SSL warning, timeout, home), so end the bar we started
     private fun onNavigationAbandoned() {
+        releaseHeldBar()
         val awaitingCommit = isAwaitingCommitAtIntent()
         navigationState = navigationState.onNavigationAbandoned()
         if (!awaitingCommit) return
@@ -2761,14 +2801,29 @@ class BrowserTabViewModel @Inject constructor(
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
         if (navigationState.ignoresProgress(progressBarUpgradeFeature.behaviourUpdate().isEnabled())) return
 
-        val isLoading = newProgress < 100 || isProcessingTrackingLink
+        var isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
 
-        val reportedProgress = if (progressBarUpgradeFeature.behaviourUpdate().isEnabled()) {
+        var reportedProgress = if (progressBarUpgradeFeature.behaviourUpdate().isEnabled()) {
             newProgress
         } else {
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) FIXED_PROGRESS else newProgress
+        }
+
+        if (isHoldProgressOnChallengeEnabled()) {
+            // Never emit below the held value: the bar view restarts when progress goes backwards
+            if (navigationState.swallows(newProgress)) return
+            if (navigationState.isChallengePage) {
+                reportedProgress = minOf(reportedProgress, HELD_PROGRESS)
+                if (newProgress == 100) {
+                    isLoading = true
+                    navigationState = navigationState.hold()
+                    scheduleChallengeHoldCutoff()
+                }
+            } else if (navigationState.isHeld) {
+                navigationState = navigationState.releaseHold()
+            }
         }
 
         // Track the first time we escape from max progress threshold for Wide Events
@@ -2800,6 +2855,7 @@ class BrowserTabViewModel @Inject constructor(
             OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
             BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR, TIMEOUT -> Unit
         }
+        if (navigationState.isHeld) scheduleChallengeHoldCutoff()
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
@@ -4842,6 +4898,7 @@ class BrowserTabViewModel @Inject constructor(
         errorCode: String,
     ) {
         // An error page replaces the load: reopen the gate and end the pending navigation
+        releaseHeldBar()
         navigationState = navigationState.onErrorReceived(isStartProgressAtIntentEnabled())
         if (errorType != OMITTED) {
             errorPagePendingDismissal = false
@@ -6188,6 +6245,10 @@ class BrowserTabViewModel @Inject constructor(
     companion object {
         private const val FIXED_PROGRESS = 50
         private const val UPGRADED_PROGRESS_THRESHOLD = 95
+        private const val HELD_PROGRESS = NavigationProgressState.HELD_PROGRESS
+        // Safety release for a held challenge page that never navigates again, which nothing else would end.
+        // Normal pages are never delayed.
+        private const val CHALLENGE_HOLD_CUTOFF_MS = 3000L
 
         private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
 

@@ -37,4 +37,7 @@ interface ProgressBarUpgradeFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun startProgressAtIntent(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun holdProgressOnChallengePage(): Toggle
 }
