@@ -23,6 +23,7 @@ package com.duckduckgo.app.browser.progressbar
  * [isNavigationPendingCommit] holds back the outgoing page's progress between the intent to navigate and the new page's commit.
  * [isChallengePage] marks a committed bot-challenge response, whose completion is replaced by a hold.
  * [isHeld] keeps the bar at [HELD_PROGRESS] until the page-initiated navigation that follows exceeds it.
+ * [isHttpsUpgradeInFlight] spans the cancelled http request and its https replacement, so the cancelled finish is not an abandon.
  * Every pending-related part is guarded by `startAtIntent`; with it false the transitions match the behaviour before the flag existed.
  */
 data class NavigationProgressState(
@@ -30,23 +31,26 @@ data class NavigationProgressState(
     val isNavigationPendingCommit: Boolean = false,
     val isChallengePage: Boolean = false,
     val isHeld: Boolean = false,
+    val isHttpsUpgradeInFlight: Boolean = false,
 ) {
     fun onNavigationRequested(startAtIntent: Boolean): NavigationProgressState =
-        if (startAtIntent) copy(hasCompletedPageLoad = false) else this
+        if (startAtIntent) copy(hasCompletedPageLoad = false, isHttpsUpgradeInFlight = false) else copy(isHttpsUpgradeInFlight = false)
+
+    fun onHttpsUpgraded(startAtIntent: Boolean): NavigationProgressState = if (startAtIntent) copy(isHttpsUpgradeInFlight = true) else this
 
     fun onNavigationPendingCommit(startAtIntent: Boolean): NavigationProgressState =
         if (startAtIntent) copy(isNavigationPendingCommit = true) else this
 
     // Leaves the pending flag alone: commit callbacks can be delivered after a newer navigation became pending
-    fun onNavigationCommitted(): NavigationProgressState = copy(hasCompletedPageLoad = false)
+    fun onNavigationCommitted(): NavigationProgressState = copy(hasCompletedPageLoad = false, isHttpsUpgradeInFlight = false)
 
     // Not guarded by the flag: a pending set while it was on must not outlive a flip to off
     fun releasePendingNavigation(): NavigationProgressState = copy(isNavigationPendingCommit = false)
 
-    fun onNavigationAbandoned(): NavigationProgressState = releasePendingNavigation()
+    fun onNavigationAbandoned(): NavigationProgressState = releasePendingNavigation().copy(isHttpsUpgradeInFlight = false)
 
     fun onErrorReceived(startAtIntent: Boolean): NavigationProgressState =
-        if (startAtIntent) onPageChanged().releasePendingNavigation() else releasePendingNavigation()
+        (if (startAtIntent) onPageChanged().releasePendingNavigation() else releasePendingNavigation()).copy(isHttpsUpgradeInFlight = false)
 
     fun onPageLoadCompleted(): NavigationProgressState = copy(hasCompletedPageLoad = true)
 

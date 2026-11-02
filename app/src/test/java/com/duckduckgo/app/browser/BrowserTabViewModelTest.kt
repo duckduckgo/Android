@@ -2496,6 +2496,118 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHttpsUpgradeCancelsHttpRequestThenSingleBarCycleAndProgressNeverGoesBackwards() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery("example.com")
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        testee.upgradedToHttps()
+        testee.onNavigationFinishedWithoutCommit()
+        assertEquals(true, loadingViewState().isLoading)
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals(1, states.loadingStarts())
+        assertEquals(0, states.progressDecreasesWhileLoading())
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenNoHttpsUpgradeAndNavigationFinishesWithoutCommitThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+
+        testee.onUserSubmittedQuery("example.com")
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHttpsUpgradeThenHttpsLoadFailsThenLoadingNoLongerHeldAndLaterAbandonEndsBar() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+
+        testee.onUserSubmittedQuery("example.com")
+        testee.upgradedToHttps()
+        testee.onReceivedError(BAD_URL, "https://example.com/", "ERROR_HOST_LOOKUP")
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHttpsUpgradeThenHttpsLoadFailsThenFinishedWithoutCommitEndsAgainOnNextPendingNavigation() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+        testee.onUserSubmittedQuery("example.com")
+        testee.upgradedToHttps()
+        testee.onReceivedError(BAD_URL, "https://example.com/", "ERROR_HOST_LOOKUP")
+
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHttpsUpgradeThenNewUserIntentThenFinishedWithoutCommitEndsBar() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+        testee.onUserSubmittedQuery("example.com")
+        testee.upgradedToHttps()
+
+        givenQueryConvertsTo("http://example.org/no-content")
+        testee.onUserSubmittedQuery("example.org/no-content")
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHttpsUpgradeThenNavigationAbandonedThenLaterFinishedWithoutCommitIsNotSwallowed() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/")
+        testee.onMainFrameNavigationDecided(true)
+        testee.upgradedToHttps()
+        testee.onMainFrameNavigationDecided(false)
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndHttpsUpgradedThenFinishedWithoutCommitLeavesBarAndNothingStaysMarked() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        reportProgress(50)
+
+        testee.upgradedToHttps()
+        testee.onNavigationFinishedWithoutCommit()
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
     fun whenNavigationRequestedBecomesDownloadThenLoadingEnds() {
         enableStartProgressAtIntent()
         testee.willOverrideUrl("http://example.com/file.zip")

@@ -2245,7 +2245,10 @@ class BrowserTabViewModel @Inject constructor(
         navigationState = navigationState.releasePendingNavigation()
     }
 
-    override fun onNavigationFinishedWithoutCommit() = onNavigationAbandoned()
+    override fun onNavigationFinishedWithoutCommit() {
+        if (navigationState.isHttpsUpgradeInFlight) return
+        onNavigationAbandoned()
+    }
 
     private fun isStartProgressAtIntentEnabled() =
         progressBarUpgradeFeature.behaviourUpdate().isEnabled() && progressBarUpgradeFeature.startProgressAtIntent().isEnabled()
@@ -2994,6 +2997,7 @@ class BrowserTabViewModel @Inject constructor(
     // This is called when interceptor upgrades to https
     override fun upgradedToHttps() {
         httpsUpgraded = true
+        navigationState = navigationState.onHttpsUpgraded(isStartProgressAtIntentEnabled())
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -6246,6 +6250,7 @@ class BrowserTabViewModel @Inject constructor(
         private const val FIXED_PROGRESS = 50
         private const val UPGRADED_PROGRESS_THRESHOLD = 95
         private const val HELD_PROGRESS = NavigationProgressState.HELD_PROGRESS
+
         // Safety release for a held challenge page that never navigates again, which nothing else would end.
         // Normal pages are never delayed.
         private const val CHALLENGE_HOLD_CUTOFF_MS = 3000L
