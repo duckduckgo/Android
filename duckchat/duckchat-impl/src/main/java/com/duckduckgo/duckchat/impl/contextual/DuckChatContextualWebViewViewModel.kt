@@ -206,7 +206,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetOpened()
         _viewState.update { it.copy(tabId = tabId) }
         val pendingEntry = contextualEntryPromptStore.consume(tabId)
-        entryWideEvent.onContextualSheetOpened(tabId, pendingEntry != null, null)
+        entryWideEvent.onContextualSheetOpened(tabId, pendingEntry != null, null, voice = pendingEntry?.voice == true)
         viewModelScope.launch(dispatchers.io()) {
             if (pendingEntry != null) {
                 // Composed in the entry dialog: open straight into the chat and auto-submit. Page context
@@ -247,7 +247,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetOpened()
         val tabId = _viewState.value.tabId
         val pendingEntry = contextualEntryPromptStore.consume(tabId)
-        entryWideEvent.onContextualSheetOpened(tabId, pendingEntry != null, null)
+        entryWideEvent.onContextualSheetOpened(tabId, pendingEntry != null, null, voice = pendingEntry?.voice == true)
         viewModelScope.launch(dispatchers.io()) {
             if (pendingEntry != null) {
                 // Composed in the entry dialog while the (persisted) sheet was hidden: reload into a fresh

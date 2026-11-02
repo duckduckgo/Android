@@ -476,6 +476,11 @@
         "parameters": [
             "appVersion",
             "duckAiEntrySource",
+            {
+                "key": "voice",
+                "type": "boolean",
+                "description": "Whether voice was used to start this entry, including dictated prompts."
+            },
             { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
             {
                 "key": "input_screen_enabled",

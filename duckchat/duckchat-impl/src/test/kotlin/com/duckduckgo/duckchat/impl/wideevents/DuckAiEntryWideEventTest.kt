@@ -110,6 +110,7 @@ class DuckAiEntryWideEventTest {
             metadata = eq(
                 mapOf(
                     "source" to "address_bar_prompt",
+                    "voice" to "false",
                     "has_prompt" to "true",
                     "chat_state" to "new",
                     "surface" to "duck_ai_tab",
@@ -123,6 +124,30 @@ class DuckAiEntryWideEventTest {
         )
         verify(client).intervalStart(1L, "time_in_duckai_ms_bucketed", buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS)
         verify(client).intervalStart(1L, "time_to_first_prompt_ms_bucketed", buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS)
+    }
+
+    @Test
+    fun `voice flag is scoped to the entry that started voice chat`() = runTest {
+        testee.onEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, hasPrompt = false, voice = true)
+        testee.onEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, hasPrompt = true)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).flowStart(
+            any(),
+            anyOrNull(),
+            argThat { get("source") == "duck_ai_new_chat" && get("voice") == "true" && get("has_prompt") == "false" },
+            any(),
+            any(),
+            any(),
+        )
+        verify(client).flowStart(
+            any(),
+            anyOrNull(),
+            argThat { get("source") == "address_bar_prompt" && get("voice") == "false" && get("has_prompt") == "true" },
+            any(),
+            any(),
+            any(),
+        )
     }
 
     @Test
@@ -179,7 +204,7 @@ class DuckAiEntryWideEventTest {
 
     @Test
     fun `contextual entry carries prompt and existing chat state`() = runTest {
-        testee.onContextualSheetOpened("tab", true, "https://duck.ai/?chatID=local-only")
+        testee.onContextualSheetOpened("tab", true, "https://duck.ai/?chatID=local-only", voice = true)
         testee.onPromptSubmitted("tab")
         testee.onContextualSheetClosed("tab")
         coroutineRule.testScope.advanceUntilIdle()
@@ -189,7 +214,7 @@ class DuckAiEntryWideEventTest {
             anyOrNull(),
             argThat {
                 get("source") == "contextual_chat" && get("surface") == "contextual_sheet" &&
-                    get("has_prompt") == "true" && get("chat_state") == "existing"
+                    get("has_prompt") == "true" && get("chat_state") == "existing" && get("voice") == "true"
             },
             any(),
             any(),

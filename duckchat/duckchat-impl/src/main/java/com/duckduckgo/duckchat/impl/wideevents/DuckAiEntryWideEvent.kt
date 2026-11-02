@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
@@ -91,16 +92,27 @@ class DuckAiEntryWideEvent @Inject constructor(
         startPendingLanding()
     }
 
-    fun onEntry(entryPoint: DuckChatEntryPoint, hasPrompt: Boolean, opensNewTab: Boolean = false) = mutate {
+    fun onEntry(
+        entryPoint: DuckChatEntryPoint,
+        hasPrompt: Boolean,
+        opensNewTab: Boolean = false,
+        voice: Boolean = false,
+    ) = mutate {
         explicitEntryReported = true
         pendingLanding = null
-        start(entryPoint.toPixelValue(), hasPrompt, Surface.DUCK_AI_TAB, excludedTabId = selectedTabId.takeIf { opensNewTab })
+        start(
+            entryPoint.toPixelValue(),
+            hasPrompt,
+            Surface.DUCK_AI_TAB,
+            excludedTabId = selectedTabId.takeIf { opensNewTab },
+            voice = voice,
+        )
     }
 
-    fun onContextualSheetOpened(tabId: String, hasPrompt: Boolean, url: String?) = mutate {
+    fun onContextualSheetOpened(tabId: String, hasPrompt: Boolean, url: String?, voice: Boolean = false) = mutate {
         explicitEntryReported = true
         pendingLanding = null
-        start(DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue(), hasPrompt, Surface.CONTEXTUAL_SHEET, tabId, url)
+        start(DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue(), hasPrompt, Surface.CONTEXTUAL_SHEET, tabId, url, voice = voice)
     }
 
     fun onContextualSheetUrlResolved(tabId: String, url: String?) = mutate {
@@ -245,15 +257,18 @@ class DuckAiEntryWideEvent @Inject constructor(
         tabId: String? = null,
         url: String? = null,
         excludedTabId: String? = null,
+        voice: Boolean = false,
     ) {
         finish("new_entry")
         if (!withContext(dispatchers.io()) { feature.value.self().isEnabled() }) return
         val flowId = wideEventClient.flowStart(
             name = "duckai_entry",
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false, flowStatus = FlowStatus.Unknown),
             metadata = mapOf(
                 "source" to source,
                 "has_prompt" to hasPrompt.toString(),
+                "voice" to voice.toString(),
                 "chat_state" to chatState(url),
                 "surface" to surface.pixelValue,
                 "prompt_submitted" to "false",
