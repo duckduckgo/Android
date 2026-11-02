@@ -235,7 +235,9 @@ suspend fun BlockListPixelsPlugin.getPrivacyToggleUsed(): MetricsPixel? {
 }
 
 suspend fun FeatureTogglesInventory.activeTdsFlag(): Toggle? {
-    return this.getAllTogglesForParent("blockList").firstOrNull {
-        it.featureName().name.startsWith(EXPERIMENT_PREFIX) && it.isEnabled()
-    }
+    return tdsExperiments().firstOrNull { it.isEnabled() }
+}
+
+internal suspend fun FeatureTogglesInventory.tdsExperiments(): List<Toggle> {
+    return this.getAllTogglesForParent("blockList").filter { it.featureName().name.startsWith(EXPERIMENT_PREFIX) }
 }
