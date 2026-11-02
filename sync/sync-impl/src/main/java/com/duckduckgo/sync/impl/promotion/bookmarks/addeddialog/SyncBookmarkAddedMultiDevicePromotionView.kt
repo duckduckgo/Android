@@ -148,7 +148,7 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
     private fun launchGetDesktopApp() {
         globalActivityStarter.start(
             context,
-            SyncGetOnOtherPlatformsParams(source = SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_MULTI_DEVICE_ADDED_DIALOG),
+            SyncGetOnOtherPlatformsParams(source = SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG),
         )
     }
 }
