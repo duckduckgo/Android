@@ -180,6 +180,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             viewModel.onWithdrawClicked()
         }
 
+        binding.keepSubscriptionButton.setOnClickListener {
+            viewModel.onKeepSubscriptionClicked(this)
+        }
+
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
@@ -219,6 +223,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.upgradeToProContainer.isVisible = false
         binding.verticalTierDivider.isVisible = false
         binding.pendingDowngradeInfoPanel.gone()
+        binding.undoCancellationContainer.isVisible = false
+        binding.subscriptionActiveStatusIcon.setImageResource(drawable.ic_dot_green)
+        binding.subscriptionActiveStatusIcon.contentDescription = getString(string.subscriptionActiveStatusIconContentDescription)
 
         if (renderCompletedWithdrawal(viewState.completedWithdrawal)) return
 
@@ -291,6 +298,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
                 // Override with pending plan message if there's a deferred change
                 showPendingPlanMessageIfPresent(viewState)
+            }
+
+            if (viewState.showUndoCancellation) {
+                binding.subscriptionActiveStatusTextView.text = getString(string.subscriptionStatusExpiring)
+                binding.subscriptionActiveStatusIcon.setImageResource(drawable.ic_dot_yellow)
+                binding.subscriptionActiveStatusIcon.contentDescription = getString(string.subscriptionExpiringIconContentDescription)
+                binding.undoCancellationExpiryText.text = getString(string.subscriptionWillExpireOn, viewState.date)
+                binding.undoCancellationContainer.isVisible = true
             }
 
             when (viewState.platform.lowercase()) {
