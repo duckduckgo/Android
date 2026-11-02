@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelecti
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
@@ -55,6 +56,7 @@ class DuckChatContextualEntryViewModelTest {
     private val modelManager: DuckAiModelManager = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val inputOutcomeTracker: InputOutcomeTracker = mock()
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
     private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
     private val viewModel = DuckChatContextualEntryViewModel(
         store,
@@ -64,6 +66,7 @@ class DuckChatContextualEntryViewModelTest {
         RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication(), object : DuckAiHostProvider {}),
         selectionJourney,
         inputOutcomeTracker,
+        entryWideEvent,
     )
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
@@ -335,6 +338,15 @@ class DuckChatContextualEntryViewModelTest {
         viewModel.onDismiss()
 
         verify(selectionJourney).onSurfaceDismissed("tab-1")
+    }
+
+    @Test
+    fun whenDismissedThenClosesTheContextualDuckAiEntry() {
+        viewModel.start("tab-1")
+
+        viewModel.onDismiss()
+
+        verify(entryWideEvent).onContextualSheetClosed("tab-1")
     }
 
     @Test

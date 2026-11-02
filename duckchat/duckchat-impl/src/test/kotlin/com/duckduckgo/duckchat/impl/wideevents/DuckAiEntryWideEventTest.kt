@@ -611,6 +611,18 @@ class DuckAiEntryWideEventTest {
     }
 
     @Test
+    fun `host page navigation keeps the contextual chat so deleting it still ends the entry`() = runTest {
+        testee.onContextualSheetOpened("tab", false, "https://duck.ai/?chatID=local-only")
+        testee.onSelectedTabChanged("tab", "https://example.com/other-page")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.onChatsDeleted(setOf("local-only"))
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(client).flowFinish(1L, FlowStatus.Success, mapOf("status_reason" to "left_duckai", "exit_trigger" to "chat_deleted"))
+    }
+
+    @Test
     fun `deleting other chats does not end the active entry`() = runTest {
         testee.onContextualSheetOpened("tab", false, "https://duck.ai/?chatID=local-only")
         testee.onChatsDeleted(setOf("other"))

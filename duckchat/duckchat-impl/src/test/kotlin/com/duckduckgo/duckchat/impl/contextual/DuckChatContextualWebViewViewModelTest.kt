@@ -589,6 +589,7 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels, never()).reportContextualSheetDismissed()
+        verify(entryWideEvent, never()).onContextualSheetClosed(any())
     }
 
     @Test
