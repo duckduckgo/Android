@@ -154,7 +154,7 @@ class DuckAiEntryWideEvent @Inject constructor(
             finish("left_duckai", entry.exitTrigger ?: ExitTrigger.OTHER_NAVIGATION)
         } else if (entry.surface == Surface.DUCK_AI_TAB && !entry.resolved) {
             resolveEntry(entry, entry.tabId ?: return@mutate, url)
-        } else if (entry.url != url) {
+        } else if (entry.surface == Surface.DUCK_AI_TAB && entry.url != url) {
             entry.url = url
             entry.exitTrigger = null
         }
