@@ -321,12 +321,12 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
-import com.duckduckgo.duckchat.api.DuckAiSubscriptionEvents
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -695,9 +695,9 @@ class BrowserTabViewModelTest {
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
-    private val duckAiSubscriptionEventsFlow = MutableSharedFlow<SubscriptionEventData>()
-    private val mockDuckAiSubscriptionEvents: DuckAiSubscriptionEvents = mock {
-        on { observe() } doReturn duckAiSubscriptionEventsFlow
+    private val promoRecordChangedEventsFlow = MutableSharedFlow<SubscriptionEventData>()
+    private val mockPromoRecordObserver: PromoRecordObserver = mock {
+        on { promoRecordChangedEvents } doReturn promoRecordChangedEventsFlow
     }
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
@@ -1070,7 +1070,7 @@ class BrowserTabViewModelTest {
                 omnibarRepository = mockOmnibarFeatureRepository,
                 contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
-                duckAiSubscriptionEvents = mockDuckAiSubscriptionEvents,
+                promoRecordObserver = mockPromoRecordObserver,
                 pageContextJSHelper = mockPageContextJSHelper,
                 tabPageContextRepository = mockTabPageContextRepository,
                 serpLogos = mockSerpLogos,
@@ -13958,25 +13958,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckAiSubscriptionEventEmittedWhileOnDuckAiThenEventSent() = runTest {
+    fun whenPromoRecordChangedEventEmittedWhileOnDuckAiThenEventSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         givenCurrentSite("https://duck.ai/chat")
         val event = SubscriptionEventData(DUCK_CHAT_FEATURE_NAME, "submitAIChatBonusRecord", JSONObject())
 
         testee.subscriptionEventDataFlow.test {
-            duckAiSubscriptionEventsFlow.emit(event)
+            promoRecordChangedEventsFlow.emit(event)
 
             assertEquals(event, awaitItem())
         }
     }
 
     @Test
-    fun whenDuckAiSubscriptionEventEmittedWhileNotOnDuckAiThenNoEventSent() = runTest {
+    fun whenPromoRecordChangedEventEmittedWhileNotOnDuckAiThenNoEventSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         givenCurrentSite("https://example.com")
 
         testee.subscriptionEventDataFlow.test {
-            duckAiSubscriptionEventsFlow.emit(SubscriptionEventData(DUCK_CHAT_FEATURE_NAME, "submitAIChatBonusRecord", JSONObject()))
+            promoRecordChangedEventsFlow.emit(SubscriptionEventData(DUCK_CHAT_FEATURE_NAME, "submitAIChatBonusRecord", JSONObject()))
 
             expectNoEvents()
         }

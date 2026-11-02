@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.api
+package com.duckduckgo.duckchat.impl.promo.messaging
 
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-/**
- * Subscription events that native Duck.ai features push to Duck.ai pages open in a browser tab.
- */
-interface DuckAiSubscriptionEvents {
-    /**
-     * Emits each event to send to Duck.ai pages open in a browser tab.
-     * Events emitted while a tab isn't showing Duck.ai aren't delivered to it.
-     */
-    fun observe(): Flow<SubscriptionEventData>
+@ContributesBinding(AppScope::class)
+class RealPromoRecordObserver @Inject constructor(
+    promoCampaignJSHelper: PromoCampaignJSHelper,
+) : PromoRecordObserver {
+    override val promoRecordChangedEvents: Flow<SubscriptionEventData> = promoCampaignJSHelper.promoRecordEvents
 }

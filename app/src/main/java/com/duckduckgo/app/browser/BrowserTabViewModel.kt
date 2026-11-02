@@ -388,12 +388,12 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
-import com.duckduckgo.duckchat.api.DuckAiSubscriptionEvents
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -584,7 +584,7 @@ class BrowserTabViewModel @Inject constructor(
     private val pageContextJSHelper: PageContextJSHelper,
     private val tabPageContextRepository: TabPageContextRepository,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
-    private val duckAiSubscriptionEvents: DuckAiSubscriptionEvents,
+    private val promoRecordObserver: PromoRecordObserver,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val pageLoadWideEvent: PageLoadWideEvent,
@@ -915,7 +915,7 @@ class BrowserTabViewModel @Inject constructor(
 
         observeSyncStatusChangesForDuckChat()
         observeSubscriptionChangesForDuckChat()
-        observeSubscriptionEventsForDuckChat()
+        observePromoRecordChangesForDuckChat()
 
         tabRepository.childClosedTabs
             .onEach { closedTab ->
@@ -1153,8 +1153,8 @@ class BrowserTabViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun observeSubscriptionEventsForDuckChat() {
-        duckAiSubscriptionEvents.observe()
+    private fun observePromoRecordChangesForDuckChat() {
+        promoRecordObserver.promoRecordChangedEvents
             .onEach { event ->
                 val currentUrl = url
                 if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) {
