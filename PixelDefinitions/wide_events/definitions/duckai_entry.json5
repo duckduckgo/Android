@@ -1,0 +1,116 @@
+{
+    "android-duckai-entry": {
+        "description": "Captures each Duck.ai entry through exit, app background, or termination, including prompt conversion and bucketed latency. Sample rate is 1.0.",
+        "owners": ["malmstein"],
+        "meta": {
+            "type": "android-duckai-entry",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "duckai_entry",
+            "status": ["SUCCESS", "CANCELLED", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "source": {
+                        "type": "string",
+                        "description": "Entry point that opened Duck.ai",
+                        "enum": [
+                            "address_bar_prompt",
+                            "address_bar_icon",
+                            "address_bar_shortcut_chip",
+                            "address_bar_editing_state",
+                            "suggestion_ask_ai",
+                            "browsing_menu_ntp",
+                            "browsing_menu_webpage",
+                            "browsing_menu_duckai",
+                            "tab_switcher",
+                            "tab_switcher_existing_chat",
+                            "chat_history_new_chat",
+                            "chat_history_open_chat",
+                            "voice",
+                            "onboarding",
+                            "onboarding_completion_promo",
+                            "subscription_onboarding",
+                            "direct_url",
+                            "serp",
+                            "ddg_homepage",
+                            "icon_shortcut",
+                            "contextual_chat",
+                            "widget_quick_actions",
+                            "widget_favorite",
+                            "system_search",
+                            "digital_assistant",
+                            "deep_link_other",
+                            "paid_settings",
+                            "return_to_chat_card",
+                            "duck_ai_new_chat",
+                            "recent_chat_tab_switcher",
+                            "recent_chat_contextual",
+                            "chat_suggestion_input",
+                            "tab_swipe",
+                            "app_open"
+                        ]
+                    },
+                    "has_prompt": {
+                        "type": "string",
+                        "description": "Whether the entry carried a prompt",
+                        "enum": ["true", "false"]
+                    },
+                    "chat_state": {
+                        "type": "string",
+                        "description": "Whether the entry URL carries a chat identifier. The identifier itself is never sent",
+                        "enum": ["new", "existing"]
+                    },
+                    "surface": {
+                        "type": "string",
+                        "description": "Duck.ai surface opened for the entry",
+                        "enum": ["duck_ai_tab", "contextual_sheet"]
+                    },
+                    "prompt_submitted": {
+                        "type": "string",
+                        "description": "Whether a prompt was submitted during this entry",
+                        "enum": ["true", "false"]
+                    },
+                    "time_to_first_prompt_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from entry to first submitted prompt, rounded down to a bucket boundary in milliseconds",
+                        "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "time_in_duckai_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from entry to exit, rounded down to a bucket boundary in milliseconds",
+                        "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "exit_trigger": {
+                        "type": "string",
+                        "description": "Action that left Duck.ai. search_started is a submitted web search from the Duck.ai tab; chat_deleted is deletion of the active chat from native history. Present only when status_reason is left_duckai",
+                        "enum": [
+                            "back_or_close",
+                            "tab_switched",
+                            "new_tab_opened",
+                            "fire_tab_opened",
+                            "search_started",
+                            "other_navigation",
+                            "chat_deleted"
+                        ]
+                    },
+                    "status_reason": {
+                        "type": "string",
+                        "description": "Reason the entry ended: left_duckai and new_entry are SUCCESS regardless of prompt submission; app_backgrounded is CANCELLED; app_terminated is UNKNOWN after process-kill cleanup",
+                        "enum": ["left_duckai", "new_entry", "app_backgrounded", "app_terminated"]
+                    },
+                    "step.entry_resolved": {
+                        "type": "string",
+                        "description": "Present when the destination tab URL resolved the entry chat state",
+                        "enum": ["true"]
+                    },
+                    "step.prompt_submitted": {
+                        "type": "string",
+                        "description": "Present when the first submitted prompt was recorded",
+                        "enum": ["true"]
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1424,6 +1424,7 @@ class BrowserTabFragment :
                     )
                 },
                 onChatSuggestionSelected = { chatUrl -> viewModel.openDuckAiChatById(chatUrl) },
+                duckAiEntryPointResolver = viewModel::resolveDuckAiEntryPoint,
                 onDuckAiQuerySubmitted = { query, entryPoint ->
                     viewModel.openDuckAiQuery(query, autoPrompt = true, entryPoint = entryPoint)
                 },
@@ -2051,6 +2052,7 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        viewModel.onViewStopped()
         webViewClient.onTabBackgrounded()
         alertDialog?.dismiss()
         super.onStop()

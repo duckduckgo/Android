@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -51,6 +52,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val selectionPayloadBuilder: TextSelectionPayloadBuilder,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
     private val inputOutcomeTracker: InputOutcomeTracker,
+    private val entryWideEvent: DuckAiEntryWideEvent,
 ) : ViewModel() {
 
     data class ViewState(
@@ -191,5 +193,6 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun onDismiss() {
         duckChatPixels.reportContextualFloatingInputDismissedWithoutSubmission()
         selectionJourney.onSurfaceDismissed(tabId)
+        entryWideEvent.onContextualSheetClosed(tabId)
     }
 }

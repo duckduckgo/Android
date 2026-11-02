@@ -317,6 +317,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
@@ -420,6 +421,7 @@ import org.mockito.internal.util.DefaultMockingDetails
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
@@ -753,6 +755,7 @@ class BrowserTabViewModelTest {
     private val fakeCustomErrorPagesFeature = FakeFeatureToggleFactory.create(CustomErrorPagesFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
+    private val mockDuckAiEntryCallback: DuckAiEntryCallback = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockBrowserMenuAcknowledgement: BrowserMenuAcknowledgement = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
@@ -1100,6 +1103,7 @@ class BrowserTabViewModelTest {
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
+                duckAiEntryCallback = lazy { mockDuckAiEntryCallback },
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
             )
 
@@ -1403,6 +1407,30 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenSearchSubmittedFromDuckAiThenEntrySearchIntentReported() {
+        whenever(mockQueryUrlPredictor.isUrl("cats")).thenReturn(false)
+        val duckChatUrl = "https://duck.ai/"
+        whenever(mockDuckChat.isDuckChatUrl(duckChatUrl.toUri())).thenReturn(true)
+        loadUrl(duckChatUrl)
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(mockDuckAiEntryCallback).onSearchStarted("abc")
+    }
+
+    @Test
+    fun whenSearchSubmittedFromWebpageThenEntrySearchIntentNotReported() {
+        whenever(mockQueryUrlPredictor.isUrl("cats")).thenReturn(false)
+        loadUrl("https://example.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(mockDuckAiEntryCallback, never()).onSearchStarted(any())
     }
 
     @Test
@@ -5520,6 +5548,85 @@ class BrowserTabViewModelTest {
         assertCommandIssued<HideOnboardingDaxBubbleCta>()
         verify(mockOnboardingInputScreenLaunchTarget).setOpenOnDuckAi()
         assertCommandIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenPromptSubmittedAfterOnboardingCompletionPromoThenEntryAndReturnSessionUsePromoSource() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatAutoPromptURL, null)).thenReturn(duckChatAutoPromptURL)
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        testee.openDuckAiQuery("hello", true, DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+
+        verify(mockDuckChat).reportDuckChatEntry(argThat { name == "ONBOARDING_COMPLETION_PROMO" }, eq(false), eq(true))
+        verify(plugin).onAiPromptSubmitted("onboarding_completion_promo")
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoTabHiddenThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onViewHidden()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoAppStoppedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onViewStopped()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoTabSwipedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onTabSwipedAway()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoPageLoadedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onPageContentStart("https://example.com")
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoThenExplicitEntrySourcesArePreserved() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertEquals(DuckChatEntryPoint.SUGGESTION_ASK_AI, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.SUGGESTION_ASK_AI))
     }
 
     @Test
@@ -13478,7 +13585,7 @@ class BrowserTabViewModelTest {
     fun whenNewImageRequestedFromChatMenuThenOpensImageGenerationAndFiresPixels() = runTest {
         testee.openNewImageDuckChatFromChatMenu()
 
-        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY, type = Daily())
     }

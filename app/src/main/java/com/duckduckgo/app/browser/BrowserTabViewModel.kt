@@ -384,6 +384,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
@@ -616,6 +617,7 @@ class BrowserTabViewModel @Inject constructor(
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
     private val customErrorPagesFeature: CustomErrorPagesFeature,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val duckAiEntryCallback: Lazy<DuckAiEntryCallback>,
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
 ) : ViewModel(),
     WebViewClientListener,
@@ -654,6 +656,7 @@ class BrowserTabViewModel @Inject constructor(
 
     // if navigating from home, want to know if a site was loaded previously to decide whether to reset WebView
     private var returnedHomeAfterSiteLoaded = false
+    private var onboardingCompletionPromoPending = false
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
 
@@ -1349,7 +1352,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onViewStopped() {
+        onboardingCompletionPromoPending = false
+    }
+
     fun onViewHidden() {
+        onboardingCompletionPromoPending = false
         newTabPageModalPresenterRegistry.unregister(this)
         ctaViewState.value?.cta.let {
             if (it is BrokenSitePromptDialogCta) {
@@ -1483,6 +1491,7 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
+        onboardingCompletionPromoPending = false
         if (submissionSource == QuerySubmissionSource.USER) {
             notifySpecificSubmission(query, queryOrigin)
         }
@@ -1672,6 +1681,9 @@ class BrowserTabViewModel @Inject constructor(
         if (isUrlSubmission) {
             browserInteractionsPlugins.getPlugins().forEach { it.onUrlSubmitted() }
         } else {
+            if (url?.let { duckChat.isDuckChatUrl(it.toUri()) } == true) {
+                duckAiEntryCallback.value.onSearchStarted(tabId)
+            }
             browserInteractionsPlugins.getPlugins().forEach { it.onSearchSubmitted() }
         }
     }
@@ -2195,6 +2207,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onPageContentStart(url: String) {
+        onboardingCompletionPromoPending = false
         navigationState = navigationState.onNavigationCommitted()
         showWebContent()
     }
@@ -5667,6 +5680,8 @@ class BrowserTabViewModel @Inject constructor(
             }
             is DaxEndBubbleCta -> {
                 if (cta.segmentedPathWithAiInput == DownloadReasonSelection.SEARCH) {
+                    onboardingCompletionPromoPending = !currentBrowserViewState().browserShowing &&
+                        url.isNullOrBlank() && omnibarTextStateFlow.value.isBlank()
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)
@@ -5860,6 +5875,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun resolveDuckAiEntryPoint(entryPoint: DuckChatEntryPoint): DuckChatEntryPoint =
+        if (onboardingCompletionPromoPending && entryPoint == DuckChatEntryPoint.ADDRESS_BAR_PROMPT &&
+            !currentBrowserViewState().browserShowing && url.isNullOrBlank()
+        ) {
+            DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO
+        } else {
+            entryPoint
+        }
+
     /**
      * Entry point for "open Duck.ai with a query" from the unified input — the Search/Duck.ai
      * toggle when Duck.ai is selected, and the "Ask Duck.ai" autocomplete row when Search is
@@ -5873,13 +5897,14 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         val duckAiUrl = duckChat.getDuckChatUrl(query, autoPrompt)
         val hasPrompt = hasAutoSubmittedPrompt(duckAiUrl)
+        val resolvedEntryPoint = if (hasPrompt) resolveDuckAiEntryPoint(entryPoint) else entryPoint
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
         if (hasPrompt) {
-            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = entryPoint.name.lowercase()) }
+            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = resolvedEntryPoint.name.lowercase()) }
         }
         navigateToDuckAi(
             url = duckAiUrl,
-            entryPoint = entryPoint,
+            entryPoint = resolvedEntryPoint,
             hasPrompt = hasPrompt,
         )
     }
@@ -5933,7 +5958,7 @@ class BrowserTabViewModel @Inject constructor(
     fun openNewImageDuckChatFromChatMenu() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY, type = Daily())
-        duckChat.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        duckChat.openDuckChatImageGeneration(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
     }
 
     fun onNewTabFromChatMenuSelected() {
@@ -6103,6 +6128,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onTabSwipedAway() {
+        onboardingCompletionPromoPending = false
         command.value = GenerateWebViewPreviewImage
     }
 
