@@ -39,6 +39,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.job
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -172,9 +173,19 @@ class RxPixelSender @Inject constructor(
 
     private fun sendPixel(pixelEntity: PixelEntity): Completable {
         if (isConcurrencyLimitEnabled()) {
-            return Completable.fromAction {
-                runBlocking {
-                    with(pixelEntity) { fireThroughDispatcher(pixelName, atb, additionalQueryParams, encodedQueryParams) }
+            return Completable.create { emitter ->
+                try {
+                    // Must block, or switchMapCompletable will cancel this send when the next queued pixel arrives.
+                    runBlocking {
+                        val job = coroutineContext.job
+                        // If the app stops mid-send, cancel the request like the old Rx path does, so the pixel stays queued and isn't sent twice
+                        emitter.setCancellable { job.cancel() }
+                        with(pixelEntity) { fireThroughDispatcher(pixelName, atb, additionalQueryParams, encodedQueryParams) }
+                    }
+                    emitter.onComplete()
+                } catch (e: Throwable) {
+                    // Use tryOnError: onError after cancelling would crash
+                    emitter.tryOnError(e)
                 }
             }
         }
