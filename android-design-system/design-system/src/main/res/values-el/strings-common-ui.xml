@@ -32,6 +32,7 @@
     <string name="removeAll">Αφαίρεση όλων</string>
     <string name="undo">Αναίρεση</string>
     <string name="cancel">Ακύρωση</string>
+    <string name="done">Ολοκληρώθηκε</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Πάντα σε λειτουργία</string>

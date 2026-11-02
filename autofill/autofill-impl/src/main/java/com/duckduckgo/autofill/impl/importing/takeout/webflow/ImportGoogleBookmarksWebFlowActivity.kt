@@ -35,6 +35,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
@@ -44,6 +45,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 /**
  * Launch the Google Bookmarks import flow
@@ -96,7 +98,9 @@ class ImportGoogleBookmarksWebFlowActivity :
 
     private fun configureEdgeToEdgeInsets() {
         if (isRedesignEnabled) {
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            // we paint the status bar strip with the page color instead of the toolbar-colored scrim,
+            // so moving between the web flow and the progress and result screens has no visible seam
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
         } else {
             edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
             edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
@@ -221,9 +225,16 @@ class ImportGoogleBookmarksWebFlowActivity :
     private fun configureToolbar() {
         with(binding.includeToolbar.toolbar) {
             setupToolbar(this)
-            setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+            setNavigationIcon(CommonR.drawable.ic_close_24)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        if (isRedesignEnabled) {
+            val pageBackground = getColorFromAttr(CommonR.attr.daxColorSurfaceTertiary)
+            binding.root.setBackgroundColor(pageBackground)
+            binding.includeToolbar.appBarLayout.setBackgroundColor(pageBackground)
+            binding.includeToolbar.toolbar.setBackgroundColor(pageBackground)
+        }
         // the redesign starts without a toolbar, and we can't wait for the first view state because it may arrive after the first frame
         binding.includeToolbar.appBarLayout.isVisible = !isRedesignEnabled
         binding.includeToolbar.topBrowserOutlineStroke.isVisible = !isRedesignEnabled

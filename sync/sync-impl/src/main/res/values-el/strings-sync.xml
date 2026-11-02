@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Ακύρωση</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Ρύθμιση του Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Ξεκλειδώστε τη συσκευή για να ρυθμίσετε τη λειτουργία Sync &amp; Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Αποκτήστε πρόσβαση στους κωδικούς πρόσβασής σας από κινητό και υπολογιστή.</string>
+    <string name="sync_passwords_import_promo_primary_button">Ενεργοποίηση Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Απόκτησε πρόσβαση στους σελιδοδείκτες σας από κινητό και υπολογιστή.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Ενεργοποίηση Sync &amp; Backup</string>
 </resources>

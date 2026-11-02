@@ -4240,6 +4240,7 @@ class BrowserTabFragment :
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
+                webViewClient.onDownloadStarted()
                 lifecycleScope.launch(dispatchers.main()) {
                     viewModel.requestFileDownload(it, url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
                 }

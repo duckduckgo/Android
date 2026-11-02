@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.promotion.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
@@ -84,14 +85,14 @@ internal class PromoMessageView @JvmOverloads constructor(
     var showElevation: Boolean = false
         set(value) {
             field = value
-            if (value) {
-                setCardBackgroundColor(context.getColorFromAttr(CommonR.attr.daxColorSurfaceSecondary))
-                addBottomShadow()
-            } else {
-                // We only use the translucent fill without a shadow because the shadow would show through it.
-                setCardBackgroundColor(context.getColorFromAttr(CommonR.attr.daxColorContainer))
-                elevation = 0f
-            }
+            if (value) addBottomShadow() else elevation = 0f
+        }
+
+    @ColorInt
+    var cardColor: Int = context.getColorFromAttr(CommonR.attr.daxColorSurfaceSecondary)
+        set(value) {
+            field = value
+            setCardBackgroundColor(value)
         }
 
     init {
@@ -106,6 +107,7 @@ internal class PromoMessageView @JvmOverloads constructor(
             secondaryButtonText = getText(R.styleable.PromoMessageView_promoSecondaryButtonText)
             showCloseButton = getBoolean(R.styleable.PromoMessageView_promoShowCloseButton, true)
             showElevation = getBoolean(R.styleable.PromoMessageView_promoShowElevation, true)
+            cardColor = getColor(R.styleable.PromoMessageView_promoCardColor, cardColor)
         }
     }
 

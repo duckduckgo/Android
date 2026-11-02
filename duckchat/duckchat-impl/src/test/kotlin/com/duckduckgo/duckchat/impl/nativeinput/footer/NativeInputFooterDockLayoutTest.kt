@@ -26,7 +26,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -135,10 +135,10 @@ class NativeInputFooterDockLayoutTest {
         }
         val sibling = View(context).apply { visibility = siblingVisibility }
         row.addView(sibling, LinearLayout.LayoutParams(SIBLING_WIDTH_PX, CARD_HEIGHT_PX).apply { marginEnd = PADDING_PX })
-        val card = MaterialCardView(context).apply {
+        val card = NativeInputLayout(context).apply {
             this.useCompatPadding = useCompatPadding
             cardElevation = ELEVATION_PX
-            addView(NativeInputModeWidget(context), MATCH_PARENT, CARD_HEIGHT_PX)
+            widget.layoutParams = widget.layoutParams.apply { height = CARD_HEIGHT_PX }
         }
         row.addView(card, LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f).apply { bottomMargin = PADDING_PX })
         dock.addView(row, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))

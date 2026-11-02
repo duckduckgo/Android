@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.duckduckgo.nextsteps.impl
 
-package com.duckduckgo.adblocking.impl.ui
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Surface
 
-import android.content.Context
-import android.view.View
-import com.duckduckgo.codegen.annotations.PriorityKey
-import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.OtherSettingsPlugin
-import dev.zacsweers.metro.ContributesIntoMap
-import javax.inject.Inject
-
-@ContributesIntoMap(ActivityScope::class)
-@PriorityKey(100)
-class AdBlockingSettingsEntry @Inject constructor() : OtherSettingsPlugin {
-
-    override fun getView(context: Context): View = AdBlockingSettingsEntryView(context)
-}
+internal fun RemoteMessage.isNextStepsForNewTabPage(): Boolean =
+    content is Content.ActionableItems && surfaces.contains(Surface.NEW_TAB_PAGE)

@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Er is iets misgegaan</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Controleer of je verbinding hebt met internet en probeer het opnieuw.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Importeren voltooid!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Wacht even — houd dit venster open. Het zou niet langer dan een minuut of twee moeten duren.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google kan om je wachtwoord vragen.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google stuurt je een e-mail om te bevestigen dat je gegevens zijn geëxporteerd. Je hoeft niets te doen.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Importeren voltooid!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Bladwijzers geïmporteerd: <b>%1$d</b>]]></string>
+
 </resources>

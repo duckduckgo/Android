@@ -23,7 +23,7 @@ env:
 
 jobs:
   release-production:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Publish Bundle to Play Store for review
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}

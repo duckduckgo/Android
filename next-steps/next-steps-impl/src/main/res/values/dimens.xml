@@ -23,4 +23,6 @@
     <dimen name="nextStepsItemTitleTextSize">16sp</dimen>
     <dimen name="nextStepsSectionTitleSpacing">6dp</dimen>
     <dimen name="nextStepsPrimaryActionSpacing">20dp</dimen>
+    <dimen name="nextStepsCheckListItemIconSize">24dp</dimen>
+    <dimen name="nextStepsCheckListItemIconSpacing">10dp</dimen>
 </resources>

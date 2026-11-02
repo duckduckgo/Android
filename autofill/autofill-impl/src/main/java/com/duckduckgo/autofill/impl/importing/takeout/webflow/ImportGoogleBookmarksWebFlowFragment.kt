@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -73,7 +74,6 @@ import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -86,7 +86,6 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class ImportGoogleBookmarksWebFlowFragment :
@@ -240,7 +239,8 @@ class ImportGoogleBookmarksWebFlowFragment :
     private fun configureWebView() {
         binding?.webView?.let { webView ->
             webView.webViewClient = ImportGoogleBookmarksWebFlowWebViewClient(this)
-            webView.setBackgroundColor(webView.context.getColorFromAttr(CommonR.attr.daxColorBackground))
+            // we let the activity's background show through so the page matches the status bar strip in both designs
+            webView.setBackgroundColor(Color.TRANSPARENT)
             configureWebViewSettings(webView)
             configureDownloadInterceptor(webView)
             configureAutofill(webView)

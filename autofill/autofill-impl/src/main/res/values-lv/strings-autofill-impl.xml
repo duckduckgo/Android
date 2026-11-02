@@ -318,4 +318,16 @@
     <string name="importBookmarksErrorGenericMessage">Kaut kas notika nepareizi</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Lūdzu, pārliecinies, vai esi izveidojis savienojumu ar internetu, un mēģini vēlreiz.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Importēšana pabeigta!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Uzgaidi — atstāj šo logu atvērtu. Tam nevajadzētu aizņemt vairāk par minūti vai divām.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google var lūgt norādīt paroli.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google tev nosūtīs e-pasta ziņojumu ar apstiprinājumu, ka tavi dati ir eksportēti. Tev nekas nav jādara.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Importēšana pabeigta!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importētas grāmatzīmes: <b>%1$d</b>]]></string>
+
 </resources>

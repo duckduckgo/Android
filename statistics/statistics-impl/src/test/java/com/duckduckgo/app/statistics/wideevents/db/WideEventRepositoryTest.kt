@@ -408,6 +408,134 @@ class WideEventRepositoryTest {
         }
 
     @Test
+    fun `when inserting wide event with process-start cleanupPolicy, its owner is stored`() =
+        runTest {
+            val policy =
+                WideEventRepository.CleanupPolicy.OnProcessStart(
+                    ownerProcessName = ":vpn",
+                    ignoreIfIntervalTimeoutPresent = true,
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                )
+
+            val eventId =
+                wideEventRepository.insertWideEvent(
+                    name = "cleanup_event",
+                    flowEntryPoint = null,
+                    metadata = emptyMap(),
+                    cleanupPolicy = policy,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
+                )
+
+            val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+            assertEquals(policy, event.cleanupPolicy)
+        }
+
+    @Test
+    fun `when cleaning up a missing event, nothing happens`() =
+        runTest {
+            var decided = false
+
+            wideEventRepository.cleanUpWideEvent(eventId = 404L) {
+                decided = true
+                null
+            }
+
+            assertFalse(decided)
+        }
+
+    @Test
+    fun `when cleaning up a completed event, it is left untouched and not re-evaluated`() =
+        runTest {
+            val eventId = insertActiveEvent()
+            wideEventRepository.setWideEventStatus(eventId = eventId, status = SUCCESS, metadata = emptyMap())
+            var decided = false
+
+            wideEventRepository.cleanUpWideEvent(eventId = eventId) {
+                decided = true
+                WideEventRepository.CleanupDecision(status = WideEventRepository.WideEventStatus.UNKNOWN, metadata = emptyMap())
+            }
+
+            assertFalse(decided)
+            assertEquals(SUCCESS, wideEventRepository.getWideEvents(setOf(eventId)).single().status)
+        }
+
+    @Test
+    fun `when cleanup decides to keep the event, it stays active and unchanged`() =
+        runTest {
+            val eventId = insertActiveEvent(metadata = mapOf("key" to "value"))
+
+            wideEventRepository.cleanUpWideEvent(eventId = eventId) { null }
+
+            val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+            assertEquals(null, event.status)
+            assertEquals(mapOf("key" to "value"), event.metadata)
+            assertEquals(listOf(eventId), wideEventRepository.getActiveWideEventIds())
+        }
+
+    @Test
+    fun `when cleanup decides to close the event, status and metadata are applied and the daily occurrence recorded`() =
+        runTest {
+            val eventId = insertActiveEvent(metadata = mapOf("kept" to "yes", "overridden" to "old"))
+
+            wideEventRepository.cleanUpWideEvent(eventId = eventId) {
+                WideEventRepository.CleanupDecision(status = FAILURE, metadata = mapOf("overridden" to "new", "reason" to "cleanup"))
+            }
+
+            val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+            assertEquals(FAILURE, event.status)
+            assertEquals(mapOf("kept" to "yes", "overridden" to "new", "reason" to "cleanup"), event.metadata)
+            assertTrue(event.isFirstDailyOccurrence)
+            assertEquals(listOf(eventId), wideEventRepository.getCompletedWideEventIds())
+        }
+
+    @Test
+    fun `when cleanup closes a second event with the same name and status on the same day, it is not the first daily occurrence`() =
+        runTest {
+            val firstId = insertActiveEvent()
+            val secondId = insertActiveEvent()
+            val decision = WideEventRepository.CleanupDecision(status = FAILURE, metadata = emptyMap())
+
+            wideEventRepository.cleanUpWideEvent(eventId = firstId) { decision }
+            wideEventRepository.cleanUpWideEvent(eventId = secondId) { decision }
+
+            val events = wideEventRepository.getWideEvents(setOf(firstId, secondId)).associateBy { it.id }
+            assertTrue(events.getValue(firstId).isFirstDailyOccurrence)
+            assertFalse(events.getValue(secondId).isFirstDailyOccurrence)
+        }
+
+    @Test
+    fun `when cleaning up, the decision sees the event's current state`() =
+        runTest {
+            val eventId = insertActiveEvent()
+            wideEventRepository.addWideEventStep(
+                eventId = eventId,
+                step = WideEventRepository.WideEventStep(name = "step_1", success = true),
+                metadata = mapOf("after_insert" to "true"),
+            )
+            var seen: WideEventRepository.WideEvent? = null
+
+            wideEventRepository.cleanUpWideEvent(eventId = eventId) { event ->
+                seen = event
+                null
+            }
+
+            assertEquals(listOf(WideEventRepository.WideEventStep(name = "step_1", success = true)), seen?.steps)
+            assertEquals("true", seen?.metadata?.get("after_insert"))
+        }
+
+    private suspend fun insertActiveEvent(metadata: Map<String, String?> = emptyMap()): Long =
+        wideEventRepository.insertWideEvent(
+            name = "cleanup_event",
+            flowEntryPoint = null,
+            metadata = metadata,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
+        )
+
+    @Test
     fun `when starting an interval, it is tracked correctly`() =
         runTest {
             val eventId =

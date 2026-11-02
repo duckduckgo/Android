@@ -60,6 +60,7 @@ fun WideEventEntity.CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepos
     when (this) {
         is WideEventEntity.CleanupPolicy.OnProcessStart ->
             WideEventRepository.CleanupPolicy.OnProcessStart(
+                ownerProcessName = ownerProcessName,
                 ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
                 status = status.mapToRepositoryWideEventStatus(),
                 metadata = metadata,
@@ -76,6 +77,7 @@ fun WideEventRepository.CleanupPolicy.mapToDbCleanupPolicy(): WideEventEntity.Cl
     when (this) {
         is WideEventRepository.CleanupPolicy.OnProcessStart ->
             WideEventEntity.CleanupPolicy.OnProcessStart(
+                ownerProcessName = ownerProcessName,
                 ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
                 status = status.mapToDbWideEventStatus(),
                 metadata = metadata,

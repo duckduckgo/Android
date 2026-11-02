@@ -3,6 +3,7 @@
         "description": "The page load watchdog reported a main-frame load that is stuck without visible content and the timeout UI was requested. Fired every time, not daily.",
         "owners": ["GerardPaligot"],
         "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -16,6 +17,7 @@
         "description": "A navigation that had timed out later showed content or finished on its own, without the user retrying. Fired at most once per timeout.",
         "owners": ["GerardPaligot"],
         "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {

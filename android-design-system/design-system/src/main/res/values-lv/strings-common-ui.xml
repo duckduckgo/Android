@@ -32,6 +32,7 @@
     <string name="removeAll">Noņemt visu</string>
     <string name="undo">Atsaukt</string>
     <string name="cancel">Atcelt</string>
+    <string name="done">Gatavs</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Vienmēr ieslēgts</string>

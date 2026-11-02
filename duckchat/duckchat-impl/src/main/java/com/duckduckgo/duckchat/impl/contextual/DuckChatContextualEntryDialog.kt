@@ -217,9 +217,9 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun renderViewState(state: DuckChatContextualEntryViewModel.ViewState) {
         val context = state.attachedContext
         if (context != null) {
-            binding.entryNativeInputWidget.setPageContext(context.title, context.url)
+            binding.entryNativeInputCard.widget.setPageContext(context.title, context.url)
         } else {
-            binding.entryNativeInputWidget.clearPageContext()
+            binding.entryNativeInputCard.widget.clearPageContext()
         }
         updateQuickActionVisibility()
     }
@@ -291,8 +291,8 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun focusInput() {
         // Auto-focus the composer once laid out so the keyboard comes up as soon as the dialog is shown.
-        binding.entryNativeInputWidget.doOnLayout {
-            binding.entryNativeInputWidget.focusInput(activity)
+        binding.entryNativeInputCard.widget.doOnLayout {
+            binding.entryNativeInputCard.widget.focusInput(activity)
         }
     }
 
@@ -333,8 +333,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureInput() {
         contextualNativeInputManager.init(
             tabId = tabId,
-            card = binding.entryNativeInputCard,
-            widget = binding.entryNativeInputWidget,
+            inputLayout = binding.entryNativeInputCard,
             footer = binding.entryNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,

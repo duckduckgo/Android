@@ -246,6 +246,13 @@ interface DuckChatFeature {
     fun sendDuckAiSessionWideEvent(): Toggle
 
     /**
+     * @return `true` when the Duck.ai response wait wide event should be sent
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendDuckAiResponseWaitWideEvent(): Toggle
+
+    /**
      * @return `true` when the updated Duck.ai model and reasoning pickers are enabled: models grouped
      * by availability, backend-driven ordering and sublines, and a gated section header that follows the
      * user's tier.

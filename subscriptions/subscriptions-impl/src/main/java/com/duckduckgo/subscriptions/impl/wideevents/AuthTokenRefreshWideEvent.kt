@@ -77,6 +77,7 @@ interface AuthTokenRefreshWideEvent {
         loginError: String,
     )
 
+    suspend fun onSkipped()
     suspend fun onSuccess()
     suspend fun onFailure(e: Exception)
 }
@@ -232,6 +233,14 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                 status = FlowStatus.Failure(reason = refreshException.toErrorString()),
                 metadata = mapOf(KEY_SIGNED_OUT to signedOut.toString()),
             )
+            ongoingTokenRefreshWideEventId = null
+        }
+    }
+
+    override suspend fun onSkipped() {
+        if (!isFeatureEnabled()) return
+        ongoingTokenRefreshWideEventId?.let { wideEventId ->
+            wideEventClient.flowAbort(wideEventId = wideEventId)
             ongoingTokenRefreshWideEventId = null
         }
     }

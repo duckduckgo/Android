@@ -27,6 +27,7 @@ import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugi
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.ImportResult
 import com.duckduckgo.codegen.annotations.PriorityKey
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R
@@ -35,6 +36,7 @@ import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
@@ -58,6 +60,7 @@ class SyncPasswordsImportPromotionPlugin @Inject constructor(
             primaryButtonText = context.getString(R.string.sync_passwords_import_promo_primary_button)
             showCloseButton = false
             showElevation = false
+            cardColor = context.getColorFromAttr(CommonR.attr.daxColorSurface)
             doOnAttach { promotion.onPromotionDisplayed() }
             onPrimaryButtonClicked {
                 promotion.onPromotionConfirmed()

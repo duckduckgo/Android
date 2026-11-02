@@ -19,7 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground"
+    android:background="?attr/daxColorSurfaceTertiary"
     android:clickable="true"
     android:focusable="true">
 
@@ -114,7 +114,7 @@
             android:id="@+id/importingFirstInfoRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/autofill_import_results_container_background"
+            android:background="@drawable/autofill_bookmark_import_info_listitem_background"
             app:leadingIcon="@drawable/info_solid_24"
             app:primaryText="@string/importBookmarksRedesignImportingFirstInfoRow" />
 
@@ -123,7 +123,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_1"
-            android:background="@drawable/autofill_import_results_container_background"
+            android:background="@drawable/autofill_bookmark_import_info_listitem_background"
             app:leadingIcon="@drawable/info_solid_24"
             app:primaryText="@string/importBookmarksRedesignImportingSecondInfoRow" />
 

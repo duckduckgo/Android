@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Cancel</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Set up Sync&#160;&amp;&#160;Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Unlock device to set up Sync&#160;&amp;&#160;Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Access your passwords across Mobile&#160;and&#160;Desktop.</string>
+    <string name="sync_passwords_import_promo_primary_button">Turn on Sync&#160;&amp;&#160;Backup</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Access your bookmarks across Mobile&#160;and&#160;Desktop.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Turn on Sync&#160;&amp;&#160;Backup</string>
 </resources>

@@ -1,0 +1,291 @@
+{
+  "name": "PhoneBooks",
+  "url": "phonebooks.com",
+  "version": "0.3.3",
+  "addedDatetime": 1791417600000,
+  "optOutUrl": "https://www.phonebooks.com/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "033226e6-14a8-47c3-8f26-7f0e9bdd44e9",
+          "url": "https://www.phonebooks.com/employee-results?name=${firstName}%20${lastName}&location=${city}%20${state|upcase}"
+        },
+        {
+          "_comment": "Results and no-results pages both render inside .v-person-results-page. The retry also waits out a Cloudflare managed challenge.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".v-person-results-page"
+            }
+          ],
+          "id": "fa481c61-e6c4-48d1-a2be-9c436e6b753c"
+        },
+        {
+          "actionType": "extract",
+          "id": "835ae826-013b-4ed3-9787-d87863283d06",
+          "selector": ".person-result",
+          "noResultsSelector": ".no-results",
+          "profile": {
+            "name": {
+              "selector": ".//h3[@class='title']/span[contains(@class, 'name')]"
+            },
+            "age": {
+              "selector": ".//h3[@class='title']/span[contains(., 'Age:')]",
+              "afterText": "Age:"
+            },
+            "addressCityState": {
+              "selector": ".//p[contains(., 'Lives in:')]/span"
+            },
+            "addressCityStateList": {
+              "selector": ".//p[contains(., 'Prior Addresses:')]/span",
+              "separator": "/\\s+,\\s*/"
+            },
+            "relativesList": {
+              "selector": ".//span[@class='relative']/text()",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//a[@class='details']"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "_comment": "Both stages were completed manually through to /opt-out-confirmed, with a real-city zip and a DOB matching the listed age. The emailed link is a direct /opt-out-removal URL, valid for 24h. Needs an email-backend parser for it before it can run.",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "d87c7a12-4f1a-4573-b8c0-95edd082c27d",
+          "url": "https://www.phonebooks.com/opt-out"
+        },
+        {
+          "actionType": "expectation",
+          "id": "cfc-48c74ba6-2c74-4dde-83c4-aa4e9682bd3c",
+          "_comment": "direct loads of /opt-out get a Cloudflare managed challenge that took about 48s to clear on a residential exit; this guard plus the next expectation give it up to about 60s",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "0dc264e8-28bc-4d96-bfba-f2806000468f",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".v-form-dropdown .dropdown"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "3ec64964-32ad-44ff-beba-e4535a80d446",
+          "_comment": "custom 'I am' dropdown; the subject fields only render after an option is chosen",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".v-form-dropdown .dropdown"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "4012e2e7-5bcd-4381-a14b-24bec568618e",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[contains(@class, 'v-form-dropdown')]//*[contains(@class, 'dropdown-item') and normalize-space(.)='The subject of the request']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "2e290707-3f98-4460-9953-a15344a8c430",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".form-rows-container #email"
+            }
+          ]
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "214793d0-6f8f-4658-a19b-b73901846ec7"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "86f3958f-03f6-4124-bac2-1eb4c5d9111a",
+          "_comment": "all three name inputs share id='firstName', so they are addressed by label",
+          "dataSource": "userProfile",
+          "selector": ".form-rows-container",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": ".//label[starts-with(normalize-space(.), '*First')]/following-sibling::input"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//label[starts-with(normalize-space(.), '*Last')]/following-sibling::input"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "de3842a8-781e-4780-88c4-9a2d0e743285",
+          "dataSource": "fetchedEmail",
+          "selector": ".form-rows-container",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "a0eff3f6-98df-4b64-9987-7a709099cbb8",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".tos input[type='checkbox']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "b80843f3-0bd3-41e0-a8e8-8baba047004a",
+          "_comment": "Turnstile is rendered programmatically with no data-sitekey or data-callback, so solveCaptcha cannot inject a token. Submit enables only once Turnstile passes on its own and the form is valid.",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//form//button[contains(@class, 'search') and not(@disabled)]"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "34c0d18e-a218-4556-9da9-c8e166a0019f",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//form//button[contains(@class, 'search') and not(@disabled)]"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "db673cd2-1b1d-4bac-9acf-0456f250b3d9",
+          "_comment": "'Email Sent' page",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".v-opt-out-submitted"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "5a1775fa-ee35-48ec-8524-b8e0018faedb",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "cfc-0ee4ca1f-a91b-402c-8f49-c8cb8d8bbb9f",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "59d10cff-5d36-4c63-93c8-66f13085034e",
+          "_comment": "emailed link opens /opt-out-removal with name, email and ticket id prefilled and disabled",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".v-opt-out-removal form #zip"
+            }
+          ]
+        },
+        {
+          "_comment": "The removal page is often reloaded behind a Cloudflare check shortly after the form first renders, and values filled before that are lost, leaving Submit disabled. Turnstile only issues its token on the settled page, so wait for it before filling.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-be3ef0a6-f7fa-4025-8458-8a29bb69d3d7"
+        },
+        {
+          "_comment": "phonebooks only matches a record on its exact DOB or street address. The street is only on the profile page, so fetch profileUrl and fill street, city, state and zip from its current address.",
+          "actionType": "executeScript",
+          "dataSource": "extractedProfile",
+          "script": "// Fills phonebooks.com's removal form with the street address from the\n// profile page. phonebooks only matches a record on its exact DOB or street\n// address, and the street is not in the search results, only on the profile.\n//\n// Called as function (userProfile, root) with dataSource: extractedProfile,\n// so userProfile is the matched profile and root is the opt-out page.\n\n// Sets an input's value the way a user typing would, so the page's form\n// framework registers it.\nconst valueSetter = Object.getOwnPropertyDescriptor(\n  HTMLInputElement.prototype,\n  \"value\",\n).set;\n\nfunction fillInput(form, selector, value) {\n  const input = form.querySelector(selector);\n  if (!input) throw new Error(\"input not found: \" + selector);\n\n  input.dispatchEvent(new Event(\"keydown\", { bubbles: true }));\n  valueSetter.call(input, value);\n  for (const type of [\"input\", \"keyup\", \"change\"]) {\n    input.dispatchEvent(new Event(type, { bubbles: true }));\n  }\n  input.blur();\n}\n\n// Fetches the profile page and returns its current address as\n// { street, city, state, zip }.\nasync function fetchCurrentAddress(profileUrl) {\n  const res = await fetch(profileUrl, { credentials: \"include\" });\n  if (!res.ok) throw new Error(\"profile fetch returned \" + res.status);\n  const doc = new DOMParser().parseFromString(await res.text(), \"text/html\");\n\n  // The address link reads \"<street> <city>, <ST> <zip>\", with no separator\n  // between street and city.\n  const addressLine = (\n    (doc.querySelector(\"ul.current-address a\") || {}).textContent || \"\"\n  ).trim();\n  const address = addressLine.match(\n    /^(.*),\\s*([A-Z]{2})\\s+(\\d{5})(?:-\\d{4})?$/,\n  );\n\n  // \"Lives in <city>, <ST>\" gives the city, which tells us where the street ends.\n  const pageText = (doc.body && doc.body.textContent) || \"\";\n  const livesIn = pageText.match(\n    /lives in[:\\s]*([A-Za-z .'-]+?),\\s*([A-Z]{2})\\b/i,\n  );\n\n  if (!address || !livesIn) {\n    throw new Error(\"current address not found on profile page\");\n  }\n\n  const city = livesIn[1].trim();\n  const streetAndCity = address[1].trim();\n  if (!streetAndCity.toLowerCase().endsWith(\" \" + city.toLowerCase())) {\n    throw new Error(\"could not split street from city\");\n  }\n  const street = streetAndCity\n    .slice(0, streetAndCity.length - city.length)\n    .trim();\n\n  return { street, city, state: address[2], zip: address[3] };\n}\n\nreturn (async () => {\n  const form = root.querySelector(\".v-opt-out-removal form\");\n  if (!form) throw new Error(\"removal form not found\");\n\n  const profileUrl = userProfile && userProfile.profileUrl;\n  if (!profileUrl) throw new Error(\"extracted profile has no profileUrl\");\n\n  const { street, city, state, zip } = await fetchCurrentAddress(profileUrl);\n\n  fillInput(form, \"input#address[type='text']\", street);\n  fillInput(form, \"#city\", city);\n  fillInput(form, \"#state\", state);\n  fillInput(form, \"#zip\", zip);\n})();\n",
+          "id": "85cabac1-5edc-4a5f-9b3a-be8f2abd6aaf"
+        },
+        {
+          "actionType": "click",
+          "id": "4569830e-dcbe-4b87-b4f2-6e66fa968c5a",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".tos input[type='checkbox']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "3fe31f20-1a73-4963-ac19-7fa1a0a393dc",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//form//button[contains(@class, 'search') and not(@disabled)]"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "e18ca08b-bd81-45b9-9c63-84b25c77a90e",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//form//button[contains(@class, 'search') and not(@disabled)]"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "4640df0f-1b69-4423-aaf0-f7df757393fc",
+          "_comment": "'Opt Out Confirmed' page",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".v-opt-out-confirmed"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

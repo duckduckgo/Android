@@ -102,7 +102,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
 
         val widgetView = FrameLayout(activity).apply {
             id = R.id.inputModeRoot
-            addView(TestWidget(activity).apply { id = R.id.inputModeWidget })
+            addView(TestWidget(activity).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
         }
         val layoutInflater: LayoutInflater = mock()
         whenever(layoutInflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)

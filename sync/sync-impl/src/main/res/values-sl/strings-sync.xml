@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Prekliči</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Nastavitev funkcije Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Odklenite napravo, da nastavite funkcijo Sync &amp; Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Do svojih gesel lahko dostopate v mobilni in namizni napravi.</string>
+    <string name="sync_passwords_import_promo_primary_button">Vklopi Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Dostopajte do zaznamkov v mobilnih in namiznih napravah.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Vklopi Sync &amp; Backup</string>
 </resources>
