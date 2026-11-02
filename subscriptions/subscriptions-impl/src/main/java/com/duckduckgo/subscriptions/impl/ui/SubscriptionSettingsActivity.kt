@@ -49,6 +49,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.impl.R.*
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionTier.PLUS
 import com.duckduckgo.subscriptions.impl.SubscriptionTier.PRO
 import com.duckduckgo.subscriptions.impl.SubscriptionTier.UNKNOWN
@@ -64,6 +65,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPlayStoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
@@ -308,15 +310,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 else -> {
                     binding.changePlan.setClickListener {
                         pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
-                        val productSKU = if (viewState.subscriptionTier == PRO) {
-                            ADVANCED_SUBSCRIPTION
-                        } else {
-                            BASIC_SUBSCRIPTION
-                        }
-                        val url = String.format(URL, productSKU, applicationContext.packageName)
-                        val intent = Intent(Intent.ACTION_VIEW)
-                        intent.setData(Uri.parse(url))
-                        startActivity(intent)
+                        goToPlayStoreSubscription(viewState.subscriptionTier)
                     }
                 }
             }
@@ -414,9 +408,22 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             LaunchOnboarding -> globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
             is ShowWithdrawalDialog -> withdrawalDialog.show(getString(command.tierNameResId), command.refundAmount)
             DismissWithdrawalDialog -> withdrawalDialog.dismiss()
+            GoToPlayStoreSubscription -> (viewModel.viewState.value as? ViewState.Ready)?.let { goToPlayStoreSubscription(it.subscriptionTier) }
             ShowWithdrawalDialogError -> withdrawalDialog.showError()
             GoToWithdrawalHelp -> goToWithdrawalHelp()
         }
+    }
+
+    private fun goToPlayStoreSubscription(tier: SubscriptionTier) {
+        val productSKU = if (tier == PRO) {
+            ADVANCED_SUBSCRIPTION
+        } else {
+            BASIC_SUBSCRIPTION
+        }
+        val url = String.format(URL, productSKU, applicationContext.packageName)
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setData(Uri.parse(url))
+        startActivity(intent)
     }
 
     private fun goToWithdrawalHelp() {
