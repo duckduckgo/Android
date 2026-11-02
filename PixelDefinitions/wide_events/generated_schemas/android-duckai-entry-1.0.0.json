@@ -86,6 +86,7 @@
                                         "tab_switcher_existing_chat",
                                         "chat_history_new_chat",
                                         "chat_history_open_chat",
+                                        "voice",
                                         "onboarding",
                                         "onboarding_completion_promo",
                                         "subscription_onboarding",
