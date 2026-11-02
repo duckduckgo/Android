@@ -20,6 +20,8 @@ import android.content.Context
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
+import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
@@ -147,3 +149,9 @@ interface UnusedAutofillResultPlugin
 
 @ContributesPluginPoint(scope = ActivityScope::class, boundType = PasswordsScreenPromotionPlugin::class)
 private interface PasswordsScreenPromotionPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = PasswordsImportScreenPromotionPlugin::class)
+private interface PasswordsImportScreenPromotionPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = BookmarksImportScreenPromotionPlugin::class)
+private interface BookmarksImportScreenPromotionPluginPoint

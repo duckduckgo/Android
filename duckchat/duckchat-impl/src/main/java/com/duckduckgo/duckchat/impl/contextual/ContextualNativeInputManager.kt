@@ -29,11 +29,11 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.google.android.material.card.MaterialCardView
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,8 +62,7 @@ data class NativeInputPrompt(
 interface ContextualNativeInputManager {
     fun init(
         tabId: String,
-        card: MaterialCardView,
-        widget: NativeInputModeWidget,
+        inputLayout: NativeInputLayout,
         footer: NativeInputFooterView? = null,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
@@ -112,7 +111,7 @@ class RealContextualNativeInputManager @Inject constructor(
 
     private var isNativeInputEnabled = false
     private var isContextualNativeInputEnabled = false
-    private var card: MaterialCardView? = null
+    private var inputLayout: NativeInputLayout? = null
     private var footer: NativeInputFooterView? = null
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
@@ -124,8 +123,7 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun init(
         tabId: String,
-        card: MaterialCardView,
-        widget: NativeInputModeWidget,
+        inputLayout: NativeInputLayout,
         footer: NativeInputFooterView?,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
@@ -141,13 +139,13 @@ class RealContextualNativeInputManager @Inject constructor(
         onInputFocusChanged: (Boolean) -> Unit,
         onInputVisibilityChanged: (Boolean) -> Unit,
     ) {
-        this.card = card
+        this.inputLayout = inputLayout
         this.footer = footer
         this.jsMessaging = jsMessaging
+        val widget = inputLayout.widget
         this.widget = widget
         this.onInputVisibilityChanged = onInputVisibilityChanged
 
-        applyCardShape(card)
         setupWidget(
             tabId, widget, chatIdFlow, onSearchSubmitted,
             onCameraCaptureRequested, onFilePickerRequested,
@@ -208,23 +206,12 @@ class RealContextualNativeInputManager @Inject constructor(
 
     private fun setInputVisible(visible: Boolean) {
         if (visible) {
-            card?.show()
+            inputLayout?.show()
         } else {
-            card?.gone()
+            inputLayout?.gone()
         }
         footer?.setSurfaceVisible(visible)
         onInputVisibilityChanged(visible)
-    }
-
-    private fun applyCardShape(card: MaterialCardView) {
-        // The card floats within the input area (margins on all sides), matching the Duck.ai omnibar
-        // card, so all four corners are rounded rather than the docked top-only shape.
-        val radius = card.resources.getDimension(
-            com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius,
-        )
-        card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
-            .setAllCornerSizes(radius)
-            .build()
     }
 
     private fun setupWidget(

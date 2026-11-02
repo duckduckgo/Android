@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportProcessor
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToConfirmFlowCancellation
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.FirstPageLoading
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.ShowWebPage
@@ -83,9 +84,9 @@ class ImportGoogleBookmarksWebFlowViewModelTest {
     }
 
     @Test
-    fun whenFirstPageLoadingThenShowWebPageState() = runTest {
+    fun whenFirstPageLoadingThenFirstPageLoadingState() = runTest {
         testee.firstPageLoading()
-        assertEquals(ShowWebPage, testee.viewState.value)
+        assertEquals(FirstPageLoading, testee.viewState.value)
     }
 
     @Test

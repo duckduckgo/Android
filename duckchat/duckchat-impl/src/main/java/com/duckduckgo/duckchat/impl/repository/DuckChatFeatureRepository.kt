@@ -104,6 +104,8 @@ interface DuckChatFeatureRepository {
 
     suspend fun setLastUsedTogglePosition(position: String)
 
+    suspend fun getLastUsedTogglePosition(): String?
+
     fun observeLastUsedTogglePosition(): StateFlow<String?>
 
     suspend fun checkAndMarkFirstPromptSubmission(): Boolean
@@ -223,6 +225,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun setLastUsedTogglePosition(position: String) {
         duckChatDataStore.setLastUsedTogglePosition(position)
     }
+
+    override suspend fun getLastUsedTogglePosition(): String? = duckChatDataStore.getLastUsedTogglePosition()
 
     override fun observeLastUsedTogglePosition(): StateFlow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
 

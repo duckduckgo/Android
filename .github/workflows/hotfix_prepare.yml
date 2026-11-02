@@ -54,7 +54,7 @@ env:
 jobs:
   hotfix-prepare:
     name: Create hotfix branch and cherry-pick fixes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       cherry-pick-conflict: ${{ steps.cherry-pick.outputs.conflict }}
 

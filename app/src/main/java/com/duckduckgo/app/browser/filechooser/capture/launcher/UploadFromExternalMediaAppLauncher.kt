@@ -38,6 +38,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -166,8 +167,8 @@ class PermissionAwareExternalMediaAppLauncher @Inject constructor(
             if (interimFile == null) {
                 onResult(MediaCaptureResult.NoMediaCaptured)
             } else {
-                appCoroutineScope.launch(dispatchers.io()) {
-                    val finalImage = moveCapturedImageToFinalLocation(interimFile)
+                appCoroutineScope.launch(dispatchers.main()) {
+                    val finalImage = withContext(dispatchers.io()) { moveCapturedImageToFinalLocation(interimFile) }
                     if (finalImage == null) {
                         onResult(MediaCaptureResult.NoMediaCaptured)
                     } else {

@@ -22,6 +22,8 @@ import androidx.room.RoomDatabase
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallbackProvider
 import com.duckduckgo.app.fire.db.FireModeDatabase
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.db.CorruptionReportingOpenHelperFactory
+import com.duckduckgo.app.global.db.DatabaseCorruptionPixelReporter
 import com.duckduckgo.app.global.db.LegacyFireproofSettingsMigration
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -49,8 +51,10 @@ object RoomDatabaseModule {
         context: Context,
         migrationsProvider: MigrationsProvider,
         databaseBookmarksMigrationCallbackProvider: AppDatabaseBookmarksMigrationCallbackProvider,
+        corruptionPixelReporter: DatabaseCorruptionPixelReporter,
     ): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
+            .openHelperFactory(CorruptionReportingOpenHelperFactory(onCorruption = { db -> corruptionPixelReporter.report("app", db) }))
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
             .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
             .addCallback(databaseBookmarksMigrationCallbackProvider.provideCallbacks())

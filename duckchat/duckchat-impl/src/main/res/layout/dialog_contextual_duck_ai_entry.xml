@@ -70,26 +70,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.google.android.material.card.MaterialCardView
+        <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
             android:id="@+id/entryNativeInputCard"
-            android:theme="?attr/daxInputModeCardThemeOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginHorizontal="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
-            app:cardBackgroundColor="?attr/daxColorWindow"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="false">
-
-            <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-                android:id="@+id/entryNativeInputWidget"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp" />
-
-        </com.google.android.material.card.MaterialCardView>
+            app:nativeInputSurface="contextual" />
 
         <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
             android:id="@+id/entryNativeInputFooter"

@@ -52,3 +52,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
 tasks.register('jvm_checks') {
     dependsOn 'test'
 }
+
+tasks.register('jvm_tests') {
+    dependsOn 'test'
+}

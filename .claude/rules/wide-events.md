@@ -98,7 +98,7 @@ wideEventClient.flowStart(
 Defines what happens to flows abandoned due to app termination or timeout:
 
 ```kotlin
-// Complete the flow with Unknown status on next process start
+// Complete the flow with Unknown status on the next start of the process that began it
 CleanupPolicy.OnProcessStart(
     ignoreIfIntervalTimeoutPresent = true,   // keep alive if an interval timeout is set
     flowStatus = FlowStatus.Unknown,

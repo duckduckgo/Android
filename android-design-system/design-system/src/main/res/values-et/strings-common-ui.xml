@@ -32,6 +32,7 @@
     <string name="removeAll">Eemalda kõik</string>
     <string name="undo">Võta tagasi</string>
     <string name="cancel">Tühista</string>
+    <string name="done">Valmis</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Alati sisse lülitatud</string>

@@ -324,4 +324,16 @@
     <string name="importBookmarksErrorGenericMessage">Nešto nije bilo kako treba</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Provjeri jesi li povezan s internetom i pokušaj ponovno.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Uvoz je dovršen!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Pričekaj — ostavi ovaj prozor otvoren. Radnja ne bi trebala potrajati više od minute ili dvije.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google može zatražiti tvoju lozinku.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google će ti poslati e-poruku s potvrdom da su tvoji podaci izvezeni. Ne moraš ništa učiniti.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Uvoz je dovršen!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Uvezenih knjižnih oznaka: <b>%1$d</b>]]></string>
+
 </resources>

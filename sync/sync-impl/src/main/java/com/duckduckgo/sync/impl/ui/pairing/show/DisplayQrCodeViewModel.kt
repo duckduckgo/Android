@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV2PairingErrorContent
@@ -67,7 +68,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class DisplayQrCodeViewModel @AssistedInject constructor(
     @Assisted private val syncEntryPoint: SyncEntryPoint,
-    @Assisted private val launchSource: String?,
+    @Assisted private val launchSource: SyncLaunchSource,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val pixels: SyncPixels,
@@ -182,7 +183,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 .onSuccess { isSynced ->
                     if (isSynced) {
                         pixels.fireSignupConnectPixel(launchSource)
-                        pixels.fireSyncSetupFinishedSuccessfully(syncType)
+                        pixels.fireSyncSetupFinishedSuccessfully(syncType, launchSource)
 
                         _commands.send(Command.SetPairingResult(pairingResult()))
                         _commands.send(Command.Close)
@@ -221,7 +222,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 .onSuccess { isAcknowledged ->
                     if (isAcknowledged) {
                         // The peer joined this account; this device did not log in, so no login pixel.
-                        pixels.fireSyncSetupFinishedSuccessfully(syncType)
+                        pixels.fireSyncSetupFinishedSuccessfully(syncType, launchSource)
 
                         _commands.send(Command.SetPairingResult(pairingResult()))
                         _commands.send(Command.Close)
@@ -237,8 +238,8 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
 
     private suspend fun startV2Presentation() {
         codeDispatcher.presentV2().collect { outcome ->
-            pixels.fireSetupFailed(syncType, outcome)
-            pixels.fireSetupCancelledIfDenied(syncType, outcome)
+            pixels.fireSetupFailed(syncType, launchSource, outcome)
+            pixels.fireSetupCancelledIfDenied(syncType, launchSource, outcome)
 
             when (outcome) {
                 is DispatchOutcome.LinkingCodeReady -> {
@@ -257,7 +258,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                     _viewState.update { it.copy(dialog = null) }
                     pixels.fireLoginPixel()
                     switchedAccountDetector.onPaired()
-                    pixels.fireSyncSetupFinishedSuccessfully(syncType, outcome.path, outcome.myRole, outcome.peerKind)
+                    pixels.fireSyncSetupFinishedSuccessfully(syncType, launchSource, outcome.path, outcome.myRole, outcome.peerKind)
                     _commands.send(Command.SetPairingResult(pairingResult()))
                     _commands.send(Command.Close)
                 }
@@ -364,13 +365,13 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             syncEntryPoint: SyncEntryPoint,
-            launchSource: String?,
+            launchSource: SyncLaunchSource,
         ): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val syncEntryPoint: SyncEntryPoint,
-            private val launchSource: String?,
+            private val launchSource: SyncLaunchSource,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")

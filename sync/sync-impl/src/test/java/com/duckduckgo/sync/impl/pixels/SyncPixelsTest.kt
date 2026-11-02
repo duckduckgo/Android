@@ -45,9 +45,11 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -161,51 +163,53 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun `when signup direct pixel is called without source then pixel is fired`() {
-        testee.fireSignupDirectPixel(source = null)
+    fun `when signup direct pixel is called with other source then fired pixel includes other source`() {
+        testee.fireSignupDirectPixel(launchSource = SyncLaunchSource.Other)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_DIRECT,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "other",
             ),
         )
     }
 
     @Test
     fun `when signup direct pixel is called with source then fired pixel includes source`() {
-        testee.fireSignupDirectPixel(source = "foo")
+        testee.fireSignupDirectPixel(launchSource = SyncLaunchSource.PromotionBookmarks)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_DIRECT,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "foo",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "promotion_bookmarks",
             ),
         )
     }
 
     @Test
-    fun `when signup connect pixel is called without source then pixel is fired`() {
-        testee.fireSignupConnectPixel(source = null)
+    fun `when signup connect pixel is called with other source then fired pixel includes other source`() {
+        testee.fireSignupConnectPixel(launchSource = SyncLaunchSource.Other)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_CONNECT,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "other",
             ),
         )
     }
 
     @Test
     fun `when signup connect pixel is called with source then fired pixel includes source`() {
-        testee.fireSignupConnectPixel(source = "foo")
+        testee.fireSignupConnectPixel(launchSource = SyncLaunchSource.PromotionBookmarks)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_CONNECT,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "foo",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "promotion_bookmarks",
             ),
         )
     }
@@ -474,7 +478,7 @@ class RealSyncPixelsTest {
     ) {
         protocol.configure(syncFeature)
 
-        testee.fireSyncSetupFinishedSuccessfully(screenType)
+        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
@@ -482,9 +486,41 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
+    }
+
+    @Test
+    fun `when setup finished then the pixel carries the launch source`(
+        @TestParameter launchSource: SyncLaunchSource,
+    ) {
+        ProtocolVersion.ProtocolV1.configure(syncFeature)
+
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT, launchSource)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to ScreenType.SYNC_CONNECT.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to launchSource.value,
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun `when launch source is not a known promotion then it maps to other`() {
+        assertEquals(SyncLaunchSource.Other, SyncLaunchSource.from("duckai_card"))
+        assertEquals(SyncLaunchSource.Other, SyncLaunchSource.from(null))
+    }
+
+    @Test
+    fun `when launch source is a known promotion then it maps to that promotion`() {
+        assertEquals(SyncLaunchSource.PromotionPasswordsImport, SyncLaunchSource.from("promotion_passwords_import"))
     }
 
     @Test
@@ -494,7 +530,7 @@ class RealSyncPixelsTest {
     ) {
         protocol.configure(syncFeature)
 
-        testee.fireSyncSetupFinishedSuccessfully(screenType, SetupPath.RECOVERY)
+        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other, SetupPath.RECOVERY)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
@@ -502,6 +538,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -517,6 +554,7 @@ class RealSyncPixelsTest {
 
         testee.fireSyncSetupFinishedSuccessfully(
             screenType,
+            SyncLaunchSource.Other,
             SetupPath.PAIRING,
             SetupRole.HOST,
             PeerKind.THIRD_PARTY,
@@ -528,6 +566,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
                 SyncPixelParameters.SYNC_SETUP_PEER_KIND to "3party",
@@ -545,6 +584,7 @@ class RealSyncPixelsTest {
 
         testee.fireSyncSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             SetupFailureReason.TRANSPORT_FAILURE,
             SetupPath.PAIRING,
             SetupRole.JOINER,
@@ -557,6 +597,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "transport_failure",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "joiner",
@@ -573,7 +614,7 @@ class RealSyncPixelsTest {
     ) {
         protocol.configure(syncFeature)
 
-        testee.fireSyncSetupFailed(screenType, SetupFailureReason.UNEXPECTED_FAILURE)
+        testee.fireSyncSetupFailed(screenType, SyncLaunchSource.Other, SetupFailureReason.UNEXPECTED_FAILURE)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
@@ -581,6 +622,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "unexpected_failure",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -596,6 +638,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
         )
 
@@ -605,6 +648,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "needs_upgrade",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
@@ -622,6 +666,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(
                 reason = "boom",
                 code = AccountErrorCodes.INVALID_CODE.code,
@@ -635,6 +680,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "invalid_credentials",
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -644,8 +690,16 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when setup failed for cancellation codes then pixel is not fired`() {
-        testee.fireSetupFailed(ScreenType.SYNC_CONNECT, DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code))
-        testee.fireSetupFailed(ScreenType.SYNC_CONNECT, DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code))
+        testee.fireSetupFailed(
+            ScreenType.SYNC_CONNECT,
+            SyncLaunchSource.Other,
+            DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code),
+        )
+        testee.fireSetupFailed(
+            ScreenType.SYNC_CONNECT,
+            SyncLaunchSource.Other,
+            DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
+        )
 
         verifyNoInteractions(pixel)
     }
@@ -659,6 +713,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "Session timed out", code = AccountErrorCodes.SESSION_TIMEOUT.code),
         )
 
@@ -668,6 +723,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -683,6 +739,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "create_account_failed", code = AccountErrorCodes.CREATE_ACCOUNT_FAILED.code),
         )
 
@@ -692,6 +749,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "account_creation_failed",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -707,6 +765,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "upgrade_failed", code = AccountErrorCodes.ACCOUNT_UPGRADE_FAILED.code),
         )
 
@@ -716,6 +775,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "account_upgrade_failed",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -731,6 +791,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "same_account", code = AccountErrorCodes.ALREADY_PAIRED.code),
         )
 
@@ -740,6 +801,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -754,7 +816,7 @@ class RealSyncPixelsTest {
         protocol.configure(syncFeature)
 
         // v2 same-account case: both peers exchange intros and discover a matching user_id
-        testee.fireSetupFailed(screenType, DispatchOutcome.AlreadyConnected)
+        testee.fireSetupFailed(screenType, SyncLaunchSource.Other, DispatchOutcome.AlreadyConnected)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
@@ -762,6 +824,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -778,6 +841,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(
                 reason = "Session timed out",
                 code = AccountErrorCodes.SESSION_TIMEOUT.code,
@@ -791,6 +855,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
                 SyncPixelParameters.SYNC_SETUP_TIMEOUT_STAGE to "waiting_for_confirmation",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -807,6 +872,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupFailed(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "pairing_unavailable", code = AccountErrorCodes.PAIRING_UNAVAILABLE.code),
         )
 
@@ -816,6 +882,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "protocol_error",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -829,7 +896,7 @@ class RealSyncPixelsTest {
     ) {
         protocol.configure(syncFeature)
 
-        testee.fireSyncSetupAbandoned(screenType, CancellationReason.CANCELLED_BEFORE_FINISHED)
+        testee.fireSyncSetupAbandoned(screenType, SyncLaunchSource.Other, CancellationReason.CANCELLED_BEFORE_FINISHED)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
@@ -837,6 +904,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "cancelled_before_finished",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -850,7 +918,7 @@ class RealSyncPixelsTest {
     ) {
         protocol.configure(syncFeature)
 
-        testee.fireSyncSetupAbandoned(screenType)
+        testee.fireSyncSetupAbandoned(screenType, SyncLaunchSource.Other)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
@@ -858,6 +926,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
@@ -872,6 +941,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupCancelledIfDenied(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
         )
 
@@ -881,6 +951,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -896,6 +967,7 @@ class RealSyncPixelsTest {
 
         testee.fireSetupCancelledIfDenied(
             screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
         )
 
@@ -905,6 +977,7 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -915,6 +988,7 @@ class RealSyncPixelsTest {
     fun `when setup cancelled if denied for a non cancellation outcome then pixel is not fired`() {
         testee.fireSetupCancelledIfDenied(
             ScreenType.SYNC_CONNECT,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
         )
 

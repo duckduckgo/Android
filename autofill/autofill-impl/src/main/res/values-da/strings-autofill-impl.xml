@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Noget gik galt</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Sørg for, at du er forbundet til internettet, og prøv igen.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import fuldført!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Vent lidt – hold dette vindue åbent. Det burde ikke tage mere end et minut eller to.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google kan bede om din adgangskode.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google sender dig en e-mail, der bekræfter, at dine data er blevet eksporteret. Du behøver ikke at gøre noget.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import fuldført!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importerede bogmærker: <b>%1$d</b>]]></string>
+
 </resources>

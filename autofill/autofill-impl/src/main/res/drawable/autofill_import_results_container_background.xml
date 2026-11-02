@@ -16,5 +16,5 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="?attr/daxContainerRadius" />
-    <solid android:color="?attr/daxColorContainer" />
+    <solid android:color="?attr/daxColorSurface" />
 </shape>

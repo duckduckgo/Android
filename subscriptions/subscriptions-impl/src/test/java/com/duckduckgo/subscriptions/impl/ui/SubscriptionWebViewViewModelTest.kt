@@ -664,6 +664,30 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenPurchaseSucceedsThenReportsPurchaseSuccessWithLaunchOrigin() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.setLaunchOrigin("funnel_appsettings_android")
+        viewModel.start()
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = true))
+
+        verify(pixelSender).reportPurchaseSuccessOrigin("funnel_appsettings_android", isFreeTrial = true)
+    }
+
+    @Test
+    fun whenPlanSwitchSucceedsThenDoesNotReportPurchaseSuccess() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.setLaunchOrigin("funnel_appsettings_android")
+        viewModel.start()
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = true))
+
+        verify(pixelSender, never()).reportPurchaseSuccessOrigin(any(), any())
+    }
+
+    @Test
     fun whenBackToSettingsThenCommandSent() = runTest {
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "backToSettings", "id", JSONObject("{}"))

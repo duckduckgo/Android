@@ -18,23 +18,14 @@ package com.duckduckgo.app.buildconfig
 
 import android.content.Context
 import android.os.Build
-import android.os.Environment
-import androidx.core.content.edit
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.install.ReinstallDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import dev.zacsweers.metro.ContributesBinding
-import kotlinx.coroutines.withContext
-import logcat.LogPriority.ERROR
-import logcat.LogPriority.INFO
-import logcat.LogPriority.WARN
-import logcat.logcat
-import java.io.File
 import java.lang.IllegalStateException
 import java.util.*
 import javax.inject.Inject
@@ -42,14 +33,9 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealAppBuildConfig @Inject constructor(
     private val variantManager: Lazy<VariantManager>, // break any possible DI dependency cycle
-    private val dispatcherProvider: DispatcherProvider,
-    private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val reinstallDetector: Lazy<ReinstallDetector>, // break any possible DI dependency cycle
     private val context: Context,
 ) : AppBuildConfig {
-    private val preferences by lazy {
-        sharedPreferencesProvider.getSharedPreferences("com.duckduckgo.app.buildconfig.cache", false, false)
-    }
-
     override val isDebug: Boolean = BuildConfig.DEBUG
     override val applicationId: String = BuildConfig.APPLICATION_ID
     override val buildType: String = BuildConfig.BUILD_TYPE
@@ -83,29 +69,7 @@ class RealAppBuildConfig @Inject constructor(
     override val variantName: String?
         get() = variantManager.value.getVariantKey()
 
-    override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext kotlin.runCatching {
-            if (sdkInt < 30) {
-                return@withContext false
-            }
-
-            if (preferences.contains(APP_REINSTALLED_KEY)) {
-                return@withContext preferences.getBoolean(APP_REINSTALLED_KEY, false)
-            }
-
-            val downloadDirectory = getDownloadsDirectory()
-            val ddgDirectoryExists = (downloadDirectory.list()?.asList() ?: emptyList()).contains(DDG_DOWNLOADS_DIRECTORY)
-            val appReinstallValue = if (!ddgDirectoryExists) {
-                createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
-                // this is a new install
-                false
-            } else {
-                true
-            }
-            preferences.edit(commit = true) { putBoolean(APP_REINSTALLED_KEY, appReinstallValue) }
-            return@withContext appReinstallValue
-        }.getOrDefault(false)
-    }
+    override suspend fun isAppReinstall(): Boolean = reinstallDetector.value.isAppReinstall()
 
     override fun isNewInstall(): Boolean {
         val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -117,33 +81,4 @@ class RealAppBuildConfig @Inject constructor(
 
     override val canSkipOnboarding: Boolean
         get() = BuildConfig.CAN_SKIP_ONBOARDING || isInternalBuild()
-
-    private fun getDownloadsDirectory(): File {
-        val downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        if (!downloadDirectory.exists()) {
-            logcat(INFO) { "Download directory doesn't exist; trying to create it. ${downloadDirectory.absolutePath}" }
-            downloadDirectory.mkdirs()
-        }
-        return downloadDirectory
-    }
-
-    private fun createNewDirectory(directoryName: String) {
-        val directory = File(getDownloadsDirectory(), directoryName)
-        val success = directory.mkdirs()
-        logcat(INFO) { "Directory creation success: $success" }
-        if (!success) {
-            logcat(ERROR) { "Directory creation failed" }
-            kotlin.runCatching {
-                val directoryCreationSuccess = directory.createNewFile()
-                logcat(INFO) { "File creation success: $directoryCreationSuccess" }
-            }.onFailure {
-                logcat(WARN) { "Failed to create file: ${it.message}" }
-            }
-        }
-    }
-
-    companion object {
-        private const val APP_REINSTALLED_KEY = "appReinstalled"
-        private const val DDG_DOWNLOADS_DIRECTORY = "DuckDuckGo"
-    }
 }

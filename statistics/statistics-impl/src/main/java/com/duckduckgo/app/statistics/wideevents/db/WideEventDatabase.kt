@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter
 
 @Database(
     exportSchema = true,
-    version = 6,
+    version = 7,
     entities = [
         WideEventEntity::class,
         WideEventDailyOccurrenceEntity::class,

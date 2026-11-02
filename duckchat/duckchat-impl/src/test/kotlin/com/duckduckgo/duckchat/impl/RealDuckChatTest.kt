@@ -273,6 +273,52 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenUserSelectedSearchAndDuckAiThenSelectedInputModeIsSearchAndDuckAiWithoutWaitingForConfig() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
+
+        assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, testee.getSelectedInputMode())
+    }
+
+    @Test
+    fun whenUserTurnedDuckAiOffThenSelectedInputModeIsSearchOnly() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
+
+        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.getSelectedInputMode())
+    }
+
+    @Test
+    fun whenInputScreenUserSettingDisabledThenSelectedInputModeIsSearchOnly() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(false)
+
+        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.getSelectedInputMode())
+    }
+
+    @Test
+    fun whenDefaultPositionIsDuckAiThenInitialToggleSelectionIsDuckAi() = runTest {
+        whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(DefaultTogglePosition.DUCK_AI.name)
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.getInitialToggleSelection())
+    }
+
+    @Test
+    fun whenDefaultPositionIsLastUsedThenInitialToggleSelectionIsLastUsedSide() = runTest {
+        whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(DefaultTogglePosition.LAST_USED.name)
+        whenever(mockDuckChatFeatureRepository.getLastUsedTogglePosition()).thenReturn(DefaultTogglePosition.DUCK_AI.name)
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.getInitialToggleSelection())
+    }
+
+    @Test
+    fun whenNoDefaultPositionStoredThenInitialToggleSelectionIsSearch() = runTest {
+        whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(null)
+
+        assertEquals(NativeInputState.ToggleSelection.SEARCH, testee.getInitialToggleSelection())
+    }
+
+    @Test
     fun whenDuckChatFeatureDisabledThenAvailableInputModeIsSearchOnly() = runTest {
         duckChatFeature.self().setRawStoredState(State(false))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)

@@ -131,6 +131,32 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/subscriptionNotSubscribedStatusContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="4dp"
+                    android:importantForAccessibility="no"
+                    android:padding="1dp"
+                    android:src="@drawable/ic_dot_grey" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/subscriptionStatusNotSubscribed"
+                    app:textType="secondary"
+                    app:typography="body2" />
+
+            </LinearLayout>
+
             <com.duckduckgo.common.ui.view.InfoPanel
                 android:id="@+id/pendingDowngradeInfoPanel"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
@@ -210,119 +236,146 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4" />
 
-            <LinearLayout
-                android:id="@+id/upgradeToProContainer"
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/completedWithdrawal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="gone"
+                app:leadingIcon="@drawable/check_circle_color_24"
+                tools:primaryText="You withdrew on October 6, 2026."
+                tools:secondaryText="Your refund of €9.99 is being processed."
+                tools:visibility="visible" />
 
-                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            <LinearLayout
+                android:id="@+id/settingsSections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/upgradeToProContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:leadingIcon="@drawable/ai_chat_advanced_color_24"
-                    app:primaryText="@string/subscriptionsProUpgradeTitle"
-                    app:primaryTextColorOverlay="?attr/daxColorAccentBlue"
-                    app:secondaryText="@string/subscriptionsProUpgradeMessage"
-                    app:secondaryTextColorOverlay="?attr/daxColorPrimaryText" />
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:leadingIcon="@drawable/ai_chat_advanced_color_24"
+                        app:primaryText="@string/subscriptionsProUpgradeTitle"
+                        app:primaryTextColorOverlay="?attr/daxColorAccentBlue"
+                        app:secondaryText="@string/subscriptionsProUpgradeMessage"
+                        app:secondaryTextColorOverlay="?attr/daxColorPrimaryText" />
+
+                    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:id="@+id/activateOnOtherDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:primaryText="@string/activateOnOtherDevices" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/manageEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/editEmailPrimaryText" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/addToDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/addToDevicePrimaryText"
+                    tools:secondaryText="@string/addToDeviceSecondaryText" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/learnMore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/learnMore" />
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/subscriptionSettingSectionManageSubscription" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/viewAllPlansTop"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:primaryText="@string/subscriptionSettingViewAllPlans"
+                    tools:visibility="visible" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/changePlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:primaryText="@string/subscriptionSettingManagePaymentOrCancel"
+                    tools:secondaryText="Your monthly subscription renews on April 20, 2027."
+                    tools:visibility="visible" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/viewPlans"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:primaryText="@string/subscriptionSettingExpiredViewPlans" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/removeDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/subscriptionSettingRemoveFromDevice" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/withdraw"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:primaryText="@string/subscriptionSettingWithdraw"
+                    tools:secondaryText="You can withdraw and get a full refund until October 15, 2026"
+                    tools:visibility="visible" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/subscriptionSettingSectionHelpAndSupport" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/faq"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:primaryText="@string/privacyProFaq"
+                    tools:secondaryText="@string/privacyProFaqSecondary" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/privacyPolicy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/privacyPolicyAndTermsOfService" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/sendFeedback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/subscriptionSettingSendFeedback" />
+
             </LinearLayout>
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/activateOnOtherDevices"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:primaryText="@string/activateOnOtherDevices" />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/manageEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/editEmailPrimaryText" />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/addToDevice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/addToDevicePrimaryText"
-                tools:secondaryText="@string/addToDeviceSecondaryText" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/learnMore"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/learnMore" />
-
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/subscriptionSettingSectionManageSubscription" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/viewAllPlansTop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:primaryText="@string/subscriptionSettingViewAllPlans"
-                tools:visibility="visible" />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/changePlan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:primaryText="@string/subscriptionSettingManagePaymentOrCancel"
-                tools:secondaryText="Your monthly subscription renews on April 20, 2027."
-                tools:visibility="visible" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/viewPlans"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:primaryText="@string/subscriptionSettingExpiredViewPlans" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/removeDevice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/subscriptionSettingRemoveFromDevice" />
-
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/subscriptionSettingSectionHelpAndSupport" />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/faq"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:primaryText="@string/privacyProFaq"
-                tools:secondaryText="@string/privacyProFaqSecondary" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/privacyPolicy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/privacyPolicyAndTermsOfService" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/sendFeedback"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/subscriptionSettingSendFeedback" />
 
         </LinearLayout>
     </ScrollView>

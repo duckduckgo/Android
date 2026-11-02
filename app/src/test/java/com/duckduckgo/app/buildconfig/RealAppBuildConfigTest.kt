@@ -18,24 +18,36 @@ package com.duckduckgo.app.buildconfig
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.install.ReinstallDetector
 import com.duckduckgo.experiments.api.VariantManager
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealAppBuildConfigTest {
 
+    private val reinstallDetector: ReinstallDetector = mock()
+
     private val testee = RealAppBuildConfig(
         variantManager = lazy { mock<VariantManager>() },
-        dispatcherProvider = mock(),
-        sharedPreferencesProvider = mock(),
+        reinstallDetector = lazy { reinstallDetector },
         context = mock(),
     )
 
     @Test
     fun whenVersionNameThenReturnsBuildConfigVersionNameWithoutSuffix() {
         assertEquals(BuildConfig.VERSION_NAME, testee.versionName)
+    }
+
+    @Test
+    fun whenIsAppReinstallThenAnswerComesFromReinstallDetector() = runTest {
+        whenever(reinstallDetector.isAppReinstall()).thenReturn(true)
+
+        assertTrue(testee.isAppReinstall())
     }
 }

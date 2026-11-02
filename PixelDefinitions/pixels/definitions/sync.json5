@@ -51,5 +51,63 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_sync_signup_direct": {
+        "description": "A Sync account was created on this device from \"sync this device\" without pairing another device",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "The promotion that opened Sync, or other for every other entry point (Sync settings, deep links)",
+                "enum": [
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "other"
+                ]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_sync_signup_connect": {
+        "description": "This device joined Sync after another device scanned the v1 connect code shown here",
+        "owners": ["MiSikora"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "The promotion that opened Sync, or other for every other entry point (Sync settings, deep links)",
+                "enum": [
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "other"
+                ]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
     }
 }

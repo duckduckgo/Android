@@ -4,7 +4,7 @@
         "owners": ["YoussefKeyrouz"],
         "meta": {
             "type": "android-return-session",
-            "version": "0.0"
+            "version": "0.1"
         },
         "feature": {
             "name": "return_session",
@@ -25,6 +25,16 @@
                         "type": "string",
                         "description": "Time away before this return, bucketed (lower end of bucket, in ms). Absent when there was no prior background timestamp/date",
                         "enum": ["0", "60000", "300000", "900000", "1800000", "3600000"]
+                    },
+                    "toggle_enabled": {
+                        "type": "string",
+                        "description": "Whether the user selected Search & Duck.ai in the address bar setting, read from storage when the session starts. False when the user turned Duck.ai off",
+                        "enum": ["true", "false"]
+                    },
+                    "toggle_position": {
+                        "type": "string",
+                        "description": "Side of the Search/Duck.ai toggle the input opens on, from the default position setting with last used resolved. Present only when toggle_enabled is true",
+                        "enum": ["search", "duck_ai"]
                     },
                     "status_reason": {
                         "type": "string",

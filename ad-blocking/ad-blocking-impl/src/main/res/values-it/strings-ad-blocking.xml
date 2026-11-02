@@ -23,6 +23,7 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blocca gli annunci video su YouTube, così puoi guardare video senza interruzioni. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Apre i video in una modalità cinema senza distrazioni che impedisce a ciò che guardi di influenzare il tuo feed di YouTube.</string>
+    <string name="ad_blocking_settings_duck_player_link">Stai cercando Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Blocco degli annunci</string>
     <string name="ad_blocking_settings_header_description">Blocca i sistemi di tracciamento prima che vengano caricati, eliminando di fatto gli annunci che si basano sul tracciamento.</string>
     <string name="contingencyMessageTitle">Blocco degli annunci su YouTube non disponibile</string>

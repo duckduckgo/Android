@@ -44,6 +44,9 @@ interface NextStepsItemsStore {
 
     fun addDismissedItemId(id: String)
 
+    /** Returns true only for the first call per message, so one tab notifies RMF when every tab has emptied the stack. */
+    fun markMessageDismissed(id: String): Boolean
+
     fun completedItemIds(): Set<String>
 
     fun addCompletedItemIds(ids: Set<String>)
@@ -59,6 +62,8 @@ class RealNextStepsItemsStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatchers: DispatcherProvider,
 ) : NextStepsItemsStore {
+
+    private val dismissedMessageIds = mutableSetOf<String>()
 
     private val preferences: SharedPreferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = false, migrate = false)
@@ -81,6 +86,9 @@ class RealNextStepsItemsStore @Inject constructor(
     override fun addDismissedItemId(id: String) {
         preferences.edit { putStringSet(KEY_DISMISSED, readDismissedItemIds() + id) }
     }
+
+    @Synchronized
+    override fun markMessageDismissed(id: String): Boolean = dismissedMessageIds.add(id)
 
     override fun completedItemIds(): Set<String> = preferences.getStringSet(KEY_COMPLETED, null)?.toSet().orEmpty()
 

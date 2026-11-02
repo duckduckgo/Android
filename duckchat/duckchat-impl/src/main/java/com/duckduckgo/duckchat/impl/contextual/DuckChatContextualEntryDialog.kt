@@ -66,7 +66,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 import com.google.android.material.R as MaterialR
@@ -218,9 +217,9 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun renderViewState(state: DuckChatContextualEntryViewModel.ViewState) {
         val context = state.attachedContext
         if (context != null) {
-            binding.entryNativeInputWidget.setPageContext(context.title, context.url)
+            binding.entryNativeInputCard.widget.setPageContext(context.title, context.url)
         } else {
-            binding.entryNativeInputWidget.clearPageContext()
+            binding.entryNativeInputCard.widget.clearPageContext()
         }
         updateQuickActionVisibility()
     }
@@ -237,26 +236,22 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun registerFileChooserResult() {
         externalCameraLauncher.registerForResult(this) { result ->
-            // The launcher may deliver the result from a background thread (media capture moves the file
-            // off the main thread), so hop back to the main thread before touching views / WebView callbacks.
-            lifecycleScope.launch {
-                when (result) {
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured ->
-                        pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(result.file)))
+            when (result) {
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured ->
+                    pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(result.file)))
 
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
-                        pendingUploadTask?.onReceiveValue(null)
-                        externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), result.inputAction)
-                    }
-
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
-                        pendingUploadTask?.onReceiveValue(null)
-                        Snackbar.make(binding.entryDialogRoot, result.messageId, Snackbar.LENGTH_SHORT).show()
-                    }
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
+                    pendingUploadTask?.onReceiveValue(null)
+                    externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), result.inputAction)
                 }
-                pendingUploadTask = null
+
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
+                    pendingUploadTask?.onReceiveValue(null)
+                    Snackbar.make(binding.entryDialogRoot, result.messageId, Snackbar.LENGTH_SHORT).show()
+                }
             }
+            pendingUploadTask = null
         }
     }
 
@@ -296,8 +291,8 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun focusInput() {
         // Auto-focus the composer once laid out so the keyboard comes up as soon as the dialog is shown.
-        binding.entryNativeInputWidget.doOnLayout {
-            binding.entryNativeInputWidget.focusInput(activity)
+        binding.entryNativeInputCard.widget.doOnLayout {
+            binding.entryNativeInputCard.widget.focusInput(activity)
         }
     }
 
@@ -338,8 +333,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureInput() {
         contextualNativeInputManager.init(
             tabId = tabId,
-            card = binding.entryNativeInputCard,
-            widget = binding.entryNativeInputWidget,
+            inputLayout = binding.entryNativeInputCard,
             footer = binding.entryNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,

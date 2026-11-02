@@ -54,6 +54,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeCameraBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
@@ -85,6 +86,11 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
             "Missing fragment argument: '$ENTRY_POINT_ARG'"
         }
 
+    private val launchSource: SyncLaunchSource
+        get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), LAUNCH_SOURCE_ARG, SyncLaunchSource::class.java)) {
+            "Missing fragment argument: '$LAUNCH_SOURCE_ARG'"
+        }
+
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
@@ -100,7 +106,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
     private val syncCodeViewModel by activityViewModels<ReadSyncCodeViewModel> {
-        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint)
+        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint, launchSource)
     }
 
     private val cameraPermissionLauncher = registerForActivityResult(
@@ -398,9 +404,16 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     companion object {
         private const val ENTRY_POINT_ARG = "entry_point"
+        private const val LAUNCH_SOURCE_ARG = "launch_source"
 
-        fun instance(entryPoint: SyncEntryPoint) = ReadSyncCodeCameraFragment().apply {
-            arguments = bundleOf(ENTRY_POINT_ARG to entryPoint)
+        fun instance(
+            entryPoint: SyncEntryPoint,
+            launchSource: SyncLaunchSource,
+        ) = ReadSyncCodeCameraFragment().apply {
+            arguments = bundleOf(
+                ENTRY_POINT_ARG to entryPoint,
+                LAUNCH_SOURCE_ARG to launchSource,
+            )
         }
 
         private const val CUTOUT_FRACTION_START = 0.53f

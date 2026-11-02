@@ -329,6 +329,8 @@ class NativeInputChatSuggestionsBinderTest {
         override val inputQuery: StateFlow<String> = inputQueryFlow
         override val inputModeCapability: StateFlow<NativeInputState.InputMode> =
             MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
+        override suspend fun getSelectedInputMode(): NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY
+        override suspend fun getInitialToggleSelection(): NativeInputState.ToggleSelection = NativeInputState.ToggleSelection.SEARCH
     }
 
     private fun binderWith(vararg plugins: NativeInputChatTabItemPlugin): NativeInputChatSuggestionsBinder =

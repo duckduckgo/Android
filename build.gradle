@@ -311,11 +311,10 @@ fladle {
             instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
             additionalTestApks.set([])
             testTargets.set(["class com.duckduckgo.macrobenchmark.PageLoadBenchmark"])
-            devices.set([["model": "MediumPhone.arm", "version": "31"]])
+            devices.set([["model": "tokay", "version": "36"]])
             environmentVariables.set([
                     "additionalTestOutputDir"        : "/sdcard/Download",
                     "no-isolated-storage"            : "true",
-                    "androidx.benchmark.suppressErrors": "EMULATOR",
             ])
             directoriesToPull.set(["/sdcard/Download"])
             localResultsDir.set("perfResults")
