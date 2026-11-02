@@ -1,7 +1,7 @@
 {
   "name": "United States Phone Book",
   "url": "unitedstatesphonebook.com",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "addedDatetime": 1790121600000,
   "optOutUrl": "https://www.unitedstatesphonebook.com/search.php",
   "steps": [
@@ -140,9 +140,9 @@
     }
   ],
   "schedulingConfig": {
-    "retryError": 48,
+    "retryError": 168,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 120,
+    "maintenanceScan": 240,
     "maxAttempts": -1
   },
   "removedAt": null
