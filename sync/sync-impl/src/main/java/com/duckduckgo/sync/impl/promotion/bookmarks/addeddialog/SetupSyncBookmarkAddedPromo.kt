@@ -60,12 +60,17 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     private val syncPixels: SyncPixels,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
     private val setUpPromotion: SyncBookmarkAddedSetUpPromotion,
+    private val multiDevicePromotion: SyncBookmarkAddedMultiDevicePromotion,
 ) : BookmarkAddedDialogPlugin {
 
     @SuppressLint("InflateParams")
     override suspend fun getView(): View? {
         if (setUpPromotion.canShowPromotion()) {
             return SyncBookmarkAddedSetUpPromotionView(activity)
+        }
+
+        if (multiDevicePromotion.canShowPromotion()) {
+            return SyncBookmarkAddedMultiDevicePromotionView(activity)
         }
 
         if (!syncPromotions.canShowBookmarkAddedDialogPromotion()) {

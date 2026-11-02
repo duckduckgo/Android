@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.di.SyncPromotion
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialogMultiDevice
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksImport
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreenMultiDevice
@@ -57,6 +58,7 @@ interface SyncPromotionDataStore {
         BookmarksImport,
         PasswordsImport,
         BookmarkAddedDialog,
+        BookmarkAddedDialogMultiDevice,
         ChatTabPage,
     }
 }
@@ -163,6 +165,7 @@ class SyncPromotionDataStoreImpl @Inject constructor(
     private fun PromotionType.dismissKey(): Preferences.Key<Long> {
         return when (this) {
             BookmarkAddedDialog -> bookmarkAddedDialogPromoDismissedKey
+            BookmarkAddedDialogMultiDevice -> bookmarkAddedDialogMultiDevicePromoDismissedKey
             BookmarksScreen -> bookmarksScreenPromoDismissedKey
             BookmarksScreenMultiDevice -> bookmarksScreenMultiDevicePromoDismissedKey
             PasswordsScreen -> passwordsPromoDismissedKey
@@ -176,6 +179,7 @@ class SyncPromotionDataStoreImpl @Inject constructor(
     private fun PromotionType.impressionsKey(): Preferences.Key<Long> {
         return when (this) {
             BookmarkAddedDialog -> bookmarkAddedDialogPromoImpressionsKey
+            BookmarkAddedDialogMultiDevice -> bookmarkAddedDialogMultiDevicePromoImpressionsKey
             BookmarksScreen -> bookmarksScreenPromoImpressionsKey
             BookmarksScreenMultiDevice -> bookmarksScreenMultiDevicePromoImpressionsKey
             PasswordsScreen -> passwordsPromoImpressionsKey
@@ -189,6 +193,7 @@ class SyncPromotionDataStoreImpl @Inject constructor(
     private fun PromotionType.lastImpressionKey(): Preferences.Key<Long> {
         return when (this) {
             BookmarkAddedDialog -> bookmarkAddedDialogPromoLastImpressionKey
+            BookmarkAddedDialogMultiDevice -> bookmarkAddedDialogMultiDevicePromoLastImpressionKey
             BookmarksScreen -> bookmarksScreenPromoLastImpressionKey
             BookmarksScreenMultiDevice -> bookmarksScreenMultiDevicePromoLastImpressionKey
             PasswordsScreen -> passwordsPromoLastImpressionKey
@@ -209,6 +214,10 @@ class SyncPromotionDataStoreImpl @Inject constructor(
         private val bookmarkAddedDialogPromoDismissedKey = longPreferencesKey("bookmark_added_dialog_promo_dismissed")
         private val bookmarkAddedDialogPromoImpressionsKey = longPreferencesKey("bookmark_added_dialog_promo_impressions")
         private val bookmarkAddedDialogPromoLastImpressionKey = longPreferencesKey("bookmark_added_dialog_promo_last_impression")
+        private val bookmarkAddedDialogMultiDevicePromoDismissedKey = longPreferencesKey("bookmark_added_dialog_multi_device_promo_dismissed")
+        private val bookmarkAddedDialogMultiDevicePromoImpressionsKey = longPreferencesKey("bookmark_added_dialog_multi_device_promo_impressions")
+        private val bookmarkAddedDialogMultiDevicePromoLastImpressionKey =
+            longPreferencesKey("bookmark_added_dialog_multi_device_promo_last_impression")
         private val passwordsPromoDismissedKey = longPreferencesKey("passwords_promo_dismissed")
         private val passwordsPromoImpressionsKey = longPreferencesKey("passwords_promo_impressions")
         private val passwordsPromoLastImpressionKey = longPreferencesKey("passwords_promo_last_impression")
