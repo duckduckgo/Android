@@ -103,12 +103,6 @@
     <string name="changePlanTitle">Изменить или отменить подписку</string>
     <string name="changePlanDescription">Подписка приобретена в магазине приложений Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Настройки &gt; Аккаунт Apple &gt; Подписки» на устройстве, где выполнен вход в ту же учетную запись Apple, через которую была оформлена подписка.</string>
 
-    <!-- PIR Activity-->
-    <string name="pirTitle">Чтобы настроить функцию Personal Information Removal, активируйте подписку DuckDuckGo на компьютере.</string>
-    <string name="pirDescription">В настольной версии браузера DuckDuckGo откройте раздел <b>Настройки &gt; Подписаться на DuckDuckGo</b> и нажмите на ссылку <b>У меня уже есть подписка</b>.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
-
     <string name="downloadsDownloadFinishedActionName">Открыть</string>
     <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
 

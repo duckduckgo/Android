@@ -103,12 +103,6 @@
     <string name="changePlanTitle">Actualizează planul sau anulează</string>
     <string name="changePlanDescription">Abonamentul tău a fost achiziționat prin Apple App Store. Pentru a-ți modifica planul sau setările de facturare, accesează Setări &gt; Cont Apple &gt; Abonamente pe un dispozitiv conectat la același cont Apple folosit pentru achiziționarea abonamentului.</string>
 
-    <!-- PIR Activity-->
-    <string name="pirTitle">Activează abonamentul DuckDuckGo pe desktop pentru a configura Personal Information Removal</string>
-    <string name="pirDescription">În browserul DuckDuckGo pentru desktop, accesează <b>Setări &gt; Abonează-te la DuckDuckGo</b> și dă click pe <b>Am un abonament</b> pentru a începe.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
-
     <string name="downloadsDownloadFinishedActionName">Deschide</string>
     <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
 

@@ -103,12 +103,6 @@
     <string name="changePlanTitle">Uppdatera abonnemang eller avbryt</string>
     <string name="changePlanDescription">Ditt abonnemang köptes genom Apple App Store. För att ändra ditt abonnemang eller faktureringsinställningar går du till Inställningar &gt; Apple-konto &gt; Abonnemang på en enhet som är inloggad på det Apple-konto som användes för att köpa ditt abonnemang.</string>
 
-    <!-- PIR Activity-->
-    <string name="pirTitle">Aktivera DuckDuckGo-abonnemanget på en dator för att konfigurera Personal Information Removal</string>
-    <string name="pirDescription">I DuckDuckGo-webbläsaren för datorer går du till <b>Inställningar &gt; Prenumerera på DuckDuckGo</b> och klickar på <b>Jag har ett abonnemang</b> för att komma igång.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
-
     <string name="downloadsDownloadFinishedActionName">Öppna</string>
     <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
 

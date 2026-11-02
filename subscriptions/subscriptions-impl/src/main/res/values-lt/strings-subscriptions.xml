@@ -103,12 +103,6 @@
     <string name="changePlanTitle">Atnaujinkite planą arba atšaukite</string>
     <string name="changePlanDescription">Jūsų prenumerata buvo įsigyta per „Apple App Store“. Norėdami pakeisti savo plano ar atsiskaitymo nustatymus, eikite į Nustatymai &gt; „Apple“ paskyra &gt; Prenumeratos įrenginyje, prijungtame prie tos pačios „Apple“ paskyros, naudotos prenumeratai įsigyti.</string>
 
-    <!-- PIR Activity-->
-    <string name="pirTitle">Aktyvuokite „DuckDuckGo“ prenumeratą darbalaukyje, kad nustatytumėte asmeninės informacijos pašalinimą</string>
-    <string name="pirDescription">Staliniam kompiuteriui skirtoje naršyklėje „DuckDuckGo“ eik į <b>Nustatymai &gt; Prenumeruoti „DuckDuckGo“ </b> ir spustelėk <b>Turiu prenumeratą</b>, kad pradėtum.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
-
     <string name="downloadsDownloadFinishedActionName">Atviras</string>
     <string name="downloadsCannotOpenFileErrorMessage">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
 
