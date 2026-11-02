@@ -135,6 +135,7 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
                 if (viewState.isSyncing) R.string.sync_simplified_setup_secondary_button_syncing else R.string.sync_simplified_setup_secondary_button,
             )
         }
+        binding.syncWithAnotherDeviceButton.isEnabled = !viewState.isSyncing
     }
 
     private fun processCommand(command: SyncThisDeviceViewModel.Command) {
