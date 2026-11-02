@@ -50,6 +50,7 @@ class PixelNetworkModule {
 
     @Provides
     @SingleIn(AppScope::class)
+    // @ContributesNonCachingServiceApi can't use a custom OkHttpClient, and pixels need their own Dispatcher
     @SuppressLint("NoRetrofitCreateMethodCallDetector")
     fun providePixelService(
         @Named("nonCaching") retrofit: Retrofit,
