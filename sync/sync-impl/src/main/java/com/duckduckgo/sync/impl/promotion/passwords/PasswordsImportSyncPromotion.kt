@@ -29,6 +29,8 @@ import javax.inject.Inject
 
 interface PasswordsImportSyncPromotion {
     suspend fun canShowPromotion(importedPasswords: Int): Boolean
+
+    suspend fun shouldUseToggle(): Boolean
 }
 
 @ContributesBinding(AppScope::class, binding = binding<PasswordsImportSyncPromotion>())
@@ -45,6 +47,10 @@ class RealPasswordsImportSyncPromotion @Inject constructor(
             val isSyncAvailable = async { canTurnOnSync() }
             isEnabled.await() && isSyncAvailable.await()
         }
+    }
+
+    override suspend fun shouldUseToggle(): Boolean = withContext(dispatchers.io()) {
+        syncPromotionFeature.importPromosToggle().isEnabled()
     }
 
     private suspend fun isPromotionEnabled(): Boolean = withContext(dispatchers.io()) {

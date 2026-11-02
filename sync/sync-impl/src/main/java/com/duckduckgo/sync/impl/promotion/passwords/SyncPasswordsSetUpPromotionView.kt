@@ -78,7 +78,7 @@ class SyncPasswordsSetUpPromotionView @JvmOverloads constructor(
 
     init {
         binding.promoMessage.apply {
-            onPrimaryButtonClicked { viewModel.setUpSync() }
+            onToggleClicked { viewModel.setUpSync() }
             onCloseButtonClicked { viewModel.dismissPromotion() }
         }
     }

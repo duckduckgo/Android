@@ -51,6 +51,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksImport
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksImportPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksImportPromotionViewModel.Command.LaunchSyncSetup
+import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView.ActionStyle
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
@@ -68,7 +69,11 @@ class SyncBookmarksImportPromotionPlugin @Inject constructor(
     private val promotion: BookmarksImportSyncPromotion,
 ) : BookmarksImportScreenPromotionPlugin {
 
+    @Volatile
+    private var promoActionStyle = ActionStyle.Buttons
+
     override suspend fun isEligible(data: ImportResult): Boolean {
+        promoActionStyle = if (promotion.shouldUseToggle()) ActionStyle.Toggle else ActionStyle.Buttons
         return promotion.canShowPromotion(data.successCount)
     }
 
@@ -79,6 +84,7 @@ class SyncBookmarksImportPromotionPlugin @Inject constructor(
         return SyncBookmarksImportPromotionView(context).apply {
             layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             this.callback = callback
+            actionStyle = promoActionStyle
         }
     }
 }
@@ -98,6 +104,12 @@ class SyncBookmarksImportPromotionView @JvmOverloads constructor(
 
     var callback: Callback? = null
 
+    internal var actionStyle: ActionStyle
+        get() = binding.promoMessage.actionStyle
+        set(value) {
+            binding.promoMessage.actionStyle = value
+        }
+
     private val binding: ViewSyncBookmarksImportPromotionBinding by viewBinding()
 
     private val viewModel: SyncBookmarksImportPromotionViewModel by lazy {
@@ -107,7 +119,10 @@ class SyncBookmarksImportPromotionView @JvmOverloads constructor(
     private var job: ConflatedJob = ConflatedJob()
 
     init {
-        binding.promoMessage.onPrimaryButtonClicked { viewModel.setUpSync() }
+        binding.promoMessage.apply {
+            onPrimaryButtonClicked { viewModel.setUpSync() }
+            onToggleClicked { viewModel.setUpSync() }
+        }
     }
 
     override fun onAttachedToWindow() {

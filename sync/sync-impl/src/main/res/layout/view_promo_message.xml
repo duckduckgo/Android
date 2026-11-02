@@ -90,6 +90,23 @@
 
         </LinearLayout>
 
+        <FrameLayout
+            android:id="@+id/toggleContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:background="@drawable/background_promo_message_toggle"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/toggleItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:showSwitch="true" />
+
+        </FrameLayout>
+
     </LinearLayout>
 
     <ImageView
