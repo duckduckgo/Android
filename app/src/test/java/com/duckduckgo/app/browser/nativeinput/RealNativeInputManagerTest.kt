@@ -588,6 +588,17 @@ class RealNativeInputManagerTest {
     }
 
     @Test
+    fun whenVoiceChatButtonClickedThenUsesTheResolvedEntryPoint() {
+        val widget = showVoiceTestWidget { _, _ -> }
+        widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO
+
+        widget.onVoiceChatClick!!.invoke()
+
+        verify(duckChat).openVoiceDuckChat(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO)
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, widget.nextDuckAiEntryPoint)
+    }
+
+    @Test
     fun whenDictatedPromptArrivesWithoutWidgetThenUsesAddressBarPromptEntryPoint() {
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
         testee.init(omnibar, rootView, lifecycleOwner)

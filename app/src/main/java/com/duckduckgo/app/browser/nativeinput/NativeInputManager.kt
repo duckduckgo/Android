@@ -1016,7 +1016,9 @@ class RealNativeInputManager @Inject constructor(
         }
         widget.onVoiceChatClick = {
             hideNativeInput(animate = false)
-            duckChat.openVoiceDuckChat(DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+            val entryPoint = widget.nextDuckAiEntryPoint
+            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+            duckChat.openVoiceDuckChat(entryPoint)
         }
     }
 
