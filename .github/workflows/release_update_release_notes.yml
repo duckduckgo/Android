@@ -19,7 +19,7 @@ env:
 jobs:
   update-release-notes:
     name: Update release notes in Play Store and Github
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -31,7 +31,7 @@ jobs:
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Decode Play Store credentials file
