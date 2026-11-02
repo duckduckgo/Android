@@ -25,7 +25,6 @@ import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingView
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
@@ -45,14 +44,6 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 class ProSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return ProSettingView(context)
-    }
-}
-
-@ContributesIntoMap(scope = ActivityScope::class)
-@PriorityKey(300)
-class PIRSettings @Inject constructor() : ProSettingsPlugin {
-    override fun getView(context: Context): View {
-        return PirSettingView(context)
     }
 }
 

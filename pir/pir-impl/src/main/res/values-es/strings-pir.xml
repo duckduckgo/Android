@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2023 DuckDuckGo
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,12 +14,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<com.duckduckgo.common.ui.view.listitem.SettingsListItem xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/pirSettings"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:indicatorStatus="on"
-    app:leadingIcon="@drawable/identity_blocked_pir_color_24"
-    app:primaryText="@string/pirSettingTitle" />
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="pirTitle">Activa la suscripción a DuckDuckGo en el escritorio para configurar Personal Information Removal</string>
+    <string name="pirDescription">En el navegador DuckDuckGo para escritorio, ve a <b>Configuración &gt; Suscribirse a DuckDuckGo</b> y haz clic en <b>Tengo una suscripción</b> para empezar.</string>
+</resources>

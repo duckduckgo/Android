@@ -29,4 +29,10 @@ sealed class PirScreens {
      * Use this model to launch the PIR subscription onboarding step.
      */
     data object PirOnboardingStepScreen : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the screen that asks the user to set up PIR from the desktop browser,
+     * shown when PIR isn't available on this device.
+     */
+    data object PirDesktopScreen : GlobalActivityStarter.ActivityParams
 }

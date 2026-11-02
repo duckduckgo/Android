@@ -34,6 +34,7 @@ dependencies {
     implementation project(':di')
     implementation project(':data-store-api')
     implementation project(':js-messaging-api')
+    implementation project(':macos-api')
     implementation project(':navigation-api')
     implementation project(':network-protection-api')
     implementation project(':remote-messaging-api')
@@ -42,6 +43,7 @@ dependencies {
     implementation project(':statistics-api')
     implementation project(':tracker-detection-api')
     implementation project(':user-agent-api')
+    implementation project(':windows-api')
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation "com.squareup.moshi:moshi-kotlin:_"

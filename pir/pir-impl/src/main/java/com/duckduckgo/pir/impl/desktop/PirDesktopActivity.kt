@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.pir
+package com.duckduckgo.pir.impl.desktop
 
 import android.os.Bundle
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
@@ -26,15 +26,15 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.databinding.ActivityPirBinding
-import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
+import com.duckduckgo.pir.api.PirScreens.PirDesktopScreen
+import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.databinding.ActivityPirDesktopBinding
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirScreenWithEmptyParams::class)
-class PirActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(PirDesktopScreen::class)
+class PirDesktopActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -45,7 +45,7 @@ class PirActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    private val binding: ActivityPirBinding by viewBinding()
+    private val binding: ActivityPirDesktopBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -86,9 +86,5 @@ class PirActivity : DuckDuckGoActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         toolbar.setTitle(null)
         toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
-    }
-
-    companion object {
-        data object PirScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

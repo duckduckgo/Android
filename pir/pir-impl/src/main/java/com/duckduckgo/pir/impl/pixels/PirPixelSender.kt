@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_APP_SETTINGS_CLICK
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
@@ -751,6 +752,8 @@ interface PirPixelSender {
     fun reportFreemiumSettingsEntryPointImpression()
 
     fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState)
+
+    fun reportAppSettingsClick()
 
     fun reportFreemiumScanCompleteNotificationSent()
 
@@ -1726,6 +1729,10 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState) {
         fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED, mapOf(PARAM_KEY_CTA_STATE to ctaState.paramValue))
+    }
+
+    override fun reportAppSettingsClick() {
+        fire(PIR_APP_SETTINGS_CLICK)
     }
 
     override fun reportFreemiumScanCompleteNotificationSent() {
