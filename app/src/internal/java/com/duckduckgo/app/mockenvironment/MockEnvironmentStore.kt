@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.mockenvironment
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import javax.inject.Inject
 
 /**
@@ -27,11 +27,11 @@ import javax.inject.Inject
  * `pm clear` resets it, and it expires on its own so a crashed run cannot leave a normal launch proxied to a dead port.
  */
 class MockEnvironmentStore @Inject constructor(
-    context: Context,
+    sharedPreferencesProvider: SharedPreferencesProvider,
     private val currentTimeProvider: CurrentTimeProvider,
 ) {
 
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
 
     var isEnabled: Boolean
         get() {
