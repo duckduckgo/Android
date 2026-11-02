@@ -374,6 +374,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -414,6 +415,36 @@ class RealDuckChatJSHelperTest {
         )
 
         assertFalse(result!!.params.getBoolean("supportsBonusOffer"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCardsEnabledThenSupportsPromoCardsIsTrue() = runTest {
+        mockDuckChatFeature.duckAiPromoCards().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsPromoCards"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCardsDisabledThenSupportsPromoCardsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiPromoCards().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsPromoCards"))
     }
 
     @Test
@@ -850,6 +881,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -953,6 +985,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1118,6 +1151,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1223,6 +1257,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1274,6 +1309,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1325,6 +1361,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1946,6 +1983,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1994,6 +2032,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -2042,6 +2081,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -2091,6 +2131,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
