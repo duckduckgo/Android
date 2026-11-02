@@ -29,6 +29,9 @@
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Sync with my Desktop&#160;App</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Let’s sync your desktop&#160;app!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Sync With Desktop</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">I Don’t Have a Desktop&#160;App</string>
 
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
