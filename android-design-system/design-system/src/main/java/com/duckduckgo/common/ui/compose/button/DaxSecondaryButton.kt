@@ -34,9 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.Black12
 import com.duckduckgo.common.ui.compose.theme.Blue20
 import com.duckduckgo.common.ui.compose.theme.Blue30
-import com.duckduckgo.common.ui.compose.theme.Blue30_20
 import com.duckduckgo.common.ui.compose.theme.Blue50
-import com.duckduckgo.common.ui.compose.theme.Blue50_12
 import com.duckduckgo.common.ui.compose.theme.Blue70
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.White24
@@ -88,9 +86,9 @@ private object DaxSecondaryButtonDefaults {
 
     val adsColorButtonSecondaryContainerPressed: Color
         @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue30_20
+            Blue30
         } else {
-            Blue50_12
+            Blue50
         }
 
     val adsColorButtonSecondaryText: Color
@@ -142,7 +140,7 @@ private object DaxSecondaryButtonDefaults {
     @Composable
     fun rippleConfiguration(): RippleConfiguration {
         val color = adsColorButtonSecondaryContainerPressed
-        return remember(color) { RippleConfiguration(color = color) }
+        return remember(color) { daxRippleConfiguration(color) }
     }
 }
 
