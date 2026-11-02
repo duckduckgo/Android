@@ -268,6 +268,16 @@ interface SubscriptionsManager {
      * @return `true` if the Black Friday offer is available, `false` otherwise
      */
     suspend fun blackFridayOfferAvailable(): Boolean
+
+    /**
+     * Buys the current plan again to undo a cancellation
+     */
+    suspend fun undoSubscriptionCancellation(activity: Activity): UndoCancellationResult
+}
+
+sealed class UndoCancellationResult {
+    data object Launched : UndoCancellationResult()
+    data object NotEligible : UndoCancellationResult()
 }
 
 @SingleIn(AppScope::class)
@@ -338,6 +348,8 @@ class RealSubscriptionsManager @Inject constructor(
 
     private var isPlanSwitchPending: Boolean = false
 
+    private var isCancellationUndoPending: Boolean = false
+
     override suspend fun isSignedIn(): Boolean {
         return isSignedInV1() || isSignedInV2()
     }
@@ -387,6 +399,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
                     is PurchaseState.Canceled -> {
                         isPlanSwitchPending = false
+                        isCancellationUndoPending = false
                         subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
                         subscriptionSwitchWideEvent.onUserCancelled()
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
@@ -400,6 +413,7 @@ class RealSubscriptionsManager @Inject constructor(
 
                     is PurchaseState.Failure -> {
                         isPlanSwitchPending = false
+                        isCancellationUndoPending = false
                         subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(it.errorType)
                         subscriptionSwitchWideEvent.onSwitchFailed(it.errorType)
                         _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
@@ -493,6 +507,7 @@ class RealSubscriptionsManager @Inject constructor(
             subscriptionSwitchWideEvent.onTargetPlanRetrieved()
 
             isPlanSwitchPending = true
+            isCancellationUndoPending = false
 
             // Launch Google Play billing flow for subscription update
             logcat { "Subs: Launching subscription update flow for plan: $planId" }
@@ -514,6 +529,51 @@ class RealSubscriptionsManager @Inject constructor(
             isPlanSwitchPending = false
             _currentPurchaseState.emit(CurrentPurchase.Failure("Failed to switch subscription plan: $error"))
             subscriptionSwitchWideEvent.onSwitchFailed(javaClass.simpleName)
+        }
+    }
+
+    override suspend fun undoSubscriptionCancellation(activity: Activity): UndoCancellationResult = withContext(dispatcherProvider.io()) {
+        try {
+            if (!subscriptionsFeature.value.undoSubscriptionCancellation().isEnabled()) {
+                return@withContext UndoCancellationResult.NotEligible
+            }
+
+            val subscription = authRepository.getSubscription()
+            val account = authRepository.getAccount()
+            if (subscription?.status != NOT_AUTO_RENEWABLE || subscription.platform != "google" || account == null) {
+                return@withContext UndoCancellationResult.NotEligible
+            }
+
+            // Buying from a Play account that doesn't own the subscription would start a second paid one
+            val ownsPurchase = when (val latestPurchase = playBillingManager.getLatestPurchase()) {
+                is LatestPurchaseResult.Present -> {
+                    val purchase = latestPurchase.purchase
+                    purchase.products.contains(SubscriptionTier.fromPlanId(subscription.productId).productId) &&
+                        purchase.accountIdentifiers?.obfuscatedAccountId == account.externalId
+                }
+                else -> false
+            }
+            if (!ownsPurchase) {
+                return@withContext UndoCancellationResult.NotEligible
+            }
+
+            pendingOnboardingEnrollmentIsFreeTrial = null
+            isPlanSwitchPending = false
+            isCancellationUndoPending = true
+
+            withContext(dispatcherProvider.main()) {
+                playBillingManager.launchBillingFlow(
+                    activity = activity,
+                    planId = subscription.productId,
+                    externalId = account.externalId,
+                    offerId = null,
+                )
+            }
+            UndoCancellationResult.Launched
+        } catch (e: Exception) {
+            logcat(ERROR) { "Subs: Failed to undo cancellation: ${extractError(e)}" }
+            isCancellationUndoPending = false
+            UndoCancellationResult.NotEligible
         }
     }
 
@@ -648,19 +708,27 @@ class RealSubscriptionsManager @Inject constructor(
                 val isFreeTrial = subscription.activeOffers.contains(ActiveOfferType.TRIAL)
                 val isPlanSwitch = isPlanSwitchPending
                 isPlanSwitchPending = false
-                if (isPlanSwitch) {
-                    pixelSender.reportSubscriptionSwitch()
-                } else {
-                    pixelSender.reportPurchaseSuccess(isFreeTrial)
-                    pixelSender.reportSubscriptionActivated()
+                val isCancellationUndo = isCancellationUndoPending
+                isCancellationUndoPending = false
+                when {
+                    isPlanSwitch -> pixelSender.reportSubscriptionSwitch()
+                    isCancellationUndo -> Unit
+                    else -> {
+                        pixelSender.reportPurchaseSuccess(isFreeTrial)
+                        pixelSender.reportSubscriptionActivated()
+                    }
                 }
                 emitEntitlementsValues()
-                _currentPurchaseState.emit(CurrentPurchase.Success(isFreeTrial, isPlanSwitch = isPlanSwitch))
-                authRepository.registerLocalPurchasedAt()
+                _currentPurchaseState.emit(
+                    CurrentPurchase.Success(isFreeTrial, isPlanSwitch = isPlanSwitch, isCancellationUndo = isCancellationUndo),
+                )
+                if (!isCancellationUndo) {
+                    authRepository.registerLocalPurchasedAt()
+                }
 
                 subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
-                if (isFreeTrial) {
+                if (isFreeTrial && !isCancellationUndo) {
                     freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
                     if (subscriptionsFeature.value.vpnReminderNotification().isEnabled()) {
                         vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
@@ -683,6 +751,7 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseToken: String,
     ): ConfirmationBody {
         val body = ConfirmationBody(packageName = packageName, purchaseToken = purchaseToken)
+        if (isCancellationUndoPending) return body
         return try {
             if (subscriptionsFeature.value.subscriptionConcurrentExperiments().isEnabled()) {
                 body.copy(experiments = buildExperimentsToReport())
@@ -731,6 +800,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun handlePurchaseFailed() {
         isPlanSwitchPending = false
+        isCancellationUndoPending = false
         authRepository.purchaseToWaitingStatus()
         pixelSender.reportPurchaseFailureBackend()
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
@@ -1167,6 +1237,7 @@ class RealSubscriptionsManager @Inject constructor(
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
 
             isPlanSwitchPending = false
+            isCancellationUndoPending = false
             pendingOnboardingEnrollmentIsFreeTrial = offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
 
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted(
@@ -1398,6 +1469,7 @@ sealed class CurrentPurchase {
     data class Success(
         val isFreeTrial: Boolean,
         val isPlanSwitch: Boolean = false,
+        val isCancellationUndo: Boolean = false,
     ) : CurrentPurchase()
     data object Waiting : CurrentPurchase()
     data object Recovered : CurrentPurchase()

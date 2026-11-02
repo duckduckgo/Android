@@ -3,6 +3,7 @@ package com.duckduckgo.subscriptions.impl
 import android.annotation.SuppressLint
 import android.content.Context
 import app.cash.turbine.test
+import com.android.billingclient.api.AccountIdentifiers
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
@@ -21,6 +22,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.model.Entitlement
@@ -2959,6 +2961,155 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenUndoCancellationAndFlagDisabledThenNotEligible() = runTest {
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenUndoCancellationAndSubscriptionAutoRenewableThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription(status = AUTO_RENEWABLE)
+        givenOwnedPurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenUndoCancellationAndPlatformNotGoogleThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription(platform = "stripe")
+        givenOwnedPurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenUndoCancellationAndNoPlayPurchaseThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenNoActivePurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenUndoCancellationAndPlayPurchaseFromOtherAccountThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase(externalId = "other")
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenUndoCancellationAndPlayPurchaseForOtherProductThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase(product = SubscriptionsConstants.ADVANCED_SUBSCRIPTION)
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenUndoCancellationAndEligibleThenLaunchesBillingFlowForBasePlan() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.Launched, result)
+        verify(playBillingManager).launchBillingFlow(
+            activity = any(),
+            planId = eq(MONTHLY_PLAN_US),
+            externalId = eq("1234"),
+            offerId = isNull(),
+        )
+    }
+
+    @Test
+    fun whenUndoCancellationConfirmedThenEmitsCancellationUndoSuccessWithoutPurchasePixels() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+        val localPurchasedAt = authRepository.getLocalPurchasedAt()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertEquals(CurrentPurchase.Success(isFreeTrial = false, isCancellationUndo = true), awaitItem())
+
+            verify(pixelSender, never()).reportPurchaseSuccess(any())
+            verify(pixelSender, never()).reportSubscriptionActivated()
+            verify(pixelSender, never()).reportSubscriptionSwitch()
+            assertEquals(localPurchasedAt, authRepository.getLocalPurchasedAt())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUndoCancellationConfirmedWithFreeTrialThenDoesNotStartFreeTrial() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+        givenConfirmPurchaseSucceedsWithFreeTrial()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertEquals(CurrentPurchase.Success(isFreeTrial = true, isCancellationUndo = true), awaitItem())
+
+            verify(freeTrialConversionWideEvent, never()).onFreeTrialStarted(any())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenPurchaseConfirmedThenDoesNotReportSwitch() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
@@ -3158,6 +3309,42 @@ class RealSubscriptionsManagerTest {
                 activeOffers = emptyList(),
             ),
         )
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenUndoSubscriptionCancellationEnabled(value: Boolean) {
+        subscriptionsFeature.undoSubscriptionCancellation().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    private suspend fun givenCancelledGoogleSubscription(
+        status: SubscriptionStatus = NOT_AUTO_RENEWABLE,
+        platform: String = "google",
+    ) {
+        authRepository.setSubscription(
+            Subscription(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "P1M",
+                startedAt = 1234L,
+                expiresOrRenewsAt = 1234L,
+                status = status,
+                platform = platform,
+                activeOffers = emptyList(),
+            ),
+        )
+    }
+
+    private suspend fun givenOwnedPurchase(
+        externalId: String = "1234",
+        product: String = SubscriptionsConstants.BASIC_SUBSCRIPTION,
+    ) {
+        val identifiers: AccountIdentifiers = mock {
+            whenever(it.obfuscatedAccountId).thenReturn(externalId)
+        }
+        val purchase: Purchase = mock {
+            whenever(it.products).thenReturn(listOf(product))
+            whenever(it.accountIdentifiers).thenReturn(identifiers)
+        }
+        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Present(purchase))
     }
 
     private suspend fun givenNoActiveSubscription() {
