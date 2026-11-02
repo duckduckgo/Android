@@ -70,6 +70,7 @@ data class SubscriptionResponse(
     val status: String,
     val activeOffers: List<ActiveOfferResponse>,
     val pendingPlans: List<PendingPlanResponse> = emptyList(),
+    val planCountry: String? = null,
 )
 
 data class PendingPlanResponse(
