@@ -16,7 +16,6 @@
 
 <resources>
     <!-- Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
     <string name="sync_bookmarks_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -27,6 +26,7 @@
     <!-- Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_set_up_promo_title">Sync&#160;&amp;&#160;Backup Bookmarks</string>
     <string name="sync_bookmark_added_set_up_promo_more_options">More options</string>
+    <string name="sync_bookmark_added_set_up_promo_turn_on_sync">Turn On Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Sync with my Desktop&#160;App</string>
