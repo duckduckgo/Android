@@ -699,9 +699,19 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     private suspend fun openNewDuckAiChat() {
-        val url = duckChat.getDuckChatUrl("", false)
-        duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
-        tabRepository.add(url, true)
+        val repository = tabRepository
+        val currentTabId = repository.getSelectedTab()?.tabId
+        val emptyChats = repository.getTabs().filter { tab ->
+            tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && it.getQueryParameter("chatID").isNullOrBlank() } == true
+        }
+        val emptyChat = emptyChats.firstOrNull { it.tabId == currentTabId } ?: emptyChats.firstOrNull()
+        if (emptyChat != null) {
+            repository.select(emptyChat.tabId)
+        } else {
+            val url = duckChat.getDuckChatUrl("", false)
+            duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
+            repository.add(url, true)
+        }
         command.value = Command.Close
     }
 

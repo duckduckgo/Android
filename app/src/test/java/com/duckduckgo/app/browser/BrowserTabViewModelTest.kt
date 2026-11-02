@@ -13428,6 +13428,58 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewChatRequestedAndEmptyChatExistsThenSwitchToIt() = runTest {
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("empty", url = "https://duck.ai/")))
+        whenever(mockDuckChat.isDuckChatUrl("https://duck.ai/".toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromChatMenu()
+
+        assertCommandIssued<Command.SwitchToTab> { assertEquals("empty", tabId) }
+        verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any())
+        verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
+    }
+
+    @Test
+    fun whenBrowsingMenuNewChatRequestedAndBlankChatIdExistsThenSwitchToIt() = runTest {
+        val url = "https://duck.ai/?chatID="
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("empty", url = url)))
+        whenever(mockDuckChat.isDuckChatUrl(url.toUri())).thenReturn(true)
+
+        testee.openNewDuckChat(ViewMode.Browser("https://example.com"))
+
+        assertCommandIssued<Command.SwitchToTab> { assertEquals("empty", tabId) }
+    }
+
+    @Test
+    fun whenCurrentChatIsEmptyThenPreferItToAnotherEmptyChat() = runTest {
+        whenever(mockTabRepository.getTabs()).thenReturn(
+            listOf(TabEntity("other", url = "https://duck.ai/"), TabEntity("abc", url = "https://duck.ai/")),
+        )
+        whenever(mockDuckChat.isDuckChatUrl("https://duck.ai/".toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromChatMenu()
+
+        verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
+        verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any())
+        assertCommandNotIssued<Command.OpenInNewTab>()
+        assertCommandNotIssued<Command.SwitchToTab>()
+    }
+
+    @Test
+    fun whenOnlyExistingConversationAndWebTabsExistThenCreateNewChat() = runTest {
+        val url = "https://duck.ai/?chatID=conversation"
+        whenever(mockTabRepository.getTabs()).thenReturn(
+            listOf(TabEntity("web", url = "https://example.com"), TabEntity("chat", url = url)),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(url.toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromChatMenu()
+
+        assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
+    }
+
+    @Test
     fun whenNewChatRequestedFromChatMenuThenOpensNewTabWithEmptyChat() = runTest {
         testee.openNewDuckChatFromChatMenu()
 
