@@ -48,6 +48,7 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import io.reactivex.Completable
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -60,6 +61,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.kotlin.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 @SuppressLint("DenyListedApi")
@@ -112,20 +116,22 @@ class RxPixelSenderTest {
         pixelSenderFeature.self().setRawStoredState(State(enable = false))
         concurrencyLimitFeature.self().setRawStoredState(State(enable = false))
 
-        testee = RxPixelSender(
-            api,
-            pendingPixelDao,
-            mockStatisticsDataStore,
-            mockDeviceInfo,
-            object : StatisticsLibraryConfig {
-                override fun shouldFirePixelsAsDev() = true
-            },
-            pixelFiredRepository,
-            lazy { pixelSenderFeature },
-            pixelRequiringAtbPlugins,
-            lazy { concurrencyLimitFeature },
-        )
+        testee = createTestee(pendingPixelDao)
     }
+
+    private fun createTestee(pixelDao: PendingPixelDao) = RxPixelSender(
+        api,
+        pixelDao,
+        mockStatisticsDataStore,
+        mockDeviceInfo,
+        object : StatisticsLibraryConfig {
+            override fun shouldFirePixelsAsDev() = true
+        },
+        pixelFiredRepository,
+        lazy { pixelSenderFeature },
+        pixelRequiringAtbPlugins,
+        lazy { concurrencyLimitFeature },
+    )
 
     @After
     fun after() {
@@ -812,6 +818,51 @@ class RxPixelSenderTest {
             verifyBlocking(api, times(1)) { fireAsync(eq(name), any(), any(), any(), any(), any()) }
         }
         assertTrue(pendingPixelDao.pixels().test().assertNoErrors().values().last().isEmpty())
+    }
+
+    @Test
+    fun whenConcurrencyLimitEnabledAndAppStopsDuringQueuedSendThenSendCancelledAndPixelKept() {
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
+        // As in the app, Room must emit on its own thread: otherwise disposing interrupts the sending thread, which cancels the send anyway
+        val roomExecutor = Executors.newSingleThreadExecutor()
+        val asyncDb = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, TestAppDatabase::class.java)
+            .allowMainThreadQueries()
+            .setQueryExecutor(roomExecutor)
+            .build()
+        val asyncPixelDao = asyncDb.pixelDao()
+        val testee = createTestee(asyncPixelDao)
+        val sendStarted = CountDownLatch(1)
+        val sendCancelled = CountDownLatch(1)
+        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.doSuspendableAnswer {
+            sendStarted.countDown()
+            try {
+                awaitCancellation()
+            } finally {
+                sendCancelled.countDown()
+            }
+        }
+        asyncPixelDao.insert(
+            PixelEntity(
+                pixelName = "test",
+                atb = "atbvariant",
+                additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+                encodedQueryParams = emptyMap(),
+            ),
+        )
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        try {
+            testee.onStart(mockLifecycleOwner)
+            assertTrue(sendStarted.await(5, TimeUnit.SECONDS))
+
+            testee.onStop(mockLifecycleOwner)
+
+            assertTrue(sendCancelled.await(5, TimeUnit.SECONDS))
+            assertEquals(1, asyncPixelDao.pixels().blockingFirst().size)
+        } finally {
+            asyncDb.close()
+            roomExecutor.shutdownNow()
+        }
     }
 
     private fun givenAsyncPixelApiSucceeds() {
