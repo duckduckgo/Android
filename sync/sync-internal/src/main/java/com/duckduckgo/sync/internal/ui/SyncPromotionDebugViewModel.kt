@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.promotion.InternalSyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialogMultiDevice
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksImport
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreenMultiDevice
@@ -151,6 +152,7 @@ class SyncPromotionDebugViewModel @Inject constructor(
         BookmarksImport -> "Bookmarks import"
         PasswordsImport -> "Passwords import"
         BookmarkAddedDialog -> "Bookmark added dialog"
+        BookmarkAddedDialogMultiDevice -> "Bookmark added dialog (multi-device)"
         ChatTabPage -> "Chat tab page"
     }
 
