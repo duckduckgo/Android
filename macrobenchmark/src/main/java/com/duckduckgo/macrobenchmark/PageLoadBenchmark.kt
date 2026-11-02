@@ -68,47 +68,72 @@ class PageLoadBenchmark {
     private val explicitPageUrl = InstrumentationRegistry.getArguments().getString("pageUrl")
 
     @Test
-    fun noTrackers() = measurePageLoad(NoTrackersFixture)
+    fun noTrackers() = measurePageLoad("no-trackers", NoTrackersFixture)
 
     @Test
-    fun manyTrackersBlocked() = measurePageLoad(ManyTrackersBlockedFixture)
+    fun manyTrackersBlocked() = measurePageLoad("many-trackers-blocked", ManyTrackersBlockedFixture)
 
     @Test
-    fun firstPartyTrackers() = measurePageLoad(FirstPartyTrackersFixture)
+    fun firstPartyTrackers() = measurePageLoad("first-party-trackers", FirstPartyTrackersFixture)
 
     @Test
-    fun cpm() = measurePageLoad(CpmFixture)
+    fun cpm() = measurePageLoad("cpm", CpmFixture)
 
     @Test
-    fun allScenariosProtectionsOn() = measurePageLoad(AllScenariosFixture, protectionsEnabled = true)
+    fun allScenariosProtectionsOn() = measurePageLoad("all-protections-on", AllScenariosFixture, protectionsEnabled = true)
 
     @Test
-    fun allScenariosProtectionsOff() = measurePageLoad(AllScenariosFixture, protectionsEnabled = false)
+    fun allScenariosProtectionsOff() = measurePageLoad("all-protections-off", AllScenariosFixture, protectionsEnabled = false)
 
-    private fun measurePageLoad(fixture: PageLoadFixture, protectionsEnabled: Boolean = true) {
+    private fun measurePageLoad(scenario: String, fixture: PageLoadFixture, protectionsEnabled: Boolean = true) {
         val pageSettleMs = if (protectionsEnabled) PAGE_SETTLE_MS_PROTECTED else PAGE_SETTLE_MS_UNPROTECTED
-        launchAndVerifyProtectionState(protectionsEnabled)
-        val fixtureServer = if (explicitPageUrl == null) PageLoadFixtureServer(fixture).also { it.start() } else null
-        val pageUrl = explicitPageUrl ?: fixtureServer!!.baseUrl
+        // Started before seeding: the app proxies all WebView traffic to this port, so it must exist (and be known) first.
+        val fixtureServer = if (explicitPageUrl == null) {
+            PageLoadFixtureServer(fixture, scenario).also { it.start() }
+        } else {
+            null
+        }
         try {
+            val seedingPid = launchAndVerifyProtectionState(protectionsEnabled, fixtureServer?.port)
+            val pageUrl = explicitPageUrl ?: fixtureServer!!.baseUrl
             benchmarkRule.measureRepeated(
                 packageName = TARGET_PACKAGE,
                 metrics = listOf(TraceSectionMetric("ddg.pageLoad", TraceSectionMetric.Mode.Sum)),
                 iterations = 1,
                 compilationMode = CompilationMode.Full(),
             ) {
-                // +1: leading warmup navigation, discarded by position in post-processing.
-                // ?i=$i forces a fresh main-frame load each time.
+                startMeasuredProcessAndAwaitMockEnvironment(seedingPid, fixtureServer)
+                // The extra leading navigation is the warmup, discarded by position; ?i= forces a fresh main-frame load.
                 repeat(NAV_COUNT + 1) { i ->
                     navigateTo("$pageUrl?i=$i", pageSettleMs)
                 }
-                // Closes the last measured navigation's slice; its own slice is the trailing sample,
-                // also discarded by position.
+                // Closes the last measured navigation's slice; its own trailing slice is also discarded by position.
                 navigateTo(fixtureServer?.traceSentinelUrl ?: "$pageUrl?i=${NAV_COUNT + 1}", pageSettleMs)
             }
         } finally {
             fixtureServer?.shutdown()
+            clearMockEnvironment()
         }
+    }
+
+    /**
+     * A plain launcher intent adds no page-load slice; the app must report ready before any navigation.
+     */
+    private fun startMeasuredProcessAndAwaitMockEnvironment(seedingPid: Int?, fixtureServer: PageLoadFixtureServer?) {
+        device.executeShellCommand("logcat -c")
+        instrumentation.context.startActivity(
+            instrumentation.context.packageManager.getLaunchIntentForPackage(TARGET_PACKAGE)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+        if (seedingPid != null) awaitMockEnvironmentState("ready", excludePid = seedingPid)
+        fixtureServer?.startCounting()
+    }
+
+    /**
+     * The seeded mock environment persists in app storage and would proxy later local launches to a dead port.
+     */
+    private fun clearMockEnvironment() {
+        device.executeShellCommand("am force-stop $TARGET_PACKAGE")
+        device.executeShellCommand("pm clear $TARGET_PACKAGE")
     }
 
     private fun navigateTo(url: String, pageSettleMs: Long) {
@@ -119,12 +144,14 @@ class PageLoadBenchmark {
             putExtra(OPEN_IN_CURRENT_TAB_EXTRA, true)
         }
         instrumentation.context.startActivity(intent)
-        // Just needs to reliably span the load so the next navigation doesn't start before
-        // onPageFinished fires; a stuck load costs at most one lost sample.
+        // Spans the load so the next navigation starts after onPageFinished; a stuck load costs at most one sample.
         SystemClock.sleep(pageSettleMs)
     }
 
-    private fun launchAndVerifyProtectionState(protectionsEnabled: Boolean) {
+    /**
+     * Returns the pid of the seeding process, or null when no mock environment was requested.
+     */
+    private fun launchAndVerifyProtectionState(protectionsEnabled: Boolean, fixturePort: Int?): Int? {
         val userAllowListValue = if (protectionsEnabled) "" else PageLoadFixtureServer.HOST
         // Seeding only runs from the intent that creates LaunchBridgeActivity, so a warm process
         // resumes the existing task and skips seeding; force-stop also makes the app's allow-list
@@ -137,6 +164,7 @@ class PageLoadBenchmark {
             .getLaunchIntentForPackage(TARGET_PACKAGE)
             ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             ?.putExtra(TestSeederKey.IS_MACROBENCHMARK.key, "true")
+            ?.apply { if (fixturePort != null) putExtra(TestSeederKey.MOCK_ENVIRONMENT.key, fixturePort.toString()) }
             ?.putExtra(TestSeederKey.USER_ALLOW_LIST.key, userAllowListValue)
         instrumentation.context.startActivity(launch)
         val skipButton = By.res(TARGET_PACKAGE, "skipOnboardingButton")
@@ -144,11 +172,36 @@ class PageLoadBenchmark {
             device.findObject(skipButton)?.click()
             device.waitForIdle()
         }
+        val seedingPid = if (fixturePort != null) awaitMockEnvironmentState("seeded", excludePid = null) else null
         verifyProtectionState(userAllowListValue)
+        return seedingPid
     }
 
-    // Seeding suspends until confirmed (UserAllowListSeederPlugin awaits the repository's Flow) and runs before
-    // onboarding is shown, so by the time we're past the skip button the DdgTestSeeder line is already final.
+    /**
+     * Polls slowly so shell spawns don't perturb a measured window. The app gives up after 45 s and logs why, so this
+     * longer timeout sees the app's failure reason first; only a hung app reaches the timeout.
+     */
+    private fun awaitMockEnvironmentState(state: String, excludePid: Int?): Int {
+        val deadline = SystemClock.elapsedRealtime() + READY_TIMEOUT_MS
+        while (true) {
+            val lines = device.executeShellCommand("logcat -d -s DdgTestSeeder").lineSequence()
+                .mapNotNull { MOCK_ENVIRONMENT_LINE.find(it) }
+                .map { Triple(it.groupValues[1], it.groupValues[2].trim(), it.groupValues[3].toInt()) }
+                .filter { it.third != excludePid }
+                .toList()
+            lines.firstOrNull { it.first == "failed" }?.let { (_, detail, pid) ->
+                error("Mock environment failed in process $pid: $detail")
+            }
+            lines.firstOrNull { it.first == state }?.let { return it.third }
+            if (SystemClock.elapsedRealtime() >= deadline) break
+            SystemClock.sleep(READY_POLL_MS)
+        }
+        error("The app never reported ready: no \"$state\" line within ${READY_TIMEOUT_MS}ms (excluding pid $excludePid)")
+    }
+
+    /**
+     * Seeding awaits the allow-list Flow before onboarding is shown, so the DdgTestSeeder line is final past the skip button.
+     */
     private fun verifyProtectionState(expectedUserAllowList: String) {
         val log = device.executeShellCommand("logcat -d -s DdgTestSeeder")
         val observed = log.lineSequence().lastOrNull { it.contains("userAllowList=") }
@@ -160,6 +213,9 @@ class PageLoadBenchmark {
 
     companion object {
         private const val NAV_COUNT = 10
+        private const val READY_TIMEOUT_MS = 60_000L
+        private const val READY_POLL_MS = 500L
+        private val MOCK_ENVIRONMENT_LINE = Regex("mockEnvironment=(seeded|ready|failed) (.*) pid=(\\d+)\\s*$")
         private const val PAGE_SETTLE_MS_PROTECTED = 8_000L
 
         // Trackers only hit the real network when protections are off, so the ~25 third-party
