@@ -65,6 +65,7 @@ class RxPixelSender @Inject constructor(
     private val pixelFiredRepository: PixelFiredRepository,
     private val pixelSenderFeature: Lazy<PixelSenderFeature>,
     private val pixelRequiringAtbPlugins: PluginPoint<PixelRequiringAtbPlugin>,
+    private val concurrencyLimitFeature: Lazy<PixelConcurrencyLimitFeature>,
 ) : PixelSender, MainProcessLifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
@@ -113,25 +114,29 @@ class RxPixelSender @Inject constructor(
     ): Single<PixelSender.SendPixelResult> = Single.fromCallable {
         runBlocking {
             if (shouldFirePixel(pixelName, type)) {
-                val completable = if (shouldSendAtb(pixelName)) {
-                    api.fire(
-                        pixelName,
-                        getDeviceFactor(),
-                        getAtbInfo(),
-                        addDeviceParametersTo(parameters),
-                        encodedParameters,
-                        devMode = shouldFirePixelsAsDev,
-                    )
+                if (isConcurrencyLimitEnabled()) {
+                    fireThroughDispatcher(pixelName, getAtbInfo(), addDeviceParametersTo(parameters), encodedParameters)
                 } else {
-                    api.fireWithoutAtb(
-                        pixelName,
-                        getDeviceFactor(),
-                        addDeviceParametersTo(parameters),
-                        encodedParameters,
-                        devMode = shouldFirePixelsAsDev,
-                    )
+                    val completable = if (shouldSendAtb(pixelName)) {
+                        api.fire(
+                            pixelName,
+                            getDeviceFactor(),
+                            getAtbInfo(),
+                            addDeviceParametersTo(parameters),
+                            encodedParameters,
+                            devMode = shouldFirePixelsAsDev,
+                        )
+                    } else {
+                        api.fireWithoutAtb(
+                            pixelName,
+                            getDeviceFactor(),
+                            addDeviceParametersTo(parameters),
+                            encodedParameters,
+                            devMode = shouldFirePixelsAsDev,
+                        )
+                    }
+                    completable.blockingAwait()
                 }
-                completable.blockingAwait()
                 storePixelFired(pixelName, type)
                 PixelSender.SendPixelResult.PIXEL_SENT
             } else {
@@ -166,6 +171,13 @@ class RxPixelSender @Inject constructor(
     }
 
     private fun sendPixel(pixelEntity: PixelEntity): Completable {
+        if (isConcurrencyLimitEnabled()) {
+            return Completable.fromAction {
+                runBlocking {
+                    with(pixelEntity) { fireThroughDispatcher(pixelName, atb, additionalQueryParams, encodedQueryParams) }
+                }
+            }
+        }
         with(pixelEntity) {
             return if (shouldSendAtb(this.pixelName)) {
                 api.fire(
@@ -187,6 +199,21 @@ class RxPixelSender @Inject constructor(
             }
         }
     }
+
+    private suspend fun fireThroughDispatcher(
+        pixelName: String,
+        atb: String,
+        additionalQueryParams: Map<String, String>,
+        encodedQueryParams: Map<String, String>,
+    ) {
+        if (shouldSendAtb(pixelName)) {
+            api.fireAsync(pixelName, getDeviceFactor(), atb, additionalQueryParams, encodedQueryParams, devMode = shouldFirePixelsAsDev)
+        } else {
+            api.fireWithoutAtbAsync(pixelName, getDeviceFactor(), additionalQueryParams, encodedQueryParams, devMode = shouldFirePixelsAsDev)
+        }
+    }
+
+    private fun isConcurrencyLimitEnabled(): Boolean = concurrencyLimitFeature.value.self().isEnabled()
 
     private fun deletePixel(pixel: PixelEntity): Completable {
         return Completable.fromAction {
