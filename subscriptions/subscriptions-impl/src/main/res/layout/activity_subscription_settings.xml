@@ -94,6 +94,7 @@
                 tools:visibility="visible">
 
                 <ImageView
+                    android:id="@+id/subscriptionActiveStatusIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
@@ -128,6 +129,36 @@
                     app:typography="body2"
                     tools:text="PRO"
                     tools:visibility="visible" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/undoCancellationContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/undoCancellationExpiryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:gravity="center"
+                    app:textType="secondary"
+                    app:typography="body2"
+                    tools:text="Your subscription will expire on October 22, 2026." />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/keepSubscriptionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:text="@string/subscriptionKeepSubscription"
+                    app:daxButtonSize="small" />
 
             </LinearLayout>
 
