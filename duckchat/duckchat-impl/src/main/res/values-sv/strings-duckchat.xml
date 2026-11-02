@@ -404,4 +404,5 @@
     <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Avskrift</string>
     <!-- Duck.ai attachment privacy footer -->
     <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Filer skannas automatiskt efter olagligt innehåll. Flaggade chattar har begränsad datalagring. <annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Sammanfatta detta dokument</string>
 </resources>
