@@ -89,7 +89,14 @@
                 "key": "source",
                 "type": "string",
                 "description": "Where the Get DuckDuckGo on other platforms screen was opened from",
-                "enum": ["activating", "not_activated", "activated", "promotion_bookmarks", "promotion_passwords"]
+                "enum": [
+                    "activating",
+                    "not_activated",
+                    "activated",
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_multi_device_added_dialog"
+                ]
             }
         ]
     },
@@ -104,7 +111,14 @@
                 "key": "source",
                 "type": "string",
                 "description": "Where the Get DuckDuckGo on other platforms screen was opened from",
-                "enum": ["activating", "not_activated", "activated", "promotion_bookmarks", "promotion_passwords"]
+                "enum": [
+                    "activating",
+                    "not_activated",
+                    "activated",
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_multi_device_added_dialog"
+                ]
             }
         ]
     },
@@ -119,7 +133,14 @@
                 "key": "source",
                 "type": "string",
                 "description": "Where the Get DuckDuckGo on other platforms screen was opened from",
-                "enum": ["activating", "not_activated", "activated", "promotion_bookmarks", "promotion_passwords"]
+                "enum": [
+                    "activating",
+                    "not_activated",
+                    "activated",
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_multi_device_added_dialog"
+                ]
             }
         ]
     }

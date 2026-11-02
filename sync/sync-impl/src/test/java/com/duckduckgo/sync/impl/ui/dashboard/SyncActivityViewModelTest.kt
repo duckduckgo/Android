@@ -340,6 +340,38 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenLaunchedFromBookmarkAddedMultiDevicePromotionAndSignedInThenEmitCommandAskSyncWithDesktop() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice)
+            awaitItem().assertCommandType(Command.AskSyncWithDesktop::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncWithDesktopSelectedThenEmitCommandAddAnotherDevice() = runTest {
+        givenUserHasDeviceAuthentication(true)
+
+        testee.commands().test {
+            testee.onSyncWithDesktopSelected()
+            awaitItem().assertCommandType(Command.AddAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNoDesktopAppSelectedThenEmitCommandLaunchSyncGetOnOtherPlatforms() = runTest {
+        testee.onNoDesktopAppSelected()
+        testee.commands().test {
+            assertEquals("promotion_bookmark_multi_device_added_dialog", (awaitItem() as LaunchSyncGetOnOtherPlatforms).source.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenLaunchedFromPromotionAndNotSignedInThenFirstViewStateHidesContent() = runTest {
         givenUserHasDeviceAuthentication(true)
         givenSetupFlowsAllowed()
@@ -364,6 +396,20 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromMultiDevicePromotionThenFirstViewStateShowsContent() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionBookmarksMultiDevice)
+
+        testee.viewState().test {
+            assertFalse(awaitItem().isContentHidden)
             cancelAndIgnoreRemainingEvents()
         }
     }

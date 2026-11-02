@@ -54,6 +54,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_MULTI_DEVICE_ADDED_DIALOG
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
@@ -274,6 +275,7 @@ class SyncActivityViewModel @Inject constructor(
             val allDevices: List<ConnectedDevice>,
         ) : Command()
         data class AskTurnOffThisDevice(val device: ConnectedDevice) : Command()
+        data object AskSyncWithDesktop : Command()
         data object AskDeleteServerData : Command()
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
@@ -671,6 +673,16 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    fun onSyncWithDesktopSelected() {
+        onAddAnotherDevice()
+    }
+
+    fun onNoDesktopAppSelected() {
+        viewModelScope.launch(dispatchers.main()) {
+            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_PROMOTION_BOOKMARK_MULTI_DEVICE_ADDED_DIALOG))
+        }
+    }
+
     fun onLearnMoreClicked() {
         viewModelScope.launch {
             command.send(Command.LaunchLearnMore(LEARN_MORE_URL))
@@ -826,10 +838,16 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun processSourceDeepLink(launchSource: SyncLaunchSource) {
-        isContentHidden.value = true
+        isContentHidden.value = launchSource !in MULTI_DEVICE_PROMOTIONS
         viewModelScope.launch(dispatchers.io()) {
             when {
-                syncAccountRepository.isSignedIn() -> onAddAnotherDevice()
+                syncAccountRepository.isSignedIn() -> {
+                    if (launchSource == SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice) {
+                        command.send(Command.AskSyncWithDesktop)
+                    } else {
+                        onAddAnotherDevice()
+                    }
+                }
                 SetupFlows.CreateAccountFlow in disabledSetupFlows() -> isContentHidden.value = false
                 else -> startSyncThisDevice(launchSource)
             }
@@ -852,5 +870,11 @@ class SyncActivityViewModel @Inject constructor(
         )
         private const val LEARN_MORE_URL =
             "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/recovery-codes-and-troubleshooting#data-expiration"
+
+        val MULTI_DEVICE_PROMOTIONS = setOf(
+            SyncLaunchSource.PromotionBookmarksMultiDevice,
+            SyncLaunchSource.PromotionPasswordsMultiDevice,
+            SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice,
+        )
     }
 }
