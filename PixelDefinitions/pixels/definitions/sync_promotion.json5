@@ -95,7 +95,7 @@
                     "activated",
                     "promotion_bookmarks",
                     "promotion_passwords",
-                    "promotion_bookmark_multi_device_added_dialog"
+                    "promotion_bookmark_added_dialog"
                 ]
             }
         ]
@@ -117,7 +117,7 @@
                     "activated",
                     "promotion_bookmarks",
                     "promotion_passwords",
-                    "promotion_bookmark_multi_device_added_dialog"
+                    "promotion_bookmark_added_dialog"
                 ]
             }
         ]
@@ -139,7 +139,7 @@
                     "activated",
                     "promotion_bookmarks",
                     "promotion_passwords",
-                    "promotion_bookmark_multi_device_added_dialog"
+                    "promotion_bookmark_added_dialog"
                 ]
             }
         ]

@@ -390,7 +390,7 @@ class SyncActivityViewModelTest {
     fun whenNoDesktopAppSelectedThenEmitCommandLaunchSyncGetOnOtherPlatforms() = runTest {
         testee.onNoDesktopAppSelected()
         testee.commands().test {
-            assertEquals("promotion_bookmark_multi_device_added_dialog", (awaitItem() as LaunchSyncGetOnOtherPlatforms).source.value)
+            assertEquals("promotion_bookmark_added_dialog", (awaitItem() as LaunchSyncGetOnOtherPlatforms).source.value)
             cancelAndIgnoreRemainingEvents()
         }
     }

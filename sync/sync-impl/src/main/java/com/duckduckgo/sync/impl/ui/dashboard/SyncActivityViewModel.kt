@@ -54,7 +54,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
-import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_MULTI_DEVICE_ADDED_DIALOG
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
@@ -679,7 +679,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onNoDesktopAppSelected() {
         viewModelScope.launch(dispatchers.main()) {
-            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_PROMOTION_BOOKMARK_MULTI_DEVICE_ADDED_DIALOG))
+            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG))
         }
     }
 
