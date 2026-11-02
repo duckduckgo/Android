@@ -28,9 +28,15 @@
         app:primaryText="@string/addBookmarkDialogHideSyncSuggestion" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/syncBookmarks"
+        android:id="@+id/syncWithDesktop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_bookmarks_multi_device_promo_primary_button" />
+        app:primaryText="@string/sync_bookmark_added_multi_device_sheet_primary_button" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/getDesktopApp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_bookmarks_multi_device_promo_secondary_button" />
 
 </LinearLayout>

@@ -99,7 +99,7 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     private fun onLaunchSyncFlow(activity: AppCompatActivity) {
         val intent = globalActivityStarter.startIntent(
             activity,
-            SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialog.value),
+            SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialog),
         )
         activity.startActivity(intent)
     }

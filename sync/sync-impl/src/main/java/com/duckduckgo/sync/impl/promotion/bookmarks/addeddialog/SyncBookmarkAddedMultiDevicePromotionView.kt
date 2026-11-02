@@ -35,13 +35,18 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncBookmarkAddedMultiDevicePromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialogMultiDevice
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.DismissPromotion
+import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchGetDesktopApp
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchSyncSettings
+import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchSyncWithDesktopChoice
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
+import com.duckduckgo.sync.impl.ui.dashboard.SyncFlowStart
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -81,7 +86,7 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
 
     init {
         binding.promoCard.clipToOutline = true
-        binding.promoItem.setClickListener { interactor?.syncBookmarks() }
+        binding.promoItem.setClickListener { interactor?.askSyncWithDesktop() }
         binding.overflowIcon.setOnClickListener { showOverflowMenu(it) }
     }
 
@@ -108,7 +113,8 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
         val popupMenu = PopupMenu(LayoutInflater.from(context), R.layout.popup_window_sync_bookmark_added_multi_device_promotion_menu)
         popupMenu.apply {
             onMenuItemClicked(contentView.findViewById(R.id.hide)) { interactor?.dismissPromotion() }
-            onMenuItemClicked(contentView.findViewById(R.id.syncBookmarks)) { interactor?.syncBookmarks() }
+            onMenuItemClicked(contentView.findViewById(R.id.syncWithDesktop)) { interactor?.syncWithDesktop() }
+            onMenuItemClicked(contentView.findViewById(R.id.getDesktopApp)) { interactor?.getDesktopApp() }
         }
         popupMenu.show(this, anchor)
     }
@@ -116,12 +122,34 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
     private fun processCommand(command: Command) {
         when (command) {
             DismissPromotion -> gone()
+            LaunchSyncWithDesktopChoice -> launchSyncWithDesktopChoice()
             LaunchSyncSettings -> launchSyncSettings()
+            LaunchGetDesktopApp -> launchGetDesktopApp()
         }
     }
 
+    private fun launchSyncWithDesktopChoice() {
+        globalActivityStarter.start(
+            context,
+            SyncActivityStartSyncFlow(
+                source = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice,
+                start = SyncFlowStart.AskSyncWithDesktop,
+            ),
+        )
+    }
+
     private fun launchSyncSettings() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice.value))
+        globalActivityStarter.start(
+            context,
+            SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice),
+        )
+    }
+
+    private fun launchGetDesktopApp() {
+        globalActivityStarter.start(
+            context,
+            SyncGetOnOtherPlatformsParams(source = SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_MULTI_DEVICE_ADDED_DIALOG),
+        )
     }
 }
 
@@ -154,12 +182,29 @@ class SyncBookmarkAddedMultiDevicePromotionInteractor @AssistedInject constructo
         scope.launch { promotionDataStore.recordPromoImpression(BookmarkAddedDialogMultiDevice) }
     }
 
-    fun syncBookmarks() {
+    fun askSyncWithDesktop() {
+        if (actionJob?.isActive == true) return
+
+        actionJob = scope.launch {
+            pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, pixelParams())
+            _commands.send(LaunchSyncWithDesktopChoice)
+        }
+    }
+
+    fun syncWithDesktop() {
         if (actionJob?.isActive == true) return
 
         actionJob = scope.launch {
             pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, pixelParams())
             _commands.send(LaunchSyncSettings)
+        }
+    }
+
+    fun getDesktopApp() {
+        if (actionJob?.isActive == true) return
+
+        actionJob = scope.launch {
+            _commands.send(LaunchGetDesktopApp)
         }
     }
 
@@ -177,7 +222,9 @@ class SyncBookmarkAddedMultiDevicePromotionInteractor @AssistedInject constructo
 
     sealed interface Command {
         data object DismissPromotion : Command
+        data object LaunchSyncWithDesktopChoice : Command
         data object LaunchSyncSettings : Command
+        data object LaunchGetDesktopApp : Command
     }
 
     @AssistedFactory

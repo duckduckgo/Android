@@ -133,7 +133,7 @@ class SyncPasswordsImportPromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSetup() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswordsImport.value))
+        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswordsImport))
         callback?.dismissHost()
     }
 }

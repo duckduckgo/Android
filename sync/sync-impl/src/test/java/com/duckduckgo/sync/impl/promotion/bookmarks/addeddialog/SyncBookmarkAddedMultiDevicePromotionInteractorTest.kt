@@ -24,7 +24,9 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.promotion.FakeSyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialogMultiDevice
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.DismissPromotion
+import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchGetDesktopApp
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchSyncSettings
+import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchSyncWithDesktopChoice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -77,9 +79,29 @@ class SyncBookmarkAddedMultiDevicePromotionInteractorTest {
     }
 
     @Test
-    fun `when bookmarks are synced then fire confirmed pixel and launch sync settings`() = runTest {
+    fun `when sync with desktop choice is asked then fire confirmed pixel and launch sync with desktop choice`() = runTest {
         testee.commands.test {
-            testee.syncBookmarks()
+            testee.askSyncWithDesktop()
+
+            assertEquals(LaunchSyncWithDesktopChoice, awaitItem())
+            verify(pixel).fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, mapOf("source" to "bookmark_multi_device_added_dialog"))
+        }
+    }
+
+    @Test
+    fun `when sync with desktop choice is asked then do not record promotion dismissal`() = runTest {
+        testee.commands.test {
+            testee.askSyncWithDesktop()
+
+            awaitItem()
+            assertFalse(promotionDataStore.hasPromoBeenDismissed(BookmarkAddedDialogMultiDevice))
+        }
+    }
+
+    @Test
+    fun `when synced with desktop then fire confirmed pixel and launch sync settings`() = runTest {
+        testee.commands.test {
+            testee.syncWithDesktop()
 
             assertEquals(LaunchSyncSettings, awaitItem())
             verify(pixel).fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, mapOf("source" to "bookmark_multi_device_added_dialog"))
@@ -87,12 +109,12 @@ class SyncBookmarkAddedMultiDevicePromotionInteractorTest {
     }
 
     @Test
-    fun `when bookmarks are synced then do not record promotion dismissal`() = runTest {
+    fun `when desktop app is requested then launch get desktop app without firing pixels`() = runTest {
         testee.commands.test {
-            testee.syncBookmarks()
+            testee.getDesktopApp()
 
-            awaitItem()
-            assertFalse(promotionDataStore.hasPromoBeenDismissed(BookmarkAddedDialogMultiDevice))
+            assertEquals(LaunchGetDesktopApp, awaitItem())
+            verify(pixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
         }
     }
 
@@ -108,37 +130,37 @@ class SyncBookmarkAddedMultiDevicePromotionInteractorTest {
     }
 
     @Test
-    fun `when bookmarks are synced twice before command is delivered then launch sync settings once`() = runTest {
-        testee.syncBookmarks()
-        testee.syncBookmarks()
+    fun `when sync with desktop choice is asked twice before command is delivered then launch sync with desktop choice once`() = runTest {
+        testee.askSyncWithDesktop()
+        testee.askSyncWithDesktop()
 
         testee.commands.test {
-            assertEquals(LaunchSyncSettings, awaitItem())
+            assertEquals(LaunchSyncWithDesktopChoice, awaitItem())
             expectNoEvents()
         }
         verify(pixel, times(1)).fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, mapOf("source" to "bookmark_multi_device_added_dialog"))
     }
 
     @Test
-    fun `when promotion is dismissed while sync settings launch is pending then ignore dismissal`() = runTest {
-        testee.syncBookmarks()
+    fun `when promotion is dismissed while sync with desktop choice launch is pending then ignore dismissal`() = runTest {
+        testee.askSyncWithDesktop()
         testee.dismissPromotion()
 
         testee.commands.test {
-            assertEquals(LaunchSyncSettings, awaitItem())
+            assertEquals(LaunchSyncWithDesktopChoice, awaitItem())
             expectNoEvents()
         }
         assertFalse(promotionDataStore.hasPromoBeenDismissed(BookmarkAddedDialogMultiDevice))
     }
 
     @Test
-    fun `when sync settings command is delivered then bookmarks can be synced again`() = runTest {
+    fun `when sync with desktop choice command is delivered then sync with desktop choice can be asked again`() = runTest {
         testee.commands.test {
-            testee.syncBookmarks()
-            assertEquals(LaunchSyncSettings, awaitItem())
+            testee.askSyncWithDesktop()
+            assertEquals(LaunchSyncWithDesktopChoice, awaitItem())
 
-            testee.syncBookmarks()
-            assertEquals(LaunchSyncSettings, awaitItem())
+            testee.askSyncWithDesktop()
+            assertEquals(LaunchSyncWithDesktopChoice, awaitItem())
         }
     }
 

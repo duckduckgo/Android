@@ -837,17 +837,21 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    fun processSyncWithDesktopDeepLink(launchSource: SyncLaunchSource) {
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncAccountRepository.isSignedIn()) {
+                command.send(Command.AskSyncWithDesktop)
+            } else {
+                processSourceDeepLink(launchSource)
+            }
+        }
+    }
+
     fun processSourceDeepLink(launchSource: SyncLaunchSource) {
         isContentHidden.value = launchSource !in MULTI_DEVICE_PROMOTIONS
         viewModelScope.launch(dispatchers.io()) {
             when {
-                syncAccountRepository.isSignedIn() -> {
-                    if (launchSource == SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice) {
-                        command.send(Command.AskSyncWithDesktop)
-                    } else {
-                        onAddAnotherDevice()
-                    }
-                }
+                syncAccountRepository.isSignedIn() -> onAddAnotherDevice()
                 SetupFlows.CreateAccountFlow in disabledSetupFlows() -> isContentHidden.value = false
                 else -> startSyncThisDevice(launchSource)
             }

@@ -107,7 +107,7 @@ class SyncPasswordsSetUpPromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSetup() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswords.value))
+        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswords))
     }
 }
 

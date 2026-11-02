@@ -120,7 +120,7 @@ class SyncBookmarksPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarks.value))
+            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarks))
             context.startActivity(intent)
         }
     }
