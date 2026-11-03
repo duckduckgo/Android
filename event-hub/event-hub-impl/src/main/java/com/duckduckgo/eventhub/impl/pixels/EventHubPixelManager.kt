@@ -132,12 +132,6 @@ class RealEventHubPixelManager @Inject constructor(
         // Sampled on arrival: an event that arrives just before a period ends belongs to that period, even if it's processed after
         val nowMillis = timeProvider.currentTimeMillis()
 
-        // Checked again once the work runs: switching the hub off may be handled first
-        appCoroutineScope.launch(pixelDispatcher) {
-            if (!isEnabled()) return@launch
-            metricsHandler.onEvent(eventType)
-        }
-
         appCoroutineScope.launch(pixelDispatcher) {
             for (pixelState in repository.getAllPixelStates()) {
                 if (nowMillis >= pixelState.periodEndMillis) continue
@@ -166,6 +160,12 @@ class RealEventHubPixelManager @Inject constructor(
                 if (changed) {
                     repository.savePixelState(pixelState.copy(params = updatedParams))
                 }
+            }
+
+            // After the counters, which never suspend, so the metric sends' I/O can't delay a count into the next period.
+            // Checked again here because switching the hub off may be handled before this work runs.
+            if (isEnabled()) {
+                metricsHandler.onEvent(eventType)
             }
         }
     }
