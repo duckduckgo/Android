@@ -65,6 +65,25 @@ class RealRemoteDeviceLogoutTest {
     }
 
     @Test
+    fun whenLogoutFailsWithErrorPixelsOffThenNoPixelFired() {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncApi.logout(token, OTHER_DEVICE_ID)).thenReturn(Error(code = 400, reason = "bad request"))
+
+        testee.logout(OTHER_DEVICE_ID, reportAccountErrorPixel = false)
+
+        verifyNoInteractions(syncPixels)
+    }
+
+    @Test
+    fun whenTokenMissingWithErrorPixelsOffThenNoPixelFired() {
+        whenever(syncStore.token).thenReturn(null)
+
+        testee.logout(OTHER_DEVICE_ID, reportAccountErrorPixel = false)
+
+        verifyNoInteractions(syncPixels)
+    }
+
+    @Test
     fun whenTokenMissingThenFireLogoutErrorPixelWithoutCallingApi() {
         whenever(syncStore.token).thenReturn(null)
 

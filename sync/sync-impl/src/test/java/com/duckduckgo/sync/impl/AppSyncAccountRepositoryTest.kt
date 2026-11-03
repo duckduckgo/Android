@@ -542,7 +542,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded))
 
-        verify(connectedDevicesRepository, never()).getConnectedDevices()
+        verify(connectedDevicesRepository, never()).getConnectedDevices(any())
         verify(syncApi, never()).logout(any(), any())
         assertEquals((result as Error).code, ALREADY_SIGNED_IN.code)
     }
@@ -614,7 +614,7 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenConnectedDevicesFetchSucceedsThenReturnDevices() {
-        whenever(connectedDevicesRepository.getConnectedDevices()).thenReturn(Success(listOfConnectedDevices))
+        whenever(connectedDevicesRepository.getConnectedDevices(reportAccountErrorPixel = true)).thenReturn(Success(listOfConnectedDevices))
 
         val result = syncRepo.getConnectedDevices() as Success
 
@@ -623,7 +623,7 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenConnectedDevicesFetchFailsThenReturnGenericError() {
-        whenever(connectedDevicesRepository.getConnectedDevices()).thenReturn(getDevicesError)
+        whenever(connectedDevicesRepository.getConnectedDevices(reportAccountErrorPixel = true)).thenReturn(getDevicesError)
 
         val result = syncRepo.getConnectedDevices() as Error
 

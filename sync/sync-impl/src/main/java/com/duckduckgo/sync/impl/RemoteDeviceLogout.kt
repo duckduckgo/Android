@@ -32,8 +32,13 @@ interface RemoteDeviceLogout {
     /**
      * Removes another device from the sync account. This device's own logout also clears local state, so it stays in
      * [SyncAccountRepository.logout].
+     *
+     * [reportAccountErrorPixel] false keeps sync account error pixels out of logouts the user didn't start, such as one from a background sync.
      */
-    fun logout(deviceId: String): Result<Boolean>
+    fun logout(
+        deviceId: String,
+        reportAccountErrorPixel: Boolean = true,
+    ): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -43,21 +48,27 @@ class RealRemoteDeviceLogout @Inject constructor(
     private val syncPixels: SyncPixels,
 ) : RemoteDeviceLogout {
 
-    override fun logout(deviceId: String): Result<Boolean> {
+    override fun logout(
+        deviceId: String,
+        reportAccountErrorPixel: Boolean,
+    ): Result<Boolean> {
         // A blank id from a malformed server entry names no device we can log out, so we skip it rather than send a request the server rejects.
         if (deviceId.isBlank()) return Error(reason = "Logout: Device Id Empty")
 
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
-            ?: return Error(reason = "Logout: Token Empty").alsoFirePixel(SyncAccountOperation.LOGOUT)
+            ?: return Error(reason = "Logout: Token Empty").alsoFirePixel(SyncAccountOperation.LOGOUT, reportAccountErrorPixel)
 
         return when (val result = syncApi.logout(token, deviceId)) {
-            is Error -> result.alsoFirePixel(SyncAccountOperation.REMOVE_DEVICE).copy(code = GENERIC_ERROR.code)
+            is Error -> result.alsoFirePixel(SyncAccountOperation.REMOVE_DEVICE, reportAccountErrorPixel).copy(code = GENERIC_ERROR.code)
             is Success -> Success(true)
         }
     }
 
-    private fun Error.alsoFirePixel(operation: SyncAccountOperation): Error {
-        syncPixels.fireSyncAccountErrorPixel(this, operation)
+    private fun Error.alsoFirePixel(
+        operation: SyncAccountOperation,
+        reportAccountErrorPixel: Boolean,
+    ): Error {
+        if (reportAccountErrorPixel) syncPixels.fireSyncAccountErrorPixel(this, operation)
         return this
     }
 }
