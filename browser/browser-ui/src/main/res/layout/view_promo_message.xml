@@ -60,7 +60,7 @@
             app:typography="body2"
             tools:text="Body text goes here. This component can be used with one or two buttons." />
 
-        <com.duckduckgo.sync.impl.promotion.widget.AdaptiveButtonsLayout
+        <com.duckduckgo.browser.ui.promo.AdaptiveButtonsLayout
             android:id="@+id/buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
                 tools:text="Primary"
                 tools:visibility="visible" />
 
-        </com.duckduckgo.sync.impl.promotion.widget.AdaptiveButtonsLayout>
+        </com.duckduckgo.browser.ui.promo.AdaptiveButtonsLayout>
 
         <FrameLayout
             android:id="@+id/toggleContainer"
