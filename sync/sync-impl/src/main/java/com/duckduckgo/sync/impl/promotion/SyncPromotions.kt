@@ -124,5 +124,7 @@ class SyncPromotionsImpl @Inject constructor(
     private fun isBookmarksPromoEnabled() = syncPromotionFeature.bookmarks().isEnabled() &&
         syncPromotionFeature.self().isEnabled() &&
         !syncPromotionFeature.leveragePromosRedesign().isEnabled()
-    private fun isPasswordsPromoEnabled() = syncPromotionFeature.passwords().isEnabled() && syncPromotionFeature.self().isEnabled()
+    private fun isPasswordsPromoEnabled() = syncPromotionFeature.passwords().isEnabled() &&
+        syncPromotionFeature.self().isEnabled() &&
+        !syncPromotionFeature.leveragePromosRedesign().isEnabled()
 }
