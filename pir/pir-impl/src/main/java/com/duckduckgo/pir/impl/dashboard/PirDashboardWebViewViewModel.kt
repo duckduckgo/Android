@@ -88,7 +88,6 @@ class PirDashboardWebViewViewModel @Inject constructor(
      */
     val freeScanEntryPoint: Deferred<PirFreeScanEntryPoint?> = freeScanEntryPointResult
 
-    /** The resolved [freeScanEntryPoint], or null until it resolves. */
     var resolvedFreeScanEntryPoint: PirFreeScanEntryPoint? = null
         private set
 
@@ -143,26 +142,6 @@ class PirDashboardWebViewViewModel @Inject constructor(
         pirPixelSender.reportFreemiumScanCompleteNotificationOpened()
     }
 
-    private fun resolveFreeScanEntryPoint(freemiumLaunch: PirFreemiumDashboardScreens?) {
-        // the ViewModel survives a configuration change, and the visit keeps the entry point it was opened with
-        if (isFreeScanEntryPointRequested) return
-        isFreeScanEntryPointRequested = true
-
-        viewModelScope.launch {
-            val entryPoint = when (freemiumLaunch) {
-                is FromEntryPoint -> freemiumLaunch.entryPoint
-                FromRemoteMessage -> withContext(dispatcherProvider.io()) { remoteMessageBannerEntryPoint() }
-                null -> null
-            }
-            resolvedFreeScanEntryPoint = entryPoint
-            freeScanEntryPointResult.complete(entryPoint)
-        }
-    }
-
-    // the scan results banners only show once there is a first scan result, so without one it was the free scan banner
-    private fun remoteMessageBannerEntryPoint(): PirFreeScanEntryPoint =
-        if (pirFreemiumDataStore.firstScanResult == null) FREE_SCAN_BANNER else VIEW_RESULTS_BANNER
-
     override fun onCleared() {
         // the handshake waits on the entry point from the app scope, so it must not wait on a cleared ViewModel forever
         freeScanEntryPointResult.cancel()
@@ -187,6 +166,25 @@ class PirDashboardWebViewViewModel @Inject constructor(
             }
         }
     }
+
+    private fun resolveFreeScanEntryPoint(freemiumLaunch: PirFreemiumDashboardScreens?) {
+        // the ViewModel survives a configuration change, and the visit keeps the entry point it was opened with
+        if (isFreeScanEntryPointRequested) return
+        isFreeScanEntryPointRequested = true
+
+        viewModelScope.launch {
+            val entryPoint = when (freemiumLaunch) {
+                is FromEntryPoint -> freemiumLaunch.entryPoint
+                FromRemoteMessage -> withContext(dispatcherProvider.io()) { remoteMessageBannerEntryPoint() }
+                null -> null
+            }
+            resolvedFreeScanEntryPoint = entryPoint
+            freeScanEntryPointResult.complete(entryPoint)
+        }
+    }
+
+    private fun remoteMessageBannerEntryPoint(): PirFreeScanEntryPoint =
+        if (pirFreemiumDataStore.firstScanResult == null) FREE_SCAN_BANNER else VIEW_RESULTS_BANNER
 
     sealed class Command {
         data class SendJsEvent(val event: SubscriptionEventData) : Command()

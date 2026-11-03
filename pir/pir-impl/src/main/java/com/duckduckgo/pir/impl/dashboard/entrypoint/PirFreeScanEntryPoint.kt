@@ -18,9 +18,6 @@ package com.duckduckgo.pir.impl.dashboard.entrypoint
 
 /**
  * Where a free scan user opened the dashboard from, so a subscription bought from it can be attributed to that entry point.
- *
- * The tokens are shared by all platforms and the web UI only accepts these four. The Settings row uses the app menu tokens,
- * as iOS does for its Settings row.
  */
 enum class PirFreeScanEntryPoint(val token: String) {
     FREE_SCAN_BANNER("freescanbanner"),
@@ -30,8 +27,7 @@ enum class PirFreeScanEntryPoint(val token: String) {
 }
 
 /**
- * Returns [baseOrigin] with the [entryPoint] token appended, the same format the web UI builds on other platforms.
- * An unknown entry point keeps [baseOrigin].
+ * Returns [baseOrigin] with the [entryPoint] token appended. An unknown entry point keeps [baseOrigin].
  */
 fun freeScanOrigin(
     baseOrigin: String,

@@ -25,7 +25,6 @@ import javax.inject.Inject
 
 /**
  * Gives the dashboard's web message handlers the free scan entry point, which the dashboard ViewModel resolves.
- * The handlers can't reach the ViewModel, so the activity hands them its result through this holder.
  */
 interface PirDashboardFreeScanEntryPointHolder {
     var freeScanEntryPoint: Deferred<PirFreeScanEntryPoint?>
