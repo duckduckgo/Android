@@ -44,6 +44,7 @@ import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncPasswordsImportPromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
@@ -108,6 +109,12 @@ class SyncPasswordsImportPromotionView @JvmOverloads constructor(
         get() = binding.promoMessage.actionStyle
         set(value) {
             binding.promoMessage.actionStyle = value
+            binding.promoMessage.title = context.getString(
+                when (value) {
+                    ActionStyle.Buttons -> R.string.sync_passwords_import_promo_title
+                    ActionStyle.Toggle -> R.string.sync_passwords_import_promo_title_toggle
+                },
+            )
         }
 
     private val binding: ViewSyncPasswordsImportPromotionBinding by viewBinding()
