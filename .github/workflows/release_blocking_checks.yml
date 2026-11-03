@@ -17,6 +17,11 @@ on:
         required: false
         type: boolean
         default: false
+      maestro_priority:
+        description: 'Maestro Cloud queue priority for E2E tests'
+        required: false
+        type: string
+        default: normal
   workflow_dispatch:
     inputs:
       commit:
@@ -56,6 +61,7 @@ jobs:
       internal_binary_id: ${{ needs.end-to-end-build.outputs.internal_binary_id }}
       release_binary_id: ${{ needs.end-to-end-build.outputs.release_binary_id }}
       fail_fast: ${{ inputs.fail_fast == true }}
+      maestro_priority: ${{ inputs.maestro_priority }}
     secrets: inherit
 
   privacy:

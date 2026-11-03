@@ -27,6 +27,10 @@ inputs:
   maestro_timeout:
     description: 'Maestro timeout in minutes'
     required: true
+  maestro_priority:
+    description: 'Maestro Cloud queue priority'
+    required: false
+    default: 'normal'
   asana_pat:
     description: 'Asana Personal Access Token'
     required: true
@@ -79,7 +83,7 @@ runs:
   steps:
     - name: Run Maestro Cloud
       id: maestro-run
-      uses: mobile-dev-inc/action-maestro-cloud@v3.0.1
+      uses: mobile-dev-inc/action-maestro-cloud@v3.1.0
       with:
         api-key: ${{ inputs.maestro_api_key }}
         project-id: ${{ inputs.maestro_project_id }}
@@ -91,6 +95,7 @@ runs:
         workspace: .maestro
         include-tags: ${{ inputs.maestro_include_tags }}
         env: ${{ inputs.maestro_env }}
+        priority: ${{ inputs.maestro_priority }}
 
     - name: Analyze Maestro Flow Results
       if: always()
