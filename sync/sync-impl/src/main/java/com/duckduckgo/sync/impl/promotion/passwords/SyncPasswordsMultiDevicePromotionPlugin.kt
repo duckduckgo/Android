@@ -136,7 +136,7 @@ class SyncPasswordsMultiDevicePromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSettings() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswordsMultiDevice.value))
+        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswordsMultiDevice))
     }
 
     private suspend fun launchGetDesktopApp() {

@@ -133,7 +133,7 @@ class SyncBookmarksMultiDevicePromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSettings() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksMultiDevice.value))
+        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksMultiDevice))
     }
 
     private suspend fun launchGetDesktopApp() {

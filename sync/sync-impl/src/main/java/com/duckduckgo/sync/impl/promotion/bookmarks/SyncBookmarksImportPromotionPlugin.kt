@@ -133,7 +133,7 @@ class SyncBookmarksImportPromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSetup() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksImport.value))
+        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksImport))
         callback?.dismissHost()
     }
 }

@@ -131,4 +131,5 @@ enum class SyncGetOnOtherPlatformsLaunchSource(val value: String) {
     SOURCE_SYNC_ENABLED("activated"),
     SOURCE_PROMOTION_BOOKMARKS("promotion_bookmarks"),
     SOURCE_PROMOTION_PASSWORDS("promotion_passwords"),
+    SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG("promotion_bookmark_added_dialog"),
 }
