@@ -56,7 +56,7 @@
         android:layout_height="@dimen/listItemImageContainerSize"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:padding="@dimen/keyline_2"
-        android:contentDescription="@string/sync_bookmark_added_set_up_promo_more_options"
+        android:contentDescription="@string/sync_bookmark_added_multi_device_promo_more_options"
         app:srcCompat="@drawable/ic_menu_vertical_24" />
 
 </LinearLayout>
