@@ -51,7 +51,83 @@ jobs:
     needs: build
     if: ${{ !cancelled() && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
     runs-on: ubuntu-latest
-    name: End-to-End tests
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Autofill Critical Path
+            test-name: autofillCriticalPath
+            binary: release
+            api-level: 34
+            include-tags: autofillNoAuthTests
+            suite-name: Autofill Critical Path (Nightly)
+          - name: Custom tabs flows
+            test-name: customTabs
+            binary: internal
+            api-level: 34
+            include-tags: customTabsTest
+            suite-name: Custom Tabs
+          - name: Internal Privacy Tests
+            test-name: internalPrivacyTest
+            binary: internal
+            api-level: 34
+            include-tags: privacyTestInternal
+            suite-name: Internal Privacy (Nightly)
+          - name: Onboarding flows
+            test-name: onboardingTest
+            binary: release
+            api-level: 34
+            include-tags: onboardingTest
+            suite-name: Onboarding (Nightly)
+          - name: Internal Onboarding Flows
+            test-name: internalonboarding
+            binary: internal
+            api-level: 36
+            include-tags: onboardingInternalTest
+            suite-name: Internal Onboarding (Nightly)
+          - name: Deeplink tests
+            test-name: navigationTest
+            binary: release
+            api-level: 34
+            include-tags: navigationTest
+            suite-name: Deeplink (Nightly)
+          - name: Ad click detection flows
+            test-name: adClickTest
+            binary: release
+            api-level: 30
+            include-tags: adClickTest
+            suite-name: Ad Click (Nightly)
+          - name: Privacy Tests
+            test-name: privacyTest
+            binary: release
+            api-level: 34
+            include-tags: privacyTest
+            suite-name: Privacy (Nightly)
+          - name: Security Tests
+            test-name: securityTest
+            binary: release
+            api-level: 34
+            include-tags: securityTest
+            suite-name: Security (Nightly)
+          - name: Release Tests
+            test-name: releaseTest
+            binary: release
+            api-level: 34
+            include-tags: releaseTest
+            suite-name: Release Tests (Nightly)
+          - name: Unified Input Field
+            test-name: unifiedInputTest
+            binary: internal
+            api-level: 34
+            include-tags: unifiedInputTest
+            suite-name: Unified Input Field (Nightly)
+          - name: Notifications permissions Android 13+
+            test-name: notificationPermissionTest
+            binary: release
+            api-level: 34
+            include-tags: permissionsTest
+            suite-name: Notification Permissions (Nightly)
     env:
       INTERNAL_BINARY_ID: ${{ needs.build.outputs.internal_binary_id || inputs.internal_binary_id }}
       RELEASE_BINARY_ID: ${{ needs.build.outputs.release_binary_id || inputs.release_binary_id }}
@@ -60,284 +136,37 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Autofill Critical Path
-        id: maestro-autofill-critical
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
+      - name: ${{ matrix.name }}
+        id: maestro-suite
         uses: ./.github/actions/maestro-cloud-asana-reporter
+        # The suites queue for the same Maestro Cloud devices, so this includes the wait for a free device.
         timeout-minutes: 120
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: autofillCriticalPath_${{ github.sha }}
+          maestro_test_name: ${{ matrix.test-name }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.RELEASE_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: autofillNoAuthTests
+          maestro_app_binary_id: ${{ matrix.binary == 'internal' && env.INTERNAL_BINARY_ID || env.RELEASE_BINARY_ID }}
+          maestro_api_level: ${{ matrix.api-level }}
+          maestro_include_tags: ${{ matrix.include-tags }}
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Autofill Critical Path (Nightly)
+          test_suite_name: ${{ matrix.suite-name }}
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
           is_release_blocker: true
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
-      - name: Custom tabs flows
-        id: maestro-custom-tabs
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: customTabs_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.INTERNAL_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: customTabsTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Custom Tabs
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+  report_failure:
+    needs: instrumentation_tests
+    # One task for the whole run rather than one per failed suite.
+    if: ${{ always() && needs.instrumentation_tests.result == 'failure' && inputs.create_asana_tasks == true && github.event_name != 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    name: Report failure
 
-      - name: Internal Privacy Tests
-        id: maestro-internal-privacy
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: internalPrivacyTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.INTERNAL_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: privacyTestInternal
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Internal Privacy (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Onboarding flows
-        id: maestro-onboarding
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: onboardingTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.RELEASE_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: onboardingTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Onboarding (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Internal Onboarding Flows
-        id: maestro-internal-onboarding
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: internalonboarding_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.INTERNAL_BINARY_ID }}
-          maestro_api_level: 36
-          maestro_include_tags: onboardingInternalTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Internal Onboarding (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Deeplink tests
-        id: maestro-deeplink
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: navigationTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.RELEASE_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: navigationTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Deeplink (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Ad click detection flows
-        id: maestro-ad-click
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: adClickTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.RELEASE_BINARY_ID }}
-          maestro_api_level: 30
-          maestro_include_tags: adClickTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Ad Click (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Privacy Tests
-        id: maestro-privacy
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: privacyTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.RELEASE_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: privacyTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Privacy (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Security Tests
-        id: maestro-security
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: securityTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.RELEASE_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: securityTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Security (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Release Tests
-        id: maestro-release
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: releaseTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.RELEASE_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: releaseTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Release Tests (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Unified Input Field
-        id: maestro-unified-input
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: unifiedInputTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.INTERNAL_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: unifiedInputTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Unified Input Field (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Notifications permissions Android 13+
-        id: maestro-notification-permissions
-        # Run regardless of earlier suite failures.
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: notificationPermissionTest_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ env.RELEASE_BINARY_ID }}
-          maestro_api_level: 34
-          maestro_include_tags: permissionsTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Notification Permissions (Nightly)
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: true
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
+    steps:
       - name: Create Asana task when workflow failed
-        if: ${{ failure() && inputs.create_asana_tasks == true && github.event_name != 'workflow_dispatch' }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
