@@ -130,7 +130,7 @@ jobs:
             - name: Create Asana task
               id: create-task
               if: ${{ steps.previous.outputs.conclusion != 'failure' }}
-              uses: duckduckgo/native-github-asana-sync@v2.7.1
+              uses: duckduckgo/native-github-asana-sync@v2.8.0
               with:
                 asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                 asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
@@ -176,7 +176,7 @@ jobs:
             - name: cc suspects on Asana task
               if: ${{ steps.suspects.outputs.comment != '' }}
               continue-on-error: true
-              uses: duckduckgo/native-github-asana-sync@v2.7.1
+              uses: duckduckgo/native-github-asana-sync@v2.8.0
               with:
                 asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
                 asana-task-id: ${{ steps.create-task.outputs.taskId }}
