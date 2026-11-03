@@ -26,6 +26,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.browser.ui.R as BrowserUiR
 
 class PageContextAttachmentView @JvmOverloads constructor(
     context: Context,
@@ -54,7 +55,7 @@ class PageContextAttachmentView @JvmOverloads constructor(
         itemView.findViewById<DaxTextView>(R.id.pageContextTitle).text = attachment.title
         itemView.findViewById<ImageView>(R.id.pageContextRemove).setOnClickListener { onRemoved() }
         faviconView = itemView.findViewById(R.id.pageContextFavicon)
-        if (attachment.mimeType == "application/pdf") faviconView?.setImageResource(R.drawable.document_pdf_color_24)
+        if (attachment.mimeType == "application/pdf") faviconView?.setImageResource(BrowserUiR.drawable.ic_document_pdf_color_24)
         addView(itemView)
         show()
     }
