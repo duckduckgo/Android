@@ -209,4 +209,14 @@ class RemoteMessagingModelTests {
         verify(remoteMessagingRepository).getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
         assertNull(result)
     }
+
+    @Test
+    fun onGetItemImageFileThenReturnFilePathFromRepository() = runTest {
+        whenever(remoteMessagingRepository.getItemImageFilePath(remoteMessage, "item1")).thenReturn("itemImageFile")
+
+        val result = testee.getItemImageFile(remoteMessage, "item1")
+
+        verify(remoteMessagingRepository).getItemImageFilePath(remoteMessage, "item1")
+        assertEquals("itemImageFile", result)
+    }
 }

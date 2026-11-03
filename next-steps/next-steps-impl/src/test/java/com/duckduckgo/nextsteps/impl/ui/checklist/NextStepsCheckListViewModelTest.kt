@@ -642,6 +642,28 @@ class NextStepsCheckListViewModelTest {
         override suspend fun isComplete(): Boolean = completed
     }
 
+    @Test
+    fun `when an item image was downloaded with the message then its local path is in the state`() = runTest {
+        val itemsWithImages = listOf(defaultBrowserItem.copy(imageUrl = "https://img/1.png"), addWidgetItem.copy(imageUrl = "https://img/2.png"))
+        val message = aMessage(content = nextStepsContent(itemsWithImages))
+        whenever(remoteMessageModel.getItemImageFile(message, defaultBrowserItem.id)).thenReturn("/images/1.png")
+        whenever(remoteMessageModel.getItemImageFile(message, addWidgetItem.id)).thenReturn(null)
+        activeMessage.value = message
+        advanceUntilIdle()
+
+        val listItems = testee.viewState.value.listItems
+        assertEquals("/images/1.png", listItems.first { it.item.id == defaultBrowserItem.id }.imageFilePath)
+        assertNull(listItems.first { it.item.id == addWidgetItem.id }.imageFilePath)
+    }
+
+    @Test
+    fun `when an item has no image url then no local image is looked up`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        verify(remoteMessageModel, never()).getItemImageFile(any(), any())
+    }
+
     private fun nextStepsContent(items: List<CardItem> = listOf(defaultBrowserItem, addWidgetItem, syncItem)) = Content.ActionableItems(
         titleText = "Complete your setup",
         listItems = items,
