@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Ava Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Loe edasi</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Küsi Duck.ai käest</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Kas soovid lihtsamat juurdepääsu privaatsele AI-vestlusele?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Otsi või sisesta aadress</string>

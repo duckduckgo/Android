@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Otwórz Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Dowiedz się więcej</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Zapytaj Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Chcesz łatwiejszego dostępu\ndo prywatnego czatu AI?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Wyszukaj lub wprowadź adres</string>

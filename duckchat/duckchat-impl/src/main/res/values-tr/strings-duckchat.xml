@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Duck.ai\'ı aç</string>
     <string name="duck_ai_paid_settings_learn_more_title">Daha fazla bilgi</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Duck.ai\'a sor</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Gizli AI sohbetine daha kolay erişmek ister misiniz?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Adres ara veya gir</string>
