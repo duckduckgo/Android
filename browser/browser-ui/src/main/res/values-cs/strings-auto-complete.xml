@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Zrušit</string>
     <string name="autocompleteRemoveItemRemove">Odstranit</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Přepnout na kartu · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Zeptej se Duck.ai</string>
 </resources>
