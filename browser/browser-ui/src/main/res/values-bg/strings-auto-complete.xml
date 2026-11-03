@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Отмени</string>
     <string name="autocompleteRemoveItemRemove">Премахване</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Превключване към раздел · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Попитай Duck.ai</string>
 </resources>

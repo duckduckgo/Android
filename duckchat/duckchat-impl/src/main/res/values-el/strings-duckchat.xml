@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Άνοιξε το Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Μάθετε περισσότερα</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Ρωτήστε το Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Θέλετε πιο εύκολη πρόσβαση στο ιδιωτικό AI chat;</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Αναζήτηση ή εισαγωγή διεύθυνσης</string>

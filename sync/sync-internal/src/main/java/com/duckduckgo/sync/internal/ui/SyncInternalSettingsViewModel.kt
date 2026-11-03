@@ -57,12 +57,9 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
+import com.duckduckgo.sync.impl.promotion.InternalSyncPromotionDataStore
 import com.duckduckgo.sync.internal.TestSyncWarningPlugin
+import com.duckduckgo.sync.internal.promotion.InternalSyncPromotionAppInstall
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
@@ -93,7 +90,6 @@ constructor(
     private val syncEnvDataStore: SyncInternalEnvDataStore,
     private val syncFaviconFetchingStore: FaviconsFetchingStore,
     private val dispatchers: DispatcherProvider,
-    private val syncPromotionDataStore: SyncPromotionDataStore,
     private val persistentStorage: PersistentStorage,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
@@ -110,6 +106,8 @@ constructor(
     private val syncCodeDispatcher: SyncCodeDispatcher,
     private val deviceAuthenticator: DeviceAuthenticator,
     private val gracePeriod: DeviceAuthorizationGracePeriod,
+    private val promotionDataStore: InternalSyncPromotionDataStore,
+    private val promotionAppInstall: InternalSyncPromotionAppInstall,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -583,31 +581,11 @@ constructor(
         }
     }
 
-    fun onClearHistoryBookmarkAddedDialogPromoClicked() {
+    fun onResetAllPromotionDataClicked() {
         viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(BookmarkAddedDialog)
-            command.send(ShowMessage("'Bookmark added' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryBookmarkScreenPromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(BookmarksScreen)
-            command.send(ShowMessage("'Bookmark screen' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryPasswordScreenPromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(PasswordsScreen)
-            command.send(ShowMessage("'Password screen' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryChatTabPagePromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(ChatTabPage)
-            command.send(ShowMessage("'Chat tab page' promo history cleared"))
+            promotionDataStore.clearAllPromoHistory()
+            promotionAppInstall.setInstallationTimeOverride(null)
+            command.send(ShowMessage("All promo data reset"))
         }
     }
 

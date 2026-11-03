@@ -40,6 +40,7 @@ data class ContextualEntryPrompt(
     val serializedPageContext: String?,
     val selectionsJson: JSONArray? = null,
     val carriesTermsConsent: Boolean = true,
+    val voice: Boolean = false,
 )
 
 /**

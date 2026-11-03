@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Deschide Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Află mai multe</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Întreabă Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Dorești un acces mai ușor\nla chatul privat cu IA?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Caută sau introdu adresa</string>

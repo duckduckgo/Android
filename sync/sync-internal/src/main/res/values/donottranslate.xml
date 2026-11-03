@@ -22,6 +22,7 @@
     <!-- Internal Setting -->
     <string name="sync_internal_activity_label">Sync Setup Internal</string>
     <string name="sync_v2_pairing_debug_activity_label">V2 Pairing Debug</string>
+    <string name="sync_promotion_debug_activity_label">Sync Promo Dev Screen</string>
     <string name="sync_internal_environment_header">Environment Settings</string>
     <string name="sync_internal_environment_title">Use Dev Environment?</string>
     <string name="sync_internal_environment_subtitle_prod">https://sync.duckduckgo.com</string>
@@ -36,10 +37,8 @@
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
     <string name="sync_internal_promotions_header">Sync Promotions</string>
-    <string name="sync_internal_promotions_clear_history_bookmark_added_promo">Clear history (bookmark added dialog)</string>
-    <string name="sync_internal_promotions_clear_history_bookmark_screen_promo">Clear history (bookmark screen)</string>
-    <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
-    <string name="sync_internal_promotions_clear_history_chat_tab_page_promo">Clear history (chat tab page)</string>
+    <string name="sync_internal_promotions_open_dev_screen">Open Promo Dev Screen</string>
+    <string name="sync_internal_promotions_reset_all_data">Reset All Promo Data</string>
 
     <string name="sync_internal_launch_recover_data_screen">Launch Recover Data Screen</string>
     <string name="sync_internal_block_store_write_recovery_code">Save account recovery code &amp; device ID to Block Store</string>

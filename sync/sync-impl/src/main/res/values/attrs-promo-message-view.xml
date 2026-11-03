@@ -22,6 +22,11 @@
         <attr name="promoMessageText" format="reference" />
         <attr name="promoPrimaryButtonText" format="reference" />
         <attr name="promoSecondaryButtonText" format="reference" />
+        <attr name="promoToggleText" format="reference" />
+        <attr name="promoActionStyle" format="enum">
+            <enum name="buttons" value="0" />
+            <enum name="toggle" value="1" />
+        </attr>
         <attr name="promoShowCloseButton" format="boolean" />
         <attr name="promoShowElevation" format="boolean" />
         <attr name="promoCardColor" format="color" />

@@ -348,7 +348,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             onAskAboutPage = { viewModel.onAttachContextRequested() },
             onPageContextRemoved = { viewModel.onContextRemoved() },
             onVoiceChatRequested = {
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
                 dismiss()
             },
             onVoiceSearchRequested = {
@@ -366,7 +366,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     ) {
         if (query.isBlank()) return
         if (isDuckAiResult) {
-            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null))
+            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null), voice = true)
         } else {
             startActivity(browserNav.openInNewTab(requireContext(), query))
             dismiss()

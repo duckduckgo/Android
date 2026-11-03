@@ -65,3 +65,121 @@ jobs:
                   exit 1
                 fi
 
+
+    report-develop-failure:
+        name: Report pixel validation failing on develop
+        needs: [pixel-validation]
+        if: ${{ failure() && github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+        runs-on: ubuntu-latest
+        permissions:
+            actions: read
+            contents: read
+            pull-requests: read
+        env:
+            GH_TOKEN: ${{ github.token }}
+            REPO: ${{ github.repository }}
+        steps:
+            # Every later push to develop fails too until it's fixed, so only report the first failure.
+            - name: Check if previous develop run passed
+              id: previous
+              run: |
+                read -r conclusion sha < <(gh api "repos/$REPO/actions/workflows/pixel-validation.yml/runs?branch=develop&event=push&status=completed&per_page=10" \
+                  --jq '[.workflow_runs[] | select(.id != ${{ github.run_id }}) | select(.conclusion == "success" or .conclusion == "failure")][0] // {} | "\(.conclusion // "") \(.head_sha // "")"') || true
+                echo "Previous develop run: ${conclusion:-none} ${sha}"
+                {
+                  echo "conclusion=$conclusion"
+                  echo "sha=$sha"
+                  echo "short_sha=${GITHUB_SHA::10}"
+                } >> "$GITHUB_OUTPUT"
+
+            - name: Collect failure details
+              id: details
+              if: ${{ steps.previous.outputs.conclusion != 'failure' }}
+              continue-on-error: true
+              run: |
+                run_url="https://github.com/$REPO/actions/runs/${{ github.run_id }}"
+                excerpt=""
+                job=$(gh api "repos/$REPO/actions/runs/${{ github.run_id }}/jobs" --jq '.jobs[] | select(.name == "pixel-validation")')
+                job_id=$(jq -r '.id' <<< "$job")
+                failed_step=$(jq -r '[.steps[] | select(.conclusion == "failure") | .name][0] // "unknown"' <<< "$job")
+                # The end of the job log is post-job cleanup, so take the output of the failed step instead.
+                if log=$(gh api "repos/$REPO/actions/jobs/$job_id/logs" --allow-escape-sequences); then
+                  excerpt=$(awk '
+                      /##\[group\]Run /       { buf = ""; header = 1; next }
+                      header && /##\[endgroup\]/ { header = 0; next }
+                      header                  { next }
+                      /##\[error\]/           { printf "%s", buf; exit }
+                                              { buf = buf $0 "\n" }
+                    ' <<< "$log" \
+                    | sed -E 's/^[0-9T:.-]+Z //; s/\x1b\[[0-9;]*m//g; /^##\[(group|endgroup)\]/d' \
+                    | cut -c1-300 | tail -n 40)
+                fi
+                delimiter="EOF_$(openssl rand -hex 8)"
+                {
+                  echo "description<<$delimiter"
+                  echo "Pixel schema validation is failing on develop."
+                  echo "Failed step: $failed_step"
+                  echo "Run: $run_url"
+                  if [ -n "$excerpt" ]; then
+                    echo
+                    echo "$excerpt"
+                  fi
+                  echo "$delimiter"
+                } >> "$GITHUB_OUTPUT"
+
+            - name: Create Asana task
+              id: create-task
+              if: ${{ steps.previous.outputs.conclusion != 'failure' }}
+              uses: duckduckgo/native-github-asana-sync@v2.7.1
+              with:
+                asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+                asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+                asana-task-name: GH Workflow Failure - Pixel Registry validation on develop (${{ steps.previous.outputs.short_sha }})
+                asana-task-description: ${{ steps.details.outputs.description || format('Pixel schema validation is failing on develop. See https://github.com/{0}/actions/runs/{1}', github.repository, github.run_id) }}
+                action: 'create-asana-task'
+
+            - name: Find authors of PRs that changed pixel definitions since the last green run
+              id: suspects
+              if: ${{ steps.create-task.outputs.taskId != '' && steps.create-task.outputs.duplicate != 'true' && steps.previous.outputs.sha != '' }}
+              continue-on-error: true
+              env:
+                BASE: ${{ steps.previous.outputs.sha }}
+                HEAD: ${{ github.sha }}
+                USER_MAP: ${{ vars.GH_ANDROID_USER_MAP }}
+              run: |
+                mentions=""
+                seen=" "
+                commits=$(gh api "repos/$REPO/compare/$BASE...$HEAD" --jq '.commits[].sha')
+                for commit in $commits; do
+                  touches_pixels=$(gh api "repos/$REPO/commits/$commit" \
+                    --jq '[.files[].filename | select(startswith("PixelDefinitions/") or . == ".github/workflows/pixel-validation.yml")] | length')
+                  [ "$touches_pixels" -gt 0 ] || continue
+                  login=$(gh api "repos/$REPO/commits/$commit/pulls" --jq '.[0].user.login // empty')
+                  [ -n "$login" ] || login=$(gh api "repos/$REPO/commits/$commit" --jq '.author.login // empty')
+                  [ -n "$login" ] || continue
+                  [[ "$login" == *"[bot]" ]] && continue
+                  [[ "$seen" == *" $login "* ]] && continue
+                  seen="$seen$login "
+                  gid=$(jq -r --arg login "${login,,}" 'to_entries[] | select((.key | ascii_downcase) == $login) | .value | tostring' <<< "$USER_MAP" | head -n 1)
+                  if [ -z "$gid" ]; then
+                    echo "$login: no Asana mapping"
+                    continue
+                  fi
+                  echo "$login: will be cc'd"
+                  mentions="$mentions <a data-asana-gid=\"$gid\"/>"
+                done
+                if [ -n "$mentions" ]; then
+                  echo "comment=<body>cc:$mentions</body>" >> "$GITHUB_OUTPUT"
+                fi
+
+            - name: cc suspects on Asana task
+              if: ${{ steps.suspects.outputs.comment != '' }}
+              continue-on-error: true
+              uses: duckduckgo/native-github-asana-sync@v2.7.1
+              with:
+                asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+                asana-task-id: ${{ steps.create-task.outputs.taskId }}
+                asana-task-comment: ${{ steps.suspects.outputs.comment }}
+                asana-task-comment-is-html: 'true'
+                action: 'post-comment-asana-task'

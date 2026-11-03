@@ -150,6 +150,13 @@ interface SyncFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canUseImprovedSyncFlow(): Toggle
+
+    /**
+     * Kill switch for refreshing the connected devices count after app-open and background syncs. Syncs after creating or joining
+     * an account always refresh it.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun refreshConnectedDevicesOnSync(): Toggle
 }
 
 /**

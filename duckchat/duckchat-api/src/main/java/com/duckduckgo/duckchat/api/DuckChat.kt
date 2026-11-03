@@ -38,8 +38,9 @@ interface DuckChat {
 
     /**
      * Opens Duck.ai from [entryPoint] and automatically submits [query].
+     * [voice] identifies a dictated prompt without changing its entry source.
      */
-    fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint)
+    fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean = false)
 
     /**
      * Opens Duck.ai from [entryPoint] with [query] prefilled but not submitted.
@@ -52,11 +53,13 @@ interface DuckChat {
      * @param entryPoint the surface that initiated the entry.
      * @param opensNewTab whether the entry opens a new browser tab.
      * @param hasPrompt whether a non-blank prompt is automatically submitted on entry.
+     * @param voice whether this entry uses voice, including dictated text prompts.
      */
     fun reportDuckChatEntry(
         entryPoint: DuckChatEntryPoint,
         opensNewTab: Boolean,
         hasPrompt: Boolean,
+        voice: Boolean = false,
     )
 
     /**

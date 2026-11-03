@@ -100,7 +100,8 @@ class NativeInputCallbacks(
         selectionsJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
-    val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint) -> Unit = { _, _ -> },
+    val duckAiEntryPointResolver: (DuckChatEntryPoint) -> DuckChatEntryPoint = { it },
+    val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) -> Unit = { _, _, _ -> },
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
     /** User tapped "Start using weekly limit" on the usage card (→ submitStartUsingWeeklyLimitAction). */
@@ -211,6 +212,7 @@ class RealNativeInputManager @Inject constructor(
     private var isNativeChatInputEnabled: Boolean = false
     private var isNavBarFeatureEnabled: Boolean = false
     private var inputModeCapability: NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY
+    private var submittingVoicePrompt = false
     private var isExiting: Boolean = false
     private var isPickingImage: Boolean = false
     private var duckAiToolbarHidden: Boolean = false
@@ -345,19 +347,22 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
+        if (query.isBlank()) return
         val widget = omnibarWidget()
         if (widget != null) {
-            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
+            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+            submittingVoicePrompt = true
             try {
                 if (!widget.isChatTabSelected()) {
                     widget.selectChatTab()
                 }
                 widget.submitMessage(query)
             } finally {
+                submittingVoicePrompt = false
                 widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
             }
         } else {
-            duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.VOICE)
+            duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.ADDRESS_BAR_PROMPT, voice = true)
         }
     }
 
@@ -685,6 +690,7 @@ class RealNativeInputManager @Inject constructor(
         callbacks: NativeInputCallbacks,
     ) {
         val widget = widgetFrom(widgetView) ?: return
+        widget.duckAiEntryPointResolver = callbacks.duckAiEntryPointResolver
         val onSearchTextChanged: (String) -> Unit = { text ->
             if (omnibarController.isDuckAiMode() && text.isBlank()) {
                 callbacks.onClearAutocomplete()
@@ -755,7 +761,7 @@ class RealNativeInputManager @Inject constructor(
                     nativeInputEventListener.onChatPromptSubmitted()
                     val entryPoint = widget.nextDuckAiEntryPoint
                     widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
-                    callbacks.onDuckAiQuerySubmitted(query, entryPoint)
+                    callbacks.onDuckAiQuerySubmitted(query, entryPoint, submittingVoicePrompt)
                 }
             },
         )
@@ -1010,7 +1016,9 @@ class RealNativeInputManager @Inject constructor(
         }
         widget.onVoiceChatClick = {
             hideNativeInput(animate = false)
-            duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+            val entryPoint = widget.nextDuckAiEntryPoint
+            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+            duckChat.openVoiceDuckChat(entryPoint)
         }
     }
 

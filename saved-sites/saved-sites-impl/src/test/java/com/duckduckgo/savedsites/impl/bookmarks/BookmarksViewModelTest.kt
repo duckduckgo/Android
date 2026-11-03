@@ -42,11 +42,12 @@ import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
 import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -106,8 +107,8 @@ class BookmarksViewModelTest {
         ),
     )
 
-    private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(
+    private fun createTestee(): BookmarksViewModel {
+        val testee = BookmarksViewModel(
             savedSitesRepository,
             faviconManager,
             savedSitesManager,
@@ -119,9 +120,9 @@ class BookmarksViewModelTest {
             importFromGoogleAvailability,
             coroutineRule.testScope,
         )
-        model.viewState.observeForever(viewStateObserver)
-        model.command.observeForever(commandObserver)
-        model
+        testee.viewState.observeForever(viewStateObserver)
+        testee.command.observeForever(commandObserver)
+        return testee
     }
 
     @Before
@@ -131,17 +132,12 @@ class BookmarksViewModelTest {
         whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(savedSitesFlow)
 
         whenever(bookmarksDataStore.getSortingMode()).thenReturn(NAME)
-        testee.fetchBookmarksAndFolders(SavedSitesNames.BOOKMARKS_ROOT)
-    }
-
-    @After
-    fun after() {
-        testee.viewState.removeObserver(viewStateObserver)
-        testee.command.removeObserver(commandObserver)
     }
 
     @Test
     fun whenInitSendBookmarksPressedPixels() {
+        createTestee()
+
         verify(pixel).fire(SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
         verify(pixel).fire(
             SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED_DAILY.pixelName,
@@ -153,7 +149,45 @@ class BookmarksViewModelTest {
     }
 
     @Test
+    fun whenBookmarksNotLoadedThenSyncNotTriggered() {
+        whenever(savedSitesRepository.getSavedSites(BOOKMARKS_ROOT)).thenReturn(MutableSharedFlow())
+        val testee = createTestee()
+
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        verify(syncEngine, never()).triggerSync(any())
+    }
+
+    @Test
+    fun whenBookmarksLoadedThenSyncTriggered() = runTest {
+        val pendingSavedSites = MutableSharedFlow<SavedSites>()
+        whenever(savedSitesRepository.getSavedSites(BOOKMARKS_ROOT)).thenReturn(pendingSavedSites)
+        val testee = createTestee()
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        pendingSavedSites.emit(savedSitesFlow.value)
+
+        assertNotNull(testee.itemsToDisplay.value)
+        verify(syncEngine).triggerSync(FEATURE_READ)
+    }
+
+    @Test
+    fun whenBookmarksReloadedThenSyncNotTriggeredAgain() = runTest {
+        val pendingSavedSites = MutableSharedFlow<SavedSites>()
+        whenever(savedSitesRepository.getSavedSites(BOOKMARKS_ROOT)).thenReturn(pendingSavedSites)
+        val testee = createTestee()
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        pendingSavedSites.emit(savedSitesFlow.value)
+        pendingSavedSites.emit(SavedSites(emptyList(), listOf(bookmark)))
+
+        verify(syncEngine, times(1)).triggerSync(FEATURE_READ)
+    }
+
+    @Test
     fun whenBookmarkDeleteUndoThenRepositoryNotUpdated() = runTest {
+        val testee = createTestee()
+
         testee.onDeleteSavedSiteRequested(bookmark)
         testee.undoDelete(bookmark)
 
@@ -163,6 +197,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkDeleteThenRepositoryUpdated() = runTest {
+        val testee = createTestee()
+
         testee.onDeleteSavedSiteRequested(bookmark)
         testee.onDeleteSavedSiteSnackbarDismissed(bookmark)
 
@@ -172,6 +208,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkDeleteRequestedThenConfirmCommandSent() = runTest {
+        val testee = createTestee()
+
         testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -181,6 +219,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFavoriteDeleteUndoThenRepositoryNotUpdated() = runTest {
+        val testee = createTestee()
+
         testee.onDeleteSavedSiteRequested(favorite)
         testee.undoDelete(favorite)
 
@@ -190,6 +230,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFavoriteDeleteThenRepositoryUpdated() = runTest {
+        val testee = createTestee()
+
         testee.onDeleteSavedSiteRequested(favorite)
         testee.onDeleteSavedSiteSnackbarDismissed(favorite)
 
@@ -199,6 +241,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFavoriteDeleteRequestedThenConfirmCommandSent() = runTest {
+        val testee = createTestee()
+
         testee.onDeleteSavedSiteRequested(favorite)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -208,6 +252,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenDaoUpdated() = runTest {
+        val testee = createTestee()
+
         testee.onBookmarkEdited(bookmark, "folder1", true)
 
         verify(savedSitesRepository).updateBookmark(bookmark, "folder1", true)
@@ -215,6 +261,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
+        val testee = createTestee()
+
         testee.onFavouriteEdited(favorite)
 
         verify(savedSitesRepository).updateFavourite(favorite)
@@ -222,6 +270,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenSavedSiteSelectedThenOpenCommandAndPixelFired() {
+        val testee = createTestee()
+
         testee.onSelected(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -233,6 +283,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFavoriteSelectedThenPixelSent() {
+        val testee = createTestee()
+
         testee.onSelected(favorite)
 
         verify(pixel).fire(SavedSitesPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
@@ -242,6 +294,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenOnEditSavedSiteRequestedThenShowEditSavedSiteCommandSentAndPixelFired() {
+        val testee = createTestee()
+
         testee.onEditSavedSiteRequested(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -252,6 +306,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteRequestedThenConfirmCommand() {
+        val testee = createTestee()
+
         testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -261,6 +317,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkFolderSelectedThenIssueOpenBookmarkFolderCommand() {
+        val testee = createTestee()
+
         testee.onBookmarkFolderSelected(bookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -269,13 +327,15 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFetchBookmarksAndFoldersThenUpdateStateWithCollectedBookmarksAndFolders() = runTest {
+        val testee = createTestee()
+
         val parentId = "folder1"
 
         testee.fetchBookmarksAndFolders(parentId = parentId)
 
         verify(savedSitesRepository).getSavedSites(parentId)
 
-        verify(viewStateObserver, times(5)).onChanged(viewStateCaptor.capture())
+        verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
 
         assertEquals(null, viewStateCaptor.allValues[0].bookmarkItems)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
@@ -290,6 +350,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFetchEverythingThenUpdateStateWithData() = runTest {
+        val testee = createTestee()
+
         whenever(savedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite))
         whenever(savedSitesRepository.getBookmarksTree()).thenReturn(listOf(bookmark, bookmark, bookmark))
         whenever(savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)).thenReturn(listOf(bookmarkFolderItem, bookmarkFolderItem))
@@ -300,7 +362,7 @@ class BookmarksViewModelTest {
         verify(savedSitesRepository).getBookmarksTree()
         verify(savedSitesRepository).getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
 
-        verify(viewStateObserver, times(5)).onChanged(viewStateCaptor.capture())
+        verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
 
         assertEquals(null, viewStateCaptor.firstValue.bookmarkItems)
         assertEquals(false, viewStateCaptor.firstValue.enableSearch)
@@ -318,6 +380,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkFolderAddedThenCallInsertOnRepository() = runTest {
+        val testee = createTestee()
+
         testee.onBookmarkFolderAdded(bookmarkFolder)
 
         verify(savedSitesRepository).insert(bookmarkFolder)
@@ -325,6 +389,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenEditBookmarkFolderThenIssueShowEditBookmarkFolderCommand() {
+        val testee = createTestee()
+
         testee.onEditBookmarkFolderRequested(bookmarkFolder)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -333,6 +399,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkFolderUpdatedThenCallUpdateOnRepository() = runTest {
+        val testee = createTestee()
+
         testee.onBookmarkFolderUpdated(bookmarkFolder)
 
         verify(savedSitesRepository).update(bookmarkFolder)
@@ -340,6 +408,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteEmptyFolderRequestedThenCommandIssued() = runTest {
+        val testee = createTestee()
+
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(bookmarkFolder, (commandCaptor.lastValue as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
@@ -347,6 +417,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteFolderRequestedThenCommandIssued() = runTest {
+        val testee = createTestee()
+
         val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOKMARKS_ROOT, 1, 1, "timestamp")
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
 
@@ -356,6 +428,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteBookmarkFolderUndoThenRepositoryNotUpdated() = runTest {
+        val testee = createTestee()
+
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
@@ -371,6 +445,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteBookmarkFolderConfirmedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
+        val testee = createTestee()
+
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
@@ -389,6 +465,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
+        val testee = createTestee()
+
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
@@ -405,6 +483,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenOnBookmarkFoldersActivityResultCalledThenOpenSavedSiteCommandSent() {
+        val testee = createTestee()
+
         val savedSiteUrl = "https://www.example.com"
 
         testee.onBookmarkFoldersActivityResult(savedSiteUrl)
@@ -415,6 +495,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenUpdateBookmarksCalledThenUpdateFolderRelation() {
+        val testee = createTestee()
+
         val parentId = "folderId"
         val bookmarksAndFolders = listOf("bookmark1", "folder1")
 
@@ -425,6 +507,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenAddFavoriteCalledThenInsertFavoriteAndPixelFired() {
+        val testee = createTestee()
+
         testee.addFavorite(bookmark)
 
         verify(savedSitesRepository).insertFavorite(bookmark.id, bookmark.url, bookmark.title)
@@ -433,6 +517,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenRemoveFavoriteCalledThenDeleteFavoriteAndPixelFired() {
+        val testee = createTestee()
+
         testee.removeFavorite(bookmark)
 
         verify(savedSitesRepository).delete(
@@ -449,6 +535,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenOnFavoriteAddedThePixelSent() {
+        val testee = createTestee()
+
         testee.onFavoriteAdded()
 
         verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_ADD_FAVORITE_TOGGLED)
@@ -456,6 +544,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenOnFavoriteRemovedThePixelSent() {
+        val testee = createTestee()
+
         testee.onFavoriteRemoved()
 
         verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
@@ -463,6 +553,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenOnSavedSiteDeletedThenConfirmDeleteSavedSiteCommandSentAndPixelFired() {
+        val testee = createTestee()
+
         testee.onSavedSiteDeleted(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -472,6 +564,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenOnSavedSiteDeleteCancelledThenPixelFired() {
+        val testee = createTestee()
+
         testee.onSavedSiteDeleteCancelled()
 
         verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CANCELLED)
@@ -479,6 +573,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenOnSavedSiteDeleteRequestedThenPixelFired() {
+        val testee = createTestee()
+
         testee.onSavedSiteDeleteRequested()
 
         verify(pixel).fire(SavedSitesPixelName.EDIT_BOOKMARK_DELETE_BOOKMARK_CLICKED)
@@ -486,18 +582,24 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenManualSortingModeSelectedThenDataStored() = runTest {
+        val testee = createTestee()
+
         testee.onSortingModeSelected(MANUAL)
         verify(bookmarksDataStore).setSortingMode(MANUAL)
     }
 
     @Test
     fun whenNameSortingModeSelectedThenDataStored() = runTest {
+        val testee = createTestee()
+
         testee.onSortingModeSelected(NAME)
         verify(bookmarksDataStore).setSortingMode(NAME)
     }
 
     @Test
     fun whenSortingByNameSelectedThenListIsSorted() = runTest {
+        val testee = createTestee()
+
         val folderNews = BookmarkFolder(id = "folderA", name = "News", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val folderSports = BookmarkFolder(id = "folderB", name = "Sports", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val bookmarkAs = Bookmark(id = "bookmarkA", title = "As", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
@@ -525,7 +627,7 @@ class BookmarksViewModelTest {
 
         testee.onSortingModeSelected(NAME)
 
-        val sortedElements = testee.itemsToDisplay.value
+        val sortedElements = testee.itemsToDisplay.value!!
         assertEquals((sortedElements[0] as BookmarkItem).bookmark, bookmarkAs)
         assertEquals((sortedElements[1] as BookmarkItem).bookmark, bookmarkCnn)
         assertEquals((sortedElements[2] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderNews)
@@ -536,6 +638,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenSortingManualSelectedThenListIsSorted() = runTest {
+        val testee = createTestee()
+
         val folderNews = BookmarkFolder(id = "folderA", name = "News", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val folderSports = BookmarkFolder(id = "folderB", name = "Sports", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val bookmarkAs = Bookmark(id = "bookmarkA", title = "As", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
@@ -563,7 +667,7 @@ class BookmarksViewModelTest {
 
         testee.onSortingModeSelected(MANUAL)
 
-        val sortedElements = testee.itemsToDisplay.value
+        val sortedElements = testee.itemsToDisplay.value!!
         assertEquals((sortedElements[0] as BookmarkItem).bookmark, bookmarkAs)
         assertEquals((sortedElements[1] as BookmarkItem).bookmark, bookmarkReddit)
         assertEquals((sortedElements[2] as BookmarkItem).bookmark, bookmarkCnn)
@@ -574,6 +678,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBrowserMenuPressedAndBookmarksEmptyThenCommandSent() {
+        val testee = createTestee()
+
         whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
             flowOf(SavedSites(emptyList(), emptyList())),
         )
@@ -589,6 +695,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBrowserMenuPressedAndBookmarksNotEmptyThenCommandSent() {
+        val testee = createTestee()
+
         testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
 
         testee.onBrowserMenuPressed()
@@ -600,6 +708,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBrowserMenuPressedAndManualSortingModeThenCommandSent() {
+        val testee = createTestee()
+
         whenever(bookmarksDataStore.getSortingMode()).thenReturn(MANUAL)
         testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
 
@@ -612,6 +722,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenImportBookmarksClickedThenPixelSent() = runTest {
+        val testee = createTestee()
+
         whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(false)
         testee.onImportBookmarksClicked()
 
@@ -620,6 +732,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenImportBookmarksClickedAndFeatureEnabledThenShowDialog() = runTest {
+        val testee = createTestee()
+
         whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(true)
         testee.onImportBookmarksClicked()
 
@@ -629,6 +743,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenImportBookmarksClickedAndFeatureDisabledThenLaunchFileImport() = runTest {
+        val testee = createTestee()
+
         whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(false)
         testee.onImportBookmarksClicked()
 
@@ -638,6 +754,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenExportBookmarksClickedThenPixelAndCommandSent() {
+        val testee = createTestee()
+
         testee.onExportBookmarksClicked()
 
         verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_EXPORT_CLICKED)
@@ -647,6 +765,8 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenAddFolderClickedThenPixelAndCommandSent() {
+        val testee = createTestee()
+
         testee.onAddFolderClicked()
 
         verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_ADD_FOLDER_CLICKED)

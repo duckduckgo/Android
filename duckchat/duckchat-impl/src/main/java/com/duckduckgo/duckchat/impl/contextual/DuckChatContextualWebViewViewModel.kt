@@ -39,6 +39,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.promo.messaging.PromoCampaignJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -87,6 +88,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val textSelectionRepository: TextSelectionRepository,
     private val termsConsent: DuckAiTermsConsent,
     private val browserMode: BrowserMode,
+    private val entryWideEvent: DuckAiEntryWideEvent,
     promoCampaignJSHelper: PromoCampaignJSHelper,
 ) : ViewModel() {
 
@@ -208,8 +210,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     fun onSheetOpened(tabId: String) {
         duckChatPixels.reportContextualSheetOpened()
         _viewState.update { it.copy(tabId = tabId) }
+        val pendingEntry = contextualEntryPromptStore.consume(tabId)
+        entryWideEvent.onContextualSheetOpened(tabId, pendingEntry != null, null, voice = pendingEntry?.voice == true)
         viewModelScope.launch(dispatchers.io()) {
-            val pendingEntry = contextualEntryPromptStore.consume(tabId)
             if (pendingEntry != null) {
                 // Composed in the entry dialog: open straight into the chat and auto-submit. Page context
                 // came over with the prompt, so there's no need to request it again here.
@@ -229,6 +232,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             val shouldReuseUrl = !existingChatUrl.isNullOrBlank() &&
                 isSessionValid &&
                 !isStoredChatMissingFromHistory(existingChatUrl)
+            entryWideEvent.onContextualSheetUrlResolved(tabId, existingChatUrl.takeIf { shouldReuseUrl })
             if (shouldReuseUrl) {
                 logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
                 duckChatPixels.reportContextualSheetSessionRestored()
@@ -246,9 +250,10 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         commandChannel.trySend(Command.ApplyContextualReopened(_viewState.value.tabId))
 
         duckChatPixels.reportContextualSheetOpened()
+        val tabId = _viewState.value.tabId
+        val pendingEntry = contextualEntryPromptStore.consume(tabId)
+        entryWideEvent.onContextualSheetOpened(tabId, pendingEntry != null, null, voice = pendingEntry?.voice == true)
         viewModelScope.launch(dispatchers.io()) {
-            val tabId = _viewState.value.tabId
-            val pendingEntry = contextualEntryPromptStore.consume(tabId)
             if (pendingEntry != null) {
                 // Composed in the entry dialog while the (persisted) sheet was hidden: reload into a fresh
                 // chat and auto-submit. The reload makes the web app re-request its hand-off data, so
@@ -280,6 +285,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             }
             return
         }
+        entryWideEvent.onContextualSheetUrlResolved(tabId, existingChatUrl)
         withContext(dispatchers.main()) {
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
         }
@@ -597,6 +603,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             hidingSheetForNewChat = false
             return
         }
+        entryWideEvent.onContextualSheetClosed(viewState.value.tabId)
         duckChatPixels.reportContextualSheetDismissed()
         selectionJourney.onSurfaceDismissed(viewState.value.tabId)
         persistTabClosed()

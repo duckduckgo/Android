@@ -1424,8 +1424,9 @@ class BrowserTabFragment :
                     )
                 },
                 onChatSuggestionSelected = { chatUrl -> viewModel.openDuckAiChatById(chatUrl) },
-                onDuckAiQuerySubmitted = { query, entryPoint ->
-                    viewModel.openDuckAiQuery(query, autoPrompt = true, entryPoint = entryPoint)
+                duckAiEntryPointResolver = viewModel::resolveDuckAiEntryPoint,
+                onDuckAiQuerySubmitted = { query, entryPoint, voice ->
+                    viewModel.openDuckAiQuery(query, autoPrompt = true, entryPoint = entryPoint, voice = voice)
                 },
                 onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
                 onChatHistoryShortcutClicked = {
@@ -1851,7 +1852,7 @@ class BrowserTabFragment :
             onMenuItemClicked(duckAiNewVoiceChatMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT)
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY, type = Daily())
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                viewModel.openNewVoiceChat(omnibar.viewMode)
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
@@ -2051,6 +2052,7 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        viewModel.onViewStopped()
         webViewClient.onTabBackgrounded()
         alertDialog?.dismiss()
         super.onStop()

@@ -65,7 +65,7 @@ dependencies {
     }
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
-    implementation "org.jetbrains.kotlin:kotlin-test:1.9.24"
+    implementation "org.jetbrains.kotlin:kotlin-test:_"
 }
 
 android {

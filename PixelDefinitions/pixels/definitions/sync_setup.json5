@@ -330,6 +330,9 @@
                     "promotion_ai_chat",
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
+                    "promotion_passwords_multi_device",
+                    "promotion_bookmark_multi_device_added_dialog",
                     "other"
                 ]
             },
@@ -395,6 +398,9 @@
                     "promotion_ai_chat",
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
+                    "promotion_passwords_multi_device",
+                    "promotion_bookmark_multi_device_added_dialog",
                     "other"
                 ]
             },
@@ -500,6 +506,9 @@
                     "promotion_ai_chat",
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
+                    "promotion_passwords_multi_device",
+                    "promotion_bookmark_multi_device_added_dialog",
                     "other"
                 ]
             },

@@ -37,6 +37,7 @@ dependencies {
     implementation project(':persistent-storage-api')
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
+    implementation project(':data-store-api')
 
     ksp project(':codegen-ksp')
     implementation project(':codegen-annotations')
