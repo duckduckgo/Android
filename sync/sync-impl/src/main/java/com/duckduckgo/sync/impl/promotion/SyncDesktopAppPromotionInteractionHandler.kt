@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_ACTIVATING
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARKS
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import dev.zacsweers.metro.BindingContainer
@@ -80,4 +81,9 @@ object SyncDesktopAppPromotionInteractionHandlerModule {
     @IntoSet
     fun provideEnabledHandler(pixel: Pixel): DesktopAppPromotionInteractionHandler =
         SyncDesktopAppPromotionInteractionHandler(SOURCE_SYNC_ENABLED, pixel)
+
+    @Provides
+    @IntoSet
+    fun providePromotionBookmarksHandler(pixel: Pixel): DesktopAppPromotionInteractionHandler =
+        SyncDesktopAppPromotionInteractionHandler(SOURCE_PROMOTION_BOOKMARKS, pixel)
 }
