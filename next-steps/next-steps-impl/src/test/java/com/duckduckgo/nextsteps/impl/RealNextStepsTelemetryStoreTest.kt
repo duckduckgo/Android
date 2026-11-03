@@ -48,6 +48,7 @@ class RealNextStepsTelemetryStoreTest {
             openDay = 20002L,
             dayCounts = mapOf("setup_default_browser" to 0, "setup_add_widget" to 4),
             totalImpressions = mapOf("setup_default_browser" to 3, "setup_add_widget" to 9),
+            sectionImpressions = 5,
             completedItems = 1,
             dismissedItems = 2,
             finishedElsewhereItems = 1,

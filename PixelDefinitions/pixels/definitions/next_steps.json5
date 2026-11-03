@@ -177,7 +177,7 @@
             {
                 "key": "dismissed",
                 "type": "string",
-                "description": "Stacked cards the user closed with the X while the section was on screen. Always 0 for the check list.",
+                "description": "Stacked cards only: cards the user closed with the X while the section was on screen. Not sent for the check list, which has no per-item dismissal.",
                 "enum": ["0", "1", "2", "3"]
             },
             {
@@ -191,6 +191,12 @@
                 "type": "string",
                 "description": "Items complete when the section first rendered, so never shown as open, including items completed during an earlier section. Not included in completed.",
                 "enum": ["0", "1", "2", "3"]
+            },
+            {
+                "key": "impressionsSoFar",
+                "type": "string",
+                "description": "Check list only: new tab page renders of this section, bucketed. Not sent for the stacked cards, which report per-item daily impressions.",
+                "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
             }
         ]
     }

@@ -490,9 +490,10 @@ class NextStepsCheckListViewModelTest {
             DAY_0,
             "all_items_done",
             completed = 1,
-            dismissed = 0,
+            dismissed = null,
             finishedElsewhere = 1,
             alreadyComplete = 1,
+            impressionsSoFar = "1",
         )
         verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
     }
@@ -510,7 +511,16 @@ class NextStepsCheckListViewModelTest {
         testee.onSectionDismissed()
         advanceUntilIdle()
 
-        verify(pixels).sectionEnded(CHECK_LIST, DAY_0, "user_dismissed", completed = 1, dismissed = 0, finishedElsewhere = 0, alreadyComplete = 0)
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "user_dismissed",
+            completed = 1,
+            dismissed = null,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+            impressionsSoFar = "1",
+        )
     }
 
     @Test

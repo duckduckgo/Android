@@ -55,6 +55,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -193,7 +194,16 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, impressions())
-        verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 1, dismissed = 0, finishedElsewhere = 0, alreadyComplete = 0)
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "all_items_done",
+            completed = 1,
+            dismissed = 0,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+            impressionsSoFar = null,
+        )
     }
 
     @Test
@@ -263,6 +273,7 @@ class NextStepsStackedCardsViewModelTest {
                 dismissed = 1,
                 finishedElsewhere = 0,
                 alreadyComplete = 0,
+                impressionsSoFar = null,
             )
             null
         }
@@ -271,7 +282,7 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
         telemetry.onActiveMessageChanged(null)
 
-        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), any(), any(), any())
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any(), anyOrNull())
         verify(remoteMessageModel, times(1)).onMessageDismissed(message)
     }
 
@@ -292,6 +303,7 @@ class NextStepsStackedCardsViewModelTest {
                 dismissed = 0,
                 finishedElsewhere = 0,
                 alreadyComplete = 0,
+                impressionsSoFar = null,
             )
             null
         }
@@ -304,7 +316,7 @@ class NextStepsStackedCardsViewModelTest {
 
         verify(pixels, times(1)).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, COMPLETED, "2")
         verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, defaultBrowserItem.id, DAY_0, "2")
-        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), any(), any(), any())
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any(), anyOrNull())
     }
 
     @Test

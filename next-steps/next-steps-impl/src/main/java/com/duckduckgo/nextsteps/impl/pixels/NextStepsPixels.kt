@@ -41,15 +41,19 @@ interface NextStepsPixels {
     /** Stacked cards only: the check list shows every item at once, so it has no per-item impressions to roll up. */
     fun itemDailyImpressions(variant: Variant, item: String, days: Days, impressions: String)
 
-    /** One count per removal reason, so they add up to the items that left the section; [completed] is CTA completions only. */
+    /**
+     * One count per removal reason, so they add up to the items that left the section; [completed] is CTA completions only.
+     * [dismissed] is stacked cards only and [impressionsSoFar], the section's renders, is check list only; each is omitted when null.
+     */
     fun sectionEnded(
         variant: Variant,
         days: Days,
         reason: String,
         completed: Int,
-        dismissed: Int,
+        dismissed: Int?,
         finishedElsewhere: Int,
         alreadyComplete: Int,
+        impressionsSoFar: String?,
     )
 
     data class Days(val activeDay: String, val calendarDay: String)
@@ -108,20 +112,20 @@ class RealNextStepsPixels @Inject constructor(private val pixel: Pixel) : NextSt
         days: NextStepsPixels.Days,
         reason: String,
         completed: Int,
-        dismissed: Int,
+        dismissed: Int?,
         finishedElsewhere: Int,
         alreadyComplete: Int,
+        impressionsSoFar: String?,
     ) {
-        fire(
-            NextStepsPixelName.SECTION_ENDED,
-            variant,
-            days,
+        val parameters = listOfNotNull(
             "reason" to reason,
             "completed" to "$completed",
-            "dismissed" to "$dismissed",
+            dismissed?.let { "dismissed" to "$it" },
             "finishedElsewhere" to "$finishedElsewhere",
             "alreadyComplete" to "$alreadyComplete",
+            impressionsSoFar?.let { IMPRESSIONS_SO_FAR to it },
         )
+        fire(NextStepsPixelName.SECTION_ENDED, variant, days, *parameters.toTypedArray())
     }
 
     private fun fire(
