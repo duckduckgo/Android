@@ -249,6 +249,7 @@ class AttachmentView(
         (stateFileIds - containerFileIds).forEach { id ->
             state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
         }
+        filesView.updateOversizedFiles(if (isEditMode) emptySet() else state.oversizedFileIds)
     }
 
     private fun syncTextSelections(state: AttachmentViewModel.AttachmentState) {
