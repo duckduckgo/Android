@@ -27,7 +27,6 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
-import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.WidgetType
@@ -72,6 +71,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalCoroutinesApi::class)
 class NewTabPageViewModel @AssistedInject constructor(
     @Assisted private val showDaxLogo: Boolean,
+    @Assisted private val tabNextStepsState: TabNextStepsState,
     private val dispatchers: DispatcherProvider,
     private val remoteMessagingModel: RemoteMessageModel,
     private val afterIdleMessageTriggerProvider: AfterIdleMessageTriggerProvider,
@@ -87,7 +87,6 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val ctaViewModel: CtaViewModel,
     private val promptsCoordinator: PromptsCoordinator,
     private val promptExposureReporter: PromptExposureReporter,
-    private val onboardingFlowChecker: OnboardingFlowChecker,
     browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -144,7 +143,6 @@ class NewTabPageViewModel @AssistedInject constructor(
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
     private var lastRemoteMessageReportedId: String? = null
-    private var onboardingCompleteWhenOpened: Boolean? = null
     private val _viewState = MutableStateFlow(
         ViewState(showDaxLogo = showDaxLogo, isFireMode = browserMode == BrowserMode.FIRE),
     )
@@ -157,21 +155,23 @@ class NewTabPageViewModel @AssistedInject constructor(
         super.onStart(owner)
 
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.getFavorites()
-                .combine(
-                    afterIdleMessageTriggerProvider.activeTrigger()
-                        .flatMapLatest { trigger ->
-                            remoteMessagingModel.observeActiveMessages(trigger)
-                        }
-                        .map { message ->
-                            if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
-                        },
-                ) { favorites, activeMessage ->
-                    if (favorites.isNotEmpty()) {
-                        syncEngine.triggerSync(FEATURE_READ)
+            combine(
+                savedSitesRepository.getFavorites(),
+                afterIdleMessageTriggerProvider.activeTrigger()
+                    .flatMapLatest { trigger ->
+                        remoteMessagingModel.observeActiveMessages(trigger)
                     }
-                    ViewStateSnapshot(favorites, activeMessage.withoutNextStepsUntilNewPage())
+                    .map { message ->
+                        if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
+                    },
+                tabNextStepsState.nextStepsAllowed,
+            ) { favorites, activeMessage, nextStepsAllowed ->
+                if (favorites.isNotEmpty()) {
+                    syncEngine.triggerSync(FEATURE_READ)
                 }
+                val message = activeMessage.takeUnless { !nextStepsAllowed && it?.content is Content.ActionableItems }
+                ViewStateSnapshot(favorites, message)
+            }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
                     // The card shares the NTP prompt surface with modals, so it renders only while
@@ -216,13 +216,6 @@ class NewTabPageViewModel @AssistedInject constructor(
                 it.copy(appTpEnabled = appTrackingProtection.isEnabled())
             }
         }
-    }
-
-    // Next Steps wait for a New Tab Page opened after onboarding, so they never appear on the page where onboarding just finished
-    private suspend fun RemoteMessage?.withoutNextStepsUntilNewPage(): RemoteMessage? {
-        val onboardingCompleteWhenOpened = onboardingCompleteWhenOpened
-            ?: onboardingFlowChecker.isOnboardingComplete().also { onboardingCompleteWhenOpened = it }
-        return takeUnless { it?.content is Content.ActionableItems && !onboardingCompleteWhenOpened }
     }
 
     private fun reportRemoteMessageCardExposure(message: RemoteMessage?, onboardingComplete: Boolean) {
@@ -313,11 +306,12 @@ class NewTabPageViewModel @AssistedInject constructor(
     class NewTabPageViewModelProviderFactory(
         private val assistedFactory: NewTabPageViewModelFactory,
         private val showDaxLogo: Boolean,
+        private val tabNextStepsState: TabNextStepsState,
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return assistedFactory.create(showDaxLogo) as T
+            return assistedFactory.create(showDaxLogo, tabNextStepsState) as T
         }
     }
 
@@ -325,6 +319,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     interface NewTabPageViewModelFactory {
         fun create(
             showDaxLogo: Boolean,
+            tabNextStepsState: TabNextStepsState,
         ): NewTabPageViewModel
     }
 }

@@ -24,7 +24,6 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.ADD_WIDGET
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
-import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -83,7 +82,7 @@ class NewTabPageViewModelTest {
     private val mockCtaViewModel: CtaViewModel = mock()
     private val mockPromptsCoordinator: PromptsCoordinator = mock()
     private val mockPromptExposureReporter: PromptExposureReporter = mock()
-    private val mockOnboardingFlowChecker: OnboardingFlowChecker = mock()
+    private val tabNextStepsState = TabNextStepsState()
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -95,7 +94,6 @@ class NewTabPageViewModelTest {
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
         whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(ADD_WIDGET)).thenReturn(false)
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
         // Default: the prompt surface is free, so RMF claims are granted.
         whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(true)
 
@@ -108,6 +106,7 @@ class NewTabPageViewModelTest {
     ): NewTabPageViewModel {
         return NewTabPageViewModel(
             showDaxLogo = showLogo,
+            tabNextStepsState = tabNextStepsState,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             remoteMessagingModel = mockRemoteMessageModel,
             afterIdleMessageTriggerProvider = mockAfterIdleMessageTriggerProvider,
@@ -123,7 +122,6 @@ class NewTabPageViewModelTest {
             ctaViewModel = mockCtaViewModel,
             promptsCoordinator = mockPromptsCoordinator,
             promptExposureReporter = mockPromptExposureReporter,
-            onboardingFlowChecker = mockOnboardingFlowChecker,
             browserMode = browserMode,
         )
     }
@@ -174,7 +172,7 @@ class NewTabPageViewModelTest {
     fun whenNextStepsMessageIsActiveAndOnboardingCompleteThenShowNextStepsIsTrue() = runTest {
         val remoteMessage = aNextStepsMessage()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
+        tabNextStepsState.onNewTabPageShownAfterOnboarding()
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         testee.onStart(mockLifecycleOwner)
@@ -200,7 +198,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenNextStepsMessageClaimIsRefusedThenShowNextStepsIsFalseAndLogoIsShown() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
+        tabNextStepsState.onNewTabPageShownAfterOnboarding()
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(aNextStepsMessage()))
         whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(false)
 
@@ -227,16 +225,11 @@ class NewTabPageViewModelTest {
     }
 
     @Test
-    fun whenOnboardingCompletesWhileThePageIsOpenThenNextStepsAreNotShownOnThatPage() = runTest {
-        val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
-        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(messages)
-        // The final onboarding dialog is marked as shown as soon as it appears, before the user dismisses it
+    fun whenTabHasNotAllowedNextStepsThenNextStepsAreNotShownOrClaimed() = runTest {
         whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(aNextStepsMessage()))
 
         testee.onStart(mockLifecycleOwner)
-        messages.emit(aNextStepsMessage())
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
-        messages.emit(aNextStepsMessage())
 
         testee.viewState.test {
             val state = expectMostRecentItem()
@@ -247,31 +240,56 @@ class NewTabPageViewModelTest {
     }
 
     @Test
-    fun whenOnboardingCompletedWhilePreviousPageWasOpenThenNewPageShowsNextSteps() = runTest {
+    fun whenTabAllowsNextStepsAfterPageWasUpdatedThenNextStepsAreShown() = runTest {
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(aNextStepsMessage()))
         testee.onStart(mockLifecycleOwner)
-        testee.viewState.test { expectMostRecentItem() }
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
 
-        val newPage = createTestee()
-        newPage.onStart(mockLifecycleOwner)
+        tabNextStepsState.onNewTabPageShownAfterOnboarding()
 
-        newPage.viewState.test {
+        testee.viewState.test {
             assertTrue(expectMostRecentItem().showNextSteps)
         }
     }
 
     @Test
-    fun whenOnboardingCompletesWhileThePageIsOpenThenOtherMessagesAreStillShown() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
-        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(messages)
+    fun whenOnboardingBubbleWasShownInThisTabThenNextStepsAreNotShownOrClaimedAfterOnboarding() = runTest {
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(aNextStepsMessage()))
+        tabNextStepsState.onOnboardingBubbleShown()
+        tabNextStepsState.onNewTabPageShownAfterOnboarding()
 
         testee.onStart(mockLifecycleOwner)
-        messages.emit(null)
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        messages.emit(remoteMessage)
+
+        testee.viewState.test {
+            val state = expectMostRecentItem()
+            assertFalse(state.showNextSteps)
+            assertNull(state.message)
+        }
+        verify(mockPromptsCoordinator, never()).tryClaim(PromptType.NTP_CARD)
+    }
+
+    @Test
+    fun whenOnlyTheLastOnboardingDialogIsRecordedThenNextStepsAreShown() = runTest {
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
+        whenever(mockCtaViewModel.areInContextDaxDialogsCompleted()).thenReturn(false)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(aNextStepsMessage()))
+        tabNextStepsState.onNewTabPageShownAfterOnboarding()
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertTrue(expectMostRecentItem().showNextSteps)
+        }
+    }
+
+    @Test
+    fun whenTabHasNotAllowedNextStepsThenOtherMessagesAreStillShown() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee.onStart(mockLifecycleOwner)
 
         testee.viewState.test {
             assertEquals(remoteMessage, expectMostRecentItem().message)
