@@ -4107,6 +4107,7 @@ class BrowserTabViewModel @Inject constructor(
                     ctaViewModel.areBubbleDaxDialogsCompleted()
                 }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
+            val previousCta = currentCtaViewState().cta
             ctaViewState.value =
                 currentCtaViewState().copy(
                     cta = cta,
@@ -4114,6 +4115,11 @@ class BrowserTabViewModel @Inject constructor(
                     isBrowserShowing = isBrowserShowing,
                     isErrorShowing = isErrorShowing,
                 )
+            // The renderer only brings the new tab page back when onboarding counts as complete there, so a Sync suggestion
+            // that stopped being due (Sync turned on, or dismissed elsewhere) is hidden explicitly.
+            if (cta == null && !isBrowserShowing && previousCta is SyncAfterDeviceTransferBubbleCta) {
+                command.value = HideOnboardingDaxBubbleCta(previousCta)
+            }
             return cta
         }
         return null

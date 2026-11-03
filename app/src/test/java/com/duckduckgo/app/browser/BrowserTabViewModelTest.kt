@@ -5600,6 +5600,22 @@ class BrowserTabViewModelTest {
             }
         }
 
+    @Test
+    fun whenSyncSuggestionStopsBeingDueOnTheNewTabPageThenTheBubbleIsHidden() =
+        runTest {
+            whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+            val cta = syncAfterDeviceTransferBubbleCta()
+            setCta(cta)
+            fakeSyncAfterDeviceTransferPrompt.due = false
+
+            testee.refreshCta()
+
+            assertNull(testee.ctaViewState.value?.cta)
+            assertCommandIssued<HideOnboardingDaxBubbleCta> {
+                assertEquals(cta, this.daxBubbleCta)
+            }
+        }
+
     private fun syncAfterDeviceTransferBubbleCta() = SyncAfterDeviceTransferBubbleCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
