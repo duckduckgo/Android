@@ -64,6 +64,7 @@ import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.sync.api.SyncAfterDeviceTransferPrompt
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -111,6 +112,7 @@ class CtaViewModel @Inject constructor(
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
     private val onboardingPixelSender: OnboardingPixelSender,
     private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
+    private val syncAfterDeviceTransferPrompt: SyncAfterDeviceTransferPrompt,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -248,6 +250,10 @@ class CtaViewModel @Inject constructor(
         viaSkipBtn: Boolean = false,
     ) {
         withContext(dispatchers.io()) {
+            if (cta is SyncAfterDeviceTransferBubbleCta) {
+                syncAfterDeviceTransferPrompt.dismiss()
+                return@withContext
+            }
             if (viaCloseBtn || viaSkipBtn) {
                 contextualOnboardingPixelNames(cta).forEach {
                     onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = false))
@@ -435,6 +441,11 @@ class CtaViewModel @Inject constructor(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                     segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
                 )
+            }
+
+            // Last, so any onboarding dialog that is due goes first and the suggestion waits for the next new tab.
+            syncAfterDeviceTransferPrompt.shouldShow() -> {
+                SyncAfterDeviceTransferBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
             }
             else -> null
         }

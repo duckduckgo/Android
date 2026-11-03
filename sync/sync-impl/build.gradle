@@ -41,7 +41,6 @@ dependencies {
     implementation project(path: ':design-system')
     implementation project(path: ':sync-api')
     implementation project(':device-migration-api')
-    implementation project(':new-tab-page-api')
     implementation project(path: ':sync-store')
     implementation project(path: ':sync-lib')
     implementation project(path: ':saved-sites-api')

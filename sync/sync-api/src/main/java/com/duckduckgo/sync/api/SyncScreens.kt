@@ -46,3 +46,14 @@ data class SyncActivityFromSetupUrl(val url: String) : GlobalActivityStarter.Act
  * ```
  */
 data class SyncActivityWithAnotherDevice(val source: String?) : GlobalActivityStarter.ActivityParams
+
+/**
+ * Use this class to launch the sync screen and immediately start setting up Sync on this device
+ * (or adding another device when already signed in).
+ * [source] is an optional telemetry tag identifying where the flow was started from.
+ *
+ * ```kotlin
+ * globalActivityStarter.start(context, SyncActivityStartSetupFlow(source = null))
+ * ```
+ */
+data class SyncActivityStartSetupFlow(val source: String?) : GlobalActivityStarter.ActivityParams

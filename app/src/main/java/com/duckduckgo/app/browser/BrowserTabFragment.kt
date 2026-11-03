@@ -380,6 +380,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.sync.api.SyncActivityStartSetupFlow
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -2817,6 +2818,10 @@ class BrowserTabFragment :
 
             is Command.LaunchVpnManagement -> {
                 globalActivityStarter.start(requireContext(), NetworkProtectionManagementScreenNoParams)
+            }
+
+            is Command.LaunchSyncSetup -> {
+                globalActivityStarter.start(requireContext(), SyncActivityStartSetupFlow(source = null))
             }
 
             is Command.DialNumber -> {

@@ -21,16 +21,9 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.SyncAfterDeviceTransferPrompt
 import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
-
-/** Suggests Sync on a phone set up by a device transfer when neither the previous phone nor this one has it. */
-interface SyncAfterDeviceTransferPrompt {
-    suspend fun shouldShow(): Boolean
-
-    /** Hides the suggestion for good on this install. */
-    suspend fun dismiss()
-}
 
 /**
  * The previous phone's Sync state is checked through [DeviceMigration.previousDeviceHadSync], which stays true until it is known,

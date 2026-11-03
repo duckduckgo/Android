@@ -88,6 +88,8 @@ sealed class Command {
 
     data object LaunchVpnManagement : Command()
 
+    data object LaunchSyncSetup : Command()
+
     class DialNumber(
         val telephoneNumber: String,
     ) : Command()

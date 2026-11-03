@@ -51,6 +51,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
+import com.duckduckgo.sync.api.SyncActivityStartSetupFlow
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.api.SyncMessagePlugin
@@ -111,6 +112,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
 @ContributeToActivityStarter(SyncActivityStartSyncFlow::class)
+@ContributeToActivityStarter(SyncActivityStartSetupFlow::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 @ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
@@ -145,15 +147,19 @@ class SyncActivity : DuckDuckGoActivity() {
     private val startSyncFlowParams
         get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)
 
+    private val startSetupFlowParams
+        get() = intent.getActivityParams(SyncActivityStartSetupFlow::class.java)
+
     private val launchSource
         get() = startSyncFlowParams?.source
+            ?: startSetupFlowParams?.let { SyncLaunchSource.from(it.source) }
             ?: SyncLaunchSource.from(intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source)
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
 
     private val shouldDeepLinkStartSync
-        get() = startSyncFlowParams != null
+        get() = startSyncFlowParams != null || startSetupFlowParams != null
 
     private val isAnotherDeviceSync
         get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
