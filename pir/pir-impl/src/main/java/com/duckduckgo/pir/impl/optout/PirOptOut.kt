@@ -42,8 +42,9 @@ import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -99,9 +100,9 @@ interface PirOptOut {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirOptOut::class,
+    binding = binding<PirOptOut>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirOptOut @Inject constructor(
     private val repository: PirRepository,
     private val eventsRepository: PirEventsRepository,

@@ -148,7 +148,7 @@ class AtbInitializerTest {
     }
 
     @Test
-    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAuraExperimentAndAtbInitialized() = runTest {
+    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitialized() = runTest {
         configureNeverInitialized()
 
         testee.onPrivacyConfigDownloaded()

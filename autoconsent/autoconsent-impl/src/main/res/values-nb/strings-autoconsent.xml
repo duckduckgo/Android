@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Du kan når som helst gjøre endringer senere i Innstillinger.</string>
     <string name="autoconsentPromptCpmOnMessage">Noen informasjonskapsler kan ikke avvises. Vi kan godta dem for deg.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Godta informasjonskapsler for meg</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Avvis om mulig eller godta for meg</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Jeg godtar dem selv</string>
     <string name="autoconsentPromptCpmOffMessage">Overlat det til oss. Vi avviser informasjonskapsler når det er mulig, og godtar dem som ikke kan avvises.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Avvis om mulig eller godta for meg</string>

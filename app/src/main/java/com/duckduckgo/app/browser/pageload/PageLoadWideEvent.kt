@@ -31,9 +31,8 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeOptimizations
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -117,7 +116,7 @@ interface PageLoadWideEvent {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPageLoadWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val webViewVersionProvider: WebViewVersionProvider,
@@ -154,6 +153,7 @@ class RealPageLoadWideEvent @Inject constructor(
                 val result = wideEventClient.flowStart(
                     name = PAGE_LOAD_FEATURE_NAME,
                     cleanupPolicy = CleanupPolicy.OnTimeout(CLEANUP_TIMEOUT),
+                    samplingProbability = SAMPLING_PROBABILITY,
                     definition = WideEventDefinition(version = DEFINITION_VERSION),
                 )
 
@@ -381,7 +381,7 @@ class RealPageLoadWideEvent @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        androidBrowserConfigFeature.get().sendPageLoadWideEvent().isEnabled()
+        androidBrowserConfigFeature.value.sendPageLoadWideEvent().isEnabled()
     }
 
     private inner class PageLoadState(
@@ -411,6 +411,7 @@ class RealPageLoadWideEvent @Inject constructor(
             1.minutes,
         )
 
+        const val SAMPLING_PROBABILITY = 0.05f
         val CONTENT_SCOPE_BUCKETS_MS: List<Long> = listOf(5, 10, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400)
         const val PAGE_LOAD_FEATURE_NAME = "page-load"
         val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 1)

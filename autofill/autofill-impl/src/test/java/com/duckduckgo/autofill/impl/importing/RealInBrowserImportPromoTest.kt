@@ -2,7 +2,7 @@ package com.duckduckgo.autofill.impl.importing
 
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.importing.RealInBrowserImportPromo.Companion.MAX_PROMO_SHOWN_COUNT
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -32,7 +32,7 @@ class RealInBrowserImportPromoParameterizedTest(
 
     private val autofillStore: InternalAutofillStore = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
-    private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
+    private val passwordImportAvailability: PasswordImportAvailability = mock()
     private val inBrowserPromoPreviousPromptsStore: InBrowserPromoPreviousPromptsStore = mock()
 
     private val testee = RealInBrowserImportPromo(
@@ -40,7 +40,7 @@ class RealInBrowserImportPromoParameterizedTest(
         dispatchers = coroutineTestRule.testDispatcherProvider,
         neverSavedSiteRepository = neverSavedSiteRepository,
         autofillFeature = autofillFeature,
-        importPasswordCapabilityChecker = importPasswordCapabilityChecker,
+        passwordImportAvailability = passwordImportAvailability,
         inBrowserPromoPreviousPromptsStore = inBrowserPromoPreviousPromptsStore,
     )
 
@@ -54,7 +54,7 @@ class RealInBrowserImportPromoParameterizedTest(
         whenever(neverSavedSiteRepository.isInNeverSaveList(NEVER_SAVE_URL)).thenReturn(true)
         autofillFeature.canPromoteImportGooglePasswordsInBrowser().setRawStoredState(State(enable = testCase.inBrowserPromoFeatureEnabled))
         autofillFeature.self().setRawStoredState(State(enable = testCase.autofillFeatureEnabled))
-        whenever(importPasswordCapabilityChecker.webViewCapableOfImporting()).thenReturn(testCase.webViewSupportsImportingPasswords)
+        whenever(passwordImportAvailability.canImport()).thenReturn(testCase.webViewSupportsImportingPasswords)
         whenever(inBrowserPromoPreviousPromptsStore.hasPromoBeenDisplayed(anyOrNull())).thenReturn(testCase.promoPreviouslyShownForUrl)
     }
 

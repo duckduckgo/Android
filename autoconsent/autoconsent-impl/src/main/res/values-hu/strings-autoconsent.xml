@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Ezt a beállításokban később bármikor módosíthatod.</string>
     <string name="autoconsentPromptCpmOnMessage">Néhány süti nem utasítható el. Elfogadhatjuk ezeket helyetted.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Sütik helyettem való elfogadása</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Elutasítás, ha lehetséges; egyébként elfogadás helyettem</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Majd elfogadom én magam</string>
     <string name="autoconsentPromptCpmOffMessage">Hadd foglalkozzunk velük helyetted. Ha lehetséges, elutasítjuk a sütiket, és elfogadjuk azokat, amelyeket nem lehet elutasítani.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Elutasítás, ha lehetséges; egyébként elfogadás helyettem</string>

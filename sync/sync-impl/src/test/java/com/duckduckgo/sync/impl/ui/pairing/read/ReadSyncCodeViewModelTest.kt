@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel.Command.StartSyncProcess
@@ -55,6 +56,7 @@ class ReadSyncCodeViewModelTest {
 
     private val testee = ReadSyncCodeViewModel(
         entryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+        launchSource = SyncLaunchSource.PromotionPasswords,
         clipboard = clipboard,
         syncPixels = syncPixels,
         codeDispatcher = codeDispatcher,
@@ -69,8 +71,8 @@ class ReadSyncCodeViewModelTest {
 
             val command = awaitItem()
             assertIs<StartSyncProcess>(command)
-            assertEquals("sync-code", command.source.code)
-            assertEquals(SyncCodeSource.Pasted("sync-code", SyncEntryPoint.SYNC_NEW_ACCOUNT), command.source)
+            assertEquals("sync-code", command.codeSource.code)
+            assertEquals(SyncCodeSource.Pasted("sync-code", SyncEntryPoint.SYNC_NEW_ACCOUNT), command.codeSource)
 
             cancel()
         }
@@ -83,8 +85,8 @@ class ReadSyncCodeViewModelTest {
 
             val command = awaitItem()
             assertIs<StartSyncProcess>(command)
-            assertEquals("sync-code", command.source.code)
-            assertEquals(SyncCodeSource.Scanned("sync-code", SyncEntryPoint.SYNC_NEW_ACCOUNT), command.source)
+            assertEquals("sync-code", command.codeSource.code)
+            assertEquals(SyncCodeSource.Scanned("sync-code", SyncEntryPoint.SYNC_NEW_ACCOUNT), command.codeSource)
 
             cancel()
         }
@@ -127,7 +129,7 @@ class ReadSyncCodeViewModelTest {
 
         testee.onUserCanceled()
 
-        verify(syncPixels).fireSyncSetupAbandoned(SYNC_CONNECT, CancellationReason.SCANNING_CANCELLED)
+        verify(syncPixels).fireSyncSetupAbandoned(SYNC_CONNECT, SyncLaunchSource.PromotionPasswords, CancellationReason.SCANNING_CANCELLED)
     }
 
     @Test
@@ -136,7 +138,7 @@ class ReadSyncCodeViewModelTest {
 
         testee.onUserCanceled()
 
-        verify(syncPixels).fireSyncSetupAbandoned(SYNC_CONNECT, CancellationReason.CANCELLED_BEFORE_FINISHED)
+        verify(syncPixels).fireSyncSetupAbandoned(SYNC_CONNECT, SyncLaunchSource.PromotionPasswords, CancellationReason.CANCELLED_BEFORE_FINISHED)
     }
 }
 

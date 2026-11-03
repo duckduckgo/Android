@@ -27,13 +27,14 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.isDeleted
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableDataProvider>())
 class SavedSitesSyncDataProvider @Inject constructor(
     private val repository: SavedSitesRepository,
     private val syncSavedSitesRepository: SyncSavedSitesRepository,

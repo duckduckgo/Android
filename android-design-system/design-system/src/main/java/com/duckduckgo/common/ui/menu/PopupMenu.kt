@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build.VERSION
 import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -42,6 +43,7 @@ open class PopupMenu(
     init {
         elevation = ELEVATION
         animationStyle = android.R.style.Animation_Dialog
+        contentView.applyMenuRadiusClipping()
         applyRoundedRippleCorners()
     }
 
@@ -184,4 +186,9 @@ open class PopupMenu(
 
         fun getPopupWidth(context: Context): Int = context.resources.getDimensionPixelSize(R.dimen.popupMenuWidth)
     }
+}
+
+fun View.applyMenuRadiusClipping() {
+    val value = TypedValue()
+    clipToOutline = context.theme.resolveAttribute(R.attr.daxMenuClipToOutline, value, true) && value.data != 0
 }

@@ -36,6 +36,7 @@ data class RemoteAIChatModel(
     @field:Json(name = "supportedReasoningEffort") val supportedReasoningEffort: List<String>? = null,
     @field:Json(name = "reasoningEffortAccess") val reasoningEffortAccess: List<RemoteReasoningEffortAccess>? = null,
     @field:Json(name = "supportedTools") val supportedTools: List<String>? = null,
+    @field:Json(name = "label") val label: String? = null,
 )
 
 data class RemoteTierAttachmentLimits(
@@ -112,6 +113,7 @@ data class AIChatModel(
     val supportedReasoningEfforts: List<ReasoningEffort> = emptyList(),
     val reasoningEffortAccess: List<ReasoningEffortAccess> = emptyList(),
     val supportedTools: List<Tool> = emptyList(),
+    val label: ModelLabel? = null,
 ) {
     val supportsFileUpload: Boolean
         get() = supportedFileTypes.isNotEmpty()
@@ -123,6 +125,26 @@ data class AIChatModel(
 
     companion object {
         val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
+    }
+}
+
+/**
+ * Editorial descriptor the backend attaches to a model, shown as a subline in the picker. The raw
+ * values are stable ids, never display text, so each client maps them to its own strings.
+ */
+enum class ModelLabel(val rawValue: String) {
+    EVERYDAY_USE("EVERYDAY_USE"),
+    USES_LIMITS_FASTER("USES_LIMITS_FASTER"),
+
+    /** A label added after this version shipped. Still treated as recommended, but renders no subline. */
+    UNKNOWN(""),
+    ;
+
+    companion object {
+        fun from(raw: String?): ModelLabel? = when {
+            raw.isNullOrBlank() -> null
+            else -> entries.firstOrNull { it.rawValue == raw } ?: UNKNOWN
+        }
     }
 }
 

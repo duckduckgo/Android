@@ -22,8 +22,8 @@ import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRe
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.*
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -65,7 +65,7 @@ interface DuckAddressStatusRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RemoteDuckAddressStatusRepository @Inject constructor(
     private val service: DuckAddressStatusManagementService,
     private val emailManager: EmailManager,

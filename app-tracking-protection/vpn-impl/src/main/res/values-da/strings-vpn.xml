@@ -46,8 +46,8 @@
     <string name="atp_OnInitialNotification">"App Tracking Protection er aktiveret og blokerer for sporingsforsøg i alle dine apps"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Scanner for sporingsaktivitet… bip… bop"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Sporingsforsøg blokeret <b>i %1$d app</b> (seneste time).]]></item>
-        <item quantity="other"><![CDATA[ Sporingsforsøg blokeret <b>i %1$d apps</b> (seneste time).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Sporingsforsøg blokeret <b>i %1$d app</b> (seneste time).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Sporingsforsøg blokeret <b>i %1$d apps</b> (seneste time).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">App Tracking Protection er deaktiveret. Tryk for at fortsætte med at blokere sporingsforsøg.</string>
     <string name="atp_RevokedNotification">En VPN-app på din enhed har deaktiveret App Tracking Protection. Tryk for at genaktivere.</string>
@@ -59,13 +59,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ App Tracking Protection blokerede <b>%1$d sporingsforsøg i %2$d apps, inkl. %3$s</b> (seneste døgn).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s forsøgte at spore dig <b>i %2$d app</b> (seneste døgn). <b>Se mere</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s forsøgte at spore dig <b>i %2$d apps</b> (seneste døgn). <b>Se mere</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s forsøgte at spore dig <b>i %2$d app</b> (seneste døgn). <b>Se mere</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s forsøgte at spore dig <b>i %2$d apps</b> (seneste døgn). <b>Se mere</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection blokerede flest sporingsforsøg i <b>%1$s</b> (seneste døgn).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection blokerede flest sporingsforsøg i <b>%1$s</b> og <b>%2$s</b> (seneste døgn).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[App Tracking Protection blokerede flest sporingsforsøg i <b>%1$s</b> (seneste døgn).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[App Tracking Protection blokerede flest sporingsforsøg i <b>%1$s</b> og <b>%2$s</b> (seneste døgn).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection blokerede <b>%1$s %2$d gang i %3$s</b> (seneste døgn).]]></string>
@@ -85,8 +85,8 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection har blokeret <b>%1$d sporingsforsøg i %2$s</b> og %3$d andre apps (seneste uge).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection blokerede <b>%1$s i %2$d app, %3$s</b> (seneste uge).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection blokerede <b>%1$s i %2$d apps, inkl. %3$s</b> (seneste uge).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection blokerede <b>%1$s i %2$d app, %3$s</b> (seneste uge).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[App Tracking Protection blokerede <b>%1$s i %2$d apps, inkl. %3$s</b> (seneste uge).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Aktiver App Tracking Protection</string>
@@ -269,12 +269,12 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d forsøg. Kendt for at indsamle:</item>
-        <item quantity="other">%1$d forsøg. Kendt for at indsamle:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d forsøg. Kendt for at indsamle:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d forsøg. Kendt for at indsamle:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">DuckDuckGo blokerede %1$d sporingsforsøg</item>
-        <item quantity="other">DuckDuckGo blokerede %1$d sporingsforsøg</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo blokerede %1$d sporingsforsøg</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo blokerede %1$d sporingsforsøg</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Rapportér et problem med denne app</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Vis %1$d mere</string>

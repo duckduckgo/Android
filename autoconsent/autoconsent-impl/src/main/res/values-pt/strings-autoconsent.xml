@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Podes sempre ajustar mais tarde nas Definições.</string>
     <string name="autoconsentPromptCpmOnMessage">Alguns cookies não podem ser rejeitados. Podemos aceitá-los por ti.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Aceitar cookies por mim</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Rejeitar se possível ou aceitar por mim</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Prefiro ser eu a aceitá-los</string>
     <string name="autoconsentPromptCpmOffMessage">Deixa-nos tratar deles por ti. Rejeitamos cookies quando possível e aceitamos os que não podem ser rejeitados.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Rejeitar se possível ou aceitar por mim</string>

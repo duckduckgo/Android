@@ -85,6 +85,30 @@ class RemoteMessagingDatabaseMigrationTest {
     }
 
     @Test
+    fun whenMigratingFromV4ToV5ThenActiveDayColumnsAddedAndExistingRowPreserved() {
+        testHelper.createDatabase(TEST_DB_NAME, 4).apply {
+            execSQL(
+                "INSERT INTO remote_message (id, message, status, shown, firstShownDate, impressions) " +
+                    "VALUES ('id1', '{}', 'SCHEDULED', 1, 1234, 2)",
+            )
+            close()
+        }
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 5, true, *RemoteMessagingDatabase.ALL_MIGRATIONS).apply {
+            val cursor = query(
+                "SELECT impressions, uniqueImpressionDays, lastImpressionDay FROM remote_message WHERE id = 'id1'",
+            )
+            cursor.moveToFirst()
+            assertEquals(2, cursor.getInt(cursor.getColumnIndexOrThrow("impressions")))
+            // a message shown before the migration starts counting active days from zero
+            assertEquals(0, cursor.getInt(cursor.getColumnIndexOrThrow("uniqueImpressionDays")))
+            assertTrue(cursor.isNull(cursor.getColumnIndexOrThrow("lastImpressionDay")))
+            cursor.close()
+            close()
+        }
+    }
+
+    @Test
     fun whenMigratingToLatestThenValidatesAgainstCurrentSchema() {
         testHelper.createDatabase(TEST_DB_NAME, 2).apply { close() }
 

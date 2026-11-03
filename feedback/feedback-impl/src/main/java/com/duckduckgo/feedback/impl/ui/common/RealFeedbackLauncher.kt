@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feedback.api.FeedbackLauncher
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

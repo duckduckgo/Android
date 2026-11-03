@@ -18,7 +18,7 @@ package com.duckduckgo.app.autocomplete.api
 
 import android.net.Uri
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AutoCompleteScorer {

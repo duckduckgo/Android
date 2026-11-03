@@ -26,7 +26,7 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -36,7 +36,7 @@ import logcat.logcat
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class ServerMigrationMonitor @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
     private val wgTunnelConfig: WgTunnelConfig,

@@ -25,11 +25,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.databinding.ViewDuckAiSettingsBinding
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.Command
@@ -37,7 +38,6 @@ import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.Com
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -97,7 +97,7 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
                 is SettingState.Enabled -> {
                     isVisible = true
                     setStatus(isOn = viewState.isDuckAiEnabled)
-                    setLeadingIconResource(DuckChatR.drawable.ic_duckduckgo_ai_color_24)
+                    setLeadingIconResource(DuckChatR.drawable.duck_ai_color_24)
                     isClickable = true
                     setClickListener { viewModel.onDuckAiClicked() }
                 }
@@ -106,7 +106,7 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
                     isClickable = false
                     setStatus(isOn = false)
                     setClickListener(null)
-                    setLeadingIconResource(DuckChatR.drawable.ic_duckduckgo_ai_grayscale_color_24)
+                    setLeadingIconResource(DuckChatR.drawable.duckduckgo_ai_grayscale_color_24)
                 }
                 SettingState.Hidden -> isGone = true
             }

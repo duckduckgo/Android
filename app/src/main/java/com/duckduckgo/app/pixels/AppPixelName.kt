@@ -57,7 +57,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE("sync-auto-restore_onboarding_prompt_shown_unique"),
     PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE("sync-auto-restore_onboarding_restore_tapped_unique"),
     PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE("sync-auto-restore_onboarding_skip_tapped_unique"),
-    PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE("m_preonboarding_skip_onboarding_shown_unique"),
     PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE("m_preonboarding_choose_search_experience_impressions_unique"),
     PREONBOARDING_AICHAT_SELECTED("m_preonboarding_aichat_selected"),
     PREONBOARDING_SEARCH_ONLY_SELECTED("m_preonboarding_search_only_selected"),
@@ -70,8 +69,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED("m_aichat_unified_input_chat_header_upgrade_tapped"),
     AI_CHAT_UNIFIED_INPUT_FREE_LABEL_SHOWN("m_aichat_unified_input_free_label_shown"),
     PREONBOARDING_SKIP_ONBOARDING_PRESSED("m_preonboarding_skip-onboarding-pressed"),
-    PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED("m_preonboarding_confirm-skip-onboarding-pressed"),
-    PREONBOARDING_RESUME_ONBOARDING_PRESSED("m_preonboarding_resume-onboarding-pressed"),
     ONBOARDING_SEARCH_CUSTOM("m_onboarding_search_custom"),
     ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
@@ -92,12 +89,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DEFAULT_BROWSER_UNSET("m_db_u"),
     DEFAULT_BROWSER_DIALOG_NOT_SHOWN("m_dbd_ns"),
 
-    WIDGET_CTA_SHOWN("m_wc_s"),
-    WIDGET_CTA_LAUNCHED("m_wc_l"),
-    WIDGET_CTA_DISMISSED("m_wc_d"),
-    WIDGET_LEGACY_CTA_SHOWN("m_wlc_s"),
-    WIDGET_LEGACY_CTA_LAUNCHED("m_wlc_l"),
-    WIDGET_LEGACY_CTA_DISMISSED("m_wlc_d"),
     WIDGETS_ADDED(pixelName = "m_w_a"),
     WIDGETS_DELETED(pixelName = "m_w_d"),
     FAVORITE_WIDGET_CONFIGURATION_SHOWN(pixelName = "m_sfw_cs"),
@@ -390,25 +381,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FORCE_DARK_MODE_ENABLED("ms_forced_dark_toggled_on"),
     FORCE_DARK_MODE_DISABLED("ms_forced_dark_toggled_off"),
 
-    ADDRESS_BAR_NEW_TAB_PAGE_CLICKED("m_addressbar_click_ntp"),
-    ADDRESS_BAR_WEBSITE_CLICKED("m_addressbar_click_website"),
-    ADDRESS_BAR_SERP_CLICKED("m_addressbar_click_serp"),
-    ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED("m_addressbar_focus_clear_entry_ntp"),
-    ADDRESS_BAR_WEBSITE_ENTRY_CLEARED("m_addressbar_focus_clear_entry_website"),
-    ADDRESS_BAR_SERP_ENTRY_CLEARED("m_addressbar_focus_clear_entry_serp"),
-    ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED("m_addressbar_focus_cancel_ntp"),
-    ADDRESS_BAR_WEBSITE_CANCELLED("m_addressbar_focus_cancel_website"),
-    ADDRESS_BAR_SERP_CANCELLED("m_addressbar_focus_cancel_serp"),
-    ADDRESS_BAR_NEW_TAB_PAGE_CLOSED("m_addressbar_focus_close_ntp"),
-    ADDRESS_BAR_WEBSITE_CLOSED("m_addressbar_focus_close_website"),
-    ADDRESS_BAR_SERP_CLOSED("m_addressbar_focus_close_serp"),
-    ADDRESS_BAR_NTP_FOCUSED("m_addressbar_focus_ntp"),
-    ADDRESS_BAR_AICHAT_CLICKED("m_addressbar_click_aichat"),
-
-    KEYBOARD_GO_NEW_TAB_CLICKED("m_keyboard_go_click_ntp"),
-    KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),
-    KEYBOARD_GO_SERP_CLICKED("m_keyboard_go_click_serp"),
-
     TAB_MANAGER_CLICKED("m_tab_manager_clicked"),
     TAB_MANAGER_CLICKED_DAILY("m_tab_manager_clicked_daily"),
     TAB_MANAGER_NEW_TAB_CLICKED("m_tab_manager_new_tab_click"),
@@ -456,6 +428,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     SWIPE_TABS_USED("m_swipe_tabs_used"),
     SWIPE_TABS_USED_DAILY("m_swipe_tabs_used_daily"),
+
+    TAB_MAX_REUSE_DISTANCE("tab_max_reuse_distance"),
 
     DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duckplayer_setting_always_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_SERP("duckplayer_setting_always_overlay_serp"),
@@ -511,8 +485,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 
-    BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
-
     SET_AS_DEFAULT_SYSTEM_DIALOG_IMPRESSION("m_set-as-default_system-dialog_impression"),
     SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK("m_set-as-default_system-dialog_click"),
     SET_AS_DEFAULT_SYSTEM_DIALOG_DISMISSED("m_set-as-default_system-dialog_dismissed"),
@@ -548,8 +520,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION("m_get_desktop_browser_complete_setup_impression"),
     GET_DESKTOP_BROWSER_CLICKED("m_get_desktop_browser_clicked"),
     GET_DESKTOP_BROWSER_DISMISSED("m_get_desktop_browser_dismissed"),
-    GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK("m_get_desktop_browser_share_download_link_click"),
-    GET_DESKTOP_BROWSER_LINK_CLICK("m_get_desktop_browser_link_click"),
 
     AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED("m_aichat_voice_session_digital-assistant_started"),
 

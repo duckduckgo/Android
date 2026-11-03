@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'com.google.devtools.ksp'
     id 'androidx.room'
 }
@@ -58,8 +57,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    // need access to Dagger annotations
-    implementation Google.dagger
     ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
     // multi-process shared preferences

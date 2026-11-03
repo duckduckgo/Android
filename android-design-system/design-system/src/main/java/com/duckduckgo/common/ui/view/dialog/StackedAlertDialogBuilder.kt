@@ -81,6 +81,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var stackedButtonList: MutableList<StackedButtonSpec> = mutableListOf()
     private var isDestructiveVersion: Boolean = false
     private var isRebrandUpdate: Boolean = false
+    private var isCancellable: Boolean = false
     private var componentCallbacks: ComponentCallbacks? = null
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): StackedAlertDialogBuilder {
@@ -153,6 +154,15 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
+    /**
+     * Allows the dialog to be dismissed by tapping outside it or pressing back. Off by default.
+     * [EventListener.onDialogCancelled] only fires when this is enabled.
+     */
+    fun setCancellable(cancellable: Boolean): StackedAlertDialogBuilder {
+        isCancellable = cancellable
+        return this
+    }
+
     fun addEventListener(eventListener: EventListener): StackedAlertDialogBuilder {
         listener = eventListener
         return this
@@ -171,7 +181,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val dialogBuilder = MaterialAlertDialogBuilder(context, dialogTheme)
             .setView(dialogContent(binding))
             .apply {
-                setCancelable(false)
+                setCancelable(isCancellable)
                 setOnDismissListener {
                     unregisterConfigurationCallback()
                     listener.onDialogDismissed()
@@ -217,7 +227,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         if (!isRebrandUpdate) return
 
         val shown = dialog ?: return
-        shown.window?.setLayout(cardWidth(), WindowManager.LayoutParams.WRAP_CONTENT)
+        shown.window?.setLayout(context.rebrandDialogCardWidth(), WindowManager.LayoutParams.WRAP_CONTENT)
         shown.window?.decorView?.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(view: View) = Unit
@@ -230,15 +240,10 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         registerConfigurationCallback()
     }
 
-    private fun cardWidth(): Int {
-        val maxWidth = context.resources.getDimensionPixelSize(R.dimen.rebrandDialogMaxWidth)
-        val margin = context.resources.getDimensionPixelSize(R.dimen.keyline_5)
-        return minOf(maxWidth, context.resources.displayMetrics.widthPixels - margin * 2)
-    }
-
     /**
-     * Rebuilds the dialog against the new configuration. The dialog is not cancellable, so dropping
-     * it on rotation would strand the caller's flow with no way back to it.
+     * Rebuilds the dialog against the new configuration. Dropping it on rotation would strand the
+     * caller's flow: a non-cancellable dialog leaves no way back to it, and a cancellable one would
+     * report a cancellation the user never made.
      */
     private fun registerConfigurationCallback() {
         if (componentCallbacks != null) return
@@ -287,9 +292,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         if (headerImageDrawableId > 0) {
             binding.stackedAlertDialogImage.setImageResource(headerImageDrawableId)
             if (isRebrandUpdate) {
-                val inset = context.resources.getDimensionPixelSize(R.dimen.rebrandDialogIconInset)
-                binding.stackedAlertDialogImage.setBackgroundResource(R.drawable.background_dialog_icon_circular)
-                binding.stackedAlertDialogImage.setPadding(inset, inset, inset, inset)
+                binding.stackedAlertDialogImage.applyRebrandHeaderIconStyle()
                 binding.stackedAlertDialogTitle.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                     topMargin = context.resources.getDimensionPixelSize(R.dimen.keyline_4)
                 }

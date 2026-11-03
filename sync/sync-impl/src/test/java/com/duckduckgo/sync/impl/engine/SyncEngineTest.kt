@@ -16,8 +16,11 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import android.annotation.SuppressLint
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
@@ -35,8 +38,10 @@ import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.API_CODE.TOO_MANY_REQUESTS_1
+import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
@@ -55,13 +60,16 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @Suppress("SameParameterValue")
+@SuppressLint("DenyListedApi")
 internal class SyncEngineTest {
 
     private val syncApiClient: SyncApiClient = mock()
@@ -74,6 +82,8 @@ internal class SyncEngineTest {
     private val syncablePersisterPlugins: PluginPoint<SyncableDataPersister> = mock()
     private val deletableDataManagerPlugins: PluginPoint<DeletableDataManager> = mock()
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle> = mock()
+    private val connectedDevicesRepository: ConnectedDevicesRepository = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private lateinit var syncEngine: RealSyncEngine
 
     @Before
@@ -82,17 +92,102 @@ internal class SyncEngineTest {
             syncApiClient,
             syncScheduler,
             syncStateRepository,
+            connectedDevicesRepository,
             syncPixels,
             syncStore,
+            syncFeature,
             syncOperationErrorRecorder,
             providerPlugins,
             syncablePersisterPlugins,
             deletableDataManagerPlugins,
             lifecyclePlugins,
         )
+        syncFeature.refreshConnectedDevicesOnSync().setRawStoredState(State(enable = true))
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(syncStore.syncingDataEnabled).thenReturn(true)
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(emptyList())
+    }
+
+    @Test
+    fun whenAppOpenSyncFinishesThenConnectedDevicesAreRefreshedAfterSuccess() {
+        givenNoLocalChanges()
+        givenGetSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        val inOrder = inOrder(connectedDevicesRepository, syncStateRepository)
+        inOrder.verify(syncStateRepository).updateSyncState(SUCCESS)
+        inOrder.verify(connectedDevicesRepository).getConnectedDevices(reportAccountErrorPixel = false)
+    }
+
+    @Test
+    fun whenBackgroundSyncFinishesThenConnectedDevicesAreRefreshed() {
+        whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
+        givenNoLocalChanges()
+        givenGetSuccess()
+
+        syncEngine.triggerSync(BACKGROUND_SYNC)
+
+        verify(connectedDevicesRepository).getConnectedDevices(reportAccountErrorPixel = false)
+    }
+
+    @Test
+    fun whenRefreshFlagDisabledThenAppOpenAndBackgroundSyncsDoNotRefreshConnectedDevices() {
+        syncFeature.refreshConnectedDevicesOnSync().setRawStoredState(State(enable = false))
+        whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
+        givenNoLocalChanges()
+        givenGetSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+        syncEngine.triggerSync(BACKGROUND_SYNC)
+
+        verify(connectedDevicesRepository, never()).getConnectedDevices(any())
+    }
+
+    @Test
+    fun whenRefreshFlagDisabledThenAccountLoginStillRefreshesConnectedDevices() {
+        syncFeature.refreshConnectedDevicesOnSync().setRawStoredState(State(enable = false))
+        givenNoLocalChanges()
+        givenGetSuccess()
+
+        syncEngine.triggerSync(ACCOUNT_LOGIN)
+
+        verify(connectedDevicesRepository).getConnectedDevices(reportAccountErrorPixel = false)
+    }
+
+    @Test
+    fun whenRefreshFlagDisabledThenAccountCreationStillRefreshesConnectedDevicesAfterSuccess() {
+        syncFeature.refreshConnectedDevicesOnSync().setRawStoredState(State(enable = false))
+        givenLocalChanges()
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(ACCOUNT_CREATION)
+
+        val inOrder = inOrder(connectedDevicesRepository, syncStateRepository)
+        inOrder.verify(syncStateRepository).updateSyncState(SUCCESS)
+        inOrder.verify(connectedDevicesRepository).getConnectedDevices(reportAccountErrorPixel = false)
+    }
+
+    @Test
+    fun whenDataChangeOrFeatureReadSyncFinishesThenConnectedDevicesAreNotRefreshed() {
+        givenNoLocalChanges()
+        givenGetSuccess()
+
+        syncEngine.triggerSync(DATA_CHANGE)
+        syncEngine.triggerSync(FEATURE_READ)
+
+        verify(connectedDevicesRepository, never()).getConnectedDevices(any())
+    }
+
+    @Test
+    fun whenRefreshingConnectedDevicesThrowsThenSyncStillSucceeds() {
+        givenNoLocalChanges()
+        givenGetSuccess()
+        whenever(connectedDevicesRepository.getConnectedDevices(reportAccountErrorPixel = false)).thenThrow(RuntimeException("boom"))
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
     @Test

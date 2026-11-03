@@ -39,6 +39,7 @@ data class JsonDisplayConditions(
     val trigger: String? = null,
     val dismissAfterDaysShown: Int? = null,
     val maxImpressions: Int? = null,
+    val dismissAfterUniqueDailyImpressions: Int? = null,
 )
 
 data class JsonContent(
@@ -104,4 +105,5 @@ sealed class JsonMessageType(val jsonValue: String) {
     data object BIG_TWO_ACTION : JsonMessageType("big_two_action")
     data object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
     data object CARDS_LIST : JsonMessageType("cards_list")
+    data object ACTIONABLE_ITEMS : JsonMessageType("actionable_items")
 }

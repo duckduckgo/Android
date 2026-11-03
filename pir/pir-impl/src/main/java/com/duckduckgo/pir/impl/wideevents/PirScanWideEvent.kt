@@ -21,14 +21,15 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -51,6 +52,7 @@ interface PirScanWideEvent {
         batteryOptimizationsEnabled: Boolean,
         notificationsPermissionGranted: Boolean,
         isTrackerBlockingEnabled: Boolean,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -138,7 +140,7 @@ interface PirScanWideEvent {
     }
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class PirScanWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -169,6 +171,7 @@ class PirScanWideEventImpl @Inject constructor(
         batteryOptimizationsEnabled: Boolean,
         notificationsPermissionGranted: Boolean,
         isTrackerBlockingEnabled: Boolean,
+        isFreeScan: Boolean,
     ) {
         if (!isFeatureEnabled()) return
         if (executionType == PirExecutionType.SCHEDULED && !sampleScheduledIn()) return
@@ -184,6 +187,7 @@ class PirScanWideEventImpl @Inject constructor(
             batteryOptimizationsEnabled = batteryOptimizationsEnabled,
             notificationsPermissionGranted = notificationsPermissionGranted,
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+            isFreeScan = isFreeScan,
             scheduling = schedulingMetadataValue(),
         )
     }
@@ -262,6 +266,7 @@ class PirScanWideEventImpl @Inject constructor(
                 duration = TIMEOUT_DURATION,
                 flowStatus = FlowStatus.Unknown,
             ),
+            definition = WideEventDefinition(version = DEFINITION_VERSION),
         ).getOrNull() ?: return
 
         recordStep(flowId, STEP_STARTED)
@@ -355,6 +360,7 @@ class PirScanWideEventImpl @Inject constructor(
             batteryOptimizationsEnabled: Boolean,
             notificationsPermissionGranted: Boolean,
             isTrackerBlockingEnabled: Boolean,
+            isFreeScan: Boolean,
             scheduling: String,
         ) {
             mutex.withLock {
@@ -396,11 +402,13 @@ class PirScanWideEventImpl @Inject constructor(
                         KEY_NOTIFICATIONS_PERMISSION_GRANTED to notificationsPermissionGranted.toString(),
                         KEY_TRACKER_BLOCKING_STATE to isTrackerBlockingEnabled.toTrackerBlockingState(),
                         KEY_SCHEDULING to scheduling,
+                        KEY_FREE_SCAN to isFreeScan.toString(),
                     ),
                     cleanupPolicy = CleanupPolicy.OnTimeout(
                         duration = TIMEOUT_DURATION,
                         flowStatus = FlowStatus.Unknown,
                     ),
+                    definition = WideEventDefinition(version = DEFINITION_VERSION),
                 ).getOrNull() ?: return@withLock
 
                 cachedFlowId = newFlowId
@@ -658,6 +666,7 @@ class PirScanWideEventImpl @Inject constructor(
 
     companion object {
         private val TIMEOUT_DURATION = 8.hours
+        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 1)
 
         const val WIDE_EVENT_NAME_MANUAL = "pir-initial-scan"
         const val WIDE_EVENT_NAME_SCHEDULED = "pir-scheduled-scan"
@@ -683,6 +692,7 @@ class PirScanWideEventImpl @Inject constructor(
         const val KEY_VPN_CONNECTION_STATE = "vpn_connection_state"
         const val KEY_NOTIFICATIONS_PERMISSION_GRANTED = "notifications_permission_granted"
         const val KEY_TRACKER_BLOCKING_STATE = "tracker_blocking_state"
+        const val KEY_FREE_SCAN = "free_scan"
         const val KEY_SCHEDULING = "scheduling"
         const val KEY_LAST_STEP = "last_step"
         const val KEY_LAST_STEP_ELAPSED = "last_step_elapsed_ms_bucketed"

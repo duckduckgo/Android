@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.plugins
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
@@ -36,5 +36,7 @@ class ReasoningModePickerNativeInputPlugin @Inject constructor() : NativeInputPl
 
     override val containerId: Int = R.id.reasoningModePickerContainer
 
-    override fun createView(context: Context, host: NativeInputHost): View = ReasoningModePickerView(context)
+    override fun createView(context: Context, host: NativeInputHost): View = ReasoningModePickerView(context).also {
+        it.isEditMode = host.isEditSurface()
+    }
 }

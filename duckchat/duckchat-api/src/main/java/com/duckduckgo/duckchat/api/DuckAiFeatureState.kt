@@ -25,11 +25,6 @@ interface DuckAiFeatureState {
     val showSettings: StateFlow<Boolean>
 
     /**
-     * Indicates whether focusing the omnibar should navigate to a new Duck.ai input screen with a Search/AI mode switcher.
-     */
-    val showInputScreen: StateFlow<Boolean>
-
-    /**
      * Indicates whether the Duck AI shortcut should be shown in the popup menus in the main browser tabs as well as on the tab switcher screen.
      */
     val showPopupMenuShortcut: StateFlow<Boolean>
@@ -43,11 +38,6 @@ interface DuckAiFeatureState {
      * Indicates whether the Duck AI omnibar shortcut should be shown in all states, including when the omnibar is not focused.
      */
     val showOmnibarShortcutInAllStates: StateFlow<Boolean>
-
-    /**
-     * Indicates whether the new address bar option choice screen feature is enabled.
-     */
-    val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean>
 
     /**
      * Indicates whether the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
@@ -71,13 +61,18 @@ interface DuckAiFeatureState {
     val showContextualMode: StateFlow<Boolean>
 
     /**
+     * Indicates whether the "Ask Duck.ai" text selection menu item should be shown.
+     */
+    val showTextSelectionAction: StateFlow<Boolean>
+
+    /**
      * Indicates whether Duck.ai should be used as digital assistant
      */
     val allowDuckAiAsDigitalAssistant: StateFlow<Boolean>
 
     /**
-     * True when the native input field is the active input surface. Mutually exclusive with
-     * [showInputScreen] (which is computed with `&& !isNativeInputFieldEnabled`).
+     * Indicates whether the Duck.ai sidebar button should open the native chat history screen
+     * instead of the legacy web sidebar.
      */
-    val nativeInputFieldEnabled: StateFlow<Boolean>
+    val nativeDuckAiSidebar: StateFlow<Boolean>
 }

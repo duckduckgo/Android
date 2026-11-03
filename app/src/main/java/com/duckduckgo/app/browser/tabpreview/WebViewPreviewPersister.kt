@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.tabpreview
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.file.FileDeleter
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat

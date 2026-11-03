@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="@string/afterInactivityTimeoutRowTitle"
+                app:primaryText="@string/afterInactivityTimeoutTitle"
                 tools:secondaryText="5 minutes"
                 tools:visibility="visible" />
 
@@ -60,7 +60,7 @@
                 android:paddingEnd="@dimen/keyline_4"
                 android:paddingTop="@dimen/keyline_2"
                 android:paddingBottom="@dimen/keyline_2"
-                android:text="@string/afterInactivityScreenSectionHeader"
+                android:text="@string/afterInactivityScreenDescription"
                 app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
@@ -68,14 +68,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/oneLineItemHeight"
-                app:primaryText="@string/showOnAppLaunchOptionLastOpenedTab" />
+                app:primaryText="@string/showOnAppLaunchOptionLastUsedTab" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/newTabCheckListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/oneLineItemHeight"
-                app:primaryText="@string/showOnAppLaunchOptionNewTabPage" />
+                app:primaryText="@string/showOnAppLaunchOptionOpenNewTab" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/specificPageCheckListItem"
@@ -107,8 +107,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="@string/returnToLastTabSettingTitle"
-                app:secondaryText="@string/returnToLastTabSettingSubtitle"
+                app:primaryText="@string/returnToLastTabShortcutSettingTitle"
+                app:secondaryText="@string/returnToLastTabShortcutSettingSubtitle"
                 app:showSwitch="true"
                 tools:visibility="visible" />
 

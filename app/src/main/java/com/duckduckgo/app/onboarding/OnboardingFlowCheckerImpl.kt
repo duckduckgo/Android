@@ -23,13 +23,13 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class OnboardingFlowCheckerImpl @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val settingsDataStore: SettingsDataStore,

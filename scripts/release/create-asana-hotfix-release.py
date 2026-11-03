@@ -97,6 +97,7 @@ def main():
     parser.add_argument('--asana-workspace-id', help='Asana workspace ID (not required with --dry-run)')
     parser.add_argument('--asana-api-key-env-var', help='Environment variable name containing the API key (not required with --dry-run)')
     parser.add_argument('--template-task-id', help='Asana template task ID to duplicate (not required with --dry-run)')
+    parser.add_argument('--grafana-dashboard-base-url', help="Grafana app-health-monitoring dashboard URL up to and including 'var-Default='; the release tag is appended to it. Optional: if omitted, the task's Grafana link placeholder is left for the release DRI to fill in by hand")
     parser.add_argument('--dry-run', action='store_true', help='Only resolve and print the tasks that would be included; make no Asana API calls')
 
     args = parser.parse_args()
@@ -167,6 +168,7 @@ def main():
             args.asana_section_id,
             args.asana_project_id,
             cherry_links,
+            args.grafana_dashboard_base_url,
             previous_release_links=prior_links,
             previous_release_label=previous_label,
         )

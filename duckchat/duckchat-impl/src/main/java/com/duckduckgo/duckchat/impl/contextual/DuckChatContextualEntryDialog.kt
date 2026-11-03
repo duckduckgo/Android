@@ -20,7 +20,6 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -39,8 +38,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoBottomSheetDialogFragment
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -49,6 +49,7 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.DialogContextualDuckAiEntryBinding
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -60,11 +61,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 import com.google.android.material.R as MaterialR
@@ -83,6 +84,12 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     @Inject
     lateinit var contextualNativeInputManager: ContextualNativeInputManager
+
+    @Inject
+    lateinit var tabRepository: TabRepository
+
+    @Inject
+    lateinit var duckChatFeature: DuckChatFeature
 
     @Inject
     @Named("ContentScopeScripts")
@@ -196,14 +203,23 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         viewModel.commands
             .onEach { handleCommand(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        if (duckChatFeature.contextualEntryDismissOnTabChange().isEnabled()) {
+            tabRepository.flowSelectedTab
+                .filterNotNull()
+                .distinctUntilChanged()
+                .filter { it.tabId != tabId }
+                .onEach { dismissAllowingStateLoss() }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
+        }
     }
 
     private fun renderViewState(state: DuckChatContextualEntryViewModel.ViewState) {
         val context = state.attachedContext
         if (context != null) {
-            binding.entryNativeInputWidget.setPageContext(context.title, context.url)
+            binding.entryNativeInputCard.widget.setPageContext(context.title, context.url)
         } else {
-            binding.entryNativeInputWidget.clearPageContext()
+            binding.entryNativeInputCard.widget.clearPageContext()
         }
         updateQuickActionVisibility()
     }
@@ -220,27 +236,22 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun registerFileChooserResult() {
         externalCameraLauncher.registerForResult(this) { result ->
-            // The launcher may deliver the result from a background thread (media capture moves the file
-            // off the main thread), so hop back to the main thread before touching views / WebView callbacks.
-            lifecycleScope.launch {
-                when (result) {
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured ->
-                        pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(result.file)))
+            when (result) {
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured ->
+                    pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(result.file)))
 
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
-                        pendingUploadTask?.onReceiveValue(null)
-                        externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), result.inputAction)
-                    }
-
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
-                        pendingUploadTask?.onReceiveValue(null)
-                        Snackbar.make(binding.entryDialogRoot, result.messageId, Snackbar.LENGTH_SHORT).show()
-                    }
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
+                    pendingUploadTask?.onReceiveValue(null)
+                    externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), result.inputAction)
                 }
-                pendingUploadTask = null
-                restoreInputFocusAfterPicker()
+
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
+                    pendingUploadTask?.onReceiveValue(null)
+                    Snackbar.make(binding.entryDialogRoot, result.messageId, Snackbar.LENGTH_SHORT).show()
+                }
             }
+            pendingUploadTask = null
         }
     }
 
@@ -280,23 +291,10 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun focusInput() {
         // Auto-focus the composer once laid out so the keyboard comes up as soon as the dialog is shown.
-        binding.entryNativeInputWidget.doOnLayout {
-            binding.entryNativeInputWidget.focusInput(activity)
+        binding.entryNativeInputCard.widget.doOnLayout {
+            binding.entryNativeInputCard.widget.focusInput(activity)
         }
     }
-
-    private fun restoreInputFocusAfterPicker() {
-        binding.entryNativeInputWidget.doOnLayout {
-            if (isExternalKeyboardConnected()) {
-                binding.entryNativeInputWidget.requestInputFocus()
-            } else {
-                binding.entryNativeInputWidget.focusInput(activity)
-            }
-        }
-    }
-
-    private fun isExternalKeyboardConnected(): Boolean =
-        resources.configuration.keyboard != Configuration.KEYBOARD_NOKEYS
 
     private fun configureSuggestions() {
         binding.entrySuggestionsView.onSuggestionSelected = { suggestion ->
@@ -323,7 +321,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.viewState
-            .map { it.attachedContext?.serialized }
+            .map { it.latestPageContext }
             .filterNotNull()
             .distinctUntilChanged()
             .onEach { binding.entrySuggestionsView.onPageContextUpdated(it) }
@@ -335,8 +333,8 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureInput() {
         contextualNativeInputManager.init(
             tabId = tabId,
-            card = binding.entryNativeInputCard,
-            widget = binding.entryNativeInputWidget,
+            inputLayout = binding.entryNativeInputCard,
+            footer = binding.entryNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
             chatIdFlow = chatIdFlow,
@@ -350,7 +348,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             onAskAboutPage = { viewModel.onAttachContextRequested() },
             onPageContextRemoved = { viewModel.onContextRemoved() },
             onVoiceChatRequested = {
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
                 dismiss()
             },
             onVoiceSearchRequested = {
@@ -368,7 +366,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     ) {
         if (query.isBlank()) return
         if (isDuckAiResult) {
-            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null))
+            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null), voice = true)
         } else {
             startActivity(browserNav.openInNewTab(requireContext(), query))
             dismiss()
@@ -412,11 +410,9 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         pendingUploadTask = null
         if (resultCode != Activity.RESULT_OK || data == null) {
             uploadTask?.onReceiveValue(null)
-            restoreInputFocusAfterPicker()
             return
         }
         uploadTask?.onReceiveValue(fileChooserIntentBuilder.extractSelectedFileUris(data))
-        restoreInputFocusAfterPicker()
     }
 
     override fun onDismiss(dialog: DialogInterface) {

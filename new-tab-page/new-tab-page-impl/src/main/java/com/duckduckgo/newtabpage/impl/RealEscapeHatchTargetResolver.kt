@@ -23,12 +23,12 @@ import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.EscapeHatchTarget
 import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class RealEscapeHatchTargetResolver @Inject constructor(
     private val browserMode: BrowserMode,

@@ -1,7 +1,7 @@
 {
   "name": "PublicRecordsInfo",
   "url": "publicrecords.info",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "propertyrecord.com",
   "addedDatetime": 1775829600000,
   "optOutUrl": "https://dashboard.publicrecords.info/opt-out",
@@ -12,29 +12,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "_comment": "Forwarding page source: https://github.com/duckduckgo/privacy-test-pages/blob/main/pir/opt-out/index.html",
-          "url": "https://privacy-test-pages.site/pir/opt-out/?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}&to=https%3A%2F%2Fdashboard.publicrecords.info%2Fopt-out%2Frecords",
+          "url": "https://dashboard.publicrecords.info/opt-out/records?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}",
           "id": "7ae485fd-ed88-482b-85d9-ddb2606143f6"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "#forward"
-            }
-          ],
-          "id": "42f9473b-625e-494a-8b7c-e18d03141e24"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "#forward"
-            }
-          ],
-          "id": "9029478a-9754-4ba6-8dee-b506c9f46651"
         },
         {
           "actionType": "expectation",

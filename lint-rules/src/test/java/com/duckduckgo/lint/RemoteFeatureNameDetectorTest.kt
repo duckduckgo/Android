@@ -30,7 +30,7 @@ class RemoteFeatureNameDetectorTest {
             .files(REMOTE_FEATURE_ANNOTATION_STUB, kt("""
                 package com.test
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "myFeature")
@@ -51,7 +51,7 @@ class RemoteFeatureNameDetectorTest {
             .files(REMOTE_FEATURE_ANNOTATION_STUB, kt("""
                 package com.test
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "my_feature")
@@ -76,7 +76,7 @@ class RemoteFeatureNameDetectorTest {
             .files(REMOTE_FEATURE_ANNOTATION_STUB, kt("""
                 package com.test
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "myFeature")
@@ -102,7 +102,7 @@ class RemoteFeatureNameDetectorTest {
             .files(REMOTE_FEATURE_ANNOTATION_STUB, kt("""
                 package com.test
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "my_feature")
@@ -149,7 +149,7 @@ class RemoteFeatureNameDetectorTest {
             .files(REMOTE_FEATURE_ANNOTATION_STUB, kt("""
                 package com.test
 
-                import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+                import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
                 import com.duckduckgo.feature.toggles.api.Toggle
 
                 @ContributesRemoteFeature(scope = Any::class, featureName = "myFeature")
@@ -175,7 +175,7 @@ class RemoteFeatureNameDetectorTest {
 
     companion object {
         private val REMOTE_FEATURE_ANNOTATION_STUB = kt("""
-            package com.duckduckgo.anvil.annotations
+            package com.duckduckgo.codegen.annotations
 
             import kotlin.reflect.KClass
 

@@ -156,6 +156,20 @@ tags:
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/primaryActionButton"
             index: 0
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Compose AppTP Banner Enabled"
+            direction: DOWN
+        - assertVisible: "Compose AppTP Banner Enabled"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Compose AppTP Banner Revoked"
+            direction: DOWN
+        - assertVisible: "Compose AppTP Banner Revoked"
         - tapOn: "LIST ITEMS"
         - scrollUntilVisible:
             timeout: 50000

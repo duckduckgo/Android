@@ -19,12 +19,14 @@ package com.duckduckgo.subscriptions.impl.onboarding.welcome
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
@@ -42,6 +44,9 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var appTheme: AppTheme
+
     private val binding: FragmentSubscriptionOnboardingWelcomeBinding by viewBinding()
     private val viewModel: SubscriptionOnboardingWelcomeViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingWelcomeViewModel::class.java]
@@ -49,6 +54,15 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.subscriptionOnboardingWelcomeDax.setImageResource(
+            if (appTheme.isLightModeEnabled()) {
+                R.drawable.subscription_onboarding_dax_light
+            } else {
+                R.drawable.subscription_onboarding_dax_dark
+            },
+        )
+
         binding.subscriptionOnboardingWelcomePrimaryButton.setOnClickListener {
             viewModel.onPrimaryCtaClicked()
         }
@@ -67,13 +81,16 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
 
     private fun processCommand(command: Command) {
         when (command) {
-            Command.LaunchConfetti -> binding.subscriptionOnboardingWelcomeKonfetti.doOnLayout {
-                binding.subscriptionOnboardingWelcomeKonfetti.launchOnboardingConfetti()
+            Command.LaunchConfetti -> binding.subscriptionOnboardingWelcomeConfetti.doOnLayout {
+                binding.subscriptionOnboardingWelcomeConfetti.fire()
             }
         }
     }
 
     private fun render(viewState: ViewState) {
+        binding.subscriptionOnboardingWelcomeBanner.isVisible = viewState.isFreeTrial
+        if (!viewState.isFreeTrial) return
+
         binding.subscriptionOnboardingWelcomeBannerDescription.text =
             getString(R.string.subscriptionOnboardingWelcomeBannerDescription, viewState.formattedBillingDate)
 

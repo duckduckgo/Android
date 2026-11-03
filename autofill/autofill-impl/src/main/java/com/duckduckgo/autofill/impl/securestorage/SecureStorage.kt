@@ -22,8 +22,8 @@ import com.duckduckgo.autofill.store.SecureStorageRepository
 import com.duckduckgo.autofill.store.db.WebsiteLoginCredentialsEntity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -166,7 +166,7 @@ interface SecureStorage {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealSecureStorage @Inject constructor(
     private val secureStorageRepositoryFactory: SecureStorageRepository.Factory,
     private val dispatchers: DispatcherProvider,

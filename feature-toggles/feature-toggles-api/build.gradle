@@ -34,9 +34,9 @@ dependencies {
     api project(":experiments-api")
     api project(":feature-toggles-internal-api")
 
-    implementation Google.dagger
     implementation "org.apache.commons:commons-math3:_"
     implementation("com.google.guava:guava:_")
     implementation KotlinX.coroutines.core
+    compileOnly "javax.inject:javax.inject:_"
 }
 

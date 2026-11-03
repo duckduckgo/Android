@@ -75,16 +75,16 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Ste prepričani, da želite izbrisati "</string>
     <string name="bookmarkFolderEmpty">Prazno</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s in %3$d element?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s in %3$d element?</item>
         <item quantity="two">%1$s%2$s in %3$d elementa?</item>
         <item quantity="few">%1$s%2$s in %3$d elementi?</item>
-        <item quantity="other">%1$s%2$s in %3$d elementov?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s in %3$d elementov?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d element</item>
         <item quantity="two">%1$d elementa</item>
         <item quantity="few">%1$d elementi</item>
-        <item quantity="other">%1$d elementov</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d elementov</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -99,10 +99,10 @@
     <string name="removeFromFavorites">Odstranitev iz priljubljenih</string>
     <string name="addToFavoritesMenu">Dodaj med priljubljene</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Ali ste prepričani, da želite izbrisati to mapo in %1$d element?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Ali ste prepričani, da želite izbrisati to mapo in %1$d element?</item>
         <item quantity="two">Ali ste prepričani, da želite izbrisati to mapo in %1$d elementa?</item>
         <item quantity="few">Ali ste prepričani, da želite izbrisati to mapo in %1$d elemente?</item>
-        <item quantity="other">Ali ste prepričani, da želite izbrisati to mapo in %1$d elementov?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Ali ste prepričani, da želite izbrisati to mapo in %1$d elementov?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ali ste prepričani, da želite izbrisati zaznamek za &lt;b&gt;%1$s&lt;/b&gt;?</string>
 

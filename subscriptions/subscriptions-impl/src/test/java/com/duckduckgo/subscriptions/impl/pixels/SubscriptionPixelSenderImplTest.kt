@@ -39,6 +39,17 @@ class SubscriptionPixelSenderImplTest {
     }
 
     @Test
+    fun whenReportOfferSubscribeClickWithPirFreeScanOriginThenOriginIsAttached() {
+        testee.reportOfferSubscribeClick(origin = "funnel_freescan_android")
+
+        verify(pixel).fire(
+            pixelName = "m_privacy-pro_terms-conditions_subscribe_click_c",
+            type = Count,
+            parameters = mapOf("origin" to "funnel_freescan_android"),
+        )
+    }
+
+    @Test
     fun whenReportExpirationReminderScheduledThenFiresScheduledPixel() {
         testee.reportExpirationReminderScheduled()
 
@@ -76,6 +87,13 @@ class SubscriptionPixelSenderImplTest {
             pixelName = "m_subscription_expiration_reminder_not_fired_permissions_rejected",
             type = Count,
         )
+    }
+
+    @Test
+    fun whenReportSubscriptionSwitchThenFiresSwitchPixel() {
+        testee.reportSubscriptionSwitch()
+
+        verify(pixel).fire(pixelName = "subscription_switch", type = Count)
     }
 
     @Test

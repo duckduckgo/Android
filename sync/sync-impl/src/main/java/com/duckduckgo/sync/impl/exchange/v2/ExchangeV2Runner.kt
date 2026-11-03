@@ -27,8 +27,8 @@ import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -111,6 +111,12 @@ interface ExchangeV2Runner {
     val peerKind: String?
 
     /**
+     * Protocol version negotiated with the peer: the lower of the two sides' versions. Baseline
+     * v2.0 until the peer's version is learned (from the scanned linking code or the hello message).
+     */
+    val protocolVersion: ExchangeProtocolVersion.V2
+
+    /**
      * Join the session behind a linking code this device scanned or pasted. Returns immediately;
      * the session is only usable once [ExchangeV2Event.SessionStarted] has been emitted, and a code
      * that doesn't parse surfaces as a [ExchangeV2Event.SessionError] rather than a thrown exception.
@@ -146,7 +152,7 @@ interface ExchangeV2Runner {
     fun localTrigger(trigger: LocalTrigger): Job
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealExchangeV2Runner @Inject constructor(
     private val smFactory: ExchangeV2StateMachineFactory,
@@ -207,6 +213,7 @@ class RealExchangeV2Runner @Inject constructor(
     override val canStartAsPresenter: Boolean get() = true
     override val peerName: String? get() = peerData?.name
     override val peerKind: String? get() = peerData?.kind
+    override val protocolVersion: ExchangeProtocolVersion.V2 get() = negotiatedVersion
 
     // -----------------------------------------------------------------------
     // Entry points

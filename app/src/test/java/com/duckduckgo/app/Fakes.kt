@@ -94,7 +94,7 @@ class FakeSettingsDataStore :
         }
 
     override var selectedFireAnimation: FireAnimation
-        get() = store["selectedFireAnimation"] as FireAnimation? ?: FireAnimation.HeroFire
+        get() = store["selectedFireAnimation"] as FireAnimation? ?: FireAnimation.Inferno
         set(value) {
             store["selectedFireAnimation"] = value
         }
@@ -112,6 +112,12 @@ class FakeSettingsDataStore :
         get() = store["appUsedSinceLastClear"] as Boolean? ?: true
         set(value) {
             store["appUsedSinceLastClear"] = value
+        }
+
+    override var tabsClearedCount: Int
+        get() = store["tabsClearedCount"] as Int? ?: 0
+        set(value) {
+            store["tabsClearedCount"] = value
         }
 
     override var automaticallyClearWhatOption: ClearWhatOption

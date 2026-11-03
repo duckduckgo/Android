@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
@@ -31,9 +31,18 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class StartChatViewModel @Inject constructor(
     duckAiFeatureState: DuckAiFeatureState,
-    duckChatInternal: DuckChatInternal,
+    private val duckChatInternal: DuckChatInternal,
     nativeInputStateProvider: NativeInputStateProvider,
 ) : ViewModel() {
+
+    enum class IconAction { SUBMIT, SHOW_MENU }
+
+    /**
+     * An empty input has nothing to send, so it offers the Duck.ai menu instead of starting a chat.
+     * Anything typed always goes straight to Duck.ai.
+     */
+    fun onIconClicked(inputEmpty: Boolean): IconAction =
+        if (inputEmpty && duckChatInternal.isContextualMenuAllChatsEnabled()) IconAction.SHOW_MENU else IconAction.SUBMIT
 
     /**
      * Show the start-chat icon only when Duck.ai is available (feature enabled +

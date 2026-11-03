@@ -19,7 +19,7 @@ package com.duckduckgo.pir.impl.pixels
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants

@@ -18,11 +18,11 @@ package com.duckduckgo.autofill.impl.store
 
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class DefaultAutofillStore @Inject constructor(
     private val autofillStore: InternalAutofillStore,

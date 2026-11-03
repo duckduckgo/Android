@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui.pairing.recover
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataContract.Input
 import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataContract.Output
@@ -28,7 +29,11 @@ class RecoverSyncedDataContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return RecoverSyncedDataActivity.intent(context, input.launchSource)
+        return RecoverSyncedDataActivity.intent(
+            context = context,
+            launchSource = input.launchSource,
+            isAuthRequired = input.isAuthRequired,
+        )
     }
 
     override fun parseResult(
@@ -48,7 +53,8 @@ class RecoverSyncedDataContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val launchSource: String?,
+        val launchSource: SyncLaunchSource,
+        val isAuthRequired: Boolean,
     )
 
     sealed interface Output {

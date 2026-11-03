@@ -33,16 +33,16 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
+@SingleIn(VpnScope::class)
 class NetPEnabledNotificationContentPlugin @Inject constructor(
     private val resources: Resources,
     private val networkProtectionState: NetworkProtectionState,

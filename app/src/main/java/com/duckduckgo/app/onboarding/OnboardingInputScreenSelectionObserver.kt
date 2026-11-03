@@ -25,7 +25,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,9 +37,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class OnboardingInputScreenSelectionObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

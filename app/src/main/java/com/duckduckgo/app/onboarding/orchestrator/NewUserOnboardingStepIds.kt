@@ -32,7 +32,6 @@ internal object NewUserOnboardingStepIds {
     const val AI_COMPARISON_CHART: LinearOnboardingStepId = "ai_comparison_chart"
     const val DUCK_AI_DEMO: LinearOnboardingStepId = "duck_ai_demo"
     const val DEFAULT_BROWSER_PROMPT: LinearOnboardingStepId = "default_browser_prompt"
-    const val ADD_TO_DOCK: LinearOnboardingStepId = "add_to_dock"
     const val WIDGET_PROMPT: LinearOnboardingStepId = "widget_prompt"
     const val ADD_WIDGET: LinearOnboardingStepId = "add_widget"
     const val PASSWORD_IMPORT: LinearOnboardingStepId = "password_import"

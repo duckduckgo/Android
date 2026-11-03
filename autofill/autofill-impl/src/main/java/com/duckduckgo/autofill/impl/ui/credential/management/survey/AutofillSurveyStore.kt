@@ -21,8 +21,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -34,8 +35,8 @@ interface AutofillSurveyStore {
     suspend fun updateAvailableSurveys(json: String)
 }
 
-@ContributesBinding(AppScope::class, boundType = AutofillSurveyStore::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<AutofillSurveyStore>())
+@SingleIn(AppScope::class)
 class AutofillSurveyStoreImpl @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,

@@ -28,7 +28,8 @@ import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import logcat.LogPriority.INFO
@@ -56,9 +57,9 @@ class TrackerDataDevReceiver(
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class TrackerDataDevReceiverRegister @Inject constructor(
     private val context: Context,

@@ -36,12 +36,23 @@ internal val PLUGIN_POINT_API = TestFiles.kt(
 ).indented()
 internal val PLUGIN_POINT_ANNOTATIONS_API = TestFiles.kt(
     """
-                    package com.duckduckgo.anvil.annotations
-    
+                    package com.duckduckgo.codegen.annotations
+
                     annotation class ContributesActivePlugin
                     annotation class ContributesActivePluginPoint(
                         val boundType: KClass<*> = Unit::class,
                     )
 
+            """
+).indented()
+internal val METRO_DI_API = TestFiles.kt(
+    """
+                    package dev.zacsweers.metro
+                    import kotlin.reflect.KClass
+
+                    annotation class BindingContainer
+                    annotation class ContributesTo(val scope: KClass<*>)
+                    annotation class Provides
+                    annotation class Binds
             """
 ).indented()

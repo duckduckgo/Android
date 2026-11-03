@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.api
 
 /** The user-visible surface that initiated an entry into Duck.ai. */
 enum class DuckChatEntryPoint {
+    APP_OPEN,
+    TAB_SWIPE,
     ADDRESS_BAR_PROMPT,
     ADDRESS_BAR_ICON,
     ADDRESS_BAR_SHORTCUT_CHIP,
@@ -25,14 +27,17 @@ enum class DuckChatEntryPoint {
     SUGGESTION_ASK_AI,
     BROWSING_MENU_NTP,
     BROWSING_MENU_WEBPAGE,
+    BROWSING_MENU_DUCKAI,
     TAB_SWITCHER,
     TAB_SWITCHER_EXISTING_CHAT,
     CHAT_HISTORY_NEW_CHAT,
     CHAT_HISTORY_OPEN_CHAT,
-    VOICE,
     ONBOARDING,
+    ONBOARDING_COMPLETION_PROMO,
+    SUBSCRIPTION_ONBOARDING,
     DIRECT_URL,
     SERP,
+    DDG_HOMEPAGE,
     ICON_SHORTCUT,
     CONTEXTUAL_CHAT,
     WIDGET_QUICK_ACTIONS,
@@ -42,4 +47,8 @@ enum class DuckChatEntryPoint {
     DEEP_LINK_OTHER,
     PAID_SETTINGS,
     RETURN_TO_CHAT_CARD,
+    DUCK_AI_NEW_CHAT,
+    RECENT_CHAT_TAB_SWITCHER,
+    RECENT_CHAT_CONTEXTUAL,
+    CHAT_SUGGESTION_INPUT,
 }

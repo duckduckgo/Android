@@ -18,25 +18,88 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorSurface"
-    android:padding="@dimen/keyline_4">
+    android:background="?attr/daxColorSurface">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/subscriptionOnboardingDuckAiText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/subscriptionOnboardingDuckAiText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:typography="h1" />
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/subscriptionOnboardingDuckAiScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingDuckAiStartButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/keyline_4"
+            android:paddingTop="@dimen/keyline_3"
+            android:paddingBottom="@dimen/keyline_4">
+
+            <ImageView
+                android:id="@+id/subscriptionOnboardingDuckAiHeaderImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:importantForAccessibility="no"
+                android:src="@drawable/duckai_ddg_feature_128" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingDuckAiHeaderTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:gravity="center"
+                android:text="@string/subscriptionOnboardingDuckAiHeaderTitle"
+                app:typography="h1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingDuckAiHeaderText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:gravity="center"
+                android:text="@string/subscriptionOnboardingDuckAiHeaderText"
+                app:textType="secondary"
+                app:typography="body1" />
+
+            <LinearLayout
+                android:id="@+id/subscriptionOnboardingDuckAiModelList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:background="@drawable/subscription_onboarding_duck_ai_list_background"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/subscriptionOnboardingDuckAiNextButton"
+        android:id="@+id/subscriptionOnboardingDuckAiStartButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/subscriptionOnboardingDuckAiNext"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:text="@string/subscriptionOnboardingDuckAiStart"
         app:daxButtonSize="large"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingDuckAiNotNowButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_goneMarginBottom="@dimen/keyline_4" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/subscriptionOnboardingDuckAiNotNowButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:layout_marginBottom="@dimen/keyline_4"
+        android:text="@string/subscriptionOnboardingDuckAiNotNow"
+        app:daxButtonSize="large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

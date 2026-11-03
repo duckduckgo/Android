@@ -120,10 +120,21 @@ sealed class PirSuccessResponse(
         val meta: AdditionalData? = null,
     ) : PirSuccessResponse(actionID, actionType)
 
+    data class ExecuteScriptResponse(
+        override val actionID: String,
+        override val actionType: String,
+        val meta: AdditionalData? = null,
+    ) : PirSuccessResponse(actionID, actionType)
+
     data class ExpectationResponse(
         override val actionID: String,
         override val actionType: String,
         val meta: AdditionalData? = null,
+    ) : PirSuccessResponse(actionID, actionType)
+
+    data class ScrollResponse(
+        override val actionID: String,
+        override val actionType: String,
     ) : PirSuccessResponse(actionID, actionType)
 
     data class AdditionalData(

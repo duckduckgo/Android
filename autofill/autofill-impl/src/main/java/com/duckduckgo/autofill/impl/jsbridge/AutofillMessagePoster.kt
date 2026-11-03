@@ -24,7 +24,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat

@@ -27,14 +27,15 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class DuckChatDailyPixelSender @Inject constructor(
     private val pixel: Pixel,

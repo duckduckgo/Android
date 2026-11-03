@@ -107,6 +107,5 @@ class RMFNtpAfterIdleStateMatchingAttributeTest {
 
     private fun enableRollout() {
         feature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        feature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
     }
 }

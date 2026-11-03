@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.promotion
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -37,6 +37,9 @@ interface SyncPromotionFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun leveragePromosRedesign(): Toggle
+
     @Toggle.InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun bookmarks(): Toggle
@@ -47,4 +50,13 @@ interface SyncPromotionFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun bookmarkAddedDialog(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun passwordsImport(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun bookmarksImport(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun importPromosToggle(): Toggle
 }

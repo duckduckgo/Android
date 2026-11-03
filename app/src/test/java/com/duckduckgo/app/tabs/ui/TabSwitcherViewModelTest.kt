@@ -19,6 +19,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
@@ -32,6 +33,7 @@ import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
@@ -54,7 +56,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.DynamicInterfac
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.LayoutMode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
-import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
@@ -66,6 +68,8 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -106,6 +110,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -163,7 +168,7 @@ class TabSwitcherViewModelTest {
 
     private val savedSitesRepository: SavedSitesRepository = mock()
 
-    private val mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository = mock()
+    private val mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
 
     private val mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore = mock()
 
@@ -173,7 +178,10 @@ class TabSwitcherViewModelTest {
 
     private val mockTabTitleResolver: TabTitleResolver = mock()
 
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
+
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
     private lateinit var testee: TabSwitcherViewModel
@@ -200,7 +208,7 @@ class TabSwitcherViewModelTest {
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(0)
+            whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(0)
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
@@ -230,6 +238,10 @@ class TabSwitcherViewModelTest {
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
     }
 
+    private fun givenDuckAiChatsMenuEnabled(enabled: Boolean) {
+        tabManagerFeatureFlags.duckAiChatsMenu().setRawStoredState(State(enable = enabled))
+    }
+
     private fun createViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore): TabSwitcherViewModel {
         return TabSwitcherViewModel(
             mockTabRepositoryProvider,
@@ -240,16 +252,18 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedHistory,
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDuckAiSessionCallback,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            tabManagerFeatureFlags,
         )
     }
 
@@ -293,6 +307,17 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun whenNewTabRequestedThenPendingNewTabOpenedExitRecordedForCurrentTabBeforeAdding() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(TabEntity("CURRENT_TAB", url = "https://duck.ai/"))
+
+        testee.onNewTabRequested()
+
+        val inOrder = inOrder(mockDuckAiSessionCallback, mockTabRepository)
+        inOrder.verify(mockDuckAiSessionCallback).onExitIntent("CURRENT_TAB", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        inOrder.verify(mockTabRepository).add()
+    }
+
+    @Test
     fun whenNewTabRequestedAndSwipingTabsEnabledAndEmptyTabExistsThenSelectEmptyTab() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
@@ -307,9 +332,13 @@ class TabSwitcherViewModelTest {
         initializeViewModel()
         prepareSelectionMode()
 
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(TabEntity("1", url = "https://duck.ai/"))
+
         testee.onNewTabRequested()
 
-        verify(mockTabRepository).select("EMPTY_TAB")
+        val inOrder = inOrder(mockDuckAiSessionCallback, mockTabRepository)
+        inOrder.verify(mockDuckAiSessionCallback).onExitIntent("1", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        inOrder.verify(mockTabRepository).select("EMPTY_TAB")
         verify(mockTabRepository, never()).add()
     }
 
@@ -411,7 +440,49 @@ class TabSwitcherViewModelTest {
     fun whenExistingRegularTabSelectedThenEntryPointNotReported() = runTest {
         testee.onTabSelected("abc")
 
-        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any())
+        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenInactiveDuckAiTabSelectedThenSwitchToAiTabPixelsSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        tabList = listOf(TabEntity("abc", url = "https://example.com", position = 0), TabEntity("duckai1", url = duckAiUrl, position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenAnswer { it.getArgument<Uri>(0).toString() == duckAiUrl }
+        initializeMockTabEntitesData()
+        initializeViewModel()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        testee.onTabSelected("duckai1")
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenActiveDuckAiTabSelectedThenSwitchToAiTabPixelsSent() = runTest {
+        tabList = listOf(TabEntity("duckai1", url = "https://duck.ai/chat", position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenReturn(true)
+        initializeMockTabEntitesData()
+        initializeViewModel()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        testee.onTabSelected("duckai1")
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenRegularTabSelectedThenSwitchToAiTabPixelsNotSent() = runTest {
+        testee.onTabSelected("abc")
+
+        verify(mockPixel, never()).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_COUNT)
     }
 
     @Test
@@ -672,6 +743,23 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun whenDuckAiTabClosedInNormalModeThenCloseAiTabPixelsSent() = runTest {
+        val tab = DuckAiTab(TabEntity("duckai1", url = "https://duck.ai/chat", position = 1), isActive = false)
+
+        testee.onTabCloseInNormalModeRequested(tab)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenRegularTabClosedInNormalModeThenCloseAiTabPixelsNotSent() = runTest {
+        testee.onTabCloseInNormalModeRequested(tabSwitcherItems.first())
+
+        verify(mockPixel, never()).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT)
+    }
+
+    @Test
     fun whenUndoDeletableTabThenUndoDelete() = runTest {
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onUndoDeleteTab(entity)
@@ -868,8 +956,52 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Duck Chat menu item clicked and it wasn't used before then send a pixel`() = runTest {
+    fun `when Duck Chat button clicked and chats menu enabled then chats menu shown`() = runTest {
+        givenDuckAiChatsMenuEnabled(true)
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        val testee = createViewModel()
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.onDuckAIButtonClicked()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowDuckAiChatsMenu, commandCaptor.lastValue)
+        verify(mockTabRepository, never()).add(any(), any())
+    }
+
+    @Test
+    fun `when Duck Chat button clicked and chats menu disabled then new chat tab opened and screen closed`() = runTest {
+        givenDuckAiChatsMenuEnabled(false)
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        val duckChatURL = "https://duck.ai"
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+        val testee = createViewModel()
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.onDuckAIButtonClicked()
+
+        verify(mockTabRepository).add(duckChatURL, true)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when Duck Chat menu chat selected then chat opened in new tab and screen closed`() = runTest {
+        val chatUrl = "https://duck.ai/?chatID=chat-1"
+
+        testee.onDuckAiChatSelected(chatUrl)
+
+        verify(duckChatMock).reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
+        verify(mockTabRepository).add(chatUrl, true)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when Duck Chat button clicked and chats menu disabled and it wasn't used before then send a pixel`() = runTest {
+        givenDuckAiChatsMenuEnabled(false)
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        val testee = createViewModel()
 
         testee.onDuckAIButtonClicked()
 
@@ -877,8 +1009,10 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Duck Chat menu item clicked and it was used before then send a pixel`() = runTest {
+    fun `when Duck Chat button clicked and chats menu enabled and it was used before then send a pixel`() = runTest {
+        givenDuckAiChatsMenuEnabled(true)
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
+        val testee = createViewModel()
 
         testee.onDuckAIButtonClicked()
 
@@ -886,13 +1020,18 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Duck Chat menu item clicked then new tab created and screen closed`() = runTest {
-        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+    fun `when Duck Chat menu new chat selected then button pixel not sent`() = runTest {
+        testee.onDuckAiNewChatSelected()
 
+        verify(mockPixel, never()).fire(eq(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB), any(), any(), any())
+    }
+
+    @Test
+    fun `when Duck Chat menu new chat selected then new tab created and screen closed`() = runTest {
         val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
 
-        testee.onDuckAIButtonClicked()
+        testee.onDuckAiNewChatSelected()
 
         verify(mockTabRepository).add(duckChatURL, true)
 
@@ -1664,7 +1803,7 @@ class TabSwitcherViewModelTest {
         val tab2 = TabEntity("2", position = 2)
         tabList = listOf(tab1, tab2)
 
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
 
         initializeMockTabEntitesData()
         initializeViewModel(fakeTabSwitcherDataStore)
@@ -1711,7 +1850,7 @@ class TabSwitcherViewModelTest {
         whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTab1))
         whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
         whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         currentModeFlow.value = BrowserMode.FIRE
 
         val testee = createViewModel(fakeTabSwitcherDataStore)
@@ -1760,7 +1899,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel visible then impressions pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         initializeViewModel(FakeTabSwitcherDataStore())
 
         testee.onTrackerAnimationInfoPanelVisible()
@@ -1770,7 +1909,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel clicked then tapped pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
 
         initializeViewModel()
 
@@ -1781,7 +1920,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel positive button clicked then dismiss pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         initializeViewModel()
 
         testee.onTrackerAnimationTilePositiveButtonClicked()
@@ -2217,16 +2356,18 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedHistory,
             mockTabSwitcherPrefsDataStore,
             faviconManager,
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDuckAiSessionCallback,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            tabManagerFeatureFlags,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2262,16 +2403,18 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedHistory,
             mockTabSwitcherPrefsDataStore,
             faviconManager,
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDuckAiSessionCallback,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            tabManagerFeatureFlags,
         )
 
         assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
@@ -2336,16 +2479,18 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedHistory,
             mockTabSwitcherPrefsDataStore,
             faviconManager,
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDuckAiSessionCallback,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
+            tabManagerFeatureFlags,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
@@ -2505,6 +2650,71 @@ class TabSwitcherViewModelTest {
         verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
     }
 
+    @Test
+    fun whenRichDuckAiCardFlagDisabledThenDuckAiTabIsNotRichCard() = runTest {
+        val items = loadItemsWithDuckAiTab()
+
+        assertFalse(items.filterIsInstance<DuckAiTab>().single().isRichDuckAiCard)
+    }
+
+    @Test
+    fun whenRichDuckAiCardFlagEnabledInGridThenDuckAiTabIsRichCard() = runTest {
+        tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
+
+        val items = loadItemsWithDuckAiTab()
+
+        assertTrue(items.filterIsInstance<DuckAiTab>().single().isRichDuckAiCard)
+        assertFalse(items.filterIsInstance<NormalTab>().single().isRichDuckAiCard)
+    }
+
+    @Test
+    fun whenRichDuckAiCardFlagEnabledInSelectionModeThenOnlySelectableDuckAiTabIsRichCard() = runTest {
+        tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
+
+        val items = loadItemsWithDuckAiTab(selectionMode = true).filterIsInstance<SelectableTab>()
+
+        val duckAiTab = items.single { it.id == DUCK_AI_TAB_ID }
+        assertTrue(duckAiTab.isDuckAi)
+        assertTrue(duckAiTab.isRichDuckAiCard)
+        assertFalse(items.single { it.id == "web" }.isRichDuckAiCard)
+    }
+
+    @Test
+    fun whenRichDuckAiCardFlagDisabledInSelectionModeThenSelectableDuckAiTabIsNotRichCard() = runTest {
+        val items = loadItemsWithDuckAiTab(selectionMode = true).filterIsInstance<SelectableTab>()
+
+        val duckAiTab = items.single { it.id == DUCK_AI_TAB_ID }
+        assertTrue(duckAiTab.isDuckAi)
+        assertFalse(duckAiTab.isRichDuckAiCard)
+    }
+
+    @Test
+    fun whenRichDuckAiCardFlagEnabledInListLayoutThenDuckAiTabIsNotRichCard() = runTest {
+        tabManagerFeatureFlags.richDuckAiGridTabItem().setRawStoredState(State(enable = true))
+        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(TabSwitcherData(NEW, LIST)))
+
+        val items = loadItemsWithDuckAiTab()
+
+        assertFalse(items.filterIsInstance<DuckAiTab>().single().isRichDuckAiCard)
+    }
+
+    private suspend fun TestScope.loadItemsWithDuckAiTab(selectionMode: Boolean = false): List<TabSwitcherItem> {
+        tabList = listOf(
+            TabEntity("web", url = "https://example.com", position = 0),
+            TabEntity(DUCK_AI_TAB_ID, url = DUCK_AI_URL, position = 1),
+        )
+        whenever(duckChatMock.isDuckChatUrl(any())).thenAnswer { it.getArgument<Uri>(0).toString() == DUCK_AI_URL }
+        initializeMockTabEntitesData()
+        val dataStore = FakeTabSwitcherDataStore().apply { setTrackersAnimationInfoTileHidden(true) }
+        val testee = createViewModel(dataStore)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        if (selectionMode) testee.onSelectionModeRequested()
+        advanceUntilIdle()
+        return testee.viewState.value.tabSwitcherItems
+    }
+
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
 
         private val animationTileDismissedFlow = MutableStateFlow(false)
@@ -2576,3 +2786,6 @@ class TabSwitcherViewModelTest {
         }
     }
 }
+
+private const val DUCK_AI_TAB_ID = "duckai"
+private const val DUCK_AI_URL = "https://duck.ai/chat?chatID=abc"

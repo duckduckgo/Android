@@ -20,7 +20,7 @@ import android.net.Uri
 import com.duckduckgo.adblocking.impl.AdBlockingExtensionDomainMatcher
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
@@ -52,12 +52,11 @@ class RealAdBlockingMenuStateProvider @Inject constructor(
         if (!domainMatcher.matches(url)) return flowOf(AdBlockingMenuState.Hidden)
         return combine(
             feature.self().enabled(),
-            feature.adBlockingUXImprovements().enabled(),
             feature.enableContingencyMode().enabled(),
             statusChecker.observeState(),
-        ) { killSwitchOn, phase2On, contingencyOn, state ->
+        ) { killSwitchOn, contingencyOn, state ->
             when {
-                !killSwitchOn || !phase2On || contingencyOn -> AdBlockingMenuState.Hidden
+                !killSwitchOn || contingencyOn -> AdBlockingMenuState.Hidden
                 state is AdBlockingState.Enabled -> AdBlockingMenuState.Enabled
                 else -> AdBlockingMenuState.Disabled
             }

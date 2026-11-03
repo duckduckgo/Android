@@ -21,8 +21,8 @@ import com.duckduckgo.autofill.impl.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.impl.jsbridge.response.EmailProtectionInContextSignupDismissedAtResponse.DismissedAt
 import com.duckduckgo.autofill.impl.jsbridge.response.NewAutofillDataAvailableResponse.NewAutofillDataAvailable
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AutofillResponseWriter {

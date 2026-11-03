@@ -34,7 +34,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.*
 import logcat.logcat
 import javax.inject.Inject

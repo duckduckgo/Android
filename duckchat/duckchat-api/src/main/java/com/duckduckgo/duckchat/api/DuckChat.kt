@@ -38,8 +38,9 @@ interface DuckChat {
 
     /**
      * Opens Duck.ai from [entryPoint] and automatically submits [query].
+     * [voice] identifies a dictated prompt without changing its entry source.
      */
-    fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint)
+    fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean = false)
 
     /**
      * Opens Duck.ai from [entryPoint] with [query] prefilled but not submitted.
@@ -52,11 +53,13 @@ interface DuckChat {
      * @param entryPoint the surface that initiated the entry.
      * @param opensNewTab whether the entry opens a new browser tab.
      * @param hasPrompt whether a non-blank prompt is automatically submitted on entry.
+     * @param voice whether this entry uses voice, including dictated text prompts.
      */
     fun reportDuckChatEntry(
         entryPoint: DuckChatEntryPoint,
         opensNewTab: Boolean,
         hasPrompt: Boolean,
+        voice: Boolean = false,
     )
 
     /**
@@ -118,14 +121,9 @@ interface DuckChat {
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
 
     /**
-     * Observes whether the native input field user setting is enabled.
-     */
-    fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
-
-    /**
      * Observes whether the Duck.ai native chat input integration is enabled.
-     * Emits `true` only when both the native input widget and the `nativeChatInput`
-     * feature flag are enabled (and the widget is not suppressed). When `false`,
+     * Emits `true` only when the `nativeChatInput` feature flag is enabled
+     * (and the widget is not suppressed). When `false`,
      * Duck.ai contextual and full modes fall back to the web input.
      */
     fun observeNativeChatInputEnabled(): Flow<Boolean>
@@ -203,4 +201,12 @@ interface DuckChat {
      * attributed back to the picker.
      */
     suspend fun onAddressBarPickerDuckAiSelected()
+
+    /**
+     * Opens Duck.ai in a new chat tab from [entryPoint] with the image-generation tool preselected on
+     * the native input. When the currently selected model can't generate images, first switches the
+     * (global) model selection to an available image-capable model; falls back to a normal new chat when
+     * no accessible model supports image generation.
+     */
+    fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint)
 }

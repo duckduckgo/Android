@@ -214,7 +214,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Как синхронизировать пароли из настольного браузера</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Импортируйте пароли в настольную версию браузера DuckDuckGo, а затем синхронизируйте их между устройствами.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Скачать настольный браузер</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ссылка скопирована</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Браузер DuckDuckGo для Mac и Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Браузер DuckDuckGo для настольных компьютеров — это конфиденциальный поиск плюс блокировка трекеров. Скачивайте по ссылке.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Синхронизировать с компьютером</string>
@@ -227,8 +226,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Наше настольное приложение</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">DuckDuckGo для Mac и Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">На компьютере откройте ссылку:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Поделиться ссылкой для загрузки</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Сообщить о сбое автозаполнения</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Анонимный отчет о сбое в работе функции автозаполнения на этом сайте. Ни в коем случае не включает пароли.</string>
@@ -264,6 +261,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Импортировать пароли из Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Твоё устройство может попросить тебя ввести ПИН-код, пароль или графический ключ для подтверждения.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Импортировать из Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Выбрать CSV-файл</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Импортировать из настольного браузера</string>
@@ -295,8 +293,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Пароли из Google — в DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Импортировать пароли в DuckDuckGo легко и безопасно. В ходе операции Google может попросить вас ввести свой пароль.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Быстро и безопасно импортируй свои пароли в DuckDuckGo. Твоё устройство может попросить тебя ввести ПИН-код, пароль или графический ключ для подтверждения.</string>
     <string name="passwords_import_promo_action">Импортировать из Google</string>
     <string name="passwords_import_promo_in_browser_title">Пароли из Google — в DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Импортируй пароли из Google в DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Больше не спрашивать</string>
     <string name="passwords_import_promo_in_settings_title">Импортировать пароли из Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Скрыть</string>
@@ -323,5 +323,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Что-то пошло не так</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Проверьте подключение к интернету и повторите попытку.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Импортирование завершено!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Подожди — не закрывай это окно. Это не должно занять больше минуты или двух.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google может попросить у тебя пароль.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google отправит тебе письмо с подтверждением экспорта данных. Тебе ничего не нужно делать.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Импортирование завершено!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Импортировано закладок: <b>%1$d</b>]]></string>
 
 </resources>

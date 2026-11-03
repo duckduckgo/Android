@@ -18,7 +18,7 @@ package com.duckduckgo.browser.ui.inputmode
 
 import android.content.Context
 import android.util.AttributeSet
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.di.scopes.ViewScope
 
 /**

@@ -16,15 +16,14 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
 	implementation project(":duckchat-api")
     implementation project(':data-clearing-api')
     implementation project(':settings-api')
@@ -55,7 +54,7 @@ dependencies {
     implementation project(':duckchat-store')
 
     implementation project(':app-build-config-api')
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     implementation project(':statistics-api')
     api AndroidX.dataStore.preferences
@@ -66,11 +65,11 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.fragment.ktx
     implementation Google.android.material
-    implementation Google.dagger
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.viewPager2
 
     implementation "com.squareup.logcat:logcat:_"
+    implementation "com.github.bumptech.glide:glide:_"
     implementation "com.airbnb.android:lottie:_"
 
     implementation Square.retrofit2.retrofit
@@ -97,9 +96,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.duckchat.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

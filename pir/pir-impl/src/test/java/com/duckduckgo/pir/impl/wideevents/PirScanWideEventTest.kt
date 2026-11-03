@@ -21,6 +21,7 @@ import android.database.sqlite.SQLiteException
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -45,6 +46,7 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_BAT
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_BROKER_COUNT
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_CANCELLATION_REASON
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_EXECUTION_TYPE
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_FREE_SCAN
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_LAST_STEP
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_LAST_STEP_ELAPSED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_NOTIFICATIONS_PERMISSION_GRANTED
@@ -126,6 +128,7 @@ class PirScanWideEventTest {
         batteryOptimizationsEnabled: Boolean = false,
         notificationsPermissionGranted: Boolean = true,
         isTrackerBlockingEnabled: Boolean = false,
+        isFreeScan: Boolean = false,
     ) {
         testee.onRunStarted(
             executionType = executionType,
@@ -138,6 +141,7 @@ class PirScanWideEventTest {
             batteryOptimizationsEnabled = batteryOptimizationsEnabled,
             notificationsPermissionGranted = notificationsPermissionGranted,
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+            isFreeScan = isFreeScan,
         )
     }
 
@@ -182,8 +186,26 @@ class PirScanWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_FREE_SCAN to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+        )
+    }
+
+    @Test
+    fun whenFreeScanRunStartedThenFlowCarriesFreeScanAndDefinitionVersion() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(12L))
+
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 5, 5, isFreeScan = true)
+
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = any(),
+            metadata = argThat { this[KEY_FREE_SCAN] == "true" },
+            cleanupPolicy = any(),
+            samplingProbability = any(),
+            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1))),
         )
     }
 
@@ -275,6 +297,7 @@ class PirScanWideEventTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = true,
             isTrackerBlockingEnabled = true,
+            isFreeScan = false,
         )
 
         // Then
@@ -293,8 +316,10 @@ class PirScanWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "enabled",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_FREE_SCAN to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
@@ -343,8 +368,10 @@ class PirScanWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_FREE_SCAN to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -372,8 +399,10 @@ class PirScanWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_FREE_SCAN to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -1075,6 +1104,7 @@ class PirScanWideEventTest {
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
         order.verify(wideEventClient).flowStep(
             wideEventId = 90L,

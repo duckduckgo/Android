@@ -19,7 +19,7 @@ package com.duckduckgo.app.startup.metrics
 import android.app.ActivityManager
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 import kotlin.math.roundToLong
 

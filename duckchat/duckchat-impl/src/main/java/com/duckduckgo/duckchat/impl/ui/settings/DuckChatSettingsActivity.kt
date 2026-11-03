@@ -33,20 +33,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -123,26 +121,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     lateinit var inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
 
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         observeViewModel()
 
@@ -337,23 +327,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     }
                 }
 
-                if (viewState.isHideGeneratedImagesOptionVisible) {
-                    searchSettingsSectionHeader.isVisible = true
+                searchSettingsSectionHeader.isVisible = true
 
-                    with(duckAiHideAiGeneratedImagesLink) {
-                        isVisible = true
-                        // When native controls are on the row reflects the current On/Off state and opens the
-                        // native dialog; otherwise it keeps its static description and opens the SERP webview.
-                        if (viewState.isNativeControlsEnabled) {
-                            setSecondaryText(getString(viewState.hideAiGeneratedImages.toDisplayNameRes()))
-                        }
-                        setOnClickListener {
-                            viewModel.onDuckAiHideAiGeneratedImagesClicked()
-                        }
+                with(duckAiHideAiGeneratedImagesLink) {
+                    isVisible = true
+                    // When native controls are on the row reflects the current On/Off state and opens the
+                    // native dialog; otherwise it keeps its static description and opens the SERP webview.
+                    if (viewState.isNativeControlsEnabled) {
+                        setSecondaryText(getString(viewState.hideAiGeneratedImages.toDisplayNameRes()))
                     }
-                } else {
-                    searchSettingsSectionHeader.isGone = true
-                    duckAiHideAiGeneratedImagesLink.isGone = true
+                    setOnClickListener {
+                        viewModel.onDuckAiHideAiGeneratedImagesClicked()
+                    }
                 }
             } else {
                 inputScreenSettingsBinding.divider2.isGone = true

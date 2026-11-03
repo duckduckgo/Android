@@ -17,14 +17,17 @@
 package com.duckduckgo.sync.impl
 
 import android.util.Base64
-import androidx.annotation.*
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.*
-import com.duckduckgo.sync.api.engine.*
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
-import com.duckduckgo.sync.crypto.*
+import com.duckduckgo.sync.crypto.AccountKeys
+import com.duckduckgo.sync.crypto.LoginKeys
+import com.duckduckgo.sync.crypto.SyncCryptoResult
+import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.API_CODE.GONE
 import com.duckduckgo.sync.impl.API_CODE.NOT_FOUND
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
@@ -34,7 +37,9 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
-import com.duckduckgo.sync.impl.ExchangeResult.*
+import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
+import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
+import com.duckduckgo.sync.impl.ExchangeResult.Pending
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
@@ -43,15 +48,20 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
-import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
-import com.duckduckgo.sync.impl.pixels.*
+import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
+import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyCreateFailureReason
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
-import com.duckduckgo.sync.store.*
-import com.squareup.anvil.annotations.*
-import com.squareup.moshi.*
-import dagger.*
+import com.duckduckgo.sync.store.ScopedPassword
+import com.duckduckgo.sync.store.SyncStore
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,8 +74,7 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicReference
-import javax.inject.*
+import javax.inject.Inject
 
 interface SyncAccountRepository {
 
@@ -157,10 +166,9 @@ interface SyncAccountRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @WorkerThread
 class AppSyncAccountRepository @Inject constructor(
-    private val connectedDevicesObserver: ConnectedDevicesObserver,
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
@@ -175,18 +183,15 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val syncJweCrypto: SyncJweCrypto,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
-    private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter,
     private val signupAccountInfoBuilder: SignupAccountInfoBuilder,
     private val deviceInfoUpdater: DeviceInfoUpdater,
-    private val deviceInfoPublishWatcher: DeviceInfoPublishWatcher,
+    private val connectedDevicesRepository: ConnectedDevicesRepository,
+    private val remoteDeviceLogout: RemoteDeviceLogout,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
     internal var upgradeRetryDelayMillis: Long = DEFAULT_UPGRADE_RETRY_DELAY_MILLIS
-
-    // The user id we've already re-published device_info for. Stops us repairing again every time the device list is shown.
-    private val republishedDeviceInfoForUserId = AtomicReference<String?>(null)
 
     /**
      * If there is a key-exchange flow in progress, we need to keep a reference to them
@@ -197,8 +202,6 @@ class AppSyncAccountRepository @Inject constructor(
      */
     private var exchangeDeviceDetailsAsInviter: DeviceDetailsForKeyExchange? = null
     private var exchangeDeviceDetailsAsReceiver: DeviceDetailsForKeyExchange? = null
-
-    private val connectedDevicesCached: MutableList<ConnectedDevice> = mutableListOf()
 
     override fun isSyncSupported(): Boolean {
         return syncStore.isEncryptionSupported()
@@ -391,7 +394,8 @@ class AppSyncAccountRepository @Inject constructor(
         if (isSignedIn()) {
             val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
             val error = Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in").alsoFireAlreadySignedInErrorPixel()
-            if (allowSwitchAccount && connectedDevicesCached.size == 1) {
+            val deviceCount = runBlocking { connectedDevicesRepository.latestConnectedDeviceCount() }
+            if (allowSwitchAccount && deviceCount == 1) {
                 val thisDeviceId = syncStore.deviceId.orEmpty()
                 val result = logout(thisDeviceId)
                 if (result is Error) {
@@ -814,6 +818,20 @@ class AppSyncAccountRepository @Inject constructor(
             is Success -> loginResult.data
         }
 
+        // The login above registered this device. If the upgrade then fails, the device stays on an account it never joined, so remove it again.
+        val upgradeResult = upgradeThirdPartyAccount(parsed, loginResponse, deviceId, deviceName)
+        if (upgradeResult is Error) {
+            logoutTemporaryThirdPartyDevice(loginResponse.token, deviceId)
+        }
+        return upgradeResult
+    }
+
+    private suspend fun upgradeThirdPartyAccount(
+        parsed: ThirdPartyRecoveryCode,
+        loginResponse: LoginResponse,
+        deviceId: String,
+        deviceName: String,
+    ): Result<Boolean> {
         // Step 2a — "Does it need an upgrade?" check per Unified Algorithm (Asana 1214739740392701,
         // "Native only - Upgrading 3party account"). The /sync/login response includes the account's
         // current access_credentials, so we can detect a pre-existing ddg credential without a
@@ -902,39 +920,26 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override fun logout(deviceId: String): Result<Boolean> {
+        val logoutThisDevice = deviceId.isEmpty() || deviceId == syncStore.deviceId
+        if (!logoutThisDevice) return remoteDeviceLogout.logout(deviceId)
+
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "Logout: Token Empty").alsoFireLogoutErrorPixel()
+        val thisDeviceId = syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+            ?: return Error(reason = "Logout: Device Id Empty").alsoFireLogoutErrorPixel()
 
-        val logoutThisDevice = deviceId.isEmpty() || deviceId == syncStore.deviceId
-
-        val deviceId = if (logoutThisDevice) {
-            syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
-                ?: return Error(reason = "Logout: Device Id Empty").alsoFireLogoutErrorPixel()
-        } else {
-            deviceId
-        }
-
-        return when (val result = syncApi.logout(token, deviceId)) {
-            is Error -> {
-                if (logoutThisDevice) {
-                    result.alsoFireLogoutErrorPixel()
-                } else {
-                    result.alsoFireRemoveDeviceErrorPixel()
-                }
-                result.copy(code = GENERIC_ERROR.code)
-            }
-
+        return when (val result = syncApi.logout(token, thisDeviceId)) {
+            is Error -> result.alsoFireLogoutErrorPixel().copy(code = GENERIC_ERROR.code)
             is Success -> {
-                if (logoutThisDevice) {
-                    syncStore.clearAll()
-                }
+                syncStore.clearAll()
                 Success(true)
             }
         }
     }
 
     override fun deleteAccount(): Result<Boolean> {
-        syncPixels.fireUserConfirmedToTurnOffSyncAndDelete(connectedDevicesCached.size)
+        val deviceCount = runBlocking { connectedDevicesRepository.latestConnectedDeviceCount() }
+        syncPixels.fireUserConfirmedToTurnOffSyncAndDelete(deviceCount)
 
         val token = syncStore.token.takeUnless {
             it.isNullOrEmpty()
@@ -966,171 +971,11 @@ class AppSyncAccountRepository @Inject constructor(
         )
     }
 
-    override fun getConnectedDevices(): Result<List<ConnectedDevice>> {
-        val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
-            ?: return Error(reason = "Token Empty")
-        val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
-            ?: return Error(reason = "PrimaryKey not found")
-
-        return if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            getConnectedDevicesV2(token, primaryKey)
-        } else {
-            getConnectedDevicesLegacy(token, primaryKey)
+    override fun getConnectedDevices(): Result<List<ConnectedDevice>> =
+        when (val result = connectedDevicesRepository.getConnectedDevices(reportAccountErrorPixel = true)) {
+            is Error -> result.copy(code = GENERIC_ERROR.code)
+            is Success -> result
         }
-    }
-
-    private fun getConnectedDevicesV2(
-        token: String,
-        primaryKey: String,
-    ): Result<List<ConnectedDevice>> {
-        val publishSnapshot = deviceInfoPublishWatcher.snapshot()
-        return when (val result = syncApi.getDevices(token)) {
-            is Error -> {
-                connectedDevicesCached.clear()
-                result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
-            }
-            is Success -> {
-                val entriesV2 = result.data.entriesV2
-                val devices = if (entriesV2 != null) {
-                    val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId, publishSnapshot)
-                    logoutFailedV2Devices(decryptResult.undecryptable)
-                    fireUnifiedDeviceListReadPixels(decryptResult)
-                    if (decryptResult.thisDeviceInfoNeedsRepair) republishThisDeviceInfo()
-                    decryptResult.decrypted.map { it.toConnectedDevice() }
-                } else {
-                    // entries_v2 missing
-                    decryptLegacyEntries(result.data.entries, primaryKey)
-                }
-                finishWith(devices)
-            }
-        }
-    }
-
-    private fun fireUnifiedDeviceListReadPixels(result: DecryptAllResult) {
-        if (!syncFeature.canReadUnifiedDeviceList().isEnabled()) return
-
-        result.keyUnavailableReason?.let {
-            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyUnavailable(it))
-            return
-        }
-
-        when (val outcome = result.ownDeviceReadOutcome) {
-            OwnDeviceReadOutcome.ResolvedDeviceInfo ->
-                syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedDeviceInfo)
-            is OwnDeviceReadOutcome.ResolvedLegacy -> fireOwnRowFallbackIfWritable(
-                UnifiedDeviceListPixel.OwnRowResolvedLegacy(outcome.reason),
-            )
-            is OwnDeviceReadOutcome.ResolvedPlaceholder -> fireOwnRowFallbackIfWritable(
-                UnifiedDeviceListPixel.OwnRowResolvedPlaceholder(outcome.reason),
-            )
-            null -> {}
-        }
-
-        result.otherRowFailedDecryptionCredentials.forEach {
-            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OtherRowDeviceInfoFailedDecryption(it))
-        }
-        result.otherRowPlaceholderCredentials.forEach {
-            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OtherRowResolvedPlaceholder(it))
-        }
-    }
-
-    private fun fireOwnRowFallbackIfWritable(event: UnifiedDeviceListPixel) {
-        if (syncFeature.canWriteUnifiedDeviceList().isEnabled()) {
-            syncPixels.fireUnifiedDeviceListPixel(event)
-        }
-    }
-
-    /**
-     * Re-writes this device's `device_info` with the name it already has, after rendering the device list showed that our own blob is missing or
-     * undecryptable. A flag-off rename is the expected cause: it omits `device_info`, so the server clears it, and migration's done-marker is a
-     * latch that won't put it back.
-     *
-     * Best-effort, so a failure never affects the list the caller is building; a failed attempt is retried on the next load.
-     */
-    private fun republishThisDeviceInfo() {
-        // an ungated repair would omit device_info and so delete the blob it is trying to restore
-        if (!syncFeature.canWriteDeviceInfo()) return
-        val userId = syncStore.userId ?: return
-        // keyed by account rather than latched outright, so signing into a different account in the same process can still repair
-        if (republishedDeviceInfoForUserId.getAndSet(userId) == userId) return
-
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            logcat { "Sync-UnifiedDevices: this device's device_info did not resolve on read; re-publishing it" }
-            when (
-                val result = deviceInfoUpdater.setThisDeviceName(
-                    name = syncDeviceIds.deviceName(),
-                    source = DeviceInfoUpdateSource.REPAIR,
-                )
-            ) {
-                is Success -> logcat { "Sync-UnifiedDevices: device_info re-published" }
-                is Error -> {
-                    logcat(WARN) { "Sync-UnifiedDevices: device_info re-publish failed: ${result.reason}" }
-                    // release the slot so the next device list load can try again, without clobbering a claim another account has since made
-                    republishedDeviceInfoForUserId.compareAndSet(userId, null)
-                }
-            }
-        }
-    }
-
-    private fun logoutFailedV2Devices(deviceIds: List<String>) {
-        val thisDeviceId = syncStore.deviceId
-        deviceIds.forEach { id ->
-            if (id != thisDeviceId) logout(id)
-        }
-    }
-
-    private fun getConnectedDevicesLegacy(
-        token: String,
-        primaryKey: String,
-    ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
-        is Error -> {
-            connectedDevicesCached.clear()
-            result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
-        }
-        is Success -> finishWith(decryptLegacyEntries(result.data.entries, primaryKey))
-    }
-
-    private fun decryptLegacyEntries(
-        devices: List<Device>,
-        primaryKey: String,
-    ): List<ConnectedDevice> = devices.mapNotNull { device ->
-        try {
-            val decryptedDeviceName = nativeLib.decryptData(device.deviceName, primaryKey).decryptedData
-            val decryptedDeviceType = device.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
-                DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
-            } ?: DeviceType()
-
-            ConnectedDevice(
-                thisDevice = syncStore.deviceId == device.deviceId,
-                deviceName = decryptedDeviceName,
-                deviceId = device.deviceId,
-                deviceType = decryptedDeviceType,
-            )
-        } catch (throwable: Throwable) {
-            throwable.asErrorResult().alsoFireAccountErrorPixel()
-            if (syncStore.deviceId != device.deviceId) {
-                logout(device.deviceId)
-            }
-            null
-        }
-    }
-
-    private fun DecryptedDevice.toConnectedDevice(): ConnectedDevice = ConnectedDevice(
-        thisDevice = syncStore.deviceId == deviceId,
-        deviceName = name,
-        deviceId = deviceId,
-        deviceType = type?.takeUnless { it.isEmpty() }?.let { DeviceType(it) } ?: DeviceType(),
-    )
-
-    private fun finishWith(devices: List<ConnectedDevice>): Result<List<ConnectedDevice>> {
-        val sorted = devices.sortedWith { a, _ -> if (a.thisDevice) -1 else 1 }
-        connectedDevicesCached.apply {
-            clear()
-            addAll(sorted)
-        }
-        connectedDevicesObserver.onDevicesUpdated(sorted)
-        return Success(sorted)
-    }
 
     override fun isSignedIn() = syncStore.isSignedIn()
 
@@ -1333,6 +1178,17 @@ class AppSyncAccountRepository @Inject constructor(
         )
     }
 
+    // This does not use the logout(deviceId) function above. That one takes the token from the store, and this flow never puts a token there.
+    private fun logoutTemporaryThirdPartyDevice(
+        token: String,
+        deviceId: String,
+    ) {
+        when (val result = syncApi.logout(token, deviceId)) {
+            is Error -> logcat(WARN) { "Sync-ScopedToken: best-effort 3party device logout failed: ${result.reason}" }
+            is Success -> logcat { "Sync-ScopedToken: temporary 3party device logged out" }
+        }
+    }
+
     private fun performLogin(
         userId: String,
         deviceId: String,
@@ -1459,11 +1315,6 @@ class AppSyncAccountRepository @Inject constructor(
 
     private fun Error.alsoFireUpdateDeviceErrorPixel(): Error {
         syncPixels.fireSyncAccountErrorPixel(this, SyncAccountOperation.UPDATE_DEVICE)
-        return this
-    }
-
-    private fun Error.alsoFireRemoveDeviceErrorPixel(): Error {
-        syncPixels.fireSyncAccountErrorPixel(this, SyncAccountOperation.REMOVE_DEVICE)
         return this
     }
 

@@ -27,7 +27,7 @@ import org.json.JSONObject
 
 /**
  * Shared JSON model classes and a pre-built [Moshi] instance used exclusively by
- * [com.duckduckgo.anvil.annotations.ContributesRemoteFeature]-generated `_RemoteFeature` classes.
+ * [com.duckduckgo.codegen.annotations.ContributesRemoteFeature]-generated `_RemoteFeature` classes.
  *
  * These types are public because they must be visible to generated code that lands in arbitrary
  * feature modules. They are an internal implementation detail of the remote feature framework
@@ -70,6 +70,7 @@ data class JsonToggleCohort(
 data class JsonToggle(
     val state: String?,
     val minSupportedVersion: Double?,
+    val maxSupportedVersion: Double?,
     val rollout: JsonToggleRollout?,
     val targets: List<JsonToggleTarget>,
     val cohorts: List<JsonToggleCohort>,
@@ -81,6 +82,7 @@ data class JsonFeature(
     val state: String?,
     val hash: String?,
     val minSupportedVersion: Int?,
+    val maxSupportedVersion: Int?,
     val settings: JSONObject?,
     val exceptions: List<JsonException>,
     val features: Map<String, JsonToggle>?,

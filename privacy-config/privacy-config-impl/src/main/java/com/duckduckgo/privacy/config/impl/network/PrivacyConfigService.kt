@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.network
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig

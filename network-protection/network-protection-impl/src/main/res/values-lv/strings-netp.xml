@@ -90,8 +90,8 @@
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Nav</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
         <item quantity="zero">Lietotnes %1$d</item>
-        <item quantity="one">Lietotne %1$d</item>
-        <item quantity="other">Lietotnes %1$d</item>
+        <item quantity="one" instruction="Placeholder is a number">Lietotne %1$d</item>
+        <item quantity="other" instruction="Placeholder is a number">Lietotnes %1$d</item>
     </plurals>
     <string name="netpManagementVpnSettings">VPN iestatījumi</string>
 
@@ -244,15 +244,15 @@
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Mēs atradām %1$s, kamēr VPN savienojums ir izveidots.</string>
     <plurals name="netpAutoExcludeAppLabel">
         <item quantity="zero">%1$d jaunas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
-        <item quantity="one">%1$d jauna lietotne, kas nav saderīga ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
-        <item quantity="other">%1$d jaunas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d jauna lietotne, kas nav saderīga ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d jaunas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Vai tu vēlies izslēgt visas lietotnes, kas nav saderīgas ar VPN?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
         <item quantity="zero">%1$d citas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
-        <item quantity="one">%1$d cita lietotne, kas nav saderīga ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
-        <item quantity="other">%1$d citas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d cita lietotne, kas nav saderīga ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d citas lietotnes, kas nav saderīgas ar VPN. Izslēdz šīs lietotnes, lai tās izmantotu</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Automātiski izslēgt nesaderīgas lietotnes</string>
     <string name="netpAutoExcludePromptActionAdd">Izslēgt lietotnes</string>

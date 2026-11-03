@@ -33,8 +33,8 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import org.json.JSONObject

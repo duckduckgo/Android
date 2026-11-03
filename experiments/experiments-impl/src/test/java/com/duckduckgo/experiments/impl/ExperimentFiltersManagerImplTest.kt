@@ -45,7 +45,7 @@ class ExperimentFiltersManagerImplTest {
     fun setup() {
         testee = ExperimentFiltersManagerImpl(
             mockAppBuildConfig,
-            { mockSubscriptions },
+            lazy { mockSubscriptions },
             coroutineRule.testDispatcherProvider,
         )
     }

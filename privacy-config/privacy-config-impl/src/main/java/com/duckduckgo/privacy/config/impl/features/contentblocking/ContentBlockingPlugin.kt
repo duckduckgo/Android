@@ -24,12 +24,12 @@ import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ContentBlockingPlugin @Inject constructor(
     private val contentBlockingRepository: ContentBlockingRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,

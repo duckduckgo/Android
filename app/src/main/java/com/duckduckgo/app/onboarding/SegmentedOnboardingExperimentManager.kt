@@ -17,12 +17,13 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.app.onboarding.SegmentedOnboardingFeatureToggles.Cohorts
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -35,25 +36,31 @@ interface SegmentedOnboardingExperimentManager {
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = SegmentedOnboardingExperimentManager::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<SegmentedOnboardingExperimentManager>())
+@SingleIn(AppScope::class)
 class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
-    private val dispatcherProvider: DispatcherProvider,
+    private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
+    private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,
     private val appBuildConfig: AppBuildConfig,
+    private val dispatcherProvider: DispatcherProvider,
     private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
 ) : SegmentedOnboardingExperimentManager {
 
     override suspend fun enroll(): SegmentedOnboardingExperimentVariant? = withContext(dispatcherProvider.io()) {
-        if (onboardingPrivacyConfigPersistedGate.awaitPersisted() && checkPrerequisites()) {
-            // scaffolding for future experiment enrollment logic
+        if (!onboardingPrivacyConfigPersistedGate.awaitPersisted() || !checkPrerequisites()) {
             return@withContext null
-        } else {
-            null
+        }
+
+        val toggle = segmentedOnboardingFeatureToggles.onboardingFlowByDownloadReasonExperiment()
+        toggle.enroll()
+        when {
+            toggle.isEnrolledAndEnabled(Cohorts.TREATMENT) -> SegmentedOnboardingExperimentVariant.TREATMENT
+            toggle.isEnrolledAndEnabled(Cohorts.CONTROL) -> SegmentedOnboardingExperimentVariant.CONTROL
+            else -> null
         }
     }
 
     private suspend fun checkPrerequisites() =
-        onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
+        !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
             !appBuildConfig.isAppReinstall()
 }

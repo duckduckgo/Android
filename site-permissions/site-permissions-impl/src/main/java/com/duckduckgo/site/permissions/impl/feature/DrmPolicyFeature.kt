@@ -16,7 +16,7 @@
 
 package com.duckduckgo.site.permissions.impl.feature
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -34,6 +34,10 @@ interface DrmPolicyFeature {
     @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun centralPolicy(): Toggle
+
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun fireModeDenyButton(): Toggle
 }
 
 fun DrmPolicyFeature.isCentralPolicyEnabled(): Boolean = self().isEnabled() && centralPolicy().isEnabled()

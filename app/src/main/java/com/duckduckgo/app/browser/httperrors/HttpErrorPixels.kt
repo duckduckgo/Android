@@ -25,7 +25,7 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

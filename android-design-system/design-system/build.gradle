@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'org.jetbrains.kotlin.plugin.compose'
 }
@@ -29,9 +28,6 @@ android {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
@@ -48,18 +44,18 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
 
     if (rootProject.ext.proprietaryFontAvailable) {
-        implementation "com.duckduckgo:ddg-proprietary-fonts:1.0.2"
+        api "com.duckduckgo:ddg-proprietary-fonts:1.0.2"
     } else {
-        implementation project(':fonts')
+        api project(':fonts')
     }
 
     implementation project(path: ':common-utils')
 
     implementation project(path: ':di')
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':app-build-config-api')
     implementation project(':internal-features-api')
     implementation project(':feature-toggles-api')
@@ -72,8 +68,6 @@ dependencies {
     implementation AndroidX.fragment.ktx
     implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
-    // just to get the dagger annotations
-    implementation Google.dagger
 
     implementation "androidx.core:core-ktx:_"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
@@ -97,7 +91,7 @@ dependencies {
 
     api("org.jetbrains.kotlinx:kotlinx-collections-immutable:_")
 
-    api lintChecks("com.slack.lint.compose:compose-lint-checks:_")
+    lintChecks("com.slack.lint.compose:compose-lint-checks:_")
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"

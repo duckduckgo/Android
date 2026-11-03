@@ -66,7 +66,7 @@ class NgVpnNetworkStackTest {
 
         ngVpnNetworkStack = NgVpnNetworkStack(
             appBuildConfig,
-            { vpnNetwork },
+            lazy { vpnNetwork },
             runtime,
             appTrackerDetector,
             trackingProtectionAppsRepository,

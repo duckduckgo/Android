@@ -25,13 +25,13 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
@@ -45,7 +45,7 @@ import kotlin.collections.chunked
 import kotlin.collections.toSet
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class CompletedWideEventsProcessor @Inject constructor(
     private val wideEventRepository: WideEventRepository,
     private val wideEventSender: WideEventSender,

@@ -38,7 +38,7 @@ jobs:
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
-          gradle_flags: '-Pconfig_patches=".maestro/duckplayer/patches/ad_blocking_enabled_patch.json"'
+          gradle_flags: '-Pconfig_patches=".maestro/duckplayer/patches/ad_blocking_enabled_patch.json,.maestro/duckplayer/patches/duck_player_standalone_settings_patch.json"'
 
       - name: Run Duck Player Maestro Tests
         id: maestro-cloud-asana
@@ -59,7 +59,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' && steps.maestro-cloud-asana.outputs.flow_summary_status != 'failure'}}
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.DUCK_PLAYER_AOR_PROJECT_ID }}

@@ -158,6 +158,7 @@
         <item name="daxColorSnackbarAction">?attr/daxColorAccentBlue</item>
         <item name="daxIconTabSwitcher">@drawable/ic_tab_24</item>
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_dax_icon_72</item>
+        <item name="daxDrawableFireWindowPhone">@drawable/fire_window_light_phone_96</item>
         <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.None</item>
         <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.None</item>
 
@@ -184,6 +185,7 @@
         <item name="android:isLightTheme" tools:ignore="NewApi">false</item>
         <item name="preferDarkStatusBarIcons">false</item>
         <item name="preferDarkNavigationBarIcons">false</item>
+        <item name="daxDrawableFireWindowPhone">@drawable/fire_window_dark_phone_96</item>
 
         <!-- Feature specific colors -->
         <!-- Autofill -->
@@ -203,6 +205,7 @@
         <item name="daxColorBackground">@color/background_background_dark</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/background_surface_dark</item>
+        <item name="daxColorSurfaceSecondary">@color/background_surface_secondary_dark</item>
         <item name="daxColorSurfaceTertiary">@color/background_surface_tertiary_dark</item>
         <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorWindow">@color/background_window_dark</item>
@@ -299,6 +302,7 @@
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
         <item name="daxColorAccentAltPrimary">@color/blue60</item>
         <item name="daxColorAccentAltContentPrimary">@color/blue0</item>
+        <item name="daxColorTabDuckAiContentTypeBorder">@color/white36</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray50</item>
@@ -326,12 +330,6 @@
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorDark</item>
 
         <!-- Temp daxColors -->
-        <item name="daxColorPreonboardingOptionBackgroundStroke">@color/white12</item>
-        <item name="daxColorPreonboardingOptionSelectedBackground">@color/gray80</item>
-        <item name="daxColorPreonboardingOptionSelectedBackgroundStroke">@color/gray80</item>
-        <item name="daxColorPreonboardingProgressBarStart">@color/blue20</item>
-        <item name="daxColorPreonboardingProgressBarCenter">@color/purple20</item>
-        <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorDark</item>
 
         <!-- Input Screen -->
@@ -342,6 +340,23 @@
         <!--Rebrand Status-->
         <item name="daxColorRebrandStatusIndicatorOff">@color/white40</item>
         <item name="daxColorStatusRed">@color/alertRedOnDarkDefault</item>
+
+        <item name="daxContainerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxDialogRadius">@dimen/dialogBorderRadius</item>
+        <item name="daxSheetRadius">@dimen/dialogBorderRadius</item>
+        <item name="daxLargeSheetRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxMenuRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxSearchBarRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxChipRadius">@dimen/keyline_2</item>
+        <item name="daxDuckAiPromptRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxWhatsNewCardRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxMenuClipToOutline">false</item>
+        <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
+        <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxMessageCtaCloseButtonSize">@dimen/messageCtaCloseButtonSize</item>
+        <item name="daxMessageCtaCloseButtonBackground">?attr/selectableItemBackground</item>
+        <item name="daxMessageCtaClipToPadding">true</item>
+        <item name="daxPillRadius">@dimen/daxYellowPillCornerRadius</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -367,6 +382,7 @@
         <item name="daxColorBackground">@color/background_background_light</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/background_surface_light</item>
+        <item name="daxColorSurfaceSecondary">@color/background_surface_secondary_light</item>
         <item name="daxColorSurfaceTertiary">@color/background_surface_tertiary_light</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorWindow">@color/background_window_light</item>
@@ -464,6 +480,7 @@
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
         <item name="daxColorAccentAltPrimary">@color/blue0</item>
         <item name="daxColorAccentAltContentPrimary">@color/blue80</item>
+        <item name="daxColorTabDuckAiContentTypeBorder">@color/black20</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray60</item>
@@ -491,12 +508,6 @@
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorLight</item>
 
         <!-- Temp daxColors -->
-        <item name="daxColorPreonboardingOptionBackgroundStroke">@color/gray15</item>
-        <item name="daxColorPreonboardingOptionSelectedBackground">@color/gray0</item>
-        <item name="daxColorPreonboardingOptionSelectedBackgroundStroke">@color/blue10</item>
-        <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
-        <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
-        <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorLight</item>
 
         <!-- Input Screen -->
@@ -507,6 +518,23 @@
         <!--Rebrand Status-->
         <item name="daxColorRebrandStatusIndicatorOff">@color/black36</item>
         <item name="daxColorStatusRed">@color/rb_red50</item>
+
+        <item name="daxContainerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxDialogRadius">@dimen/dialogBorderRadius</item>
+        <item name="daxSheetRadius">@dimen/dialogBorderRadius</item>
+        <item name="daxLargeSheetRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxMenuRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxSearchBarRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxChipRadius">@dimen/keyline_2</item>
+        <item name="daxDuckAiPromptRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxWhatsNewCardRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxMenuClipToOutline">false</item>
+        <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
+        <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxMessageCtaCloseButtonSize">@dimen/messageCtaCloseButtonSize</item>
+        <item name="daxMessageCtaCloseButtonBackground">?attr/selectableItemBackground</item>
+        <item name="daxMessageCtaClipToPadding">true</item>
+        <item name="daxPillRadius">@dimen/daxYellowPillCornerRadius</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">

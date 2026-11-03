@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController.Event
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject
@@ -30,7 +30,11 @@ class DummySubscriptionOnboardingController @Inject constructor() : Subscription
 
     override val events: Flow<Event> = emptyFlow()
 
-    override fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome) {
+    override fun onStepFinished(
+        stepId: String,
+        outcome: SubscriptionOnboardingStepOutcome,
+        handoff: (() -> Unit)?,
+    ) {
         // no-op
     }
 

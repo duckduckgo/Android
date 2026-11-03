@@ -46,8 +46,8 @@
     <string name="atp_OnInitialNotification">"App Tracking Protection е активирана и блокира опитите за проследяване във Вашите приложения"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Сканиране за проследяваща активност… бийп… бууп"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Блокирани опити за проследяване <b>в %1$d приложение</b> (през последния час).]]></item>
-        <item quantity="other"><![CDATA[ Блокирани опити за проследяване <b>в %1$d приложения</b> (през последния час).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Блокирани опити за проследяване <b>в %1$d приложение</b> (през последния час).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Блокирани опити за проследяване <b>в %1$d приложения</b> (през последния час).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">App Tracking Protection е деактивирана. Докоснете, за да продължите да блокирате опитите за проследяване.</string>
     <string name="atp_RevokedNotification">VPN приложението на Вашето устройство е деактивирало App Tracking Protection. Докоснете за повторно активиране.</string>
@@ -59,13 +59,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ App Tracking Protection блокира <b>%1$d опита за проследяване в %2$d приложения, включително %3$s</b> (през последния ден).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s се опита да Ви проследи <b>в %2$d приложение</b> (през последния ден). <b>Вижте още</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s се опита да Ви проследи <b>в %2$d приложения</b> (през последния ден). <b>Вижте още</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s се опита да Ви проследи <b>в %2$d приложение</b> (през последния ден). <b>Вижте още</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s се опита да Ви проследи <b>в %2$d приложения</b> (през последния ден). <b>Вижте още</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection блокира най-много опити за проследяване в <b>%1$s</b> (през последния ден).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection блокира най-много опити за проследяване в <b>%1$s</b> и <b>%2$s</b> (през последния ден).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[App Tracking Protection блокира най-много опити за проследяване в <b>%1$s</b> (през последния ден).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[App Tracking Protection блокира най-много опити за проследяване в <b>%1$s</b> и <b>%2$s</b> (през последния ден).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection блокира <b>%1$s %2$d път в %3$s</b> (през последния ден).]]></string>
@@ -85,8 +85,8 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection блокира <b>%1$d опита за проследяване в %2$s</b> и %3$d други приложения (през последната седмица).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection блокира <b>%1$s в %2$d приложение, %3$s</b> (през последната седмица).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection блокира <b>%1$s в %2$d приложения, включително %3$s</b> (през последната седмица).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection блокира <b>%1$s в %2$d приложение, %3$s</b> (през последната седмица).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[App Tracking Protection блокира <b>%1$s в %2$d приложения, включително %3$s</b> (през последната седмица).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Активиране на App Tracking Protection</string>
@@ -269,12 +269,12 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d опит. Известно е, че събира:</item>
-        <item quantity="other">%1$d опита. Известно е, че събира:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d опит. Известно е, че събира:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d опита. Известно е, че събира:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">DuckDuckGo блокира %1$d опит за проследяване</item>
-        <item quantity="other">DuckDuckGo блокира %1$d опита за проследяване</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo блокира %1$d опит за проследяване</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo блокира %1$d опита за проследяване</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Докладване на проблем с това приложение</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Показване на още %1$d</string>

@@ -18,19 +18,16 @@ package com.duckduckgo.app.onboarding.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
-import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.*
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -42,13 +39,11 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class OnboardingViewModel @Inject constructor(
-    private val userStageStore: UserStageStore,
     private val pageLayoutManager: OnboardingPageManager,
     private val dispatchers: DispatcherProvider,
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
     private val dismissedCtaDao: DismissedCtaDao,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) : ViewModel() {
@@ -57,18 +52,7 @@ class OnboardingViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     suspend fun initializePages() {
-        val renderer = withContext(dispatchers.io()) { resolveRenderer() }
-        when (renderer) {
-            OnboardingRenderer.ConfigDriven -> pageLayoutManager.buildConfigDrivenPageBlueprints()
-            OnboardingRenderer.BrandDesignUpdate -> pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
-            OnboardingRenderer.Legacy -> pageLayoutManager.buildPageBlueprints()
-        }
-    }
-
-    private fun resolveRenderer(): OnboardingRenderer = when {
-        !onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() -> OnboardingRenderer.Legacy
-        onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() -> OnboardingRenderer.ConfigDriven
-        else -> OnboardingRenderer.BrandDesignUpdate
+        pageLayoutManager.buildPageBlueprints()
     }
 
     fun pageCount(): Int {
@@ -81,14 +65,6 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun onOnboardingDone(extendedOnboardingFlow: ExtendedOnboardingFlow = DEFAULT) {
         withContext(dispatchers.io()) {
-            // The orchestrator owns the terminal AppStage write when it drives the run (BrandDesignUpdate
-            // page). The legacy WelcomePage path (brand design update off) does not touch the orchestrator,
-            // so it writes the terminal state here. The extended-flow CTA seeding below always runs (it is
-            // driven by the chosen demo query, not the orchestrator).
-            if (!onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                userStageStore.stageCompleted(AppStage.NEW)
-            }
-
             when (extendedOnboardingFlow) {
                 DEFAULT -> {
                     // no-op
@@ -107,17 +83,6 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun onOnboardingSkipped() {
-        viewModelScope.launch(dispatchers.io()) {
-            // The orchestrator owns the skip terminal write when it drives the run (BrandDesignUpdate
-            // page): its onSkipped runs markOnboardingAsCompleted before it emits Skipped. The legacy
-            // WelcomePage path (brand design update off) does not touch the orchestrator, so it writes here.
-            if (!onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                onboardingSkipper.markOnboardingAsCompleted()
-            }
-        }
-    }
-
     fun initializeOnboardingSkipper() {
         if (!appBuildConfig.canSkipOnboarding) return
 
@@ -129,24 +94,9 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Dev-only "skip all onboarding" shortcut. Returns true when the caller must navigate away itself.
-     *
-     * In the BrandDesignUpdate (orchestrator) path the orchestrator owns the skip: AbortPlan -> Skipped
-     * runs onSkipped and the active page navigates off Skipped, so the caller must not also navigate
-     * (returns false). In the legacy WelcomePage path this writes the terminal state directly and nothing
-     * navigates automatically, so the caller still owns navigation (returns true).
-     */
-    suspend fun devOnlyFullyCompleteAllOnboarding(): Boolean {
-        val brandDesignUpdateEnabled = withContext(dispatchers.io()) {
-            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
-        }
-        if (brandDesignUpdateEnabled) {
-            linearOnboardingOrchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
-        } else {
-            onboardingSkipper.markOnboardingAsCompleted()
-        }
-        return !brandDesignUpdateEnabled
+    /** Dev-only "skip all onboarding" shortcut handled by the linear onboarding orchestrator. */
+    suspend fun devOnlyFullyCompleteAllOnboarding() {
+        linearOnboardingOrchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
     }
 
     companion object {
@@ -158,6 +108,4 @@ class OnboardingViewModel @Inject constructor(
         DUCK_AI_FOCUSED,
         DEFAULT_WITHOUT_INTRO_CTA,
     }
-
-    private enum class OnboardingRenderer { Legacy, BrandDesignUpdate, ConfigDriven }
 }

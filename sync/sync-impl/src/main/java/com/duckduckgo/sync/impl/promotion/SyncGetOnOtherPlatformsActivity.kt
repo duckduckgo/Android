@@ -23,13 +23,11 @@ import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
@@ -38,7 +36,6 @@ import com.duckduckgo.sync.impl.databinding.ActivitySyncGetOnOtherDevicesBinding
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShareLink
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShowCopiedNotification
-import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -58,33 +55,21 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { renderViewState(it) }
-            .launchIn(lifecycleScope)
-
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureUiEventHandlers()
         if (savedInstanceState == null) {
@@ -104,12 +89,6 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
         }
         binding.downloadLinkText.setOnClickListener {
             viewModel.onLinkClicked(extractLaunchSource())
-        }
-    }
-
-    private fun renderViewState(viewState: ViewState) {
-        if (viewState.showDesktopBrowserUrl) {
-            binding.downloadLinkText.text = getString(R.string.getDesktopBrowserUrl)
         }
     }
 
@@ -150,4 +129,7 @@ enum class SyncGetOnOtherPlatformsLaunchSource(val value: String) {
     SOURCE_ACTIVATING("activating"),
     SOURCE_SYNC_DISABLED("not_activated"),
     SOURCE_SYNC_ENABLED("activated"),
+    SOURCE_PROMOTION_BOOKMARKS("promotion_bookmarks"),
+    SOURCE_PROMOTION_PASSWORDS("promotion_passwords"),
+    SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG("promotion_bookmark_added_dialog"),
 }

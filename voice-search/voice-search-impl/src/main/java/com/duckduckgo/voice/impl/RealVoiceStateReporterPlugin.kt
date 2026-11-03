@@ -21,14 +21,15 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 interface VoiceStateReporterPlugin
 
-@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
-@ContributesBinding(scope = AppScope::class, boundType = VoiceStateReporterPlugin::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<BrowserFeatureStateReporterPlugin>())
+@ContributesBinding(scope = AppScope::class, binding = binding<VoiceStateReporterPlugin>())
 class RealVoiceStateReporterPlugin @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : VoiceStateReporterPlugin, BrowserFeatureStateReporterPlugin {

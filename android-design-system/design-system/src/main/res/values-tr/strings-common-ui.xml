@@ -32,6 +32,7 @@
     <string name="removeAll">Tümünü Kaldır</string>
     <string name="undo">Geri al</string>
     <string name="cancel">Vazgeç</string>
+    <string name="done">Bitti</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Her Zaman Açık</string>

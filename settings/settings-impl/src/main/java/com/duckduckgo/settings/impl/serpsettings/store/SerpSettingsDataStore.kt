@@ -25,8 +25,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.settings.impl.serpsettings.di.SerpSettings
 import com.duckduckgo.settings.impl.serpsettings.pixel.SerpSettingsPixelName
 import com.duckduckgo.settings.impl.serpsettings.pixel.fireSerpSettingsCountAndDaily
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -53,7 +53,7 @@ interface SerpSettingsDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SerpSettingsPrefsDataStore @Inject constructor(
     @SerpSettings private val store: DataStore<Preferences>,
     private val pixel: Pixel,

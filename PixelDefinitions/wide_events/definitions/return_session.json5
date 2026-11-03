@@ -4,7 +4,7 @@
         "owners": ["YoussefKeyrouz"],
         "meta": {
             "type": "android-return-session",
-            "version": "0.0"
+            "version": "0.2"
         },
         "feature": {
             "name": "return_session",
@@ -25,6 +25,16 @@
                         "type": "string",
                         "description": "Time away before this return, bucketed (lower end of bucket, in ms). Absent when there was no prior background timestamp/date",
                         "enum": ["0", "60000", "300000", "900000", "1800000", "3600000"]
+                    },
+                    "toggle_enabled": {
+                        "type": "string",
+                        "description": "Whether the user selected Search & Duck.ai in the address bar setting, read from storage when the session starts. False when the user turned Duck.ai off",
+                        "enum": ["true", "false"]
+                    },
+                    "toggle_position": {
+                        "type": "string",
+                        "description": "Side of the Search/Duck.ai toggle the input opens on, from the default position setting with last used resolved. Present only when toggle_enabled is true",
+                        "enum": ["search", "duck_ai"]
                     },
                     "status_reason": {
                         "type": "string",
@@ -85,6 +95,8 @@
                         "type": "string",
                         "description": "The Duck.ai entry point that triggered the session's ai_prompt_submitted terminal. Omitted for every other status_reason or when unknown",
                         "enum": [
+                            "app_open",
+                            "tab_swipe",
                             "address_bar_prompt",
                             "address_bar_icon",
                             "address_bar_shortcut_chip",
@@ -97,8 +109,10 @@
                             "chat_history_open_chat",
                             "voice",
                             "onboarding",
+                            "onboarding_completion_promo",
                             "direct_url",
                             "serp",
+                            "ddg_homepage",
                             "icon_shortcut",
                             "contextual_chat",
                             "widget_quick_actions",
@@ -106,7 +120,15 @@
                             "system_search",
                             "digital_assistant",
                             "deep_link_other",
-                            "paid_settings"
+                            "paid_settings",
+                            "return_to_chat_card",
+                            "tab_switcher_existing_chat",
+                            "subscription_onboarding",
+                            "browsing_menu_duckai",
+                            "duck_ai_new_chat",
+                            "recent_chat_tab_switcher",
+                            "recent_chat_contextual",
+                            "chat_suggestion_input"
                         ]
                     }
                 }

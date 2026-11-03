@@ -29,8 +29,8 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore.Companion.DEFAULT_SPECIFIC_PAGE_URL
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -53,7 +53,7 @@ interface ShowOnAppLaunchOptionDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
     @ShowOnAppLaunch private val store: DataStore<Preferences>,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
@@ -81,13 +81,7 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
     }
 
     private fun defaultShowOnAppLaunchOption(): ShowOnAppLaunchOption =
-        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
-            androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().isEnabled()
-        ) {
-            NewTabPage
-        } else {
-            LastOpenedTab
-        }
+        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) NewTabPage else LastOpenedTab
 
     override val specificPageUrlFlow: Flow<String> = store.data.map { preferences ->
         preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)] ?: DEFAULT_SPECIFIC_PAGE_URL

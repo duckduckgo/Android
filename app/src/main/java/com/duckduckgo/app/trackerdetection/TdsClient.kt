@@ -103,15 +103,17 @@ class TdsClient(
                     typeResolved = true
                 }
 
-                if (rule.options != null) {
-                    if (!matchedDomainAndTypes(rule.options.domains, rule.options.types, documentUrl, type)) {
+                val options = rule.options
+                if (options != null) {
+                    if (!matchedDomainAndTypes(options.domains, options.types, documentUrl, type)) {
                         // Continue to the next rule instead
                         return@forEach
                     }
                 }
 
-                if (rule.exceptions != null) {
-                    if (matchedDomainAndTypes(rule.exceptions.domains, rule.exceptions.types, documentUrl, type)) {
+                val exceptions = rule.exceptions
+                if (exceptions != null) {
+                    if (matchedDomainAndTypes(exceptions.domains, exceptions.types, documentUrl, type)) {
                         return MatchedResult(shouldBlock = false, isATracker = true)
                     }
                 }

@@ -22,10 +22,14 @@ private const val MAX_URL_SUGGESTIONS_KEY = "maxUrlSuggestions"
 private const val DEFAULT_MAX_URL_SUGGESTIONS = 3
 private const val MAX_HISTORY_COUNT_KEY = "maxHistoryCount"
 private const val DEFAULT_MAX_HISTORY_COUNT = 10
+private const val RECENT_DAYS_CUTOFF_KEY = "recentDaysCutoff"
+private const val DEFAULT_RECENT_DAYS_CUTOFF = 7
 
 fun DuckAiChatHistoryFeature.maxUrlSuggestions(): Int = readIntSetting(MAX_URL_SUGGESTIONS_KEY, DEFAULT_MAX_URL_SUGGESTIONS)
 
 fun DuckAiChatHistoryFeature.maxHistoryCount(): Int = readIntSetting(MAX_HISTORY_COUNT_KEY, DEFAULT_MAX_HISTORY_COUNT)
+
+fun DuckAiChatHistoryFeature.recentDaysCutoff(): Int = readIntSetting(RECENT_DAYS_CUTOFF_KEY, DEFAULT_RECENT_DAYS_CUTOFF)
 
 private fun DuckAiChatHistoryFeature.readIntSetting(key: String, default: Int): Int =
     runCatching {

@@ -1,0 +1,30 @@
+// Native (NDK) crash reporting pixels, fired by the Crashpad-based crash handler
+{
+    "m_app_register_native_crash_handler": {
+        "description": "Fired on process creation when Crashpad initialisation returns success, so the native crash handler is registered for that process. Initialisation can fail or be skipped by the nativeCrashHandling remote feature flags, so this does not fire on every launch.",
+        "owners": ["joshliebe"],
+        "triggers": ["startup"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "v",
+                "description": "App version and build flavor at the time the handler was registered.",
+                "type": "string",
+                "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?-(INTERNAL|FDROID|PLAY)$",
+                "examples": ["5.302.0-PLAY"]
+            },
+            {
+                "key": "pn",
+                "description": "Name of the process the handler was registered in.",
+                "type": "string",
+                "enum": ["main", ":vpn", ":pir", "UNKNOWN", "ERROR"]
+            },
+            {
+                "key": "customTab",
+                "description": "Whether a Custom Tab was active in this process when the handler was registered.",
+                "type": "boolean"
+            }
+        ]
+    }
+}

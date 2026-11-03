@@ -26,7 +26,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
-import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -36,23 +35,22 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
@@ -73,7 +71,8 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
+import com.duckduckgo.duckchat.api.DuckChatHistoryParams
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -83,7 +82,7 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
-import com.duckduckgo.duckchat.impl.models.iconRes
+import com.duckduckgo.duckchat.impl.history.DuckAiChatsPopupMenu
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
@@ -344,12 +343,11 @@ class DuckChatContextualWebViewFragment :
                 domStorageEnabled = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
-                builtInZoomControls = true
-                displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 setSupportMultipleWindows(true)
                 databaseEnabled = false
-                setSupportZoom(true)
+                // Pinch and double-tap zoom distort the chat layout, so zoom stays off in the contextual sheet.
+                setSupportZoom(false)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -453,8 +451,8 @@ class DuckChatContextualWebViewFragment :
         }
         contextualNativeInputManager.init(
             tabId = tabId,
-            card = binding.contextualNativeInputCard,
-            widget = binding.contextualNativeInputWidget,
+            inputLayout = binding.contextualNativeInputCard,
+            footer = binding.contextualNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
             chatIdFlow = viewModel.chatId,
@@ -476,18 +474,21 @@ class DuckChatContextualWebViewFragment :
                     selectedTool = submitted.selectedTool,
                     imagesJson = submitted.imagesJson,
                     filesJson = submitted.filesJson,
+                    selectionsJson = submitted.selectionsJson,
                 )
             },
             onAskAboutPage = { viewModel.onAskAboutPageClicked() },
             onPageContextRemoved = { viewModel.removePageContext() },
             onVoiceChatRequested = {
                 viewModel.onContextualClose()
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
             },
             onVoiceSearchRequested = {
                 activity?.hideKeyboard()
                 voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.DUCK_AI)
             },
+            onInputFocusChanged = { renderFireButton() },
+            onInputVisibilityChanged = { renderFireButton() },
         )
         observeViewModel()
 
@@ -538,6 +539,9 @@ class DuckChatContextualWebViewFragment :
         binding.contextualFire.setOnClickListener {
             viewModel.onFireButtonClicked()
         }
+        binding.contextualInputFire.setOnClickListener {
+            viewModel.onFireButtonClicked()
+        }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
         binding.contextualFullScreen.setOnClickListener {
@@ -561,7 +565,7 @@ class DuckChatContextualWebViewFragment :
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.ChangeSheetState -> {
-                        command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
+                        command.prefillNativeInput?.let { binding.contextualNativeInputCard.widget.text = it }
                         if (command.hideKeyboard) activity?.hideKeyboard()
                         bottomSheetBehavior.state = command.newState
                     }
@@ -591,7 +595,7 @@ class DuckChatContextualWebViewFragment :
 
                     is DuckChatContextualWebViewViewModel.Command.LaunchChatHistory -> {
                         viewModel.onContextualClose()
-                        globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
+                        globalActivityStarter.start(requireContext(), DuckChatHistoryParams(DuckChatHistorySource.CONTEXTUAL_CHAT))
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.OpenSearchInNewTab -> {
@@ -600,7 +604,7 @@ class DuckChatContextualWebViewFragment :
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.FocusInput -> {
-                        binding.contextualNativeInputWidget.focusInput(activity)
+                        binding.contextualNativeInputCard.widget.focusInput(activity)
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.ApplyContextualReopened -> {
@@ -650,16 +654,29 @@ class DuckChatContextualWebViewFragment :
         }
 
         binding.contextualNewChat.show()
-        if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
         contextualNativeInputManager.onWebViewMode()
 
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
-            binding.contextualNativeInputWidget.setPageContext(
+            binding.contextualNativeInputCard.widget.setPageContext(
                 title = viewState.contextTitle,
                 url = viewState.contextUrl,
             )
         } else {
-            binding.contextualNativeInputWidget.clearPageContext()
+            binding.contextualNativeInputCard.widget.clearPageContext()
+        }
+    }
+
+    // Matches Duck.ai by sitting next to the native input and hiding while it's focused. The web input is
+    // drawn inside the WebView, so a native button can't sit beside it and falls back to the header.
+    private fun renderFireButton() {
+        val isFireButtonEnabled = viewModel.viewState.value.isFireButtonEnabled
+        val isNativeInputVisible = binding.contextualNativeInputCard.isVisible
+        val isNativeInputFocused = binding.contextualNativeInputCard.widget.hasInputFocus()
+        if (isFireButtonEnabled && !isNativeInputVisible) binding.contextualFire.show() else binding.contextualFire.gone()
+        if (isFireButtonEnabled && isNativeInputVisible && !isNativeInputFocused) {
+            binding.contextualInputFire.show()
+        } else {
+            binding.contextualInputFire.gone()
         }
     }
 
@@ -679,52 +696,17 @@ class DuckChatContextualWebViewFragment :
 
     private fun showChatsPopup(recentChats: List<ChatHistoryItem>) {
         logcat { "Duck.ai Contextual: showChatsPopup chats=${recentChats.size}" }
-        val popup = PopupMenu(
-            layoutInflater = layoutInflater,
-            resourceId = R.layout.popup_contextual_chats_menu,
-            width = resources.getDimensionPixelSize(R.dimen.contextualChatsPopupMenuWidth),
-        )
-        val content = popup.contentView
-
         // The webview surface always exposes New Chat (there is always a chat in progress to replace).
-        val newChatRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupNewChat)
-        val headerDivider = content.findViewById<View>(R.id.contextualChatsPopupHeaderDivider)
-        newChatRow.visibility = View.VISIBLE
-        headerDivider.visibility = View.VISIBLE
-        popup.onMenuItemClicked(newChatRow) { viewModel.onNewChatRequestedFromPopup() }
-
-        val openDuckAiRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupOpenDuckAi)
-        popup.onMenuItemClicked(openDuckAiRow) { viewModel.onOpenDuckAiFromPopup() }
-
-        val recentContainer = content.findViewById<LinearLayout>(R.id.contextualChatsPopupRecentContainer)
-        recentContainer.removeAllViews()
-        recentChats.forEach { chat ->
-            val row = PopupMenuItemView(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                )
-                setPrimaryText(chat.displayTitle)
-                setLeadingIconResource(chat.type.iconRes(chat.pinned))
-                setPrimaryTextMaxLines(MAX_CHAT_TITLE_LINES)
-                setPrimaryTextEllipsize(TextUtils.TruncateAt.END)
-            }
-            popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
-            recentContainer.addView(row)
-        }
-
-        val viewAllRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupViewAll)
-        val footerDivider = content.findViewById<View>(R.id.contextualChatsPopupFooterDivider)
-        val showFooter = recentChats.isNotEmpty()
-        viewAllRow.visibility = if (showFooter) View.VISIBLE else View.GONE
-        footerDivider.visibility = if (showFooter) View.VISIBLE else View.GONE
-        if (showFooter) {
-            popup.onMenuItemClicked(viewAllRow) { viewModel.onViewAllChatsClicked() }
-        }
-
+        val popup = DuckAiChatsPopupMenu(
+            layoutInflater = layoutInflater,
+            recentChats = recentChats,
+            onNewChat = viewModel::onNewChatRequestedFromPopup,
+            onOpenDuckAi = viewModel::onOpenDuckAiFromPopup,
+            onRecentChat = viewModel::onRecentChatClicked,
+            onViewAllChats = viewModel::onViewAllChatsClicked,
+        ).show(requireActivity(), binding.root, binding.contextualNewChat)
         popup.setOnDismissListener { chatsPopup = null }
         chatsPopup = popup
-        popup.showAnchoredView(requireActivity(), binding.root, binding.contextualNewChat)
     }
 
     private fun observeSubscriptionEventDataChannel() {
@@ -1025,7 +1007,6 @@ class DuckChatContextualWebViewFragment :
 
     companion object {
         private const val HALF_EXPANDED_RATIO = 0.5f
-        private const val MAX_CHAT_TITLE_LINES = 1
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"

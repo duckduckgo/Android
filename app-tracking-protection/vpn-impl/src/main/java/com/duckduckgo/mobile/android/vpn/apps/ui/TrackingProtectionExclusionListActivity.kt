@@ -28,19 +28,17 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.*
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
@@ -65,7 +63,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 import com.duckduckgo.mobile.android.R as commonR
 
 @InjectWith(ActivityScope::class)
@@ -85,14 +82,12 @@ class TrackingProtectionExclusionListActivity :
     @Inject
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
-    @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+    @Inject lateinit var reportBreakageContract: () -> ReportBreakageContract
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
@@ -108,12 +103,9 @@ class TrackingProtectionExclusionListActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
-        reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
+        reportBreakage = registerForActivityResult(reportBreakageContract()) { result ->
             if (!result.isEmpty()) {
                 Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, LENGTH_LONG).show()
             }
@@ -126,9 +118,7 @@ class TrackingProtectionExclusionListActivity :
         bindViews()
         observeViewModel()
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         viewModel.applyAppsFilter(getAppsFilterOrDefault())
 

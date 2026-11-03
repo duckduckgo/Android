@@ -17,8 +17,9 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.attachment
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -33,8 +34,8 @@ interface LimitsHandler {
     fun setConversationFilesUsed(count: Int, sizeBytes: Long = 0L)
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = LimitsHandler::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<LimitsHandler>())
 class RealLimitsHandler @Inject constructor() : LimitsHandler {
 
     private val _conversationImagesSent = MutableStateFlow(0)

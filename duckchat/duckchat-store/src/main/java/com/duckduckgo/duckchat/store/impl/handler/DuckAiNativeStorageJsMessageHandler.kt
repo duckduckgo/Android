@@ -32,14 +32,14 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class DuckAiNativeStorageJsMessageHandler @Inject constructor(
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val duckAiHostProvider: DuckAiHostProvider,

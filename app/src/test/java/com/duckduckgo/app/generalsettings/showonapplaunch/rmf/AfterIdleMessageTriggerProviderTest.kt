@@ -43,7 +43,7 @@ class AfterIdleMessageTriggerProviderTest {
 
     @Test
     fun whenBothFlagsEnabledAndAfterIdleReturnWithReturnTargetThenAfterIdleTrigger() = runTest {
-        enableBothFlags()
+        enableFlag()
         whenever(ntpAfterIdleManager.isAfterIdleReturn).thenReturn(MutableStateFlow(true))
         whenever(escapeHatchTargetResolver.resolve()).thenReturn(EscapeHatchTarget("tab1", BrowserMode.REGULAR))
 
@@ -53,7 +53,7 @@ class AfterIdleMessageTriggerProviderTest {
     @Test
     fun whenAfterIdleReturnButNoReturnTargetThenNull() = runTest {
         // e.g. cold launch onto an existing NTP: after-idle, but nothing real to return to.
-        enableBothFlags()
+        enableFlag()
         whenever(ntpAfterIdleManager.isAfterIdleReturn).thenReturn(MutableStateFlow(true))
         whenever(escapeHatchTargetResolver.resolve()).thenReturn(null)
 
@@ -62,7 +62,7 @@ class AfterIdleMessageTriggerProviderTest {
 
     @Test
     fun whenNotAfterIdleReturnThenNull() = runTest {
-        enableBothFlags()
+        enableFlag()
         whenever(ntpAfterIdleManager.isAfterIdleReturn).thenReturn(MutableStateFlow(false))
 
         assertNull(testee.activeTrigger().firstOrNull())
@@ -71,21 +71,11 @@ class AfterIdleMessageTriggerProviderTest {
     @Test
     fun whenShowNtpAfterIdleReturnFlagDisabledThenNull() = runTest {
         feature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
-        feature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
 
         assertNull(testee.activeTrigger().firstOrNull())
     }
 
-    @Test
-    fun whenNtpAsDefaultFlagDisabledThenNull() = runTest {
+    private fun enableFlag() {
         feature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        feature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
-
-        assertNull(testee.activeTrigger().firstOrNull())
-    }
-
-    private fun enableBothFlags() {
-        feature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        feature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
     }
 }

@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.onboarding
 
 import android.content.Context
 import androidx.annotation.StringRes
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R

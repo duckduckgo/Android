@@ -20,11 +20,11 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.survey.api.SurveyParameterPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class LastDuckAiUsageSurveyParameterPlugin @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val currentTimeProvider: CurrentTimeProvider,

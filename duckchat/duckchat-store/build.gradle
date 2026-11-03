@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -33,9 +32,7 @@ dependencies {
     implementation project(':js-messaging-api')
     implementation project(':di')
 
-    implementation project(path: ':anvil-annotations')
-
-    implementation Google.dagger
+    implementation project(path: ':codegen-annotations')
 
     ksp AndroidX.room.compiler
     implementation AndroidX.room.runtime
@@ -61,9 +58,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.duckchat.store.impl"
-    anvil {
-        generateDaggerFactories = true
-    }
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }

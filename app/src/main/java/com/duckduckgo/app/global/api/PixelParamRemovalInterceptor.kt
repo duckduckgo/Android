@@ -38,14 +38,15 @@ import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.impl.SitePermissionsPixelName
 import com.duckduckgo.sqlcipher.loader.impl.SqlCipherPixelName
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class,
+    binding = binding<PixelInterceptorPlugin>(),
 )
 class PixelParamRemovalInterceptor @Inject constructor(
     private val pixelsPlugin: PluginPoint<PixelParamRemovalPlugin>,
@@ -85,9 +86,9 @@ class PixelParamRemovalInterceptor @Inject constructor(
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
+    binding = binding<PixelParamRemovalPlugin>(),
 )
 object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
@@ -97,6 +98,8 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             WebViewPixelName.WEB_PAGE_LOADED.pixelName to PixelParameter.removeAll(),
             WebViewPixelName.WEB_PAGE_PAINTED.pixelName to PixelParameter.removeAll(),
             WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE.pixelName to PixelParameter.removeAtb(),
+            WebViewPixelName.WEB_PAGE_LOAD_TIMEOUT_SHOWN.pixelName to PixelParameter.removeAtb(),
+            WebViewPixelName.WEB_PAGE_LOAD_TIMEOUT_RECOVERED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN.pixelName to PixelParameter.removeAtb(),
             HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_400_DAILY.pixelName to PixelParameter.removeAtb(),
             HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_4XX_DAILY.pixelName to PixelParameter.removeAtb(),
@@ -133,10 +136,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_AICHAT_SELECTED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED.pixelName to PixelParameter.removeAtb(),
@@ -215,8 +215,6 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION.pixelName to PixelParameter.removeAtb(),
             AppPixelName.GET_DESKTOP_BROWSER_CLICKED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.GET_DESKTOP_BROWSER_DISMISSED.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
             AppPixelName.MENU_ACTION_VPN_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName to PixelParameter.removeAtb(),
             SqlCipherPixelName.LIBRARY_LOAD_FAILURE_SQLCIPHER.pixelName to PixelParameter.removeAtb(),

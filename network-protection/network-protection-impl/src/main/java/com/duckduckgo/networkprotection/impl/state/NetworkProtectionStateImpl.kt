@@ -33,7 +33,7 @@ import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

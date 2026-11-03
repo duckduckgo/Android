@@ -20,7 +20,8 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import okhttp3.Interceptor
@@ -43,9 +44,9 @@ import javax.inject.Inject
  *  WebInterferenceDetectionContentScopeConfigPlugin.preferences() and gates the detection events at
  *  the source. See TD task https://app.asana.com/1/137249556945/project/481882893211075/task/1215138970525763?focus=true.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class,
+    binding = binding<PixelInterceptorPlugin>(),
 )
 class AdBlockingTelemetryPixelInterceptor @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,

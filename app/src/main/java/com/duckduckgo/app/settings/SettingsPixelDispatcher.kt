@@ -32,8 +32,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ interface SettingsPixelDispatcher {
 }
 
 @ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SettingsPixelDispatcherImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,

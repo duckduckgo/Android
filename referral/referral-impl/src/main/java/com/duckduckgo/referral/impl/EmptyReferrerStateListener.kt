@@ -20,11 +20,11 @@ import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import com.duckduckgo.referral.api.ParsedReferrerResult
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class EmptyReferrerStateListener @Inject constructor() : AppInstallationReferrerStateListener, AtbInitializerListener {
 
     private var referralResult: ParsedReferrerResult = ParsedReferrerResult.ReferrerInitialising

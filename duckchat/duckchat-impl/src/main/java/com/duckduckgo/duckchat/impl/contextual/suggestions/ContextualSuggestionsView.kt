@@ -29,16 +29,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ItemContextualSuggestionBinding
-import dagger.android.support.AndroidSupportInjection
+import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -58,6 +59,10 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ContextualSuggestionsViewModel::class.java]
     }
 
+    private val attachmentViewModel: AttachmentViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[AttachmentViewModel::class.java]
+    }
+
     var onSuggestionSelected: ((ContextualSuggestedPrompt) -> Unit)? = null
 
     var onContentChanged: (() -> Unit)? = null
@@ -66,6 +71,7 @@ class ContextualSuggestionsView @JvmOverloads constructor(
     private val cardsContainer = LinearLayout(context).apply { orientation = VERTICAL }
 
     private val viewStateJob = ConflatedJob()
+    private val attachmentsJob = ConflatedJob()
 
     @DrawableRes
     private val suggestionBackgroundRes: Int = context.obtainStyledAttributes(attrs, R.styleable.ContextualSuggestionsView).use {
@@ -90,10 +96,17 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         viewStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(scope)
+        attachmentsJob += attachmentViewModel.attachmentState
+            .onEach { state ->
+                val others = state.images.size + state.files.size + if (state.pageContext != null) 1 else 0
+                viewModel.onAttachmentsChanged(state.textSelections.size, others, attachmentViewModel.textSelectionsTabId)
+            }
+            .launchIn(scope)
     }
 
     override fun onDetachedFromWindow() {
         viewStateJob.cancel()
+        attachmentsJob.cancel()
         super.onDetachedFromWindow()
     }
 

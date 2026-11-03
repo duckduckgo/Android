@@ -18,9 +18,10 @@ package com.duckduckgo.app.statistics.wideevents.db
 
 import androidx.room.withTransaction
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPolicy
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import java.time.Duration
 import java.time.Instant
@@ -33,6 +34,7 @@ class WideEventRepositoryImpl @Inject constructor(
     private val database: WideEventDatabase,
     private val wideEventDao: WideEventDao,
     private val timeProvider: CurrentTimeProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : WideEventRepository {
     override suspend fun insertWideEvent(
         name: String,
@@ -56,6 +58,7 @@ class WideEventRepositoryImpl @Inject constructor(
                 samplingProbability = samplingProbability,
                 metaType = metaType,
                 metaVersion = metaVersion,
+                appVersion = appBuildConfig.versionName,
             )
 
         return wideEventDao.insertWideEvent(entity)
@@ -95,6 +98,29 @@ class WideEventRepositoryImpl @Inject constructor(
                 metadata = mergeMetadata(event.metadata, metadata),
                 isFirstDailyOccurrence = recordDailyOccurrence(event.name, dbStatus),
             )
+        }
+    }
+
+    override suspend fun cleanUpWideEvent(
+        eventId: Long,
+        decide: (WideEventRepository.WideEvent) -> WideEventRepository.CleanupDecision?,
+    ) {
+        database.withTransaction {
+            val event = wideEventDao.getWideEventById(eventId) ?: return@withTransaction
+            if (event.status != null) return@withTransaction
+
+            val decision = decide(event.mapToRepositoryWideEvent()) ?: return@withTransaction
+            val dbStatus = decision.status.mapToDbWideEventStatus()
+
+            val updatedEvent =
+                event.copy(
+                    status = dbStatus,
+                    metadata = mergeMetadata(event.metadata, decision.metadata),
+                    isFirstDailyOccurrence = recordDailyOccurrence(event.name, dbStatus),
+                )
+
+            val updateSuccessful = wideEventDao.updateWideEvent(updatedEvent) == 1
+            check(updateSuccessful) { "Failed to clean up wide event" }
         }
     }
 

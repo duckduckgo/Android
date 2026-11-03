@@ -16,7 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions
 
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 

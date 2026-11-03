@@ -46,10 +46,10 @@
     <string name="atp_OnInitialNotification">"Ochrona przed śledzeniem przez aplikacje jest włączona i blokuje próby śledzenia w aplikacjach."</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Trwa wyszukiwanie śladów śledzenia..."</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacji</b> (ostatnia godzina).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacji</b> (ostatnia godzina).]]></item>
         <item quantity="few"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacjach</b> (ostatnia godzina).]]></item>
         <item quantity="many"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacjach</b> (ostatnia godzina).]]></item>
-        <item quantity="other"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacji</b> (ostatnia godzina).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacji</b> (ostatnia godzina).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Ochrona przed śledzeniem przez aplikacje jest wyłączona. Dotknij, aby kontynuować blokowanie prób śledzenia.</string>
     <string name="atp_RevokedNotification">Aplikacja VPN na Twoim urządzeniu wyłączyła ochronę przed śledzeniem przez aplikacje. Dotknij, aby ponownie włączyć.</string>
@@ -61,17 +61,17 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Ochrona przed śledzeniem przez aplikacje zablokowała <b>następującą liczbę prób śledzenia: %1$d w %2$d aplikacjach, w tym %3$s</b> (ostatni dzień).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacji</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacji</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
         <item quantity="few"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacjach</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
         <item quantity="many"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacjach</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
-        <item quantity="other"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacji</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacji</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacjach <b>%1$s</b> i <b>%2$s</b> (ostatni dzień).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacjach <b>%1$s</b> i <b>%2$s</b> (ostatni dzień).]]></item>
         <item quantity="few"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacjach <b>%1$s</b> i <b>%2$s</b> (ostatni dzień).]]></item>
         <item quantity="many"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacjach <b>%1$s</b> i <b>%2$s</b> (ostatni dzień).]]></item>
-        <item quantity="other"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacjach <b>%1$s</b> i <b>%2$s</b> (ostatni dzień).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacjach <b>%1$s</b> i <b>%2$s</b> (ostatni dzień).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s %2$d raz w aplikacji %3$s</b> (ostatni dzień).]]></string>
@@ -91,10 +91,10 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>następującą liczbę prób śledzenia: %1$d w aplikacji %2$s i %3$d innych aplikacjach</b> (ostatni tydzień).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacji, w tym %3$s</b> (ostatni tydzień).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacji, w tym %3$s</b> (ostatni tydzień).]]></item>
         <item quantity="few"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacjach, w tym %3$s</b> (ostatni tydzień).]]></item>
         <item quantity="many"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacjach, w tym %3$s</b> (ostatni tydzień).]]></item>
-        <item quantity="other"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacji, w tym %3$s</b> (ostatni tydzień).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacji, w tym %3$s</b> (ostatni tydzień).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Włącz ochronę przed śledzeniem przez aplikacje</string>
@@ -281,16 +281,16 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d próba. Wiemy, że gromadzone są następujące informacje:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d próba. Wiemy, że gromadzone są następujące informacje:</item>
         <item quantity="few">%1$d próby. Wiemy, że gromadzone są następujące informacje:</item>
         <item quantity="many">%1$d prób. Wiemy, że gromadzone są następujące informacje:</item>
-        <item quantity="other">%1$d próby. Wiemy, że gromadzone są następujące informacje:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d próby. Wiemy, że gromadzone są następujące informacje:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">DuckDuckGo zablokował %1$d próbę śledzenia</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo zablokował %1$d próbę śledzenia</item>
         <item quantity="few">DuckDuckGo zablokował %1$d próby śledzenia</item>
         <item quantity="many">DuckDuckGo zablokował %1$d prób śledzenia</item>
-        <item quantity="other">DuckDuckGo zablokował %1$d próby śledzenia</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo zablokował %1$d próby śledzenia</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Zgłoś problem z tą aplikacją</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Pokaż jeszcze %1$d</string>

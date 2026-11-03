@@ -20,13 +20,13 @@
             <stroke
                 android:width="2dp"
                 android:color="?attr/daxColorAccentBlue" />
-            <corners android:radius="@dimen/smallShapeCornerRadius" />
+            <corners android:radius="?attr/daxSearchBarRadius" />
         </shape>
     </item>
     <item>
         <shape>
             <solid android:color="?attr/daxColorContainer" />
-            <corners android:radius="@dimen/smallShapeCornerRadius" />
+            <corners android:radius="?attr/daxSearchBarRadius" />
         </shape>
     </item>
 </layer-list>

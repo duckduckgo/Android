@@ -21,7 +21,6 @@ import com.duckduckgo.app.tabs.db.DuckAiTabSessionDao
 import com.duckduckgo.app.tabs.db.DuckAiTabSessionEntity
 import com.duckduckgo.app.tabs.db.RealDuckAiTabSessionRepository
 import com.duckduckgo.duckchat.api.DuckChat
-import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -42,7 +41,7 @@ class RealDuckAiTabSessionRepositoryTest {
 
     @Before
     fun setup() {
-        testee = RealDuckAiTabSessionRepository(dao = mockDao, duckChat = Lazy { mockDuckChat })
+        testee = RealDuckAiTabSessionRepository(dao = mockDao, duckChat = lazy { mockDuckChat })
     }
 
     @Test

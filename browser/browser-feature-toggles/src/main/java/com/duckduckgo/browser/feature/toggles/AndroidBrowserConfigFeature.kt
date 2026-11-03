@@ -16,7 +16,7 @@
 
 package com.duckduckgo.browser.feature.toggles
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -150,14 +150,6 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun showNTPAfterIdleReturn(): Toggle
 
-    /**
-     * @return `true` when the remote config has the global "ntpAsDefaultAfterIdleReturn" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun ntpAsDefaultAfterIdleReturn(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
 
@@ -183,9 +175,6 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun handleIntentScheme(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun hideDuckAiInSerpKillSwitch(): Toggle
 
     /**
      * Kill switch for intent resolution validation in SpecialUrlDetector

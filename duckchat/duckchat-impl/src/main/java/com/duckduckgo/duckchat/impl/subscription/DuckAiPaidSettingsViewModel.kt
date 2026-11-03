@@ -19,8 +19,8 @@ package com.duckduckgo.duckchat.impl.subscription
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R

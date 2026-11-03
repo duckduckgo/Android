@@ -24,7 +24,7 @@ import android.os.Build.VERSION_CODES
 import android.os.PersistableBundle
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

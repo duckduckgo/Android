@@ -17,9 +17,9 @@
 package com.duckduckgo.app.startup
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 import kotlin.random.Random
 

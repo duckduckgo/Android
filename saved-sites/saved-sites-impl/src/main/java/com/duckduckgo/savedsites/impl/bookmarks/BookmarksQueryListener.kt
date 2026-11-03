@@ -42,7 +42,7 @@ class BookmarksQueryListener(
             delay(DEBOUNCE_PERIOD)
             viewModel.onSearchQueryUpdated(newText)
             val favorites = viewModel.viewState.value?.favorites
-            viewModel.itemsToDisplay.value.let { bookmarks ->
+            viewModel.itemsToDisplay.value.orEmpty().let { bookmarks ->
                 val filteredBookmarks = filterBookmarks(newText, bookmarks, favorites)
                 bookmarksAdapter.setItems(
                     filteredBookmarks,

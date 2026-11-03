@@ -18,6 +18,9 @@ package com.duckduckgo.app.browser.applinks
 
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.pm.ResolveInfo
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -25,6 +28,8 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertNotNull
+import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -427,6 +432,78 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
+    fun whenAppLinksDisabledAndOverrideAllowedAndTrustedCallerWithoutGestureThenLaunchAppLink() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "foo.com", appIntent = appIntent),
+                hasGesture = false,
+                clientPackage = "com.example.app",
+                appLinksEnabled = false,
+                shouldHaltWebNavigation = true,
+                trustedCallerOverridesDisabledAppLinks = true,
+                launchAppLink = mockCallback,
+            ),
+        )
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenAppLinksDisabledAndOverrideAllowedWithGestureButNoVerifiedCallerThenLaunchAppLink() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "foo.com", appIntent = appIntent),
+                hasGesture = true,
+                clientPackage = null,
+                appLinksEnabled = false,
+                shouldHaltWebNavigation = true,
+                trustedCallerOverridesDisabledAppLinks = true,
+                launchAppLink = mockCallback,
+            ),
+        )
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenAppLinksDisabledAndOverrideAllowedWithoutGestureOrVerifiedCallerThenReturnFalseAndDoNotLaunch() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "foo.com", appIntent = appIntent),
+                hasGesture = false,
+                clientPackage = null,
+                appLinksEnabled = false,
+                shouldHaltWebNavigation = true,
+                trustedCallerOverridesDisabledAppLinks = true,
+                launchAppLink = mockCallback,
+            ),
+        )
+        verifyNoInteractions(mockCallback)
+    }
+
+    @Test
+    fun whenAppLinksDisabledAndOverrideNotAllowedThenTrustedCallerReturnsFalseAndDoesNotLaunch() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "foo.com", appIntent = appIntent),
+                hasGesture = true,
+                clientPackage = "com.example.app",
+                appLinksEnabled = false,
+                shouldHaltWebNavigation = true,
+                trustedCallerOverridesDisabledAppLinks = false,
+                launchAppLink = mockCallback,
+            ),
+        )
+        verifyNoInteractions(mockCallback)
+    }
+
+    @Test
     fun whenNoGestureAndNotTrustedCallerButIsInAlwaysTriggerListThenLaunchAppLink() {
         testee.isAUserQuery = false
         testee.previousUrl = "foo.com"
@@ -546,6 +623,88 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
+    fun whenIntentSchemePackageResolvesToCallerActivityThenTrustedCallerIntentReturned() {
+        val intent = browsableIntent().setPackage(CALLER)
+        val trusted = testee.trustedCallerIntent(intent, CALLER) { listOf(resolveInfo(CALLER)) }
+        assertEquals(CALLER, trusted?.intent?.`package`)
+    }
+
+    @Test
+    fun whenIntentHasComponentThenTrustedCallerIntentResolvedWithoutIt() {
+        val intent = browsableIntent().setComponent(ComponentName(CALLER, "$CALLER.InternalActivity"))
+        var queried: Intent? = null
+        val trusted = testee.trustedCallerIntent(intent, CALLER) {
+            queried = it
+            listOf(resolveInfo(CALLER))
+        }
+        assertNull(queried?.component)
+        assertNull(trusted?.intent?.component)
+        assertEquals(ComponentName(CALLER, "$CALLER.InternalActivity"), intent.component)
+    }
+
+    @Test
+    fun whenIntentHasComponentAndNoCallerFilterMatchesThenTrustedCallerIntentIsNull() {
+        val intent = browsableIntent().setComponent(ComponentName(CALLER, "$CALLER.InternalActivity"))
+        assertNull(testee.trustedCallerIntent(intent, CALLER) { emptyList() })
+    }
+
+    @Test
+    fun whenIntentHasSelectorThenSelectorResolvedWithoutComponentAndBrowsable() {
+        val intent = browsableIntent()
+        intent.selector = Intent(Intent.ACTION_VIEW).setComponent(ComponentName(CALLER, "$CALLER.InternalActivity"))
+        var queried: Intent? = null
+        testee.trustedCallerIntent(intent, CALLER) {
+            queried = it
+            listOf(resolveInfo(CALLER))
+        }
+        assertNull(queried?.selector?.component)
+        assertTrue(queried?.selector?.hasCategory(Intent.CATEGORY_BROWSABLE) == true)
+    }
+
+    @Test
+    fun whenCustomSchemeResolvesToSingleCallerActivityThenTrustedCallerIntentReturned() {
+        assertNotNull(testee.trustedCallerIntent(browsableIntent(), CALLER) { listOf(resolveInfo(CALLER)) })
+    }
+
+    @Test
+    fun whenCustomSchemeResolvesToMultipleCallerActivitiesThenTrustedCallerIntentReturnedWithAllOfThem() {
+        val trusted = testee.trustedCallerIntent(browsableIntent(), CALLER) { listOf(resolveInfo(CALLER), resolveInfo(CALLER)) }
+        assertEquals(2, trusted?.activities?.size)
+    }
+
+    @Test
+    fun whenCustomSchemeResolvesToActivitiesInDifferentAppsThenTrustedCallerIntentIsNull() {
+        assertNull(testee.trustedCallerIntent(browsableIntent(), CALLER) { listOf(resolveInfo(CALLER), resolveInfo(OTHER)) })
+    }
+
+    @Test
+    fun whenIntentResolvesToNoActivityThenTrustedCallerIntentIsNull() {
+        assertNull(testee.trustedCallerIntent(browsableIntent().setPackage(CALLER), CALLER) { emptyList() })
+    }
+
+    @Test
+    fun whenIntentNotBrowsableThenTrustedCallerIntentResolvedAsBrowsable() {
+        val intent = Intent(Intent.ACTION_VIEW, "example://details".toUri()).setPackage(CALLER)
+        var queried: Intent? = null
+        testee.trustedCallerIntent(intent, CALLER) {
+            queried = it
+            listOf(resolveInfo(CALLER))
+        }
+        assertTrue(queried?.hasCategory(Intent.CATEGORY_BROWSABLE) == true)
+        assertFalse(intent.hasCategory(Intent.CATEGORY_BROWSABLE))
+    }
+
+    @Test
+    fun whenCallerPackageIsNullThenTrustedCallerIntentIsNull() {
+        assertNull(testee.trustedCallerIntent(browsableIntent().setPackage(CALLER), null) { listOf(resolveInfo(CALLER)) })
+    }
+
+    @Test
+    fun whenIntentResolvesToDifferentAppThenTrustedCallerIntentIsNull() {
+        assertNull(testee.trustedCallerIntent(browsableIntent().setPackage(OTHER), CALLER) { listOf(resolveInfo(OTHER)) })
+    }
+
+    @Test
     fun whenDomainInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsTrue() {
         assertTrue(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://app.digid.nl/path")))
     }
@@ -553,5 +712,16 @@ class DuckDuckGoAppLinksHandlerTest {
     @Test
     fun whenDomainNotInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsFalse() {
         assertFalse(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://example.com/path")))
+    }
+
+    private fun browsableIntent(): Intent =
+        Intent(Intent.ACTION_VIEW, "example://details".toUri()).addCategory(Intent.CATEGORY_BROWSABLE)
+
+    private fun resolveInfo(packageName: String): ResolveInfo =
+        ResolveInfo().apply { activityInfo = ActivityInfo().apply { this.packageName = packageName } }
+
+    private companion object {
+        const val CALLER = "com.example.app"
+        const val OTHER = "com.different.app"
     }
 }

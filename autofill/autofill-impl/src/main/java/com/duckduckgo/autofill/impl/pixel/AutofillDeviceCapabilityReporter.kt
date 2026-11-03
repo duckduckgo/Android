@@ -24,7 +24,8 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
@@ -33,9 +34,9 @@ import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class AutofillDeviceCapabilityReporter @Inject constructor(
     private val pixel: AutofillPixelSender,

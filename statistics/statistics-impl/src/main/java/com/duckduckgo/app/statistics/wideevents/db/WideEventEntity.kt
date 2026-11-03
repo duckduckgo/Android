@@ -60,6 +60,8 @@ data class WideEventEntity(
     val metaVersion: String,
     @ColumnInfo(name = "is_first_daily_occurrence", defaultValue = "0")
     val isFirstDailyOccurrence: Boolean = false,
+    @ColumnInfo(name = "app_version")
+    val appVersion: String,
 ) {
     data class MetadataEntry(
         @Json(name = "key")
@@ -89,6 +91,8 @@ data class WideEventEntity(
         abstract val metadata: Map<String, String>
 
         data class OnProcessStart(
+            @Json(name = "ownerProcessName")
+            val ownerProcessName: String,
             @Json(name = "ignore_if_interval_timeout_present")
             val ignoreIfIntervalTimeoutPresent: Boolean,
             @Json(name = "status")

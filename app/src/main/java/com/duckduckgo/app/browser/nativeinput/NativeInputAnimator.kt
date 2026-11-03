@@ -31,7 +31,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.RelativeCornerSize
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 data class Margins(val top: Int, val bottom: Int)
@@ -101,8 +101,6 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     private var widgetCornerRadius = 0f
     private var widgetUsesRelativeCornerSize = false
     private var widgetCardElevation = 0f
-    private var widgetCompatPaddingWidth = 0
-    private var widgetCompatPaddingHeight = 0
     private var isBottomCard = false
 
     // The card is a weighted LinearLayout child (width=0dp), which ignores an
@@ -126,9 +124,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val margins = Margins(params.topMargin, params.bottomMargin)
 
         detachWeightForMorph(params)
-        shrinkCardToMatchOmnibar(params, omnibarWidth, omnibarHeight, isBottom)
-
         animateCornerRadius(widgetCard, omnibarCornerRadius)
+        shrinkCardToMatchOmnibar(widgetCard, params, omnibarWidth, omnibarHeight, isBottom)
         widgetCard.visibility = View.INVISIBLE
 
         return margins
@@ -317,7 +314,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             )
         }
 
-        val widgetContent = widgetCard.findViewById<View?>(R.id.inputModeWidget)
+        val widgetContent = widgetCard.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget)
         omnibarCard.alpha = 0f
 
         runAnimator(
@@ -370,7 +367,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             }
         }
         widgetView.findViewById<ViewGroup?>(R.id.inputModeWidgetCard)?.layoutTransition = changingTransition()
-        widgetView.findViewById<ViewGroup?>(R.id.inputModeWidget)?.layoutTransition = changingTransition()
+        widgetView.findViewById<ViewGroup?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget)?.layoutTransition = changingTransition()
         if (isBottom) {
             (widgetView as? ViewGroup)?.layoutTransition = changingTransition()
         }
@@ -382,18 +379,17 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         widgetCornerRadius = materialCard?.radius ?: 0f
         omnibarCornerRadius = (omnibarCard as? MaterialCardView)?.radius ?: 0f
         widgetCardElevation = materialCard?.cardElevation ?: 0f
-        widgetCompatPaddingWidth = widgetCard.paddingLeft + widgetCard.paddingRight
-        widgetCompatPaddingHeight = widgetCard.paddingTop + widgetCard.paddingBottom
     }
 
     private fun shrinkCardToMatchOmnibar(
+        card: View,
         params: ViewGroup.MarginLayoutParams,
         omnibarWidth: Int,
         omnibarHeight: Int,
         isBottom: Boolean,
     ) {
-        params.width = omnibarWidth + widgetCompatPaddingWidth
-        params.height = omnibarHeight + widgetCompatPaddingHeight
+        params.width = omnibarWidth + card.paddingLeft + card.paddingRight
+        params.height = omnibarHeight + card.paddingTop + card.paddingBottom
         params.topMargin = 0
         params.bottomMargin = 0
         // Gravity only applies to FrameLayout children. For the LinearLayout case the
@@ -429,7 +425,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         onComplete: () -> Unit,
     ) {
         val offsetToOmnibar = positionCardOverOmnibar(card, omnibarPosition)
-        val widgetContent = card.findViewById<View?>(R.id.inputModeWidget)
+        val widgetContent = card.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget)
         widgetContent?.alpha = 0f
 
         val params = card.layoutParams as ViewGroup.MarginLayoutParams
@@ -569,7 +565,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     override fun clearLayoutTransitions(widgetView: View) {
         (widgetView as? ViewGroup)?.layoutTransition = null
         widgetView.findViewById<ViewGroup?>(R.id.inputModeWidgetCard)?.layoutTransition = null
-        widgetView.findViewById<ViewGroup?>(R.id.inputModeWidget)?.layoutTransition = null
+        widgetView.findViewById<ViewGroup?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget)?.layoutTransition = null
     }
 
     private fun visibleSurfacePosition(view: View): Position {

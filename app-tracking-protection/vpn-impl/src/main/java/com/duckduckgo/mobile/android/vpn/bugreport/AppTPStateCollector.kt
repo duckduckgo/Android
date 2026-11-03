@@ -20,11 +20,11 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class AppTPStateCollector @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnStateCollectorPlugin {

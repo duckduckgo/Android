@@ -1,7 +1,7 @@
 {
   "name": "VehicleHistory",
   "url": "vehiclehistory.us",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "propertyrecord.com",
   "addedDatetime": 1775829600000,
   "optOutUrl": "https://dashboard.vehiclehistory.us/opt-out",
@@ -12,29 +12,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "_comment": "Forwarding page source: https://github.com/duckduckgo/privacy-test-pages/blob/main/pir/opt-out/index.html",
-          "url": "https://privacy-test-pages.site/pir/opt-out/?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}&to=https%3A%2F%2Fdashboard.vehiclehistory.us%2Fopt-out%2Frecords",
+          "url": "https://dashboard.vehiclehistory.us/opt-out/records?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}",
           "id": "227207ce-699d-46ee-8693-0f42015c602c"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "#forward"
-            }
-          ],
-          "id": "85b6a83b-4a92-4f96-a56b-37ac873a1978"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "#forward"
-            }
-          ],
-          "id": "9fece957-82ee-4692-8ff1-f4c22f19767a"
         },
         {
           "actionType": "expectation",

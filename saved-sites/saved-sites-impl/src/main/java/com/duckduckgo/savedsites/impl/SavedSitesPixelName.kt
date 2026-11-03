@@ -20,7 +20,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 
 enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName {
     /** Bookmarks Screen **/
@@ -80,9 +81,9 @@ object SavedSitesPixelParameters {
     const val SORT_MODE = "sort_mode"
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
+    binding = binding<PixelParamRemovalPlugin>(),
 )
 object SavedSitePixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

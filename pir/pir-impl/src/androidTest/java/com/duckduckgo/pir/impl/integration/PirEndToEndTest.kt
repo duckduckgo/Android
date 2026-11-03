@@ -26,6 +26,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
@@ -55,6 +56,8 @@ import com.duckduckgo.pir.impl.email.PirEmailConfirmation
 import com.duckduckgo.pir.impl.email.PirEmailConfirmationJobsRunner
 import com.duckduckgo.pir.impl.email.RealPirEmailConfirmation
 import com.duckduckgo.pir.impl.email.RealPirEmailConfirmationJobsRunner
+import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
+import com.duckduckgo.pir.impl.freemium.RealPirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.integration.fakes.FakeCurrentTimeProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeDbpService
 import com.duckduckgo.pir.impl.integration.fakes.FakeEventHandlerPluginPoint
@@ -73,10 +76,12 @@ import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.notifications.PirScanCompleteNotifier
 import com.duckduckgo.pir.impl.optout.RealPirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixel
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.pixels.RealPirPixelSender
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.scan.RealPirScan
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
@@ -99,6 +104,8 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoR
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.store.PirEventsRepository
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.RealPirEventsRepository
@@ -388,6 +395,15 @@ class PirEndToEndTest {
             pirInitialScanCompletionWideEvent = NoOpPirInitialScanCompletionWideEvent,
             networkProtectionState = fakeNetworkProtectionState,
             pirWebViewCountProvider = pirWebViewCountProvider,
+            pirFreeScanBrokerFilter = RealPirFreeScanBrokerFilter(
+                pirRepository = pirRepository,
+                brokerStepsParser = brokerStepsParser,
+                dispatcherProvider = dispatcherProvider,
+            ),
+            pirFreeScanWorkWindow = NoOpPirFreeScanWorkWindow,
+            pirScanScheduler = NoOpPirScanScheduler,
+            pirFreemiumDataStore = NoOpPirFreemiumDataStore,
+            pirScanCompleteNotifier = NoOpPirScanCompleteNotifier,
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -451,7 +467,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run Eligible Scan and Opt-Out Jobs ====================")
 
         // Run eligible jobs - this will trigger PirScan and PirOptOut
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
         assertTrue("Scan should succeed", scanResult.isSuccess)
 
         // Verify: Scan jobs created only for active broker
@@ -619,7 +635,7 @@ class PirEndToEndTest {
         fakeTimeProvider.advanceByHours(73)
 
         // Run confirmation scan
-        val confirmationResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.SCHEDULED)
+        val confirmationResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.SCHEDULED, PirRunMode.SCAN_AND_OPT_OUT)
         assertTrue("Confirmation scan should succeed", confirmationResult.isSuccess)
 
         // Verify navigate actions were pushed for active broker only
@@ -683,7 +699,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run scan - should fail gracefully ====================")
 
         // Run eligible jobs - should not crash even though scan step has unknown action
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
         assertTrue("Scan should succeed overall (not crash)", scanResult.isSuccess)
 
         // Verify scan job was created
@@ -750,7 +766,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run scan - should succeed (scan step is valid) ====================")
 
         // Run scan - should succeed since the scan step is valid
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
         assertTrue("Scan should succeed", scanResult.isSuccess)
 
         // Check scan job record
@@ -1025,6 +1041,7 @@ class PirEndToEndTest {
             batteryOptimizationsEnabled: Boolean,
             notificationsPermissionGranted: Boolean,
             isTrackerBlockingEnabled: Boolean,
+            isFreeScan: Boolean,
         ) = Unit
 
         override suspend fun onScanJobsResolved(executionType: PirExecutionType, actualScanJobs: Int) = Unit
@@ -1056,5 +1073,39 @@ class PirEndToEndTest {
 
         override suspend fun onScanCompleted() = Unit
         override suspend fun onUserReset() = Unit
+    }
+
+    /**
+     * This test only runs [PirRunMode.SCAN_AND_OPT_OUT], which never consults the free scan window
+     * or retires the scan worker, so these are unused no-ops rather than exercised fakes.
+     */
+    private object NoOpPirFreeScanWorkWindow : PirFreeScanWorkWindow {
+        override suspend fun isOpen(): Boolean = true
+    }
+
+    private object NoOpPirScanCompleteNotifier : PirScanCompleteNotifier {
+        override fun onInitialScanStarted() = Unit
+        override suspend fun onRunCompleted(runMode: PirRunMode) = Unit
+    }
+
+    private object NoOpPirFreemiumDataStore : PirFreemiumDataStore {
+        override val didActivate: Boolean = false
+        override val firstProfileSavedTimestamp: Long = 0L
+        override val firstScanResult: PirFreemiumFirstScanResult? = null
+        override fun activate(timestampMillis: Long) = Unit
+        override fun recordFirstScanResult(result: PirFreemiumFirstScanResult) = Unit
+        override fun clearFirstScanResult() = Unit
+        override fun reset() = Unit
+    }
+
+    private object NoOpPirScanScheduler : PirScanScheduler {
+        override fun scheduleScans() = Unit
+        override fun scheduleScanOnlyWork() = Unit
+        override fun rescheduleScanWork() = Unit
+        override fun rescheduleAllWork() = Unit
+        override fun cancelScheduledScans(context: Context) = Unit
+        override fun cancelScheduledScanWorker() = Unit
+        override fun cancelScheduledEmailConfirmation() = Unit
+        override suspend fun isScheduledScanRunning(): Boolean = false
     }
 }

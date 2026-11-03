@@ -86,3 +86,7 @@ data class StoreLoginBody(
 data class ResponseError(
     val error: String,
 )
+
+data class ResponseErrorCode(
+    @field:Json(name = "error_code") val errorCode: Int?,
+)

@@ -25,11 +25,11 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.referral.impl.InstallOriginBridgeFeature
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class GetInstallOriginVariantHandler @Inject constructor(
     private val installOriginBridgeFeature: InstallOriginBridgeFeature,
     private val installOriginVariantResolver: InstallOriginVariantResolver,

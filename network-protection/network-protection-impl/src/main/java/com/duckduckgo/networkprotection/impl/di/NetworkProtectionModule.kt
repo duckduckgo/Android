@@ -34,21 +34,21 @@ import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DataModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideNetworkProtectionRepository(
         sharedPreferencesProvider: SharedPreferencesProvider,
     ): NetworkProtectionPrefs = RealNetworkProtectionPrefs(sharedPreferencesProvider)
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun bindNetPDatabase(context: Context): NetPDatabase {
         return Room.databaseBuilder(context, NetPDatabase::class.java, "vpn-netp.db")
@@ -59,7 +59,7 @@ object DataModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideNetPManualExclusionListRepository(
         database: NetPDatabase,
     ): NetPManualExclusionListRepository {
@@ -67,7 +67,7 @@ object DataModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideNetPGeoswitchingRepository(
         database: NetPDatabase,
         networkProtectionPrefs: NetworkProtectionPrefs,
@@ -76,14 +76,14 @@ object DataModule {
         return RealNetPGeoswitchingRepository(networkProtectionPrefs, database.geoswitchingDao(), dispatcherProvider)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideAutoExcludeDao(netpDatabase: NetPDatabase): AutoExcludeDao {
         return netpDatabase.autoExcludeDao()
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object NetPBreakageCategoriesModule {
     @Provides
@@ -103,7 +103,7 @@ object NetPBreakageCategoriesModule {
         }
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     @ProdNetPConfigTogglesDao
     fun provideNetPConfigTogglesDao(netpDatabase: NetPDatabase): NetPConfigTogglesDao {
@@ -111,7 +111,7 @@ object NetPBreakageCategoriesModule {
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object NetPDataStoreModule {
     @Provides

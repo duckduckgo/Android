@@ -23,8 +23,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperimentMetrics
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,12 +34,13 @@ import javax.inject.Inject
 /**
  * Handles subscription features related callbacks from multiple sources [e.g. VPN, DuckChat]
  */
-@ContributesMultibinding(VpnScope::class, boundType = VpnServiceCallbacks::class)
-@ContributesMultibinding(AppScope::class, boundType = AtbLifecyclePlugin::class)
+@ContributesIntoSet(VpnScope::class, binding = binding<VpnServiceCallbacks>())
+@ContributesIntoSet(AppScope::class, binding = binding<AtbLifecyclePlugin>())
 class SubscriptionFeatureCallbacks @Inject constructor(
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics,
 ) : VpnServiceCallbacks, AtbLifecyclePlugin {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -66,6 +69,7 @@ class SubscriptionFeatureCallbacks @Inject constructor(
         if (metadata[KEY_MODEL_TIER] in MODEL_TIERS_PAID) {
             coroutineScope.launch(dispatcherProvider.io()) {
                 freeTrialConversionWideEvent.onDuckAiPaidPromptSubmitted()
+                subscriptionOnboardingExperimentMetrics.fireDuckAiPaidUsed()
             }
         }
     }

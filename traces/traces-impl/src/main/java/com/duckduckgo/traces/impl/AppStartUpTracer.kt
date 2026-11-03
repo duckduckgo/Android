@@ -25,15 +25,16 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.traces.api.StartupTraces
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class AppStartUpTracer @Inject constructor() : ContentProvider(), MainProcessLifecycleObserver {
 

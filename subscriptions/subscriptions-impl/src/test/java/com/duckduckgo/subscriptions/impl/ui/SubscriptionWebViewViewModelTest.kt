@@ -1,12 +1,15 @@
 package com.duckduckgo.subscriptions.impl.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.pir.api.PirFeature
@@ -18,8 +21,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
+import com.duckduckgo.subscriptions.impl.Experiment
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PricingPhase
+import com.duckduckgo.subscriptions.impl.PurchaseExperiments
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
@@ -35,9 +40,13 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.internal.PaywallUrlResolver
 import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.stripe.StripePlansHandler
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
@@ -61,8 +70,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -83,8 +94,12 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private val pirFeature: PirFeature = mock()
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler = mock()
+    private val paywallUrlResolver: PaywallUrlResolver = mock()
+    private val subscriptionOnboardingStore = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
+    private val stripePlansHandler: StripePlansHandler = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -92,17 +107,58 @@ class SubscriptionWebViewViewModelTest {
     fun setup() = runTest {
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
         viewModel = SubscriptionWebViewViewModel(
-            coroutineTestRule.testDispatcherProvider,
-            subscriptionsManager,
-            subscriptionsChecker,
-            networkProtectionAccessState,
-            pixelSender,
-            subscriptionsFeature,
-            pirFeature,
-            subscriptionExpirationReminderScheduler,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            subscriptionsManager = subscriptionsManager,
+            subscriptionsChecker = subscriptionsChecker,
+            networkProtectionAccessState = networkProtectionAccessState,
+            pixelSender = pixelSender,
+            subscriptionsFeature = subscriptionsFeature,
+            subscriptionOnboardingExperiments = subscriptionOnboardingExperiments,
+            pirFeature = pirFeature,
+            subscriptionExpirationReminderScheduler = subscriptionExpirationReminderScheduler,
+            paywallUrlResolver = paywallUrlResolver,
+            subscriptionOnboardingStore = subscriptionOnboardingStore,
+            stripePlansHandler = stripePlansHandler,
         )
         givenSubscriptionStatus(UNKNOWN)
+    }
+
+    @Test
+    fun whenResolveInitialUrlThenInitialUrlHoldsResolvedUrl() = runTest {
+        val buyUrl = "https://duckduckgo.com/subscriptions"
+        val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
+        whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
+
+        viewModel.resolveInitialUrl(buyUrl)
+
+        assertEquals(resolvedUrl, viewModel.initialUrl.value)
+    }
+
+    @Test
+    fun whenResolveInitialUrlCalledAgainThenUrlIsResolvedOnlyOnce() = runTest {
+        val buyUrl = "https://duckduckgo.com/subscriptions"
+        val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
+        whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
+
+        viewModel.resolveInitialUrl(buyUrl)
+        viewModel.resolveInitialUrl(buyUrl)
+
+        verify(paywallUrlResolver, times(1)).resolve(buyUrl)
+    }
+
+    @Test
+    fun whenCollectedAfterResolvingThenResolvedUrlIsStillReplayed() = runTest {
+        val buyUrl = "https://duckduckgo.com/subscriptions"
+        val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
+        whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
+        viewModel.resolveInitialUrl(buyUrl)
+
+        viewModel.initialUrl.test {
+            assertEquals(resolvedUrl, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -136,6 +192,68 @@ class SubscriptionWebViewViewModelTest {
             flowTest.emit(CurrentPurchase.PreFlowFinished)
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
 
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseInTreatmentThenLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        assertLaunchOnboarding(isFreeTrial = true, expected = true)
+    }
+
+    @Test
+    fun whenPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
+        assertLaunchOnboarding(isFreeTrial = true, expected = false)
+    }
+
+    @Test
+    fun whenPaidPurchaseInTreatmentThenLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        assertLaunchOnboarding(isFreeTrial = false, expected = true)
+    }
+
+    @Test
+    fun whenPaidPurchaseInControlThenDoNotLaunchOnboarding() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
+        assertLaunchOnboarding(isFreeTrial = false, expected = false)
+    }
+
+    @Test
+    fun whenPurchaseInTreatmentThenOnboardingProgressIsReset() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        subscriptionOnboardingStore.setStepCompleted("welcome")
+
+        assertLaunchOnboarding(isFreeTrial = false, expected = true)
+
+        assertTrue(subscriptionOnboardingStore.completedSteps().isEmpty())
+    }
+
+    @Test
+    fun whenPurchaseInControlThenOnboardingProgressIsKept() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false)
+        subscriptionOnboardingStore.setStepCompleted("welcome")
+
+        assertLaunchOnboarding(isFreeTrial = false, expected = false)
+
+        assertEquals(setOf("welcome"), subscriptionOnboardingStore.completedSteps())
+    }
+
+    private suspend fun assertLaunchOnboarding(
+        isFreeTrial: Boolean,
+        expected: Boolean,
+    ) {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+
+        viewModel.currentPurchaseViewState.test {
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
+            flowTest.emit(CurrentPurchase.Success(isFreeTrial = isFreeTrial))
+            val success = awaitItem().purchaseState
+            assertTrue(success is Success)
+            assertEquals(expected, (success as Success).launchOnboarding)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -206,6 +324,201 @@ class SubscriptionWebViewViewModelTest {
             val result = awaitItem()
             assertTrue(result is Command.SubscriptionSelected)
             assertEquals("myId", (result as Command.SubscriptionSelected).id)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithMultipleExperimentsThenAllAreSentInOrder() = runTest {
+        val json = """
+            {"id":"myId","experiments":[{"name":"experimentOne","cohort":"control"},{"name":"experimentTwo","cohort":"treatment"}]}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(
+                listOf(
+                    Experiment(name = "experimentOne", cohort = "control"),
+                    Experiment(name = "experimentTwo", cohort = "treatment"),
+                ),
+                (result as Command.SubscriptionSelected).experiments.experiments,
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithDuplicateExperimentNamesThenOnlyFirstIsKept() = runTest {
+        val json = """
+            {"id":"myId","experiments":[{"name":"experimentOne","cohort":"control"},{"name":"experimentOne","cohort":"treatment"}]}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(
+                listOf(Experiment(name = "experimentOne", cohort = "control")),
+                (result as Command.SubscriptionSelected).experiments.experiments,
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithIncompleteExperimentThenItIsDropped() = runTest {
+        val json = """
+            {"id":"myId","experiments":[{"name":"experimentOne"},{"name":"experimentTwo","cohort":"treatment"}]}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(
+                listOf(Experiment(name = "experimentTwo", cohort = "treatment")),
+                (result as Command.SubscriptionSelected).experiments.experiments,
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithLegacySingleExperimentThenItIsStillSent() = runTest {
+        val json = """
+            {"id":"myId","experiment":{"name":"experimentOne","cohort":"control"}}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(
+                PurchaseExperiments(legacyExperiment = Experiment(name = "experimentOne", cohort = "control")),
+                (result as Command.SubscriptionSelected).experiments,
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithoutExperimentsThenNoneAreSent() = runTest {
+        val json = """
+            {"id":"myId"}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(PurchaseExperiments(), (result as Command.SubscriptionSelected).experiments)
+        }
+    }
+
+    @Test
+    fun whenBothExperimentPayloadsArePresentThenBothArePreservedRegardlessOfFlag() = runTest {
+        val json = """
+            {
+                "id":"myId",
+                "experiments":[{"name":"arrayExperiment","cohort":"control"}],
+                "experiment":{"name":"legacyExperiment","cohort":"treatment"}
+            }
+        """.trimIndent()
+        val expected = PurchaseExperiments(
+            experiments = listOf(Experiment("arrayExperiment", "control")),
+            legacyExperiment = Experiment("legacyExperiment", "treatment"),
+        )
+
+        for (enabled in listOf(false, true)) {
+            subscriptionsFeature.subscriptionConcurrentExperiments().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+            assertPurchaseExperiments(json, expected)
+        }
+    }
+
+    @Test
+    fun whenExperimentArrayIsUnusableThenLegacyIsPreservedSeparately() = runTest {
+        val unusableArrays = listOf(
+            "null",
+            "{}",
+            "[]",
+            """[null, 42, "invalid", {}, {"name":"missingCohort"}]""",
+        )
+        for (array in unusableArrays) {
+            val json = """
+                {"id":"myId","experiments":$array,"experiment":{"name":"legacyExperiment","cohort":"control"}}
+            """.trimIndent()
+            assertPurchaseExperiments(json, PurchaseExperiments(legacyExperiment = Experiment("legacyExperiment", "control")))
+        }
+    }
+
+    @Test
+    fun whenExperimentArrayHasInvalidEntriesThenOnlyValidEntriesArePreserved() = runTest {
+        val json = """
+            {
+                "id":"myId",
+                "experiments":[
+                    null, 42, "invalid", {},
+                    {"name":"missingCohort"},
+                    {"cohort":"missingName"},
+                    {"name":"","cohort":"control"},
+                    {"name":"emptyCohort","cohort":""},
+                    {"name":null,"cohort":"control"},
+                    {"name":"nullCohort","cohort":null},
+                    {"name":42,"cohort":"control"},
+                    {"name":"validExperiment","cohort":"treatment"}
+                ]
+            }
+        """.trimIndent()
+        assertPurchaseExperiments(json, PurchaseExperiments(experiments = listOf(Experiment("validExperiment", "treatment"))))
+    }
+
+    @Test
+    fun whenLegacyExperimentIsInvalidThenItIsIgnored() = runTest {
+        val invalidExperiments = listOf(
+            "null",
+            "42",
+            "{}",
+            """{"name":"missingCohort"}""",
+            """{"cohort":"missingName"}""",
+            """{"name":"","cohort":"control"}""",
+            """{"name":"nullCohort","cohort":null}""",
+        )
+        for (legacy in invalidExperiments) {
+            assertPurchaseExperiments("""{"id":"myId","experiment":$legacy}""", PurchaseExperiments())
+        }
+    }
+
+    @Test
+    fun whenPurchaseSubscriptionThenBothExperimentPayloadsArePassedToManager() = runTest {
+        val activity: Activity = mock()
+        val experiments = PurchaseExperiments(
+            experiments = listOf(Experiment("arrayExperiment", "control")),
+            legacyExperiment = Experiment("legacyExperiment", "treatment"),
+        )
+
+        viewModel.purchaseSubscription(activity, "planId", "offerId", experiments, "origin")
+
+        verify(subscriptionsManager).purchase(activity, "planId", "offerId", experiments, "origin")
+    }
+
+    @Test
+    fun whenSubscriptionChangeStartsNewPurchaseThenBothExperimentPayloadsArePreserved() = runTest {
+        subscriptionsFeature.handleExpiredStateWhenSubscriptionChangeSelected().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionsManager.getSubscription()).thenReturn(null)
+        val json = """
+            {
+                "id":"targetPlanId",
+                "experiments":[{"name":"arrayExperiment","cohort":"control"}],
+                "experiment":{"name":"legacyExperiment","cohort":"treatment"}
+            }
+        """.trimIndent()
+
+        assertPurchaseExperiments(
+            json,
+            PurchaseExperiments(
+                experiments = listOf(Experiment("arrayExperiment", "control")),
+                legacyExperiment = Experiment("legacyExperiment", "treatment"),
+            ),
+            method = "subscriptionChangeSelected",
+        )
+    }
+
+    private suspend fun assertPurchaseExperiments(
+        json: String,
+        expected: PurchaseExperiments,
+        method: String = "subscriptionSelected",
+    ) {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", method, "id", JSONObject(json))
+            val result = awaitItem() as Command.SubscriptionSelected
+            assertEquals(expected, result.experiments)
         }
     }
 
@@ -353,6 +666,30 @@ class SubscriptionWebViewViewModelTest {
         flowTest.emit(CurrentPurchase.Success(isFreeTrial = false))
 
         verify(subscriptionExpirationReminderScheduler, never()).scheduleReminderNotification(any())
+    }
+
+    @Test
+    fun whenPurchaseSucceedsThenReportsPurchaseSuccessWithLaunchOrigin() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.setLaunchOrigin("funnel_appsettings_android")
+        viewModel.start()
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = true))
+
+        verify(pixelSender).reportPurchaseSuccessOrigin("funnel_appsettings_android", isFreeTrial = true)
+    }
+
+    @Test
+    fun whenPlanSwitchSucceedsThenDoesNotReportPurchaseSuccess() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.setLaunchOrigin("funnel_appsettings_android")
+        viewModel.start()
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = true))
+
+        verify(pixelSender, never()).reportPurchaseSuccessOrigin(any(), any())
     }
 
     @Test
@@ -2129,6 +2466,105 @@ class SubscriptionWebViewViewModelTest {
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndStripeHandlesSubscriptionThenSendStripeTierOptions() = runTest {
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        val stripeOptions = SubscriptionTierOptionsJson(platform = "stripe", products = emptyList())
+        whenever(stripePlansHandler.getTierOptions()).thenReturn(stripeOptions)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+
+            assertEquals("id", response.id)
+            assertEquals(stripeOptions, tierJsonAdapter.fromJson(response.params.toString()))
+        }
+        verify(subscriptionsManager, never()).getSubscriptionOffer()
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndStripeDoesNotHandleSubscriptionThenStripeTierOptionsNotRequested() = runTest {
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(false)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("android", tierJsonAdapter.fromJson(response.params.toString())?.platform)
+        }
+        verify(stripePlansHandler, never()).getTierOptions()
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionThenSendRedirectEvent() = runTest {
+        givenActiveSubscription(platform = "stripe")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        val redirectEvent = SubscriptionEventData("useSubscription", "onPurchaseUpdate", JSONObject("""{"type":"redirect"}"""))
+        whenever(stripePlansHandler.getRedirectEvent()).thenReturn(redirectEvent)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject("""{"id":"stripe-yearly"}"""))
+
+            assertEquals(Command.SendJsEvent(redirectEvent), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionAndNoRedirectEventThenReturnFailure() = runTest {
+        givenActiveSubscription(platform = "stripe")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        whenever(stripePlansHandler.getRedirectEvent()).thenReturn(null)
+
+        viewModel.currentPurchaseViewState.test {
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
+
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject("""{"id":"stripe-yearly"}"""))
+
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeDoesNotHandleSubscriptionThenRedirectEventNotRequested() = runTest {
+        givenActiveSubscription(platform = "google")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(false)
+
+        viewModel.processJsCallbackMessage(
+            "test",
+            "subscriptionChangeSelected",
+            "id",
+            JSONObject("""{"id":"${SubscriptionsConstants.YEARLY_PLAN_US}"}"""),
+        )
+
+        verify(stripePlansHandler, never()).getRedirectEvent()
+    }
+
+    @Test
+    fun whenCompleteStripePaymentThenNotifyHandlerAndRespondToJs() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "completeStripePayment", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+
+            assertEquals("id", response.id)
+            assertEquals("completeStripePayment", response.method)
+        }
+        verify(stripePlansHandler).onPlanChangeCompleted()
+    }
+
+    private fun givenActiveSubscription(platform: String) = runBlocking {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = platform,
+                activeOffers = listOf(),
+            ),
+        )
     }
 
     private fun givenSubscriptionStatus(subscriptionStatus: SubscriptionStatus) = runBlocking {

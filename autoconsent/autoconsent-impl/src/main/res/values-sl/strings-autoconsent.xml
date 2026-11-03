@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">To lahko pozneje kadar koli prilagodite v nastavitvah.</string>
     <string name="autoconsentPromptCpmOnMessage">Nekaterih piškotkov ni mogoče zavrniti. Te lahko sprejmemo namesto vas.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Sprejmi piškotke zame</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Zavrni, če je mogoče, ali sprejmi zame</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Sprejem bom uredil/-a sam/-a</string>
     <string name="autoconsentPromptCpmOffMessage">Naj se z njimi ukvarjamo namesto vas. Piškotke bomo zavrnili, kadar bo mogoče, in sprejeli tiste, ki jih ni mogoče zavrniti.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Zavrni, če je mogoče, ali sprejmi zame</string>

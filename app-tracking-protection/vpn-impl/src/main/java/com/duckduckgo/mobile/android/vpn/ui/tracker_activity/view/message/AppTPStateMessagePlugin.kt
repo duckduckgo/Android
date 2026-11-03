@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState

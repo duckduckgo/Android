@@ -27,7 +27,11 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
         context: Context,
         input: Input,
     ): Intent {
-        return EditDeviceActivity.intent(context, ParcelableDevice.fromConnectedDevice(input.device))
+        return EditDeviceActivity.intent(
+            context = context,
+            device = ParcelableDevice.fromConnectedDevice(input.device),
+            isImprovedSyncFlow = input.isImprovedSyncFlow,
+        )
     }
 
     override fun parseResult(
@@ -49,6 +53,7 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
 
     data class Input(
         val device: ConnectedDevice,
+        val isImprovedSyncFlow: Boolean,
     )
 
     sealed interface Output {

@@ -20,7 +20,11 @@ class FakeMetricsPixelExtension : MetricsPixelExtension {
 
     val sentMetrics = mutableListOf<MetricsPixel>()
 
+    /** Metric names whose send throws, for testing how callers handle a failing send. */
+    val failingMetrics = mutableSetOf<String>()
+
     override suspend fun send(metricsPixel: MetricsPixel) {
+        if (metricsPixel.metric in failingMetrics) throw IllegalStateException("Send failed for ${metricsPixel.metric}")
         sentMetrics.add(metricsPixel)
     }
 

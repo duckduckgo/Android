@@ -111,12 +111,27 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportDAU()
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirDauPixelTimeMs(baseDateMs)
-        verify(mockPirPixelSender).reportWAU()
+        verify(mockPirPixelSender).reportWAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirWauPixelTimeMs(baseDateMs)
-        verify(mockPirPixelSender).reportMAU()
+        verify(mockPirPixelSender).reportMAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirMauPixelTimeMs(baseDateMs)
+    }
+
+    @Test
+    fun whenActiveUserHasNoPirSubscriptionThenFiresAllPixelsAsFree() = runTest {
+        setupActiveUser(hasPirSubscription = false)
+        whenever(mockPirRepository.getLastPirDauPixelTimeMs()).thenReturn(0L)
+        whenever(mockPirRepository.getLastPirWauPixelTimeMs()).thenReturn(0L)
+        whenever(mockPirRepository.getLastPirMauPixelTimeMs()).thenReturn(0L)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
+
+        testee.attemptFirePixel()
+
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = false)
+        verify(mockPirPixelSender).reportWAU(isAuthenticated = false)
+        verify(mockPirPixelSender).reportMAU(isAuthenticated = false)
     }
 
     @Test
@@ -129,7 +144,7 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportDAU()
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirDauPixelTimeMs(oneDayLaterMs)
         verifyNoMoreInteractions(mockPirPixelSender)
         verify(mockPirRepository, never()).setLastPirWauPixelTimeMs(any())
@@ -163,7 +178,7 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportDAU()
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirDauPixelTimeMs(almostOneDayLater)
         verifyNoMoreInteractions(mockPirPixelSender)
         verify(mockPirRepository, never()).setLastPirWauPixelTimeMs(any())
@@ -180,7 +195,7 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportWAU()
+        verify(mockPirPixelSender).reportWAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirWauPixelTimeMs(sevenDaysLaterMs)
         verifyNoMoreInteractions(mockPirPixelSender)
         verify(mockPirRepository, never()).setLastPirDauPixelTimeMs(any())
@@ -216,7 +231,7 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportMAU()
+        verify(mockPirPixelSender).reportMAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirMauPixelTimeMs(twentyEightDaysLaterMs)
         verifyNoMoreInteractions(mockPirPixelSender)
         verify(mockPirRepository, never()).setLastPirDauPixelTimeMs(any())
@@ -252,9 +267,9 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportDAU()
-        verify(mockPirPixelSender).reportWAU()
-        verify(mockPirPixelSender).reportMAU()
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = true)
+        verify(mockPirPixelSender).reportWAU(isAuthenticated = true)
+        verify(mockPirPixelSender).reportMAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirDauPixelTimeMs(twentyEightDaysLaterMs)
         verify(mockPirRepository).setLastPirWauPixelTimeMs(twentyEightDaysLaterMs)
         verify(mockPirRepository).setLastPirMauPixelTimeMs(twentyEightDaysLaterMs)
@@ -270,9 +285,9 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportDAU()
-        verify(mockPirPixelSender).reportWAU()
-        verify(mockPirPixelSender, never()).reportMAU()
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = true)
+        verify(mockPirPixelSender).reportWAU(isAuthenticated = true)
+        verify(mockPirPixelSender, never()).reportMAU(any())
         verify(mockPirRepository).setLastPirDauPixelTimeMs(sevenDaysLaterMs)
         verify(mockPirRepository).setLastPirWauPixelTimeMs(sevenDaysLaterMs)
         verify(mockPirRepository, never()).setLastPirMauPixelTimeMs(any())
@@ -303,7 +318,7 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender, never()).reportDAU()
+        verify(mockPirPixelSender, never()).reportDAU(any())
     }
 
     @Test
@@ -323,7 +338,7 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportDAU()
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirDauPixelTimeMs(feb1Ms)
     }
 
@@ -344,7 +359,7 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportDAU()
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirDauPixelTimeMs(jan1Ms)
     }
 
@@ -359,12 +374,13 @@ class RealPirEngagementReporterTest {
 
         testee.attemptFirePixel()
 
-        verify(mockPirPixelSender).reportDAU()
+        verify(mockPirPixelSender).reportDAU(isAuthenticated = true)
         verify(mockPirRepository).setLastPirDauPixelTimeMs(twoDaysLater)
     }
 
-    private suspend fun setupActiveUser() {
+    private suspend fun setupActiveUser(hasPirSubscription: Boolean = true) {
         whenever(mockPirUserUtils.isActiveUser()).thenReturn(true)
+        whenever(mockPirUserUtils.hasPirSubscription()).thenReturn(hasPirSubscription)
         whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(testProfileQuery))
     }
 }

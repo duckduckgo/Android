@@ -21,8 +21,8 @@ import android.os.Build
 import android.util.Patterns
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.WARN
 import logcat.logcat
 import java.io.BufferedReader
@@ -42,7 +42,7 @@ interface LatencyMeasurer {
     fun measureLatency(serverIP: String): Int
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class LatencyMeasurerImpl @Inject constructor() : LatencyMeasurer {
 

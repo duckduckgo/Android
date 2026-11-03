@@ -89,8 +89,8 @@
     <string name="netpManagementManageItemExclusion">Uitgesloten apps</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Geen</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d -app</item>
-        <item quantity="other">%1$d -apps</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d -app</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d -apps</item>
     </plurals>
     <string name="netpManagementVpnSettings">VPN-instellingen</string>
 
@@ -242,14 +242,14 @@
     <string name="netpAutoExcludePromptTitle">Wil je apps uitsluiten die niet compatibel zijn met VPN\'s?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">We hebben %1$s gevonden terwijl de VPN is verbonden.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d nieuwe app die niet compatibel is met VPN\'s. Sluit deze app uit om ze te kunnen gebruiken</item>
-        <item quantity="other">%1$d nieuwe apps die niet compatibel zijn met VPN\'s. Sluit deze apps uit om ze te kunnen gebruiken</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d nieuwe app die niet compatibel is met VPN\'s. Sluit deze app uit om ze te kunnen gebruiken</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d nieuwe apps die niet compatibel zijn met VPN\'s. Sluit deze apps uit om ze te kunnen gebruiken</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Wil je alle apps uitsluiten die niet compatibel zijn met VPN\'s?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d andere app die niet compatibel is met VPN\'s. Sluit deze app uit om hem te gebruiken</item>
-        <item quantity="other">%1$d andere apps die niet compatibel zijn met VPN\'s. Sluit deze apps uit om ze te gebruiken</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d andere app die niet compatibel is met VPN\'s. Sluit deze app uit om hem te gebruiken</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d andere apps die niet compatibel zijn met VPN\'s. Sluit deze apps uit om ze te gebruiken</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Incompatibele apps automatisch uitsluiten</string>
     <string name="netpAutoExcludePromptActionAdd">Apps uitsluiten</string>

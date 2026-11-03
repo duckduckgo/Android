@@ -112,6 +112,30 @@ class CookiePopupOptInViewModelTest {
     }
 
     @Test
+    fun whenPrimaryButtonV2FlagEnabledAndProtectionOnThenUseV2PrimaryButtonCopyIsTrue() {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+        feature.cookiePopUpOptInPromptPrimaryButtonV2().setRawStoredState(Toggle.State(enable = true))
+
+        assertTrue(testee.viewState.value.useV2PrimaryButtonCopy)
+    }
+
+    @Test
+    fun whenPrimaryButtonV2FlagDisabledThenUseV2PrimaryButtonCopyIsFalse() {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+        feature.cookiePopUpOptInPromptPrimaryButtonV2().setRawStoredState(Toggle.State(enable = false))
+
+        assertFalse(testee.viewState.value.useV2PrimaryButtonCopy)
+    }
+
+    @Test
+    fun whenPrimaryButtonV2FlagEnabledButProtectionOffThenUseV2PrimaryButtonCopyIsFalse() {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(false)
+        feature.cookiePopUpOptInPromptPrimaryButtonV2().setRawStoredState(Toggle.State(enable = true))
+
+        assertFalse(testee.viewState.value.useV2PrimaryButtonCopy)
+    }
+
+    @Test
     fun whenCloseButtonClickedThenCloseCommandEmitted() = runTest {
         testee.commands().test {
             testee.onCloseClicked()

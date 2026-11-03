@@ -48,7 +48,7 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 fun DaxSurface(
     modifier: Modifier = Modifier,
     border: BorderStroke? = null,
-    shape: Shape = DaxSurfaceDefaults.shape,
+    shape: Shape = DaxSurfaceDefaults.Shape,
     shadowElevation: Dp = DaxSurfaceDefaults.elevation,
     content: @Composable () -> Unit,
 ) {
@@ -83,7 +83,7 @@ fun DaxSurface(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     border: BorderStroke? = null,
-    shape: Shape = DaxSurfaceDefaults.shape,
+    shape: Shape = DaxSurfaceDefaults.Shape,
     shadowElevation: Dp = DaxSurfaceDefaults.elevation,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit,
@@ -107,7 +107,7 @@ private object DaxSurfaceDefaults {
      * The default shape for Dax surfaces is rectangular, matching the Material3 [Surface] default.
      * Callers that want a rounded surface should pass an explicit [Shape].
      */
-    val shape: Shape = RectangleShape
+    val Shape: Shape = RectangleShape
 
     /**
      * The default colors for Dax surfaces are derived from the DuckDuckGo theme.

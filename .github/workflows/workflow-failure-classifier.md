@@ -81,9 +81,7 @@ tests, no touching feature flags, no reverting.
 1. `list_workflow_jobs` for the run to find the failed job(s), **and the failed step inside each
    one**. The nightly orchestrator calls the other workflows as reusable workflows, so job names
    look like `call-release-blocking-checks / end-to-end / End-to-End tests` and carry no detail —
-   the suite that failed is the step name (e.g. `Unified Input Field`). A run also commonly fails
-   twice, once per DI variant (`call-release-blocking-checks` and `call-release-blocking-checks-metro`);
-   that is the same failure, report it once.
+   the suite that failed is the step name (e.g. `Unified Input Field`).
 2. `get_job_logs` with `failed_only: true` for the run — this is your primary signal. Use
    `tail_lines` generously on the failing job.
 3. Extract, as specifically as the logs allow: the failing job name, the failing test class and
@@ -198,7 +196,7 @@ Append this to `$GITHUB_STEP_SUMMARY` (via a Bash heredoc). One report per run.
     ## 🤖 Failure classifier
 
     **Likely cause:** <one of: flaky test | feature-flag rollout | recent change | infrastructure | unclear>, <≤12 words>
-    **What failed:** <suite/step> → <test#method or flow> (<n> of <m>; <other DI variant passed | both variants>)
+    **What failed:** <suite/step> → <test#method or flow> (<n> of <m>)
     ```
     <verbatim error line, 1-3 lines>
     ```

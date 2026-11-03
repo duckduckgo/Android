@@ -89,10 +89,10 @@
     <string name="netpManagementManageItemExclusion">Vyloučené aplikace</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Žádný</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d aplikace</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d aplikace</item>
         <item quantity="few">%1$d aplikace</item>
         <item quantity="many">%1$d aplikace</item>
-        <item quantity="other">%1$d aplikací</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d aplikací</item>
     </plurals>
     <string name="netpManagementVpnSettings">Nastavení sítě VPN</string>
 
@@ -244,18 +244,18 @@
     <string name="netpAutoExcludePromptTitle">Chceš vyloučit aplikace, které nejsou kompatibilní s VPN?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Něco jsme našli. %1$s (Když je VPN připojená.)</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d nová aplikace, která není kompatibilní s VPN. Vyluč ji, ať ji můžeš používat.</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d nová aplikace, která není kompatibilní s VPN. Vyluč ji, ať ji můžeš používat.</item>
         <item quantity="few">%1$d nové aplikace, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
         <item quantity="many">%1$d nových aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
-        <item quantity="other">%1$d nových aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d nových aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Chceš vyloučit všechny aplikace, které nejsou kompatibilní s VPN?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d další aplikace, která není kompatibilní s VPN. Vyluč ji, ať ji můžeš používat.</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d další aplikace, která není kompatibilní s VPN. Vyluč ji, ať ji můžeš používat.</item>
         <item quantity="few">%1$d další aplikace, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
         <item quantity="many">%1$d dalších aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
-        <item quantity="other">%1$d dalších aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d dalších aplikací, které nejsou kompatibilní s VPN. Vyluč tyhle aplikace, ať je můžeš používat.</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Automaticky vyloučit nekompatibilní aplikace</string>
     <string name="netpAutoExcludePromptActionAdd">Vyloučit aplikace</string>

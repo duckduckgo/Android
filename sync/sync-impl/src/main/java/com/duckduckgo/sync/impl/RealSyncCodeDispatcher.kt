@@ -45,9 +45,9 @@ import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -58,7 +58,7 @@ import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSyncCodeDispatcher @Inject constructor(
     private val syncFeature: SyncFeature,
@@ -308,10 +308,18 @@ class RealSyncCodeDispatcher @Inject constructor(
         peerKind: PeerKind?,
     ): DispatchOutcome? = when (transition.to) {
         ExchangeV2State.Joiner.Confirming ->
-            DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+            DispatchOutcome.JoinerConfirmationRequested(
+                peerName = runner.peerName,
+                protocolVersion = runner.protocolVersion,
+                peerKind = peerKind,
+            )
 
         ExchangeV2State.Host.Confirming ->
-            DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+            DispatchOutcome.HostConfirmationRequested(
+                peerName = runner.peerName,
+                protocolVersion = runner.protocolVersion,
+                peerKind = peerKind,
+            )
 
         ExchangeV2State.Host.Done -> hostDoneToOutcome(transition.trigger, peerKind)
 

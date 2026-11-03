@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.PirConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
@@ -41,8 +42,9 @@ import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -55,6 +57,7 @@ interface PirScan {
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
+        isFreeScan: Boolean,
         onJobCompleted: suspend () -> Unit = {},
         onScanJobsResolved: suspend (Int) -> Unit = {},
     ): Result<Unit>
@@ -106,9 +109,9 @@ interface PirScan {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirScan::class,
+    binding = binding<PirScan>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirScan @Inject constructor(
     private val repository: PirRepository,
     private val eventsRepository: PirEventsRepository,
@@ -130,6 +133,7 @@ class RealPirScan @Inject constructor(
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
+        isFreeScan: Boolean,
         onJobCompleted: suspend () -> Unit,
         onScanJobsResolved: suspend (Int) -> Unit,
     ) = withContext(dispatcherProvider.io()) {
@@ -156,7 +160,7 @@ class RealPirScan @Inject constructor(
 
         cleanPreviousRun()
 
-        val processedJobRecords = processJobRecords(jobRecords, activeBrokers)
+        val processedJobRecords = processJobRecords(jobRecords, activeBrokers, isFreeScan)
         logcat { "PIR-SCAN: Total processed records ${processedJobRecords.size}" }
         onScanJobsResolved(processedJobRecords.size)
 
@@ -242,6 +246,7 @@ class RealPirScan @Inject constructor(
     private suspend fun processJobRecords(
         jobRecords: List<ScanJobRecord>,
         activeBrokers: Map<String, Broker>,
+        isFreeScan: Boolean,
     ): List<Pair<ProfileQuery, BrokerStep>> {
         val relevantBrokerSteps = jobRecords.mapTo(mutableSetOf()) { it.brokerName }.mapNotNull {
             val broker = activeBrokers[it] ?: return@mapNotNull null
@@ -250,7 +255,8 @@ class RealPirScan @Inject constructor(
                 brokerStepsParser.parseStep(broker, this)
             }
             if (!steps.isNullOrEmpty()) {
-                it to steps[0]
+                val step = steps[0]
+                it to if (step is ScanStep) step.copy(isFreeScan = isFreeScan) else step
             } else {
                 null
             }

@@ -18,14 +18,15 @@ package com.duckduckgo.app.anr
 
 import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AnrCrashPixelsRequiringAtb @Inject constructor() : PixelRequiringAtbPlugin {
     override fun names(): List<String> = listOf(
         AnrPixelName.ANR_PIXEL.pixelName,
         CrashPixel.APPLICATION_CRASH_GLOBAL.pixelName,
         CrashPixel.APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL.pixelName,
+        CrashPixel.APPLICATION_CRASH_NATIVE.pixelName,
     )
 }

@@ -19,8 +19,8 @@ package com.duckduckgo.app.notification
 import android.app.PendingIntent
 import android.content.Intent
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 const val EXTRA_LAUNCHED_FROM_NOTIFICATION = "com.duckduckgo.notification.launched_from_notification"
@@ -29,7 +29,7 @@ interface NotificationLaunchIntentBuilder {
     fun createLaunchPendingIntent(launchIntent: Intent?, requestCode: Int): PendingIntent?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealNotificationLaunchIntentBuilder @Inject constructor(
     private val taskStackBuilderFactory: TaskStackBuilderFactory,

@@ -29,19 +29,18 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityProcessSyncCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command
@@ -72,18 +71,20 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     lateinit var vmFactory: Factory
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    private val source
+    private val codeSource
         get() = requireNotNull(IntentCompat.getParcelableExtra(intent, SYNC_CODE_SOURCE_EXTRA_KEY, SyncCodeSource::class.java)) {
             "Missing intent extra: '$SYNC_CODE_SOURCE_EXTRA_KEY'"
         }
 
+    private val launchSource
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, LAUNCH_SOURCE_EXTRA_KEY, SyncLaunchSource::class.java)) {
+            "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
+        }
+
     private val viewModel by viewModels<ProcessSyncCodeViewModel> {
-        Provider(vmFactory, source)
+        Provider(vmFactory, codeSource, launchSource)
     }
 
     private var visibleDialog: DaxAlertDialog? = null
@@ -92,7 +93,7 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     private var isAcknowledgementAnimationExecuted = false
 
     private val headlineLabel
-        get() = if (source.entryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA) {
+        get() = if (codeSource.entryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA) {
             R.string.sync_simplified_pairing_headline_recovery
         } else {
             R.string.sync_simplified_pairing_headline
@@ -101,14 +102,9 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val isEdgeToEdge = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
-        if (isEdgeToEdge) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        if (isEdgeToEdge) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureHeadline()
         configureAcknowledgementAnimation()
@@ -305,13 +301,16 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val SYNC_CODE_SOURCE_EXTRA_KEY = "code_source"
+        private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
 
         fun intent(
             context: Context,
             codeSource: SyncCodeSource,
+            launchSource: SyncLaunchSource,
         ): Intent {
             return Intent(context, ProcessSyncCodeActivity::class.java).apply {
                 putExtra(SYNC_CODE_SOURCE_EXTRA_KEY, codeSource)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

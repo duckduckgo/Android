@@ -119,6 +119,12 @@ class TwoLineListItem @JvmOverloads constructor(
 
             setLeadingIconSize(leadingIconSize, leadingIconBackground)
 
+            setLeadingIconVerticalAlignment(
+                VerticalAlignment.from(
+                    getInt(R.styleable.TwoLineListItem_leadingIconVerticalAlignment, VerticalAlignment.Center.ordinal),
+                ),
+            )
+
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
@@ -150,6 +156,34 @@ class TwoLineListItem @JvmOverloads constructor(
             setSwitchEnabled(switchEnabled)
 
             recycle()
+        }
+    }
+
+    /** Sets how the leading icon is aligned vertically against the rest of the item */
+    fun setLeadingIconVerticalAlignment(alignment: VerticalAlignment) {
+        val anchor = when (alignment) {
+            VerticalAlignment.Center -> LayoutParams.PARENT_ID
+            VerticalAlignment.PrimaryText -> binding.primaryText.id
+        }
+        val params = binding.leadingIconBackground.layoutParams as LayoutParams
+        params.topToTop = anchor
+        params.bottomToBottom = anchor
+        binding.leadingIconBackground.layoutParams = params
+    }
+
+    enum class VerticalAlignment {
+        Center,
+        PrimaryText,
+        ;
+
+        companion object {
+            fun from(value: Int): VerticalAlignment {
+                // same order as attrs-lists.xml
+                return when (value) {
+                    1 -> PrimaryText
+                    else -> Center
+                }
+            }
         }
     }
 }

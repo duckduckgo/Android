@@ -23,11 +23,6 @@ import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 
-/**
- * A [SubscriptionOnboardingActivity]-hosted step. Wraps the contributed [stepPlugin] (which owns the
- * Fragment) with the linear-onboarding step contract. The activity renders `stepPlugin.createFragment()`;
- * the orchestrator only sees the generic [LinearOnboardingStep].
- */
 data class SubscriptionOnboardingActivityStep(
     override val id: LinearOnboardingStepId,
     override val host: LinearOnboardingHost = LinearOnboardingHost.SubscriptionOnboardingActivity,

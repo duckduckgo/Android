@@ -22,9 +22,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import javax.inject.Inject
@@ -33,9 +34,9 @@ interface BrokenSiteReportRequester {
     fun requestReport()
 }
 
-@ContributesBinding(AppScope::class, boundType = BrokenSiteReportRequester::class)
-@ContributesMultibinding(AppScope::class, boundType = BrokenSiteReportTriggerPlugin::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<BrokenSiteReportRequester>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrokenSiteReportTriggerPlugin>())
+@SingleIn(AppScope::class)
 class AdBlockingBrokenSiteReportTrigger @Inject constructor(
     private val pixel: Pixel,
 ) : BrokenSiteReportTriggerPlugin,

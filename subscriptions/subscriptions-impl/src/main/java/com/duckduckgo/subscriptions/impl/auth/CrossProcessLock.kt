@@ -19,8 +19,8 @@ package com.duckduckgo.subscriptions.impl.auth
 import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -50,7 +50,7 @@ interface CrossProcessLock {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealCrossProcessLock @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,

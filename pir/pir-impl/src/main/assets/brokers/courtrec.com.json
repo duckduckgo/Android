@@ -1,7 +1,7 @@
 {
   "name": "CourtRec",
   "url": "courtrec.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "propertyrecord.com",
   "addedDatetime": 1775829600000,
   "optOutUrl": "https://dashboard.courtrec.com/opt-out",
@@ -12,29 +12,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "_comment": "Forwarding page source: https://github.com/duckduckgo/privacy-test-pages/blob/main/pir/opt-out/index.html",
-          "url": "https://privacy-test-pages.site/pir/opt-out/?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}&to=https%3A%2F%2Fdashboard.courtrec.com%2Fopt-out%2Frecords",
+          "url": "https://dashboard.courtrec.com/opt-out/records?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}",
           "id": "f1a05523-08e8-4094-a4d6-c30f972ae7cb"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "#forward"
-            }
-          ],
-          "id": "a9cee5d4-1987-44ba-b53b-0bdf43fddafb"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "#forward"
-            }
-          ],
-          "id": "2d54e0e4-03a5-4f7c-9bf0-8c1ac4c525d0"
         },
         {
           "actionType": "expectation",

@@ -17,12 +17,12 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import kotlin.random.Random
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object RandomModule {
 

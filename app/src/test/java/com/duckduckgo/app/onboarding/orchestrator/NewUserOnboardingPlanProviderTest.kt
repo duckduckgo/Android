@@ -20,8 +20,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
@@ -33,18 +31,19 @@ import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
-import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
+import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
+import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
+import com.duckduckgo.app.onboarding.ui.page.welcome.ContentConfig
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.TextConfig
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -56,6 +55,8 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_COMPLETE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH
@@ -79,6 +80,8 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.api.NextSteps
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
@@ -96,6 +99,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -126,8 +131,10 @@ class NewUserOnboardingPlanProviderTest {
     private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget = mock()
     private val customAiOnboardingResolver: CustomAiOnboardingResolver = mock()
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
-    private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
+    private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
+    private val nextSteps: NextSteps = mock()
+    private val privacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
     }
@@ -162,16 +169,16 @@ class NewUserOnboardingPlanProviderTest {
         whenever(splitOmnibarWelcomeToggle.isEnabled()).thenReturn(false)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        // Most flows are exercised without the widget prompt; widget tests opt in by clearing this.
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
         runBlocking {
             whenever(syncAutoRestore.canRestore()).thenReturn(false)
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
             whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
-            whenever(homeScreenPromptsExperiment.enroll())
-                .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
             whenever(passwordImportExperiment.enroll()).thenReturn(null)
+            whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(true)
         }
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
@@ -192,8 +199,10 @@ class NewUserOnboardingPlanProviderTest {
             onboardingInputScreenLaunchTarget = onboardingInputScreenLaunchTarget,
             customAiOnboardingResolver = customAiOnboardingResolver,
             duckAiOnboardingDemo = duckAiOnboardingDemo,
-            onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
+            segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
+            nextSteps = nextSteps,
+            onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
@@ -201,8 +210,11 @@ class NewUserOnboardingPlanProviderTest {
         )
     }
 
-    private suspend fun start() {
-        orchestrator.startPlan(provider.buildRootPlan(onCompleted = {}, onSkipped = {}))
+    private suspend fun start(
+        onCompleted: suspend () -> Unit = {},
+        onSkipped: suspend () -> Unit = {},
+    ) {
+        orchestrator.startPlan(provider.buildRootPlan(onCompleted = onCompleted, onSkipped = onSkipped))
     }
 
     private fun assertStep(id: String) {
@@ -220,7 +232,8 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when initial user then walks full happy path to completed`() = runTest {
-        start()
+        var callbackState: LinearOnboardingState? = null
+        start(onCompleted = { callbackState = orchestrator.state.value })
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
@@ -239,12 +252,23 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
         // input_screen_preview precondition is false (not AI) -> plan exhausts.
+        assertTrue(callbackState is InProgress)
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
     }
 
     @Test
+    fun `when dev skip aborts real root plan then supplied callback runs while orchestrator is in progress`() = runTest {
+        var callbackState: LinearOnboardingState? = null
+        start(onSkipped = { callbackState = orchestrator.state.value })
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+
+        assertTrue(callbackState is InProgress)
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
     fun `when enrolled in the segmented treatment then reaches the download reason step`() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
         start()
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
@@ -262,7 +286,32 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.AI)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.AI_CHAT)
+    }
+
+    @Test
+    fun `when a run starts then a download reason left by an abandoned run is cleared`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        verify(onboardingStore).setDownloadReason(null)
+    }
+
+    @Test
+    fun `when a download reason is picked then the selection metric is fired for it`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+
+        verify(segmentedOnboardingMetrics).fireDownloadReasonSelectedMetric(DownloadReasonSelection.AI_CHAT)
+    }
+
+    @Test
+    fun `when the download reason is missing then the fallback selection metric is fired`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(selection = null))
+
+        verify(segmentedOnboardingMetrics).fireDownloadReasonSelectedMetric(DownloadReasonSelection.SEARCH)
     }
 
     private suspend fun startSegmentedAtAiProviderChoice() {
@@ -279,7 +328,6 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     private suspend fun startSegmentedAtDownloadReason() {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -381,7 +429,6 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when the segmented plan is built then the single choice options are prefetched`() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
 
         start()
@@ -499,23 +546,23 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when the no ai download reason is confirmed then it clears an input screen selection left by an abandoned run`() = runTest {
+    fun `when the no ai download reason is confirmed then it is persisted and clears an input screen selection left by an abandoned run`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(null)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.NO_AI)
         verify(duckChat).setCosmeticInputScreenUserSetting(false)
         verify(onboardingStore).storeInputScreenSelection(false)
     }
 
     @Test
-    fun `when the block ads download reason is confirmed then it clears a segmented path left by an abandoned run`() = runTest {
+    fun `when the block ads download reason is confirmed then it is persisted`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(null)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.BLOCK_ADS)
     }
 
     @Test
@@ -641,6 +688,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -675,6 +723,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -721,7 +770,7 @@ class NewUserOnboardingPlanProviderTest {
         verify(onboardingPreferenceCatalog, never()).apply(any())
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.SEARCH)
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
@@ -757,7 +806,7 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.SEARCH)
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
     }
 
@@ -837,7 +886,6 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when the segmented control variant then builds the default plan`() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.CONTROL)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -851,20 +899,6 @@ class NewUserOnboardingPlanProviderTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
 
-        verify(segmentedOnboardingExperiment, never()).enroll()
-    }
-
-    @Test
-    fun `when enrolled in the home screen prompts experiment then the segmented experiment is never enrolled`() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll())
-            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
-        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-
-        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
         verify(segmentedOnboardingExperiment, never()).enroll()
     }
 
@@ -1035,6 +1069,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingStore, never()).setTriedDuckAi()
     }
 
     @Test
@@ -1058,6 +1093,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+        verify(onboardingStore).setTriedDuckAi()
     }
 
     @Test
@@ -1619,6 +1655,20 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when custom ai input screen preview demo submitted then marks duck ai as tried`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+
+        verify(onboardingStore).setTriedDuckAi()
+    }
+
+    @Test
     fun `when duck ai demo fire completed then fires AiChatClicked`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
@@ -1634,39 +1684,15 @@ class NewUserOnboardingPlanProviderTest {
 
     // endregion
 
-    // region Home-screen prompts experiment composition
+    // region Widget prompt composition
 
-    private suspend fun stepIdsFor(
-        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant,
-    ): List<String> {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
-        return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
-    }
+    private suspend fun stepIds(): List<String> =
+        provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
 
     @Test
-    fun whenControlThenNoNewPagesInPlan() = runTest {
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
-    }
-
-    @Test
-    fun whenDockOnlyThenOnlyAddToDockInsertedAfterDefaultBrowser() = runTest {
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY)
-        assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
-        assertEquals(
-            ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
-            ids.indexOf(NewUserOnboardingStepIds.ADD_TO_DOCK),
-        )
-    }
-
-    @Test
-    fun whenWidgetOnlyThenWidgetPromptAndAddWidgetInserted() = runTest {
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
+    fun whenNoWidgetInstalledThenWidgetPromptAndAddWidgetInsertedAfterDefaultBrowser() = runTest {
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val ids = stepIds()
         assertTrue(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
         assertEquals(
@@ -1680,79 +1706,111 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun whenWidgetPromptStepPresentedThenLinearPlanWidgetPromptShownStored() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll())
-            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
-        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
-        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
-
-        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-
-        verify(onboardingStore).linearPlanWidgetPromptShown = true
-        verify(dismissedCtaDao, never()).insert(DismissedCta(CtaId.ADD_WIDGET))
-        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
+    fun whenCustomAiPlanAndNoWidgetInstalledThenWidgetPromptAndAddWidgetInsertedAfterDefaultBrowser() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val ids = stepIds()
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT),
+        )
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET),
+        )
+        assertEquals(
+            ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET) + 1,
+            ids.indexOf(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION),
+        )
     }
 
     @Test
-    fun whenWidgetVariantButUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
+    fun whenCustomAiPlanAndUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        val ids = stepIds()
         assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
-    @Test
-    fun whenBothThenDockThenWidgetPromptThenAddWidget() = runTest {
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET)
-        val dock = ids.indexOf(NewUserOnboardingStepIds.ADD_TO_DOCK)
+    private suspend fun segmentedPlanStepIds(reason: DownloadReasonSelection): List<String> {
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        startSegmentedAtDownloadReason()
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(reason))
+        return (orchestrator.state.value as InProgress).currentPlan.steps.map { it.id }
+    }
+
+    private fun assertWidgetStepsBetween(ids: List<String>, before: String, after: String) {
         val prompt = ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT)
-        val add = ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET)
-        assertTrue(dock < prompt && prompt < add)
-        assertEquals(ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1, dock)
+        assertEquals(ids.indexOf(before) + 1, prompt)
+        assertEquals(prompt + 1, ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET))
+        assertEquals(prompt + 2, ids.indexOf(after))
     }
 
     @Test
-    fun whenNotEnrolledThenNoNewPagesInPlan() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
-        val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+    fun whenSegmentedSearchPlanAndNoWidgetThenWidgetStepsBetweenPreferencesAndInputScreen() = runTest {
+        val ids = segmentedPlanStepIds(DownloadReasonSelection.SEARCH)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.PREFERENCE_SELECTOR, NewUserOnboardingStepIds.INPUT_SCREEN)
     }
 
     @Test
-    fun whenReinstallThenNotEnrolledInHomeScreenPromptsExperiment() = runTest {
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(homeScreenPromptsExperiment.enroll())
-            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
-        val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
-        verify(homeScreenPromptsExperiment, never()).enroll()
+    fun whenSegmentedAiPlanAndNoWidgetThenWidgetStepsBetweenTogglePositionAndAddressBar() = runTest {
+        val ids = segmentedPlanStepIds(DownloadReasonSelection.AI_CHAT)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.TOGGLE_POSITION, NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun whenSegmentedNoAiPlanAndNoWidgetThenWidgetStepsBetweenPreferencesAndDuckAiState() = runTest {
+        val ids = segmentedPlanStepIds(DownloadReasonSelection.NO_AI)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.PREFERENCE_SELECTOR, NewUserOnboardingStepIds.DUCK_AI_STATE)
+    }
+
+    @Test
+    fun whenSegmentedBlockAdsPlanAndNoWidgetThenWidgetStepsBetweenPreferencesAndInputScreen() = runTest {
+        val ids = segmentedPlanStepIds(DownloadReasonSelection.BLOCK_ADS)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.PREFERENCE_SELECTOR, NewUserOnboardingStepIds.INPUT_SCREEN)
+    }
+
+    @Test
+    fun whenSegmentedPlanAndUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
+        startSegmentedAtDownloadReason()
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+        val ids = (orchestrator.state.value as InProgress).currentPlan.steps.map { it.id }
         assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+    }
+
+    @Test
+    fun whenUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val ids = stepIds()
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+    }
+
+    @Test
+    fun whenReinstallWithoutWidgetThenWidgetStepsInserted() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val ids = stepIds()
+        assertTrue(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
     // endregion
 
     // region Step-indicator regression guard
 
-    private suspend fun indicatorCountFor(
-        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant,
-    ): Int {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
-        return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps
+    private suspend fun indicatorCount(): Int =
+        provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps
             .count { (it as? NewUserOnboardingActivityStep)?.indicator == StepIndicatorMode.COUNTED }
-    }
 
     @Test
-    fun stepIndicatorTotalsMatchCohort() = runTest {
-        val control = indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
-        assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY))
-        assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY))
-        assertEquals(control + 2, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET))
+    fun widgetPromptAddsExactlyOneCountedStep() = runTest {
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val withoutWidget = indicatorCount()
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        assertEquals(withoutWidget + 1, indicatorCount())
     }
 
     // endregion
@@ -1777,6 +1835,51 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
 
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorShown(transient = true),
+        )
+    }
+
+    @Test
+    fun `when the import is cancelled from the web flow then reports nothing`() = runTest {
+        startAtPasswordImportLaunch()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.CANCELLED))
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+        verify(onboardingPixelSender, never()).fire(eq(ONBOARDING_PASSWORD_IMPORT_ERROR), any())
+    }
+
+    @Test
+    fun `when the retry alert is retried then reports it to the error pixel and returns to the launch step`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportErrorRetryRequested)
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH)
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.RETRY),
+        )
+        // Only the Import CTA that opened the flow in the first place, not the retry on top of it.
+        verify(onboardingPixelSender, times(1)).fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun `when the retry alert is cancelled then reports it to the error pixel and skips past the import`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportErrorCancelled)
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CANCEL),
+        )
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     @Test
@@ -1818,9 +1921,60 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
 
+        verify(onboardingPixelSender).fire(ONBOARDING_PASSWORD_IMPORT_COMPLETE, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when the outcome step is presented before the import is parsed then reports nothing yet`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+
+        verify(onboardingPixelSender, never()).fire(eq(ONBOARDING_PASSWORD_IMPORT_COMPLETE), any())
+        verify(onboardingPixelSender, never()).fire(eq(ONBOARDING_PASSWORD_IMPORT_ERROR), any())
+    }
+
+    @Test
+    fun `when the import completed screen is continued then reports the click to the complete pixel`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        verify(onboardingPixelSender).fire(ONBOARDING_PASSWORD_IMPORT_COMPLETE, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun `when the import is parsed as failed then reports a permanent error`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Failed))
+
         verify(onboardingPixelSender).fire(
-            ONBOARDING_PASSWORD_IMPORT,
-            OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.SUCCESS),
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorShown(transient = false),
+        )
+    }
+
+    @Test
+    fun `when the failed screen is presented and continued then both are reported to the error pixel`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorShown(transient = false),
+        )
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CONTINUE),
         )
     }
 
@@ -1870,16 +2024,20 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when a download reason is confirmed then the clicked pixel fires and the variant is established`() = runTest {
+    fun `when a download reason is confirmed then it is persisted before the clicked pixel fires`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
 
-        verify(onboardingPixelSender).fire(
-            ONBOARDING_DOWNLOAD_CHOICE,
-            OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.BLOCK_ADS),
-        )
-        verify(onboardingPixelSender).downloadReasonSelected(DownloadReasonSelection.BLOCK_ADS)
+        // The pixel sender reads the reason back off the store, so the step's own clicked pixel only
+        // carries the variant param if the write happens first.
+        inOrder(onboardingStore, onboardingPixelSender) {
+            verify(onboardingStore).setDownloadReason(DownloadReasonSelection.BLOCK_ADS)
+            verify(onboardingPixelSender).fire(
+                ONBOARDING_DOWNLOAD_CHOICE,
+                OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.BLOCK_ADS),
+            )
+        }
     }
 
     @Test
@@ -1991,6 +2149,37 @@ class NewUserOnboardingPlanProviderTest {
             ONBOARDING_PREFERENCES_DUCK_AI,
             OnboardingPixelAction.SingleChoiceClicked(duckAiStateOptions[1].id),
         )
+    }
+
+    @Test
+    fun `when new user then the next steps items experiment is enrolled once`() = runTest {
+        start()
+
+        verify(nextSteps, times(1)).enroll()
+    }
+
+    @Test
+    fun `when reinstall user then the next steps items experiment is never enrolled`() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+
+        verify(nextSteps, never()).enroll()
+    }
+
+    @Test
+    fun `when privacy config is not persisted in time then the next steps items experiment is never enrolled`() = runTest {
+        whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(false)
+        start()
+
+        verify(nextSteps, never()).enroll()
+    }
+
+    @Test
+    fun `when custom ai path and new user then the next steps items experiment is enrolled once`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+
+        verify(nextSteps, times(1)).enroll()
     }
 
     // endregion

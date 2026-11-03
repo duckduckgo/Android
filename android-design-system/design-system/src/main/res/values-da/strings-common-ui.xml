@@ -32,6 +32,7 @@
     <string name="removeAll">Fjern alt</string>
     <string name="undo">Fortryd</string>
     <string name="cancel">Annullér</string>
+    <string name="done">Færdig</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Altid aktiv</string>

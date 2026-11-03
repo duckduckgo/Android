@@ -28,7 +28,7 @@ class FaviconPromptSheet(
     builder: Builder,
 ) : BottomSheetDialog(
     builder.context,
-    if (builder.edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+    com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
 
     private val binding = BottomSheetFaviconsPromptBinding.inflate(LayoutInflater.from(context))
@@ -40,9 +40,7 @@ class FaviconPromptSheet(
 
     init {
         setContentView(binding.root)
-        if (builder.edgeToEdgeEnabled) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
         binding.faviconsPromptPrimaryCta.setOnClickListener {
             builder.listener.onFaviconsFetchingPromptDismissed(true)
             dismiss()
@@ -65,15 +63,9 @@ class FaviconPromptSheet(
     class Builder(val context: Context) {
         var dialog: BottomSheetDialog? = null
         var listener: EventListener = DefaultEventListener()
-        var edgeToEdgeEnabled: Boolean = false
 
         fun addEventListener(eventListener: EventListener): Builder {
             listener = eventListener
-            return this
-        }
-
-        fun setEdgeToEdgeEnabled(enabled: Boolean): Builder {
-            edgeToEdgeEnabled = enabled
             return this
         }
 

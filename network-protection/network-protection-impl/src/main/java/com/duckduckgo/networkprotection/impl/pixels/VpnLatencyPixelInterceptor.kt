@@ -25,16 +25,17 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REPORT_POOR_LATENCY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REPORT_TERRIBLE_LATENCY
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class,
+    binding = binding<PixelInterceptorPlugin>(),
 )
 class VpnLatencyPixelInterceptor @Inject constructor(
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,

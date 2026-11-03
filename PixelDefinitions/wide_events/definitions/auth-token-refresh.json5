@@ -4,7 +4,7 @@
         "owners": ["lmac012"],
         "meta": {
             "type": "android-auth-token-refresh",
-            "version": "0.0"
+            "version": "1.2"
         },
         "feature": {
             "name": "auth-token-refresh",
@@ -30,11 +30,6 @@
                         "type": "string",
                         "description": "Whether the VPN was running when the refresh started. Empty string if the value could not be read.",
                         "enum": ["true", "false", ""]
-                    },
-                    "serialization_enabled": {
-                        "type": "string",
-                        "description": "Whether refreshes were being serialized across processes with a cross-process lock, i.e. the value of the serializeTokenRefresh flag when the refresh started.",
-                        "enum": ["true", "false"]
                     },
                     "lock_outcome": {
                         "type": "string",
@@ -66,13 +61,84 @@
                         "description": "Backend-supplied error code from the `error` field of the token endpoint's error body. Free-form as far as the app is concerned - the app only special-cases 'unknown_account'.",
                         "examples": ["unknown_account", "invalid_token_request"]
                     },
+                    "backend_error_code": {
+                        "type": "string",
+                        "description": "Backend-supplied numeric code from the `error_code` field of the token endpoint's error body, sent alongside `error`.",
+                        "enum": ["0", "1", "2", "3", "4"]
+                    },
                     "play_login_error": {
                         "type": "string",
                         "description": "Why the Play store login fallback failed. PurchaseInfoNotAvailable carries the reason Play could not be queried.",
                         "pattern": "^(NoActivePurchase|AccountExternalIdMismatch|AuthenticationError|TokenValidationFailed|UnknownError|PurchaseInfoNotAvailable - .+)$",
                         "examples": ["NoActivePurchase", "AuthenticationError", "PurchaseInfoNotAvailable - billing_client_not_ready"]
                     },
-                    "failure_reason": "failureReason",
+                    "token_validation_failed_token": {
+                        "type": "string",
+                        "description": "Which of the newly fetched tokens failed validation. Only present when step.token_validation is false.",
+                        "enum": ["access", "refresh"]
+                    },
+                    "token_validation_failure_reason": {
+                        "type": "string",
+                        "description": "Why the token failed validation.",
+                        "enum": [
+                            "expired",
+                            "not_yet_valid",
+                            "invalid_signature",
+                            "key_not_found",
+                            "jwks_parse_error",
+                            "malformed",
+                            "unsupported",
+                            "missing_claim",
+                            "invalid_issuer",
+                            "invalid_audience",
+                            "invalid_scope",
+                            "invalid_claim",
+                            "claims_parse_error",
+                            "other"
+                        ]
+                    },
+                    "token_validation_clock_skew_s_bucketed": {
+                        "type": "string",
+                        "description": "Time between the failed token's issued-at time and the device clock in seconds, rounded toward zero to a bucket boundary and clamped at one day.",
+                        "enum": [
+                            "-86400",
+                            "-28800",
+                            "-14400",
+                            "-7200",
+                            "-3600",
+                            "-1800",
+                            "-600",
+                            "-300",
+                            "-120",
+                            "-60",
+                            "-30",
+                            "-15",
+                            "-5",
+                            "-2",
+                            "-1",
+                            "0",
+                            "1",
+                            "2",
+                            "5",
+                            "15",
+                            "30",
+                            "60",
+                            "120",
+                            "300",
+                            "600",
+                            "1800",
+                            "3600",
+                            "7200",
+                            "14400",
+                            "28800",
+                            "86400"
+                        ]
+                    },
+                    "failure_reason": {
+                        "type": "string",
+                        "description": "Exception class name of the failure. Only present on FAILURE events. TokenValidationException when the newly fetched tokens failed validation; see token_validation_failure_reason.",
+                        "examples": ["HttpException", "SocketTimeoutException", "TokenValidationException"]
+                    },
                     "signed_out": {
                         "type": "string",
                         "description": "Whether the user was signed out after an irrecoverable error was encountered, such as an invalid refresh token.",
@@ -100,8 +166,8 @@
                     },
                     "step.token_validation": {
                         "type": "string",
-                        "description": "Parameter present if the newly fetched tokens passed validation",
-                        "enum": ["true"]
+                        "description": "true if the newly fetched tokens passed validation, false if either token failed it. See token_validation_failed_token and token_validation_failure_reason.",
+                        "enum": ["true", "false"]
                     },
                     "step.play_login": {
                         "type": "string",

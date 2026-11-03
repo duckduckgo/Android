@@ -25,16 +25,16 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.CoroutineScope
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -43,7 +43,7 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class TrackersDbCleanerSchedulerModule {
 
@@ -79,22 +79,19 @@ class TrackersDbCleanerWorker(
 ) : CoroutineWorker(context, workerParams), CoroutineScope {
 
     @Inject
-    lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
+    lateinit var webTrackersBlockedHistory: WebTrackersBlockedHistory
 
     @Inject
     lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
 
     @WorkerThread
     override suspend fun doWork(): Result {
-        webTrackersBlockedDao.deleteOldDataUntil(dateOfLastWeek())
-        appTrackerBlockingStatsRepository.deleteTrackersUntil(dateOfLastWeek())
+        webTrackersBlockedHistory.deleteExpiredEntries()
+        appTrackerBlockingStatsRepository.deleteTrackersUntil(DatabaseDateFormatter.timestamp(dateOfLastWeek()))
 
         logcat(INFO) { "Clear trackers dao job finished; returning SUCCESS" }
         return Result.success()
     }
 
-    private fun dateOfLastWeek(): String {
-        val midnight = LocalDateTime.now().minusDays(7)
-        return DatabaseDateFormatter.timestamp(midnight)
-    }
+    private fun dateOfLastWeek(): LocalDateTime = LocalDateTime.now().minusDays(7)
 }

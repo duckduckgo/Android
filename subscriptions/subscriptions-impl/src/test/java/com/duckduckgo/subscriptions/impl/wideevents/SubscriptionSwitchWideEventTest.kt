@@ -57,7 +57,7 @@ class SubscriptionSwitchWideEventTest {
     fun setup() {
         subscriptionSwitchWideEvent = SubscriptionSwitchWideEventImpl(
             wideEventClient = wideEventClient,
-            subscriptionsFeature = { subscriptionsFeature },
+            subscriptionsFeature = lazy { subscriptionsFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )

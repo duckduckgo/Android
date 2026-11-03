@@ -34,17 +34,18 @@ import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
-import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
+import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
+import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.welcome.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -66,6 +67,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingPlanId
@@ -78,7 +80,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.sync.api.SyncAutoRestore
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -94,7 +96,7 @@ import javax.inject.Inject
  * Each call to [buildRootPlan] creates a fresh [NewUserOnboardingPlanContext] and per-run [SuspendMemo]s, so
  * a new onboarding run never reads stale state.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class NewUserOnboardingPlanProvider @Inject constructor(
     private val syncAutoRestore: SyncAutoRestore,
     private val appBuildConfig: AppBuildConfig,
@@ -114,8 +116,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget,
     private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
-    private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
+    private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
+    private val nextSteps: NextSteps,
+    private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
@@ -131,8 +135,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx.isReinstall = appBuildConfig.isAppReinstall()
 
         // A restarted run replays from before the branching step, so a branch persisted by a previous
-        // run must not label this run's pre-branch pixels as branched.
+        // run must not label this run's pre-branch pixels as branched, nor keep driving the contextual
+        // CTAs and the segment retention metrics of a branch this run may never reach.
         onboardingPixelSender.clearFlowAttribution()
+        onboardingStore.setDownloadReason(null)
+
+        if (!ctx.isReinstall && onboardingPrivacyConfigPersistedGate.awaitPersisted()) {
+            nextSteps.enroll()
+        }
 
         return if (customAiOnboardingResolver.resolve()) {
             // in custom AI onboarding path, the input toggle is enabled by default
@@ -146,17 +156,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
             buildCustomAiPlan(ctx, onCompleted, onSkipped)
         } else {
-            val onboardingPromptExperimentVariant = if (ctx.isReinstall) {
-                null
+            if (segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT) {
+                buildSegmentedPlan(ctx, onCompleted, onSkipped)
             } else {
-                onboardingPromptsExperimentManager.enroll()
-            }
-            when {
-                onboardingPromptExperimentVariant != null -> buildDefaultPlan(ctx, onCompleted, onSkipped, onboardingPromptExperimentVariant)
-                segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT ->
-                    buildSegmentedPlan(ctx, onCompleted, onSkipped)
-
-                else -> buildDefaultPlan(ctx, onCompleted, onSkipped)
+                buildDefaultPlan(ctx, onCompleted, onSkipped)
             }
         }
     }
@@ -165,21 +168,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
-        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant? = null,
     ): LinearOnboardingPlan {
         // SuspendMemos evaluate the inner lambda lazily, on first access, and store the result in-memory for subsequent access
         val firstDialog = SuspendMemo { resolveFirstDialog(ctx.isReinstall) }
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
 
         val quickSetupPlan = quickSetupPlan(ctx)
-
-        val showDock = onboardingPromptExperimentVariant ==
-            OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY ||
-            onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
-        val variantAllowsWidget = onboardingPromptExperimentVariant ==
-            OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY ||
-            onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
-        val showWidget = variantAllowsWidget && withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
 
         val showPasswordImport = onboardingPasswordImportExperimentManager.enroll() == OnboardingPasswordImportVariant.TREATMENT
 
@@ -195,13 +189,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(initialStep(firstDialog))
                 add(comparisonChartStep())
                 add(defaultBrowserPromptStep())
-                if (showDock) {
-                    add(addToDockStep())
-                }
-                if (showWidget) {
-                    add(widgetPromptStep(ctx))
-                    add(addWidgetStep(ctx))
-                }
+                addAll(widgetSteps(ctx))
                 if (showPasswordImport) {
                     add(passwordImportStep(ctx))
                     add(passwordImportLaunchStep(ctx))
@@ -221,7 +209,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun buildCustomAiPlan(
+    private suspend fun buildCustomAiPlan(
         ctx: NewUserOnboardingPlanContext,
         rootOnCompleted: suspend () -> Unit,
         rootOnSkipped: suspend () -> Unit,
@@ -256,23 +244,26 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             ctx = ctx,
             onCompleted = onCompleted,
             onSkipped = onSkipped,
-            steps = listOf(
-                introAnimationStep(withDuckAi = true),
-                notificationPermissionStep(),
-                initialReinstallUserStep(firstDialog, quickSetupPlan, isCustomAiPlan = true),
-                initialStep(firstDialog),
-                aiComparisonChartStep(),
-                inputScreenPreviewStep(
-                    ctx = ctx,
-                    isSearchDefault = false,
-                    showsStepIndicator = true,
-                    handsPromptToDemoStep = true,
-                ),
-                duckAiDemoStep(ctx),
-                comparisonChartStep(),
-                defaultBrowserPromptStep(),
-                addressBarPositionStep(),
-            ),
+            steps = buildList {
+                add(introAnimationStep(withDuckAi = true))
+                add(notificationPermissionStep())
+                add(initialReinstallUserStep(firstDialog, quickSetupPlan, isCustomAiPlan = true))
+                add(initialStep(firstDialog))
+                add(aiComparisonChartStep())
+                add(
+                    inputScreenPreviewStep(
+                        ctx = ctx,
+                        isSearchDefault = false,
+                        showsStepIndicator = true,
+                        handsPromptToDemoStep = true,
+                    ),
+                )
+                add(duckAiDemoStep(ctx))
+                add(comparisonChartStep())
+                add(defaultBrowserPromptStep())
+                addAll(widgetSteps(ctx))
+                add(addressBarPositionStep())
+            },
         )
     }
 
@@ -552,8 +543,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             DownloadReasonSelection.SEARCH
                         }
 
+                        // Persisted before the pixel is fired, so this step's own clicked pixel already
+                        // carries the reason as its `variant_download_reason` param.
+                        onboardingStore.setDownloadReason(selection)
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.DownloadReasonClicked(selection))
-                        onboardingPixelSender.downloadReasonSelected(selection)
+                        segmentedOnboardingExperimentMetrics.fireDownloadReasonSelectedMetric(selection)
 
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
@@ -568,35 +562,41 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun segmentedSearchPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+    private suspend fun segmentedSearchPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
-        onboardingStore.setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
         return sidePlan(
             id = SEGMENTED_SEARCH_PLAN_ID,
-            steps = listOf(
-                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)),
-                defaultBrowserPromptStep(),
-                preferenceSelectorStep(
-                    ctx = ctx,
-                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_SERP,
-                    titleRes = R.string.searchPathPreferenceSelectorTitle,
-                    listOf(
-                        OnboardingPreference.SEARCH_HISTORY,
-                        OnboardingPreference.SAFE_SEARCH,
+            steps = buildList {
+                add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)))
+                add(defaultBrowserPromptStep())
+                add(
+                    preferenceSelectorStep(
+                        ctx = ctx,
+                        pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_SERP,
+                        titleRes = R.string.searchPathPreferenceSelectorTitle,
+                        listOf(
+                            OnboardingPreference.SEARCH_HISTORY,
+                            OnboardingPreference.SAFE_SEARCH,
+                        ),
                     ),
-                ),
-                inputScreenStep(
-                    ctx = ctx,
-                    embellishment = Embellishment.BottomWing,
-                    background = OnboardingBackground.Horizon,
-                ),
-                addressBarPositionStep(),
-                inputScreenPreviewStep(
-                    ctx = ctx,
-                    isSearchDefault = true,
-                    showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
-                ),
-            ),
+                )
+                addAll(widgetSteps(ctx))
+                add(
+                    inputScreenStep(
+                        ctx = ctx,
+                        embellishment = Embellishment.BottomWing,
+                        background = OnboardingBackground.Horizon,
+                    ),
+                )
+                add(addressBarPositionStep())
+                add(
+                    inputScreenPreviewStep(
+                        ctx = ctx,
+                        isSearchDefault = true,
+                        showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                    ),
+                )
+            },
         )
     }
 
@@ -605,19 +605,19 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
-        onboardingStore.setSegmentedOnboardingPath(SegmentedOnboardingPath.AI)
         applyInputModeSelection(ctx, withAi = true, fireTelemetry = false)
         ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
         return sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
-            steps = listOf(
-                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)),
-                defaultBrowserPromptStep(),
-                modelProviderStep(modelProviderChoice),
-                togglePositionStep(togglePositionChoice),
-                addressBarPositionStep(),
-                inputScreenPreviewStep(ctx = ctx, isSearchDefault = false),
-            ),
+            steps = buildList {
+                add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)))
+                add(defaultBrowserPromptStep())
+                add(modelProviderStep(modelProviderChoice))
+                add(togglePositionStep(togglePositionChoice))
+                addAll(widgetSteps(ctx))
+                add(addressBarPositionStep())
+                add(inputScreenPreviewStep(ctx = ctx, isSearchDefault = false))
+            },
         )
     }
 
@@ -625,60 +625,68 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
-        onboardingStore.setSegmentedOnboardingPath(null)
         applyInputModeSelection(ctx, withAi = false, fireTelemetry = false)
         return sidePlan(
             id = SEGMENTED_NO_AI_PLAN_ID,
-            steps = listOf(
-                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)),
-                defaultBrowserPromptStep(),
-                preferenceSelectorStep(
-                    ctx = ctx,
-                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH,
-                    titleRes = R.string.noAiPathPreferenceSelectorTitle,
-                    listOf(
-                        OnboardingPreference.SEARCH_ASSIST,
-                        OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+            steps = buildList {
+                add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)))
+                add(defaultBrowserPromptStep())
+                add(
+                    preferenceSelectorStep(
+                        ctx = ctx,
+                        pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH,
+                        titleRes = R.string.noAiPathPreferenceSelectorTitle,
+                        listOf(
+                            OnboardingPreference.SEARCH_ASSIST,
+                            OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+                        ),
                     ),
-                ),
-                duckAiStateStep(ctx, duckAiStateChoice),
-                addressBarPositionStep(),
-                inputScreenPreviewStep(ctx = ctx, isSearchDefault = true),
-            ),
+                )
+                addAll(widgetSteps(ctx))
+                add(duckAiStateStep(ctx, duckAiStateChoice))
+                add(addressBarPositionStep())
+                add(inputScreenPreviewStep(ctx = ctx, isSearchDefault = true))
+            },
         )
     }
 
-    private fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+    private suspend fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
-        onboardingStore.setSegmentedOnboardingPath(null)
         return sidePlan(
             id = SEGMENTED_BLOCK_ADS_PLAN_ID,
-            steps = listOf(
-                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
-                defaultBrowserPromptStep(),
-                preferenceSelectorStep(
-                    ctx = ctx,
-                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING,
-                    titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
-                    listOf(
-                        OnboardingPreference.BLOCK_ADS,
-                        OnboardingPreference.REJECT_OPTIONAL_COOKIES,
-                        OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+            steps = buildList {
+                add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)))
+                add(defaultBrowserPromptStep())
+                add(
+                    preferenceSelectorStep(
+                        ctx = ctx,
+                        pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING,
+                        titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
+                        listOf(
+                            OnboardingPreference.BLOCK_ADS,
+                            OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+                        ),
+                        caption = R.string.preferenceChangeInSettingsCaption,
                     ),
-                    caption = R.string.preferenceChangeInSettingsCaption,
-                ),
-                inputScreenStep(
-                    ctx = ctx,
-                    embellishment = Embellishment.BottomWing,
-                    background = OnboardingBackground.Horizon,
-                ),
-                addressBarPositionStep(),
-                inputScreenPreviewStep(
-                    ctx = ctx,
-                    isSearchDefault = true,
-                    showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
-                ),
-            ),
+                )
+                addAll(widgetSteps(ctx))
+                add(
+                    inputScreenStep(
+                        ctx = ctx,
+                        embellishment = Embellishment.BottomWing,
+                        background = OnboardingBackground.Horizon,
+                    ),
+                )
+                add(addressBarPositionStep())
+                add(
+                    inputScreenPreviewStep(
+                        ctx = ctx,
+                        isSearchDefault = true,
+                        showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                    ),
+                )
+            },
         )
     }
 
@@ -854,25 +862,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         },
     )
 
-    private fun addToDockStep(): NewUserOnboardingActivityStep {
-        val pixelName = OnboardingPixelName.ONBOARDING_ADD_TO_DOCK
-        return NewUserOnboardingActivityStep(
-            id = NewUserOnboardingStepIds.ADD_TO_DOCK,
-            pixelName = pixelName,
-            indicator = StepIndicatorMode.COUNTED,
-            resolveDialog = { NewUserOnboardingActivityDialog.AddToDock },
-            transition = { event ->
-                when {
-                    event is NewUserOnboardingEvent.ContinueClicked -> {
-                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
-                        Advance
-                    }
-
-                    else -> Stay
-                }
-            },
-        )
-    }
+    private suspend fun widgetSteps(ctx: NewUserOnboardingPlanContext): List<LinearOnboardingStep> =
+        if (withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }) {
+            emptyList()
+        } else {
+            listOf(widgetPromptStep(ctx), addWidgetStep(ctx))
+        }
 
     private fun widgetPromptStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_WIDGET_PROMPT
@@ -883,11 +878,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
             transition = { event ->
                 when (event) {
-                    is NewUserOnboardingEvent.Presented -> {
-                        onboardingStore.linearPlanWidgetPromptShown = true
-                        Stay
-                    }
-
                     is NewUserOnboardingEvent.AddWidgetRequested -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
@@ -951,6 +941,23 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         Advance
                     }
 
+                    is NewUserOnboardingEvent.PasswordImportErrorRetryRequested -> {
+                        onboardingPixelSender.fire(
+                            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+                            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.RETRY),
+                        )
+                        Advance
+                    }
+
+                    is NewUserOnboardingEvent.PasswordImportErrorCancelled -> {
+                        ctx.skipPasswordsImport = true
+                        onboardingPixelSender.fire(
+                            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+                            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CANCEL),
+                        )
+                        Advance
+                    }
+
                     else -> Stay
                 }
             },
@@ -958,7 +965,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     }
 
     private fun passwordImportLaunchStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
-        val pixelName = OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH,
             pixelName = null,
@@ -972,21 +978,20 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             Advance
                         }
 
-                        PasswordImportOutcome.CANCELLED -> {
-                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
-                            GoBack
-                        }
+                        PasswordImportOutcome.CANCELLED -> GoBack
 
                         // Back to the import card so its Import/Skip actions stay live: the retry alert is
                         // dropped on configuration change and would otherwise be the only way forward.
                         PasswordImportOutcome.TRANSIENT_ERROR -> {
-                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                            onboardingPixelSender.fire(
+                                OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+                                OnboardingPixelAction.PasswordImportErrorShown(transient = true),
+                            )
                             GoBack
                         }
 
                         PasswordImportOutcome.PERMANENT_ERROR -> {
                             ctx.passwordImportResult = PasswordImportResult.Terminal.Failed
-                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
                             Advance
                         }
                     }
@@ -1003,7 +1008,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     }
 
     private fun passwordImportCompleteStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
-        val pixelName = OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE,
             pixelName = null,
@@ -1012,24 +1016,52 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete(result = ctx.passwordImportResult) },
             transition = { event ->
                 when (event) {
+                    is NewUserOnboardingEvent.Presented -> {
+                        (ctx.passwordImportResult as? PasswordImportResult.Terminal)?.let { fireImportOutcomeShown(it) }
+                        Stay
+                    }
+
                     is NewUserOnboardingEvent.PasswordImportParsed -> {
                         if (ctx.passwordImportResult !is PasswordImportResult.Terminal) {
-                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.result.toOutcome()))
+                            fireImportOutcomeShown(event.result)
                         }
                         ctx.passwordImportResult = event.result
                         Stay
                     }
 
-                    is NewUserOnboardingEvent.ContinueClicked -> Advance
+                    is NewUserOnboardingEvent.ContinueClicked -> {
+                        when (ctx.passwordImportResult) {
+                            is PasswordImportResult.Terminal.Imported -> onboardingPixelSender.fire(
+                                OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_COMPLETE,
+                                OnboardingPixelAction.Clicked(engaged = true),
+                            )
+
+                            PasswordImportResult.Terminal.Failed -> onboardingPixelSender.fire(
+                                OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+                                OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CONTINUE),
+                            )
+
+                            PasswordImportResult.InProgress, null -> Unit
+                        }
+                        Advance
+                    }
+
                     else -> Stay
                 }
             },
         )
     }
 
-    private fun PasswordImportResult.Terminal.toOutcome(): PasswordImportOutcome = when (this) {
-        is PasswordImportResult.Terminal.Imported -> PasswordImportOutcome.SUCCESS
-        PasswordImportResult.Terminal.Failed -> PasswordImportOutcome.PERMANENT_ERROR
+    private fun fireImportOutcomeShown(result: PasswordImportResult.Terminal) = when (result) {
+        is PasswordImportResult.Terminal.Imported -> onboardingPixelSender.fire(
+            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_COMPLETE,
+            OnboardingPixelAction.Shown,
+        )
+
+        PasswordImportResult.Terminal.Failed -> onboardingPixelSender.fire(
+            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorShown(transient = false),
+        )
     }
 
     private fun addressBarPositionStep(): NewUserOnboardingActivityStep {
@@ -1127,9 +1159,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         if (handsPromptToDemoStep) {
+                            onboardingStore.setTriedDuckAi()
                             ctx.pendingDuckAiPrompt = event.query
                         } else {
                             ctx.completionResult = if (event.isChat) {
+                                onboardingStore.setTriedDuckAi()
                                 NewUserOnboardingResult.LaunchChat(prompt = event.query)
                             } else {
                                 NewUserOnboardingResult.LaunchSearch(query = event.query)

@@ -28,9 +28,9 @@ internal fun Activity.launchBrandDesignFireAnimationSelector(
     animation: FireAnimation,
     onAnimationSelected: (FireAnimation) -> Unit,
 ) {
-    val animations = availableFireAnimations(includesInferno = true)
+    val animations = availableFireAnimations()
     val currentIndex = animations.indexOf(animation).coerceAtLeast(0) + 1
-    val labels = animations.map { it.displayLabelResId(includesInferno = true) }
+    val labels = animations.map { it.displayLabelResId() }
 
     RadioListAlertDialogBuilder(this)
         .setTitle(R.string.settingsSelectFireAnimationDialog)

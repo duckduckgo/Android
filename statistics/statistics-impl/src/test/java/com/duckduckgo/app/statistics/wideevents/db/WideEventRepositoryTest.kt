@@ -23,6 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.FAILURE
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.SUCCESS
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStep
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.squareup.moshi.Moshi
@@ -37,6 +38,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -66,11 +69,16 @@ class WideEventRepositoryTest {
             override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
         }
 
+    private val appBuildConfig: AppBuildConfig = mock { appBuildConfig ->
+        whenever(appBuildConfig.versionName).thenReturn("5.123.0")
+    }
+
     private val wideEventRepository: WideEventRepository =
         WideEventRepositoryImpl(
             database = database,
             wideEventDao = database.wideEventDao(),
             timeProvider = timeProvider,
+            appBuildConfig = appBuildConfig,
         )
 
     @After
@@ -296,6 +304,23 @@ class WideEventRepositoryTest {
         }
 
     @Test
+    fun `when app version changes after event is inserted, then event keeps the app version from insertion`() =
+        runTest {
+            whenever(appBuildConfig.versionName).thenReturn("5.1.0")
+            val eventId = insertEvent(name = "test_event")
+
+            whenever(appBuildConfig.versionName).thenReturn("5.2.0")
+            wideEventRepository.addWideEventStep(
+                eventId = eventId,
+                step = WideEventStep(name = "step_A", success = true),
+                metadata = emptyMap(),
+            )
+            wideEventRepository.setWideEventStatus(eventId = eventId, status = SUCCESS, metadata = emptyMap())
+
+            assertEquals("5.1.0", wideEventRepository.getWideEvents(setOf(eventId)).single().appVersion)
+        }
+
+    @Test
     fun `when delete event then it is no longer accessible`() =
         runTest {
             val completedEventId =
@@ -381,6 +406,134 @@ class WideEventRepositoryTest {
             val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
             assertEquals(policy, event.cleanupPolicy)
         }
+
+    @Test
+    fun `when inserting wide event with process-start cleanupPolicy, its owner is stored`() =
+        runTest {
+            val policy =
+                WideEventRepository.CleanupPolicy.OnProcessStart(
+                    ownerProcessName = ":vpn",
+                    ignoreIfIntervalTimeoutPresent = true,
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                )
+
+            val eventId =
+                wideEventRepository.insertWideEvent(
+                    name = "cleanup_event",
+                    flowEntryPoint = null,
+                    metadata = emptyMap(),
+                    cleanupPolicy = policy,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
+                )
+
+            val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+            assertEquals(policy, event.cleanupPolicy)
+        }
+
+    @Test
+    fun `when cleaning up a missing event, nothing happens`() =
+        runTest {
+            var decided = false
+
+            wideEventRepository.cleanUpWideEvent(eventId = 404L) {
+                decided = true
+                null
+            }
+
+            assertFalse(decided)
+        }
+
+    @Test
+    fun `when cleaning up a completed event, it is left untouched and not re-evaluated`() =
+        runTest {
+            val eventId = insertActiveEvent()
+            wideEventRepository.setWideEventStatus(eventId = eventId, status = SUCCESS, metadata = emptyMap())
+            var decided = false
+
+            wideEventRepository.cleanUpWideEvent(eventId = eventId) {
+                decided = true
+                WideEventRepository.CleanupDecision(status = WideEventRepository.WideEventStatus.UNKNOWN, metadata = emptyMap())
+            }
+
+            assertFalse(decided)
+            assertEquals(SUCCESS, wideEventRepository.getWideEvents(setOf(eventId)).single().status)
+        }
+
+    @Test
+    fun `when cleanup decides to keep the event, it stays active and unchanged`() =
+        runTest {
+            val eventId = insertActiveEvent(metadata = mapOf("key" to "value"))
+
+            wideEventRepository.cleanUpWideEvent(eventId = eventId) { null }
+
+            val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+            assertEquals(null, event.status)
+            assertEquals(mapOf("key" to "value"), event.metadata)
+            assertEquals(listOf(eventId), wideEventRepository.getActiveWideEventIds())
+        }
+
+    @Test
+    fun `when cleanup decides to close the event, status and metadata are applied and the daily occurrence recorded`() =
+        runTest {
+            val eventId = insertActiveEvent(metadata = mapOf("kept" to "yes", "overridden" to "old"))
+
+            wideEventRepository.cleanUpWideEvent(eventId = eventId) {
+                WideEventRepository.CleanupDecision(status = FAILURE, metadata = mapOf("overridden" to "new", "reason" to "cleanup"))
+            }
+
+            val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+            assertEquals(FAILURE, event.status)
+            assertEquals(mapOf("kept" to "yes", "overridden" to "new", "reason" to "cleanup"), event.metadata)
+            assertTrue(event.isFirstDailyOccurrence)
+            assertEquals(listOf(eventId), wideEventRepository.getCompletedWideEventIds())
+        }
+
+    @Test
+    fun `when cleanup closes a second event with the same name and status on the same day, it is not the first daily occurrence`() =
+        runTest {
+            val firstId = insertActiveEvent()
+            val secondId = insertActiveEvent()
+            val decision = WideEventRepository.CleanupDecision(status = FAILURE, metadata = emptyMap())
+
+            wideEventRepository.cleanUpWideEvent(eventId = firstId) { decision }
+            wideEventRepository.cleanUpWideEvent(eventId = secondId) { decision }
+
+            val events = wideEventRepository.getWideEvents(setOf(firstId, secondId)).associateBy { it.id }
+            assertTrue(events.getValue(firstId).isFirstDailyOccurrence)
+            assertFalse(events.getValue(secondId).isFirstDailyOccurrence)
+        }
+
+    @Test
+    fun `when cleaning up, the decision sees the event's current state`() =
+        runTest {
+            val eventId = insertActiveEvent()
+            wideEventRepository.addWideEventStep(
+                eventId = eventId,
+                step = WideEventRepository.WideEventStep(name = "step_1", success = true),
+                metadata = mapOf("after_insert" to "true"),
+            )
+            var seen: WideEventRepository.WideEvent? = null
+
+            wideEventRepository.cleanUpWideEvent(eventId = eventId) { event ->
+                seen = event
+                null
+            }
+
+            assertEquals(listOf(WideEventRepository.WideEventStep(name = "step_1", success = true)), seen?.steps)
+            assertEquals("true", seen?.metadata?.get("after_insert"))
+        }
+
+    private suspend fun insertActiveEvent(metadata: Map<String, String?> = emptyMap()): Long =
+        wideEventRepository.insertWideEvent(
+            name = "cleanup_event",
+            flowEntryPoint = null,
+            metadata = metadata,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
+        )
 
     @Test
     fun `when starting an interval, it is tracked correctly`() =

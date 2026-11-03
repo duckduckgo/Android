@@ -35,7 +35,7 @@ class WrongPluginPointCollectorDetectorTest {
     
                     import com.duckduckgo.common.utils.plugins.ActivePlugin
                     import com.duckduckgo.common.utils.plugins.PluginPoint
-                    import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+                    import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 
                     interface MyPlugin
                     interface MyPluginActivePlugin : ActivePlugin
@@ -70,7 +70,7 @@ class WrongPluginPointCollectorDetectorTest {
     
                     import com.duckduckgo.common.utils.plugins.ActivePlugin
                     import com.duckduckgo.common.utils.plugins.PluginPoint
-                    import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+                    import com.duckduckgo.codegen.annotations.ContributesActivePlugin
     
                     interface MyPlugin
                     interface MyPluginActivePlugin : ActivePlugin
@@ -96,7 +96,7 @@ class WrongPluginPointCollectorDetectorTest {
 
                     import com.duckduckgo.common.utils.plugins.ActivePlugin
                     import com.duckduckgo.common.utils.plugins.PluginPoint
-                    import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+                    import com.duckduckgo.codegen.annotations.ContributesActivePlugin
     
                     interface MyPlugin
                     interface MyPluginActivePlugin : ActivePlugin
@@ -129,7 +129,7 @@ class WrongPluginPointCollectorDetectorTest {
     
                     import com.duckduckgo.common.utils.plugins.ActivePlugin
                     import com.duckduckgo.common.utils.plugins.PluginPoint
-                    import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+                    import com.duckduckgo.codegen.annotations.ContributesActivePlugin
         
                     class Duck {
                         private val pp: PluginPoint<MyPlugin>

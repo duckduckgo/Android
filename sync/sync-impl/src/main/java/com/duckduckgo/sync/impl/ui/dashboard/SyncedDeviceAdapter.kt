@@ -23,16 +23,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceLoadingBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceLocalBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceRemoteBinding
+import com.duckduckgo.sync.impl.iconRes
 import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncedDeviceAdapter.Listener
 
 class SyncedDeviceAdapter(
-    private val listener: Listener,
+    private val listener: Listener? = null,
 ) : ListAdapter<SyncDeviceListItem, ViewHolder>(ItemCallback) {
     override fun getItemViewType(position: Int): Int = when (val item = getItem(position)) {
         is LoadingItem -> R.layout.item_sync_device_loading
@@ -108,40 +108,44 @@ private object ItemCallback : DiffUtil.ItemCallback<SyncDeviceListItem>() {
 
 private class LocalDeviceViewHolder(
     private val binding: ItemSyncDeviceLocalBinding,
-    private val listener: Listener,
+    private val listener: Listener?,
 ) : ViewHolder(binding.root) {
     private var device: ConnectedDevice? = null
 
     init {
         binding.root.setSecondaryText(itemView.context.getString(R.string.sync_simplified_settings_local_device_item_hint))
-        binding.root.setOnClickListener {
-            device?.let(listener::onDeviceClicked)
+        if (listener != null) {
+            binding.root.setOnClickListener {
+                device?.let(listener::onDeviceClicked)
+            }
         }
     }
 
     fun bind(device: ConnectedDevice) {
         this.device = device
-        binding.root.setLeadingIconResource(device.deviceType.type().asDrawableRes())
+        binding.root.setLeadingIconResource(device.deviceType.iconRes())
         binding.root.setPrimaryText(device.deviceName)
     }
 }
 
 private class RemoteDeviceViewHolder(
     private val binding: ItemSyncDeviceRemoteBinding,
-    private val listener: Listener,
+    private val listener: Listener?,
 ) : ViewHolder(binding.root) {
     private var device: ConnectedDevice? = null
 
     init {
-        binding.root.setOnClickListener {
-            device?.let(listener::onDeviceClicked)
+        if (listener != null) {
+            binding.root.setOnClickListener {
+                device?.let(listener::onDeviceClicked)
+            }
         }
     }
 
     fun bind(device: ConnectedDevice) {
         this.device = device
         binding.root.setPrimaryText(device.deviceName)
-        binding.root.setLeadingIconResource(device.deviceType.type().asDrawableRes())
+        binding.root.setLeadingIconResource(device.deviceType.iconRes())
     }
 }
 

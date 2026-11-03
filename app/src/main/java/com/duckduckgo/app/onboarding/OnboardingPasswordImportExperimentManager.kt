@@ -18,13 +18,13 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportToggles.OnboardingPasswordImportCohorts
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -38,11 +38,10 @@ interface OnboardingPasswordImportExperimentManager {
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = OnboardingPasswordImportExperimentManager::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<OnboardingPasswordImportExperimentManager>())
+@SingleIn(AppScope::class)
 class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
     private val toggles: OnboardingPasswordImportToggles,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val importPasswordsFromGoogle: ImportPasswordsFromGoogle,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
@@ -65,11 +64,10 @@ class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
 
     /**
      * Checked before enrolling, so users who could never reach the step are kept out of the experiment: it exists
-     * only in the config-driven onboarding, only for new installs, and only where the import flow is supported.
+     * only for new installs and only where the import flow is supported.
      */
     private suspend fun checkPrerequisites() =
         toggles.self().isEnabled() &&
-            onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
             !appBuildConfig.isAppReinstall() &&
             importPasswordsFromGoogle.isSupported()
 }

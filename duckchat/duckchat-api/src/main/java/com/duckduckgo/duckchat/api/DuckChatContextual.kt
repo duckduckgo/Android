@@ -39,6 +39,7 @@ interface DuckChatContextual {
         sourceTabId: String,
         sourceUrl: String?,
         anchor: View?,
+        textSelection: String? = null,
         showChatSurface: () -> Unit,
     )
 

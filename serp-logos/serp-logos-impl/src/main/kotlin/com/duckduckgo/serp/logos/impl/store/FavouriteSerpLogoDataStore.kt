@@ -22,8 +22,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.serp.logos.impl.di.FavouriteSerpEasterEggLogo
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -38,7 +38,7 @@ interface FavouriteSerpLogoDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class FavouriteSerpLogoPrefsDataStore @Inject constructor(
     @FavouriteSerpEasterEggLogo private val store: DataStore<Preferences>,
 ) : FavouriteSerpLogoDataStore {

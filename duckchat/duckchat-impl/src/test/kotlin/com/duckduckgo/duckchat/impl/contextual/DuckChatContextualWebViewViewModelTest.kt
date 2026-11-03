@@ -18,7 +18,9 @@ package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -30,6 +32,11 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -39,6 +46,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -47,6 +55,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -69,11 +79,15 @@ class DuckChatContextualWebViewViewModelTest {
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val duckChatFeature: DuckChatFeature = mock()
+    private val termsConsent: DuckAiTermsConsent = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
     private val contextualEntryPromptStore: ContextualEntryPromptStore = mock()
+    private val textSelectionRepository: TextSelectionRepository = mock()
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
 
     private val serializedPageData =
@@ -93,6 +107,7 @@ class DuckChatContextualWebViewViewModelTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        whenever(textSelectionRepository.selections(any())).thenReturn(MutableStateFlow(emptyList()))
         whenever(duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(
             SubscriptionEventData(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, "submitNewChatAction", JSONObject()),
         )
@@ -109,6 +124,7 @@ class DuckChatContextualWebViewViewModelTest {
             assertTrue(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.LoadUrl)
             cancelAndIgnoreRemainingEvents()
         }
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", false, null)
         assertEquals("tab-1", testee.viewState.value.tabId)
         verify(duckChatPixels).reportContextualSheetOpened()
     }
@@ -130,6 +146,36 @@ class DuckChatContextualWebViewViewModelTest {
             assertEquals("hello", event.params.getJSONObject("query").getString("prompt"))
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `entry prompt with selections does not re-report the submission on web app ready`() = runTest {
+        val selections = JSONArray().apply { put(JSONObject().apply { put("content", "picked text") }) }
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null, selectionsJson = selections)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null, selectionsJson = selections))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onWebAppReady()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels, never()).reportContextualPromptSubmittedWithSelections(any())
+        verify(selectionJourney, never()).onPromptSubmitted(any())
+    }
+
+    @Test
+    fun `onPromptSent with selections reports the pixel`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val selections = JSONArray().apply {
+            put(JSONObject().apply { put("content", "one") })
+            put(JSONObject().apply { put("content", "two") })
+        }
+
+        testee.onPromptSent("Explain", selectionsJson = selections)
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithSelections(2)
     }
 
     @Test
@@ -171,6 +217,38 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `reopen after the session timed out ends the selection journey as expired`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 0L)
+        sessionTimeoutProvider.timeoutMs = 1_000L
+        timeProvider.nowMs = 5_000L
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.SESSION_EXPIRED)
+    }
+
+    @Test
+    fun `reopen with the stored chat deleted from history ends the selection journey as new chat`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?ia=chat&chatID=gone")
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 0L)
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        timeProvider.nowMs = 1_000L
+        recentChatsFlow.value = emptyList()
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.NEW_CHAT)
+    }
+
+    @Test
     fun `sheet closed after reopen entry dialog handoff does not revert the contextual input state`() = runTest {
         (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
         testee.onSheetOpened("tab-1")
@@ -192,6 +270,32 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `dictated entry prompt retains voice attribution when sheet opens`() = runTest {
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null, voice = true))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null, voice = true)
+    }
+
+    @Test
+    fun `dictated entry prompt retains voice attribution when sheet reopens`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null, voice = true))
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null, voice = true)
+    }
+
+    @Test
     fun `onSheetOpened reports the sheet opened even for an entry-dialog hand-off`() = runTest {
         val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
         whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null))
@@ -201,6 +305,7 @@ class DuckChatContextualWebViewViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(duckChatPixels).reportContextualSheetOpened()
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null)
     }
 
     @Test
@@ -223,6 +328,29 @@ class DuckChatContextualWebViewViewModelTest {
 
         verify(duckChatPixels).reportContextualSheetSessionRestored()
         verify(duckChatPixels).reportContextualSheetOpened()
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", false, null)
+        verify(entryWideEvent).onContextualSheetUrlResolved("tab-1", chatUrl)
+    }
+
+    @Test
+    fun `onSheetOpened after the session timed out ends the selection journey as expired`() = runTest {
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?ia=chat&chatID=abc")
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 0L)
+        sessionTimeoutProvider.timeoutMs = 1_000L
+        timeProvider.nowMs = 5_000L
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.SESSION_EXPIRED)
+    }
+
+    @Test
+    fun `onSheetOpened with no prior session does not expire the selection journey`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(selectionJourney, never()).onJourneyEnded(any(), eq(SelectionTerminalReason.SESSION_EXPIRED))
     }
 
     @Test
@@ -292,6 +420,18 @@ class DuckChatContextualWebViewViewModelTest {
         assertTrue(testee.viewState.value.showContext)
         assertEquals("Page Title", testee.viewState.value.contextTitle)
         verify(duckChatPixels).reportContextualPageContextAutoAttached()
+    }
+
+    @Test
+    fun `onPageContextReceived does not auto-attach when text selections are attached`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        whenever(textSelectionRepository.selections("tab-1"))
+            .thenReturn(MutableStateFlow(listOf(TextSelection(id = "1", text = "selected", url = "https://example.com"))))
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
+
+        assertFalse(testee.viewState.value.showContext)
+        verify(duckChatPixels, never()).reportContextualPageContextAutoAttached()
     }
 
     @Test
@@ -449,6 +589,7 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels, never()).reportContextualSheetDismissed()
+        verify(entryWideEvent, never()).onContextualSheetClosed(any())
     }
 
     @Test
@@ -464,6 +605,7 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels).reportContextualSheetDismissed()
+        verify(entryWideEvent).onContextualSheetClosed("tab-1")
     }
 
     @Test
@@ -482,6 +624,24 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onContextualFireConfirmed clears attached text selections`() = runTest {
+        testee.onSheetOpened("tab-1")
+
+        testee.onContextualFireConfirmed()
+
+        verify(textSelectionRepository).consume("tab-1")
+    }
+
+    @Test
+    fun `onNewChatRequestedFromPopup clears attached text selections`() = runTest {
+        testee.onSheetOpened("tab-1")
+
+        testee.onNewChatRequestedFromPopup()
+
+        verify(textSelectionRepository).consume("tab-1")
+    }
+
+    @Test
     fun `onFullModeRequested opens fullscreen`() = runTest {
         (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
 
@@ -492,6 +652,17 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels).reportContextualSheetExpanded()
+    }
+
+    @Test
+    fun `onFullModeRequested ends the selection journey as moved to tab`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+
+        testee.onFullModeRequested()
+
+        verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.MOVED_TO_TAB)
+        verify(textSelectionRepository).consume("tab-1")
     }
 
     @Test
@@ -530,6 +701,25 @@ class DuckChatContextualWebViewViewModelTest {
         }
         verify(duckChatPixels).reportContextualOpenDuckAiMenuTapped()
         verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
+    fun `onRecentChatClicked opens the chat and reports the contextual recent chat entry point`() = runTest {
+        whenever(duckChatInternal.buildChatUrl("chat-1")).thenReturn("https://duckduckgo.com/?ia=chat&chatID=chat-1")
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            testee.onRecentChatClicked("chat-1")
+
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualWebViewViewModel.Command.OpenChatUrl)
+            command as DuckChatContextualWebViewViewModel.Command.OpenChatUrl
+            assertEquals("https://duckduckgo.com/?ia=chat&chatID=chat-1", command.url)
+            assertEquals("tab-1", command.sourceTabId)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(duckChatPixels).reportContextualRecentChatSelected()
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_CONTEXTUAL, opensNewTab = true, hasPrompt = false)
     }
 
     @Test
@@ -604,6 +794,44 @@ class DuckChatContextualWebViewViewModelTest {
         }
     }
 
+    @Test
+    fun `when prompt sent then the terms consent is carried on the event`() = runTest {
+        testee.onPromptSent("Hello Duck.ai")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
+    }
+
+    @Test
+    fun `when a canned entry prompt is sent then the terms consent is not carried`() = runTest {
+        val prompt = NativeInputPrompt("Translate this page", null, null, null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null, carriesTermsConsent = false))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onWebAppReady()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(termsConsent, never()).carry(any(), any())
+    }
+
+    @Test
+    fun `when a typed entry prompt is sent then the terms consent is carried`() = runTest {
+        val prompt = NativeInputPrompt("hello", null, null, null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onWebAppReady()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
+    }
+
     private fun buildViewModel() = DuckChatContextualWebViewViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
@@ -613,10 +841,15 @@ class DuckChatContextualWebViewViewModelTest {
         sessionTimeoutProvider = sessionTimeoutProvider,
         timeProvider = timeProvider,
         duckChatPixels = duckChatPixels,
+        selectionJourney = selectionJourney,
         duckChatFeature = duckChatFeature,
         modelManager = modelManager,
         chatHistoryRepository = chatHistoryRepository,
         contextualEntryPromptStore = contextualEntryPromptStore,
+        textSelectionRepository = textSelectionRepository,
+        termsConsent = termsConsent,
+        browserMode = BrowserMode.REGULAR,
+        entryWideEvent = entryWideEvent,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
@@ -625,12 +858,13 @@ class DuckChatContextualWebViewViewModelTest {
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat(entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
-        override fun openDuckChatWithAutoPrompt(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun openDuckChatWithAutoPrompt(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint, voice: Boolean) = Unit
         override fun openDuckChatWithPrefill(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
         override fun reportDuckChatEntry(
             entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint,
             opensNewTab: Boolean,
             hasPrompt: Boolean,
+            voice: Boolean,
         ) = Unit
         override fun getDuckChatUrl(
             query: String,
@@ -650,7 +884,6 @@ class DuckChatContextualWebViewViewModelTest {
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = flowOf(true)
-        override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = emptyFlow()
         override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
         override fun observeNativeInputNavBarEnabled(): Flow<Boolean> = emptyFlow()
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
@@ -665,6 +898,7 @@ class DuckChatContextualWebViewViewModelTest {
         override suspend fun hasUserEnabledChatHistory(): Boolean = false
         override fun observeHasChatSuggestions(): Flow<Boolean> = emptyFlow()
         override suspend fun onAddressBarPickerDuckAiSelected() = Unit
+        override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) = Unit
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

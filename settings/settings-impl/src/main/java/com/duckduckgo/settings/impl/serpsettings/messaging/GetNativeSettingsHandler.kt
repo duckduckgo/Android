@@ -26,9 +26,8 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -39,11 +38,10 @@ import javax.inject.Inject
  *
  * If there are no stored settings, it returns an empty JSON object according to the expected format.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class GetNativeSettingsHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
-    private val serpSettingsFeature: SerpSettingsFeature,
     private val serpSettingsDataStore: SerpSettingsDataStore,
 ) : ContentScopeJsMessageHandlersPlugin {
 
@@ -55,26 +53,24 @@ class GetNativeSettingsHandler @Inject constructor(
                 jsMessageCallback: JsMessageCallback?,
             ) {
                 appScope.launch(dispatcherProvider.io()) {
-                    if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-                        val settingsString = serpSettingsDataStore.getSerpSettings()
+                    val settingsString = serpSettingsDataStore.getSerpSettings()
 
-                        val settingsJsonObject = if (settingsString.isNullOrEmpty()) {
-                            // Return noNativeSettings: true until settings have been updated by FE
-                            JSONObject().put(KEY_NO_NATIVE_SETTINGS, true)
-                        } else {
-                            JSONObject(settingsString)
-                        }
+                    val settingsJsonObject = if (settingsString.isNullOrEmpty()) {
+                        // Return noNativeSettings: true until settings have been updated by FE
+                        JSONObject().put(KEY_NO_NATIVE_SETTINGS, true)
+                    } else {
+                        JSONObject(settingsString)
+                    }
 
-                        jsMessage.id?.let { id ->
-                            jsMessaging.onResponse(
-                                JsCallbackData(
-                                    params = settingsJsonObject,
-                                    featureName = jsMessage.featureName,
-                                    method = jsMessage.method,
-                                    id = id,
-                                ),
-                            )
-                        }
+                    jsMessage.id?.let { id ->
+                        jsMessaging.onResponse(
+                            JsCallbackData(
+                                params = settingsJsonObject,
+                                featureName = jsMessage.featureName,
+                                method = jsMessage.method,
+                                id = id,
+                            ),
+                        )
                     }
                 }
             }

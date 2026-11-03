@@ -25,12 +25,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
 import com.duckduckgo.promptscoordinator.api.NewTabPageModalTrigger
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.promptscoordinator.impl.store.ModalEvaluatorCompletionStore
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -48,21 +50,22 @@ import javax.inject.Inject
  * - Evaluators blocked by 24-hour window are skipped entirely (evaluate() not called)
  * - When evaluation completes (with or without action), timestamp is recorded
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = NewTabPageModalTrigger::class,
+    binding = binding<NewTabPageModalTrigger>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ModalEvaluatorCoordinator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val modalEvaluatorPluginPoint: PluginPoint<ModalEvaluator>,
     private val completionStore: ModalEvaluatorCompletionStore,
     private val promptsCoordinator: PromptsCoordinator,
     private val dispatchers: DispatcherProvider,
+    private val promptExposureReporter: PromptExposureReporter,
 ) : MainProcessLifecycleObserver, NewTabPageModalTrigger {
 
     private val evaluationMutex = Mutex()
@@ -117,6 +120,7 @@ class ModalEvaluatorCoordinator @Inject constructor(
                         }
                         // Recorded either way so kill-switch flips stay seamless.
                         completionStore.recordCompletion()
+                        promptExposureReporter.reportPromptShown(evaluator.evaluatorId)
                         promptsCoordinator.onClaimDone(PromptType.MODAL)
                         claimHeld = false
                         return@withLock

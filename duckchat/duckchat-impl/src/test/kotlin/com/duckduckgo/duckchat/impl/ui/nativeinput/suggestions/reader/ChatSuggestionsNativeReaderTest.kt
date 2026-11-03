@@ -93,6 +93,28 @@ class ChatSuggestionsNativeReaderTest {
     }
 
     @Test
+    fun `fetchSuggestions with empty query honours recentDaysCutoff from feature settings`() = runTest {
+        whenever(toggle.getSettings()).thenReturn("""{"recentDaysCutoff":30}""")
+        val withinWindow = chatWithLastEdit(Instant.now().minus(20, ChronoUnit.DAYS).toString())
+        val outsideWindow = chatWithLastEdit(Instant.now().minus(40, ChronoUnit.DAYS).toString(), chatId = "old")
+        whenever(store.getChats()).thenReturn(listOf(withinWindow, outsideWindow))
+
+        val result = reader.fetchSuggestions(query = "")
+        assertEquals(1, result.size)
+        assertEquals("chat-1", result[0].chatId)
+    }
+
+    @Test
+    fun `fetchSuggestions with empty query applies no age filter when recentDaysCutoff is zero`() = runTest {
+        whenever(toggle.getSettings()).thenReturn("""{"recentDaysCutoff":0}""")
+        val recent = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString())
+        val old = chatWithLastEdit("2025-01-01T10:00:00.000Z", chatId = "old")
+        whenever(store.getChats()).thenReturn(listOf(recent, old))
+
+        assertEquals(2, reader.fetchSuggestions(query = "").size)
+    }
+
+    @Test
     fun `fetchSuggestions sorts pinned chats first then by lastEdit desc`() = runTest {
         val older = chatWithLastEdit("2026-03-01T10:00:00.000Z", chatId = "older")
         val newer = chatWithLastEdit("2026-04-01T10:00:00.000Z", chatId = "newer")

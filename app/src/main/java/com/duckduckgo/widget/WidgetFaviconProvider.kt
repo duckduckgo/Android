@@ -25,12 +25,12 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class WidgetFaviconProvider @Inject constructor(
     private val context: Context,
     private val faviconPersister: FaviconPersister,

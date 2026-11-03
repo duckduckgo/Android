@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Bunu daha sonra Ayarlar\'dan her zaman değiştirebilirsiniz.</string>
     <string name="autoconsentPromptCpmOnMessage">Bazı çerezler reddedilemez. Bunları sizin yerinize kabul edebiliriz.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Çerezleri benim için kabul et</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Mümkünse reddet veya benim adıma kabul et</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Bunları kendim kabul edeceğim</string>
     <string name="autoconsentPromptCpmOffMessage">Onlarla sizin yerinize biz ilgilenelim. Mümkün olduğunda çerezleri reddedecek, reddedilemeyenleri ise kabul edeceğiz.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Mümkünse reddet veya benim adıma kabul et</string>

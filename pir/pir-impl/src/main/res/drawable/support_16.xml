@@ -1,0 +1,32 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:pathData="M9.375,7.75C9.72,7.75 10,8.03 10,8.375C10,8.72 9.72,9 9.375,9H3.625C3.28,9 3,8.72 3,8.375C3,8.03 3.28,7.75 3.625,7.75H9.375Z" />
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:pathData="M12.375,4.75C12.72,4.75 13,5.03 13,5.375C13,5.72 12.72,6 12.375,6H6.625C6.28,6 6,5.72 6,5.375C6,5.03 6.28,4.75 6.625,4.75H12.375Z" />
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:fillType="evenOdd"
+        android:pathData="M12,1C14.209,1 16,2.791 16,5V9.012C16,11.221 14.209,13.012 12,13.012H9.005C8.895,13.012 8.782,13.047 8.679,13.115L8.579,13.194C7.495,14.237 6.301,15.038 5.311,15.606L4.899,15.835C4.339,16.139 3.741,15.995 3.364,15.622C2.999,15.259 2.842,14.685 3.053,14.128C3.204,13.729 3.331,13.333 3.412,12.99C1.477,12.787 0,11.146 0,9.166V5C0,2.791 1.791,1 4,1H12ZM4,2.25C2.481,2.25 1.25,3.481 1.25,5V9.166C1.25,10.606 2.392,11.762 3.818,11.762C4.057,11.762 4.284,11.856 4.451,12.009C4.601,12.146 4.732,12.362 4.736,12.627L4.729,12.743C4.66,13.309 4.443,13.985 4.222,14.57C4.191,14.651 4.217,14.708 4.244,14.734C4.251,14.741 4.257,14.745 4.261,14.747C4.263,14.748 4.265,14.749 4.266,14.749C4.266,14.749 4.269,14.748 4.271,14.748C4.276,14.747 4.286,14.745 4.304,14.735L4.69,14.519C5.62,13.987 6.723,13.246 7.713,12.294L7.845,12.178C8.165,11.92 8.569,11.762 9.005,11.762H12C13.519,11.762 14.75,10.531 14.75,9.012V5C14.75,3.481 13.519,2.25 12,2.25H4Z" />
+</vector>

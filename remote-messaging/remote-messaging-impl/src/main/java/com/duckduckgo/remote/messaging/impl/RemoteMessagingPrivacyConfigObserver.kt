@@ -25,7 +25,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
@@ -33,9 +34,9 @@ import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
 )
 class RemoteMessagingPrivacyConfigObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

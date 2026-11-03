@@ -25,7 +25,7 @@ import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.duckduckgo.site.permissions.impl.isSiteUnprotectedByUser
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

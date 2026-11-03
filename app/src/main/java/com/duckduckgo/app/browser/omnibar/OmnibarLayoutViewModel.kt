@@ -16,22 +16,18 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.view.MotionEvent.ACTION_UP
-import android.webkit.URLUtil
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
-import com.duckduckgo.app.browser.nativeinput.NativeInputOmnibarFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -61,13 +57,12 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BROWSER_MODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
@@ -79,7 +74,6 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -91,9 +85,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -123,22 +115,18 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
-    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val omnibarPreFillKillSwitch: OmnibarPreFillKillSwitch,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
-    private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
-    private val browserMode: BrowserMode,
     appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
-    private val isProgressBarIndeterminateEnabled =
-        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
+    private val isAnimationUpdateEnabled =
+        isProgressBarUpgradeEnabled && progressBarUpgradeFeature.animationConfigUpdate().isEnabled()
     private val addressBarRebrandToggle = appBrandDesignUpdateToggles.addressBar()
-    private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     // Tracked separately from ViewState so the derived enabledState can be recomputed
     // whenever either the lock or the fire-button highlight changes.
@@ -151,8 +139,8 @@ class OmnibarLayoutViewModel @Inject constructor(
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
-            isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
             isAddressBarRebrandEnabled = addressBarRebrandToggle.isEnabled(),
+            isAnimationUpdateEnabled = isAnimationUpdateEnabled,
         ),
     )
 
@@ -160,30 +148,19 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             _viewState,
             tabRepository.flowTabs,
-            flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
             addressBarTrackersAnimationManager.softwareRenderingModeEnabled,
             browserMenuHighlight.shouldShowHighlightForMode(mode),
-        ) { state, tabs, isAddressBarTrackersAnimationEnabled, useSoftwareRenderingMode, showHighlight ->
+        ) { state, tabs, useSoftwareRenderingMode, showHighlight ->
             state.copy(
                 shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
                 tabCount = tabs.size,
                 hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
                 showBrowserMenuHighlight = showHighlight,
                 viewMode = getViewMode(state),
-                isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
                 useSoftwareRenderingMode = useSoftwareRenderingMode,
             )
         }
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
-
-    private fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
-        is Browser -> BrowserViewMode.Browser
-        is ViewMode.Pdf -> BrowserViewMode.Browser
-        is NewTab -> BrowserViewMode.NewTab
-        is CustomTab -> BrowserViewMode.CustomTab
-        is ViewMode.DuckAI -> BrowserViewMode.DuckAi
-        is Error, is SSLWarning, is MaliciousSiteWarning -> BrowserViewMode.Error
-    }
 
     private fun getViewMode(state: ViewState): ViewMode {
         return if (state.viewMode is CustomTab) {
@@ -220,7 +197,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 true
             }
 
-            else -> showOnNtpAndOnFocus && (viewState.viewMode is NewTab || viewState.hasFocus && viewState.omnibarText.isNotBlank())
+            else -> showOnNtpAndOnFocus && viewState.viewMode is NewTab
         }
     }.distinctUntilChanged()
 
@@ -244,9 +221,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     data class ViewState(
         val viewMode: ViewMode = Browser(null),
         val leadingIconState: LeadingIconState = Search,
-        val previousLeadingIconState: LeadingIconState? = null,
         val privacyShield: PrivacyShieldState = PrivacyShieldState.UNKNOWN,
-        val hasFocus: Boolean = false,
         val query: String = "",
         val omnibarText: String = "",
         val url: String = "",
@@ -257,7 +232,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val hasUnreadTabs: Boolean = false,
         val shouldUpdateTabsCount: Boolean = false,
         val showVoiceSearch: Boolean = false,
-        val showClearButton: Boolean = false,
         val showTabsMenu: Boolean = true,
         val showFireIcon: Boolean = true,
         val showBrowserMenu: Boolean = true,
@@ -272,38 +246,25 @@ class OmnibarLayoutViewModel @Inject constructor(
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
         val isSearchOnly: Boolean = false,
-        val searchOnlyRestoreEnabled: Boolean = false,
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
-        val isNativeInputEnabled: Boolean = false,
         val isNativeChatInputEnabled: Boolean = false,
-        val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
-        val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
         val isAddressBarRebrandEnabled: Boolean = false,
+        val isAnimationUpdateEnabled: Boolean = false,
     ) {
         /**
-         * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
-         * input field setting is enabled, we're not on the new-tab page, and Duck.ai is available in
-         * the address bar (not search-only) — tapping it then opens the contextual sheet. In every
-         * other case (including search-only) it falls back to the standard chat icon. Derived from
-         * flags + viewMode rather than a stored flag so it can't drift out of sync.
+         * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when we're not on
+         * the new-tab page and Duck.ai is available in the address bar (not search-only) — tapping it
+         * then opens the contextual sheet. In every other case (including search-only) it falls back
+         * to the standard chat icon. Derived from viewMode rather than a stored flag so it can't drift
+         * out of sync.
          */
         val showContextualSheetIcon: Boolean
-            get() = isNativeInputEnabled && viewMode !is NewTab && !isSearchOnly
-
-        /**
-         * The click catcher routes an omnibar tap to the native input overlay. Shown when the native
-         * field is on and we should use it for the current context — i.e. we're in Duck.ai (always
-         * UTI) or not in search-only. In search-only the browser omnibar keeps the catcher hidden so
-         * its text input stays focusable and a tap focuses it directly. Derived from flags + viewMode
-         * so it can't drift out of sync.
-         */
-        val showTextInputClickCatcher: Boolean
-            get() = isNativeInputEnabled && (viewMode is ViewMode.DuckAI || !isSearchOnly || searchOnlyRestoreEnabled)
+            get() = viewMode !is NewTab && !isSearchOnly
 
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -327,11 +288,9 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     sealed class Command {
-        data object CancelAnimations : Command()
         data class StartTrackersAnimation(
             val entities: List<Entity>?,
             val isCustomTab: Boolean,
-            val isAddressBarTrackersAnimationEnabled: Boolean,
             val useSoftwareRenderingMode: Boolean,
         ) : Command()
 
@@ -342,10 +301,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         ) : Command()
 
         data object AdBlockingAnimationSuppressed : Command()
-        data object MoveCaretToFront : Command()
         data class LaunchNativeInput(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
-        data object FocusInputField : Command()
         data class CopyUrlToClipboard(val url: String) : Command()
         data object CancelEasterEggLogoAnimation : Command()
     }
@@ -366,20 +323,13 @@ class OmnibarLayoutViewModel @Inject constructor(
     init {
         logVoiceSearchAvailability()
         combine(
-            duckChat.observeNativeInputFieldUserSettingEnabled(),
             duckChat.observeNativeChatInputEnabled(),
             duckChatInputModeState.inputModeCapability,
-            combine(
-                nativeInputOmnibarFeature.self().enabled(),
-                nativeInputOmnibarFeature.nativeInputSearchOnly().enabled(),
-            ) { self, searchOnly -> self && searchOnly },
-        ) { nativeInputEnabled, nativeChatInputEnabled, inputModeCapability, searchOnlyRestoreEnabled ->
+        ) { nativeChatInputEnabled, inputModeCapability ->
             _viewState.update {
                 it.copy(
                     isSearchOnly = inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY,
-                    isNativeInputEnabled = nativeInputEnabled,
                     isNativeChatInputEnabled = nativeChatInputEnabled,
-                    searchOnlyRestoreEnabled = searchOnlyRestoreEnabled,
                 )
             }
         }.launchIn(viewModelScope)
@@ -399,7 +349,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     state.copy(
                         showVoiceSearch = shouldShowVoiceSearch(
                             viewMode = state.viewMode,
-                            hasFocus = state.hasFocus,
                             query = state.omnibarText,
                             hasQueryChanged = false,
                             urlLoaded = state.url,
@@ -411,33 +360,9 @@ class OmnibarLayoutViewModel @Inject constructor(
 
         voiceActiveOnSelectedTab.onEach { voiceActive ->
             _viewState.update {
-                it.copy(showDuckAISidebar = shouldShowDuckAiSidebar(it.viewMode, it.hasFocus, voiceActive))
+                it.copy(showDuckAISidebar = shouldShowDuckAiSidebar(it.viewMode, voiceActive))
             }
         }.launchIn(viewModelScope)
-
-        viewState.map {
-            NewTabPixelParams(
-                isNtp = it.viewMode == NewTab,
-                isFocused = it.hasFocus,
-                isTabSwitcherButtonVisible = it.showTabsMenu,
-                isFireButtonVisible = it.showFireIcon,
-                isBrowserMenuButtonVisible = it.showBrowserMenu,
-            )
-        }.distinctUntilChanged()
-            .filter { it.isNtp && it.isFocused }
-            .onEach {
-                val params = mapOf(
-                    Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to it.isTabSwitcherButtonVisible.toString(),
-                    Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to it.isFireButtonVisible.toString(),
-                    Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to it.isBrowserMenuButtonVisible.toString(),
-                )
-                pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
-            }.launchIn(viewModelScope)
-
-        serpEasterEggLogosToggles.setFavourite().enabled().onEach { isSetFavouriteEasterEggLogoFeatureEnabled ->
-            this.isSetFavouriteEasterEggLogoFeatureEnabled = isSetFavouriteEasterEggLogoFeatureEnabled
-        }.flowOn(dispatcherProvider.io())
-            .launchIn(viewModelScope)
 
         addressBarRebrandToggle.enabled().onEach { isAddressBarRebrandEnabled ->
             _viewState.update {
@@ -461,129 +386,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onOmnibarFocusChanged(
-        hasFocus: Boolean,
-        inputFieldText: String,
-    ) {
-        logcat { "Omnibar: onOmnibarFocusChanged hasFocus $hasFocus" }
-        val showClearButton = hasFocus && inputFieldText.isNotBlank()
-        val showControls = inputFieldText.isBlank() && !isSplitOmnibarEnabled
-
-        if (hasFocus) {
-            viewModelScope.launch {
-                command.send(Command.CancelAnimations)
-            }
-
-            _viewState.update {
-                val shouldUpdateOmnibarText = !isFullUrlEnabled.value &&
-                    !it.omnibarText.isEmpty() &&
-                    it.omnibarText != ABOUT_BLANK &&
-                    !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url) || it.viewMode == ViewMode.DuckAI
-                val omnibarText = if (shouldUpdateOmnibarText) {
-                    if (it.viewMode == ViewMode.DuckAI) {
-                        ""
-                    } else {
-                        it.url
-                    }
-                } else {
-                    it.omnibarText
-                }
-
-                it.copy(
-                    hasFocus = true,
-                    expanded = true,
-                    leadingIconState = Search,
-                    previousLeadingIconState = it.leadingIconState,
-                    highlightPrivacyShield = HighlightableButton.Gone,
-                    showClearButton = showClearButton,
-                    showTabsMenu = showControls,
-                    showFireIcon = showControls,
-                    showBrowserMenu = showControls,
-                    showVoiceSearch = shouldShowVoiceSearch(
-                        viewMode = _viewState.value.viewMode,
-                        hasFocus = true,
-                        query = _viewState.value.omnibarText,
-                        hasQueryChanged = false,
-                        urlLoaded = _viewState.value.url,
-                    ),
-                    updateOmnibarText = shouldUpdateOmnibarText,
-                    omnibarText = omnibarText,
-                    showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
-                    showDuckAISidebar = shouldShowDuckAiSidebar(_viewState.value.viewMode, true),
-                )
-            }
-        } else {
-            _viewState.update {
-                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(isFullUrlEnabled.value)
-                logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
-                val omnibarText = if (shouldUpdateOmnibarText) {
-                    if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
-                        logcat { "Omnibar: is DDG url, showing query ${it.query}" }
-                        it.query
-                    } else {
-                        logcat { "Omnibar: is url, showing URL ${it.url}" }
-                        if (isFullUrlEnabled.value) {
-                            it.url
-                        } else {
-                            addressDisplayFormatter.getShortUrl(it.url)
-                        }
-                    }
-                } else {
-                    logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
-                    it.omnibarText
-                }
-
-                val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
-                    getCurrentSerpLogoUrl(
-                        currentUrl = it.url,
-                        leadingIconState = it.previousLeadingIconState,
-                    )
-                } else {
-                    when (val previousState = it.previousLeadingIconState) {
-                        is EasterEggLogo -> previousState.logoUrl
-                        else -> null
-                    }
-                }
-
-                val isFavouriteEasterEggLogo = it.previousLeadingIconState is EasterEggLogo && it.previousLeadingIconState.isFavourite
-
-                it.copy(
-                    hasFocus = false,
-                    expanded = false,
-                    leadingIconState = getLeadingIconState(
-                        viewMode = _viewState.value.viewMode,
-                        hasFocus = false,
-                        url = it.url,
-                        serpLogoUrl = currentLogoUrl,
-                        isFavouriteSerpLogo = isFavouriteEasterEggLogo,
-                    ),
-                    previousLeadingIconState = null,
-                    highlightFireButton = HighlightableButton.Visible(highlighted = false),
-                    enabledState = enabledStateFor(locked, fireButtonHighlighted = false),
-                    showClearButton = false,
-                    showTabsMenu = !isSplitOmnibarEnabled,
-                    showFireIcon = !isSplitOmnibarEnabled,
-                    showBrowserMenu = !isSplitOmnibarEnabled,
-                    showVoiceSearch = shouldShowVoiceSearch(
-                        viewMode = _viewState.value.viewMode,
-                        hasFocus = false,
-                        query = _viewState.value.omnibarText,
-                        hasQueryChanged = false,
-                        urlLoaded = _viewState.value.url,
-                    ),
-                    updateOmnibarText = shouldUpdateOmnibarText,
-                    omnibarText = omnibarText,
-                    showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
-                    showDuckAISidebar = shouldShowDuckAiSidebar(_viewState.value.viewMode, false),
-                )
-            }
-
-            viewModelScope.launch {
-                command.send(Command.MoveCaretToFront)
-            }
-        }
-    }
-
     fun onOmnibarScrollingEnabledChanged(isEnabled: Boolean) {
         _viewState.update {
             it.copy(
@@ -600,7 +402,6 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun getLeadingIconState(
         viewMode: ViewMode,
-        hasFocus: Boolean,
         url: String,
         serpLogoUrl: String?,
         isFavouriteSerpLogo: Boolean,
@@ -608,10 +409,9 @@ class OmnibarLayoutViewModel @Inject constructor(
         return when (viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
             NewTab -> Search
-            is ViewMode.Pdf -> if (hasFocus) Search else PrivacyShield
+            is ViewMode.Pdf -> PrivacyShield
             else -> {
                 when {
-                    hasFocus -> Search
                     serpLogoUrl != null -> EasterEggLogo(logoUrl = serpLogoUrl, serpUrl = url, isFavourite = isFavouriteSerpLogo)
                     shouldShowDaxIcon(url) -> Dax
                     shouldShowDuckPlayerIcon(url) -> DuckPlayer
@@ -655,7 +455,6 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun shouldShowVoiceSearch(
         viewMode: ViewMode,
-        hasFocus: Boolean = false,
         query: String = "",
         hasQueryChanged: Boolean = false,
         urlLoaded: String = "",
@@ -664,7 +463,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             false
         } else {
             voiceSearchAvailability.shouldShowVoiceSearch(
-                hasFocus = hasFocus,
+                hasFocus = false,
                 query = query,
                 hasQueryChanged = hasQueryChanged,
                 urlLoaded = urlLoaded,
@@ -672,27 +471,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private fun shouldShowDuckAiHeader(
-        viewMode: ViewMode,
-        hasFocus: Boolean,
-    ): Boolean {
-        logcat { "Omnibar: shouldShowDuckAiHeader $viewMode, focus: $hasFocus" }
-        return if (viewMode == ViewMode.DuckAI) {
-            !hasFocus
-        } else {
-            false
-        }
-    }
+    private fun shouldShowDuckAiHeader(viewMode: ViewMode): Boolean = viewMode == ViewMode.DuckAI
 
     private fun shouldShowDuckAiSidebar(
         viewMode: ViewMode,
-        hasFocus: Boolean,
         voiceActive: Boolean = voiceActiveOnSelectedTab.value,
-    ): Boolean = shouldShowDuckAiHeader(viewMode, hasFocus) && !voiceActive
+    ): Boolean = shouldShowDuckAiHeader(viewMode) && !voiceActive
 
     fun onViewModeChanged(viewMode: ViewMode) {
         val currentViewMode = _viewState.value.viewMode
-        val hasFocus = _viewState.value.hasFocus
         logcat { "Omnibar: onViewModeChanged $viewMode" }
         if (currentViewMode is CustomTab) {
             logcat { "Omnibar: custom tab mode enabled, sending updates there" }
@@ -702,7 +489,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     _viewState.update {
                         it.copy(
                             viewMode = viewMode,
-                            showClearButton = false,
                             showVoiceSearch = false,
                             showBrowserMenu = true,
                             showTabsMenu = false,
@@ -716,40 +502,29 @@ class OmnibarLayoutViewModel @Inject constructor(
                     _viewState.update {
                         it.copy(
                             viewMode = viewMode,
-                            showClearButton = false,
                             showVoiceSearch = false,
                             showShadows = true,
                             scrollingEnabled = false,
-                            hasFocus = false,
                             isLoading = false,
                             omnibarText = "",
                             updateOmnibarText = true,
-                            showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
-                            showDuckAISidebar = shouldShowDuckAiSidebar(viewMode, hasFocus),
+                            showDuckAIHeader = shouldShowDuckAiHeader(viewMode),
+                            showDuckAISidebar = shouldShowDuckAiSidebar(viewMode),
                         )
                     }
                 }
 
                 else -> {
                     val scrollingEnabled = viewMode != NewTab
-                    val hasFocus = _viewState.value.hasFocus
-                    val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
-                        getCurrentSerpLogoUrl(
-                            currentUrl = _viewState.value.url,
-                            leadingIconState = _viewState.value.leadingIconState,
-                        )
-                    } else {
-                        when (val leadingIconState = _viewState.value.leadingIconState) {
-                            is EasterEggLogo -> leadingIconState.logoUrl
-                            else -> null
-                        }
-                    }
+                    val currentLogoUrl = getCurrentSerpLogoUrl(
+                        currentUrl = _viewState.value.url,
+                        leadingIconState = _viewState.value.leadingIconState,
+                    )
                     _viewState.update {
                         it.copy(
                             viewMode = viewMode,
                             leadingIconState = getLeadingIconState(
                                 viewMode = viewMode,
-                                hasFocus = hasFocus,
                                 url = _viewState.value.url,
                                 serpLogoUrl = currentLogoUrl,
                                 isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
@@ -757,23 +532,16 @@ class OmnibarLayoutViewModel @Inject constructor(
                             scrollingEnabled = scrollingEnabled,
                             showVoiceSearch = shouldShowVoiceSearch(
                                 viewMode = _viewState.value.viewMode,
-                                hasFocus = _viewState.value.hasFocus,
                                 query = _viewState.value.omnibarText,
                                 hasQueryChanged = false,
                                 urlLoaded = _viewState.value.url,
                             ),
                             showShadows = false,
-                            showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
-                            showDuckAISidebar = shouldShowDuckAiSidebar(viewMode, hasFocus),
+                            showDuckAIHeader = shouldShowDuckAiHeader(viewMode),
+                            showDuckAISidebar = shouldShowDuckAiSidebar(viewMode),
                         )
                     }
                 }
-            }
-        }
-
-        if (currentViewMode == ViewMode.DuckAI && viewMode != ViewMode.DuckAI) {
-            viewModelScope.launch {
-                command.send(Command.FocusInputField)
             }
         }
     }
@@ -783,27 +551,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 privacyShield = privacyShieldState,
-            )
-        }
-    }
-
-    fun onClearTextButtonPressed() {
-        logcat { "Omnibar: onClearTextButtonPressed" }
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED,
-            AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED,
-            AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED,
-        )
-
-        _viewState.update {
-            it.copy(
-                omnibarText = "",
-                updateOmnibarText = true,
-                expanded = true,
-                showClearButton = false,
-                showBrowserMenu = !isSplitOmnibarEnabled,
-                showTabsMenu = !isSplitOmnibarEnabled,
-                showFireIcon = !isSplitOmnibarEnabled,
             )
         }
     }
@@ -854,14 +601,12 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onInputStateChanged(
         query: String,
-        hasFocus: Boolean,
         clearQuery: Boolean,
         deleteLastCharacter: Boolean,
     ) {
-        val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = (!hasFocus || query.isBlank()) && !isSplitOmnibarEnabled
+        val showControls = !isSplitOmnibarEnabled
 
-        logcat { "Omnibar: onInputStateChanged query $query hasFocus $hasFocus clearQuery $clearQuery deleteLastCharacter $deleteLastCharacter" }
+        logcat { "Omnibar: onInputStateChanged query $query clearQuery $clearQuery deleteLastCharacter $deleteLastCharacter" }
 
         _viewState.update {
             val updatedQuery = if (deleteLastCharacter) {
@@ -883,14 +628,11 @@ class OmnibarLayoutViewModel @Inject constructor(
                 query = updatedQuery,
                 omnibarText = query,
                 updateOmnibarText = false,
-                hasFocus = hasFocus,
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
-                showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     viewMode = _viewState.value.viewMode,
-                    hasFocus = hasFocus,
                     query = query,
                     hasQueryChanged = query != updatedQuery,
                     urlLoaded = _viewState.value.url,
@@ -948,7 +690,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     ) {
         logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState forceRender $forceRender" }
         val shouldUpdateText =
-            shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText, _viewState.value.hasFocus) || forceRender
+            shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender
         val state = if (shouldUpdateText) {
             if (forceRender &&
                 !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl) &&
@@ -993,7 +735,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     updateOmnibarText = shouldUpdateText,
                     showVoiceSearch = shouldShowVoiceSearch(
                         viewMode = _viewState.value.viewMode,
-                        hasFocus = omnibarViewState.isEditing,
                         query = omnibarViewState.omnibarText,
                         hasQueryChanged = true,
                         urlLoaded = _viewState.value.url,
@@ -1001,7 +742,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     leadingIconState = when (omnibarViewState.serpLogo) {
                         is SerpLogo.EasterEgg -> getLeadingIconState(
                             viewMode = _viewState.value.viewMode,
-                            hasFocus = omnibarViewState.isEditing,
                             url = _viewState.value.url,
                             serpLogoUrl = omnibarViewState.serpLogo.logoUrl,
                             isFavouriteSerpLogo = omnibarViewState.serpLogo.isFavourite,
@@ -1009,36 +749,23 @@ class OmnibarLayoutViewModel @Inject constructor(
 
                         SerpLogo.Normal -> getLeadingIconState(
                             viewMode = _viewState.value.viewMode,
-                            hasFocus = omnibarViewState.isEditing,
                             url = _viewState.value.url,
                             serpLogoUrl = null,
                             isFavouriteSerpLogo = false,
                         )
 
                         null -> {
-                            if (isSetFavouriteEasterEggLogoFeatureEnabled) {
-                                // serpLogo is null - preserve existing Easter Egg if present
-                                val currentLogoUrl = getCurrentSerpLogoUrl(
-                                    currentUrl = _viewState.value.url,
-                                    leadingIconState = _viewState.value.leadingIconState,
-                                )
-                                getLeadingIconState(
-                                    viewMode = _viewState.value.viewMode,
-                                    hasFocus = omnibarViewState.isEditing,
-                                    url = _viewState.value.url,
-                                    serpLogoUrl = currentLogoUrl,
-                                    isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
-                                )
-                            } else {
-                                // previous behaviour for null
-                                getLeadingIconState(
-                                    viewMode = _viewState.value.viewMode,
-                                    hasFocus = omnibarViewState.isEditing,
-                                    url = _viewState.value.url,
-                                    serpLogoUrl = null,
-                                    isFavouriteSerpLogo = false,
-                                )
-                            }
+                            // A null logo means extraction is pending, so preserve an existing SERP logo.
+                            val currentLogoUrl = getCurrentSerpLogoUrl(
+                                currentUrl = _viewState.value.url,
+                                leadingIconState = _viewState.value.leadingIconState,
+                            )
+                            getLeadingIconState(
+                                viewMode = _viewState.value.viewMode,
+                                url = _viewState.value.url,
+                                serpLogoUrl = currentLogoUrl,
+                                isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
+                            )
                         }
                     },
                 )
@@ -1048,17 +775,10 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
         logcat { "Omnibar: onExternalLoadingStateChanged $loadingState" }
-        val currentLogoUrl = if (isSetFavouriteEasterEggLogoFeatureEnabled) {
-            getCurrentSerpLogoUrl(
-                currentUrl = loadingState.url,
-                leadingIconState = _viewState.value.leadingIconState,
-            )
-        } else {
-            when (val leadingIconState = _viewState.value.leadingIconState) {
-                is EasterEggLogo -> leadingIconState.logoUrl
-                else -> null
-            }
-        }
+        val currentLogoUrl = getCurrentSerpLogoUrl(
+            currentUrl = loadingState.url,
+            leadingIconState = _viewState.value.leadingIconState,
+        )
         _viewState.update {
             it.copy(
                 url = loadingState.url,
@@ -1066,73 +786,18 @@ class OmnibarLayoutViewModel @Inject constructor(
                 loadingProgress = loadingState.progress,
                 leadingIconState = getLeadingIconState(
                     viewMode = _viewState.value.viewMode,
-                    hasFocus = it.hasFocus,
                     url = loadingState.url,
                     serpLogoUrl = currentLogoUrl,
                     isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
                 ),
                 showVoiceSearch = shouldShowVoiceSearch(
                     viewMode = _viewState.value.viewMode,
-                    hasFocus = _viewState.value.hasFocus,
                     query = _viewState.value.omnibarText,
                     hasQueryChanged = false,
                     urlLoaded = loadingState.url,
                 ),
             )
         }
-    }
-
-    fun onUserTouchedOmnibarTextInput(touchAction: Int) {
-        logcat { "Omnibar: onUserTouchedOmnibarTextInput" }
-        if (touchAction == ACTION_UP) {
-            if (_viewState.value.viewMode == ViewMode.DuckAI) {
-                pixel.fire(
-                    AppPixelName.ADDRESS_BAR_AICHAT_CLICKED,
-                    mapOf(BROWSER_MODE to browserMode.name.lowercase()),
-                )
-            } else {
-                firePixelBasedOnCurrentUrl(
-                    AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
-                    AppPixelName.ADDRESS_BAR_SERP_CLICKED,
-                    AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
-                    extraParams = mapOf(BROWSER_MODE to browserMode.name.lowercase()),
-                )
-            }
-        }
-    }
-
-    fun onBackKeyPressed() {
-        logcat { "Omnibar: onBackKeyPressed" }
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED,
-            AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
-            AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED,
-        )
-        _viewState.update {
-            it.copy(
-                omnibarText = if (isFullUrlEnabled.value) it.url else addressDisplayFormatter.getShortUrl(it.url),
-                updateOmnibarText = true,
-            )
-        }
-    }
-
-    fun onBackButtonPressed() {
-        logcat { "Omnibar: onBackButtonPressed" }
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLOSED,
-            AppPixelName.ADDRESS_BAR_SERP_CLOSED,
-            AppPixelName.ADDRESS_BAR_WEBSITE_CLOSED,
-        )
-        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED)
-    }
-
-    fun onEnterKeyPressed() {
-        logcat { "Omnibar: onEnterKeyPressed" }
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED,
-            AppPixelName.KEYBOARD_GO_SERP_CLICKED,
-            AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
-        )
     }
 
     fun onAnimationStarted(decoration: Decoration) {
@@ -1145,31 +810,26 @@ class OmnibarLayoutViewModel @Inject constructor(
 
             is LaunchTrackersAnimation -> {
                 if (!decoration.entities.isNullOrEmpty()) {
-                    val hasFocus = _viewState.value.hasFocus
-                    if (!hasFocus) {
-                        _viewState.update {
-                            it.copy(
-                                leadingIconState = PrivacyShield,
-                            )
-                        }
-                        viewModelScope.launch {
-                            command.send(
-                                Command.StartTrackersAnimation(
-                                    entities = decoration.entities,
-                                    isCustomTab = viewState.value.viewMode is CustomTab,
-                                    isAddressBarTrackersAnimationEnabled = viewState.value.isAddressBarTrackersAnimationEnabled,
-                                    useSoftwareRenderingMode = viewState.value.useSoftwareRenderingMode,
-                                ),
-                            )
-                        }
+                    _viewState.update {
+                        it.copy(
+                            leadingIconState = PrivacyShield,
+                        )
+                    }
+                    viewModelScope.launch {
+                        command.send(
+                            Command.StartTrackersAnimation(
+                                entities = decoration.entities,
+                                isCustomTab = viewState.value.viewMode is CustomTab,
+                                useSoftwareRenderingMode = viewState.value.useSoftwareRenderingMode,
+                            ),
+                        )
                     }
                 }
             }
 
             is LaunchAdBlockingAnimation -> {
-                val hasFocus = _viewState.value.hasFocus
                 val isCustomTab = viewState.value.viewMode is CustomTab
-                if (!hasFocus && !isCustomTab) {
+                if (!isCustomTab) {
                     _viewState.update {
                         it.copy(
                             leadingIconState = PrivacyShield,
@@ -1194,30 +854,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private fun shouldUpdateOmnibarTextInput(
         viewState: OmnibarViewState,
         currentText: String,
-        hasFocus: Boolean,
-    ) = (!hasFocus || viewState.omnibarText.isEmpty()) && currentText != viewState.omnibarText
-
-    private fun firePixelBasedOnCurrentUrl(
-        emptyUrlPixel: AppPixelName,
-        duckDuckGoQueryUrlPixel: AppPixelName,
-        websiteUrlPixel: AppPixelName,
-        extraParams: Map<String, String> = emptyMap(),
-    ) {
-        val text = _viewState.value.url
-        if (text.isEmpty()) {
-            pixel.fire(emptyUrlPixel, extraParams)
-        } else if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(text)) {
-            pixel.fire(duckDuckGoQueryUrlPixel, extraParams)
-        } else if (isUrl(text)) {
-            pixel.fire(websiteUrlPixel, extraParams)
-        }
-    }
-
-    private fun isUrl(text: String): Boolean {
-        return URLUtil.isNetworkUrl(text) || URLUtil.isAssetUrl(text) || URLUtil.isFileUrl(text) || URLUtil.isContentUrl(
-            text,
-        )
-    }
+    ) = currentText != viewState.omnibarText
 
     fun onVoiceSearchDisabled(url: String) {
         logcat { "Omnibar: onVoiceSearchDisabled" }
@@ -1247,7 +884,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onDuckChatButtonPressed() {
         viewModelScope.launch {
             val launchSource = when {
-                viewState.value.hasFocus -> "focused"
                 viewState.value.viewMode is NewTab -> "ntp"
                 viewState.value.viewMode is Browser -> when {
                     duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(viewState.value.url) -> "serp"
@@ -1282,18 +918,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onDuckAiHeaderClicked() {
-        if (viewState.value.showTextInputClickCatcher) {
-            onTextInputClickCatcherClicked()
-        } else {
-            _viewState.update {
-                it.copy(
-                    showDuckAIHeader = false,
-                )
-            }
-            viewModelScope.launch {
-                command.send(Command.FocusInputField)
-            }
-        }
+        onTextInputClickCatcherClicked()
     }
 
     fun onTextInputClickCatcherClicked() {
@@ -1336,15 +961,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private data class NewTabPixelParams(
-        val isNtp: Boolean,
-        val isFocused: Boolean,
-        val isTabSwitcherButtonVisible: Boolean,
-        val isFireButtonVisible: Boolean,
-        val isBrowserMenuButtonVisible: Boolean,
-    )
-
     companion object {
         private const val ABOUT_BLANK = "about:blank"
     }
+}
+
+internal fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
+    is Browser -> BrowserViewMode.Browser
+    is ViewMode.Pdf -> BrowserViewMode.Browser
+    is NewTab -> BrowserViewMode.NewTab
+    is CustomTab -> BrowserViewMode.CustomTab
+    is ViewMode.DuckAI -> BrowserViewMode.DuckAi
+    is Error, is SSLWarning, is MaliciousSiteWarning -> BrowserViewMode.Error
 }

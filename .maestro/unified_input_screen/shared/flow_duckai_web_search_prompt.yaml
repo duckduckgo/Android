@@ -29,7 +29,7 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: "Remove Web Search"
 - tapOn:
-    id: "actionSend"
+    id: "nativeInputSubmitButton|nativeInputAskButton"
 
 # handle the duck.ai T&C if it appears (first run only)
 - runFlow: ../../shared/accept_duckai_agreement.yaml

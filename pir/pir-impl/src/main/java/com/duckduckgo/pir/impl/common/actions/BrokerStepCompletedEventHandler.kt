@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.common.PirJob.RunType.SCHEDULED
@@ -43,13 +44,14 @@ import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.getCategory
 import com.duckduckgo.pir.impl.scripts.models.getDetails
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class BrokerStepCompletedEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -118,6 +120,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
         when (state.runType) {
             RunType.MANUAL, SCHEDULED -> {
                 val isManual = state.runType == RunType.MANUAL
+                val isFreeScan = (currentBrokerStep as? ScanStep)?.isFreeScan == true
                 if (lastAction == null) return
 
                 if (isSuccess) {
@@ -130,6 +133,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                             startTimeInMillis = brokerStartTime,
                             isManualRun = isManual,
                             lastAction = lastAction,
+                            isFreeScan = isFreeScan,
                         ),
                     )
                 } else {
@@ -146,6 +150,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                             errorCategory = failure.error.getCategory(),
                             errorDetails = failure.error.getDetails(),
                             failedAction = lastAction,
+                            isFreeScan = isFreeScan,
                         ),
                     )
                 }

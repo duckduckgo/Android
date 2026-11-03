@@ -18,13 +18,13 @@ package com.duckduckgo.autoconsent.impl.prompt
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelParameters
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -59,6 +59,7 @@ class CookiePopupOptInViewModel @Inject constructor(
         val variant: Variant,
         val isBackDismissEnabled: Boolean,
         val isCloseButtonVisible: Boolean,
+        val useV2PrimaryButtonCopy: Boolean,
     )
 
     sealed class Command {
@@ -67,13 +68,17 @@ class CookiePopupOptInViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    private val viewStateFlow = MutableStateFlow(
-        ViewState(
-            variant = if (autoconsent.isSettingEnabled()) Variant.PROTECTION_ON else Variant.PROTECTION_OFF,
-            isBackDismissEnabled = autoconsentFeature.cookiePopUpOptInPromptDismissible().isEnabled(),
-            isCloseButtonVisible = autoconsentFeature.cookiePopUpOptInPromptCloseButton().isEnabled(),
-        ),
-    )
+    private val viewStateFlow = run {
+        val protectionEnabled = autoconsent.isSettingEnabled()
+        MutableStateFlow(
+            ViewState(
+                variant = if (protectionEnabled) Variant.PROTECTION_ON else Variant.PROTECTION_OFF,
+                isBackDismissEnabled = autoconsentFeature.cookiePopUpOptInPromptDismissible().isEnabled(),
+                isCloseButtonVisible = autoconsentFeature.cookiePopUpOptInPromptCloseButton().isEnabled(),
+                useV2PrimaryButtonCopy = protectionEnabled && autoconsentFeature.cookiePopUpOptInPromptPrimaryButtonV2().isEnabled(),
+            ),
+        )
+    }
     val viewState: StateFlow<ViewState> = viewStateFlow
 
     fun commands(): Flow<Command> = command.receiveAsFlow()

@@ -23,12 +23,12 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DuckPlayerContentScopeConfigPlugin @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val appBuildConfig: AppBuildConfig,

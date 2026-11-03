@@ -18,10 +18,10 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat

@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">You can always adjust later in Settings.</string>
     <string name="autoconsentPromptCpmOnMessage">Some cookies can\'t be rejected. We can accept these for you.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Accept cookies for me</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Reject if possible or accept for me</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">I\'ll accept them myself</string>
     <string name="autoconsentPromptCpmOffMessage">Let us deal with them for you. We\'ll reject cookies when possible, and accept those that can\'t be rejected.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Reject if possible or accept for me</string>

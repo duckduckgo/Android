@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Înainte</string>
     <string name="browserMenuRefresh">Reîncărcare</string>
     <string name="browserMenuFireTabsData">Șterge filele și datele</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Chat vocal nou</string>
+    <string name="chatMenuPopupNewImage">Imagine nouă</string>
+    <string name="chatMenuPopupNewTab">Filă nouă</string>
+    <string name="chatMenuPopupNewFireTab">Noua filă Fire</string>
 </resources>

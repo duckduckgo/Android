@@ -31,11 +31,16 @@ import com.intellij.psi.PsiParameter
 import org.jetbrains.uast.UBlockExpression
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UIfExpression
 import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.UParenthesizedExpression
 import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.UReferenceExpression
 import org.jetbrains.uast.UReturnExpression
+import org.jetbrains.uast.USwitchClauseExpressionWithBody
+import org.jetbrains.uast.USwitchExpression
 import org.jetbrains.uast.UVariable
+import org.jetbrains.uast.UYieldExpression
 import org.jetbrains.uast.getParameterForArgument
 import org.jetbrains.uast.toUElement
 import java.util.EnumSet
@@ -72,6 +77,53 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
         }
 
         private fun isFromValidDuckDuckGoColorSource(argument: UExpression): Boolean {
+            return isValidColorExpression(argument, depth = 0, visited = mutableSetOf())
+        }
+
+        /**
+         * Accepts a colour expression when every value it can evaluate to is a valid theme colour. This is
+         * what lets a light/dark switch such as `if (isDark) White48 else Black48` pass: each branch is
+         * checked on its own, so the rule keeps validating the colours rather than stopping at the `if`.
+         * A branch-less `if` or a `when` without `else` is rejected, since it can evaluate to no colour at all.
+         */
+        private fun isValidColorExpression(
+            expression: UExpression,
+            depth: Int,
+            visited: MutableSet<PsiElement>,
+        ): Boolean {
+            return when (expression) {
+                is UParenthesizedExpression -> isValidColorExpression(expression.expression, depth, visited)
+                is UYieldExpression -> {
+                    val yielded = expression.expression ?: return false
+                    isValidColorExpression(yielded, depth, visited)
+                }
+                is UBlockExpression -> {
+                    val single = singleExpressionBody(expression) ?: return false
+                    isValidColorExpression(single, depth, visited)
+                }
+                is UIfExpression -> {
+                    val thenBranch = expression.thenExpression ?: return false
+                    val elseBranch = expression.elseExpression ?: return false
+                    isValidColorExpression(thenBranch, depth, visited) && isValidColorExpression(elseBranch, depth, visited)
+                }
+                is USwitchExpression -> {
+                    val clauses = expression.body.expressions.filterIsInstance<USwitchClauseExpressionWithBody>()
+                    val hasElse = clauses.any { it.caseValues.isEmpty() }
+                    if (!hasElse) return false
+                    clauses.all { clause ->
+                        val result = clause.body.expressions.lastOrNull() ?: return false
+                        isValidColorExpression(result, depth, visited)
+                    }
+                }
+                else -> isValidColorReference(expression, depth, visited)
+            }
+        }
+
+        private fun isValidColorReference(
+            argument: UExpression,
+            depth: Int,
+            visited: MutableSet<PsiElement>,
+        ): Boolean {
             val source = argument.sourcePsi?.text.orEmpty()
 
             // Direct semantic color access on theme.
@@ -85,11 +137,7 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
             if (resolveExpression(argument) is PsiParameter) return true
 
             // Reference via defaults object/property: validate declaration implementation.
-            return resolvesToValidatedColorDeclaration(
-                expression = argument,
-                depth = 0,
-                visited = mutableSetOf(),
-            )
+            return resolvesToValidatedColorDeclaration(argument, depth, visited)
         }
 
         private fun containsSemanticThemeColorPath(source: String): Boolean {
@@ -128,25 +176,50 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
 
             val resolved = resolveExpression(expression) ?: return false
             if (!visited.add(resolved)) return false
+            try {
+                return isValidatedColorDeclaration(resolved, depth, visited)
+            } finally {
+                visited.remove(resolved)
+            }
+        }
 
+        private fun isValidatedColorDeclaration(
+            resolved: PsiElement,
+            depth: Int,
+            visited: MutableSet<PsiElement>,
+        ): Boolean {
             if (isThemePackageElement(resolved)) return true
 
             val declaration = resolved.navigationElement ?: resolved
             val declarationText = declaration.text.orEmpty()
             if (declarationText.isBlank()) return false
 
+            val body = bodyExpressionOf(resolved)
+            if (body != null && isBranchExpression(body)) return isValidColorExpression(body, depth + 1, visited)
+
             if (containsSemanticThemeColorPath(declarationText)) return true
             if (declarationText.contains(COLOR_THEME_PACKAGE)) return true
             if (containsArbitraryComposeColorLiteral(declarationText)) return false
 
-            val body = bodyExpressionOf(resolved) ?: return false
-            return resolvesToValidatedColorDeclaration(body, depth + 1, visited)
+            return isValidColorExpression(body ?: return false, depth + 1, visited)
+        }
+
+        private fun isBranchExpression(expression: UExpression): Boolean {
+            return when (expression) {
+                is UIfExpression, is USwitchExpression -> true
+                is UParenthesizedExpression -> isBranchExpression(expression.expression)
+                is UBlockExpression -> singleExpressionBody(expression)?.let(::isBranchExpression) ?: false
+                else -> false
+            }
         }
 
         private fun bodyExpressionOf(element: PsiElement): UExpression? {
             return when (val u = element.toUElement()) {
                 is UVariable -> u.uastInitializer
+                // A property reference resolves to its light getter, whose UAST body is null when the getter is
+                // implicit; the colour then lives in the property initializer.
                 is UMethod -> singleExpressionBody(u.uastBody)
+                    ?: (element.navigationElement.toUElement() as? UVariable)?.uastInitializer
                 else -> null
             }
         }

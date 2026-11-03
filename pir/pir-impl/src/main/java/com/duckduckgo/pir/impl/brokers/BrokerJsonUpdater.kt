@@ -24,7 +24,7 @@ import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR

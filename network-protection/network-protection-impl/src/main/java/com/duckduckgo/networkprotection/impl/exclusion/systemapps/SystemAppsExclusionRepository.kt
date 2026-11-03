@@ -34,8 +34,8 @@ import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExcl
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory.Networking
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory.Others
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -63,7 +63,7 @@ interface SystemAppsExclusionRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealSystemAppsExclusionRepository @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val sharedPreferencesProvider: SharedPreferencesProvider,

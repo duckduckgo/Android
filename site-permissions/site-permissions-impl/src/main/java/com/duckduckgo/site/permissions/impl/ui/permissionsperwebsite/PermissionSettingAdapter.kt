@@ -20,9 +20,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.site.permissions.impl.databinding.ItemSitePermissionSettingSelectionBinding
+import com.duckduckgo.site.permissions.impl.ui.GlobalPermission
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionSettingAdapter.ViewHolder
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.ASK_DISABLED
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.DENY
 
-class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewModel) : RecyclerView.Adapter<ViewHolder>() {
+class PermissionSettingAdapter(
+    private val viewModel: PermissionsPerWebsiteViewModel,
+    private val permissionSettingsRedesign: Boolean,
+) : RecyclerView.Adapter<ViewHolder>() {
 
     private var items: List<WebsitePermissionSetting> = listOf()
 
@@ -38,6 +44,7 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
         ViewHolder(
             ItemSitePermissionSettingSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             viewModel,
+            permissionSettingsRedesign,
         )
 
     override fun onBindViewHolder(
@@ -52,13 +59,22 @@ class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewM
     class ViewHolder(
         private val binding: ItemSitePermissionSettingSelectionBinding,
         private val viewModel: PermissionsPerWebsiteViewModel,
+        private val permissionSettingsRedesign: Boolean,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(setting: WebsitePermissionSetting) {
             val context = binding.root.context
             binding.permissionSettingListItem.apply {
-                setLeadingIconResource(setting.icon)
-                setPrimaryText(context.getString(setting.title))
-                setSecondaryText(context.getString(setting.setting.stringRes))
+                if (permissionSettingsRedesign) {
+                    val permission = GlobalPermission.from(setting.title)
+                    val blocked = setting.setting == ASK_DISABLED || setting.setting == DENY
+                    setLeadingIconResource(permission?.let { if (blocked) it.blockedIcon else it.icon } ?: setting.icon)
+                    setPrimaryText(context.getString(permission?.settingTitle ?: setting.title))
+                    setSecondaryText(context.getString(setting.setting.redesignedStringRes))
+                } else {
+                    setLeadingIconResource(setting.icon)
+                    setPrimaryText(context.getString(setting.title))
+                    setSecondaryText(context.getString(setting.setting.stringRes))
+                }
                 setOnClickListener { viewModel.permissionSettingSelected(setting) }
             }
         }

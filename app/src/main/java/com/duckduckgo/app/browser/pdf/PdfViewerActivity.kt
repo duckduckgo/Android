@@ -25,8 +25,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import androidx.core.view.children
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityPdfViewerBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
@@ -35,11 +33,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
@@ -52,9 +50,6 @@ class PdfViewerActivity : DuckDuckGoActivity() {
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityPdfViewerBinding by viewBinding()
@@ -63,15 +58,10 @@ class PdfViewerActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
         // Default inset is too wide between the back arrow and title on this screen.
         binding.includeToolbar.toolbar.contentInsetStartWithNavigation =
             TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics).toInt()

@@ -182,6 +182,11 @@ interface PirRepository {
      */
     suspend fun getValidUserProfileQueries(): List<ProfileQuery>
 
+    /**
+     * Returns whether any user profile query not marked as deprecated is stored.
+     */
+    suspend fun hasValidUserProfileQueries(): Boolean
+
     suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery>
 
     suspend fun deleteAllUserProfilesQueries()
@@ -653,6 +658,11 @@ class RealPirRepository(
             }.orEmpty()
         }
 
+    override suspend fun hasValidUserProfileQueries(): Boolean =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao()?.hasValidUserProfiles() ?: false
+        }
+
     override suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery> =
         withContext(dispatcherProvider.io()) {
             userProfileDao()?.getUserProfilesWithIds(ids)?.map {
@@ -702,8 +712,9 @@ class RealPirRepository(
         profileQueriesToUpdate: List<ProfileQuery>,
         profileQueryIdsToDelete: List<Long>,
     ): Boolean = withContext(dispatcherProvider.io()) {
+        val dao = userProfileDao() ?: return@withContext false
         try {
-            userProfileDao()?.updateUserProfiles(
+            dao.updateUserProfiles(
                 profilesToAdd = profileQueriesToAdd.map { query -> query.toUserProfile() },
                 profilesToUpdate = profileQueriesToUpdate.map { query -> query.toUserProfile() },
                 profileIdsToDelete = profileQueryIdsToDelete,

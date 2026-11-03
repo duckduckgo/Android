@@ -40,6 +40,11 @@ object PirJobConstants {
     const val CUSTOM_PIXEL_INTERVAL_HOURS = 5L
     const val BG_STATS_REPORT_INTERVAL_HOURS = 24L
     const val BG_SCAN_RUN_THRESHOLD_HRS = 48L
+
+    /**
+     * How long a freemium user's periodic scan worker survives an unfinished initial scan.
+     */
+    const val FREE_SCAN_BACKGROUND_WINDOW_DAYS = 7L
     val preSeedList = listOf(
         "Spokeo",
     )

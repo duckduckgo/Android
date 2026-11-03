@@ -16,13 +16,16 @@
 
 package com.duckduckgo.app.global.view
 
+import android.app.ActivityManager
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import androidx.core.content.getSystemService
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.SiteDataCleaner
@@ -31,7 +34,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -61,6 +64,11 @@ interface ClearDataAction {
      * Clears tabs and associated data.
      */
     suspend fun clearTabsOnly()
+
+    /**
+     * Closes the custom tabs that are open now, including those in other apps' tasks.
+     */
+    suspend fun closeCustomTabs()
 
     /**
      * Clears browser data except tabs and chats.
@@ -98,8 +106,14 @@ interface ClearDataAction {
      * @param notifyDataCleared whether to notify that data has been cleared
      * @param enableTransitionAnimation whether to enable transition animation during restart
      * @param deletedTabCount number of tabs that were deleted (shown in the snackbar)
+     * @param query opened in the browser after the restart
      */
-    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true, deletedTabCount: Int = 0)
+    fun killAndRestartProcess(
+        notifyDataCleared: Boolean,
+        enableTransitionAnimation: Boolean = true,
+        deletedTabCount: Int = 0,
+        query: String? = null,
+    )
 }
 
 class ClearPersonalDataAction(
@@ -117,7 +131,7 @@ class ClearPersonalDataAction(
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
+    private val webTrackersBlockedHistory: WebTrackersBlockedHistory,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     duckAiHostProvider: DuckAiHostProvider,
@@ -125,9 +139,9 @@ class ClearPersonalDataAction(
     private val sitePreferencesDataClearer: SitePreferencesDataClearer,
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int, query: String?) {
         logcat(INFO) { "Restarting process" }
-        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation, deletedTabCount)
+        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation, deletedTabCount, query)
     }
 
     override fun killProcess() {
@@ -142,6 +156,17 @@ class ClearPersonalDataAction(
         }
     }
 
+    override suspend fun closeCustomTabs() {
+        withContext(dispatchers.io()) {
+            settingsDataStore.tabsClearedCount++
+
+            // Tabs in their own task aren't closed by clearing the browser's tabs, so close them here.
+            context.getSystemService<ActivityManager>()?.appTasks
+                ?.filter { it.taskInfo.baseIntent.component?.className == CustomTabActivity::class.java.name }
+                ?.forEach { it.finishAndRemoveTask() }
+        }
+    }
+
     override suspend fun clearBrowserDataOnly(shouldFireDataClearPixel: Boolean) {
         withContext(dispatchers.io()) {
             clearFireproofExemptData()
@@ -151,7 +176,7 @@ class ClearPersonalDataAction(
                 savedSitesRepository.pruneDeleted()
             }
 
-            webTrackersBlockedRepository.deleteAll()
+            webTrackersBlockedHistory.deleteAll()
 
             navigationHistory.clearHistory()
             tabVisitedSitesRepository.clearAll()
@@ -186,12 +211,11 @@ class ClearPersonalDataAction(
         }
 
         return try {
-            // Keep fireproofed sites out of the burn; host-fallback key so IPs/localhost are retained too.
-            val fireproofDomains = withContext(dispatchers.io()) {
-                fireproofWebsiteRepository.fireproofWebsitesSync()
-                    .map { it.domain.toTldPlusOneOrSelf() }
-                    .toSet()
+            // Keep fireproofed sites out of the burn; host-fallback key so IPs/localhost are retained too
+            val fireproofHosts = withContext(dispatchers.io()) {
+                fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             }
+            val fireproofDomains = fireproofHosts.map { it.toTldPlusOneOrSelf() }.toSet()
 
             val domainsToClear = domains
                 .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
@@ -205,6 +229,8 @@ class ClearPersonalDataAction(
                 logcat(INFO) { "Cleared site data for ${domains.size} domains" }
             }
 
+            // Raw fireproof hosts (not eTLD+1) to match full fire (only the exact fireproofed host keeps its permissions)
+            sitePermissionsManager.clearForDomainsButFireproof(domains, fireproofHosts)
             sitePreferencesDataClearer.clear(domainsToClear)
 
             ClearDataResult.Success

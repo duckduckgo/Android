@@ -23,7 +23,7 @@ import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_IGNOR
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import io.reactivex.schedulers.Schedulers
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN

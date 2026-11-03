@@ -17,9 +17,8 @@
 package com.duckduckgo.duckchat.impl.contextual.suggestions
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -46,21 +45,17 @@ class ContextualSuggestionsViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val suggestedPromptsProvider: ContextualSuggestedPromptsProvider = mock()
-    private val duckChatFeature: DuckChatFeature = mock()
-    private val suggestedPromptsToggle: Toggle = mock()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
 
     private val viewModel = ContextualSuggestionsViewModel(
         suggestedPromptsProvider = suggestedPromptsProvider,
-        duckChatFeature = duckChatFeature,
-        dispatchers = coroutineRule.testDispatcherProvider,
         duckChatPixels = duckChatPixels,
+        selectionJourney = selectionJourney,
     )
 
     @Before
     fun setup() {
-        whenever(duckChatFeature.contextualSuggestedPrompts()).thenReturn(suggestedPromptsToggle)
-        whenever(suggestedPromptsToggle.isEnabled()).thenReturn(true)
         runBlocking {
             stubProvider(emptyList())
             whenever(suggestedPromptsProvider.maxSuggestedPrompts()).thenReturn(4)
@@ -75,18 +70,6 @@ class ContextualSuggestionsViewModelTest {
     ) {
         whenever(suggestedPromptsProvider.resolveSuggestions(any()))
             .thenReturn(ResolvedPageSuggestions(suggestions = result, isSmart = isSmart, pageType = pageType))
-    }
-
-    @Test
-    fun `when feature disabled then load does nothing`() = runTest {
-        whenever(suggestedPromptsToggle.isEnabled()).thenReturn(false)
-
-        viewModel.load()
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertFalse(viewModel.viewState.value.loading)
-        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
-        verify(suggestedPromptsProvider, never()).resolveSuggestions(any())
     }
 
     @Test
@@ -185,42 +168,6 @@ class ContextualSuggestionsViewModelTest {
 
         assertTrue(viewModel.viewState.value.loading)
         verify(suggestedPromptsProvider, never()).resolveSuggestions(any())
-    }
-
-    @Test
-    fun `when feature disabled then page context is ignored`() = runTest {
-        whenever(suggestedPromptsToggle.isEnabled()).thenReturn(false)
-
-        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
-
-        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
-        verify(suggestedPromptsProvider, never()).resolveSuggestions(any())
-    }
-
-    @Test
-    fun `when feature disabled after suggestions rendered then next load clears them`() = runTest {
-        stubProvider(listOf(ContextualSuggestedPrompt("id", "Label", "Prompt.", null)))
-        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
-        assertTrue(viewModel.viewState.value.suggestions.isNotEmpty())
-
-        whenever(suggestedPromptsToggle.isEnabled()).thenReturn(false)
-        viewModel.load()
-        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
-        assertFalse(viewModel.viewState.value.loading)
-    }
-
-    @Test
-    fun `when feature disabled after suggestions rendered then next page context clears them`() = runTest {
-        stubProvider(listOf(ContextualSuggestedPrompt("id", "Label", "Prompt.", null)))
-        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
-        assertTrue(viewModel.viewState.value.suggestions.isNotEmpty())
-
-        whenever(suggestedPromptsToggle.isEnabled()).thenReturn(false)
-        viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com/next","content":"c"}""")
-
-        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
     }
 
     @Test
@@ -441,5 +388,84 @@ class ContextualSuggestionsViewModelTest {
         viewModel.onPageContextUpdated("""{"title":"T","url":"https://example.com","content":"c"}""")
 
         assertEquals(SuggestionsPageType.RECIPE, viewModel.currentPageType())
+    }
+
+    @Test
+    fun whenSingleTextSelectionAttachedThenSelectionSuggestionsShown() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+            ContextualSuggestedPrompt("translate-selection", "Translate this selection", "Translate this selection into English.", "translate"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
+    }
+
+    @Test
+    fun whenSelectionSuggestionsShownThenJourneyToldTheyWereViewed() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0, textSelectionsTabId = "tab-1")
+
+        verify(selectionJourney).onSuggestionsViewed("tab-1")
+    }
+
+    @Test
+    fun whenSelectionSuggestionsResolvedButHiddenThenJourneyNotToldTheyWereViewed() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 1, textSelectionsTabId = "tab-1")
+
+        verify(selectionJourney, never()).onSuggestionsViewed(any())
+    }
+
+    @Test
+    fun whenMoreThanOneTextSelectionAttachedThenSelectionSuggestionsHidden() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        viewModel.onAttachmentsChanged(textSelections = 2, otherAttachments = 0)
+
+        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenTextSelectionAttachedAlongsideOtherAttachmentThenSelectionSuggestionsHidden() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 1)
+
+        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenExtraSelectionRemovedThenAllSelectionSuggestionsRestoredWithoutReresolving() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+            ContextualSuggestedPrompt("translate-selection", "Translate this selection", "Translate this selection into English.", "translate"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        viewModel.onAttachmentsChanged(textSelections = 2, otherAttachments = 0)
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
+        verify(suggestedPromptsProvider, times(1)).resolveTextSelectionSuggestions(any())
     }
 }

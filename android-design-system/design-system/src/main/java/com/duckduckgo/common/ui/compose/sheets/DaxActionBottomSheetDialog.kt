@@ -89,7 +89,7 @@ fun DaxActionBottomSheetDialog(
                 verticalArrangement = verticalArrangement,
                 horizontalAlignment = horizontalAlignment,
                 userScrollEnabled = userScrollEnabled,
-                contentPadding = PaddingValues(vertical = DaxActionBottomSheetDefaults.sheetVerticalPadding),
+                contentPadding = PaddingValues(vertical = DaxActionBottomSheetDefaults.SheetVerticalPadding),
                 content = {
                     if (title != null) {
                         item {
@@ -116,7 +116,7 @@ private fun DaxActionTitleBottomSheetDialog(
         color = contentColor,
         style = daxStyle,
         modifier = modifier
-            .padding(DaxActionBottomSheetDefaults.sheetActionTitleContentPadding),
+            .padding(DaxActionBottomSheetDefaults.SheetActionTitleContentPadding),
     )
 }
 
@@ -129,8 +129,8 @@ object DaxActionBottomSheetDefaults {
         @Composable
         get() = DuckDuckGoTheme.colors.text.secondary
 
-    internal val sheetVerticalPadding = 10.dp
-    internal val sheetActionTitleContentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+    internal val SheetVerticalPadding = 10.dp
+    internal val SheetActionTitleContentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

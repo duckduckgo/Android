@@ -17,7 +17,7 @@
 package com.duckduckgo.subscriptions.impl.auth
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.inject.Inject

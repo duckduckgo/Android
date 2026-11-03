@@ -22,21 +22,21 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class WidgetPrivacyConfigUpdateListener @Inject constructor(
     private val context: Context,
     private val widgetUpdater: WidgetUpdater,
-    private val searchWidgetProviderInfoUpdater: SearchWidgetProviderInfoUpdater,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
 
@@ -54,7 +54,6 @@ class WidgetPrivacyConfigUpdateListener @Inject constructor(
     }
 
     private fun refreshWidgets(isAddressBarEnabled: Boolean) {
-        searchWidgetProviderInfoUpdater.sync()
         widgetUpdater.updateWidgets(context)
         lastAppliedAddressBarEnabled = isAddressBarEnabled
     }

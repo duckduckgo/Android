@@ -16,15 +16,10 @@
 
 package com.duckduckgo.subscriptions.impl.onboarding
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 
-/**
- * Declares the plugin point that collects every [SubscriptionOnboardingStepPlugin] contributed across
- * feature modules. Feature modules contribute their step with `@ContributesMultibinding(AppScope::class)`
- * and order it with `@PriorityKey(n)` (lower first).
- */
 @ContributesPluginPoint(
     scope = AppScope::class,
     boundType = SubscriptionOnboardingStepPlugin::class,

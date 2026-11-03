@@ -29,11 +29,15 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngineFactory
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scripts.BrokerActionProcessor
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
+import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
@@ -592,5 +596,28 @@ class RealPirActionsRunnerTest {
         val eventCaptor = argumentCaptor<Event>()
         verify(mockEngine, times(2)).dispatch(eventCaptor.capture())
         assertTrue(eventCaptor.allValues.none { it is Event.LoadUrlComplete })
+    }
+
+    @Test
+    fun whenExecuteScriptDoesNotRespondThenNativeTimeoutFiresAfterSixtySeconds() = runTest {
+        val deferred = async { testee.execute(testProfileQuery, testScanStep) }
+        yield()
+        val action = BrokerAction.ExecuteScript("script-1", "return new Promise(() => {});")
+        val request = PirScriptRequestData.UserProfile(testProfileQuery)
+        sideEffectFlow.emit(SideEffect.PushJsAction(action.id, action, 0L, request))
+        runCurrent()
+
+        advanceTimeBy(59_999)
+        runCurrent()
+        verify(mockEngine, never()).dispatch(any<Event.BrokerActionFailed>())
+
+        advanceTimeBy(1)
+        runCurrent()
+        verify(mockEngine).dispatch(
+            Event.BrokerActionFailed(PirError.ActionError.JsActionFailed(action.id, "Local timeout"), allowRetry = true),
+        )
+        verify(mockBrokerActionProcessor, times(1)).pushAction(action, request)
+        sideEffectFlow.emit(SideEffect.CompleteExecution)
+        deferred.await()
     }
 }

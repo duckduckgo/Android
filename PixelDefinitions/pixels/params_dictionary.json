@@ -57,8 +57,8 @@
         "description": "Onboarding Duck.ai search/chat branch, chosen at the input-screen preview step. Set on every onboarding pixel fired after the user passes that step; absent for pixels fired before it or for users who never see it.",
         "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
     },
-    "onboardingSegmentedVariant": {
-        "key": "variant_segmented",
+    "onboardingDownloadReasonVariant": {
+        "key": "variant_download_reason",
         "type": "string",
         "description": "Download reason picked on the download-choice screen of the segmented onboarding flow. Set on every onboarding pixel fired after that screen; absent for pixels fired before it and for flows that never show it. Independent of the search/chat branch reported by `variant`, since a run can make both choices.",
         "enum": ["download_reason_search", "download_reason_ai-chat", "download_reason_no-ai", "download_reason_ad-blocking"]
@@ -102,6 +102,8 @@
         "type": "string",
         "description": "The Duck.ai entry point: the surface that initiated the entry or prompt submission. Omitted when unknown.",
         "enum": [
+            "app_open",
+            "tab_swipe",
             "address_bar_prompt",
             "address_bar_icon",
             "address_bar_shortcut_chip",
@@ -114,8 +116,10 @@
             "chat_history_open_chat",
             "voice",
             "onboarding",
+            "onboarding_completion_promo",
             "direct_url",
             "serp",
+            "ddg_homepage",
             "icon_shortcut",
             "contextual_chat",
             "widget_quick_actions",
@@ -125,7 +129,13 @@
             "deep_link_other",
             "paid_settings",
             "return_to_chat_card",
-            "tab_switcher_existing_chat"
+            "tab_switcher_existing_chat",
+            "subscription_onboarding",
+            "browsing_menu_duckai",
+            "duck_ai_new_chat",
+            "recent_chat_tab_switcher",
+            "recent_chat_contextual",
+            "chat_suggestion_input"
         ]
     },
     "osVersion": {
@@ -160,7 +170,7 @@
     "widePixelAppVersion": {
         "key": "app.version",
         "type": "string",
-        "description": "The version of the app sending the pixel"
+        "description": "The version of the app when the wide event's flow started"
     },
     "widePixelDevMode": {
         "key": "app.dev_mode",
@@ -264,6 +274,23 @@
         "type": "string",
         "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data"
     },
+    "passkeyError": {
+        "key": "error",
+        "type": "string",
+        "description": "Sanitized WebAuthn DOMException name. UnknownError also covers CSS Other and unrecognized names.",
+        "enum": [
+            "AbortError",
+            "ConstraintError",
+            "EncodingError",
+            "InvalidStateError",
+            "NotAllowedError",
+            "NotReadableError",
+            "NotSupportedError",
+            "SecurityError",
+            "TypeError",
+            "UnknownError"
+        ]
+    },
     "freeTrial": {
         "key": "free_trial",
         "type": "boolean",
@@ -296,6 +323,16 @@
             "work_stopped"
         ]
     },
+    "pirIsAuthenticated": {
+        "key": "is_authenticated",
+        "type": "boolean",
+        "description": "Whether the user has an active subscription that includes PIR."
+    },
+    "pirIsFreeScan": {
+        "key": "free_scan",
+        "type": "boolean",
+        "description": "Whether the user is a free (freemium) PIR user."
+    },
     "duckAiSubscriptionFunnelOrigin": {
         "key": "origin",
         "type": "string",
@@ -318,5 +355,17 @@
             "funnel_duckai_android__disclaimerbanner",
             "funnel_duckai_android__unknown"
         ]
+    },
+    "promptDaysSinceInstall": {
+        "key": "days_since_install",
+        "type": "string",
+        "description": "Days since install, bucketed by install-week (lower bound inclusive).",
+        "enum": ["d0_6", "d7_13", "d14_20", "d21_27", "d28_plus"]
+    },
+    "promptExposureVersion": {
+        "key": "version",
+        "type": "string",
+        "description": "Version of the prompt exposure pixels, bumped whenever the meaning of a parameter or the session sampling rate changes.",
+        "enum": ["1"]
     }
 }

@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Saad seda hiljem alati seadetes muuta.</string>
     <string name="autoconsentPromptCpmOnMessage">Mõnest küpsisest ei saa loobuda. Saame nõustuda nendega sinu eest.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Nõustu küpsistega minu eest</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Keeldu võimalusel või nõustu minu eest</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Ma nõustun nendega ise</string>
     <string name="autoconsentPromptCpmOffMessage">Me tegeleme nendega sinu eest. Võimalusel keeldume küpsistest ja nõustume nendega, millest ei saa loobuda.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Keeldu võimalusel või nõustu minu eest</string>

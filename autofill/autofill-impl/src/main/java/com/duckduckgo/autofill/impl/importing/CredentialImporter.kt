@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.importing
 
 import android.os.Parcelable
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Finished
@@ -25,8 +26,8 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.In
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,6 +39,7 @@ interface CredentialImporter {
     suspend fun import(
         importList: List<LoginCredentials>,
         originalImportListSize: Int,
+        source: AutofillImportLaunchSource,
     )
 
     fun getImportStatus(): Flow<ImportResult>
@@ -51,11 +53,12 @@ interface CredentialImporter {
         data class Finished(
             val savedCredentials: Int,
             val numberSkipped: Int,
+            val source: AutofillImportLaunchSource,
         ) : ImportResult
     }
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class CredentialImporterImpl @Inject constructor(
     private val autofillStore: InternalAutofillStore,
@@ -68,19 +71,23 @@ class CredentialImporterImpl @Inject constructor(
     override suspend fun import(
         importList: List<LoginCredentials>,
         originalImportListSize: Int,
+        source: AutofillImportLaunchSource,
     ) {
+        // emitted before the work starts so the replay buffer cannot hand a late subscriber the
+        // result of the previous import
+        _importStatus.emit(InProgress)
+
         appCoroutineScope.launch(dispatchers.io()) {
-            doImportCredentials(importList, originalImportListSize)
+            doImportCredentials(importList, originalImportListSize, source)
         }
     }
 
     private suspend fun doImportCredentials(
         importList: List<LoginCredentials>,
         originalImportListSize: Int,
+        source: AutofillImportLaunchSource,
     ) {
         var skippedCredentials = originalImportListSize - importList.size
-
-        _importStatus.emit(InProgress)
 
         val insertedIds = autofillStore.bulkInsert(importList)
 
@@ -89,7 +96,7 @@ class CredentialImporterImpl @Inject constructor(
         // mark that the user has imported passwords at least once, regardless of the number of credentials imported
         autofillStore.hasEverImportedPasswords = true
 
-        _importStatus.emit(Finished(savedCredentials = insertedIds.size, numberSkipped = skippedCredentials))
+        _importStatus.emit(Finished(savedCredentials = insertedIds.size, numberSkipped = skippedCredentials, source = source))
     }
 
     override fun getImportStatus(): Flow<ImportResult> = _importStatus

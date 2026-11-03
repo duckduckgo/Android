@@ -21,21 +21,21 @@ import androidx.room.Room
 import com.duckduckgo.app.anrs.store.CrashDatabase
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Qualifier
 
 @Retention(AnnotationRetention.BINARY)
 @Qualifier
 private annotation class InternalApi
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object CrashModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @InternalApi
     fun provideCrashDatabase(context: Context): CrashDatabase {
         return Room.databaseBuilder(context, CrashDatabase::class.java, "crash_database.db")
@@ -46,7 +46,7 @@ object CrashModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideUncaughtExceptionDao(@InternalApi crashDatabase: CrashDatabase): UncaughtExceptionDao {
         return crashDatabase.uncaughtExceptionDao()
     }

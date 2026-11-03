@@ -179,6 +179,49 @@ class ChatExporterTest {
     }
 
     @Test
+    fun `canonical content arrays export only their text entries`() {
+        val json = """
+            {
+              "model": "gpt-5-mini",
+              "messages": [
+                {"role":"user","createdAt":"2026-05-15T14:00:00.000Z","content":[{"type":"text","text":"canonical question"}]},
+                {"role":"assistant","content":[
+                  {"type":"reasoning","encryptedText":"secret"},
+                  {"type":"text","text":"canonical answer"}
+                ]}
+              ]
+            }
+        """.trimIndent()
+
+        val result = exporter.export(json, ChatType.Discussion, modelDisplay = gpt5MiniDisplay)
+
+        assertTrue(result is ExportResult.Text)
+        assertTrue(result.content.contains("canonical question"))
+        assertTrue(result.content.contains("GPT-5 mini:\ncanonical answer"))
+        assertFalse(result.content.contains("secret"))
+        assertFalse(result.content.contains("\"type\""))
+    }
+
+    @Test
+    fun `legacy content objects export their text field`() {
+        val json = """
+            {
+              "model": "gpt-5-mini",
+              "messages": [
+                {"role":"user","createdAt":"2026-05-15T14:00:00.000Z","content":{"text":"object question"}},
+                {"role":"assistant","content":{"text":"object answer"}}
+              ]
+            }
+        """.trimIndent()
+
+        val result = exporter.export(json, ChatType.Discussion, modelDisplay = gpt5MiniDisplay)
+
+        assertTrue(result is ExportResult.Text)
+        assertTrue(result.content.contains("object question"))
+        assertTrue(result.content.contains("GPT-5 mini:\nobject answer"))
+    }
+
+    @Test
     fun `null modelDisplay falls back to raw id and generic provider wording`() {
         val json = """
             {

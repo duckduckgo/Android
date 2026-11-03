@@ -22,8 +22,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.impl.store.ClientBrandHintDatabase
 import com.duckduckgo.user.agent.impl.store.ClientHintBrandDomainEntity
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
@@ -37,7 +37,7 @@ interface ClientBrandHintFeatureSettingsRepository {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealClientBrandHintFeatureSettingsRepository @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,

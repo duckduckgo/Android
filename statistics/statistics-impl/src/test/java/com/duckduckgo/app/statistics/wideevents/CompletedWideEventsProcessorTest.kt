@@ -207,5 +207,6 @@ class CompletedWideEventsProcessorTest {
             createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
             metaType = "android-test-event",
             metaVersion = "1.0.0",
+            appVersion = "5.123.0",
         )
 }

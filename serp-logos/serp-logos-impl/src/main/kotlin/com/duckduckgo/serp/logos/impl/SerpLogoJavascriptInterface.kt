@@ -17,7 +17,7 @@
 package com.duckduckgo.serp.logos.impl
 
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface SerpLogoJavascriptInterface {

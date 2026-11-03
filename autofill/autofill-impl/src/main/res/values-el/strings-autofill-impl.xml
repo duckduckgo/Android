@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Πώς να συγχρονίσετε τους κωδικούς πρόσβασης υπολογιστών</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Εισαγάγετε κωδικούς πρόσβασης στην έκδοση του προγράμματος περιήγησης DuckDuckGo για υπολογιστές και έπειτα συγχρονίστε τους σε όλες τις συσκευές.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ο σύνδεσμος αντιγράφηκε</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Αποκτήστε το πρόγραμμα περιήγησης DuckDuckGo για Mac ή Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Αναζητήστε ιδιωτικά και αποκλείστε εφαρμογές παρακολούθησης με το πρόγραμμα περιήγησης DuckDuckGo για υπολογιστές. Επισκεφτείτε αυτόν τον σύνδεσμο στον υπολογιστή σας για να πραγματοποιήσετε λήψη σήμερα.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Συγχρονισμός με υπολογιστή</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Αποκτήστε την εφαρμογή για υπολογιστές</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Αποκτήστε το DuckDuckGo για Mac ή Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Στον υπολογιστή σας, μεταβείτε στη διεύθυνση:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Κοινή χρήση συνδέσμου λήψης</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Αναφέρετε ένα πρόβλημα με την Αυτόματη συμπλήρωση</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Αναφέρετε ανώνυμα ότι η αυτόματη συμπλήρωση δεν λειτουργεί σε αυτόν τον ιστότοπο. Οι κωδικοί πρόσβασης δεν κοινοποιούνται ποτέ.</string>
@@ -252,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Η συσκευή σου μπορεί να σου ζητήσει να εισαγάγεις το PIN, τον κωδικό πρόσβασης ή το μοτίβο σου για επιβεβαίωση.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Εισαγωγή από το Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Επιλογή αρχείου CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Εισαγωγή από πρόγραμμα περιήγησης για υπολογιστές</string>
@@ -283,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Μεταφέρετε τους κωδικούς σας από&lt;br /&gt;το Google στο DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Εισαγάγετε γρήγορα και με ασφάλεια τους κωδικούς πρόσβασής σας στο DuckDuckGo. Η Google ίσως σας ζητήσει να εισαγάγετε τον κωδικό πρόσβασής σας.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Συμπλήρωσε γρήγορα και με ασφάλεια τους κωδικούς πρόσβασής σου στο DuckDuckGo. Η συσκευή σου μπορεί να σου ζητήσει να εισαγάγεις το PIN, τον κωδικό πρόσβασης ή το μοτίβο σου για επιβεβαίωση.</string>
     <string name="passwords_import_promo_action">Εισαγωγή από το Google</string>
     <string name="passwords_import_promo_in_browser_title">Μεταφέρετε τους κωδικούς σας από&lt;br /&gt;το Google στο DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Μετάφερε τους κωδικούς πρόσβασής σου από τη Google στο DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Να μην ερωτηθώ ξανά</string>
     <string name="passwords_import_promo_in_settings_title">Εισαγωγή κωδικών πρόσβασης από το Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Αποκρυψη</string>
@@ -311,5 +311,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Κάτι πήγε λάθος</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Βεβαιωθείτε ότι είστε συνδεδεμένοι στο διαδίκτυο και προσπαθήστε ξανά.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Η εισαγωγή ολοκληρώθηκε!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Κάντε λίγη υπομονή — διατηρήστε αυτό το παράθυρο ανοιχτό. Δεν θα χρειαστούν περισσότερα από ένα ή δύο λεπτά.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Η Google ίσως σας ζητήσει τον κωδικό πρόσβασής σας.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Η Google θα σας στείλει email για να επιβεβαιώσει ότι έγινε εξαγωγή των δεδομένων σας. Δεν χρειάζεται να κάνετε τίποτα.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Η εισαγωγή ολοκληρώθηκε!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Σελιδοδείκτες που εισήχθησαν: <b>%1$d</b>]]></string>
 
 </resources>

@@ -20,9 +20,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewBinding
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope

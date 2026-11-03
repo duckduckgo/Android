@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ import javax.inject.Inject
  * Tracks first publishes of this device's `device_info` so a `getDevices` read can tell whether it was in flight before we published.
  * Without this, a response that raced our first write sees its own blob missing and mistakes a stale read for a server-side gap.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DeviceInfoPublishWatcher @Inject constructor() {
 
     // a counter, not a boolean: a snapshot compares the count before and after a fetch, so publishes that happen and are consumed

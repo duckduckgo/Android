@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import logcat.LogPriority

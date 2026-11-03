@@ -24,8 +24,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.impl.pixels.toDeviceInfoWriteFailureReason
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -55,7 +55,7 @@ enum class DeviceInfoUpdateSource {
     REPAIR,
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDeviceInfoUpdater @Inject constructor(
     private val syncStore: SyncStore,

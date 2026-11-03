@@ -17,8 +17,8 @@
 package com.duckduckgo.adblocking.impl.store
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +36,7 @@ interface AdBlockingSessionStore {
     fun clear()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAdBlockingSessionStore @Inject constructor() : AdBlockingSessionStore {
 

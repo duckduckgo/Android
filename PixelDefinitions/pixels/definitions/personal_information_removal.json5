@@ -113,7 +113,8 @@
                     "solveCaptcha",
                     "condition",
                     "getEmailData",
-                    "generateEmail"
+                    "generateEmail",
+                    "executeScript"
                 ]
             },
             {
@@ -281,102 +282,88 @@
             }
         ]
     },
+    "m_dbp_optoutjob_removed-identifier-found": {
+        "description": "Fired when a scan marks a stored profile as removed although the same scan found a profile with the same identifier, because the profile's name or profile URL changed.",
+        "owners": ["landomen"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker on which the profile was found",
+                "type": "string"
+            },
+            {
+                "key": "changed_field",
+                "description": "Which part of the stored profile no longer matched the profile found with the same identifier",
+                "type": "string",
+                "enum": ["name", "profile_url", "name_and_profile_url"]
+            },
+            {
+                "key": "optout_status",
+                "description": "Status of the opt-out job before it was marked removed",
+                "type": "string",
+                "enum": ["not_executed", "pending_email_confirmation", "requested", "error"]
+            }
+        ],
+        "expires": "2027-01-31"
+    },
     "m_dbp_engagement_dau": {
         "description": "Pixel for PIR daily active users.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_engagement_wau": {
         "description": "Pixel for PIR weekly active users.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_engagement_mau": {
         "description": "Pixel for PIR monthly active users.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["scheduled"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_dau": {
         "description": "Pixel for PIR user-interacted daily active users. Fired when the PIR dashboard is presented to the user.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "is_authenticated",
-                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
-                "type": "boolean"
-            },
-            {
-                "key": "free_scan",
-                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
-                "type": "boolean"
-            }
-        ]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_wau": {
         "description": "Pixel for PIR user-interacted weekly active users. Fired when the PIR dashboard is presented to the user.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "is_authenticated",
-                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
-                "type": "boolean"
-            },
-            {
-                "key": "free_scan",
-                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
-                "type": "boolean"
-            }
-        ]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_interaction_mau": {
         "description": "Pixel for PIR user-interacted monthly active users. Fired when the PIR dashboard is presented to the user.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "is_authenticated",
-                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
-                "type": "boolean"
-            },
-            {
-                "key": "free_scan",
-                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
-                "type": "boolean"
-            }
-        ]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_first_scan_u": {
         "description": "Fired once per install when the user starts their first PIR scan.",
         "owners": ["karlenDimla", "landomen"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
+    },
+    "m_dbp_freemium_upsell_u": {
+        "description": "Fired once per install when a user who had activated Freemium PIR is first seen holding an active subscription, bought from any entry point.",
+        "owners": ["landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "is_authenticated",
-                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
-                "type": "boolean"
-            },
-            {
-                "key": "free_scan",
-                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
-                "type": "boolean"
-            }
-        ]
+        "parameters": ["appVersion"]
     },
     "m_dbp_weekly_child-broker_orphaned-optouts": {
         "description": "Pixel to know orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.",
@@ -419,10 +406,11 @@
     "m_dbp_scan_stage": {
         "description": "Pixel emitted for every stage of a scan for a broker x profile.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker the stage was for",
@@ -463,7 +451,8 @@
                     "solveCaptcha",
                     "condition",
                     "getEmailData",
-                    "generateEmail"
+                    "generateEmail",
+                    "executeScript"
                 ]
             }
         ]
@@ -510,10 +499,12 @@
     "m_dbp_search_stage_main_status_success": {
         "description": "Pixel emitted when the scan is completed with results.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsAuthenticated",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker scanned",
@@ -562,10 +553,12 @@
     "m_dbp_search_stage_main_status_no_results": {
         "description": "Pixel emitted when the scan is completed with no results found.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsAuthenticated",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker scanned",
@@ -623,7 +616,8 @@
                     "solveCaptcha",
                     "condition",
                     "getEmailData",
-                    "generateEmail"
+                    "generateEmail",
+                    "executeScript"
                 ]
             },
             {
@@ -637,10 +631,12 @@
     "m_dbp_search_stage_main_status_error": {
         "description": "Pixel emitted when the scan is completed with an error.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsAuthenticated",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker scanned",
@@ -708,7 +704,8 @@
                     "solveCaptcha",
                     "condition",
                     "getEmailData",
-                    "generateEmail"
+                    "generateEmail",
+                    "executeScript"
                 ]
             },
             {
@@ -1155,10 +1152,11 @@
     "m_dbp_update_databrokers_success": {
         "description": "Fired when a data broker JSON is updated successfuly.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "data_broker_json_file",
                 "description": "The JSON file name for the data broker that this action was operating on",
@@ -1174,10 +1172,11 @@
     "m_dbp_update_databrokers_failure": {
         "description": "Fired when a data broker JSON update has failed.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "data_broker_json_file",
                 "description": "The JSON file name for the data broker that this action was operating on",
@@ -1289,10 +1288,11 @@
     "m_dbp_data_broker_action-failed_error": {
         "description": "Fired when a scan or opt-out action fails while processing a data broker.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "data_broker",
                 "description": "The URL of the data broker that this action was operating on",
@@ -1329,17 +1329,18 @@
     "pir_webui_dashboard_opened": {
         "description": "Android specific pixel which is fired when the PIR dashboard is opened",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
     },
     "m_dbp_initial_scan_duration": {
         "description": "Fired when the initial scan for all brokers and profile combination are completed.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "appVersion",
+            "pirIsFreeScan",
             {
                 "key": "duration_in_ms",
                 "description": "Total duration of the initial scan in ms",
@@ -2218,10 +2219,68 @@
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_dbp_freemium_settings_entry_point_impression": {
+        "description": "Fired once per Settings visit when the Freemium PIR entry point is shown. Denominator for the Freemium PIR settings funnel.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_dbp_freemium_settings_entry_point_clicked": {
+        "description": "Fired when the Freemium PIR entry point in Settings is tapped. Numerator for the Freemium PIR settings funnel.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "cta_state",
+                "description": "Which call to action the entry point was showing when tapped.",
+                "type": "string",
+                "enum": ["start_free_scan", "view_scan_results"]
+            }
+        ]
+    },
+    "m_privacy-pro_app-settings_personal-information-removal_click": {
+        "description": "The user tapped 'Personal Information Removal' (DuckDuckGo Subscription) in the app-wide Settings.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_dbp_freemium_notification_sent_first_scan_complete": {
+        "description": "Fired when the Freemium PIR scan-complete notification is posted after a free user's scan finishes, at most once per profile save.",
+        "owners": ["landomen"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_dbp_freemium_notification_opened_first_scan_complete": {
+        "description": "Fired when the PIR dashboard is opened by tapping the Freemium PIR scan-complete notification.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_dbp_freemium_pir_maintenance_scan_skipped": {
+        "description": "Fired at most once per run when a free PIR user's run skips maintenance scans.",
+        "owners": ["landomen"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2027-03-31"
+    },
+    "m_dbp_notification_sent_first_scan_complete": {
+        "description": "Fired when the PIR scan-complete notification is posted after a subscriber's run finishes, at most once per profile save.",
+        "owners": ["landomen"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "wide_pir-initial-scan": {
         "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "widePixelPlatform",
@@ -2327,6 +2386,11 @@
                 "key": "feature.data.ext.tracker_blocking_state",
                 "description": "Whether tracker blocking was enabled or disabled during the run",
                 "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.free_scan",
+                "description": "Whether the run was a free (freemium) scan.",
+                "enum": ["true", "false"]
             },
             {
                 "key": "feature.data.ext.last_step",
@@ -2553,7 +2617,7 @@
     "wide_pir-scheduled-scan": {
         "description": "Wide event tracking the lifecycle of a scheduled (background, WorkManager-triggered) PIR run, covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Sampled client-side at 20% (hardcoded in PirScanWideEventImpl.SCHEDULED_SCAN_SAMPLE_RATE) to keep pixel volume manageable.",
         "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "widePixelPlatform",
@@ -2659,6 +2723,11 @@
                 "key": "feature.data.ext.tracker_blocking_state",
                 "description": "Whether tracker blocking was enabled or disabled during the run",
                 "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.free_scan",
+                "description": "Whether the run was a free (freemium) scan.",
+                "enum": ["true", "false"]
             },
             {
                 "key": "feature.data.ext.last_step",

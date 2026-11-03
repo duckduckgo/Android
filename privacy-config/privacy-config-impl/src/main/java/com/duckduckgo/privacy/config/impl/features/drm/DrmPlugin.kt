@@ -24,12 +24,12 @@ import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DrmPlugin @Inject constructor(
     private val drmRepository: DrmRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,

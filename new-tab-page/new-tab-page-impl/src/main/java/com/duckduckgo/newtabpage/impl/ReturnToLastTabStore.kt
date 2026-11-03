@@ -24,8 +24,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.impl.RealReturnToLastTabStore.Keys.RETURN_TO_LAST_TAB_ENABLED
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -45,7 +45,7 @@ private val Context.returnToLastTabStore: DataStore<Preferences> by preferencesD
     name = "return_to_last_tab_store",
 )
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealReturnToLastTabStore @Inject constructor(
     private val context: Context,

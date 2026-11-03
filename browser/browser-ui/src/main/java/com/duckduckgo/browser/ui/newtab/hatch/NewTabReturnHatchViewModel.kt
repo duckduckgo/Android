@@ -18,17 +18,19 @@ package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import androidx.annotation.StringRes
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -37,6 +39,8 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.newtabpage.api.EscapeHatchTarget
 import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import com.duckduckgo.settings.api.AfterInactivitySettings
+import com.duckduckgo.settings.api.AfterInactivitySettingsDataProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -62,9 +66,16 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val duckChatInputModeState: DuckChatInputModeState,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val afterInactivitySettingsDataProvider: AfterInactivitySettingsDataProvider,
+    private val newTabReturnHatchFeature: NewTabReturnHatchFeature,
     private val escapeHatchTargetResolver: EscapeHatchTargetResolver,
     private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
+
+    sealed interface AfterInactivityDestinationSummary {
+        data class TextRes(@param:StringRes val resId: Int) : AfterInactivityDestinationSummary
+        data class Url(val url: String) : AfterInactivityDestinationSummary
+    }
 
     data class ViewState(
         val tabTitle: String = "",
@@ -77,6 +88,9 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val isSerp: Boolean = false,
         val tabs: Int = 0,
         val showTabsButton: Boolean = false,
+        val showAfterInactivityEntry: Boolean = false,
+        val afterInactivityDestinationSummary: AfterInactivityDestinationSummary =
+            AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityOpenNewTab),
     )
 
     sealed class Command {
@@ -119,22 +133,30 @@ class NewTabReturnHatchViewModel @Inject constructor(
     // repository (burned, closed, or purged), so every live ViewModel instance stays in sync without
     // per-instance burn tracking. For a Fire target, visibility tracks the fire repo's flowTabs,
     // while the activity-mode repo supplies the tabs count shown in the tab button.
-    // The tabs button shows only when native input is enabled AND the address bar isn't search-only.
-    // In search-only the hatch mirrors the legacy chrome, which has no tabs entry here.
+    // The tabs button shows only when the address bar isn't search-only, which has no tabs entry here.
     // It is also hidden when the nav bar flag is on: those users get a tabs button in the input-mode
     // nav bar instead, so the hatch shouldn't duplicate it.
     private val shouldShowTabsButton: Flow<Boolean> = combine(
-        duckChat.observeNativeInputFieldUserSettingEnabled(),
         duckChatInputModeState.inputModeCapability,
         duckChat.observeNativeInputNavBarEnabled(),
-    ) { nativeInputEnabled, capability, navBarEnabled ->
-        nativeInputEnabled && capability != NativeInputState.InputMode.SEARCH_ONLY && !navBarEnabled
+    ) { capability, navBarEnabled ->
+        capability != NativeInputState.InputMode.SEARCH_ONLY && !navBarEnabled
     }
 
     val viewState = snapshotTarget.flatMapLatest { target ->
         if (target == null) {
-            combine(currentTabRepository.flowTabs, shouldShowTabsButton) { tabs, showTabs ->
-                ViewState(shouldShow = false, tabs = tabs.size, showTabsButton = showTabs)
+            combine(
+                currentTabRepository.flowTabs,
+                shouldShowTabsButton,
+                afterInactivitySettingsDataProvider.settings,
+            ) { tabs, showTabs, afterInactivitySettings ->
+                ViewState(
+                    shouldShow = false,
+                    tabs = tabs.size,
+                    showTabsButton = showTabs,
+                    showAfterInactivityEntry = newTabReturnHatchFeature.afterInactivityEntry().isEnabled(),
+                    afterInactivityDestinationSummary = afterInactivitySettings.destinationSummary(),
+                )
             }
         } else {
             val isFireTarget = target.mode == BrowserMode.FIRE
@@ -143,9 +165,11 @@ class NewTabReturnHatchViewModel @Inject constructor(
                 tabRepositoryProvider.forMode(target.mode).flowTabs,
                 currentTabRepository.flowTabs,
                 shouldShowTabsButton,
-                ntpAfterIdleManager.returnToLastTabEnabled,
-            ) { closed, targetTabs, activityTabs, showTabs, returnToLastTabEnabled ->
+                afterInactivitySettingsDataProvider.settings,
+            ) { closed, targetTabs, activityTabs, showTabs, afterInactivitySettings ->
                 val tab = targetTabs.firstOrNull { it.tabId == target.tabId }
+                val returnToLastTabEnabled = afterInactivitySettings is AfterInactivitySettings.NewTabPage &&
+                    afterInactivitySettings.returnToLastTabShortcutEnabled
                 if (!closed && tab != null && returnToLastTabEnabled) {
                     val url = if (isFireTarget) "" else tab.url.orEmpty()
                     ViewState(
@@ -159,9 +183,17 @@ class NewTabReturnHatchViewModel @Inject constructor(
                         isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
                         tabs = activityTabs.size,
                         showTabsButton = showTabs,
+                        showAfterInactivityEntry = newTabReturnHatchFeature.afterInactivityEntry().isEnabled(),
+                        afterInactivityDestinationSummary = afterInactivitySettings.destinationSummary(),
                     )
                 } else {
-                    ViewState(shouldShow = false, tabs = activityTabs.size, showTabsButton = showTabs)
+                    ViewState(
+                        shouldShow = false,
+                        tabs = activityTabs.size,
+                        showTabsButton = showTabs,
+                        showAfterInactivityEntry = newTabReturnHatchFeature.afterInactivityEntry().isEnabled(),
+                        afterInactivityDestinationSummary = afterInactivitySettings.destinationSummary(),
+                    )
                 }
             }
         }
@@ -240,5 +272,11 @@ class NewTabReturnHatchViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             ntpAfterIdleManager.setReturnToLastTabEnabled(false)
         }
+    }
+
+    private fun AfterInactivitySettings.destinationSummary(): AfterInactivityDestinationSummary = when (this) {
+        AfterInactivitySettings.LastUsedTab -> AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityLastUsedTab)
+        is AfterInactivitySettings.NewTabPage -> AfterInactivityDestinationSummary.TextRes(R.string.hatchMenuAfterInactivityOpenNewTab)
+        is AfterInactivitySettings.SpecificPage -> AfterInactivityDestinationSummary.Url(url)
     }
 }

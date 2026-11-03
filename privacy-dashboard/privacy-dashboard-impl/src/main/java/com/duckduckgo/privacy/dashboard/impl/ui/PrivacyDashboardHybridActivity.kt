@@ -24,18 +24,16 @@ import android.webkit.WebViewClient
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.brokensite.api.ReportFlow
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -80,9 +78,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -167,14 +162,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
         configureWebView()
 
         val initialScreen = when (params) {

@@ -22,8 +22,8 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEve
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -48,14 +48,14 @@ import javax.inject.Inject
  * The pipeline is already wired: [BrowserTabViewModel.onViewResumed] iterates every
  * [ContentScopeScriptsSubscriptionEventPlugin] and sends each event via `contentScopeScripts.sendSubscriptionEvent`.
  * That callback is not a suspend function, so we keep a synchronous snapshot of the blob, collected from the store
- * for app lifetime (`@SingleInstanceIn` so there's a single collector). `@Volatile`: written on the IO collector,
+ * for app lifetime (`@SingleIn` so there's a single collector). `@Volatile`: written on the IO collector,
  * read on whatever thread the subscription-event fan-out runs on.
  *
  * NOTE: inert until the SERP frontend re-subscribes `nativeSettingsDidChange` (removed in a Nov 2025 refactor, being
  * restored by the frontend `nativeSync` work).
  */
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class SerpSettingsSubscriptionEventPlugin @Inject constructor(
     serpSettingsDataStore: SerpSettingsDataStore,
     dispatcherProvider: DispatcherProvider,

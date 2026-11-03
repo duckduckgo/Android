@@ -24,12 +24,12 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
 import com.duckduckgo.app.browser.mode.Onboarding
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DUCK_AI_FOCUSED
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -88,7 +88,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     fun onSkipClicked() {
-        viewModel.onOnboardingSkipped()
         startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, newSearch = true))
         finish()
     }
@@ -161,11 +160,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
-                val shouldNavigate = viewModel.devOnlyFullyCompleteAllOnboarding()
-                if (shouldNavigate) {
-                    startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
-                    finish()
-                }
+                viewModel.devOnlyFullyCompleteAllOnboarding()
             }
         }
         viewModel.initializeOnboardingSkipper()

@@ -26,11 +26,32 @@
         android:layout_height="wrap_content"
         app:primaryText="Slider" />
 
+    <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:layout_marginBottom="@dimen/keyline_1"
+        app:platformType="view" />
+
     <com.google.android.material.slider.Slider
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"
         app:labelBehavior="gone" />
+
+    <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_1"
+        app:platformType="compose" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeDaxSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4" />
 
 </LinearLayout>

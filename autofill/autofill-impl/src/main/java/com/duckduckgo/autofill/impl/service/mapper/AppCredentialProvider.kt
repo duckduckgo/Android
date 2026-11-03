@@ -21,8 +21,8 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -35,7 +35,7 @@ interface AppCredentialProvider {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAppCredentialProvider @Inject constructor(
     private val appToDomainMapper: AppToDomainMapper,
     private val dispatcherProvider: DispatcherProvider,

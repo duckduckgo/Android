@@ -1,0 +1,190 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.onboarding
+
+import android.content.SharedPreferences
+import androidx.core.content.edit
+import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.daxOnboardingActive
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.pixels.OnboardingPixelName
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import logcat.logcat
+import org.json.JSONObject
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+
+/** Ends contextual onboarding once the user is past a days-since-install or app-opens limit. */
+interface ContextualOnboardingTimeLimit {
+    suspend fun endOnboardingIfTimeLimitReached()
+
+    suspend fun wasOnboardingEndedByTimeLimit(): Boolean
+
+    /** For re-running onboarding from the internal dev settings. */
+    suspend fun restartTimeLimit()
+}
+
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<ContextualOnboardingTimeLimit>())
+@ContributesIntoSet(
+    scope = AppScope::class,
+    binding = binding<MainProcessLifecycleObserver>(),
+)
+class RealContextualOnboardingTimeLimit @Inject constructor(
+    private val userStageStore: UserStageStore,
+    private val appInstallStore: AppInstallStore,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
+    private val appBuildConfig: AppBuildConfig,
+    private val onboardingPixelSender: OnboardingPixelSender,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : ContextualOnboardingTimeLimit, MainProcessLifecycleObserver {
+
+    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
+    private val mutex = Mutex()
+
+    override fun onStart(owner: LifecycleOwner) {
+        appCoroutineScope.launch(dispatchers.io()) {
+            countAppOpen()
+            endOnboardingIfTimeLimitReached()
+        }
+    }
+
+    override suspend fun endOnboardingIfTimeLimitReached() {
+        withContext(dispatchers.io()) {
+            mutex.withLock {
+                val reachedLimit = reachedLimit() ?: return@withLock
+                logcat { "Contextual onboarding time limit reached ($reachedLimit), ending onboarding" }
+                preferences.edit { putBoolean(KEY_ENDED_BY_TIME_LIMIT, true) }
+                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
+                onboardingPixelSender.fire(
+                    OnboardingPixelName.ONBOARDING_TIME_LIMIT,
+                    OnboardingPixelAction.TimeLimitReached(byAppOpens = reachedLimit == ReachedLimit.APP_OPENS),
+                )
+            }
+        }
+    }
+
+    override suspend fun wasOnboardingEndedByTimeLimit(): Boolean = withContext(dispatchers.io()) {
+        preferences.getBoolean(KEY_ENDED_BY_TIME_LIMIT, false)
+    }
+
+    override suspend fun restartTimeLimit() {
+        withContext(dispatchers.io()) {
+            mutex.withLock {
+                preferences.edit {
+                    putLong(KEY_TIME_LIMIT_START, currentTimeProvider.currentTimeMillis())
+                    putInt(KEY_APP_OPENS, 0)
+                    putBoolean(KEY_ENDED_BY_TIME_LIMIT, false)
+                }
+            }
+        }
+    }
+
+    private suspend fun countAppOpen() {
+        mutex.withLock {
+            // Counted from first launch, so both limits run from install.
+            if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED) {
+                preferences.edit { putInt(KEY_APP_OPENS, preferences.getInt(KEY_APP_OPENS, 0) + 1) }
+            }
+        }
+    }
+
+    private suspend fun reachedLimit(): ReachedLimit? {
+        if (!userStageStore.daxOnboardingActive()) return null
+        val toggle = extendedOnboardingFeatureToggles.contextualOnboardingTimeLimit()
+        if (!toggle.isEnabled()) return null
+
+        val limits = toggle.limits()
+        return when {
+            isDaysLimitReached(limits.maxDaysSinceInstall) -> ReachedLimit.DAYS
+            preferences.getInt(KEY_APP_OPENS, 0) > limits.maxAppOpens -> ReachedLimit.APP_OPENS
+            else -> null
+        }
+    }
+
+    private fun isDaysLimitReached(maxDaysSinceInstall: Int): Boolean {
+        val start = timeLimitStart() ?: return false
+        return currentTimeProvider.currentTimeMillis() - start >= TimeUnit.DAYS.toMillis(maxDaysSinceInstall.toLong())
+    }
+
+    private fun timeLimitStart(): Long? = when {
+        preferences.contains(KEY_TIME_LIMIT_START) -> preferences.getLong(KEY_TIME_LIMIT_START, 0L)
+        appInstallStore.hasInstallTimestampRecorded() -> appInstallStore.installTimestamp
+        else -> null
+    }
+
+    private fun Toggle.limits(): Limits {
+        // Short fixed limits so testers can reach the end of onboarding.
+        if (appBuildConfig.isInternalBuild()) {
+            return Limits(maxDaysSinceInstall = INTERNAL_MAX_DAYS_SINCE_INSTALL, maxAppOpens = INTERNAL_MAX_APP_OPENS)
+        }
+
+        val settings = runCatching { getSettings()?.let { JSONObject(it) } }.getOrNull()
+        return Limits(
+            maxDaysSinceInstall = settings.positiveIntOrDefault(KEY_MAX_DAYS_SINCE_INSTALL, DEFAULT_MAX_DAYS_SINCE_INSTALL),
+            maxAppOpens = settings.positiveIntOrDefault(KEY_MAX_APP_OPENS, DEFAULT_MAX_APP_OPENS),
+        )
+    }
+
+    private fun JSONObject?.positiveIntOrDefault(key: String, default: Int): Int =
+        this?.optInt(key, default)?.takeIf { it > 0 } ?: default
+
+    private data class Limits(
+        val maxDaysSinceInstall: Int,
+        val maxAppOpens: Int,
+    )
+
+    private enum class ReachedLimit { DAYS, APP_OPENS }
+
+    companion object {
+        private const val FILENAME = "com.duckduckgo.app.onboarding.contextual.timelimit"
+        private const val KEY_APP_OPENS = "appOpens"
+        private const val KEY_ENDED_BY_TIME_LIMIT = "endedByTimeLimit"
+        private const val KEY_TIME_LIMIT_START = "timeLimitStart"
+        private const val KEY_MAX_DAYS_SINCE_INSTALL = "maxDaysSinceInstall"
+        private const val KEY_MAX_APP_OPENS = "maxAppOpens"
+        private const val DEFAULT_MAX_DAYS_SINCE_INSTALL = 7
+        private const val DEFAULT_MAX_APP_OPENS = 28
+        private const val INTERNAL_MAX_DAYS_SINCE_INSTALL = 1
+        private const val INTERNAL_MAX_APP_OPENS = 3
+    }
+}

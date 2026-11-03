@@ -24,8 +24,10 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -53,7 +55,7 @@ interface TabManager {
     )
 }
 
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class DefaultTabManager @Inject constructor(
     private val tabRepository: TabRepository,
@@ -61,6 +63,7 @@ class DefaultTabManager @Inject constructor(
     private val queryUrlConverter: OmnibarEntryConverter,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val browserMode: BrowserMode,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : TabManager {
     private lateinit var onTabsUpdated: (List<TabModel>) -> Unit
     private var selectedTabId: String? = null
@@ -104,6 +107,9 @@ class DefaultTabManager @Inject constructor(
         sourceTabId: String?,
         skipHome: Boolean,
     ): String = withContext(dispatchers.io()) {
+        selectedTabId?.let { tabId ->
+            duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        }
         val url = query?.let {
             if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
                 query

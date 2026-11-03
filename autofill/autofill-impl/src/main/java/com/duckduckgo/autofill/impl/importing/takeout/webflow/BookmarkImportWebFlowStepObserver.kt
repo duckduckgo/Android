@@ -6,7 +6,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportPr
 import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportProcessor.ImportResult.Success
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.BookmarkImportWebFlowStepObserver.Step
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

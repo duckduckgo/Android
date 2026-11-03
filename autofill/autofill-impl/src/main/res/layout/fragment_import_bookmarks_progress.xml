@@ -70,7 +70,7 @@
                 android:layout_gravity="center"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_bookmarks_import_96" />
+                android:src="@drawable/bookmarks_import_96" />
 
         </FrameLayout>
 

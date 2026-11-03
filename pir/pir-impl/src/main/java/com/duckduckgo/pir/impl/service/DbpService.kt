@@ -16,7 +16,7 @@
 
 package com.duckduckgo.pir.impl.service
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Json
 import okhttp3.ResponseBody
@@ -30,13 +30,11 @@ import retrofit2.http.Streaming
 
 @ContributesServiceApi(AppScope::class)
 interface DbpService {
-    @PirAuthRequired
     @GET("$BASE_URL/remote/v0/main_config.json")
     suspend fun getMainConfig(
         @Header("If-None-Match") etag: String?,
     ): Response<PirMainConfig>
 
-    @PirAuthRequired
     @GET("$BASE_URL/remote/v0?name=all.zip&type=spec")
     @Streaming
     suspend fun getBrokerJsonFiles(): ResponseBody

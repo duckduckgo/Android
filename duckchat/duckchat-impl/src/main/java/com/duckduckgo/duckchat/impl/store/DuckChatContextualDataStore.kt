@@ -25,11 +25,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.contextual.ContextualEntryPromptStore
 import com.duckduckgo.duckchat.impl.di.DuckChat
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -47,7 +47,7 @@ interface DuckChatContextualDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealDuckChatContextualDataStore @Inject constructor(
     @DuckChat private val store: DataStore<Preferences>,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

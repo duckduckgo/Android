@@ -20,7 +20,7 @@ import android.Manifest
 import android.app.Activity
 import androidx.core.app.ActivityCompat
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PermissionRationale {

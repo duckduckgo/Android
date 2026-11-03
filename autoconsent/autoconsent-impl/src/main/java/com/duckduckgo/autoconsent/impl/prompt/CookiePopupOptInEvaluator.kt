@@ -30,8 +30,9 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,11 +40,11 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ModalEvaluator::class,
+    binding = binding<ModalEvaluator>(),
 )
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class CookiePopupOptInEvaluator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val applicationContext: Context,
@@ -56,7 +57,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val appInstallTimeProvider: AppInstallTimeProvider,
 ) : ModalEvaluator {
 
-    override val priority: Int = 6
+    override val priority: Int = 7
 
     override val evaluatorId: String = "cookie_popup_opt_in"
 

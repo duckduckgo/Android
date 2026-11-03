@@ -20,7 +20,7 @@ import android.content.Context
 import android.view.View
 import androidx.core.net.toUri
 import androidx.core.view.doOnAttach
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
@@ -69,7 +69,7 @@ class PProUpsellBannerPlugin @Inject constructor(
                 .apply {
                     this.setMessage(
                         Message(
-                            topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro,
+                            topIllustration = com.duckduckgo.mobile.android.R.drawable.subscription_96,
                             title = context.getString(R.string.apptp_PproUpsellBannerTitle),
                             subtitle = context.getString(R.string.apptp_PproUpsellBannerMessage_freeTrial),
                             action = actionText,

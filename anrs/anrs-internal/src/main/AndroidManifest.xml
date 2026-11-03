@@ -6,6 +6,24 @@
             android:name=".feature.CrashANRsInternalSettingsActivity"
             android:label="Crash And ANRs Dev Settings"
             android:exported="false" />
+        <activity
+            android:name=".feature.CrashAnrDevActivity"
+            android:label="Crash And ANRs Dev Settings"
+            android:exported="false" />
+        <activity
+            android:name=".feature.MinidumpListActivity"
+            android:label="Minidumps"
+            android:exported="false" />
+
+        <provider
+            android:name=".feature.CrashkitFileProvider"
+            android:authorities="${applicationId}.crashkit.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/crashkit_file_paths" />
+        </provider>
     </application>
 
 </manifest>

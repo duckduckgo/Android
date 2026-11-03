@@ -27,8 +27,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.di.ModalSurface
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -72,7 +72,7 @@ interface ModalSurfaceStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ModalSurfaceStoreImpl @Inject constructor(
     @ModalSurface private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,

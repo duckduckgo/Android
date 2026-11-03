@@ -55,8 +55,7 @@ class BottomAppBarBehavior<V : View>(
         R.id.webViewFullScreenContainer,
         R.id.browserLayout,
         R.id.includeNewBrowserTab,
-        R.id.inputModeBottomRoot,
-        R.id.inputModeTopRoot,
+        R.id.inputModeRoot,
         R.id.inputModeWidgetNavLayout,
     )
 

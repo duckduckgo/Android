@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.settings
 
 import android.content.*
 import android.view.*
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 
 /**

@@ -22,7 +22,8 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.FEATURE_CAMERA_ANY
 import androidx.core.content.ContextCompat
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 interface CameraAccess {
@@ -30,7 +31,7 @@ interface CameraAccess {
     fun isPermissionGranted(): Boolean
 }
 
-@ContributesBinding(AppScope::class, boundType = CameraAccess::class)
+@ContributesBinding(AppScope::class, binding = binding<CameraAccess>())
 class RealCameraAccess @Inject constructor(
     private val context: Context,
 ) : CameraAccess {

@@ -33,7 +33,7 @@ import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import logcat.logcat

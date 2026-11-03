@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.progressbar
 
 data class ProgressBarConfig(
+    val initialProgress: Float = 0f,
     val fastStartTarget: Float = 20f,
     val fastStartDurationMs: Long = 600L,
     val springStiffness: Float = 2.0f,

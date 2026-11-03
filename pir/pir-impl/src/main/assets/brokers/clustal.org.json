@@ -1,0 +1,922 @@
+{
+  "name": "Clustal",
+  "url": "clustal.org",
+  "version": "0.3.3",
+  "addedDatetime": 1790913600000,
+  "optOutUrl": "https://www.clustal.org/privacy-control/",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.clustal.org/people-search/",
+          "id": "bdfd96e9-72f4-4a89-a377-d304f2bcdade"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#main-search"
+            }
+          ],
+          "id": "e3a50283-e652-4ca2-9b8d-449e3ed848ce"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "#main-search form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#main-search-field"
+            }
+          ],
+          "id": "fd5e8638-d83a-4141-9440-8f0cbef72fc8"
+        },
+        {
+          "_comment": "Name validates via async autocomplete; wait for a suggestion before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@id='main-search-field']/following-sibling::div[contains(@class, 'input-dropdown') and contains(@class, 'visible')]//span"
+            }
+          ],
+          "id": "6e28ea13-8562-4318-ac3a-a71f81923b80"
+        },
+        {
+          "_comment": "City has the same gate but can't be matched dynamically, so this submits on name alone; the state click below narrows the resulting listing.",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "(//input[@id='main-search-field']/following-sibling::div[contains(@class, 'input-dropdown')]//span)[1]"
+            }
+          ],
+          "id": "ffacdc89-8fed-4028-aec0-dee313127d37"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#main-search button[type='submit']"
+            }
+          ],
+          "id": "395a16f4-defd-485f-a48d-e2403d4a30f5"
+        },
+        {
+          "_comment": "Waits for the post-submit page specifically (results or 404), not the search page itself.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[@id='search-results-list'] | //h1[contains(text(), 'Page Not Found')]"
+            }
+          ],
+          "id": "25f4a2bd-adf0-4e41-b4c2-c744479b78b3"
+        },
+        {
+          "_comment": "Narrows the listing to the user's state via the sidebar's own links, matched by href since the base URL can't be templated.",
+          "actionType": "click",
+          "choices": [
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "al"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/al/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ak"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ak/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "az"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/az/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ar"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ar/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ca"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ca/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "co"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/co/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ct"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ct/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "de"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/de/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "dc"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/dc/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "fl"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/fl/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ga"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ga/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "hi"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/hi/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "id"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/id/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "il"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/il/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "in"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/in/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ia"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ia/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ks"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ks/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ky"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ky/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "la"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/la/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "me"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/me/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "md"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/md/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ma"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ma/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "mi"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/mi/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "mn"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/mn/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ms"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ms/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "mo"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/mo/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "mt"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/mt/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ne"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ne/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "nv"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/nv/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "nh"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/nh/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "nj"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/nj/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "nm"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/nm/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ny"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ny/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "nc"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/nc/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "nd"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/nd/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "oh"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/oh/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ok"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ok/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "or"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/or/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "pa"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/pa/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ri"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ri/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "sc"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/sc/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "sd"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/sd/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "tn"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/tn/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "tx"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/tx/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "ut"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/ut/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "vt"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/vt/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "va"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/va/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "wa"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/wa/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "wv"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/wv/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "wi"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/wi/')]"
+                }
+              ]
+            },
+            {
+              "condition": {
+                "operation": "==",
+                "left": "${state}",
+                "right": "wy"
+              },
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//a[contains(@href, '/wy/')]"
+                }
+              ]
+            }
+          ],
+          "id": "7a3f1c2e-5b6d-4e8f-9a0c-1d2e3f4a5b6c"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[@id='search-results-list'] | //h1[contains(text(), 'Page Not Found')]"
+            }
+          ],
+          "id": "8b4a2d1f-6c7e-4f9a-ab1d-2e3f4a5b6c7d"
+        },
+        {
+          "actionType": "extract",
+          "selector": "#search-results-list .name-card",
+          "noResultsSelector": "//h1[contains(text(), 'Page Not Found')]",
+          "profile": {
+            "name": {
+              "selector": ".//h2/a[contains(@class, 'like-h2')]",
+              "beforeText": ","
+            },
+            "age": {
+              "selector": ".//h2/a[contains(@class, 'like-h2')]",
+              "afterText": ","
+            },
+            "addressCityState": {
+              "selector": ".//span[contains(@class, 'person-location')]"
+            },
+            "addressFull": {
+              "selector": ".//div[contains(@class, 'section-title') and contains(@class, 'home-icon')]/following-sibling::div[contains(@class, 'section-flex')]//p"
+            },
+            "phoneList": {
+              "selector": ".//div[contains(@class, 'section-title') and contains(@class, 'phone-icon')]/following-sibling::div[contains(@class, 'section-flex')]//p",
+              "separator": ","
+            },
+            "email": {
+              "selector": ".//div[contains(@class, 'section-title') and contains(@class, 'email-icon')]/following-sibling::div[contains(@class, 'section-flex')]//p"
+            },
+            "relativesList": {
+              "selector": ".//div[contains(@class, 'section-title') and contains(@class, 'relative-icon')]/following-sibling::div[contains(@class, 'section-flex')]//a",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//h2/a[contains(@class, 'like-h2')]"
+            }
+          },
+          "id": "b21fb757-d690-45f8-83b2-62dfdde4e725"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.clustal.org/privacy-control/",
+          "id": "9d69fe40-c6e5-41db-9a47-975b3e4cbcb4"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#removebylink-link"
+            }
+          ],
+          "id": "204885aa-618b-4974-b669-2af080d8bd83"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".opt-out-form form",
+          "dataSource": "extractedProfile",
+          "elements": [
+            {
+              "type": "profileUrl",
+              "selector": "#removebylink-link"
+            }
+          ],
+          "id": "d27f56ba-948f-4303-91f7-5573a2ecdd1c"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".opt-out-form button[type='submit']"
+            }
+          ],
+          "id": "5bed42fb-a844-4f73-8039-a027648b8151"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "9777dabd-8549-4f7e-93c5-74657150e969"
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "9a4864bf-881b-45b1-9d9c-e3fdb8845aa2"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".opt-out-form form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "47a87bf7-74e4-466c-b3e2-adaf7d025551"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".opt-out-form button[type='submit']"
+            }
+          ],
+          "id": "39897922-33fb-4a01-948b-f54998684981"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".opt-out-text"
+            },
+            {
+              "type": "text",
+              "selector": ".opt-out-text",
+              "expect": "has been sent"
+            }
+          ],
+          "id": "006771cd-a8f3-4ca7-a123-bee9ff364019"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "9ddd48cd-82cb-4a9f-96f4-7a4a5440dfaf"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".opt-out-text"
+            },
+            {
+              "type": "text",
+              "selector": ".opt-out-text",
+              "expect": "has been received"
+            }
+          ],
+          "id": "a4d17c0b-7018-458d-bc06-21e0fce39b5a"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

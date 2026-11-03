@@ -37,21 +37,23 @@ import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = BrowserLifecycleObserver::class,
+    binding = binding<BrowserLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class FirstScreenHandlerImpl @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
@@ -71,6 +73,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val returnSessionLandingListener: ReturnSessionLandingListener,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val idleThresholdResolver: IdleThresholdResolver,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : BrowserLifecycleObserver {
 
     // Launch boundary: process-lifecycle callback, no activity graph exists to provide a frozen mode.
@@ -112,6 +115,9 @@ class FirstScreenHandlerImpl @Inject constructor(
             ensureNewUserDefault()
             val resolvedLanding = handleFirstScreen(isFreshLaunch, preAppliedFreshNtpTreatment)
             returnSessionLandingListener.onReturnLandingResolved(resolvedLanding)
+            // Report a duck.ai tab launch to the Ai session wide event.
+            val duckAiTab = tabRepository.getSelectedTab().takeIf { resolvedLanding.landing == ReturnSessionLanding.DUCK_AI }
+            duckAiSessionCallback.onLaunchLandingResolved(duckAiTab?.tabId, duckAiTab?.url)
         }
     }
 

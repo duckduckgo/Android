@@ -111,6 +111,22 @@ class RealBrowserMenuHighlightTest {
         }
     }
 
+    @Test
+    fun `when a fresh aggregate instance is created then it holds no acknowledgement state`() = runTest {
+        val testee1 = createTestee(listOf(pluginA, pluginB))
+        pluginAFlow.value = true
+        testee1.shouldShowHighlightForMode(BrowserViewMode.Browser).test {
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        val testee2 = createTestee(listOf(pluginA, pluginB))
+        testee2.shouldShowHighlightForMode(BrowserViewMode.Browser).test {
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun createTestee(plugins: List<BrowserMenuHighlightPlugin>): RealBrowserMenuHighlight {
         val pluginPoint = object : PluginPoint<BrowserMenuHighlightPlugin> {
             override fun getPlugins(): Collection<BrowserMenuHighlightPlugin> = plugins

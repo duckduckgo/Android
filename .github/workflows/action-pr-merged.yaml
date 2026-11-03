@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add PR merged comment
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         if: github.event.pull_request.merged
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -39,14 +39,14 @@ jobs:
       - name: Find Asana task ID
         id: find-asana-task
         if: steps.landed.outputs.on_default == 'true'
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: "Task/Issue URL:"
           action: 'find-asana-task-id'
       - name: If merged to the default branch, add to Waiting for release
         if: steps.find-asana-task.outputs.asanaTaskId != ''
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.7.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}

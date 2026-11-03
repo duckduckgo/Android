@@ -60,13 +60,14 @@ import com.duckduckgo.pir.impl.scripts.models.FetchedEmail
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class ExecuteBrokerStepActionEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -233,6 +234,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                                 profileQueryId = state.profileQuery.id,
                                 currentActionAttemptCount = state.actionRetryCount + 1, // actionRetryCount starts at 0
                                 currentAction = actionToExecute,
+                                isFreeScan = currentBrokerStep.isFreeScan,
                             ),
                         )
                     } else if (currentBrokerStep is OptOutStep && actionToExecute is SolveCaptcha) {

@@ -19,44 +19,69 @@ package com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.setMargins
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(BookmarkAddedDialogPlugin.PRIORITY_KEY_SETUP_SYNC)
 class SetupSyncBookmarkAddedPromo @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val activity: AppCompatActivity,
     private val syncPromotions: SyncPromotions,
+    private val promotionDataStore: SyncPromotionDataStore,
     private val syncStateMonitor: SyncStateMonitor,
     private val syncPixels: SyncPixels,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
+    private val setUpPromotion: SyncBookmarkAddedSetUpPromotion,
+    private val multiDevicePromotion: SyncBookmarkAddedMultiDevicePromotion,
 ) : BookmarkAddedDialogPlugin {
 
     @SuppressLint("InflateParams")
     override suspend fun getView(): View? {
+        if (setUpPromotion.canShowPromotion()) {
+            return SyncBookmarkAddedSetUpPromotionView(activity)
+        }
+
+        if (multiDevicePromotion.canShowPromotion()) {
+            return SyncBookmarkAddedMultiDevicePromotionView(activity)
+        }
+
         if (!syncPromotions.canShowBookmarkAddedDialogPromotion()) {
             return null
         }
 
         val root = LayoutInflater.from(activity).inflate(R.layout.view_sync_setup_bookmark_added_promo, null) as OneLineListItem
+        root.layoutParams = MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { setMargins(16.toPx(activity)) }
+        if (appBrandDesignUpdateToggles.radius().isEnabled()) {
+            root.setBackgroundResource(R.drawable.sync_bookmark_added_promo_background)
+        }
         root.setOnClickListener {
             onLaunchSyncFlow(activity)
             syncPixels.fireSetupSyncPromoBookmarkAddedDialogConfirmed()
@@ -72,7 +97,10 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     }
 
     private fun onLaunchSyncFlow(activity: AppCompatActivity) {
-        val intent = globalActivityStarter.startIntent(activity, SyncActivityWithEmptyParams)
+        val intent = globalActivityStarter.startIntent(
+            activity,
+            SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialog),
+        )
         activity.startActivity(intent)
     }
 
@@ -120,6 +148,7 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
         this.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
                 syncPixels.fireSetupSyncPromoBookmarkAddedDialogShown()
+                activity.lifecycleScope.launch { promotionDataStore.recordPromoImpression(BookmarkAddedDialog) }
             }
 
             override fun onViewDetachedFromWindow(v: View) {

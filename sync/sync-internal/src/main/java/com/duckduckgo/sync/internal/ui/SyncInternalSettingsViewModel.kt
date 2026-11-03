@@ -22,8 +22,8 @@ import android.content.Context
 import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -48,28 +48,30 @@ import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.auth.AuthPrompt
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
+import com.duckduckgo.sync.impl.auth.DeviceAuthorizationGracePeriod
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
+import com.duckduckgo.sync.impl.promotion.InternalSyncPromotionDataStore
 import com.duckduckgo.sync.internal.TestSyncWarningPlugin
+import com.duckduckgo.sync.internal.promotion.InternalSyncPromotionAppInstall
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.store.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -88,7 +90,6 @@ constructor(
     private val syncEnvDataStore: SyncInternalEnvDataStore,
     private val syncFaviconFetchingStore: FaviconsFetchingStore,
     private val dispatchers: DispatcherProvider,
-    private val syncPromotionDataStore: SyncPromotionDataStore,
     private val persistentStorage: PersistentStorage,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
@@ -103,6 +104,10 @@ constructor(
     private val syncDeviceIds: SyncDeviceIds,
     private val exchangeV2QrCode: ExchangeV2QrCode,
     private val syncCodeDispatcher: SyncCodeDispatcher,
+    private val deviceAuthenticator: DeviceAuthenticator,
+    private val gracePeriod: DeviceAuthorizationGracePeriod,
+    private val promotionDataStore: InternalSyncPromotionDataStore,
+    private val promotionAppInstall: InternalSyncPromotionAppInstall,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -110,6 +115,9 @@ constructor(
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart { getConnectedDevices() }
     fun commands(): Flow<Command> = command.receiveAsFlow()
+    val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
+    private var authJob: Job? = null
+    private val authLog = mutableListOf<String>()
 
     data class ViewState(
         val userId: String = "",
@@ -156,6 +164,7 @@ constructor(
         val canUsePatchEndpointForLegacyDeviceRenameEnabled: Boolean = false,
         val migrationStatusText: String = "",
         val migrationResult: String = "",
+        val authenticateResult: String = "",
     )
 
     sealed class BlockStoreValue {
@@ -183,6 +192,26 @@ constructor(
             refreshBlockStoreValue()
         }
         observeTestSyncWarningState()
+    }
+
+    fun onAuthenticateClicked() {
+        if (authJob?.isActive == true) return
+        authLog.clear()
+        authJob = viewModelScope.launch {
+            appendAuthLog("Authenticating…")
+            val response = deviceAuthenticator.authenticate(DeviceAuthenticator.Request()) { event -> appendAuthLog("Event: $event") }
+            appendAuthLog("Response: $response")
+        }
+    }
+
+    fun onInvalidateGracePeriodClicked() {
+        gracePeriod.invalidate()
+        appendAuthLog("Grace period invalidated")
+    }
+
+    private fun appendAuthLog(line: String) {
+        authLog += "${System.currentTimeMillis().toLogTimestamp()} $line"
+        viewState.update { it.copy(authenticateResult = authLog.joinToString("\n")) }
     }
 
     fun onResume() {
@@ -552,31 +581,11 @@ constructor(
         }
     }
 
-    fun onClearHistoryBookmarkAddedDialogPromoClicked() {
+    fun onResetAllPromotionDataClicked() {
         viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(BookmarkAddedDialog)
-            command.send(ShowMessage("'Bookmark added' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryBookmarkScreenPromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(BookmarksScreen)
-            command.send(ShowMessage("'Bookmark screen' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryPasswordScreenPromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(PasswordsScreen)
-            command.send(ShowMessage("'Password screen' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryChatTabPagePromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(ChatTabPage)
-            command.send(ShowMessage("'Chat tab page' promo history cleared"))
+            promotionDataStore.clearAllPromoHistory()
+            promotionAppInstall.setInstallationTimeOverride(null)
+            command.send(ShowMessage("All promo data reset"))
         }
     }
 

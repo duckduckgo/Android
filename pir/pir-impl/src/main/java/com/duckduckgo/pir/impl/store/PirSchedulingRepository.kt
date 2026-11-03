@@ -31,8 +31,9 @@ import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.ReportingRecord
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -149,9 +150,9 @@ interface PirSchedulingRepository {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirSchedulingRepository::class,
+    binding = binding<PirSchedulingRepository>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirSchedulingRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -407,6 +408,7 @@ class RealPirSchedulingRepository @Inject constructor(
             attemptCount = this.attemptCount,
             lastOptOutAttemptDateInMillis = this.lastOptOutAttemptDate ?: 0L,
             optOutRequestedDateInMillis = this.optOutRequestedDate,
+            optOutFirstRequestedDateInMillis = this.optOutFirstRequestedDate,
             optOutFormSubmittedDateInMillis = this.optOutFormSubmittedDate,
             optOutRemovedDateInMillis = this.optOutRemovedDate,
             deprecated = this.deprecated,
@@ -426,6 +428,7 @@ class RealPirSchedulingRepository @Inject constructor(
             attemptCount = this.attemptCount,
             lastOptOutAttemptDate = this.lastOptOutAttemptDateInMillis,
             optOutRequestedDate = this.optOutRequestedDateInMillis,
+            optOutFirstRequestedDate = this.optOutFirstRequestedDateInMillis,
             optOutFormSubmittedDate = this.optOutFormSubmittedDateInMillis,
             optOutRemovedDate = this.optOutRemovedDateInMillis,
             deprecated = this.deprecated,

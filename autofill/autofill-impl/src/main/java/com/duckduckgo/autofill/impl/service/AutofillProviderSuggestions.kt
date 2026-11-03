@@ -35,8 +35,8 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Compa
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_PACKAGE_ID_EXTRAS
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Companion.FILL_REQUEST_URL_EXTRAS
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
@@ -50,7 +50,7 @@ interface AutofillProviderSuggestions {
     ): FillResponse
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAutofillProviderSuggestions @Inject constructor(
     private val appBuildConfig: AppBuildConfig,

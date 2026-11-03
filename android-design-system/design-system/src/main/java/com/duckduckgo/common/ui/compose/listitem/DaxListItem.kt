@@ -21,14 +21,9 @@ package com.duckduckgo.common.ui.compose.listitem
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -119,55 +114,36 @@ internal fun DaxListItem(
     }
     val leadingScope = DaxListItemLeadingScope(enabled)
     val trailingScope = DaxListItemTrailingScope(enabled)
+    val contentAlpha = if (enabled) 1f else DaxListItemDefaults.DisabledAlpha
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(interaction)
-            .heightIn(min = rowMinHeight)
-            .padding(start = HorizontalPadding),
-        verticalAlignment = Alignment.CenterVertically,
+    DaxListItemLayout(
+        minHeight = rowMinHeight,
+        modifier = modifier.then(interaction),
+        leadingContent = leadingContent?.let { slot -> { leadingScope.slot() } },
+        trailingContent = trailingContent?.let { slot -> { trailingScope.slot() } },
     ) {
-        if (leadingContent != null) {
-            leadingScope.leadingContent()
-            Spacer(Modifier.width(DaxListItemDefaults.LeadingGap))
-        }
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(DaxListItemDefaults.TextSpacing),
-            modifier = Modifier
-                .weight(1f)
-                .alpha(if (enabled) 1f else DaxListItemDefaults.DisabledAlpha),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                DaxText(
-                    text = primaryText,
-                    style = DuckDuckGoTheme.typography.body1,
-                    color = primaryTextColor,
-                    maxLines = primaryMaxLines,
-                    modifier = Modifier.weight(1f, fill = false),
-                )
-                if (inlineContent != null) {
-                    Spacer(Modifier.width(DaxListItemDefaults.PillGap))
-                    DaxListItemInlineScope.inlineContent()
-                }
-            }
-
-            if (secondaryText != null) {
-                DaxText(
-                    text = secondaryText,
-                    style = DuckDuckGoTheme.typography.body2,
-                    color = secondaryTextColor,
-                    maxLines = secondaryMaxLines,
-                )
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.alpha(contentAlpha)) {
+            DaxText(
+                text = primaryText,
+                style = DuckDuckGoTheme.typography.body1,
+                color = primaryTextColor,
+                maxLines = primaryMaxLines,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            if (inlineContent != null) {
+                Spacer(Modifier.width(DaxListItemDefaults.PillGap))
+                DaxListItemInlineScope.inlineContent()
             }
         }
 
-        if (trailingContent != null) {
-            Spacer(Modifier.width(DaxListItemDefaults.TrailingGap))
-            trailingScope.trailingContent()
-        } else {
-            Spacer(Modifier.width(HorizontalPadding))
+        if (secondaryText != null) {
+            DaxText(
+                text = secondaryText,
+                style = DuckDuckGoTheme.typography.body2,
+                color = secondaryTextColor,
+                maxLines = secondaryMaxLines,
+                modifier = Modifier.alpha(contentAlpha),
+            )
         }
     }
 }

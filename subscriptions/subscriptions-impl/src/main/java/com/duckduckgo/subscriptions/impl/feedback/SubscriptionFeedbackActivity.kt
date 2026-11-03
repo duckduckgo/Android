@@ -24,14 +24,12 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -72,9 +70,6 @@ class SubscriptionFeedbackActivity :
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityFeedbackBinding by viewBinding()
@@ -85,15 +80,10 @@ class SubscriptionFeedbackActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         setupToolbar(toolbar)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
         observeViewModel()
         handleInitialState()
         onBackPressedDispatcher.addCallback(

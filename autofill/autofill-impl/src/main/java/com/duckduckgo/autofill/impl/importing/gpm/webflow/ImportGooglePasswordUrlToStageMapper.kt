@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

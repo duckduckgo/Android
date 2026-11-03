@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
@@ -37,13 +38,14 @@ import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.asActionType
 import com.duckduckgo.pir.impl.scripts.models.getDetails
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class BrokerActionFailedEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -81,6 +83,18 @@ class BrokerActionFailedEventHandler @Inject constructor(
         // and skip to the next action, instead of retrying and then failing the whole broker step.
         if (currentAction is BrokerAction.Condition) {
             return handleConditionNotMet(state)
+        }
+
+        // Silenced script failures still need diagnostics, but must not stop the broker step.
+        if (currentAction is BrokerAction.ExecuteScript && currentAction.failSilently && error is PirError.ActionError.JsActionFailed) {
+            emitBrokerActionFailedPixel(state, error)
+            return Next(
+                nextState = state.copy(
+                    currentActionIndex = state.currentActionIndex + 1,
+                    actionRetryCount = 0,
+                ),
+                nextEvent = ExecuteBrokerStepAction(UserProfile(userProfile = state.profileQuery)),
+            )
         }
 
         // If failure is on Any captcha action, we proceed to next action
@@ -159,7 +173,8 @@ class BrokerActionFailedEventHandler @Inject constructor(
         event: BrokerActionFailed,
         currentAction: BrokerAction,
     ): Boolean {
-        if (!event.allowRetry) {
+        // Scripts can have non-idempotent side effects, so never retry them.
+        if (!event.allowRetry || currentAction is BrokerAction.ExecuteScript) {
             return false
         }
 
@@ -201,6 +216,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
                 stepType = currentBrokerStep.step.stepType,
                 completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 actionType = currentAction.asActionType(),
+                isFreeScan = (currentBrokerStep as? ScanStep)?.isFreeScan == true,
             ),
         )
     }

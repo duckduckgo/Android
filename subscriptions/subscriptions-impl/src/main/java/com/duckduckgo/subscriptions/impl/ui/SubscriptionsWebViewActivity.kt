@@ -43,13 +43,13 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
@@ -57,9 +57,7 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -80,19 +78,21 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
+import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.api.PirScreens.PirDesktopScreen
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.PurchaseExperiments
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.appendFunnelOriginParam
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
-import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
@@ -119,8 +119,10 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONObject
@@ -147,7 +149,6 @@ data class SubscriptionsWebViewActivityWithParams(
 
 @InjectWith(
     scope = ActivityScope::class,
-    delayGeneration = true, // Delayed because it has a dependency on DownloadConfirmationFragment from another module
 )
 @ContributeToActivityStarter(SubscriptionPurchase::class, screenName = "subscriptions.purchase")
 @ContributeToActivityStarter(SubscriptionUpgrade::class, screenName = "subscriptions.upgrade")
@@ -208,9 +209,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
@@ -241,10 +239,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             logcat { "Subscription Flow: entering with params $it" }
         }
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         if (savedInstanceState == null) {
             params.launchPixel?.let { pixel.fire(it) }
@@ -253,9 +248,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         binding.webview.let {
             subscriptionJsMessaging.register(
@@ -323,17 +316,21 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
         }
 
-        logcat {
-            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: ${params.url}"
-        }
-        binding.webview.loadUrl(params.url)
-
         viewModel.start()
 
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.initialUrl
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .filterNotNull()
+            .take(1)
+            .onEach { loadUrl(it) }
+            .launchIn(lifecycleScope)
+
+        viewModel.resolveInitialUrl(params.url)
 
         viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).distinctUntilChanged().onEach {
             renderPurchaseState(it.purchaseState)
@@ -398,19 +395,24 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 } else {
                     webViewActivityWithParams
                 }
-            }
+            }.appendFunnelOriginToUrl()
         }
 
         intent.getActivityParams(SubscriptionUpgrade::class.java)?.let { params ->
             return SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.upgradeToProUrl,
                 origin = params.origin,
-            )
+            ).appendFunnelOriginToUrl()
         }
 
-        return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-            ?: SubscriptionsWebViewActivityWithParams(subscriptionsUrlProvider.buyUrl)
+        return (
+            intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
+                ?: SubscriptionsWebViewActivityWithParams(subscriptionsUrlProvider.buyUrl)
+            ).appendFunnelOriginToUrl()
     }
+
+    private fun SubscriptionsWebViewActivityWithParams.appendFunnelOriginToUrl(): SubscriptionsWebViewActivityWithParams =
+        copy(url = url.appendFunnelOriginParam(origin))
 
     private fun launchDownloadMessagesJob() {
         downloadMessagesJob += lifecycleScope.launch {
@@ -567,7 +569,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is BackToSettings, BackToSettingsActivateSuccess -> finishToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
-            is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
+            is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experiments)
             is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
@@ -579,6 +581,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is RequestNotificationsPermission -> launchNotificationsPermission(command.id)
             Reload -> binding.webview.reload()
         }
+    }
+
+    private fun loadUrl(url: String) {
+        logcat {
+            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: $url"
+        }
+        binding.webview.loadUrl(url)
     }
 
     private fun goToPIRDashboard() {
@@ -599,7 +608,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun goToPIR() {
-        globalActivityStarter.start(this, PirScreenWithEmptyParams)
+        globalActivityStarter.start(this, PirDesktopScreen)
     }
 
     private fun goToNetP(params: ActivityParams) {
@@ -643,7 +652,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 onPurchaseSuccess(subscriptionEventData = null, launchOnboarding = false)
             }
             is PurchaseStateView.Success -> {
-                pixelSender.reportPurchaseSuccessOrigin(params.origin, purchaseState.isFreeTrial)
                 onPurchaseSuccess(purchaseState.subscriptionEventData, purchaseState.launchOnboarding)
             }
             is PurchaseStateView.Recovered -> {
@@ -717,10 +725,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun selectSubscription(
         id: String,
         offerId: String?,
-        experimentName: String?,
-        experimentCohort: String?,
+        experiments: PurchaseExperiments,
     ) {
-        viewModel.purchaseSubscription(this, id, offerId, experimentName, experimentCohort, params.origin)
+        viewModel.purchaseSubscription(this, id, offerId, experiments, params.origin)
     }
 
     private fun changeSubscriptionPlan(

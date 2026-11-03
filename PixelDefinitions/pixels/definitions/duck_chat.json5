@@ -29,12 +29,41 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_addressbar_click_aichat": {
-        "description": "Fires when the user touches the address bar while the Duck.ai chat input is showing",
-        "owners": ["0nko"],
+    "m_aichat_contextual_selection_attached": {
+        "description": "User attached a text selection to Duck.ai via the \"Ask Duck.ai\" text selection action. Not sent when the same text is selected again, or when the attachment is refused at the limit.",
+        "owners": ["joshliebe"],
         "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "browserMode"]
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_selection_limit_reached": {
+        "description": "User tried to attach a text selection to Duck.ai but had already attached the maximum number of selections, so it was refused.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_selection_removed": {
+        "description": "User removed an attached text selection from the Duck.ai composer.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_with_selections": {
+        "description": "User submitted a Duck.ai contextual prompt that carried one or more attached text selections.",
+        "owners": ["joshliebe"],
+        "triggers": ["user_submitted"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selection_count",
+                "type": "string",
+                "description": "Bucketed number of text selections attached to the submitted prompt.",
+                "enum": ["1", "2", "3-5"]
+            }
+        ]
     },
     "m_aichat_contextual_sheet_opened_count": {
         "description": "User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
@@ -440,13 +469,18 @@
         ]
     },
     "m_aichat_entry_point": {
-        "description": "Fires when an active user action enters Duck.ai, with the initiating surface and navigation context.",
+        "description": "Fires when a user enters Duck.ai, including opening the app onto a Duck.ai tab or swiping onto one, with the initiating surface and navigation context.",
         "owners": ["YoussefKeyrouz"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction", "startup"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": [
             "appVersion",
             "duckAiEntrySource",
+            {
+                "key": "voice",
+                "type": "boolean",
+                "description": "Whether voice was used to start this entry, including dictated prompts."
+            },
             { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
             {
                 "key": "input_screen_enabled",
@@ -1231,6 +1265,33 @@
             }
         ]
     },
+    "m_aichat_input_outcome": {
+        "description": "How a Duck.ai input session ended: a prompt was sent, a voice chat started, a suggested prompt was picked, or the input closed without any of them. A session is the input focused with Duck.ai selected. Only sent while native ToS consent is on.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            {
+                "key": "tos_disclaimer_shown",
+                "type": "boolean",
+                "description": "Whether the ToS disclaimer was on screen at any point during the input session"
+            },
+            {
+                "key": "outcome",
+                "type": "string",
+                "description": "How the input session ended",
+                "enum": ["prompt_submitted", "voice_started", "abandoned", "suggested_prompt"]
+            },
+            {
+                "key": "submit_method",
+                "type": "string",
+                "description": "What the user did to send. Only present for prompt_submitted and suggested_prompt. other covers quick actions, suggested prompts, Paste and Go and dictation. Enter only counts when the keyboard submits, not when it inserts a newline.",
+                "enum": ["button", "enter", "other"]
+            }
+        ]
+    },
     "m_aichat_unified_input_prompt_submitted_count": {
         "description": "User submitted a prompt from the Unified Input",
         "owners": ["malmstein"],
@@ -1492,6 +1553,61 @@
             }
         ]
     },
+    "m_aichat_unified_input_picker_upsell_shown": {
+        "description": "Subscription-funnel impression: a Unified Input picker was shown with a gated section, so the user saw the upsell. The matching click is m_aichat_unified_input_subscription_upsell_triggered.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which picker showed the gated section",
+                "enum": ["model_picker", "reasoning_picker"]
+            },
+            {
+                "key": "header",
+                "type": "string",
+                "description": "Which gated section header the user saw, i.e. what the copy told them unlocks those rows",
+                "enum": ["try_free_trial", "subscriber_exclusive", "pro_exclusive"]
+            },
+            {
+                "key": "current_tier",
+                "type": "string",
+                "description": "The user's current subscription tier",
+                "enum": ["free", "plus", "pro"]
+            },
+            {
+                "key": "origin",
+                "type": "string",
+                "description": "Subscription-funnel entry point of the picker that showed the upsell",
+                "enum": [
+                    "funnel_addressbar_android__modelpicker",
+                    "funnel_addressbar_android__reasoningdropdown",
+                    "funnel_duckai_android__modelpicker",
+                    "funnel_duckai_android__reasoningdropdown",
+                    "funnel_duckai_android__switchmodel"
+                ]
+            }
+        ]
+    },
+    "m_aichat_model_label_unknown_daily": {
+        "description": "Debug: the models endpoint returned an editorial label this app version does not recognise, so the model sorts as recommended but renders no subline. Signals that new label copy needs adding.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "label",
+                "type": "string",
+                "description": "The unrecognised label id as returned by the backend, uppercased and stripped to letters, digits and underscores",
+                "pattern": "^[A-Z0-9_]{1,40}$",
+                "examples": ["EXTRA_PRIVACY"]
+            }
+        ]
+    },
     "m_aichat_unified_input_reasoning_effort_picker_shown": {
         "description": "Subscription-funnel impression: the Unified Input reasoning effort picker was shown to the user",
         "owners": ["YoussefKeyrouz"],
@@ -1685,6 +1801,34 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_attachment_privacy_image_shown": {
+        "description": "Fires when the attachment privacy disclaimer appears under the native Duck.ai input with an image staged. Once per prompt, and the disclaimer is shown for one prompt per install.",
+        "owners": ["joshliebe"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_file_shown": {
+        "description": "Fires when the attachment privacy disclaimer appears under the native Duck.ai input with a file (no image) staged. Once per prompt, and the disclaimer is shown for one prompt per install.",
+        "owners": ["joshliebe"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_image_learn_more_tapped": {
+        "description": "Fires when the user taps the Learn more link on the attachment privacy disclaimer while an image is staged.",
+        "owners": ["joshliebe"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_file_learn_more_tapped": {
+        "description": "Fires when the user taps the Learn more link on the attachment privacy disclaimer while a file (no image) is staged.",
+        "owners": ["joshliebe"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
     "m_aichat_contextual_quick_action_ask_about_page_shown": {
         "description": "The Ask About Page quick action pill was shown in the Contextual sheet",
         "owners": ["karlenDimla"],
@@ -1741,7 +1885,9 @@
         "description": "User submitted a follow-up prompt in an existing Duck.ai chat, reported by the Duck.ai frontend via the reportMetric JS bridge.",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
+            "appVersion",
             {
                 "key": "delta-timestamp-minutes",
                 "type": "integer",
@@ -1754,13 +1900,29 @@
         "description": "User submitted the first prompt of a new Duck.ai chat, reported by the Duck.ai frontend via the reportMetric JS bridge.",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
+            "appVersion",
             {
                 "key": "delta-timestamp-minutes",
                 "type": "integer",
                 "description": "Minutes since the previous Duck.ai session interaction"
             },
             "firstPromptNewInstall"
+        ]
+    },
+    "aichat_start_new_conversation_button_clicked": {
+        "description": "User tapped the New Chat button in the Duck.ai frontend, reported via the reportMetric JS bridge.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "delta-timestamp-minutes",
+                "type": "integer",
+                "description": "Minutes since the previous Duck.ai session interaction"
+            }
         ]
     },
     "aichat_contextual_address_bar_menu_shown": {
@@ -1791,6 +1953,13 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "aichat_contextual_address_bar_menu_all_chats_selected": {
+        "description": "Fired when the user selects All Chats in the address bar Duck.ai menu",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "aichat_contextual_open_duckai_menu_tapped": {
         "description": "Fired when the user selects Open Duck.ai in the contextual sheet chats menu",
         "owners": ["karlenDimla"],
@@ -1817,6 +1986,48 @@
         "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_menu_new_voice_chat_tapped": {
+        "description": "User tapped New Voice Chat in the Duck.ai plus menu in the omnibar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_menu_new_image_tapped": {
+        "description": "User tapped New Image in the Duck.ai plus menu in the omnibar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_menu_new_tab_tapped": {
+        "description": "User tapped New Tab in the Duck.ai plus menu in the omnibar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_menu_new_fire_tab_tapped": {
+        "description": "User tapped New Fire Tab in the Duck.ai plus menu in the omnibar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_new_chat_button_tapped": {
+        "description": "User tapped New Chat in the Duck.ai omnibar, either the dedicated button or the entry in the \"+\" menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_sidebar_button_tapped": {
+        "description": "User tapped the sidebar button in the Duck.ai omnibar, which opens the recent chats sidebar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     }
 }

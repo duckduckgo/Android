@@ -19,7 +19,7 @@ package com.duckduckgo.remote.messaging.internal.feature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.internal.setting.RmfConfigMode
 import com.duckduckgo.remote.messaging.internal.setting.RmfConfigSourceStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import okhttp3.HttpUrl
 import javax.inject.Inject

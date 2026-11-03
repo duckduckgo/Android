@@ -21,14 +21,15 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.OnboardingPreference
-import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
-import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_END
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
-import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_COMPLETE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH
@@ -38,6 +39,7 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SET_DEFAULT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_TIME_LIMIT
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -80,6 +82,7 @@ class RealOnboardingPixelSenderTest {
         on { formFactor() } doReturn DeviceInfo.FormFactor.PHONE
     }
     private val mockAppBuildConfig: AppBuildConfig = mock { onBlocking { isAppReinstall() } doReturn false }
+    private val mockOnboardingStore: OnboardingStore = mock()
 
     private val testee = RealOnboardingPixelSender(
         appCoroutineScope = coroutineRule.testScope,
@@ -92,6 +95,7 @@ class RealOnboardingPixelSenderTest {
         widgetCapabilities = mockWidgetCapabilities,
         deviceInfo = mockDeviceInfo,
         appBuildConfig = mockAppBuildConfig,
+        onboardingStore = mockOnboardingStore,
     )
 
     @Test
@@ -123,6 +127,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = true))
 
@@ -137,6 +142,46 @@ class RealOnboardingPixelSenderTest {
                 "value" to "engage",
             ),
             type = Unique(tag = "onboarding_welcome_clicked_engage"),
+        )
+    }
+
+    @Test
+    fun whenFireTimeLimitReachedByAppOpensThenReachedEventWithAppOpensValue() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(ONBOARDING_TIME_LIMIT, OnboardingPixelAction.TimeLimitReached(byAppOpens = true))
+
+        verify(mockPixel).fire(
+            ONBOARDING_TIME_LIMIT,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "reached",
+                "value" to "app-opens",
+            ),
+            type = Unique(tag = "onboarding_time-limit_reached"),
+        )
+    }
+
+    @Test
+    fun whenFireTimeLimitReachedByDaysThenReachedEventWithDaysValue() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7))
+
+        testee.fire(ONBOARDING_TIME_LIMIT, OnboardingPixelAction.TimeLimitReached(byAppOpens = false))
+
+        verify(mockPixel).fire(
+            ONBOARDING_TIME_LIMIT,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "4-10",
+                "event" to "reached",
+                "value" to "days",
+            ),
+            type = Unique(tag = "onboarding_time-limit_reached"),
         )
     }
 
@@ -317,6 +362,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(ONBOARDING_QUICK_SETUP, OnboardingPixelAction.Shown)
 
@@ -345,6 +391,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(
             ONBOARDING_QUICK_SETUP,
@@ -389,6 +436,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(
             ONBOARDING_QUICK_SETUP,
@@ -433,6 +481,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(
             ONBOARDING_QUICK_SETUP,
@@ -489,6 +538,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockAppBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         variantTestee.chatBranchSelected()
 
@@ -523,6 +573,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockAppBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         variantTestee.searchBranchSelected()
 
@@ -558,6 +609,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockAppBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         variantTestee.chatBranchSelected()
 
@@ -904,45 +956,76 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFirePasswordImportConfirmedSuccessThenValueSuccess() = runTest {
+    fun whenFirePasswordImportCompleteShownThenNoValue() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.SUCCESS))
+        testee.fire(ONBOARDING_PASSWORD_IMPORT_COMPLETE, OnboardingPixelAction.Shown)
 
         verify(mockPixel).fire(
-            ONBOARDING_PASSWORD_IMPORT,
+            ONBOARDING_PASSWORD_IMPORT_COMPLETE,
             mapOf(
                 "installType" to "new",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
-                "event" to "confirmed",
-                "value" to "success",
+                "event" to "shown",
             ),
-            type = Unique(tag = "onboarding_password-import_confirmed_success"),
+            type = Unique(tag = "onboarding_password-import-complete_shown"),
         )
     }
 
     @Test
-    fun whenFirePasswordImportConfirmedForEitherErrorThenBothReportTheSameValue() = runTest {
+    fun whenFirePasswordImportErrorShownThenValueIsTheFailureKind() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.TRANSIENT_ERROR))
-        testee.fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.PERMANENT_ERROR))
+        testee.fire(ONBOARDING_PASSWORD_IMPORT_ERROR, OnboardingPixelAction.PasswordImportErrorShown(transient = true))
+        testee.fire(ONBOARDING_PASSWORD_IMPORT_ERROR, OnboardingPixelAction.PasswordImportErrorShown(transient = false))
 
-        verify(mockPixel, times(2)).fire(
-            ONBOARDING_PASSWORD_IMPORT,
-            mapOf(
-                "installType" to "new",
-                "flow" to "default",
-                "pixelSource" to "phone",
-                "daysSinceInstall" to "0",
-                "event" to "confirmed",
-                "value" to "error",
-            ),
-            type = Unique(tag = "onboarding_password-import_confirmed_error"),
+        verify(mockPixel).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            errorParams(event = "shown", value = "transient"),
+            type = Unique(tag = "onboarding_password-import-error_shown_transient"),
+        )
+        verify(mockPixel).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            errorParams(event = "shown", value = "permanent"),
+            type = Unique(tag = "onboarding_password-import-error_shown_permanent"),
         )
     }
+
+    @Test
+    fun whenFirePasswordImportErrorClickedThenValueIsTheActionTaken() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(ONBOARDING_PASSWORD_IMPORT_ERROR, OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CONTINUE))
+        testee.fire(ONBOARDING_PASSWORD_IMPORT_ERROR, OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.RETRY))
+        testee.fire(ONBOARDING_PASSWORD_IMPORT_ERROR, OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CANCEL))
+
+        verify(mockPixel).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            errorParams(event = "clicked", value = "engage"),
+            type = Unique(tag = "onboarding_password-import-error_clicked_engage"),
+        )
+        verify(mockPixel).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            errorParams(event = "clicked", value = "retry"),
+            type = Unique(tag = "onboarding_password-import-error_clicked_retry"),
+        )
+        verify(mockPixel).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            errorParams(event = "clicked", value = "dismiss"),
+            type = Unique(tag = "onboarding_password-import-error_clicked_dismiss"),
+        )
+    }
+
+    private fun errorParams(event: String, value: String) = mapOf(
+        "installType" to "new",
+        "flow" to "default",
+        "pixelSource" to "phone",
+        "daysSinceInstall" to "0",
+        "event" to event,
+        "value" to value,
+    )
 
     @Test
     fun whenSegmentedFlowStartedThenFlowParamIsTailoredByDownloadReason() = runTest {
@@ -986,10 +1069,10 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenDownloadReasonSelectedThenSegmentedVariantParamIsThatReason() = runTest {
+    fun whenDownloadReasonSelectedThenDownloadReasonVariantParamIsThatReason() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.downloadReasonSelected(DownloadReasonSelection.AI_CHAT)
+        whenever(mockOnboardingStore.getDownloadReason()).thenReturn(DownloadReasonSelection.AI_CHAT)
         testee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Shown)
 
         verify(mockPixel).fire(
@@ -997,7 +1080,7 @@ class RealOnboardingPixelSenderTest {
             mapOf(
                 "installType" to "new",
                 "flow" to "default",
-                "variant_segmented" to "download_reason_ai-chat",
+                "variant_download_reason" to "download_reason_ai-chat",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "shown",
@@ -1010,7 +1093,7 @@ class RealOnboardingPixelSenderTest {
     fun whenBothDownloadReasonAndBranchSelectedThenEachGetsItsOwnParam() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.downloadReasonSelected(DownloadReasonSelection.BLOCK_ADS)
+        whenever(mockOnboardingStore.getDownloadReason()).thenReturn(DownloadReasonSelection.BLOCK_ADS)
         testee.chatBranchSelected()
         testee.fire(ONBOARDING_END, OnboardingPixelAction.Shown)
 
@@ -1020,7 +1103,7 @@ class RealOnboardingPixelSenderTest {
                 "installType" to "new",
                 "flow" to "default",
                 "variant" to "search_plus_duckai-chat",
-                "variant_segmented" to "download_reason_ad-blocking",
+                "variant_download_reason" to "download_reason_ad-blocking",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "shown",
@@ -1030,7 +1113,7 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenOnlyTheBranchIsSelectedThenSegmentedVariantIsAbsent() = runTest {
+    fun whenOnlyTheBranchIsSelectedThenDownloadReasonVariantIsAbsent() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
         testee.searchBranchSelected()
@@ -1051,11 +1134,11 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFlowAttributionClearedThenSegmentedFlowAndReasonAreBothDropped() = runTest {
+    fun whenFlowAttributionClearedThenSegmentedFlowAndBranchAreBothDropped() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
         testee.segmentedFlowStarted()
-        testee.downloadReasonSelected(DownloadReasonSelection.SEARCH)
+        testee.chatBranchSelected()
         testee.clearFlowAttribution()
         testee.fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
 
@@ -1088,10 +1171,10 @@ class RealOnboardingPixelSenderTest {
 
     /** The reason is persisted as the choice is confirmed, so the step's own clicked pixel already carries it. */
     @Test
-    fun whenFireDownloadReasonClickedAfterTheReasonIsPersistedThenTheSegmentedVariantIsAlsoSent() = runTest {
+    fun whenFireDownloadReasonClickedAfterTheReasonIsPersistedThenTheDownloadReasonVariantIsAlsoSent() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.downloadReasonSelected(DownloadReasonSelection.NO_AI)
+        whenever(mockOnboardingStore.getDownloadReason()).thenReturn(DownloadReasonSelection.NO_AI)
         testee.fire(ONBOARDING_DOWNLOAD_CHOICE, OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.NO_AI))
 
         verify(mockPixel).fire(
@@ -1099,7 +1182,7 @@ class RealOnboardingPixelSenderTest {
             mapOf(
                 "installType" to "new",
                 "flow" to "default",
-                "variant_segmented" to "download_reason_no-ai",
+                "variant_download_reason" to "download_reason_no-ai",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "clicked",

@@ -14,7 +14,7 @@ Wide events measure a user's complete journey through a multi-step flow, sending
 Cross-platform design guidance on naming, status, data selection and latency bucketing lives in the
 `windows-browser` repository, not here — ask the user for it if you need it.
 
-The privacy invariants in CLAUDE.md apply to every field of a wide event, including bucketing all
+The privacy invariants in AGENTS.md apply to every field of a wide event, including bucketing all
 latency values.
 
 ---
@@ -98,7 +98,7 @@ wideEventClient.flowStart(
 Defines what happens to flows abandoned due to app termination or timeout:
 
 ```kotlin
-// Complete the flow with Unknown status on next process start
+// Complete the flow with Unknown status on the next start of the process that began it
 CleanupPolicy.OnProcessStart(
     ignoreIfIntervalTimeoutPresent = true,   // keep alive if an interval timeout is set
     flowStatus = FlowStatus.Unknown,
@@ -127,7 +127,7 @@ interface MyFeatureWideEvent {
 }
 
 // 2. Implement it, injecting WideEventClient
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class MyFeatureWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,

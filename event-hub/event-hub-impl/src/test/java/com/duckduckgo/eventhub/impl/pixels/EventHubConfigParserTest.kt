@@ -82,6 +82,36 @@ class EventHubConfigParserTest {
     }
 
     @Test
+    fun `buckets keep the order they appear in the config`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_period": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "c": {
+                                "template": "counter", "source": "e",
+                                "buckets": {
+                                    "40+": {"gte": 40},
+                                    "0":   {"gte": 0, "lt": 1},
+                                    "3-5": {"gte": 3, "lt": 6},
+                                    "1-2": {"gte": 1, "lt": 3},
+                                    "6-39": {"gte": 6, "lt": 40}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val buckets = EventHubConfigParser.parseTelemetry(json).single().parameters["c"]!!.buckets
+
+        assertEquals(listOf("40+", "0", "3-5", "1-2", "6-39"), buckets.keys.toList())
+    }
+
+    @Test
     fun `seconds period parses correctly`() {
         val json = """
             {
@@ -319,4 +349,135 @@ class EventHubConfigParserTest {
         assertEquals(1, telemetry.size)
         assertEquals(5400L, telemetry[0].trigger.period.periodSeconds) // 1h30m = 5400s
     }
+
+    @Test
+    fun `immediate_v2 entry does not prevent sibling period entry from parsing`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_immediate": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate_v2", "source": "captcha" },
+                        "parameters": {}
+                    },
+                    "webTelemetry_period": $periodPixelJson
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
+        assertEquals(listOf("webTelemetry_period"), telemetry.map { it.name })
+    }
+
+    @Test
+    fun `immediate, immediate_v3 and unknown trigger types are skipped`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_immediate": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate", "source": "captcha", "period": { "days": 1 } },
+                        "parameters": $counterParametersJson
+                    },
+                    "webTelemetry_immediateV3": {
+                        "state": "enabled",
+                        "trigger": { "type": "immediate_v3", "source": "captcha", "cooldown": { "days": 1 } },
+                        "parameters": $counterParametersJson
+                    },
+                    "webTelemetry_unknown": {
+                        "state": "enabled",
+                        "trigger": { "type": "somethingNew", "period": { "days": 1 } },
+                        "parameters": $counterParametersJson
+                    },
+                    "webTelemetry_period": $periodPixelJson
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
+        assertEquals(listOf("webTelemetry_period"), telemetry.map { it.name })
+    }
+
+    @Test
+    fun `explicit period trigger type is parsed`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_period": {
+                        "state": "enabled",
+                        "trigger": { "type": "period", "period": { "days": 1 } },
+                        "parameters": $counterParametersJson
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
+        assertEquals(1, telemetry.size)
+        assertEquals(86400L, telemetry[0].trigger.period.periodSeconds)
+    }
+
+    @Test
+    fun `malformed entry does not affect sibling entries`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_missingState": {
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": $counterParametersJson
+                    },
+                    "webTelemetry_badBucket": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "c": { "template": "counter", "source": "e", "buckets": {"bad": {"lt": 5}} }
+                        }
+                    },
+                    "webTelemetry_notAnObject": 42,
+                    "webTelemetry_period": $periodPixelJson
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
+        assertEquals(listOf("webTelemetry_period"), telemetry.map { it.name })
+    }
+
+    @Test
+    fun `null entry is skipped without affecting sibling entries`() {
+        val json = """
+            {
+                "telemetry": {
+                    "webTelemetry_null": null,
+                    "webTelemetry_period": $periodPixelJson
+                }
+            }
+        """.trimIndent()
+
+        val telemetry = EventHubConfigParser.parseTelemetry(json)
+
+        assertEquals(listOf("webTelemetry_period"), telemetry.map { it.name })
+    }
+
+    private val counterParametersJson = """
+        {
+            "c": {
+                "template": "counter",
+                "source": "e",
+                "buckets": {"0+": {"gte": 0}}
+            }
+        }
+    """.trimIndent()
+
+    private val periodPixelJson = """
+        {
+            "state": "enabled",
+            "trigger": { "period": { "days": 1 } },
+            "parameters": $counterParametersJson
+        }
+    """.trimIndent()
 }

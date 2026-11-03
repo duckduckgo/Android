@@ -23,9 +23,10 @@ import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
@@ -37,14 +38,14 @@ interface AutofillServiceFeatureRepository {
     val exceptions: CopyOnWriteArrayList<String>
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AutofillServiceFeatureRepository::class,
+    binding = binding<AutofillServiceFeatureRepository>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = AutofillServiceFeatureRepository::class,
+    binding = binding<AutofillServiceFeatureRepository>(),
 )
 class RealAutofillServiceFeatureRepository @Inject constructor(
     @IsMainProcess private val isMainProcess: Boolean,

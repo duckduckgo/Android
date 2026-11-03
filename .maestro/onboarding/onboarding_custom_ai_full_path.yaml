@@ -36,8 +36,12 @@ tags:
             - tapOn: "duckduckgo"
             - tapOn: "set as default"
       - assertVisible:
+          id: "widgetPromptTitle"
+      - tapOn: "Not Now"
+      - assertVisible:
           text: "Where should I put your address.bar."
       - tapOn: "Next"
+      - hideKeyboard
       - assertVisible:
           text: "Ask anything privately.*"
       - assertVisible:

@@ -1,20 +1,17 @@
 appId: com.duckduckgo.mobile.android
 ---
-# with inputWithAiToggle="false" the address bar is in search-only mode, where the
-# `nativeInputOmnibar.nativeInputSearchOnly` remote flag (percentage rollout) decides
-# whether we get the native input widget or the legacy omnibar. Wait for either.
+# with inputWithAiToggle="false" the address bar is in search-only mode
 - extendedWaitUntil:
     visible:
-      id: "inputModeWidget|omnibarTextInput"
+      id: "inputModeWidget"
     timeout: 15000
 
-# focus whichever field is live and type a question
 - tapOn:
-    id: "omnibarTextInput|inputField"
+    id: "inputField"
 - inputText: "what is a car"
 
-# with inputWithAiToggle=false there is no Duck.ai tab — the Duck.ai icon is the
-# entry point to chat, and it carries the same id in both input paths
+# with inputWithAiToggle=false there is no Duck.ai tab, so the Duck.ai icon is the
+# entry point to chat
 - assertVisible:
     id: "aiChatIconMenu"
 - tapOn:
@@ -26,20 +23,18 @@ appId: com.duckduckgo.mobile.android
 # duck.ai's web view sometimes fails to load — tap "Reload Duck.ai" if shown
 - runFlow: reload_duckai_if_needed.yaml
 
-# Duck.ai opened — header replaces the omnibar and the back arrow appears
+# Duck.ai opened — header replaces the omnibar
 - extendedWaitUntil:
     visible:
-      id: "duckAiBack"
+      id: "duckAIHeader"
     timeout: 15000
 
-# tap the back arrow — only present in this AI-off entry path — and verify
-# we land back on the NTP. We avoid asserting on ddgLogo because there are
-# two views with that id (one on the NTP, one a Lottie inside the unified
+# press system back and verify we land back on the NTP. We avoid asserting
+# on ddgLogo because there are two views with that id (one on the NTP, one a Lottie inside the unified
 # input fragment), and after the back-pop the unified input re-opens over
 # the NTP so the NTP logo can be obscured. Instead assert the NTP container
 # is present and that the Duck.ai chat header is gone.
-- tapOn:
-    id: "duckAiBack"
+- back
 - extendedWaitUntil:
     visible:
       id: "newTabPage"

@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.elementhiding.store.ElementHidingEntity
 import com.duckduckgo.elementhiding.store.ElementHidingRepository
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ElementHidingFeaturePlugin @Inject constructor(
     private val elementHidingRepository: ElementHidingRepository,
 ) : PrivacyFeaturePlugin {

@@ -23,7 +23,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,7 +59,7 @@ class RealInlineBrowserAutofillConfigurator @Inject constructor(
                 val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url, reauthenticationDetails, browserMode)
 
                 withContext(dispatchers.main()) {
-                    webView.evaluateJavascript("javascript:$formatted", null)
+                    webView.evaluateJavascript(formatted, null)
                 }
             } else {
                 logcat(VERBOSE) { "Won't inject autofill JS into WebView for: $url" }

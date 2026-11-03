@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.scripts.models
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Click
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Condition
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.EmailConfirmation
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction.ExecuteScript
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation.ExpectationSelector
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Extract
@@ -74,12 +75,20 @@ sealed class BrokerAction(
         val parent: ParentElement? = null,
     ) : BrokerAction(id)
 
+    /**
+     * A click either targets [elements] directly, or branches on [choices] with an optional [default].
+     */
     data class Click(
         override val id: String,
-        val elements: List<ElementSelector>,
+        val elements: List<ElementSelector>? = null,
         val selector: String?,
-        val choice: List<Choice> = emptyList(),
+        val choices: List<Choice>? = null,
+        val default: Default? = null,
     ) : BrokerAction(id) {
+        data class Default(
+            val elements: List<ElementSelector>,
+        )
+
         data class Choice(
             val condition: Condition,
             val elements: List<ElementSelector>,
@@ -92,13 +101,20 @@ sealed class BrokerAction(
         )
     }
 
+    data class ExecuteScript(
+        override val id: String,
+        val script: String,
+        val failSilently: Boolean = false,
+    ) : BrokerAction(id)
+
     data class Expectation(
         override val id: String,
         val expectations: List<ExpectationSelector>,
+        val actions: List<BrokerAction> = emptyList(),
     ) : BrokerAction(id) {
         data class ExpectationSelector(
             val type: String,
-            val selector: String,
+            val selector: String?,
             val expect: String?,
             val parent: String?,
             val failSilently: Boolean?,
@@ -113,9 +129,14 @@ sealed class BrokerAction(
     data class Condition(
         override val id: String,
         @Json(name = "_comment")
-        val comment: String,
+        val comment: String?,
         val expectations: List<ExpectationSelector>,
-        val actions: List<BrokerAction>,
+        val actions: List<BrokerAction> = emptyList(),
+    ) : BrokerAction(id)
+
+    data class Scroll(
+        override val id: String,
+        val selector: String,
     ) : BrokerAction(id)
 
     data class GenerateEmail(
@@ -180,11 +201,13 @@ fun BrokerAction.asActionType(): String {
         is Extract -> "extract"
         is Expectation -> "expectation"
         is Click -> "click"
+        is ExecuteScript -> "executeScript"
         is FillForm -> "fillForm"
         is GetCaptchaInfo -> "getCaptchaInfo"
         is SolveCaptcha -> "solveCaptcha"
         is EmailConfirmation -> "emailConfirmation"
         is Condition -> "condition"
+        is BrokerAction.Scroll -> "scroll"
         is BrokerAction.GenerateEmail -> "generateEmail"
         is BrokerAction.GetEmailData -> "getEmailData"
     }

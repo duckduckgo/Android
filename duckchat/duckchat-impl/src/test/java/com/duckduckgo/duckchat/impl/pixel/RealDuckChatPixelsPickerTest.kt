@@ -51,6 +51,7 @@ class RealDuckChatPixelsPickerTest {
         appBuildConfig = mock(),
         browserInteractionsPlugins = mock(),
         duckAiNewChatMetricPixelsPlugin = mock(),
+        duckAiSessionCallback = mock(),
     )
 
     @Test
@@ -95,6 +96,17 @@ class RealDuckChatPixelsPickerTest {
                 DuckChatPixelParameters.UPSELL_FLOW_TYPE to "purchase",
                 DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__modelpicker",
             ),
+        )
+    }
+
+    @Test
+    fun whenUnknownModelLabelThenDailyIsTaggedByLabelSoOtherLabelsStillReport() = runTest {
+        testee.fireUnknownModelLabel("EXTRA_PRIVACY")
+
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_MODEL_LABEL_UNKNOWN_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.MODEL_LABEL to "EXTRA_PRIVACY"),
+            type = Pixel.PixelType.Daily(tag = "m_aichat_model_label_unknown_daily_EXTRA_PRIVACY"),
         )
     }
 

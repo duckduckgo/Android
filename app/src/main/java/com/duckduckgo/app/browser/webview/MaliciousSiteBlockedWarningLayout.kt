@@ -29,25 +29,25 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewMaliciousSiteBlockedWarningBinding
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.VisitSite
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)

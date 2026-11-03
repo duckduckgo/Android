@@ -26,7 +26,8 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -35,9 +36,9 @@ import javax.inject.Inject
 /**
  * Handles the message from Web to remove an opt-out record from the dashboard.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = ActivityScope::class,
-    boundType = PirWebJsMessageHandler::class,
+    binding = binding<PirWebJsMessageHandler>(),
 )
 class PirRemoveOptOutFromDashboardMessageHandler @Inject constructor(
     private val jobRecordUpdater: JobRecordUpdater,

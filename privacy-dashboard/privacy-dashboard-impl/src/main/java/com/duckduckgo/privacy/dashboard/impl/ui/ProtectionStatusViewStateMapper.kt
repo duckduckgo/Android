@@ -22,7 +22,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName.ContentBlockingFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface ProtectionStatusViewStateMapper {

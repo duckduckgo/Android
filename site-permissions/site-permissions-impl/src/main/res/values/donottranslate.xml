@@ -17,4 +17,5 @@
 <resources>
     <!-- DRM -->
     <string name="sitePermissionsSettingsDRM">DRM</string>
+
 </resources>

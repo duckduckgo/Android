@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -33,9 +32,9 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
+    ksp project(':codegen-ksp')
     testImplementation 'junit:junit:4.13.1'
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
 
     implementation project(path: ':di')
     implementation project(path: ':cookies-api')
@@ -52,8 +51,6 @@ dependencies {
     implementation project(path: ':settings-api')
     implementation project(path: ':network-protection-api')
     implementation project(path: ':internal-features-api')
-    implementation project(path: ':macos-api')
-    implementation project(path: ':windows-api')
     implementation project(path: ':downloads-api')
     implementation project(path: ':statistics-api')
     implementation project(':privacy-config-api') // remote feature flag
@@ -76,9 +73,8 @@ dependencies {
     implementation "com.android.billingclient:billing:_"
     implementation "com.android.billingclient:billing-ktx:_"
     implementation "com.squareup.logcat:logcat:_"
-    implementation 'nl.dionsegijn:konfetti:1.2.5'
+    implementation "com.airbnb.android:lottie:_"
 
-    implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.fragment.ktx
     implementation AndroidX.lifecycle.viewModelKtx
@@ -119,9 +115,6 @@ dependencies {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true

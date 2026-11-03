@@ -21,8 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DoNotAskAgainSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
@@ -64,10 +62,14 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -115,6 +117,7 @@ class BrowserViewModel @Inject constructor(
     private val browserModeStateHolder: BrowserModeStateHolder,
     private val fireModeAvailability: FireModeAvailability,
     private val browserMode: BrowserMode,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : ViewModel(), CoroutineScope {
 
     // Mode-switch orchestrator: observes the mode it also writes via switchTo().
@@ -264,6 +267,7 @@ class BrowserViewModel @Inject constructor(
     }
 
     suspend fun onNewTabRequested(sourceTabId: String? = null): String {
+        recordPendingNewTabOpenedExit()
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
         } else {
@@ -282,6 +286,7 @@ class BrowserViewModel @Inject constructor(
         sourceTabId: String? = null,
         skipHome: Boolean = false,
     ): String {
+        recordPendingNewTabOpenedExit()
         val url = if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
             query
         } else {
@@ -299,6 +304,12 @@ class BrowserViewModel @Inject constructor(
                 url = url,
                 skipHome = skipHome,
             )
+        }
+    }
+
+    private suspend fun recordPendingNewTabOpenedExit() {
+        tabRepository.getSelectedTab()?.tabId?.let { tabId ->
+            duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
         }
     }
 

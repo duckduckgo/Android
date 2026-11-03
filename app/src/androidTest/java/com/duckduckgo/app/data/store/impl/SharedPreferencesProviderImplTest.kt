@@ -68,9 +68,9 @@ class SharedPreferencesProviderImplTest {
         preferencesProvider = SharedPreferencesProviderImpl(
             context,
             coroutineRule.testDispatcherProvider,
-            { mock() },
-            { mock() },
-            { crashLogger },
+            lazy { mock() },
+            lazy { mock() },
+            lazyOf(crashLogger),
         )
     }
 
