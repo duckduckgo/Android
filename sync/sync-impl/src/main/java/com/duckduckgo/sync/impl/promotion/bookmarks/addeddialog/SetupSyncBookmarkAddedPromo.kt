@@ -19,7 +19,11 @@ package com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.setMargins
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.codegen.annotations.PriorityKey
@@ -27,6 +31,7 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -54,15 +59,21 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     private val syncStateMonitor: SyncStateMonitor,
     private val syncPixels: SyncPixels,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
+    private val setUpPromotion: SyncBookmarkAddedSetUpPromotion,
 ) : BookmarkAddedDialogPlugin {
 
     @SuppressLint("InflateParams")
     override suspend fun getView(): View? {
+        if (setUpPromotion.canShowPromotion()) {
+            return SyncBookmarkAddedSetUpPromotionView(activity)
+        }
+
         if (!syncPromotions.canShowBookmarkAddedDialogPromotion()) {
             return null
         }
 
         val root = LayoutInflater.from(activity).inflate(R.layout.view_sync_setup_bookmark_added_promo, null) as OneLineListItem
+        root.layoutParams = MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { setMargins(16.toPx(activity)) }
         if (appBrandDesignUpdateToggles.radius().isEnabled()) {
             root.setBackgroundResource(R.drawable.sync_bookmark_added_promo_background)
         }

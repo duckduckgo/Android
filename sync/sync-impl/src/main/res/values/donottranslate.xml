@@ -23,6 +23,10 @@
     <string name="sync_bookmarks_multi_device_promo_primary_button">Sync Bookmarks</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button">Get Desktop App</string>
 
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Sync&#160;&amp;&#160;Backup Bookmarks</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options">More options</string>
+
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
 
