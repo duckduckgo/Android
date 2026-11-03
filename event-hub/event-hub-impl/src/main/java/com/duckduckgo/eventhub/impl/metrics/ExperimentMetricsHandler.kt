@@ -59,36 +59,9 @@ class RealExperimentMetricsHandler @Inject constructor(
 
     override suspend fun onEvent(eventType: String) {
         mutex.withLock {
-            val experiments = try {
-                activeExperiments()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logcat(WARN) { "EventHub: failed to read active experiments: ${e.message}" }
-                return
-            }
-            for (experiment in experiments) {
-                val metrics = try {
-                    definitions.of(experiment.featureName(), experiment.getSettings())
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    logcat(WARN) { "EventHub: failed to read metrics of ${experiment.featureName().name}: ${e.message}" }
-                    continue
-                }
-                for (metric in metrics.filter { it.event == eventType }) {
-                    for ((threshold, windows) in metric.windowsByThreshold) {
-                        logcat(VERBOSE) { "EventHub: metric ${metric.name} on ${experiment.featureName().name}, threshold $threshold" }
-                        // The framework runs on the app scope, where an uncaught exception crashes the app; one failed send
-                        // also mustn't stop the others
-                        try {
-                            sendConversion(experiment, metric.name, threshold, windows)
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            logcat(WARN) { "EventHub: failed to send metric ${metric.name} on ${experiment.featureName().name}: ${e.message}" }
-                        }
-                    }
+            for (experiment in activeExperiments()) {
+                for (metric in metricsOf(experiment).filter { it.event == eventType }) {
+                    sendMetric(experiment, metric)
                 }
             }
         }
@@ -96,8 +69,46 @@ class RealExperimentMetricsHandler @Inject constructor(
 
     // Each feature that runs experiments decides which are active, so the hub never disagrees with it about which one
     // a user is measured for
-    private suspend fun activeExperiments(): List<Toggle> =
+    private suspend fun activeExperiments(): List<Toggle> = catchingNonCancellation(
+        onError = { e ->
+            logcat(WARN) { "EventHub: failed to read active experiments: ${e.message}" }
+            emptyList()
+        },
+    ) {
         contentScopeExperiments.getActiveExperiments() + listOfNotNull(blockListExperiment.activeExperiment())
+    }
+
+    private fun metricsOf(experiment: Toggle): List<MetricDefinition> = catchingNonCancellation(
+        onError = { e ->
+            logcat(WARN) { "EventHub: failed to read metrics of ${experiment.featureName().name}: ${e.message}" }
+            emptyList()
+        },
+    ) {
+        definitions.of(experiment.featureName(), experiment.getSettings())
+    }
+
+    private suspend fun sendMetric(experiment: Toggle, metric: MetricDefinition) {
+        for ((threshold, windows) in metric.windowsByThreshold) {
+            logcat(VERBOSE) { "EventHub: metric ${metric.name} on ${experiment.featureName().name}, threshold $threshold" }
+            // The framework runs on the app scope, where an uncaught exception crashes the app; one failed send
+            // also mustn't stop the others
+            catchingNonCancellation(
+                onError = { e ->
+                    logcat(WARN) { "EventHub: failed to send metric ${metric.name} on ${experiment.featureName().name}: ${e.message}" }
+                },
+            ) {
+                sendConversion(experiment, metric.name, threshold, windows)
+            }
+        }
+    }
+
+    private inline fun <T> catchingNonCancellation(onError: (Exception) -> T, block: () -> T): T = try {
+        block()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        onError(e)
+    }
 
     // value comes from remote config, already validated by the parser as a whole number of at least 1
     @Suppress("MetricsPixelNumericValue")
