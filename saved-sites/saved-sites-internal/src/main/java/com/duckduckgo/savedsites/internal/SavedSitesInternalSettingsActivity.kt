@@ -29,6 +29,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportRequest
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.ImportFromGoogleResult
 import com.duckduckgo.browser.api.ui.BrowserScreens
@@ -187,7 +188,8 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun launchImportBookmarksFlow() {
         lifecycleScope.launch {
-            importFromGoogleLauncher.launchBookmarksImport(googleBookmarksImport)
+            // we report dev settings imports as coming from the bookmarks screen so they don't add a launch source to the telemetry
+            importFromGoogleLauncher.launchBookmarksImport(GOOGLE_IMPORT_PARAMS, googleBookmarksImport)
         }
     }
 
@@ -233,5 +235,6 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent = Intent(context, SavedSitesInternalSettingsActivity::class.java)
 
         private const val TAG_PRE_IMPORT_BOOKMARKS = "ImportBookmarksPreImportDialog"
+        private val GOOGLE_IMPORT_PARAMS = BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true)
     }
 }

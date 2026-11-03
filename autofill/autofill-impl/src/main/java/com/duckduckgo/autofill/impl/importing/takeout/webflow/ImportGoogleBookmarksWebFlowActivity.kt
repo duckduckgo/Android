@@ -27,6 +27,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportGoogleBookmarksWebflowBinding
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
@@ -51,7 +52,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 /**
  * Launch the Google Bookmarks import flow
  */
-data class ImportBookmarksViaGoogleTakeoutScreen(val launchSource: String) : GlobalActivityStarter.ActivityParams
+data class ImportBookmarksViaGoogleTakeoutScreen(val params: BookmarksImportParams) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class, screenName = "importGoogleBookmarks")
@@ -71,7 +72,7 @@ class ImportGoogleBookmarksWebFlowActivity :
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
     private val viewModel by viewModels<ImportGoogleBookmarksViewModel> {
-        ImportGoogleBookmarksViewModel.Factory.Provider(importViewModelFactory, getLaunchSource(), isRedesignEnabled)
+        ImportGoogleBookmarksViewModel.Factory.Provider(importViewModelFactory, getImportParams(), isRedesignEnabled)
     }
 
     private var isRedesignEnabled = false
@@ -138,7 +139,7 @@ class ImportGoogleBookmarksWebFlowActivity :
                 if (isRedesignEnabled) {
                     ImportFinishedRedesignFragment.newInstanceSuccess(
                         importedCount = viewState.viewMode.importedCount,
-                        launchSource = getLaunchSource(),
+                        params = getImportParams(),
                     )
                 } else {
                     ImportFinishedFragment.newInstanceSuccess(
@@ -150,7 +151,7 @@ class ImportGoogleBookmarksWebFlowActivity :
             is ViewMode.Error -> showResultFragment {
                 if (isRedesignEnabled) {
                     ImportFinishedRedesignFragment.newInstanceError(
-                        launchSource = getLaunchSource(),
+                        params = getImportParams(),
                     )
                 } else {
                     ImportFinishedFragment.newInstanceFailure(getString(R.string.importBookmarksErrorGenericMessage))
@@ -263,8 +264,9 @@ class ImportGoogleBookmarksWebFlowActivity :
         viewModel.onWaitingForExportStopped()
     }
 
-    private fun getLaunchSource(): String {
-        return intent.getActivityParams(ImportBookmarksViaGoogleTakeoutScreen::class.java)?.launchSource ?: UNKNOWN_LAUNCH_SOURCE
+    private fun getImportParams(): BookmarksImportParams {
+        return intent.getActivityParams(ImportBookmarksViaGoogleTakeoutScreen::class.java)?.params
+            ?: BookmarksImportParams(launchSource = UNKNOWN_LAUNCH_SOURCE, offerPasswordsImport = true)
     }
 
     companion object {

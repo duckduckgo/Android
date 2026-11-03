@@ -25,6 +25,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.app.ActivityOptionsCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.ImportFromGoogleAvailability
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportRequest
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportBookmarksViaGoogleTakeoutScreen
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason
@@ -38,6 +39,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.ImportFromGoogleResult as PublicResult
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult as InternalResult
@@ -83,7 +85,10 @@ class ImportFromGoogleLauncherImplTest {
 
     @Test
     fun `Synchronous result is Unavailable when request was not created by the launcher`() {
-        val result = contract.getSynchronousResult(context, object : BookmarksImportRequest {})
+        val request = object : BookmarksImportRequest {
+            override val params = BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true)
+        }
+        val result = contract.getSynchronousResult(context, request)
         assertEquals(PublicResult.Unavailable, result?.value)
     }
 
@@ -102,9 +107,19 @@ class ImportFromGoogleLauncherImplTest {
         whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(true)
         val launcher = FakeActivityResultLauncher()
 
-        testee.launchBookmarksImport(launcher)
+        testee.launchBookmarksImport(BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true), launcher)
 
         assertEquals(1, launcher.launchedInputs.size)
+    }
+
+    @Test
+    fun `createIntent opens the import screen with the launch source`() = runTest {
+        val params = BookmarksImportParams(launchSource = "promotion_passwords_import", offerPasswordsImport = false)
+        val request = launchedRequest(isAvailable = true, params = params)
+
+        contract.createIntent(context, request)
+
+        verify(globalActivityStarter).startIntent(context, ImportBookmarksViaGoogleTakeoutScreen(params))
     }
 
     @Test
@@ -149,10 +164,13 @@ class ImportFromGoogleLauncherImplTest {
         assertEquals(PublicResult.UserCancelled, contract.parseResult(Activity.RESULT_OK, intent))
     }
 
-    private suspend fun launchedRequest(isAvailable: Boolean): BookmarksImportRequest {
+    private suspend fun launchedRequest(
+        isAvailable: Boolean,
+        params: BookmarksImportParams = BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true),
+    ): BookmarksImportRequest {
         whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(isAvailable)
         val launcher = FakeActivityResultLauncher()
-        testee.launchBookmarksImport(launcher)
+        testee.launchBookmarksImport(params, launcher)
         return launcher.launchedInputs.single()
     }
 

@@ -19,11 +19,12 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
+import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.Companion.PRIORITY_KEY_IMPORT_PASSWORDS_PROMO
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command.Exit
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoogleBookmarksJourney
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -39,10 +40,10 @@ import logcat.logcat
 import kotlin.time.Duration.Companion.seconds
 
 class ImportGoogleBookmarksViewModel @AssistedInject constructor(
-    @Assisted private val launchSource: String,
+    @Assisted private val params: BookmarksImportParams,
     @Assisted private val isRedesignEnabled: Boolean,
     private val importJourney: ImportGoogleBookmarksJourney,
-    private val promotionPlugins: PluginPoint<BookmarksImportScreenPromotionPlugin>,
+    private val promotionPlugins: Map<Int, BookmarksImportScreenPromotionPlugin>,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -52,7 +53,7 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     init {
-        importJourney.started(launchSource)
+        importJourney.started(params.launchSource)
     }
 
     fun onWaitingForExportStarted() {
@@ -112,7 +113,11 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
         val data = BookmarksImportScreenPromotionPlugin.ImportResult(successCount = importedCount)
         // we don't let a broken promo plugin keep the user on the importing screen
         return withTimeoutOrNull(PROMO_TIMEOUT) {
-            promotionPlugins.getPlugins().firstOrNull { it.isEligible(data) }
+            promotionPlugins.entries
+                .sortedBy { it.key }
+                .filterNot { !params.offerPasswordsImport && it.key == PRIORITY_KEY_IMPORT_PASSWORDS_PROMO }
+                .firstOrNull { it.value.isEligible(data) }
+                ?.value
         }
     }
 
@@ -161,19 +166,19 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            launchSource: String,
+            params: BookmarksImportParams,
             isRedesignEnabled: Boolean,
         ): ImportGoogleBookmarksViewModel
 
         class Provider(
             private val assistedFactory: Factory,
-            private val launchSource: String,
+            private val params: BookmarksImportParams,
             private val isRedesignEnabled: Boolean,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(launchSource, isRedesignEnabled) as T
+                return assistedFactory.create(params, isRedesignEnabled) as T
             }
         }
     }

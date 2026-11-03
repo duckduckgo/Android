@@ -40,6 +40,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportRequest
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.ImportFromGoogleResult
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -493,7 +494,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     private fun launchBookmarkImportWebFlow() {
         lifecycleScope.launch {
-            importFromGoogleLauncher.launchBookmarksImport(googleBookmarksImport)
+            importFromGoogleLauncher.launchBookmarksImport(GOOGLE_IMPORT_PARAMS, googleBookmarksImport)
         }
     }
 
@@ -942,5 +943,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         }
 
         private const val DIALOG_TAG_IMPORT_BOOKMARKS = "ImportBookmarksPreImportDialog"
+        private val GOOGLE_IMPORT_PARAMS = BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true)
     }
 }
