@@ -44,8 +44,8 @@ import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.databinding.ViewSyncPasswordsMultiDevicePromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
-import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreenMultiDevice
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsMultiDevicePromotionViewModel.Command
@@ -92,6 +92,9 @@ class SyncPasswordsMultiDevicePromotionView @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
+
     private val binding: ViewSyncPasswordsMultiDevicePromotionBinding by viewBinding()
 
     private val viewModel: SyncPasswordsMultiDevicePromotionViewModel by lazy {
@@ -124,7 +127,7 @@ class SyncPasswordsMultiDevicePromotionView @JvmOverloads constructor(
         job.cancel()
     }
 
-    private fun processCommand(command: Command) {
+    private suspend fun processCommand(command: Command) {
         when (command) {
             DismissPromotion -> (context as? Callback)?.onPromotionDismissed()
             LaunchSyncSettings -> launchSyncSettings()
@@ -136,8 +139,8 @@ class SyncPasswordsMultiDevicePromotionView @JvmOverloads constructor(
         globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswordsMultiDevice.value))
     }
 
-    private fun launchGetDesktopApp() {
-        globalActivityStarter.start(context, SyncGetOnOtherPlatformsParams(source = SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_PASSWORDS))
+    private suspend fun launchGetDesktopApp() {
+        syncDesktopAppPromotionLauncher.launch(context, SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_PASSWORDS)
     }
 }
 
