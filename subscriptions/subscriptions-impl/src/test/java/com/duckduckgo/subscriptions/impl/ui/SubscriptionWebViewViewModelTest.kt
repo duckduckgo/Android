@@ -71,6 +71,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -2523,7 +2524,7 @@ class SubscriptionWebViewViewModelTest {
         givenActiveSubscription(platform = "stripe")
         whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
         val redirectEvent = SubscriptionEventData("useSubscription", "onPurchaseUpdate", JSONObject("""{"type":"redirect"}"""))
-        whenever(stripePlansHandler.getRedirectEvent()).thenReturn(redirectEvent)
+        whenever(stripePlansHandler.getRedirectEvent(any(), any(), anyOrNull(), anyOrNull())).thenReturn(redirectEvent)
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject("""{"id":"stripe-yearly"}"""))
@@ -2533,10 +2534,26 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionThenPassPlanChangeToHandler() = runTest {
+        givenActiveSubscription(platform = "stripe")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        viewModel.setLaunchOrigin("origin")
+
+        viewModel.processJsCallbackMessage(
+            "test",
+            "subscriptionChangeSelected",
+            "id",
+            JSONObject("""{"id":"stripe-yearly","change":"crossgrade"}"""),
+        )
+
+        verify(stripePlansHandler).getRedirectEvent(any(), eq("stripe-yearly"), eq("crossgrade"), eq("origin"))
+    }
+
+    @Test
     fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionAndNoRedirectEventThenReturnFailure() = runTest {
         givenActiveSubscription(platform = "stripe")
         whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
-        whenever(stripePlansHandler.getRedirectEvent()).thenReturn(null)
+        whenever(stripePlansHandler.getRedirectEvent(any(), any(), anyOrNull(), anyOrNull())).thenReturn(null)
 
         viewModel.currentPurchaseViewState.test {
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
@@ -2560,7 +2577,7 @@ class SubscriptionWebViewViewModelTest {
             JSONObject("""{"id":"${SubscriptionsConstants.YEARLY_PLAN_US}"}"""),
         )
 
-        verify(stripePlansHandler, never()).getRedirectEvent()
+        verify(stripePlansHandler, never()).getRedirectEvent(any(), any(), anyOrNull(), anyOrNull())
     }
 
     @Test

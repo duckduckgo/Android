@@ -70,8 +70,8 @@
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
-                                "from_plan": { "type": "string", "description": "Play basePlan ID the user is switching from" },
-                                "to_plan": { "type": "string", "description": "Play basePlan ID the user is switching to" },
+                                "from_plan": { "type": "string", "description": "Plan ID the user is switching from" },
+                                "to_plan": { "type": "string", "description": "Plan ID the user is switching to" },
                                 "from_tier": {
                                     "type": "string",
                                     "description": "Subscription tier the user is switching from",
@@ -99,7 +99,7 @@
                                 },
                                 "activation_latency_ms_bucketed": {
                                     "type": "string",
-                                    "description": "Duration from the Play billing switch to subscription activation",
+                                    "description": "Duration from the Play billing switch or Stripe redirect to subscription activation",
                                     "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
                                 },
                                 "failure_reason": {
@@ -125,6 +125,11 @@
                                     "type": "string",
                                     "description": "Present if the Play billing switch succeeded",
                                     "enum": ["true"]
+                                },
+                                "step.stripe_redirect": {
+                                    "type": "string",
+                                    "description": "Whether the user was sent to Stripe to complete the plan change",
+                                    "enum": ["true", "false"]
                                 },
                                 "step.confirm_switch": {
                                     "type": "string",

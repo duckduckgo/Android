@@ -441,8 +441,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
 
             // Stripe plan changes can't go through Play Billing
-            if (stripePlansHandler.shouldHandle(subscription)) {
-                val redirectEvent = stripePlansHandler.getRedirectEvent()
+            if (subscription != null && stripePlansHandler.shouldHandle(subscription)) {
+                val redirectEvent = stripePlansHandler.getRedirectEvent(
+                    subscription = subscription,
+                    planId = targetPlanId,
+                    change = change,
+                    origin = launchOrigin,
+                )
                 if (redirectEvent != null) {
                     command.send(SendJsEvent(redirectEvent))
                 } else {
