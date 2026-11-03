@@ -53,6 +53,11 @@ enum class TestSeederKey(val key: String, val description: String) {
         "userAllowList",
         "Comma-separated domains to replace the user allow list with (protections off). Empty value clears the list.",
     ),
+    PRIVACY_CONFIG_URL(
+        "privacyConfigUrl",
+        "Overrides the remote privacy config URL and downloads the config from it before the app starts. " +
+            "Example: \"https://privacy-test-pages.site/content-scope-scripts/infra/config/conditional-matching-experiments.json\"",
+    ),
     MOCK_ENVIRONMENT(
         "mockEnvironment",
         "Fixture server port. Pins TDS and surrogates, proxies the WebView to the fixture server on that port " +
