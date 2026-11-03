@@ -38,10 +38,14 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendResponseToJs
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirDashboardFreeScanEntryPointHolder
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
@@ -55,7 +59,9 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirDashboardWebViewScreen::class, screenName = "pir.main")
+@ContributeToActivityStarter(PirDashboardWebViewScreen::class)
+@ContributeToActivityStarter(PirFreemiumDashboardScreens.FromEntryPoint::class)
+@ContributeToActivityStarter(PirFreemiumDashboardScreens.FromRemoteMessage::class, screenName = "pir.main")
 class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -77,6 +83,9 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var freeScanEntryPointHolder: PirDashboardFreeScanEntryPointHolder
+
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
 
     private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
@@ -88,6 +97,8 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         setupCloseToolbarIfNeeded()
         configureEdgeToEdgeInsets()
 
+        // set before the web view loads, so the handshake always waits on this visit's entry point
+        freeScanEntryPointHolder.freeScanEntryPoint = viewModel.freeScanEntryPoint
         setupWebView()
         observeCommands()
 
@@ -99,7 +110,27 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         viewModel.onLaunched(
             isRestored = savedInstanceState != null || launchedFromRecents,
             fromFreemiumScanCompleteNotification = intent.getBooleanExtra(EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION, false),
+            freemiumLaunch = freemiumLaunch(savedInstanceState),
         )
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.resolvedFreeScanEntryPoint?.let { outState.putString(KEY_FREE_SCAN_ENTRY_POINT, it.name) }
+    }
+
+    /**
+     * After process death the ViewModel is new, so a restored dashboard uses the entry point it saved rather than resolving
+     * the launch again: a scan that finished in the meantime would otherwise turn a free scan banner visit into a results one.
+     */
+    private fun freemiumLaunch(savedInstanceState: Bundle?): PirFreemiumDashboardScreens? {
+        if (savedInstanceState == null) {
+            return intent.getActivityParams(PirFreemiumDashboardScreens::class.java)
+        }
+
+        return savedInstanceState.getString(KEY_FREE_SCAN_ENTRY_POINT)
+            ?.let { name -> PirFreeScanEntryPoint.entries.firstOrNull { it.name == name } }
+            ?.let { PirFreemiumDashboardScreens.FromEntryPoint(it) }
     }
 
     override fun onDestroy() {
@@ -227,5 +258,6 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_SHOW_CLOSE_BUTTON = "extra_show_close_button"
         const val EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION = "extra_from_freemium_scan_complete_notification"
+        private const val KEY_FREE_SCAN_ENTRY_POINT = "key_free_scan_entry_point"
     }
 }

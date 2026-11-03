@@ -18,31 +18,50 @@ package com.duckduckgo.pir.impl.dashboard
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromRemoteMessage
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
 /**
- * RMF `navigation` actions with value `pir.main` open the PIR dashboard. The mapper under test is generated from the
- * `@ContributeToActivityStarter(..., screenName = "pir.main")` annotation on [PirDashboardWebViewActivity].
+ * RMF `navigation` actions with value `pir.main` open the PIR dashboard as a remote message launch, so the dashboard can
+ * attribute the visit to the banner. The mappers under test are generated from the `@ContributeToActivityStarter`
+ * annotations on [PirDashboardWebViewActivity].
  */
 class PirDashboardDeeplinkMapperTest {
 
-    private val mapper = PirDashboardWebViewActivity_PirDashboardWebViewScreen_Mapper()
+    private val dashboardScreenMapper = PirDashboardWebViewActivity_PirDashboardWebViewScreen_Mapper()
+    private val fromEntryPointMapper = PirDashboardWebViewActivity_FromEntryPoint_Mapper()
+    private val fromRemoteMessageMapper = PirDashboardWebViewActivity_FromRemoteMessage_Mapper()
 
     @Test
-    fun whenRmfNavigatesToPirMainThenMapsToDashboardScreen() {
-        assertEquals(PirDashboardWebViewScreen, mapper.map(DeeplinkActivityParams(screenName = "pir.main", jsonArguments = "")))
+    fun whenRmfNavigatesToPirMainThenMapsToRemoteMessageLaunch() {
+        assertEquals(FromRemoteMessage, fromRemoteMessageMapper.map(DeeplinkActivityParams(screenName = "pir.main", jsonArguments = "")))
+    }
+
+    @Test
+    fun whenRmfNavigatesToPirMainThenOnlyTheRemoteMessageLaunchClaimsIt() {
+        val pirMain = DeeplinkActivityParams(screenName = "pir.main", jsonArguments = "")
+
+        assertNull(dashboardScreenMapper.map(pirMain))
+        assertNull(fromEntryPointMapper.map(pirMain))
     }
 
     @Test
     fun whenDeeplinkScreenNameDoesNotMatchThenReturnsNull() {
-        assertNull(mapper.map(DeeplinkActivityParams(screenName = "pir.settings")))
-        assertNull(mapper.map(DeeplinkActivityParams(screenName = "PIR.MAIN")))
+        assertNull(fromRemoteMessageMapper.map(DeeplinkActivityParams(screenName = "pir.settings")))
+        assertNull(fromRemoteMessageMapper.map(DeeplinkActivityParams(screenName = "PIR.MAIN")))
     }
 
     @Test
-    fun whenStartedWithActivityParamsThenStillResolvesDashboardActivity() {
-        assertEquals(PirDashboardWebViewActivity::class.java, mapper.map(PirDashboardWebViewScreen))
+    fun whenStartedWithActivityParamsThenEachResolvesDashboardActivity() {
+        assertEquals(PirDashboardWebViewActivity::class.java, dashboardScreenMapper.map(PirDashboardWebViewScreen))
+        assertEquals(
+            PirDashboardWebViewActivity::class.java,
+            fromEntryPointMapper.map(FromEntryPoint(PirFreeScanEntryPoint.APP_MENU_PRE_SCAN)),
+        )
+        assertEquals(PirDashboardWebViewActivity::class.java, fromRemoteMessageMapper.map(FromRemoteMessage))
     }
 }

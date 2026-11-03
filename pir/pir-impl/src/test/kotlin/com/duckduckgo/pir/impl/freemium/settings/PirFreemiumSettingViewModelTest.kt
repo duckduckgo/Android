@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.freemium.settings
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
 import com.duckduckgo.pir.impl.freemium.PirFreemium
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState.ELIGIBLE
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState.NOT_ELIGIBLE
@@ -96,9 +97,21 @@ class PirFreemiumSettingViewModelTest {
         testee.commands().test {
             testee.onEntryPointClicked()
 
-            assertEquals(OpenPirDashboard, awaitItem())
+            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_MENU_PRE_SCAN), awaitItem())
         }
         verify(pixelSender).reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.START_FREE_SCAN)
+    }
+
+    @Test
+    fun whenUsedAndClickedThenDashboardOpensFromThePostScanEntryPoint() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(USED)
+        testee.onResume(lifecycleOwner)
+
+        testee.commands().test {
+            testee.onEntryPointClicked()
+
+            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_MENU_POST_SCAN), awaitItem())
+        }
     }
 
     @Test

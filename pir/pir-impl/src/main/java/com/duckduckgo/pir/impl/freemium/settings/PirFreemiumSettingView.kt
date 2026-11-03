@@ -32,8 +32,8 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
 import com.duckduckgo.pir.impl.databinding.ViewPirFreemiumSettingsBinding
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState.ELIGIBLE
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState.NOT_ELIGIBLE
@@ -112,7 +112,7 @@ class PirFreemiumSettingView @JvmOverloads constructor(
 
     private fun processCommands(command: Command) {
         when (command) {
-            OpenPirDashboard -> globalActivityStarter.start(context, PirDashboardWebViewScreen)
+            is OpenPirDashboard -> globalActivityStarter.start(context, PirFreemiumDashboardScreens.FromEntryPoint(command.entryPoint))
         }
     }
 }
