@@ -23,7 +23,7 @@
     android:paddingTop="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_2">
 
-    <com.duckduckgo.sync.impl.promotion.widget.PromoMessageView
+    <com.duckduckgo.browser.ui.promo.PromoMessageView
         android:id="@+id/promoMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
