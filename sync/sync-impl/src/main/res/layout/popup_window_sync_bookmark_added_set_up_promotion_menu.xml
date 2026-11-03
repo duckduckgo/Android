@@ -25,12 +25,12 @@
         android:id="@+id/hide"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/addBookmarkDialogHideSyncSuggestion" />
+        app:primaryText="@string/sync_bookmark_added_set_up_promo_menu_hide" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/turnOnSync"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_bookmark_added_set_up_promo_turn_on_sync" />
+        app:primaryText="@string/sync_bookmark_added_set_up_promo_menu_turn_on_sync" />
 
 </LinearLayout>

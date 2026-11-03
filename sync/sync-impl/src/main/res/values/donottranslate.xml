@@ -16,6 +16,8 @@
 
 <resources>
     <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Sync &amp; Back Up Your Bookmarks</string>
+    <string name="sync_bookmarks_promo_message">No account needed. End-to-end encryption means nobody but you can see your bookmarks, not even us.</string>
     <string name="sync_bookmarks_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -26,15 +28,22 @@
     <!-- Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_set_up_promo_title">Sync&#160;&amp;&#160;Backup Bookmarks</string>
     <string name="sync_bookmark_added_set_up_promo_more_options">More options</string>
-    <string name="sync_bookmark_added_set_up_promo_turn_on_sync">Turn On Sync&#160;&amp;&#160;Backup</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide">Hide</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Turn On Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Sync with my Desktop&#160;App</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options">More options</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide">Hide</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Sync With Desktop</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Get Desktop&#160;App</string>
     <string name="sync_bookmark_added_multi_device_sheet_title">Let’s sync your desktop&#160;app!</string>
     <string name="sync_bookmark_added_multi_device_sheet_primary_button">Sync With Desktop</string>
     <string name="sync_bookmark_added_multi_device_sheet_secondary_button">I Don’t Have a Desktop&#160;App</string>
 
     <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Sync &amp; Back Up Your Passwords</string>
+    <string name="sync_passwords_promo_message">No account needed. End-to-end encryption means nobody but you can see your passwords, not even us.</string>
     <string name="sync_passwords_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
