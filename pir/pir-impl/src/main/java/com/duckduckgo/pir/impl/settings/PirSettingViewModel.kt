@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
@@ -31,20 +32,25 @@ import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState
 import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled.Type
 import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled.Type.DASHBOARD
 import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled.Type.DESKTOP
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import logcat.LogPriority.ERROR
+import logcat.logcat
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -53,6 +59,7 @@ class PirSettingViewModel @Inject constructor(
     private val pixelSender: PirPixelSender,
     private val subscriptions: Subscriptions,
     private val pirFeature: PirFeature,
+    private val pirRepository: PirRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -61,6 +68,7 @@ class PirSettingViewModel @Inject constructor(
         data object ShowPirUnavailableDialog : Command()
     }
 
+    private val pirStateJob = ConflatedJob()
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
     data class ViewState(val pirState: PirState = PirState.Hidden) {
@@ -68,7 +76,7 @@ class PirSettingViewModel @Inject constructor(
         sealed class PirState {
 
             data object Hidden : PirState()
-            data class Enabled(val type: Type) : PirState() {
+            data class Enabled(val type: Type, val isOn: Boolean) : PirState() {
                 enum class Type {
                     DESKTOP,
                     DASHBOARD,
@@ -100,10 +108,11 @@ class PirSettingViewModel @Inject constructor(
         }
     }
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
 
-        subscriptions.getEntitlementStatus().map { entitledProducts -> entitledProducts.contains(PIR) }
+        pirStateJob += subscriptions.getEntitlements().map { entitlements -> entitlements.any { it.product == PIR.value } }
+            .distinctUntilChanged()
             .onEach { hasValidEntitlement ->
 
                 val subscriptionStatus = subscriptions.getSubscriptionStatus()
@@ -113,6 +122,11 @@ class PirSettingViewModel @Inject constructor(
                 _viewState.update { it.copy(pirState = pirState) }
             }
             .launchIn(viewModelScope)
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        pirStateJob.cancel()
     }
 
     private suspend fun getPirState(
@@ -138,14 +152,11 @@ class PirSettingViewModel @Inject constructor(
             SubscriptionStatus.GRACE_PERIOD,
             -> {
                 if (hasValidEntitlement) {
-                    val type = when (pirFeature.getPirFeatureState()) {
-                        PirFeatureState.ENABLED,
-                        PirFeatureState.NOT_AVAILABLE,
-                        -> DASHBOARD
-
-                        PirFeatureState.DISABLED -> DESKTOP
+                    when (pirFeature.getPirFeatureState()) {
+                        PirFeatureState.ENABLED -> PirState.Enabled(DASHBOARD, isOn = hasUserProfile())
+                        PirFeatureState.NOT_AVAILABLE -> PirState.Enabled(DASHBOARD, isOn = false)
+                        PirFeatureState.DISABLED -> PirState.Enabled(DESKTOP, isOn = true)
                     }
-                    PirState.Enabled(type)
                 } else {
                     PirState.Hidden
                 }
@@ -155,6 +166,17 @@ class PirSettingViewModel @Inject constructor(
 
     private suspend fun isPirAvailable(): Boolean {
         return subscriptions.getAvailableProducts().contains(PIR)
+    }
+
+    private suspend fun hasUserProfile(): Boolean {
+        return try {
+            pirRepository.hasValidUserProfileQueries()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(ERROR) { "PIR-SETTINGS: Failed to read user profile: $e" }
+            false
+        }
     }
 
     private fun sendCommand(newCommand: Command) {

@@ -39,6 +39,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -387,6 +388,21 @@ class RealPirRepositoryTest {
         testee.deleteEmailData(emailDataList)
 
         verifyNoInteractions(mockDbpService)
+    }
+
+    @Test
+    fun whenValidUserProfilesStoredThenHasValidUserProfileQueriesReturnsTrue() = runTest {
+        whenever(mockUserProfileDao.hasValidUserProfiles()).thenReturn(true)
+
+        assertTrue(testee.hasValidUserProfileQueries())
+    }
+
+    @Test
+    fun whenDatabaseNotReadableThenHasValidUserProfileQueriesReturnsFalse() = runTest {
+        whenever(mockBrokerJsonDao.getAllBrokersCount()).thenThrow(RuntimeException("Database not readable"))
+
+        assertFalse(testee.hasValidUserProfileQueries())
+        verify(mockUserProfileDao, never()).hasValidUserProfiles()
     }
 
     // Tests for getUserProfileQuery
