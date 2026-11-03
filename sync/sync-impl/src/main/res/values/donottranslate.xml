@@ -17,7 +17,7 @@
 <resources>
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Sync&#160;&amp;&#160;Back&#160;Up Your&#160;Bookmarks</string>
-    <string name="sync_bookmarks_promo_message">No account needed. End-to-end encryption means nobody but you can see your&#160;bookmarks, not&#160;even&#160;us</string>
+    <string name="sync_bookmarks_promo_message">End-to-end encrypted. Nobody can see your&#160;bookmarks, not&#160;even&#160;us.</string>
     <string name="sync_bookmarks_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -43,7 +43,7 @@
 
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Sync&#160;&amp;&#160;Back&#160;Up Your&#160;Passwords</string>
-    <string name="sync_passwords_promo_message">No account needed. End-to-end encryption means nobody but you can see your&#160;passwords, not&#160;even&#160;us</string>
+    <string name="sync_passwords_promo_message">End-to-end encryption means nobody but you can see your&#160;passwords, not&#160;even&#160;us.</string>
     <string name="sync_passwords_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
