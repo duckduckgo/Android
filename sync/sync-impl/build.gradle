@@ -35,6 +35,7 @@ dependencies {
     ksp project(':codegen-ksp')
     implementation project(path: ':di')
     implementation project(':browser-api')
+    implementation project(':browser-ui')
     implementation project(path: ':common-utils')
     implementation project(':data-store-api')
     implementation project(path: ':design-system')

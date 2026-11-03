@@ -34,6 +34,7 @@ import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugi
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin.ImportResult
+import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.codegen.annotations.PriorityKey
@@ -51,7 +52,6 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsImport
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsImportPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsImportPromotionViewModel.Command.LaunchSyncSetup
-import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView.ActionStyle
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap

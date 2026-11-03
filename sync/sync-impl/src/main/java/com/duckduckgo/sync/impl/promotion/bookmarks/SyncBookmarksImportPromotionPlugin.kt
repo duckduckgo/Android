@@ -34,6 +34,7 @@ import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugi
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.ImportResult
+import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.codegen.annotations.PriorityKey
@@ -51,7 +52,6 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksImport
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksImportPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksImportPromotionViewModel.Command.LaunchSyncSetup
-import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView.ActionStyle
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
