@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Loobu</string>
     <string name="autocompleteRemoveItemRemove">Eemaldage</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Vaheta vahekaardile · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Küsi Duck.ai käest</string>
 </resources>

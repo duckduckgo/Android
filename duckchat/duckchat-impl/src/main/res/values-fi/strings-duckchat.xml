@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Avaa Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Lue lisää</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Kysy Duck.ai:lta</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Haluatko helpomman pääsyn\nyksityiseen tekoäly-chatiin?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Hae tai anna osoite</string>

@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Otvori Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Saznajte više</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Pitaj Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Želiš lakši pristup privatnom AI čavrljanju?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Pretraži ili unesi adresu</string>
