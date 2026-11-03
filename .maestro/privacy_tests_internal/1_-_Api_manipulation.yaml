@@ -8,41 +8,10 @@ tags:
     commands:
       - launchApp:
           clearState: true
+          arguments:
+            isMaestro: "true"
+            privacyConfigUrl: "https://privacy-test-pages.site/content-scope-scripts/infra/config/conditional-matching-experiments.json"
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
-      - scrollUntilVisible:
-          element:
-            text: "Developer Settings"
-          direction: DOWN
-          timeout: 50000
-          speed: 40
-          visibilityPercentage: 100
-          centerElement: false
-      - tapOn: "Developer Settings"
-      - scrollUntilVisible:
-          element:
-            id: "com.duckduckgo.mobile.android:id/overridePrivacyRemoteConfigUrl"
-          direction: DOWN
-          timeout: 50000
-          speed: 40
-          visibilityPercentage: 100
-          centerElement: true
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/overridePrivacyRemoteConfigUrl"
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/trailingSwitch"
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/internal_edit_text"
-      - inputText: "https://privacy-test-pages.site/content-scope-scripts/infra/config/conditional-matching-experiments.json"
-      - hideKeyboard
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/load"
-      - tapOn: "OK"
-      - pressKey: Back
-      - pressKey: Back
-      - pressKey: Back
       # Tap whichever field is live: the legacy omnibar (native input search-only off)
       # or the native input widget's field (native input search-only on).
       - tapOn:
