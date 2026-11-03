@@ -29,6 +29,16 @@ import javax.inject.Inject
 /**
  * Enabled by test harnesses through the seeder extra mockEnvironment=<fixture port>: pins the tracker data and surrogates, proxies the
  * WebView to the fixture server on that port and logs mockEnvironment=seeded.
+ *
+ * Mocked:
+ * - Tracker data (TDS) and surrogates, served from assets/mockenvironment.
+ * - WebView traffic, proxied to the fixture server with no direct fallback.
+ *
+ * Not mocked yet (still reaches the real network):
+ * - Privacy config and remote feature flags.
+ * - Pixels.
+ * - Other app API calls (remote messaging, subscriptions, autoconsent and scriptlet downloads, etc.).
+ * - App-side loads outside WebView (favicons, page titles, crash reporting, Firebase).
  */
 @ContributesIntoSet(AppScope::class)
 class MockEnvironmentSeederPlugin @Inject constructor(
