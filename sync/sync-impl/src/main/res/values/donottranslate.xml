@@ -26,6 +26,11 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
 
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Sync passwords with your Desktop app.</string>
+    <string name="sync_passwords_multi_device_promo_primary_button">Sync Passwords</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button">Get Desktop App</string>
+
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
 </resources>

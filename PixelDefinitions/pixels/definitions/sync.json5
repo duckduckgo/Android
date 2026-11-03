@@ -71,6 +71,7 @@
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
                     "promotion_bookmarks_multi_device",
+                    "promotion_passwords_multi_device",
                     "other"
                 ]
             },
@@ -101,6 +102,7 @@
                     "promotion_passwords_import",
                     "promotion_bookmarks_import",
                     "promotion_bookmarks_multi_device",
+                    "promotion_passwords_multi_device",
                     "other"
                 ]
             },
