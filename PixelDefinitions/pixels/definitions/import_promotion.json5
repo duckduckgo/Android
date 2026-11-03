@@ -1,0 +1,32 @@
+{
+    "import_promotion_displayed": {
+        "description": "Fired when a promotion to import another data type is shown on an import result screen.",
+        "owners": ["MiSikora"],
+        "triggers": ["impression"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "The import result screen the promotion was shown on",
+                "enum": ["bookmarks_import"]
+            }
+        ]
+    },
+    "import_promotion_confirmed": {
+        "description": "Fired when the user taps a promotion on an import result screen to start importing another data type.",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "The import result screen the promotion was tapped on",
+                "enum": ["bookmarks_import"]
+            }
+        ]
+    }
+}

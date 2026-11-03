@@ -42,6 +42,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.withResumed
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.BookmarksImportPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
@@ -562,7 +563,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private fun canShowPreImportDialog(launchSource: AutofillImportLaunchSource): Boolean {
         return when (launchSource) {
-            PasswordManagementPromo -> false
+            PasswordManagementPromo, BookmarksImportPromo -> false
             else -> true
         }
     }
