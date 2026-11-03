@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.promotion.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.CompoundButton
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.withStyledAttributes
@@ -60,12 +61,18 @@ internal class PromoMessageView @JvmOverloads constructor(
             binding.messageText.isVisible = value != null
         }
 
+    var actionStyle: ActionStyle = ActionStyle.Buttons
+        set(value) {
+            field = value
+            updateActionsVisibility()
+        }
+
     var primaryButtonText: CharSequence?
         get() = binding.primaryButton.text
         set(value) {
             binding.primaryButton.text = value
             binding.primaryButton.isVisible = value != null
-            updateButtonsVisibility()
+            updateActionsVisibility()
         }
 
     var secondaryButtonText: CharSequence?
@@ -73,8 +80,22 @@ internal class PromoMessageView @JvmOverloads constructor(
         set(value) {
             binding.secondaryButton.text = value
             binding.secondaryButton.isVisible = value != null
-            updateButtonsVisibility()
+            updateActionsVisibility()
         }
+
+    var toggleText: CharSequence? = null
+        set(value) {
+            field = value
+            binding.toggleItem.setPrimaryText(value)
+        }
+
+    private var onToggleClick: (() -> Unit)? = null
+
+    // We never show the switch as on: turning it on only starts the setup, and Sync being enabled removes the promotion.
+    private val toggleListener: CompoundButton.OnCheckedChangeListener = CompoundButton.OnCheckedChangeListener { _, _ ->
+        binding.toggleItem.quietlySetIsChecked(false, toggleListener)
+        onToggleClick?.invoke()
+    }
 
     var showCloseButton: Boolean
         get() = binding.closeButton.isVisible
@@ -98,6 +119,11 @@ internal class PromoMessageView @JvmOverloads constructor(
     init {
         radius = context.getDimensionFromAttr(CommonR.attr.daxContainerRadius, CommonR.dimen.largeShapeCornerRadius)
         cardElevation = 0f
+        binding.toggleContainer.clipToOutline = true
+        binding.toggleItem.apply {
+            setClickListener { onToggleClick?.invoke() }
+            setOnCheckedChangeListener(toggleListener)
+        }
 
         context.withStyledAttributes(attrs, R.styleable.PromoMessageView) {
             headerImage = getResourceId(R.styleable.PromoMessageView_promoHeaderImage, 0).takeIf { it != 0 }
@@ -105,6 +131,8 @@ internal class PromoMessageView @JvmOverloads constructor(
             message = getText(R.styleable.PromoMessageView_promoMessageText)
             primaryButtonText = getText(R.styleable.PromoMessageView_promoPrimaryButtonText)
             secondaryButtonText = getText(R.styleable.PromoMessageView_promoSecondaryButtonText)
+            toggleText = getText(R.styleable.PromoMessageView_promoToggleText)
+            actionStyle = ActionStyle.entries[getInt(R.styleable.PromoMessageView_promoActionStyle, ActionStyle.Buttons.ordinal)]
             showCloseButton = getBoolean(R.styleable.PromoMessageView_promoShowCloseButton, true)
             showElevation = getBoolean(R.styleable.PromoMessageView_promoShowElevation, true)
             cardColor = getColor(R.styleable.PromoMessageView_promoCardColor, cardColor)
@@ -119,11 +147,22 @@ internal class PromoMessageView @JvmOverloads constructor(
         binding.secondaryButton.setOnClickListener { onClick() }
     }
 
+    fun onToggleClicked(onClick: () -> Unit) {
+        onToggleClick = onClick
+    }
+
     fun onCloseButtonClicked(onClick: () -> Unit) {
         binding.closeButton.setOnClickListener { onClick() }
     }
 
-    private fun updateButtonsVisibility() {
-        binding.buttons.isVisible = binding.primaryButton.isVisible || binding.secondaryButton.isVisible
+    private fun updateActionsVisibility() {
+        val hasButtons = binding.primaryButton.isVisible || binding.secondaryButton.isVisible
+        binding.buttons.isVisible = actionStyle == ActionStyle.Buttons && hasButtons
+        binding.toggleContainer.isVisible = actionStyle == ActionStyle.Toggle
+    }
+
+    enum class ActionStyle {
+        Buttons,
+        Toggle,
     }
 }

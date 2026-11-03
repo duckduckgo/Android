@@ -16,7 +16,7 @@
 
 <resources>
     <!-- Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
+    <string name="sync_bookmarks_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_multi_device_promo_title">Sync bookmarks with your Desktop&#160;App.</string>
@@ -26,6 +26,7 @@
     <!-- Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_set_up_promo_title">Sync&#160;&amp;&#160;Backup Bookmarks</string>
     <string name="sync_bookmark_added_set_up_promo_more_options">More options</string>
+    <string name="sync_bookmark_added_set_up_promo_turn_on_sync">Turn On Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Sync with my Desktop&#160;App</string>
@@ -34,12 +35,18 @@
     <string name="sync_bookmark_added_multi_device_sheet_secondary_button">I Don’t Have a Desktop&#160;App</string>
 
     <!-- Sync promo on passwords screen -->
-    <string name="sync_passwords_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
+    <string name="sync_passwords_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
     <string name="sync_passwords_multi_device_promo_title">Sync passwords with your Desktop&#160;App.</string>
     <string name="sync_passwords_multi_device_promo_primary_button">Sync Passwords</string>
     <string name="sync_passwords_multi_device_promo_secondary_button">Get Desktop&#160;App</string>
+
+    <!-- Sync promo after bookmarks import -->
+    <string name="sync_bookmarks_import_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
+
+    <!-- Sync promo after passwords import -->
+    <string name="sync_passwords_import_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>

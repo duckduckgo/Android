@@ -31,6 +31,6 @@
         android:id="@+id/turnOnSync"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_bookmarks_promo_primary_button" />
+        app:primaryText="@string/sync_bookmark_added_set_up_promo_turn_on_sync" />
 
 </LinearLayout>
