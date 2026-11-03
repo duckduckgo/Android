@@ -27,6 +27,7 @@ jobs:
     uses: ./.github/workflows/release_blocking_checks.yml
     with:
       commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+      maestro_priority: high
     secrets: inherit
 
   build_fdroid_release:
