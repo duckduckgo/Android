@@ -53,4 +53,9 @@ enum class TestSeederKey(val key: String, val description: String) {
         "userAllowList",
         "Comma-separated domains to replace the user allow list with (protections off). Empty value clears the list.",
     ),
+    MOCK_ENVIRONMENT(
+        "mockEnvironment",
+        "Fixture server port. Pins TDS and surrogates, proxies the WebView to the fixture server on that port " +
+            "and verifies readiness in the measured process. Other network calls are untouched. Absent means off.",
+    ),
 }
