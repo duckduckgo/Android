@@ -22,6 +22,11 @@ on:
         required: false
         type: string
         default: ''
+      fail_fast:
+        description: 'Cancel the remaining suites as soon as one fails'
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       commit:
@@ -53,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ${{ matrix.name }}
     strategy:
-      fail-fast: false
+      fail-fast: ${{ inputs.fail_fast == true }}
       matrix:
         include:
           - name: Autofill Critical Path

@@ -63,6 +63,7 @@ jobs:
     with:
       commit: ${{ needs.resolve-hotfix-sha.outputs.commit_sha }}
       create_asana_tasks: false
+      fail_fast: true
     secrets: inherit
 
   finish:
