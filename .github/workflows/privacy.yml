@@ -22,7 +22,7 @@ on:
         type: string
 
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-privacy
   cancel-in-progress: true
 
 jobs:
