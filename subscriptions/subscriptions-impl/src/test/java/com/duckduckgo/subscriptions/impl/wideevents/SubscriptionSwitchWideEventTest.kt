@@ -257,6 +257,109 @@ class SubscriptionSwitchWideEventTest {
     }
 
     @Test
+    fun `onStripeSwitchFlowStarted starts flow with stripe metadata`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onStripeSwitchFlowStarted(
+            context = "subscription_settings",
+            fromPlan = "stripe-plus-yearly-de",
+            toPlan = "stripe-plus-monthly-de",
+            fromTier = "Plus",
+            toTier = "plus",
+            fromBillingPeriod = "Yearly",
+            toBillingPeriod = "monthly",
+            change = "crossgrade",
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = "subscription_settings",
+            metadata = mapOf(
+                "from_plan" to "stripe-plus-yearly-de",
+                "to_plan" to "stripe-plus-monthly-de",
+                "from_tier" to "plus",
+                "to_tier" to "plus",
+                "billing_cycle_switch_type" to "downgrade",
+                "tier_change_type" to "crossgrade",
+                "purchase_platform" to "stripe",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+        )
+    }
+
+    @Test
+    fun `onStripeSwitchFlowStarted without tiers or billing periods sends unknown tiers and no billing cycle switch type`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onStripeSwitchFlowStarted(
+            context = null,
+            fromPlan = "stripe-plus-monthly",
+            toPlan = "stripe-pro-monthly",
+            fromTier = null,
+            toTier = null,
+            fromBillingPeriod = null,
+            toBillingPeriod = "monthly",
+            change = "upgrade",
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = null,
+            metadata = mapOf(
+                "from_plan" to "stripe-plus-monthly",
+                "to_plan" to "stripe-pro-monthly",
+                "from_tier" to "unknown",
+                "to_tier" to "unknown",
+                "tier_change_type" to "upgrade",
+                "purchase_platform" to "stripe",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+        )
+    }
+
+    @Test
+    fun `onStripeRedirected starts interval and sends successful step`() = runTest {
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(listOf(123L)))
+
+        subscriptionSwitchWideEvent.onStripeRedirected()
+
+        verify(wideEventClient).intervalStart(
+            wideEventId = eq(123L),
+            key = eq("activation_latency_ms_bucketed"),
+            timeout = eq(10.minutes),
+            buckets = any(),
+        )
+        verify(wideEventClient).flowStep(
+            wideEventId = eq(123L),
+            stepName = eq("stripe_redirect"),
+            success = eq(true),
+            metadata = eq(emptyMap()),
+        )
+    }
+
+    @Test
+    fun `onStripeRedirectFailure sends failure step and finishes flow`() = runTest {
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(listOf(123L)))
+
+        subscriptionSwitchWideEvent.onStripeRedirectFailure()
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 123L,
+            stepName = "stripe_redirect",
+            success = false,
+        )
+        verify(wideEventClient).flowFinish(
+            wideEventId = 123L,
+            status = FlowStatus.Failure("missing_access_token"),
+            metadata = emptyMap(),
+        )
+    }
+
+    @Test
     fun `onCurrentSubscriptionValidated sends successful step`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(123L)))
@@ -504,6 +607,18 @@ class SubscriptionSwitchWideEventTest {
         subscriptionSwitchWideEvent.onTargetPlanRetrieved()
         subscriptionSwitchWideEvent.onBillingFlowInitSuccess()
         subscriptionSwitchWideEvent.onPlayBillingSwitchSuccess()
+        subscriptionSwitchWideEvent.onStripeSwitchFlowStarted(
+            context = null,
+            fromPlan = "stripe-plus-monthly",
+            toPlan = "stripe-pro-monthly",
+            fromTier = "plus",
+            toTier = "pro",
+            fromBillingPeriod = "monthly",
+            toBillingPeriod = "monthly",
+            change = "upgrade",
+        )
+        subscriptionSwitchWideEvent.onStripeRedirected()
+        subscriptionSwitchWideEvent.onStripeRedirectFailure()
         subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
 
         verify(wideEventClient, never()).flowStart(any(), any(), any(), any(), any(), any())

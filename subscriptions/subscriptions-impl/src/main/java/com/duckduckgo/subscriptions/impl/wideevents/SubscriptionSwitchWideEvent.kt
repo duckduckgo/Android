@@ -47,6 +47,21 @@ interface SubscriptionSwitchWideEvent {
         change: String? = null,
     )
 
+    suspend fun onStripeSwitchFlowStarted(
+        context: String?,
+        fromPlan: String,
+        toPlan: String,
+        fromTier: String?,
+        toTier: String?,
+        fromBillingPeriod: String?,
+        toBillingPeriod: String?,
+        change: String?,
+    )
+
+    suspend fun onStripeRedirected()
+
+    suspend fun onStripeRedirectFailure()
+
     suspend fun onCurrentSubscriptionValidated()
 
     suspend fun onValidationFailure(error: String)
@@ -99,19 +114,101 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         val switchType = deriveSwitchBillingType(fromPlan, toPlan)
         val changeType = parseChangeType(change) ?: deriveChangeType(fromTier, toTier)
 
+        startFlow(
+            context = context,
+            metadata = mapOf(
+                KEY_FROM_PLAN to fromPlan,
+                KEY_TO_PLAN to toPlan,
+                KEY_FROM_TIER to fromTier.value,
+                KEY_TO_TIER to toTier.value,
+                KEY_SWITCH_TYPE to switchType,
+                KEY_CHANGE_TYPE to changeType,
+                KEY_PURCHASE_PLATFORM to PURCHASE_PLATFORM_PLAY_STORE,
+            ),
+        )
+    }
+
+    override suspend fun onStripeSwitchFlowStarted(
+        context: String?,
+        fromPlan: String,
+        toPlan: String,
+        fromTier: String?,
+        toTier: String?,
+        fromBillingPeriod: String?,
+        toBillingPeriod: String?,
+        change: String?,
+    ) {
+        if (!isFeatureEnabled()) return
+
+        val from = fromTier?.let { SubscriptionTier.fromTierString(it.lowercase()) } ?: SubscriptionTier.UNKNOWN
+        val to = toTier?.let { SubscriptionTier.fromTierString(it.lowercase()) } ?: SubscriptionTier.UNKNOWN
+        val switchType = if (fromBillingPeriod != null && toBillingPeriod != null) {
+            billingCycleSwitchType(
+                fromIsMonthly = fromBillingPeriod.equals(MONTHLY, ignoreCase = true),
+                toIsMonthly = toBillingPeriod.equals(MONTHLY, ignoreCase = true),
+            )
+        } else {
+            null
+        }
+        val changeType = parseChangeType(change) ?: deriveChangeType(from, to)
+
+        startFlow(
+            context = context,
+            metadata = buildMap {
+                put(KEY_FROM_PLAN, fromPlan)
+                put(KEY_TO_PLAN, toPlan)
+                put(KEY_FROM_TIER, from.value)
+                put(KEY_TO_TIER, to.value)
+                switchType?.let { put(KEY_SWITCH_TYPE, it) }
+                put(KEY_CHANGE_TYPE, changeType)
+                put(KEY_PURCHASE_PLATFORM, PURCHASE_PLATFORM_STRIPE)
+            },
+        )
+    }
+
+    override suspend fun onStripeRedirected() {
+        if (!isFeatureEnabled()) return
+
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.intervalStart(
+                wideEventId = wideEventId,
+                key = KEY_ACTIVATION_LATENCY,
+                timeout = 10.minutes,
+            )
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_STRIPE_REDIRECT,
+                success = true,
+            )
+        }
+    }
+
+    override suspend fun onStripeRedirectFailure() {
+        if (!isFeatureEnabled()) return
+
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_STRIPE_REDIRECT,
+                success = false,
+            )
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Failure(reason = FAILURE_MISSING_ACCESS_TOKEN),
+            )
+            cachedFlowId = null
+        }
+    }
+
+    private suspend fun startFlow(
+        context: String?,
+        metadata: Map<String, String>,
+    ) {
         cachedFlowId = wideEventClient
             .flowStart(
                 name = SUBSCRIPTION_PLAN_CHANGE_FEATURE_NAME,
                 flowEntryPoint = context,
-                metadata = mapOf(
-                    KEY_FROM_PLAN to fromPlan,
-                    KEY_TO_PLAN to toPlan,
-                    KEY_FROM_TIER to fromTier.value,
-                    KEY_TO_TIER to toTier.value,
-                    KEY_SWITCH_TYPE to switchType,
-                    KEY_CHANGE_TYPE to changeType,
-                    KEY_PURCHASE_PLATFORM to PURCHASE_PLATFORM_PLAY_STORE,
-                ),
+                metadata = metadata,
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
                 definition = DEFINITION,
             )
@@ -122,8 +219,16 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         fromPlan: String,
         toPlan: String,
     ): String {
-        val fromIsMonthly = fromPlan in LIST_MONTHLY_PLUS_PLANS + LIST_MONTHLY_PRO_PLANS
-        val toIsMonthly = toPlan in LIST_MONTHLY_PLUS_PLANS + LIST_MONTHLY_PRO_PLANS
+        return billingCycleSwitchType(
+            fromIsMonthly = fromPlan in LIST_MONTHLY_PLUS_PLANS + LIST_MONTHLY_PRO_PLANS,
+            toIsMonthly = toPlan in LIST_MONTHLY_PLUS_PLANS + LIST_MONTHLY_PRO_PLANS,
+        )
+    }
+
+    private fun billingCycleSwitchType(
+        fromIsMonthly: Boolean,
+        toIsMonthly: Boolean,
+    ): String {
         return when {
             fromIsMonthly && toIsMonthly -> SWITCH_TYPE_NONE
             !fromIsMonthly && !toIsMonthly -> SWITCH_TYPE_NONE
@@ -353,6 +458,9 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         const val KEY_PURCHASE_PLATFORM = "purchase_platform"
 
         const val PURCHASE_PLATFORM_PLAY_STORE = "play_store"
+        const val PURCHASE_PLATFORM_STRIPE = "stripe"
+        const val MONTHLY = "monthly"
+        const val FAILURE_MISSING_ACCESS_TOKEN = "missing_access_token"
 
         val DEFINITION = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1))
 
@@ -372,5 +480,6 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         const val STEP_BILLING_FLOW_SWITCH = "billing_flow_switch"
         const val STEP_CONFIRM_SWITCH = "confirm_switch"
         const val STEP_UI_REFRESH = "ui_refresh"
+        const val STEP_STRIPE_REDIRECT = "stripe_redirect"
     }
 }
