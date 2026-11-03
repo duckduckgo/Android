@@ -202,7 +202,6 @@ class NextStepsStackedCardsViewModelTest {
             dismissed = 0,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
     }
 
@@ -273,7 +272,6 @@ class NextStepsStackedCardsViewModelTest {
                 dismissed = 1,
                 finishedElsewhere = 0,
                 alreadyComplete = 0,
-                impressionsSoFar = null,
             )
             null
         }
@@ -282,7 +280,7 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
         telemetry.onActiveMessageChanged(null)
 
-        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any(), anyOrNull())
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any())
         verify(remoteMessageModel, times(1)).onMessageDismissed(message)
     }
 
@@ -303,7 +301,6 @@ class NextStepsStackedCardsViewModelTest {
                 dismissed = 0,
                 finishedElsewhere = 0,
                 alreadyComplete = 0,
-                impressionsSoFar = null,
             )
             null
         }
@@ -316,7 +313,7 @@ class NextStepsStackedCardsViewModelTest {
 
         verify(pixels, times(1)).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, COMPLETED, "2")
         verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, defaultBrowserItem.id, DAY_0, "2")
-        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any(), anyOrNull())
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any())
     }
 
     @Test

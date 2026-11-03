@@ -493,7 +493,6 @@ class NextStepsCheckListViewModelTest {
             dismissed = null,
             finishedElsewhere = 1,
             alreadyComplete = 1,
-            impressionsSoFar = "1",
         )
         verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
     }
@@ -519,7 +518,6 @@ class NextStepsCheckListViewModelTest {
             dismissed = null,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = "1",
         )
     }
 

@@ -43,7 +43,7 @@ interface NextStepsPixels {
 
     /**
      * One count per removal reason, so they add up to the items that left the section; [completed] is CTA completions only.
-     * [dismissed] is stacked cards only and [impressionsSoFar], the section's renders, is check list only; each is omitted when null.
+     * [dismissed] is stacked cards only and omitted when null, since the check list has no per-item dismissal.
      */
     fun sectionEnded(
         variant: Variant,
@@ -53,7 +53,6 @@ interface NextStepsPixels {
         dismissed: Int?,
         finishedElsewhere: Int,
         alreadyComplete: Int,
-        impressionsSoFar: String?,
     )
 
     data class Days(val activeDay: String, val calendarDay: String)
@@ -115,7 +114,6 @@ class RealNextStepsPixels @Inject constructor(private val pixel: Pixel) : NextSt
         dismissed: Int?,
         finishedElsewhere: Int,
         alreadyComplete: Int,
-        impressionsSoFar: String?,
     ) {
         val parameters = listOfNotNull(
             "reason" to reason,
@@ -123,7 +121,6 @@ class RealNextStepsPixels @Inject constructor(private val pixel: Pixel) : NextSt
             dismissed?.let { "dismissed" to "$it" },
             "finishedElsewhere" to "$finishedElsewhere",
             "alreadyComplete" to "$alreadyComplete",
-            impressionsSoFar?.let { IMPRESSIONS_SO_FAR to it },
         )
         fire(NextStepsPixelName.SECTION_ENDED, variant, days, *parameters.toTypedArray())
     }

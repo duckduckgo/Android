@@ -218,9 +218,8 @@ class RealNextStepsTelemetryTest {
             dismissed = 1,
             finishedElsewhere = 1,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
-        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any(), anyOrNull())
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any())
         val state = telemetryStore.state()
         assertNull(state.displayedMessageId)
         assertEquals(emptyMap<String, Int>(), state.dayCounts)
@@ -248,7 +247,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 1,
             finishedElsewhere = 0,
             alreadyComplete = 2,
-            impressionsSoFar = null,
         )
     }
 
@@ -270,7 +268,6 @@ class RealNextStepsTelemetryTest {
             dismissed = null,
             finishedElsewhere = 1,
             alreadyComplete = 0,
-            impressionsSoFar = "1",
         )
         verify(pixels).sectionEnded(
             CHECK_LIST,
@@ -280,7 +277,6 @@ class RealNextStepsTelemetryTest {
             dismissed = null,
             finishedElsewhere = 0,
             alreadyComplete = 1,
-            impressionsSoFar = "1",
         )
     }
 
@@ -301,7 +297,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 0,
             finishedElsewhere = 2,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
         val state = telemetryStore.state()
         assertEquals(0, state.finishedElsewhereItems)
@@ -404,7 +399,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 1,
             finishedElsewhere = 1,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
     }
 
@@ -447,7 +441,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 0,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
         verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
         verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
@@ -468,7 +461,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 0,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
     }
 
@@ -517,7 +509,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 0,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
         verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
         verify(pixels).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
@@ -548,7 +539,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 0,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
     }
 
@@ -693,7 +683,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 0,
             finishedElsewhere = 0,
             alreadyComplete = 1,
-            impressionsSoFar = null,
         )
         assertEquals(0, telemetryStore.state().activeDays)
         assertNull(telemetryStore.state().firstRenderDay)
@@ -759,7 +748,6 @@ class RealNextStepsTelemetryTest {
             dismissed = null,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = "2",
         )
         verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
         assertNull(telemetryStore.state().displayedVariant)
@@ -783,7 +771,6 @@ class RealNextStepsTelemetryTest {
             dismissed = null,
             finishedElsewhere = 1,
             alreadyComplete = 0,
-            impressionsSoFar = "1",
         )
         verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
     }
@@ -803,7 +790,6 @@ class RealNextStepsTelemetryTest {
             dismissed = null,
             finishedElsewhere = 0,
             alreadyComplete = 1,
-            impressionsSoFar = "1",
         )
     }
 
@@ -822,7 +808,6 @@ class RealNextStepsTelemetryTest {
             dismissed = null,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = "1",
         )
         verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
         assertNull(telemetryStore.state().displayedMessageId)
@@ -851,7 +836,6 @@ class RealNextStepsTelemetryTest {
             dismissed = 0,
             finishedElsewhere = 0,
             alreadyComplete = 0,
-            impressionsSoFar = null,
         )
     }
 

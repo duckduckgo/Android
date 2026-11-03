@@ -41,8 +41,6 @@ data class NextStepsTelemetryState(
     val dayCounts: Map<String, Int> = emptyMap(),
     /** Impressions per item over the whole install; never reset, so a CTA tap or removal can report how often the item was seen. */
     val totalImpressions: Map<String, Int> = emptyMap(),
-    /** Check list renders in the current section; the stacked cards report per-item daily counts instead. */
-    val sectionImpressions: Int = 0,
     /** Items removed while the section was on screen, one count per removal reason; reported when it ends. */
     val completedItems: Int = 0,
     val dismissedItems: Int = 0,
@@ -78,7 +76,6 @@ class RealNextStepsTelemetryStore @Inject constructor(
         openDay = preferences.getLong(KEY_OPEN_DAY, 0).takeIf { preferences.contains(KEY_OPEN_DAY) },
         dayCounts = preferences.counts(KEY_DAY_COUNTS),
         totalImpressions = preferences.counts(KEY_TOTAL_IMPRESSIONS),
-        sectionImpressions = preferences.getInt(KEY_SECTION_IMPRESSIONS, 0),
         completedItems = preferences.getInt(KEY_COMPLETED_ITEMS, 0),
         dismissedItems = preferences.getInt(KEY_DISMISSED_ITEMS, 0),
         finishedElsewhereItems = preferences.getInt(KEY_FINISHED_ELSEWHERE_ITEMS, 0),
@@ -96,7 +93,6 @@ class RealNextStepsTelemetryStore @Inject constructor(
             state.openDay?.let { putLong(KEY_OPEN_DAY, it) } ?: remove(KEY_OPEN_DAY)
             putCounts(KEY_DAY_COUNTS, state.dayCounts)
             putCounts(KEY_TOTAL_IMPRESSIONS, state.totalImpressions)
-            putInt(KEY_SECTION_IMPRESSIONS, state.sectionImpressions)
             putInt(KEY_COMPLETED_ITEMS, state.completedItems)
             putInt(KEY_DISMISSED_ITEMS, state.dismissedItems)
             putInt(KEY_FINISHED_ELSEWHERE_ITEMS, state.finishedElsewhereItems)
@@ -123,7 +119,6 @@ class RealNextStepsTelemetryStore @Inject constructor(
         const val KEY_OPEN_DAY = "KEY_OPEN_DAY"
         const val KEY_DAY_COUNTS = "KEY_DAY_COUNTS"
         const val KEY_TOTAL_IMPRESSIONS = "KEY_TOTAL_IMPRESSIONS"
-        const val KEY_SECTION_IMPRESSIONS = "KEY_SECTION_IMPRESSIONS"
         const val KEY_COMPLETED_ITEMS = "KEY_COMPLETED_CARDS"
         const val KEY_DISMISSED_ITEMS = "KEY_DISMISSED_CARDS"
         const val KEY_FINISHED_ELSEWHERE_ITEMS = "KEY_FINISHED_ELSEWHERE_ITEMS"

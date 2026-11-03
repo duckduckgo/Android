@@ -75,9 +75,8 @@ class RealNextStepsTelemetry @Inject constructor(
 
     override suspend fun onCheckListShown(messageId: String, openItemIds: Set<String>, completedItemIds: Set<String>) {
         update { state, today ->
-            val displayed = state.display(messageId, Variant.CHECK_LIST, today, openItemIds, completedItemIds)
-            openItemIds.fold(displayed.copy(sectionImpressions = displayed.sectionImpressions + 1)) { shown, itemId ->
-                shown.incrementImpressions(itemId)
+            openItemIds.fold(state.display(messageId, Variant.CHECK_LIST, today, openItemIds, completedItemIds)) { displayed, itemId ->
+                displayed.incrementImpressions(itemId)
             }
         }
     }
@@ -230,7 +229,6 @@ class RealNextStepsTelemetry @Inject constructor(
             dismissed = dismissedItems.takeIf { variant == Variant.STACKED_CARDS },
             finishedElsewhereItems,
             alreadyCompleteItems,
-            impressionsSoFar = impressionsBucket(sectionImpressions).takeIf { variant == Variant.CHECK_LIST },
         )
         return copy(
             displayedMessageId = null,
@@ -244,7 +242,6 @@ class RealNextStepsTelemetry @Inject constructor(
             dismissedItems = 0,
             finishedElsewhereItems = 0,
             alreadyCompleteItems = 0,
-            sectionImpressions = 0,
         )
     }
 
