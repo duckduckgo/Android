@@ -83,6 +83,7 @@ import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -117,6 +118,7 @@ class AppSyncAccountRepositoryTest {
     private var syncPixels: SyncPixels = mock()
     private val deviceKeyGenerator: DeviceKeyGenerator = mock()
     private val connectedDevicesRepository: ConnectedDevicesRepository = mock()
+    private var connectedDevicesCount = 0
     private val moshi = Moshi.Builder().build()
     private val invitationCodeWrapperAdapter = moshi.adapter(InvitationCodeWrapper::class.java)
     private val invitedDeviceDetailsAdapter = moshi.adapter(InvitedDeviceDetails::class.java)
@@ -161,6 +163,7 @@ class AppSyncAccountRepositoryTest {
             connectedDevicesRepository = connectedDevicesRepository,
             remoteDeviceLogout = RealRemoteDeviceLogout(syncStore, syncApi, syncPixels),
         )
+        runBlocking { whenever(connectedDevicesRepository.latestConnectedDeviceCount()).thenAnswer { connectedDevicesCount } }
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
         // passthrough by default (no modifications)
@@ -434,7 +437,6 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         givenConnectedDevices(numberOfDevices)
         whenever(syncApi.logout(token, deviceId)).thenReturn(Success(Logout(deviceId)))
-        syncRepo.getConnectedDevices()
     }
 
     private fun configureExchangeResultRecoveryReceived() {
@@ -529,6 +531,19 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded))
 
+        assertEquals((result as Error).code, ALREADY_SIGNED_IN.code)
+    }
+
+    @Test
+    fun whenSignedInAndProcessRecoveryCodeIfAllowSwitchAccountTrueThenReturnErrorIfNoDeviceCountStored() {
+        givenAuthenticatedDevice()
+        prepareForEncryption()
+        prepareForLoginSuccess()
+
+        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(jsonRecoveryKeyEncoded))
+
+        verify(connectedDevicesRepository, never()).getConnectedDevices()
+        verify(syncApi, never()).logout(any(), any())
         assertEquals((result as Error).code, ALREADY_SIGNED_IN.code)
     }
 
@@ -948,7 +963,7 @@ class AppSyncAccountRepositoryTest {
     fun whenAccountDeletedWithASingleConnectedDeviceThenPixelFired() {
         prepareForExchangeSuccess()
         whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
-        configureAsSignedWithConnectedDevices(1)
+        connectedDevicesCount = 1
         syncRepo.deleteAccount()
         verify(syncPixels).fireUserConfirmedToTurnOffSyncAndDelete(eq(1))
     }
@@ -957,7 +972,7 @@ class AppSyncAccountRepositoryTest {
     fun whenAccountDeletedWithMultipleConnectedDevicesThenPixelFired() {
         prepareForExchangeSuccess()
         whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
-        configureAsSignedWithConnectedDevices(10)
+        connectedDevicesCount = 10
         syncRepo.deleteAccount()
         verify(syncPixels).fireUserConfirmedToTurnOffSyncAndDelete(eq(10))
     }
@@ -1064,12 +1079,10 @@ class AppSyncAccountRepositoryTest {
     private fun givenAccountWithConnectedDevices(size: Int) {
         prepareForEncryption()
         givenConnectedDevices(size)
-        syncRepo.getConnectedDevices() as Success
     }
 
     private fun givenConnectedDevices(size: Int) {
-        val devices = (0 until size).map { connectedDevice.copy(thisDevice = it == 0, deviceId = "device$it") }
-        whenever(connectedDevicesRepository.getConnectedDevices()).thenReturn(Success(devices))
+        connectedDevicesCount = size
     }
 
     // A3: Login with scoped access credentials flag

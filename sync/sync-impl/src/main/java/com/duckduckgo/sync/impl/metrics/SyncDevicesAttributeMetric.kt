@@ -25,6 +25,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -43,7 +44,7 @@ class SyncDevicesAttributeMetric @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val attributedMetricClient: AttributedMetricClient,
     private val attributedMetricConfig: AttributedMetricConfig,
-    private val connectedDevicesObserver: ConnectedDevicesObserver,
+    private val connectedDevicesRepository: ConnectedDevicesRepository,
 ) : AttributedMetric, MainProcessLifecycleObserver {
 
     companion object {
@@ -65,7 +66,7 @@ class SyncDevicesAttributeMetric @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (isEnabled.await()) {
-                connectedDevicesObserver.observeConnectedDevicesCount().collect { deviceCount ->
+                connectedDevicesRepository.latestConnectedDeviceCountFlow().collect { deviceCount ->
                     if (deviceCount > 0) {
                         attributedMetricClient.emitMetric(this@SyncDevicesAttributeMetric)
                     }
@@ -77,7 +78,7 @@ class SyncDevicesAttributeMetric @Inject constructor(
     override fun getPixelName(): String = PIXEL_NAME
 
     override suspend fun getMetricParameters(): Map<String, String> {
-        val connectedDevices = connectedDevicesObserver.observeConnectedDevicesCount().value
+        val connectedDevices = connectedDevicesRepository.latestConnectedDeviceCount()
         val params = mutableMapOf(
             "number_of_devices" to getBucketValue(connectedDevices).toString(),
             "version" to bucketConfig.await().version.toString(),
@@ -86,7 +87,7 @@ class SyncDevicesAttributeMetric @Inject constructor(
     }
 
     override suspend fun getTag(): String {
-        val connectedDevices = connectedDevicesObserver.observeConnectedDevicesCount().value
+        val connectedDevices = connectedDevicesRepository.latestConnectedDeviceCount()
         return getBucketValue(connectedDevices).toString()
     }
 
