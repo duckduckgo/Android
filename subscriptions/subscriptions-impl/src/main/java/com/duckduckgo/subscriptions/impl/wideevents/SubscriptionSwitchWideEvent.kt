@@ -20,6 +20,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -109,8 +110,10 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
                     KEY_TO_TIER to toTier.value,
                     KEY_SWITCH_TYPE to switchType,
                     KEY_CHANGE_TYPE to changeType,
+                    KEY_PURCHASE_PLATFORM to PURCHASE_PLATFORM_PLAY_STORE,
                 ),
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+                definition = DEFINITION,
             )
             .getOrNull()
     }
@@ -347,6 +350,11 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         const val KEY_SWITCH_TYPE = "billing_cycle_switch_type"
         const val KEY_CHANGE_TYPE = "tier_change_type"
         const val KEY_ACTIVATION_LATENCY = "activation_latency_ms_bucketed"
+        const val KEY_PURCHASE_PLATFORM = "purchase_platform"
+
+        const val PURCHASE_PLATFORM_PLAY_STORE = "play_store"
+
+        val DEFINITION = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1))
 
         // Switch types
         const val SWITCH_TYPE_UPGRADE = "upgrade"

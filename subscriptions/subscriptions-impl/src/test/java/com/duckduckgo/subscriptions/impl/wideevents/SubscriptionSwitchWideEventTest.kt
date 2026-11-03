@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -84,8 +85,10 @@ class SubscriptionSwitchWideEventTest {
                 "to_tier" to "plus",
                 "billing_cycle_switch_type" to "upgrade",
                 "tier_change_type" to "crossgrade",
+                "purchase_platform" to "play_store",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -109,8 +112,10 @@ class SubscriptionSwitchWideEventTest {
                 "to_tier" to "plus",
                 "billing_cycle_switch_type" to "downgrade",
                 "tier_change_type" to "crossgrade",
+                "purchase_platform" to "play_store",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -134,8 +139,10 @@ class SubscriptionSwitchWideEventTest {
                 "to_tier" to "pro",
                 "billing_cycle_switch_type" to "upgrade",
                 "tier_change_type" to "crossgrade",
+                "purchase_platform" to "play_store",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -159,8 +166,10 @@ class SubscriptionSwitchWideEventTest {
                 "to_tier" to "pro",
                 "billing_cycle_switch_type" to "none",
                 "tier_change_type" to "upgrade",
+                "purchase_platform" to "play_store",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -184,8 +193,10 @@ class SubscriptionSwitchWideEventTest {
                 "to_tier" to "plus",
                 "billing_cycle_switch_type" to "none",
                 "tier_change_type" to "downgrade",
+                "purchase_platform" to "play_store",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -210,8 +221,10 @@ class SubscriptionSwitchWideEventTest {
                 "to_tier" to "plus",
                 "billing_cycle_switch_type" to "upgrade",
                 "tier_change_type" to "upgrade",
+                "purchase_platform" to "play_store",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -236,8 +249,10 @@ class SubscriptionSwitchWideEventTest {
                 "to_tier" to "pro",
                 "billing_cycle_switch_type" to "none",
                 "tier_change_type" to "upgrade",
+                "purchase_platform" to "play_store",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 

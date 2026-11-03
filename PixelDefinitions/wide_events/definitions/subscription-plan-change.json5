@@ -4,7 +4,7 @@
         "owners": ["lmac012"],
         "meta": {
             "type": "android-subscription-plan-change",
-            "version": "0.0"
+            "version": "0.1"
         },
         "feature": {
             "name": "subscription-plan-change",
@@ -38,6 +38,11 @@
                         "type": "string",
                         "description": "Direction of the tier change",
                         "enum": ["upgrade", "downgrade", "crossgrade"]
+                    },
+                    "purchase_platform": {
+                        "type": "string",
+                        "description": "Platform where the subscription was bought",
+                        "enum": ["play_store", "stripe"]
                     },
                     "activation_latency_ms_bucketed": {
                         "type": "string",
