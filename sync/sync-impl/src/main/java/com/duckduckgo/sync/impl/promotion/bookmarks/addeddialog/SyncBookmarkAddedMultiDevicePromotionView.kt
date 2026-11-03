@@ -35,8 +35,8 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncBookmarkAddedMultiDevicePromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
-import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialogMultiDevice
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command
@@ -74,6 +74,9 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -119,7 +122,7 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
         popupMenu.show(this, anchor)
     }
 
-    private fun processCommand(command: Command) {
+    private suspend fun processCommand(command: Command) {
         when (command) {
             DismissPromotion -> gone()
             LaunchSyncWithDesktopChoice -> launchSyncWithDesktopChoice()
@@ -145,11 +148,8 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
         )
     }
 
-    private fun launchGetDesktopApp() {
-        globalActivityStarter.start(
-            context,
-            SyncGetOnOtherPlatformsParams(source = SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG),
-        )
+    private suspend fun launchGetDesktopApp() {
+        syncDesktopAppPromotionLauncher.launch(context, SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG)
     }
 }
 

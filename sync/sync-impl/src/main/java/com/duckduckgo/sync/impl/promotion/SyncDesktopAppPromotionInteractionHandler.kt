@@ -24,6 +24,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_ACTIVATING
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARKS
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_PASSWORDS
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
@@ -92,4 +93,9 @@ object SyncDesktopAppPromotionInteractionHandlerModule {
     @IntoSet
     fun providePromotionPasswordsHandler(pixel: Pixel): DesktopAppPromotionInteractionHandler =
         SyncDesktopAppPromotionInteractionHandler(SOURCE_PROMOTION_PASSWORDS, pixel)
+
+    @Provides
+    @IntoSet
+    fun providePromotionBookmarkAddedDialogHandler(pixel: Pixel): DesktopAppPromotionInteractionHandler =
+        SyncDesktopAppPromotionInteractionHandler(SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG, pixel)
 }
