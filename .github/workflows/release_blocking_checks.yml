@@ -35,12 +35,21 @@ jobs:
       commit: ${{ inputs.commit }}
     secrets: inherit
 
+  end-to-end-build:
+    uses: ./.github/workflows/e2e-build-and-upload.yml
+    with:
+      commit: ${{ inputs.commit }}
+      create_asana_tasks: ${{ inputs.create_asana_tasks }}
+    secrets: inherit
+
   end-to-end:
-    needs: nightly
+    needs: [nightly, end-to-end-build]
     uses: ./.github/workflows/e2e-nightly-full-suite.yml
     with:
       commit: ${{ inputs.commit }}
       create_asana_tasks: ${{ inputs.create_asana_tasks }}
+      internal_binary_id: ${{ needs.end-to-end-build.outputs.internal_binary_id }}
+      release_binary_id: ${{ needs.end-to-end-build.outputs.release_binary_id }}
     secrets: inherit
 
   privacy:
