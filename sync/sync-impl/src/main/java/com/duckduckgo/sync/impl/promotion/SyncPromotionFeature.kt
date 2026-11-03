@@ -37,6 +37,9 @@ interface SyncPromotionFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun leveragePromosRedesign(): Toggle
+
     @Toggle.InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun bookmarks(): Toggle
