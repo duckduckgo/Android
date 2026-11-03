@@ -19,7 +19,10 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 import android.content.Context
 import android.view.View
 import app.cash.turbine.test
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.LaunchSource
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
+import com.duckduckgo.autofill.impl.importing.promo.PasswordsInBookmarksImportPromotion
+import com.duckduckgo.autofill.impl.importing.promo.PasswordsInBookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command.Exit
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.ViewMode
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.DownloadError
@@ -162,6 +165,28 @@ class ImportGoogleBookmarksViewModelTest {
     }
 
     @Test
+    fun `when launched from passwords import promo then passwords import promo not offered`() {
+        val fallback = FakePromotionPlugin { true }
+        promotionPlugins += listOf(eligiblePasswordsImportPromo(), fallback)
+        val testee = createViewModel(isRedesignEnabled = true, launchSource = LaunchSource.PasswordsImportPromo.value)
+
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Success(importedCount = 10))
+
+        assertEquals(ViewMode.Success(importedCount = 10, promo = fallback), testee.viewState.value.viewMode)
+    }
+
+    @Test
+    fun `when not launched from passwords import promo then passwords import promo offered`() {
+        val passwordsImportPromo = eligiblePasswordsImportPromo()
+        promotionPlugins += listOf(passwordsImportPromo, FakePromotionPlugin { true })
+        val testee = createViewModel(isRedesignEnabled = true)
+
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Success(importedCount = 10))
+
+        assertEquals(ViewMode.Success(importedCount = 10, promo = passwordsImportPromo), testee.viewState.value.viewMode)
+    }
+
+    @Test
     fun `when web flow finished with error then error shown`() {
         testee.onWebFlowFinished(ImportGoogleBookmarkResult.Error(DownloadError))
 
@@ -249,8 +274,17 @@ class ImportGoogleBookmarksViewModelTest {
         }
     }
 
-    private fun createViewModel(isRedesignEnabled: Boolean) = ImportGoogleBookmarksViewModel(
-        launchSource = "bookmarks_screen",
+    private fun eligiblePasswordsImportPromo() = PasswordsInBookmarksImportScreenPromotionPlugin(
+        promotion = object : PasswordsInBookmarksImportPromotion {
+            override suspend fun canShowPromotion(importedBookmarksCount: Int) = true
+        },
+    )
+
+    private fun createViewModel(
+        isRedesignEnabled: Boolean,
+        launchSource: String = "bookmarks_screen",
+    ) = ImportGoogleBookmarksViewModel(
+        launchSource = launchSource,
         isRedesignEnabled = isRedesignEnabled,
         importJourney = mockImportJourney,
         promotionPlugins = object : PluginPoint<BookmarksImportScreenPromotionPlugin> {

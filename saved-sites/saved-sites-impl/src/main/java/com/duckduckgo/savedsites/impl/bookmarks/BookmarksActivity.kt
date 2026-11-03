@@ -42,6 +42,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportRequest
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.ImportFromGoogleResult
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.LaunchSource
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
@@ -493,7 +494,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     private fun launchBookmarkImportWebFlow() {
         lifecycleScope.launch {
-            importFromGoogleLauncher.launchBookmarksImport(googleBookmarksImport)
+            importFromGoogleLauncher.launchBookmarksImport(LaunchSource.BookmarksScreen, googleBookmarksImport)
         }
     }
 
