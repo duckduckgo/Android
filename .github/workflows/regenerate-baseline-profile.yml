@@ -1,0 +1,377 @@
+name: Regenerate Baseline Profile
+
+on:
+  schedule:
+    - cron: '30 5 * * 1' # Mondays at 5:30 AM UTC
+  workflow_dispatch:
+    inputs:
+      device_model:
+        description: 'FTL physical device model id (shiba = Pixel 8)'
+        required: true
+        default: 'shiba'
+      device_version:
+        description: 'FTL Android API level for the device'
+        required: true
+        default: '34'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  DEFAULT_DEVICE_MODEL: shiba
+  DEFAULT_DEVICE_VERSION: '34'
+
+jobs:
+  generate:
+    name: Generate profile on FTL
+    runs-on: android-large-runner
+    timeout-minutes: 90
+
+    steps:
+      - name: Validate inputs
+        env:
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+        run: |
+          [[ "$DEVICE_MODEL" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "Invalid device_model"; exit 1; }
+          [[ "$DEVICE_VERSION" =~ ^[0-9]+$ ]] || { echo "Invalid device_version"; exit 1; }
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          submodules: recursive
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          cache-read-only: true
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Decode release properties
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode release key
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Write Flank credentials
+        env:
+          FLANK: ${{ secrets.FLANK }}
+        run: echo "$FLANK" > flank.json
+
+      - name: Ensure debug keystore exists
+        run: |
+          # macrobenchmark/build.gradle signs its release build types with the AGP debug keystore.
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            mkdir -p "$HOME/.android"
+            keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build capture APKs
+        env:
+          DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+        run: ./gradlew -q :app:assembleInternalNonMinifiedRelease :macrobenchmark:assembleNonMinifiedRelease -Pforce-default-variant
+
+      - name: Generate profile on FTL
+        env:
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+        run: |
+          ./gradlew -q runFlankBaselineProfileGeneration --no-configuration-cache \
+            -PftlDeviceModel="$DEVICE_MODEL" -PftlDeviceVersion="$DEVICE_VERSION"
+
+      - name: Authenticate to Google Cloud
+        if: always()
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FLANK }}
+
+      - name: Download results from the FTL results bucket
+        if: always()
+        run: |
+          set -euo pipefail
+          GCS_PATH=$(jq -r '.[].gcsPath' build/fladle/baselineProfileResults/matrix_ids.json | head -1)
+          GCS_PATH="${GCS_PATH%/}"
+          if [ -z "$GCS_PATH" ] || [ "$GCS_PATH" = "null" ]; then
+            echo "ERROR: could not read gcsPath from matrix_ids.json" >&2
+            exit 1
+          fi
+          mkdir -p profile-artifacts
+          gcloud storage cp -r "gs://${GCS_PATH}/*" profile-artifacts/
+
+      - name: Collect generated profile
+        run: |
+          set -euo pipefail
+          # With includeInStartupProfile = true the generator only writes
+          # <class>_<method>-startup-prof.txt (plus a timestamped copy). The baselineprofile
+          # plugin builds baseline-prof.txt from baseline and startup rules, so both
+          # committed files come from the same capture.
+          SRC=$(find profile-artifacts -type f -name '*StartupBaselineProfileGenerator_startup-startup-prof.txt' | head -1)
+          if [ -z "$SRC" ] || [ ! -s "$SRC" ]; then
+            echo "ERROR: startup profile missing or empty in FTL results" >&2
+            find profile-artifacts -type f -name '*prof*' >&2 || true
+            exit 1
+          fi
+          mkdir -p profile
+          cp "$SRC" profile/startup-prof.txt
+          cp "$SRC" profile/baseline-prof.txt
+          wc -l profile/*.txt
+
+      - name: Upload generated profile
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-profile
+          path: profile/*.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload FTL results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-profile-generation-${{ github.run_number }}
+          path: profile-artifacts/**
+          retention-days: 30
+
+  validate-and-propose:
+    name: Validate profile and open PR
+    needs: generate
+    runs-on: android-large-runner
+    timeout-minutes: 90
+
+    steps:
+      - name: Validate inputs
+        env:
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+        run: |
+          [[ "$DEVICE_MODEL" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "Invalid device_model"; exit 1; }
+          [[ "$DEVICE_VERSION" =~ ^[0-9]+$ ]] || { echo "Invalid device_version"; exit 1; }
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          submodules: recursive
+
+      - name: Download generated profile
+        uses: actions/download-artifact@v4
+        with:
+          name: baseline-profile
+          path: profile
+
+      - name: Install generated profile
+        run: |
+          set -euo pipefail
+          for f in baseline-prof.txt startup-prof.txt; do
+            [ -s "profile/$f" ] || { echo "ERROR: profile/$f missing or empty" >&2; exit 1; }
+            cp "profile/$f" "app/src/main/generated/baselineProfiles/$f"
+          done
+
+      - name: Check whether the profile changed
+        id: diff
+        run: |
+          if git diff --quiet -- app/src/main/generated/baselineProfiles; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Generated profile matches the committed one, nothing to propose." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up JDK version
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Setup Gradle
+        if: steps.diff.outputs.changed == 'true'
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          cache-read-only: true
+
+      - name: Set up gcloud
+        if: steps.diff.outputs.changed == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Decode release properties
+        if: steps.diff.outputs.changed == 'true'
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode release key
+        if: steps.diff.outputs.changed == 'true'
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Write Flank credentials
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          FLANK: ${{ secrets.FLANK }}
+        run: echo "$FLANK" > flank.json
+
+      - name: Ensure debug keystore exists
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          # macrobenchmark/build.gradle signs its release build types with the AGP debug keystore.
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            mkdir -p "$HOME/.android"
+            keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build APKs with the new profile
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+        run: ./gradlew -q :app:assembleInternalRelease :macrobenchmark:assembleRelease -Pforce-default-variant
+
+      - name: Check the profile is packaged
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          APK=$(find app/build/outputs/apk/internal/release -maxdepth 1 -name '*-internal-release.apk' | head -1)
+          [ -n "$APK" ] || { echo "ERROR: internalRelease APK not found" >&2; exit 1; }
+          unzip -l "$APK" | grep -q 'assets/dexopt/baseline.prof' || { echo "ERROR: assets/dexopt/baseline.prof missing from $APK" >&2; exit 1; }
+
+      - name: Run startup benchmark on FTL
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+        run: |
+          ./gradlew -q runFlankStartupTests --no-configuration-cache \
+            -PftlStartupMethods=baselineProfile,noCompilation \
+            -PftlDeviceModel="$DEVICE_MODEL" -PftlDeviceVersion="$DEVICE_VERSION"
+
+      - name: Authenticate to Google Cloud
+        if: steps.diff.outputs.changed == 'true' && always()
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FLANK }}
+
+      - name: Download benchmark artifacts from the FTL results bucket
+        if: steps.diff.outputs.changed == 'true' && always()
+        run: |
+          set -euo pipefail
+          GCS_PATH=$(jq -r '.[].gcsPath' build/fladle/startupResults/matrix_ids.json | head -1)
+          GCS_PATH="${GCS_PATH%/}"
+          if [ -z "$GCS_PATH" ] || [ "$GCS_PATH" = "null" ]; then
+            echo "ERROR: could not read gcsPath from matrix_ids.json" >&2
+            exit 1
+          fi
+          mkdir -p startup-artifacts
+          gcloud storage cp -r "gs://${GCS_PATH}/*" startup-artifacts/
+
+      - name: Summarize results
+        if: steps.diff.outputs.changed == 'true' && always()
+        env:
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          {
+            echo "Device: \`${DEVICE_MODEL}\` API ${DEVICE_VERSION}, ref \`${REF_NAME}\` @ \`${GITHUB_SHA::10}\`"
+            echo
+            echo "| Test | TTID min | TTID median | TTID max | TTFD min | TTFD median | TTFD max |"
+            echo "|---|---:|---:|---:|---:|---:|---:|"
+            find startup-artifacts -name '*benchmarkData.json' -print0 | xargs -0 -r jq -r '
+              .benchmarks[]
+              | "| \(.name) | " + ([ .metrics.timeToInitialDisplayMs, .metrics.timeToFullDisplayMs ]
+                  | map("\(.minimum) | \(.median) | \(.maximum)") | join(" | ")) + " |"'
+          } > benchmark-table.md
+          cat benchmark-table.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Prepare PR body
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          DEVICE_MODEL: ${{ inputs.device_model || env.DEFAULT_DEVICE_MODEL }}
+          DEVICE_VERSION: ${{ inputs.device_version || env.DEFAULT_DEVICE_VERSION }}
+        run: |
+          {
+            echo "### Description"
+            echo
+            echo "Regenerated the app Baseline Profile (\`baseline-prof.txt\` and \`startup-prof.txt\`) with \`StartupBaselineProfileGenerator\` on Firebase Test Lab (\`${DEVICE_MODEL}\`, API ${DEVICE_VERSION})."
+            echo
+            echo "Startup benchmark with the regenerated profile on the same device:"
+            echo
+            cat benchmark-table.md
+            echo
+            echo "### Steps to test this PR"
+            echo
+            echo "- [ ] Check the diff only touches \`app/src/main/generated/baselineProfiles/\`"
+            echo "- [ ] Check \`baselineProfile\` TTID/TTFD is better than \`noCompilation\` in the table above"
+            echo "- [ ] Check the CI build passes"
+          } > pr-body.md
+
+      - name: Get current date
+        if: steps.diff.outputs.changed == 'true'
+        run: echo "current_date=$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
+
+      - name: Create Pull Request
+        if: steps.diff.outputs.changed == 'true'
+        id: create-pr
+        uses: peter-evans/create-pull-request@v6.1.0
+        with:
+          base: ${{ github.ref_name }}
+          title: "Regenerate baseline profile - ${{ env.current_date }}"
+          author: daxmobile <daxmobile@users.noreply.github.com>
+          token: ${{ secrets.GT_DAXMOBILE }}
+          commit-message: "Regenerate baseline profile - ${{ env.current_date }}"
+          branch: automation/baseline-profile-${{ env.current_date }}
+          add-paths: app/src/main/generated/baselineProfiles
+          body-path: pr-body.md
+
+      - name: Apply labels to PR
+        if: steps.diff.outputs.changed == 'true' && steps.create-pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+          PR_NUMBER: ${{ steps.create-pr.outputs.pull-request-number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api "repos/${REPO}/issues/${PR_NUMBER}/labels" \
+            --method POST \
+            -f "labels[]=automated pr"
+
+      - name: Upload results
+        if: steps.diff.outputs.changed == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-profile-validation-${{ github.run_number }}
+          path: |
+            startup-artifacts/**
+          retention-days: 30

@@ -350,6 +350,31 @@ fladle {
             localResultsDir.set("startupResults")
             flakyTestAttempts.set(0)
         }
+        baselineProfileGeneration {
+            serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
+            flankVersion.set("21.+")
+            useOrchestrator.set(false)
+            recordVideo.set(false)
+            testTimeout.set("45m")
+            debugApk.set(project.provider {
+                def dir = rootProject.file("app/build/outputs/apk/internal/nonMinifiedRelease")
+                def apks = dir.exists() ? (dir.listFiles() ?: []).findAll { it.name.endsWith("-internal-nonMinifiedRelease.apk") } : []
+                apks.isEmpty() ? new File(dir, "missing-internal-nonMinifiedRelease.apk").absolutePath : apks.first().absolutePath
+            })
+            instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/nonMinifiedRelease/macrobenchmark-nonMinifiedRelease.apk").absolutePath)
+            additionalTestApks.set([])
+            testTargets.set(["class com.duckduckgo.macrobenchmark.StartupBaselineProfileGenerator#startup"])
+            devices.set([["model": findProperty("ftlDeviceModel") ?: "shiba", "version": findProperty("ftlDeviceVersion") ?: "34"]])
+            environmentVariables.set([
+                    "additionalTestOutputDir"        : "/sdcard/Download",
+                    "no-isolated-storage"            : "true",
+                    "androidx.benchmark.suppressErrors": "EMULATOR",
+            ])
+            directoriesToPull.set(["/sdcard/Download"])
+            filesToDownload.set([".*/sdcard/Download/.*"])
+            localResultsDir.set("baselineProfileResults")
+            flakyTestAttempts.set(0)
+        }
     }
 }
 
@@ -357,6 +382,14 @@ tasks.matching { it.name == "execFlankPerfTests" || it.name == "execFlankStartup
     doFirst {
         if (!file(config.debugApk.get()).exists()) {
             throw new GradleException("No internalRelease APK in app/build/outputs/apk/internal/release — run :app:assembleInternalRelease first")
+        }
+    }
+}
+
+tasks.matching { it.name == "execFlankBaselineProfileGeneration" }.configureEach {
+    doFirst {
+        if (!file(config.debugApk.get()).exists()) {
+            throw new GradleException("No internalNonMinifiedRelease APK in app/build/outputs/apk/internal/nonMinifiedRelease — run :app:assembleInternalNonMinifiedRelease first")
         }
     }
 }
