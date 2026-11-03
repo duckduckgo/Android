@@ -50,6 +50,8 @@ class RealNextStepsTelemetryStoreTest {
             totalImpressions = mapOf("setup_default_browser" to 3, "setup_add_widget" to 9),
             completedItems = 1,
             dismissedItems = 2,
+            finishedElsewhereItems = 1,
+            alreadyCompleteItems = 3,
             reportedCompletedItems = setOf("setup_sync"),
         )
         testee.save(state)

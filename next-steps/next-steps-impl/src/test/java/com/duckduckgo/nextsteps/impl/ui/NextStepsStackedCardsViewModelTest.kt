@@ -193,7 +193,7 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, impressions())
-        verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 1, dismissed = 0)
+        verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 1, dismissed = 0, finishedElsewhere = 0, alreadyComplete = 0)
     }
 
     @Test
@@ -255,7 +255,15 @@ class NextStepsStackedCardsViewModelTest {
         aViewModel()
         advanceUntilIdle()
         whenever(remoteMessageModel.onMessageDismissed(any())).thenAnswer {
-            verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 0, dismissed = 1)
+            verify(pixels).sectionEnded(
+                STACKED_CARDS,
+                DAY_0,
+                "all_items_done",
+                completed = 0,
+                dismissed = 1,
+                finishedElsewhere = 0,
+                alreadyComplete = 0,
+            )
             null
         }
 
@@ -263,7 +271,7 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
         telemetry.onActiveMessageChanged(null)
 
-        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), any())
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), any(), any(), any())
         verify(remoteMessageModel, times(1)).onMessageDismissed(message)
     }
 
@@ -276,7 +284,15 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
         whenever(remoteMessageModel.onMessageDismissed(any())).thenAnswer {
             verify(pixels, times(1)).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, COMPLETED, "2")
-            verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 1, dismissed = 0)
+            verify(pixels).sectionEnded(
+                STACKED_CARDS,
+                DAY_0,
+                "all_items_done",
+                completed = 1,
+                dismissed = 0,
+                finishedElsewhere = 0,
+                alreadyComplete = 0,
+            )
             null
         }
         defaultBrowserCheck.completed = true
@@ -288,7 +304,7 @@ class NextStepsStackedCardsViewModelTest {
 
         verify(pixels, times(1)).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, COMPLETED, "2")
         verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, defaultBrowserItem.id, DAY_0, "2")
-        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), any())
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), any(), any(), any())
     }
 
     @Test

@@ -44,6 +44,10 @@ data class NextStepsTelemetryState(
     /** Items completed and dismissed while the section was on screen; reported when it ends. */
     val completedItems: Int = 0,
     val dismissedItems: Int = 0,
+    /** Completions without a CTA tap, part of [completedItems]. */
+    val finishedElsewhereItems: Int = 0,
+    /** Items complete at this section's first render, including those completed during an earlier section. */
+    val alreadyCompleteItems: Int = 0,
     /** Items whose completion was already reported; a second detection from another tab or after a restart sends nothing. */
     val reportedCompletedItems: Set<String> = emptySet(),
 )
@@ -75,6 +79,8 @@ class RealNextStepsTelemetryStore @Inject constructor(
         totalImpressions = preferences.counts(KEY_TOTAL_IMPRESSIONS),
         completedItems = preferences.getInt(KEY_COMPLETED_ITEMS, 0),
         dismissedItems = preferences.getInt(KEY_DISMISSED_ITEMS, 0),
+        finishedElsewhereItems = preferences.getInt(KEY_FINISHED_ELSEWHERE_ITEMS, 0),
+        alreadyCompleteItems = preferences.getInt(KEY_ALREADY_COMPLETE_ITEMS, 0),
         reportedCompletedItems = preferences.getStringSet(KEY_REPORTED_COMPLETED_ITEMS, null).orEmpty(),
     )
 
@@ -90,6 +96,8 @@ class RealNextStepsTelemetryStore @Inject constructor(
             putCounts(KEY_TOTAL_IMPRESSIONS, state.totalImpressions)
             putInt(KEY_COMPLETED_ITEMS, state.completedItems)
             putInt(KEY_DISMISSED_ITEMS, state.dismissedItems)
+            putInt(KEY_FINISHED_ELSEWHERE_ITEMS, state.finishedElsewhereItems)
+            putInt(KEY_ALREADY_COMPLETE_ITEMS, state.alreadyCompleteItems)
             putStringSet(KEY_REPORTED_COMPLETED_ITEMS, state.reportedCompletedItems)
         }
     }
@@ -114,6 +122,8 @@ class RealNextStepsTelemetryStore @Inject constructor(
         const val KEY_TOTAL_IMPRESSIONS = "KEY_TOTAL_IMPRESSIONS"
         const val KEY_COMPLETED_ITEMS = "KEY_COMPLETED_CARDS"
         const val KEY_DISMISSED_ITEMS = "KEY_DISMISSED_CARDS"
+        const val KEY_FINISHED_ELSEWHERE_ITEMS = "KEY_FINISHED_ELSEWHERE_ITEMS"
+        const val KEY_ALREADY_COMPLETE_ITEMS = "KEY_ALREADY_COMPLETE_ITEMS"
         const val KEY_REPORTED_COMPLETED_ITEMS = "KEY_REPORTED_COMPLETED_CARDS"
     }
 }

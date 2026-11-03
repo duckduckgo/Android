@@ -40,7 +40,17 @@ interface NextStepsPixels {
 
     /** Stacked cards only: the check list shows every item at once, so it has no per-item impressions to roll up. */
     fun itemDailyImpressions(variant: Variant, item: String, days: Days, impressions: String)
-    fun sectionEnded(variant: Variant, days: Days, reason: String, completed: Int, dismissed: Int)
+
+    /** [completed] counts every completion on screen, by CTA or elsewhere; [finishedElsewhere] and [alreadyComplete] break out the non-CTA ones. */
+    fun sectionEnded(
+        variant: Variant,
+        days: Days,
+        reason: String,
+        completed: Int,
+        dismissed: Int,
+        finishedElsewhere: Int,
+        alreadyComplete: Int,
+    )
 
     data class Days(val activeDay: String, val calendarDay: String)
 
@@ -93,8 +103,25 @@ class RealNextStepsPixels @Inject constructor(private val pixel: Pixel) : NextSt
         fire(NextStepsPixelName.ITEM_DAILY_IMPRESSIONS, variant, days, ITEM to item, "impressions" to impressions)
     }
 
-    override fun sectionEnded(variant: NextStepsPixels.Variant, days: NextStepsPixels.Days, reason: String, completed: Int, dismissed: Int) {
-        fire(NextStepsPixelName.SECTION_ENDED, variant, days, "reason" to reason, "completed" to "$completed", "dismissed" to "$dismissed")
+    override fun sectionEnded(
+        variant: NextStepsPixels.Variant,
+        days: NextStepsPixels.Days,
+        reason: String,
+        completed: Int,
+        dismissed: Int,
+        finishedElsewhere: Int,
+        alreadyComplete: Int,
+    ) {
+        fire(
+            NextStepsPixelName.SECTION_ENDED,
+            variant,
+            days,
+            "reason" to reason,
+            "completed" to "$completed",
+            "dismissed" to "$dismissed",
+            "finishedElsewhere" to "$finishedElsewhere",
+            "alreadyComplete" to "$alreadyComplete",
+        )
     }
 
     private fun fire(

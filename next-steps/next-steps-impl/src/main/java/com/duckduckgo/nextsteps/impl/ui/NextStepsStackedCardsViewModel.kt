@@ -210,7 +210,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
         val onScreen = _viewState.value.items
         val isNewMessage = _viewState.value.message?.id != message.id
         return if (onScreen.isEmpty() || isNewMessage) {
-            loadItems(message, remaining)
+            loadItems(message, remaining, completedIds)
         } else {
             refreshOnScreenItems(message, onScreen, remaining, completedIds)
         }
@@ -222,13 +222,14 @@ class NextStepsStackedCardsViewModel @Inject constructor(
     private suspend fun loadItems(
         message: RemoteMessage,
         remaining: List<CardItem.ListItem>,
+        completedIds: Set<String>,
     ): List<CardItem.ListItem> = withContext(dispatchers.io()) {
         if (remaining.isEmpty()) return@withContext emptyList()
         val visible = remaining.sortedByOrder(itemsStore.itemOrder()).rotatedIfDue()
         itemsStore.saveItemOrder(visible.map { it.id })
         if (visible.isNotEmpty()) {
             countImpressionForRotationAndRmf(message, visible.first().id)
-            telemetry.onFrontCardShown(message.id, visible.first().id, visible.ids())
+            telemetry.onFrontCardShown(message.id, visible.first().id, visible.ids(), completedIds)
         }
         visible
     }

@@ -172,11 +172,13 @@ class NextStepsCheckListViewModel @Inject constructor(
     }
 
     fun onSectionDismissed() {
-        val message = _viewState.value.message ?: return
+        val state = _viewState.value
+        val message = state.message ?: return
+        val allItemsDone = state.listItems.all { it.completed || it.item.id == animatingCompletionItemId }
         viewModelScope.launch {
             val firstDismissal = withContext(dispatchers.io()) { itemsStore.markMessageDismissed(message.id) }
             if (firstDismissal) {
-                telemetry.onSectionDismissed()
+                if (allItemsDone) telemetry.onAllItemsDone() else telemetry.onSectionDismissed()
                 remoteMessageModel.onMessageDismissed(message)
             }
         }
@@ -194,7 +196,7 @@ class NextStepsCheckListViewModel @Inject constructor(
             .sortedItems()
         if (listItems.isNotEmpty() && shownMessageId != id) {
             shownMessageId = id
-            telemetry.onCheckListShown(id, settledListItems.filter { !it.completed }.map { it.item.id }.toSet())
+            telemetry.onCheckListShown(id, settledListItems.filter { !it.completed }.map { it.item.id }.toSet(), completedIds)
             remoteMessageModel.onMessageShown(this)
         }
         return ViewState(message = this, title = content.titleText, listItems = listItems)

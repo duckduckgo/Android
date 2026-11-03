@@ -165,7 +165,7 @@
             {
                 "key": "reason",
                 "type": "string",
-                "description": "Why the section ended: every stacked card completed or dismissed by the user, the user closed the check list, or RMF removed the message.",
+                "description": "Why the section ended: every stacked card completed or dismissed by the user, the user closed the check list with every item complete (all_items_done) or with items still open (user_dismissed), or RMF removed the message.",
                 "enum": ["all_items_done", "user_dismissed", "auto"]
             },
             {
@@ -178,6 +178,18 @@
                 "key": "dismissed",
                 "type": "string",
                 "description": "Stacked cards the user closed with the X while the section was on screen. Always 0 for the check list.",
+                "enum": ["0", "1", "2", "3"]
+            },
+            {
+                "key": "finishedElsewhere",
+                "type": "string",
+                "description": "Of the completed items, those detected complete without a tap on their CTA.",
+                "enum": ["0", "1", "2", "3"]
+            },
+            {
+                "key": "alreadyComplete",
+                "type": "string",
+                "description": "Items complete when the section first rendered, so never shown as open, including items completed during an earlier section. Not included in completed.",
                 "enum": ["0", "1", "2", "3"]
             }
         ]

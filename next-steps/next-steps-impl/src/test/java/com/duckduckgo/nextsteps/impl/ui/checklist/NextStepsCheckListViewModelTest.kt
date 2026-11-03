@@ -470,7 +470,7 @@ class NextStepsCheckListViewModelTest {
     }
 
     @Test
-    fun `when the section is dismissed then the section end is reported once with the completions on screen`() = runTest {
+    fun `when the completed section is dismissed then all items done is reported once with the completion breakdown`() = runTest {
         defaultBrowserCheck.completed = true
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
@@ -485,8 +485,32 @@ class NextStepsCheckListViewModelTest {
         testee.onSectionDismissed()
         advanceUntilIdle()
 
-        verify(pixels, times(1)).sectionEnded(CHECK_LIST, DAY_0, "user_dismissed", completed = 2, dismissed = 0)
+        verify(pixels, times(1)).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "all_items_done",
+            completed = 2,
+            dismissed = 0,
+            finishedElsewhere = 1,
+            alreadyComplete = 1,
+        )
         verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when the section is dismissed with items still open then user dismissed is reported with the completions on screen`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onItemClicked(syncItem.id)
+        advanceUntilIdle()
+        syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        testee.onSectionDismissed()
+        advanceUntilIdle()
+
+        verify(pixels).sectionEnded(CHECK_LIST, DAY_0, "user_dismissed", completed = 1, dismissed = 0, finishedElsewhere = 0, alreadyComplete = 0)
     }
 
     @Test
