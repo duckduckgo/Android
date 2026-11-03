@@ -41,10 +41,9 @@ data class NextStepsTelemetryState(
     val dayCounts: Map<String, Int> = emptyMap(),
     /** Impressions per item over the whole install; never reset, so a CTA tap or removal can report how often the item was seen. */
     val totalImpressions: Map<String, Int> = emptyMap(),
-    /** Items completed and dismissed while the section was on screen; reported when it ends. */
+    /** Items removed while the section was on screen, one count per removal reason; reported when it ends. */
     val completedItems: Int = 0,
     val dismissedItems: Int = 0,
-    /** Completions without a CTA tap, part of [completedItems]. */
     val finishedElsewhereItems: Int = 0,
     /** Items complete at this section's first render, including those completed during an earlier section. */
     val alreadyCompleteItems: Int = 0,

@@ -209,7 +209,7 @@ class RealNextStepsTelemetryTest {
         testee.onAllItemsDone()
         testee.onActiveMessageChanged(null)
 
-        verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 2, dismissed = 1, finishedElsewhere = 1, alreadyComplete = 0)
+        verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 1, dismissed = 1, finishedElsewhere = 1, alreadyComplete = 0)
         verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), any(), any(), any())
         val state = telemetryStore.state()
         assertNull(state.displayedMessageId)
@@ -243,7 +243,7 @@ class RealNextStepsTelemetryTest {
         testee.onSectionDismissed()
 
         verify(pixels, times(1)).itemRemoved(any(), any(), any(), any(), any())
-        verify(pixels).sectionEnded(CHECK_LIST, DAY_0, "user_dismissed", completed = 1, dismissed = 0, finishedElsewhere = 1, alreadyComplete = 0)
+        verify(pixels).sectionEnded(CHECK_LIST, DAY_0, "user_dismissed", completed = 0, dismissed = 0, finishedElsewhere = 1, alreadyComplete = 0)
         verify(pixels).sectionEnded(CHECK_LIST, DAY_0, "user_dismissed", completed = 0, dismissed = 0, finishedElsewhere = 0, alreadyComplete = 1)
     }
 
@@ -256,7 +256,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onAllItemsDone()
 
-        verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 3, dismissed = 0, finishedElsewhere = 2, alreadyComplete = 0)
+        verify(pixels).sectionEnded(STACKED_CARDS, DAY_0, "all_items_done", completed = 1, dismissed = 0, finishedElsewhere = 2, alreadyComplete = 0)
         val state = telemetryStore.state()
         assertEquals(0, state.finishedElsewhereItems)
         assertEquals(0, state.alreadyCompleteItems)
@@ -354,7 +354,7 @@ class RealNextStepsTelemetryTest {
             STACKED_CARDS,
             Days(activeDay = "0", calendarDay = "1"),
             "all_items_done",
-            completed = 1,
+            completed = 0,
             dismissed = 1,
             finishedElsewhere = 1,
             alreadyComplete = 0,
@@ -698,7 +698,7 @@ class RealNextStepsTelemetryTest {
 
         verify(pixels).itemRemoved(CHECK_LIST, A, DAY_0, COMPLETED, "1")
         verify(pixels).itemRemoved(CHECK_LIST, B, DAY_0, FINISHED_ELSEWHERE, "1")
-        verify(pixels).sectionEnded(CHECK_LIST, DAY_0, "user_dismissed", completed = 2, dismissed = 0, finishedElsewhere = 1, alreadyComplete = 0)
+        verify(pixels).sectionEnded(CHECK_LIST, DAY_0, "user_dismissed", completed = 1, dismissed = 0, finishedElsewhere = 1, alreadyComplete = 0)
         verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
     }
 

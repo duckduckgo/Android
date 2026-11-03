@@ -41,7 +41,7 @@ interface NextStepsPixels {
     /** Stacked cards only: the check list shows every item at once, so it has no per-item impressions to roll up. */
     fun itemDailyImpressions(variant: Variant, item: String, days: Days, impressions: String)
 
-    /** [completed] counts every completion on screen, by CTA or elsewhere; [finishedElsewhere] and [alreadyComplete] break out the non-CTA ones. */
+    /** One count per removal reason, so they add up to the items that left the section; [completed] is CTA completions only. */
     fun sectionEnded(
         variant: Variant,
         days: Days,

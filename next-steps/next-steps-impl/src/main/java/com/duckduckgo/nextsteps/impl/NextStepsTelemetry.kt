@@ -211,7 +211,7 @@ class RealNextStepsTelemetry @Inject constructor(
         return copy(
             dayCounts = dayCounts - removed,
             ctaClickedItemId = ctaClickedItemId.takeUnless { it in removed },
-            completedItems = completedItems + reasons.count { it.value == RemovalReason.COMPLETED || it.value == RemovalReason.FINISHED_ELSEWHERE },
+            completedItems = completedItems + reasons.count { it.value == RemovalReason.COMPLETED },
             dismissedItems = dismissedItems + reasons.count { it.value == RemovalReason.DISMISSED },
             finishedElsewhereItems = finishedElsewhereItems + reasons.count { it.value == RemovalReason.FINISHED_ELSEWHERE },
         )

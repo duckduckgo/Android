@@ -171,7 +171,7 @@
             {
                 "key": "completed",
                 "type": "string",
-                "description": "Items completed while the section was on screen, by CTA or elsewhere. Items already complete before the first render are not counted.",
+                "description": "Items completed after a tap on their CTA while the section was on screen. Completions without a CTA tap are in finishedElsewhere instead.",
                 "enum": ["0", "1", "2", "3"]
             },
             {
@@ -183,7 +183,7 @@
             {
                 "key": "finishedElsewhere",
                 "type": "string",
-                "description": "Of the completed items, those detected complete without a tap on their CTA.",
+                "description": "Items detected complete while on screen without a tap on their CTA. Not included in completed.",
                 "enum": ["0", "1", "2", "3"]
             },
             {

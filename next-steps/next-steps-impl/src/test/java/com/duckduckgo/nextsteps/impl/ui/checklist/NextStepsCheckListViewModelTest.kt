@@ -489,7 +489,7 @@ class NextStepsCheckListViewModelTest {
             CHECK_LIST,
             DAY_0,
             "all_items_done",
-            completed = 2,
+            completed = 1,
             dismissed = 0,
             finishedElsewhere = 1,
             alreadyComplete = 1,
