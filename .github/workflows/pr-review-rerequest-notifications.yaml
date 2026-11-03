@@ -16,7 +16,7 @@ jobs:
       - name: Checkout native actions repo
         uses: actions/checkout@v4
         with:
-          ref: ms/rerequest-review-ping # switch to the release tag once it ships
+          ref: v2.8.0
           # Do not change the below path (the composite expects it)
           path: native-github-asana-sync
           repository: duckduckgo/native-github-asana-sync
