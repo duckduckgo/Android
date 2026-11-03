@@ -43,6 +43,7 @@ interface SubscriptionSwitchWideEvent {
         context: String?,
         fromPlan: String,
         toPlan: String,
+        change: String? = null,
     )
 
     suspend fun onCurrentSubscriptionValidated()
@@ -88,13 +89,14 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         context: String?,
         fromPlan: String,
         toPlan: String,
+        change: String?,
     ) {
         if (!isFeatureEnabled()) return
 
         val fromTier = SubscriptionTier.fromPlanId(fromPlan)
         val toTier = SubscriptionTier.fromPlanId(toPlan)
         val switchType = deriveSwitchBillingType(fromPlan, toPlan)
-        val changeType = deriveChangeType(fromTier, toTier)
+        val changeType = parseChangeType(change) ?: deriveChangeType(fromTier, toTier)
 
         cachedFlowId = wideEventClient
             .flowStart(
@@ -125,6 +127,10 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
             toIsMonthly -> SWITCH_TYPE_DOWNGRADE
             else -> SWITCH_TYPE_UPGRADE
         }
+    }
+
+    private fun parseChangeType(change: String?): String? {
+        return change?.lowercase()?.takeIf { it in CHANGE_TYPES }
     }
 
     private fun deriveChangeType(
@@ -349,6 +355,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         const val CHANGE_TYPE_CROSSGRADE = "crossgrade"
         const val CHANGE_TYPE_UPGRADE = "upgrade"
         const val CHANGE_TYPE_DOWNGRADE = "downgrade"
+        val CHANGE_TYPES = setOf(CHANGE_TYPE_UPGRADE, CHANGE_TYPE_DOWNGRADE, CHANGE_TYPE_CROSSGRADE)
 
         // Steps
         const val STEP_VALIDATE_CURRENT_SUBSCRIPTION = "validate_current_subscription"

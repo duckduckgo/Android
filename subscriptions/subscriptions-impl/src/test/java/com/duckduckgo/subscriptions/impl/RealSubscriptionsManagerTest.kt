@@ -2786,6 +2786,28 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenSwitchSubscriptionPlanWithChangeThenPassChangeToWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+
+        subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = YEARLY_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+            origin = "origin",
+            change = "crossgrade",
+        )
+
+        verify(subscriptionSwitchWideEvent).onSwitchFlowStarted(
+            context = eq("origin"),
+            fromPlan = any(),
+            toPlan = eq(YEARLY_PLAN_US),
+            change = eq("crossgrade"),
+        )
+    }
+
+    @Test
     fun whenSwitchSubscriptionPlanWithNoPurchaseTokenThenEmitFailure() = runTest {
         givenUserIsSignedIn()
         givenActiveSubscription()

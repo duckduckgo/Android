@@ -190,6 +190,58 @@ class SubscriptionSwitchWideEventTest {
     }
 
     @Test
+    fun `onSwitchFlowStarted with change from page uses it as tier_change_type`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onSwitchFlowStarted(
+            context = "subscription_settings",
+            fromPlan = SubscriptionsConstants.MONTHLY_PLAN_US,
+            toPlan = SubscriptionsConstants.YEARLY_PLAN_US,
+            change = "UPGRADE",
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = "subscription_settings",
+            metadata = mapOf(
+                "from_plan" to SubscriptionsConstants.MONTHLY_PLAN_US,
+                "to_plan" to SubscriptionsConstants.YEARLY_PLAN_US,
+                "from_tier" to "plus",
+                "to_tier" to "plus",
+                "billing_cycle_switch_type" to "upgrade",
+                "tier_change_type" to "upgrade",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+        )
+    }
+
+    @Test
+    fun `onSwitchFlowStarted with unknown change from page derives tier_change_type from plans`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onSwitchFlowStarted(
+            context = "subscription_settings",
+            fromPlan = SubscriptionsConstants.MONTHLY_PLAN_US,
+            toPlan = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+            change = "other",
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = "subscription_settings",
+            metadata = mapOf(
+                "from_plan" to SubscriptionsConstants.MONTHLY_PLAN_US,
+                "to_plan" to SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
+                "from_tier" to "plus",
+                "to_tier" to "pro",
+                "billing_cycle_switch_type" to "none",
+                "tier_change_type" to "upgrade",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+        )
+    }
+
+    @Test
     fun `onCurrentSubscriptionValidated sends successful step`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(123L)))

@@ -2454,6 +2454,28 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenSubscriptionChangeSelectedWithChangeThenCommandCarriesChange() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "google",
+                activeOffers = listOf(),
+            ),
+        )
+
+        val json = """{"id":"${SubscriptionsConstants.MONTHLY_PRO_PLAN_US}","change":"upgrade"}"""
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject(json))
+            val result = awaitItem() as Command.SubscriptionChangeSelected
+            assertEquals("upgrade", result.change)
+        }
+    }
+
+    @Test
     fun whenSubscriptionChangeSelectedAndFetchingSubscriptionFailsThenReturnFailure() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenThrow(RuntimeException())
 

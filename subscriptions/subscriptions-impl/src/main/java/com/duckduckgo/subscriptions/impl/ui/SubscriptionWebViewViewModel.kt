@@ -494,7 +494,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     "targetPlanId/targetTier: $targetPlanId/$targetTier, replacementMode: $replacementMode"
             }
 
-            command.send(SubscriptionChangeSelected(planId = targetPlanId, offerId = null, replacementMode = replacementMode))
+            command.send(SubscriptionChangeSelected(planId = targetPlanId, offerId = null, replacementMode = replacementMode, change = change))
         }
     }
 
@@ -516,6 +516,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         offerId: String?,
         replacementMode: SubscriptionReplacementMode,
         origin: String?,
+        change: String?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             subscriptionsManager.switchSubscriptionPlan(
@@ -524,6 +525,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 offerId = offerId,
                 replacementMode = replacementMode,
                 origin = origin,
+                change = change,
             )
         }
     }
@@ -890,6 +892,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val planId: String,
             val offerId: String?,
             val replacementMode: SubscriptionReplacementMode,
+            val change: String?,
         ) : Command()
         data object RestoreSubscription : Command()
         data class ComputeUserSettings(val id: String) : Command()
