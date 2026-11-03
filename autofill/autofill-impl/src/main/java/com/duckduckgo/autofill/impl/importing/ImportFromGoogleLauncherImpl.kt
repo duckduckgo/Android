@@ -24,6 +24,7 @@ import androidx.core.os.BundleCompat
 import com.duckduckgo.autofill.api.ImportFromGoogleAvailability
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportRequest
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.LaunchSource
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportBookmarksViaGoogleTakeoutScreen
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult
 import com.duckduckgo.di.scopes.AppScope
@@ -41,8 +42,15 @@ class ImportFromGoogleLauncherImpl @Inject constructor(
 
     override fun bookmarksImportContract(): ActivityResultContract<BookmarksImportRequest, PublicResult> = contract
 
-    override suspend fun launchBookmarksImport(launcher: ActivityResultLauncher<BookmarksImportRequest>) {
-        launcher.launch(AvailabilityCheckedRequest(isAvailable = importFromGoogleAvailability.isBookmarksImportAvailable()))
+    override suspend fun launchBookmarksImport(
+        launchSource: LaunchSource,
+        launcher: ActivityResultLauncher<BookmarksImportRequest>,
+    ) {
+        val request = AvailabilityCheckedRequest(
+            isAvailable = importFromGoogleAvailability.isBookmarksImportAvailable(),
+            launchSource = launchSource,
+        )
+        launcher.launch(request)
     }
 }
 
@@ -56,7 +64,7 @@ private class ImportBookmarksFromGoogleContract(
         val isAvailable = (input as? AvailabilityCheckedRequest)?.isAvailable == true
         return when {
             !isAvailable -> SynchronousResult(PublicResult.Unavailable)
-            buildIntent(context) == null -> SynchronousResult(PublicResult.Unavailable)
+            buildIntent(context, input.launchSource) == null -> SynchronousResult(PublicResult.Unavailable)
             else -> null
         }
     }
@@ -65,7 +73,7 @@ private class ImportBookmarksFromGoogleContract(
         context: Context,
         input: BookmarksImportRequest,
     ): Intent {
-        return checkNotNull(buildIntent(context)) {
+        return checkNotNull(buildIntent(context, input.launchSource)) {
             "getSynchronousResult should return a result when there is no intent"
         }
     }
@@ -89,14 +97,15 @@ private class ImportBookmarksFromGoogleContract(
         }
     }
 
-    private fun buildIntent(context: Context): Intent? {
-        return globalActivityStarter.startIntent(context, ImportBookmarksViaGoogleTakeoutScreen(getLaunchSource()))
-    }
-
-    private fun getLaunchSource(): String {
-        // launchSource can only be bookmarks screen or dev settings currently, so hardcoding to bookmarks screen for now
-        return "bookmarks_screen"
+    private fun buildIntent(
+        context: Context,
+        launchSource: LaunchSource,
+    ): Intent? {
+        return globalActivityStarter.startIntent(context, ImportBookmarksViaGoogleTakeoutScreen(launchSource.value))
     }
 }
 
-private data class AvailabilityCheckedRequest(val isAvailable: Boolean) : BookmarksImportRequest
+private data class AvailabilityCheckedRequest(
+    val isAvailable: Boolean,
+    override val launchSource: LaunchSource,
+) : BookmarksImportRequest

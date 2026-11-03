@@ -19,7 +19,9 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.LaunchSource
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
+import com.duckduckgo.autofill.impl.importing.promo.PasswordsInBookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command.Exit
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoogleBookmarksJourney
@@ -112,7 +114,10 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
         val data = BookmarksImportScreenPromotionPlugin.ImportResult(successCount = importedCount)
         // we don't let a broken promo plugin keep the user on the importing screen
         return withTimeoutOrNull(PROMO_TIMEOUT) {
-            promotionPlugins.getPlugins().firstOrNull { it.isEligible(data) }
+            promotionPlugins.getPlugins()
+                // we don't send the user back to importing passwords when they came here from the passwords import promo
+                .filterNot { launchSource == LaunchSource.PasswordsImportPromo.value && it is PasswordsInBookmarksImportScreenPromotionPlugin }
+                .firstOrNull { it.isEligible(data) }
         }
     }
 

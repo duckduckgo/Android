@@ -36,14 +36,33 @@ interface ImportFromGoogleLauncher {
      * Start the bookmark import flow. If the flow is unsupported, nothing is launched and
      * [ImportFromGoogleResult.Unavailable] is delivered to the registered callback.
      *
+     * @param launchSource Where the flow is started from, reported with the import's telemetry.
      * @param launcher The launcher returned when registering [bookmarksImportContract].
      */
-    suspend fun launchBookmarksImport(launcher: ActivityResultLauncher<BookmarksImportRequest>)
+    suspend fun launchBookmarksImport(
+        launchSource: LaunchSource,
+        launcher: ActivityResultLauncher<BookmarksImportRequest>,
+    )
+
+    /**
+     * Where the bookmark import flow is started from.
+     *
+     * @param value The value reported with the import's telemetry.
+     */
+    enum class LaunchSource(val value: String) {
+        BookmarksScreen("bookmarks_screen"),
+        PasswordsImportPromo("promotion_passwords_import"),
+    }
 
     /**
      * Input of [bookmarksImportContract]. Only [launchBookmarksImport] creates it.
      */
-    interface BookmarksImportRequest
+    interface BookmarksImportRequest {
+        /**
+         * Where the flow is started from, as passed to [launchBookmarksImport].
+         */
+        val launchSource: LaunchSource
+    }
 
     sealed interface ImportFromGoogleResult {
         data class Success(val bookmarksImported: Int) : ImportFromGoogleResult
