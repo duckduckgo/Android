@@ -89,7 +89,7 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
 
     init {
         binding.promoCard.clipToOutline = true
-        binding.promoItem.setClickListener { interactor?.askSyncWithDesktop() }
+        binding.promoCard.setOnClickListener { interactor?.askSyncWithDesktop() }
         binding.overflowIcon.setOnClickListener { showOverflowMenu(it) }
     }
 
