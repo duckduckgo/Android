@@ -62,8 +62,8 @@
                     android:id="@+id/messageText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:breakStrategy="balanced"
                     android:layout_marginTop="@dimen/keyline_2"
+                    android:breakStrategy="balanced"
                     android:visibility="gone"
                     app:textType="secondary"
                     app:typography="body2"
@@ -86,14 +86,15 @@
             android:visibility="gone"
             tools:visibility="visible">
 
+            <!-- We ignore InvalidDaxButtonProperty: match_parent keeps both buttons the same height. -->
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/secondaryButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:visibility="gone"
-                tools:text="Secondary"
                 tools:ignore="InvalidDaxButtonProperty"
+                tools:text="Secondary"
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonBrand
@@ -102,8 +103,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:visibility="gone"
-                tools:text="Primary"
                 tools:ignore="InvalidDaxButtonProperty"
+                tools:text="Primary"
                 tools:visibility="visible" />
 
         </LinearLayout>
