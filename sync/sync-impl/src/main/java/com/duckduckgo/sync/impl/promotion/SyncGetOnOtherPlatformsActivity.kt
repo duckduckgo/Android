@@ -129,4 +129,5 @@ enum class SyncGetOnOtherPlatformsLaunchSource(val value: String) {
     SOURCE_ACTIVATING("activating"),
     SOURCE_SYNC_DISABLED("not_activated"),
     SOURCE_SYNC_ENABLED("activated"),
+    SOURCE_PROMOTION_BOOKMARKS("promotion_bookmarks"),
 }
