@@ -34,6 +34,8 @@ import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
@@ -48,6 +50,7 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val activity: AppCompatActivity,
     private val syncPromotions: SyncPromotions,
+    private val promotionDataStore: SyncPromotionDataStore,
     private val syncStateMonitor: SyncStateMonitor,
     private val syncPixels: SyncPixels,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
@@ -129,6 +132,7 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
         this.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
                 syncPixels.fireSetupSyncPromoBookmarkAddedDialogShown()
+                activity.lifecycleScope.launch { promotionDataStore.recordPromoImpression(BookmarkAddedDialog) }
             }
 
             override fun onViewDetachedFromWindow(v: View) {

@@ -23,6 +23,7 @@ import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreenMultiDevice
 import com.duckduckgo.sync.impl.promotion.SyncPromotionFeature
 import dev.zacsweers.metro.ContributesBinding
@@ -33,6 +34,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 interface SyncBookmarksMultiDevicePromotion {
     suspend fun canShowPromotion(savedBookmarks: Int): Boolean
@@ -57,7 +59,7 @@ class RealSyncBookmarksMultiDevicePromotion @Inject constructor(
                 async { isPromotionEnabled() },
                 async { isSyncingWithSingleDevice() },
                 async { !isPromotionDismissed() },
-                async { isInstalledLongEnough() },
+                async { hasWaitedLongEnough() },
             ).awaitAll()
             preconditions.all { it }
         }
@@ -80,12 +82,16 @@ class RealSyncBookmarksMultiDevicePromotion @Inject constructor(
 
     private suspend fun isPromotionDismissed(): Boolean = promotionDataStore.hasPromoBeenDismissed(BookmarksScreenMultiDevice)
 
-    private suspend fun isInstalledLongEnough(): Boolean {
+    private suspend fun hasWaitedLongEnough(): Boolean {
         val installAge = appInstall.getInstallAge() ?: return false
-        return installAge > MIN_INSTALL_DURATION
+        if (installAge <= MIN_INSTALL_DURATION) return false
+
+        val timeSinceSetUpPromotionShown = promotionDataStore.getTimeSinceLastPromoImpression(BookmarksScreen) ?: return true
+        return timeSinceSetUpPromotionShown >= SET_UP_PROMOTION_COOLDOWN
     }
 
     private companion object {
         val MIN_INSTALL_DURATION = 7.days
+        val SET_UP_PROMOTION_COOLDOWN = 24.hours
     }
 }

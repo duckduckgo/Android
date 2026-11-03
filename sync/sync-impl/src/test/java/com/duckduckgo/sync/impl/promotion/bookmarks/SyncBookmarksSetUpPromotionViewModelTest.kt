@@ -30,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -47,19 +48,31 @@ class SyncBookmarksSetUpPromotionViewModelTest {
     private val promotionDataStore = FakeSyncPromotionDataStore()
     private val pixel: Pixel = mock()
 
-    private val testee = SyncBookmarksSetUpPromotionViewModel(
-        connectedDevicesRepository = mock<ConnectedDevicesRepository> {
-            on { latestConnectedDeviceCountFlow() } doReturn connectedDeviceCount
-        },
-        promotionDataStore = promotionDataStore,
-        pixel = pixel,
-    )
+    private lateinit var testee: SyncBookmarksSetUpPromotionViewModel
+
+    @Before
+    fun setUp() {
+        testee = SyncBookmarksSetUpPromotionViewModel(
+            connectedDevicesRepository = mock<ConnectedDevicesRepository> {
+                on { latestConnectedDeviceCountFlow() } doReturn connectedDeviceCount
+            },
+            promotionDataStore = promotionDataStore,
+            pixel = pixel,
+        )
+    }
 
     @Test
     fun `when impression is recorded then fire displayed pixel`() = runTest {
         testee.recordImpression()
 
         verify(pixel).fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, mapOf("source" to "bookmarks"))
+    }
+
+    @Test
+    fun `when impression is recorded then record promotion impression`() = runTest {
+        testee.recordImpression()
+
+        assertEquals(1L, promotionDataStore.getPromoImpressionCount(BookmarksScreen))
     }
 
     @Test

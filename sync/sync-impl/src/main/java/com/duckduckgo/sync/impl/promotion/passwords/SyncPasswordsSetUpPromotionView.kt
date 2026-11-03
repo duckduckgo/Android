@@ -139,6 +139,7 @@ class SyncPasswordsSetUpPromotionViewModel @Inject constructor(
         isImpressionRecorded = true
 
         pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, pixelParams())
+        viewModelScope.launch { promotionDataStore.recordPromoImpression(PasswordsScreen) }
     }
 
     fun setUpSync() {

@@ -4,8 +4,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreenMultiDevice
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import kotlinx.coroutines.test.runTest
@@ -13,6 +15,10 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.mock
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 class SyncPromotionDataStoreImplTest {
 
@@ -27,7 +33,14 @@ class SyncPromotionDataStoreImplTest {
             produceFile = { temporaryFolder.newFile("temp.preferences_pb") },
         )
 
-    private val testee = SyncPromotionDataStoreImpl(testDataStore)
+    private var currentTimeMillis = 1_000_000L
+
+    private val testee = SyncPromotionDataStoreImpl(
+        dataStore = testDataStore,
+        currentTimeProvider = mock<CurrentTimeProvider> {
+            on { currentTimeMillis() } doAnswer { currentTimeMillis }
+        },
+    )
 
     @Test
     fun whenInitializedThenBookmarksScreenPromoHasNotBeenDismissed() = runTest {
@@ -127,5 +140,42 @@ class SyncPromotionDataStoreImplTest {
 
         testee.recordPromoImpression(ChatTabPage)
         assertEquals(2L, testee.getPromoImpressionCount(ChatTabPage))
+    }
+
+    @Test
+    fun whenInitializedThenBookmarksScreenPromoHasNoLastImpression() = runTest {
+        assertNull(testee.getTimeSinceLastPromoImpression(BookmarksScreen))
+    }
+
+    @Test
+    fun whenBookmarksPromoImpressionRecordedThenTimeSinceLastImpressionGrowsWithTime() = runTest {
+        testee.recordPromoImpression(BookmarksScreen)
+        assertEquals(0.milliseconds, testee.getTimeSinceLastPromoImpression(BookmarksScreen))
+
+        currentTimeMillis += 2.hours.inWholeMilliseconds
+        assertEquals(2.hours, testee.getTimeSinceLastPromoImpression(BookmarksScreen))
+    }
+
+    @Test
+    fun whenBookmarksPromoImpressionRecordedAgainThenTimeSinceLastImpressionResets() = runTest {
+        testee.recordPromoImpression(BookmarksScreen)
+        currentTimeMillis += 2.hours.inWholeMilliseconds
+
+        testee.recordPromoImpression(BookmarksScreen)
+        assertEquals(0.milliseconds, testee.getTimeSinceLastPromoImpression(BookmarksScreen))
+    }
+
+    @Test
+    fun whenBookmarksPromoImpressionRecordedThenOtherPromosHaveNoLastImpression() = runTest {
+        testee.recordPromoImpression(BookmarksScreen)
+        assertNull(testee.getTimeSinceLastPromoImpression(BookmarksScreenMultiDevice))
+    }
+
+    @Test
+    fun whenPromoHistoryClearedThenPromoHasNoLastImpression() = runTest {
+        testee.recordPromoImpression(BookmarksScreen)
+
+        testee.clearPromoHistory(BookmarksScreen)
+        assertNull(testee.getTimeSinceLastPromoImpression(BookmarksScreen))
     }
 }
