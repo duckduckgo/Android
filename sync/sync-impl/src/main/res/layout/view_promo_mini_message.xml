@@ -54,6 +54,7 @@
                     android:id="@+id/titleText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:breakStrategy="balanced"
                     app:typography="h3"
                     tools:text="Placeholder Title" />
 
@@ -61,6 +62,7 @@
                     android:id="@+id/messageText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:breakStrategy="balanced"
                     android:layout_marginTop="@dimen/keyline_2"
                     android:visibility="gone"
                     app:textType="secondary"
@@ -77,6 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginBottom="-4dp"
+            android:baselineAligned="false"
             android:divider="@drawable/divider_promo_message_buttons"
             android:orientation="horizontal"
             android:showDividers="middle"
@@ -86,19 +89,21 @@
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/secondaryButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:visibility="gone"
                 tools:text="Secondary"
+                tools:ignore="InvalidDaxButtonProperty"
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonBrand
                 android:id="@+id/primaryButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:visibility="gone"
                 tools:text="Primary"
+                tools:ignore="InvalidDaxButtonProperty"
                 tools:visibility="visible" />
 
         </LinearLayout>
