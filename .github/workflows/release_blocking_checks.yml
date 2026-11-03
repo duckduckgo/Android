@@ -44,7 +44,7 @@ jobs:
     secrets: inherit
 
   privacy:
-    needs: end-to-end
+    needs: nightly
     uses: ./.github/workflows/privacy.yml
     with:
       commit: ${{ inputs.commit }}
