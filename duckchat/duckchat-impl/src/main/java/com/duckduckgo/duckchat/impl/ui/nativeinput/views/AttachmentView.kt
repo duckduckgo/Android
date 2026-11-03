@@ -43,6 +43,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -202,7 +203,7 @@ class AttachmentView(
     private fun buildLimitErrorView(parent: LinearLayout): TextView {
         return TextView(context).apply {
             setPadding(12.toPx(), 4.toPx(), 12.toPx(), 4.toPx())
-            setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
+            setTextColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorDestructive))
             textSize = 13f
             setTypeface(typeface, Typeface.BOLD)
             visibility = GONE
