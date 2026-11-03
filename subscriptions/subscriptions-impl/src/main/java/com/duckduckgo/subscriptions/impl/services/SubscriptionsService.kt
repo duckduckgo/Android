@@ -44,7 +44,6 @@ interface SubscriptionsService {
     @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
     suspend fun features(@Path("sku") sku: String): FeaturesResponse
 
-    @AuthRequired
     @GET("https://subscriptions.duckduckgo.com/api/v2/products")
     suspend fun tierProducts(
         @Query("region") region: String,
