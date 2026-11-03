@@ -54,7 +54,7 @@ on:
         default: normal
 
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-e2e-full-suite
   cancel-in-progress: true
 
 jobs:
