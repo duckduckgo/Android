@@ -337,6 +337,7 @@ import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -9199,7 +9200,32 @@ class BrowserTabViewModelTest {
 
             testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
 
-            verify(mockPageContextJSHelper).collectPageContext(any(), any())
+            verify(mockPageContextJSHelper).collectPageContext(any(), any(), anyOrNull(), any())
+        }
+
+    @Test
+    fun whenPageFinishedWithContextualSheetHiddenThenCollectWithoutReportingOutcome() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = true))
+            givenCurrentSite("https://example.com")
+            testee.onMainFrameLoadStarted(navigationId = 7L)
+
+            testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "https://example.com")
+
+            verify(mockPageContextJSHelper).collectPageContext(any(), eq(Trigger.NAVIGATION), eq(7L), eq(false))
+        }
+
+    @Test
+    fun whenPageFinishedWithContextualSheetVisibleThenCollectReportingNavigationOutcome() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = true))
+            givenCurrentSite("https://example.com")
+            testee.onMainFrameLoadStarted(navigationId = 7L)
+            testee.onDuckAiContextualSheetVisibilityChanged(true)
+
+            testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "https://example.com")
+
+            verify(mockPageContextJSHelper).collectPageContext(any(), eq(Trigger.NAVIGATION), eq(7L), eq(true))
         }
 
     @Test
@@ -9210,7 +9236,7 @@ class BrowserTabViewModelTest {
 
             testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
 
-            verify(mockPageContextJSHelper, never()).collectPageContext(any(), any())
+            verify(mockPageContextJSHelper, never()).collectPageContext(any(), any(), anyOrNull(), any())
         }
 
     @Test
@@ -14425,7 +14451,7 @@ class BrowserTabViewModelTest {
             subscriptionName = "collect",
             params = JSONObject(),
         )
-        whenever(mockPageContextJSHelper.collectPageContext(any(), any())).thenReturn(expectedEvent)
+        whenever(mockPageContextJSHelper.collectPageContext(any(), any(), anyOrNull(), any())).thenReturn(expectedEvent)
 
         testee.collectPageContext()
 

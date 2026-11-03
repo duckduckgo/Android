@@ -4070,6 +4070,7 @@ class BrowserTabFragment :
 
     private fun showDuckChatContextualSheet(tabId: String) {
         binding.duckAiContextualFragmentContainer.show()
+        viewModel.onDuckAiContextualSheetVisibilityChanged(true)
 
         setupContextualSheetHeightSync()
 
@@ -4129,6 +4130,7 @@ class BrowserTabFragment :
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                         omnibar.setExpanded(true)
                         binding.duckAiContextualFragmentContainer.gone()
+                        viewModel.onDuckAiContextualSheetVisibilityChanged(false)
                         hideKeyboard()
                         browserActivity?.onEditModeChanged(false)
                     }
@@ -4147,6 +4149,7 @@ class BrowserTabFragment :
     }
 
     private fun removeDuckChatContextualSheet() {
+        viewModel.onDuckAiContextualSheetVisibilityChanged(false)
         duckAiContextualFragment?.let { fragment ->
             val transaction = childFragmentManager.beginTransaction()
             transaction.remove(fragment)

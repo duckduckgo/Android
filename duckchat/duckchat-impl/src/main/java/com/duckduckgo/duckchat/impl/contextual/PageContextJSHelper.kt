@@ -45,7 +45,16 @@ interface PageContextJSHelper {
 
     fun cancelCollection(tabId: String)
 
-    fun collectPageContext(tabId: String = "", trigger: Trigger = Trigger.TAB_CONTENT): SubscriptionEventData
+    /**
+     * Outcome pixels are reported only when [isDuckAiVisible] is true, and at most once per [navigationId]
+     * when one is given.
+     */
+    fun collectPageContext(
+        tabId: String = "",
+        trigger: Trigger = Trigger.TAB_CONTENT,
+        navigationId: Long? = null,
+        isDuckAiVisible: Boolean = true,
+    ): SubscriptionEventData
 }
 
 @ContributesBinding(AppScope::class)
@@ -55,8 +64,10 @@ class RealPageContextJSHelper @Inject constructor(
     @AppCoroutineScope private val scope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : PageContextJSHelper {
-    private data class Request(val started: Long, val trigger: Trigger)
+    private data class Request(val started: Long, val trigger: Trigger, val navigationId: Long?)
     private val requests = ConcurrentHashMap<String, Request>()
+    private val reportedNavigations = ConcurrentHashMap<String, Long>()
+
     override suspend fun processPageContext(
         featureName: String,
         method: String,
@@ -68,7 +79,7 @@ class RealPageContextJSHelper @Inject constructor(
         }
 
         val serializedPageData = data?.optString(KEY_SERIALIZED_PAGE_DATA, null)
-        requests.remove(tabId)?.let { request ->
+        requests.remove(tabId)?.takeIf { claimReport(tabId, it) }?.let { request ->
             val json = serializedPageData?.let { runCatching { JSONObject(it) }.getOrNull() }
             val reason = when {
                 serializedPageData.isNullOrBlank() -> Reason.EMPTY_CONTENT
@@ -92,13 +103,18 @@ class RealPageContextJSHelper @Inject constructor(
         requests.remove(tabId)
     }
 
-    override fun collectPageContext(tabId: String, trigger: Trigger): SubscriptionEventData {
-        if (feature.pdfPageContext().isEnabled()) {
-            val request = Request(SystemClock.elapsedRealtime(), trigger)
+    override fun collectPageContext(
+        tabId: String,
+        trigger: Trigger,
+        navigationId: Long?,
+        isDuckAiVisible: Boolean,
+    ): SubscriptionEventData {
+        if (isDuckAiVisible && feature.pdfPageContext().isEnabled()) {
+            val request = Request(SystemClock.elapsedRealtime(), trigger, navigationId)
             requests[tabId] = request
             scope.launch(dispatchers.io()) {
                 delay(30_000)
-                if (requests.remove(tabId, request) && feature.pdfPageContext().isEnabled()) {
+                if (requests.remove(tabId, request) && feature.pdfPageContext().isEnabled() && claimReport(tabId, request)) {
                     pixels.failed(Reason.TIMEOUT, trigger, ContextType.MARKDOWN)
                 }
             }
@@ -108,6 +124,11 @@ class RealPageContextJSHelper @Inject constructor(
             SUBSCRIPTION_COLLECT,
             JSONObject(),
         )
+    }
+
+    private fun claimReport(tabId: String, request: Request): Boolean {
+        val navigationId = request.navigationId ?: return true
+        return reportedNavigations.put(tabId, navigationId) != navigationId
     }
 
     companion object {

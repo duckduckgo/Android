@@ -404,6 +404,7 @@ import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -813,6 +814,7 @@ class BrowserTabViewModel @Inject constructor(
 
     // Needed for PageLoadWideEvent: it identifies which page load the progress events belong to.
     private var pageLoadNavigationId: Long? = null
+    private var isDuckAiContextualSheetVisible = false
     private var hasExitedFixedProgress = false
     private var navigationState = NavigationProgressState()
 
@@ -2911,7 +2913,7 @@ class BrowserTabViewModel @Inject constructor(
             onDuckAiOnboardingPageFinishedIfApplicable()
 
             if (androidBrowserConfig.storePageContext().isEnabled()) {
-                collectPageContext()
+                collectPageContext(Trigger.NAVIGATION, pageLoadNavigationId, isDuckAiContextualSheetVisible)
             }
         }
     }
@@ -6158,10 +6160,22 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun collectPageContext() {
+        collectPageContext(Trigger.TAB_CONTENT, navigationId = null, isDuckAiVisible = true)
+    }
+
+    private fun collectPageContext(
+        trigger: Trigger,
+        navigationId: Long?,
+        isDuckAiVisible: Boolean,
+    ) {
         viewModelScope.launch {
-            val subscriptionEvent = pageContextJSHelper.collectPageContext(tabId)
+            val subscriptionEvent = pageContextJSHelper.collectPageContext(tabId, trigger, navigationId, isDuckAiVisible)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
+    }
+
+    fun onDuckAiContextualSheetVisibilityChanged(visible: Boolean) {
+        isDuckAiContextualSheetVisible = visible
     }
 
     fun onDuckChatOmnibarButtonClicked(
