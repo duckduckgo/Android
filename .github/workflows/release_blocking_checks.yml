@@ -18,7 +18,7 @@ on:
         type: boolean
         default: false
       maestro_priority:
-        description: 'Maestro Cloud queue priority for E2E tests'
+        description: 'Maestro Cloud queue priority for E2E tests (high, normal or low)'
         required: false
         type: string
         default: normal
@@ -33,6 +33,15 @@ on:
         required: false
         type: boolean
         default: true
+      maestro_priority:
+        description: 'Maestro Cloud queue priority for E2E tests'
+        required: false
+        type: choice
+        options:
+          - high
+          - normal
+          - low
+        default: normal
 
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}
