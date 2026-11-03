@@ -324,4 +324,12 @@
     <string name="importBookmarksRedesignResultTitle">İçe aktarma tamamlandı!</string>
     <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[İçe aktarılan yer işaretleri: <b>%1$d</b>]]></string>
 
+    <!-- Passwords import promo on the bookmarks import result screen -->
+    <string name="passwords_import_promo_in_bookmarks_import_title">Şifrelerinizi Google\'dan DuckDuckGo\'ya taşıyın.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_button">Google\'dan Şifreleri İçe Aktar</string>
+
+    <!-- Bookmarks import promo on the passwords import result screen -->
+    <string name="bookmarks_import_promo_in_passwords_import_title">Yer işaretlerinizi Google\'dan DuckDuckGo\'ya taşıyın.</string>
+    <string name="bookmarks_import_promo_in_passwords_import_button">Google\'dan Yer İşaretlerini İçe Aktar</string>
+
 </resources>
