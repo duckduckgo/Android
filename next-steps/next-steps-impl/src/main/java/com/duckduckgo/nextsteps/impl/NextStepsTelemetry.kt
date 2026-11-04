@@ -19,7 +19,8 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels
-import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
@@ -29,18 +30,26 @@ import javax.inject.Inject
 
 /**
  * Owns the Next Steps pixel state shared by every NTP tab: the day anchor, the open-day and lifetime impression counters,
- * CTA attribution and which message is on screen.
+ * CTA attribution and which message and design are on screen.
  */
 interface NextStepsTelemetry {
-    suspend fun onFrontCardShown(messageId: String, cardId: String, cardIdsInStack: Set<String>)
+    /** [completedItemIds] is the completion snapshot at this render; a section starting now reports its size as already complete. */
+    suspend fun onFrontCardShown(messageId: String, cardId: String, cardIdsInStack: Set<String>, completedItemIds: Set<String> = emptySet())
 
-    suspend fun onCtaClicked(cardId: String)
+    /** The check list shows every open item at once, so one render counts an impression for each of them. */
+    suspend fun onCheckListShown(messageId: String, openItemIds: Set<String>, completedItemIds: Set<String> = emptySet())
 
-    suspend fun onCardsCompleted(completedIds: Set<String>)
+    suspend fun onCtaClicked(variant: Variant, itemId: String)
 
-    suspend fun onCardDismissed(cardId: String)
+    /** [variant] is passed in because items already complete are reported before the section is first rendered. */
+    suspend fun onItemsCompleted(variant: Variant, completedIds: Set<String>)
 
-    suspend fun onAllCardsDone()
+    /** Stacked cards only; the check list has no per-item dismissal. */
+    suspend fun onItemDismissed(itemId: String)
+
+    suspend fun onAllItemsDone()
+
+    suspend fun onSectionDismissed()
 
     suspend fun onActiveMessageChanged(nextStepsMessageId: String?)
 
@@ -58,48 +67,54 @@ class RealNextStepsTelemetry @Inject constructor(
 ) : NextStepsTelemetry {
     private val mutex = Mutex()
 
-    override suspend fun onFrontCardShown(messageId: String, cardId: String, cardIdsInStack: Set<String>) {
+    override suspend fun onFrontCardShown(messageId: String, cardId: String, cardIdsInStack: Set<String>, completedItemIds: Set<String>) {
         update { state, today ->
-            val current = state.endCarouselIfReplaced(messageId, today)
-            if (current.firstRenderDay == null) {
-                pixels.sectionShownUnique(messageId)
+            state.display(messageId, Variant.STACKED_CARDS, today, cardIdsInStack, completedItemIds).incrementImpressions(cardId)
+        }
+    }
+
+    override suspend fun onCheckListShown(messageId: String, openItemIds: Set<String>, completedItemIds: Set<String>) {
+        update { state, today ->
+            openItemIds.fold(state.display(messageId, Variant.CHECK_LIST, today, openItemIds, completedItemIds)) { displayed, itemId ->
+                displayed.incrementImpressions(itemId)
             }
-            val displayed = current
-                .markCarouselDisplayed(messageId, today)
-                .startNewDayIfChanged(today, cardIdsInStack)
-            displayed.incrementImpressions(cardId)
         }
     }
 
-    override suspend fun onCtaClicked(cardId: String) {
+    override suspend fun onCtaClicked(variant: Variant, itemId: String) {
         update { state, today ->
-            pixels.cardCtaClicked(cardId, state.dayParams(today), state.impressionsSoFar(cardId))
-            state.copy(ctaClickedCardId = cardId)
+            pixels.itemCtaClicked(variant, itemId, state.dayParams(today), state.impressionsSoFar(itemId))
+            state.copy(ctaClickedItemId = itemId)
         }
     }
 
-    override suspend fun onCardsCompleted(completedIds: Set<String>) {
+    override suspend fun onItemsCompleted(variant: Variant, completedIds: Set<String>) {
         update { state, today ->
-            completedIds.forEach { cardId ->
-                state.completionReason(cardId)?.let { pixels.cardRemoved(cardId, state.dayParams(today), it, state.impressionsSoFar(cardId)) }
+            val reasons = completedIds.mapNotNull { itemId -> state.completionReason(itemId)?.let { itemId to it } }.toMap()
+            reasons.forEach { (itemId, reason) ->
+                pixels.itemRemoved(variant, itemId, state.dayParams(today), reason, state.impressionsSoFar(itemId))
             }
-            state.removeCards(completedIds, Removal.COMPLETED).copy(reportedCompletedCards = state.reportedCompletedCards + completedIds)
+            state.removeItems(reasons).copy(reportedCompletedItems = state.reportedCompletedItems + completedIds)
         }
     }
 
-    override suspend fun onCardDismissed(cardId: String) {
+    override suspend fun onItemDismissed(itemId: String) {
         update { state, today ->
-            pixels.cardRemoved(cardId, state.dayParams(today), CardRemovalReason.DISMISSED, state.impressionsSoFar(cardId))
-            state.removeCards(setOf(cardId), Removal.DISMISSED)
+            pixels.itemRemoved(Variant.STACKED_CARDS, itemId, state.dayParams(today), RemovalReason.DISMISSED, state.impressionsSoFar(itemId))
+            state.removeItems(mapOf(itemId to RemovalReason.DISMISSED))
         }
     }
 
-    override suspend fun onAllCardsDone() {
-        update { state, today -> state.endCarousel(DismissReason.ALL_CARDS_DONE, today) }
+    override suspend fun onAllItemsDone() {
+        update { state, today -> state.endSection(SectionEndReason.ALL_ITEMS_DONE, today) }
+    }
+
+    override suspend fun onSectionDismissed() {
+        update { state, today -> state.endSection(SectionEndReason.USER_DISMISSED, today) }
     }
 
     override suspend fun onActiveMessageChanged(nextStepsMessageId: String?) {
-        update { state, today -> state.endCarouselIfReplaced(nextStepsMessageId, today) }
+        update { state, today -> state.endSectionIfReplaced(nextStepsMessageId, today) }
     }
 
     override suspend fun onAppResumed() {
@@ -119,29 +134,49 @@ class RealNextStepsTelemetry @Inject constructor(
         }
     }
 
-    private fun NextStepsTelemetryState.endCarouselIfReplaced(messageId: String?, today: Long): NextStepsTelemetryState =
-        if (displayedMessageId != null && displayedMessageId != messageId) endCarousel(DismissReason.AUTO, today) else this
+    /**
+     * The already-complete count comes from the render snapshot rather than from completion reports, because
+     * an item reports its completion once per install and a later section would otherwise count it as zero.
+     */
+    private fun NextStepsTelemetryState.display(
+        messageId: String,
+        variant: Variant,
+        today: Long,
+        openItemIds: Set<String>,
+        completedItemIds: Set<String>,
+    ): NextStepsTelemetryState {
+        val current = endSectionIfReplaced(messageId, today)
+        if (current.firstRenderDay != null) {
+            return current.copy(displayedMessageId = messageId, displayedVariant = variant).startNewDayIfChanged(today, openItemIds)
+        }
+        pixels.sectionShownUnique(messageId, variant)
+        return current
+            .copy(
+                firstRenderDay = today,
+                displayedMessageId = messageId,
+                displayedVariant = variant,
+                alreadyCompleteItems = completedItemIds.size,
+            )
+            .startNewDayIfChanged(today, openItemIds)
+    }
 
-    private fun NextStepsTelemetryState.markCarouselDisplayed(messageId: String, today: Long): NextStepsTelemetryState =
-        copy(
-            firstRenderDay = firstRenderDay ?: today,
-            displayedMessageId = messageId,
-        )
+    private fun NextStepsTelemetryState.endSectionIfReplaced(messageId: String?, today: Long): NextStepsTelemetryState =
+        if (displayedMessageId != null && displayedMessageId != messageId) endSection(SectionEndReason.AUTO, today) else this
 
-    /** On a new calendar day: sends the previous day's counts, then starts counting again with zero for every card in the stack. */
-    private fun NextStepsTelemetryState.startNewDayIfChanged(today: Long, cardIdsInStack: Set<String>): NextStepsTelemetryState {
+    /** On a new calendar day: sends the previous day's counts, then starts counting again with zero for every open item. */
+    private fun NextStepsTelemetryState.startNewDayIfChanged(today: Long, openItemIds: Set<String>): NextStepsTelemetryState {
         val state = sendCountsIfDayEnded(today)
         if (state.openDay != null) return state
         return state.copy(
             activeDays = state.activeDays + 1,
             openDay = today,
-            dayCounts = cardIdsInStack.associateWith { 0 },
+            dayCounts = openItemIds.associateWith { 0 },
         )
     }
 
     /**
      * Sends the counts of a day that has ended, so they go out on app resume instead of waiting for the next render.
-     * The cards stay listed with zero so a removal before that render still counts in the summary, while
+     * The items stay listed with zero so a removal before that render still counts in the summary, while
      * [sendDailyImpressions] sends nothing until a day is open again.
      */
     private fun NextStepsTelemetryState.sendCountsIfDayEnded(today: Long): NextStepsTelemetryState {
@@ -154,55 +189,74 @@ class RealNextStepsTelemetry @Inject constructor(
         }
     }
 
-    private fun NextStepsTelemetryState.completionReason(cardId: String): CardRemovalReason? = when {
-        cardId in reportedCompletedCards -> null
-        cardId == ctaClickedCardId -> CardRemovalReason.COMPLETED
-        cardId in dayCounts -> CardRemovalReason.FINISHED_ELSEWHERE
-        firstRenderDay == null -> CardRemovalReason.ALREADY_COMPLETE
+    private fun NextStepsTelemetryState.completionReason(itemId: String): RemovalReason? = when {
+        itemId in reportedCompletedItems -> null
+        itemId == ctaClickedItemId -> RemovalReason.COMPLETED
+        itemId in dayCounts -> RemovalReason.FINISHED_ELSEWHERE
+        firstRenderDay == null -> RemovalReason.ALREADY_COMPLETE
         else -> null
     }
 
-    private fun NextStepsTelemetryState.incrementImpressions(cardId: String): NextStepsTelemetryState = copy(
-        dayCounts = dayCounts + (cardId to (dayCounts[cardId] ?: 0) + 1),
-        totalImpressions = totalImpressions + (cardId to (totalImpressions[cardId] ?: 0) + 1),
+    private fun NextStepsTelemetryState.incrementImpressions(itemId: String): NextStepsTelemetryState = copy(
+        dayCounts = dayCounts + (itemId to (dayCounts[itemId] ?: 0) + 1),
+        totalImpressions = totalImpressions + (itemId to (totalImpressions[itemId] ?: 0) + 1),
     )
 
-    private fun NextStepsTelemetryState.impressionsSoFar(cardId: String): String = impressionsBucket(totalImpressions[cardId] ?: 0)
+    private fun NextStepsTelemetryState.impressionsSoFar(itemId: String): String = impressionsBucket(totalImpressions[itemId] ?: 0)
 
-    private fun NextStepsTelemetryState.removeCards(cardIds: Set<String>, removal: Removal): NextStepsTelemetryState {
-        val removed = cardIds.filter { it in dayCounts }.toSet()
+    /** Items already complete were never on screen; the section counts them from its render snapshot instead. */
+    private fun NextStepsTelemetryState.removeItems(reasons: Map<String, RemovalReason>): NextStepsTelemetryState {
+        val removed = reasons.keys.filter { it in dayCounts }.toSet()
         sendDailyImpressions(removed)
         return copy(
             dayCounts = dayCounts - removed,
-            ctaClickedCardId = ctaClickedCardId.takeUnless { it in removed },
-            completedCards = completedCards + if (removal == Removal.COMPLETED) removed.size else 0,
-            dismissedCards = dismissedCards + if (removal == Removal.DISMISSED) removed.size else 0,
+            ctaClickedItemId = ctaClickedItemId.takeUnless { it in removed },
+            completedItems = completedItems + reasons.count { it.value == RemovalReason.COMPLETED },
+            dismissedItems = dismissedItems + reasons.count { it.value == RemovalReason.DISMISSED },
+            finishedElsewhereItems = finishedElsewhereItems + reasons.count { it.value == RemovalReason.FINISHED_ELSEWHERE },
         )
     }
 
-    private fun NextStepsTelemetryState.endCarousel(reason: DismissReason, today: Long): NextStepsTelemetryState {
+    private fun NextStepsTelemetryState.endSection(reason: SectionEndReason, today: Long): NextStepsTelemetryState {
         if (displayedMessageId == null) return this
         sendDailyImpressions(dayCounts.keys)
-        pixels.cardsDismissed(dayParams(today), reason.value, completedCards, dismissedCards)
+        val variant = displayedVariantOrDefault()
+        pixels.sectionEnded(
+            variant,
+            dayParams(today),
+            reason.value,
+            completedItems,
+            dismissed = dismissedItems.takeIf { variant == Variant.STACKED_CARDS },
+            finishedElsewhereItems,
+            alreadyCompleteItems,
+        )
         return copy(
             displayedMessageId = null,
+            displayedVariant = null,
             firstRenderDay = null,
             activeDays = 0,
-            ctaClickedCardId = null,
+            ctaClickedItemId = null,
             openDay = null,
             dayCounts = emptyMap(),
-            completedCards = 0,
-            dismissedCards = 0,
+            completedItems = 0,
+            dismissedItems = 0,
+            finishedElsewhereItems = 0,
+            alreadyCompleteItems = 0,
         )
     }
 
-    private fun NextStepsTelemetryState.sendDailyImpressions(cardIds: Set<String>) {
+    private fun NextStepsTelemetryState.sendDailyImpressions(itemIds: Set<String>) {
+        val variant = displayedVariantOrDefault()
+        if (variant != Variant.STACKED_CARDS) return
         val openDay = openDay ?: return
-        for (cardId in cardIds) {
-            val count = dayCounts[cardId] ?: continue
-            pixels.cardDailyImpressions(cardId, dayParams(openDay), impressionsBucket(count))
+        for (itemId in itemIds) {
+            val count = dayCounts[itemId] ?: continue
+            pixels.itemDailyImpressions(variant, itemId, dayParams(openDay), impressionsBucket(count))
         }
     }
+
+    /** State saved before the check list existed carries no variant; only the stacked cards could have been on screen. */
+    private fun NextStepsTelemetryState.displayedVariantOrDefault(): Variant = displayedVariant ?: Variant.STACKED_CARDS
 
     private fun NextStepsTelemetryState.dayParams(eventDay: Long) = NextStepsPixels.Days(
         activeDay = dayBucket(activeDays - 1L),
@@ -216,10 +270,9 @@ class RealNextStepsTelemetry @Inject constructor(
         else -> "15+"
     }
 
-    private enum class Removal { COMPLETED, DISMISSED }
-
-    private enum class DismissReason(val value: String) {
-        ALL_CARDS_DONE("all_cards_done"),
+    private enum class SectionEndReason(val value: String) {
+        ALL_ITEMS_DONE("all_items_done"),
+        USER_DISMISSED("user_dismissed"),
         AUTO("auto"),
     }
 

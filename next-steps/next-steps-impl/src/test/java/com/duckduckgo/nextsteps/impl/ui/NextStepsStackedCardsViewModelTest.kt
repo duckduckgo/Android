@@ -29,10 +29,11 @@ import com.duckduckgo.nextsteps.impl.RealNextStepsItemsStore
 import com.duckduckgo.nextsteps.impl.RealNextStepsTelemetry
 import com.duckduckgo.nextsteps.impl.RealNextStepsTelemetryStore
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels
-import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.COMPLETED
-import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.DISMISSED
-import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.FINISHED_ELSEWHERE
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Days
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.COMPLETED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.DISMISSED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.FINISHED_ELSEWHERE
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant.STACKED_CARDS
 import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsViewModel.Command
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
@@ -54,6 +55,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -132,7 +134,7 @@ class NextStepsStackedCardsViewModelTest {
         testee.onFrontCardDismissed()
         advanceUntilIdle()
 
-        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, DISMISSED, "1")
+        verify(pixels).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, DISMISSED, "1")
         assertEquals(1, impressions(addWidgetItem.id))
         verify(remoteMessageModel, times(1)).onMessageShown(any())
         assertEquals(0, itemsStore.frontImpressions(addWidgetItem.id))
@@ -151,8 +153,8 @@ class NextStepsStackedCardsViewModelTest {
         testee.onFrontCardCompletionAnimated()
         advanceUntilIdle()
 
-        verify(pixels).cardCtaClicked(defaultBrowserItem.id, DAY_0, "1")
-        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED, "1")
+        verify(pixels).itemCtaClicked(STACKED_CARDS, defaultBrowserItem.id, DAY_0, "1")
+        verify(pixels).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, COMPLETED, "1")
         assertEquals(1, impressions(addWidgetItem.id))
     }
 
@@ -171,7 +173,7 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(emptyList<Command>(), commands)
-        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED, "1")
+        verify(pixels).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, COMPLETED, "1")
         assertEquals(1, impressions(defaultBrowserItem.id))
         assertEquals(1, impressions(addWidgetItem.id))
         verify(remoteMessageModel, times(1)).onMessageShown(any())
@@ -192,7 +194,15 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, impressions())
-        verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 1, dismissed = 0)
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "all_items_done",
+            completed = 1,
+            dismissed = 0,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
     }
 
     @Test
@@ -242,7 +252,7 @@ class NextStepsStackedCardsViewModelTest {
         testee.onResume(mock())
         advanceUntilIdle()
 
-        verify(pixels).cardRemoved(defaultBrowserItem.id, DAY_0, FINISHED_ELSEWHERE, "1")
+        verify(pixels).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, FINISHED_ELSEWHERE, "1")
         assertEquals(1, impressions(addWidgetItem.id))
         assertEquals(listOf(addWidgetItem), testee.viewState.value.items)
     }
@@ -254,7 +264,15 @@ class NextStepsStackedCardsViewModelTest {
         aViewModel()
         advanceUntilIdle()
         whenever(remoteMessageModel.onMessageDismissed(any())).thenAnswer {
-            verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 0, dismissed = 1)
+            verify(pixels).sectionEnded(
+                STACKED_CARDS,
+                DAY_0,
+                "all_items_done",
+                completed = 0,
+                dismissed = 1,
+                finishedElsewhere = 0,
+                alreadyComplete = 0,
+            )
             null
         }
 
@@ -262,7 +280,7 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
         telemetry.onActiveMessageChanged(null)
 
-        verify(pixels, times(1)).cardsDismissed(any(), any(), any(), any())
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any())
         verify(remoteMessageModel, times(1)).onMessageDismissed(message)
     }
 
@@ -274,8 +292,16 @@ class NextStepsStackedCardsViewModelTest {
         testee.onPrimaryActionClicked()
         advanceUntilIdle()
         whenever(remoteMessageModel.onMessageDismissed(any())).thenAnswer {
-            verify(pixels, times(1)).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED, "2")
-            verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 1, dismissed = 0)
+            verify(pixels, times(1)).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, COMPLETED, "2")
+            verify(pixels).sectionEnded(
+                STACKED_CARDS,
+                DAY_0,
+                "all_items_done",
+                completed = 1,
+                dismissed = 0,
+                finishedElsewhere = 0,
+                alreadyComplete = 0,
+            )
             null
         }
         defaultBrowserCheck.completed = true
@@ -285,9 +311,9 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
         telemetry.onActiveMessageChanged(null)
 
-        verify(pixels, times(1)).cardRemoved(defaultBrowserItem.id, DAY_0, COMPLETED, "2")
-        verify(pixels, times(1)).cardDailyImpressions(defaultBrowserItem.id, DAY_0, "2")
-        verify(pixels, times(1)).cardsDismissed(any(), any(), any(), any())
+        verify(pixels, times(1)).itemRemoved(STACKED_CARDS, defaultBrowserItem.id, DAY_0, COMPLETED, "2")
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, defaultBrowserItem.id, DAY_0, "2")
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any())
     }
 
     @Test
@@ -872,7 +898,7 @@ class NextStepsStackedCardsViewModelTest {
         advanceUntilIdle()
         testee.onPrimaryActionClicked()
         assertEquals(Command.LaunchDefaultBrowserSettings, testee.commands().first())
-        verify(pixels).cardCtaClicked(defaultBrowserItem.id, DAY_0, "1")
+        verify(pixels).itemCtaClicked(STACKED_CARDS, defaultBrowserItem.id, DAY_0, "1")
         val commands = mutableListOf<Command>()
         val job = testee.commands().onEach { commands.add(it) }.launchIn(this)
         testee.onStop(mock())
@@ -1189,7 +1215,7 @@ class NextStepsStackedCardsViewModelTest {
 
         assertEquals(emptyList<Command>(), commands)
         assertEquals(listOf(item), testee.viewState.value.items)
-        verify(pixels, never()).cardCtaClicked(any(), any(), any())
+        verify(pixels, never()).itemCtaClicked(any(), any(), any(), any())
         job.cancel()
     }
 
