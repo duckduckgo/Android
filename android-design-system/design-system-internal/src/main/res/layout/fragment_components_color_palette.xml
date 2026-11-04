@@ -277,7 +277,7 @@
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
             android:text="Accent Yellow"
-            app:colorFillColor="?attr/daxColorAccentYellow"
+            app:colorFillColor="?attr/daxColorAlertYellow"
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 

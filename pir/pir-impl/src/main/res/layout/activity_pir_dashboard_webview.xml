@@ -45,7 +45,7 @@
             android:id="@+id/manualConfigWarning"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/daxColorAccentYellow"
+            android:background="?attr/daxColorAlertYellow"
             android:padding="@dimen/keyline_2"
             android:text="@string/pirDashboardManualConfigWarning"
             android:textColor="?attr/daxColorSecondaryText"

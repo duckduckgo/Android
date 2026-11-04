@@ -17,5 +17,5 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="false" android:color="?attr/daxColorTextDisabled" />
-    <item android:state_enabled="true" android:color="?attr/daxColorTertiaryText"/>
+    <item android:state_enabled="true" android:color="?attr/daxColorTextTertiary"/>
 </selector>

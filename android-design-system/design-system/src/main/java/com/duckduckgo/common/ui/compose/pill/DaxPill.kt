@@ -87,7 +87,7 @@ internal object DaxPillDefaults {
     val colors: DaxPillColors
         @Composable
         get() = DaxPillColors(
-            background = DuckDuckGoTheme.colors.brand.accentYellow,
+            background = DuckDuckGoTheme.colors.brand.alertYellow,
             text = Black,
         )
 }
