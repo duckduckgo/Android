@@ -390,6 +390,7 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckAiPdfPageContext
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
@@ -400,7 +401,6 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
-import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -606,7 +606,7 @@ class BrowserTabViewModel @Inject constructor(
     private val brokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfPageContextProvider: RealPdfPageContextProvider,
-    private val pdfPageContextResolver: PdfPageContextResolver,
+    private val pdfPageContextResolver: DuckAiPdfPageContext,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
     private val newDownloadState: NewDownloadState,
@@ -6208,7 +6208,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (pdfPageContextResolver.isEnabled()) {
-                val context = pdfPageContextResolver.resolve(tabId, null, includeData = false)
+                val context = pdfPageContextResolver.getMetadata(tabId)
                 if (context != null) {
                     command.value = Command.PageContextReceived(tabId, context)
                     return@launch

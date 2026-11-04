@@ -706,7 +706,7 @@ class BrowserTabViewModelTest {
     }
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
-    private val pdfPageContextResolver: com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver = mock()
+    private val pdfPageContextResolver: com.duckduckgo.duckchat.api.DuckAiPdfPageContext = mock()
     private val mockPageContextJSHelper: PageContextJSHelper = mock()
     private val mockTabPageContextRepository: TabPageContextRepository = mock()
 
@@ -14486,6 +14486,34 @@ class BrowserTabViewModelTest {
         assertEquals(duckAIUrl, command.url)
 
         verify(mockDuckChat, never()).openDuckChat(any())
+    }
+
+    @Test
+    fun whenCollectPageContextHasPdfMetadataThenEmitMetadataWithoutCollectingWebPage() = runTest {
+        val metadata = """{"title":"document.pdf","mimeType":"application/pdf","attached":false}"""
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(metadata)
+
+        testee.collectPageContext()
+
+        assertCommandIssued<Command.PageContextReceived> {
+            assertEquals(metadata, pageContext)
+        }
+        verify(mockPageContextJSHelper, never()).collectPageContext(any(), any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenCollectPageContextHasNoPdfMetadataThenCollectWebPage() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(null)
+        whenever(mockPageContextJSHelper.collectPageContext(any(), any(), anyOrNull(), any())).thenReturn(
+            SubscriptionEventData(PAGE_CONTEXT_FEATURE_NAME, "collect", JSONObject()),
+        )
+
+        testee.collectPageContext()
+
+        verify(mockPageContextJSHelper).collectPageContext(any(), any(), anyOrNull(), any())
+        assertCommandNotIssued<Command.PageContextReceived>()
     }
 
     @Test

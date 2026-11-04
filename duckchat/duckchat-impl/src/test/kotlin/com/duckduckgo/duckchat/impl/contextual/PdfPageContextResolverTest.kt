@@ -48,6 +48,26 @@ class PdfPageContextResolverTest {
         verifyNoInteractions(pixels)
     }
 
+    @Test fun `metadata API never requests PDF bytes`() = runTest {
+        whenever(provider.get("tab", false)).thenReturn(document)
+
+        val result = JSONObject(testee.getMetadata("tab")!!)
+
+        assertEquals("document.pdf", result.getString("title"))
+        assertFalse(result.has("data"))
+        assertFalse(result.getBoolean("attached"))
+        verify(provider).get("tab", false)
+        verify(provider, never()).get("tab", true)
+    }
+
+    @Test fun `disabled metadata API does not read the PDF`() = runTest {
+        whenever(toggle.isEnabled()).thenReturn(false)
+
+        assertNull(testee.getMetadata("tab"))
+
+        verifyNoInteractions(provider, pixels)
+    }
+
     @Test fun `explicit attach sends base64 PDF`() = runTest {
         whenever(provider.get("tab", true)).thenReturn(document.copy(data = "JVBERi0="))
         val result = JSONObject(testee.resolve("tab", null, true)!!)

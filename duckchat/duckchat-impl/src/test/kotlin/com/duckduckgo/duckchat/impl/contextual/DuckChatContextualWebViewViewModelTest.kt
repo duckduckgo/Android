@@ -22,6 +22,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.PageContextTrigger
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -131,7 +132,7 @@ class DuckChatContextualWebViewViewModelTest {
                 "tab-1",
                 pdf,
                 true,
-                com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger.USER_REQUEST,
+                PageContextTrigger.USER_REQUEST,
             ),
         ).doSuspendableAnswer { pending.await() }
         testee.onPageContextReceived("tab-1", pdf)
@@ -168,7 +169,7 @@ class DuckChatContextualWebViewViewModelTest {
                 "tab-1",
                 pdf,
                 false,
-                com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger.AUTO,
+                PageContextTrigger.AUTO,
             ),
         ).thenReturn(pdf)
         testee.subscriptionEventDataFlow.test {

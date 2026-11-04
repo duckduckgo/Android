@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.PageContextTrigger
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -423,7 +424,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                     expectedTabId,
                     pageContextSerialized,
                     true,
-                    com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger.USER_REQUEST,
+                    PageContextTrigger.USER_REQUEST,
                 )
                 if (resolved == null || !JSONObject(resolved).has("data")) {
                     if (_viewState.value.tabId == expectedTabId) {
@@ -596,7 +597,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                     _viewState.value.tabId,
                     currentPageContext,
                     duckChatInternal.isAutomaticContextAttachmentEnabled() && _viewState.value.showContext,
-                    com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger.AUTO,
+                    PageContextTrigger.AUTO,
                 )?.let { JSONObject(it) }
             } else {
                 JSONObject(currentPageContext)
@@ -676,7 +677,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                         _viewState.value.tabId,
                         currentPageContext,
                         true,
-                        com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger.USER_REQUEST,
+                        PageContextTrigger.USER_REQUEST,
                     )
                     if (generation != pageContextGeneration || expectedTabId != _viewState.value.tabId || !_viewState.value.showContext) return@launch
                     if (resolved == null || !JSONObject(resolved).optBoolean("attachable", true)) {

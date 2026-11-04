@@ -19,23 +19,29 @@ package com.duckduckgo.duckchat.impl.contextual
 import android.os.SystemClock
 import com.duckduckgo.browser.api.pdf.PdfPageContext.Status
 import com.duckduckgo.browser.api.pdf.PdfPageContextProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiPdfPageContext
 import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Category
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.ContextType
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Reason
-import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
+import dev.zacsweers.metro.ContributesBinding
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
+import com.duckduckgo.duckchat.api.PageContextTrigger as Trigger
 
+@ContributesBinding(AppScope::class)
 class PdfPageContextResolver @Inject constructor(
     private val feature: DuckChatFeature,
     private val provider: PdfPageContextProvider,
     private val pixels: PageContextExtractionPixels,
-) {
-    fun isEnabled(): Boolean = feature.pdfPageContext().isEnabled()
+) : DuckAiPdfPageContext {
+    override fun isEnabled(): Boolean = feature.pdfPageContext().isEnabled()
+
+    override suspend fun getMetadata(tabId: String): String? = resolve(tabId, null, includeData = false)
 
     suspend fun resolve(
         tabId: String,
