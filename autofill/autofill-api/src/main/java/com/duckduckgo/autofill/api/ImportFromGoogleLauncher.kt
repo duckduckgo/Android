@@ -16,10 +16,9 @@
 
 package com.duckduckgo.autofill.api
 
-import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 /**
  * Launches the flow for importing data from Google.
@@ -52,11 +51,10 @@ interface ImportFromGoogleLauncher {
      * @param launchSource A Pixel tag for where the flow is started from.
      * @param offerPasswordsImport Whether the success screen may offer importing passwords.
      */
-    @Parcelize
     data class BookmarksImportParams(
         val launchSource: String,
         val offerPasswordsImport: Boolean,
-    ) : Parcelable
+    ) : Serializable
 
     /**
      * Input of [bookmarksImportContract]. Only [launchBookmarksImport] creates it.

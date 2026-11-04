@@ -43,7 +43,7 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
     private val importViewModel by activityViewModels<ImportGoogleBookmarksViewModel> {
         ImportGoogleBookmarksViewModel.Factory.Provider(
             assistedFactory = importViewModelFactory,
-            params = requireNotNull(BundleCompat.getParcelable(requireArguments(), ARG_PARAMS, BookmarksImportParams::class.java)),
+            params = requireNotNull(BundleCompat.getSerializable(requireArguments(), ARG_PARAMS, BookmarksImportParams::class.java)),
             isRedesignEnabled = true,
         )
     }
@@ -115,14 +115,14 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
             arguments = Bundle().apply {
                 putBoolean(ARG_IS_SUCCESS, true)
                 putInt(ARG_IMPORTED_COUNT, importedCount)
-                putParcelable(ARG_PARAMS, params)
+                putSerializable(ARG_PARAMS, params)
             }
         }
 
         fun newInstanceError(params: BookmarksImportParams): ImportFinishedRedesignFragment = ImportFinishedRedesignFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(ARG_IS_SUCCESS, false)
-                putParcelable(ARG_PARAMS, params)
+                putSerializable(ARG_PARAMS, params)
             }
         }
     }
