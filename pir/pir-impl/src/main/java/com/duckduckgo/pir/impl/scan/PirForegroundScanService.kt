@@ -175,8 +175,11 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     override fun onDestroy() {
         logcat { "PIR-SCAN: PIR service destroyed" }
+        // an instance recreated only to show the notification ran no jobs, and the runner is shared with the scheduled worker
+        if (isRunInProgress) {
+            pirJobsRunner.stop()
+        }
         isRunInProgress = false
-        pirJobsRunner.stop()
     }
 
     companion object {
