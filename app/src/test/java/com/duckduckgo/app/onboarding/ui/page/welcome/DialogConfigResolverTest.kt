@@ -504,7 +504,9 @@ class DialogConfigResolverTest {
     fun `resolves the migration default browser dialog with set default and skip ctas`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.MigrationDefaultBrowser, isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackground.Pond, config.background)
+        assertEquals(OnboardingBackground.Horizon, config.background)
+        assertEquals(Embellishment.BottomWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         assertEquals(CardEntry.AfterBackgroundTransition, config.cardEntry)
         assertEquals(
             ContentConfig.Welcome(
@@ -535,7 +537,9 @@ class DialogConfigResolverTest {
     fun `resolves the migration all set dialog with a lets go cta`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.MigrationAllSet, isCustomAiFlow = true)!!
 
-        assertEquals(OnboardingBackground.Pond, config.background)
+        assertEquals(OnboardingBackground.IslandWithHorizon, config.background)
+        assertEquals(Embellishment.RightWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtStartMirrored, config.cardArrow)
         assertEquals(
             ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.deviceMigrationAllSetTitle),
