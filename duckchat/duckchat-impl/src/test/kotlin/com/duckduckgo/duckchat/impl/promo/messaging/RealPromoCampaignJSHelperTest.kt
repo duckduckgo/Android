@@ -47,6 +47,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -143,6 +144,18 @@ class RealPromoCampaignJSHelperTest {
         assertTrue(response.params.has("record"))
         assertFalse(response.params.getBoolean("isNewInstall"))
         assertFalse(response.params.getBoolean("aiChatEnabled"))
+    }
+
+    @Test
+    fun `when promo record requested, then an expired promo is ended before reading it`() = runTest {
+        givenStoredRecord(ACTIVE_RECORD)
+
+        process(METHOD_GET_BONUS_RECORD)
+
+        inOrder(mockPromoCampaignRepository) {
+            verify(mockPromoCampaignRepository).endPromo(checkExpiry = true)
+            verify(mockPromoCampaignRepository).getPromoRecord()
+        }
     }
 
     @Test
