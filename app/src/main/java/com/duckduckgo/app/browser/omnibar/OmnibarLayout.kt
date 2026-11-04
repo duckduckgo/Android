@@ -107,6 +107,7 @@ import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -1260,7 +1261,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun calculateCustomTabBackgroundColor(color: Int): Int {
         // Handle the case where we did not receive a color.
         if (color == 0) {
-            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
+            return context.getColorFromAttr(CommonR.attr.daxColorPrimaryText)
         }
 
         if (color == Color.WHITE || Color.alpha(color) < 128) {
