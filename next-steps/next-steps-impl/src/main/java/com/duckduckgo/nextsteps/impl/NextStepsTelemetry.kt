@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 /**
  * Owns the Next Steps pixel state shared by every NTP tab: the day anchor, the open-day and lifetime impression counters,
- * CTA attribution and which message and design are on screen.
+ * CTA attribution and which message and design are on screen. Experiment metrics are reported from the same events.
  */
 interface NextStepsTelemetry {
     /** [completedItemIds] is the completion snapshot at this render; a section starting now reports its size as already complete. */
@@ -62,6 +62,7 @@ interface NextStepsTelemetry {
 class RealNextStepsTelemetry @Inject constructor(
     private val telemetryStore: NextStepsTelemetryStore,
     private val pixels: NextStepsPixels,
+    private val metrics: NextStepsExperimentMetrics,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
 ) : NextStepsTelemetry {
@@ -69,12 +70,14 @@ class RealNextStepsTelemetry @Inject constructor(
 
     override suspend fun onFrontCardShown(messageId: String, cardId: String, cardIdsInStack: Set<String>, completedItemIds: Set<String>) {
         update { state, today ->
+            metrics.onItemShown(cardId)
             state.display(messageId, Variant.STACKED_CARDS, today, cardIdsInStack, completedItemIds).incrementImpressions(cardId)
         }
     }
 
     override suspend fun onCheckListShown(messageId: String, openItemIds: Set<String>, completedItemIds: Set<String>) {
         update { state, today ->
+            metrics.onSectionShown()
             openItemIds.fold(state.display(messageId, Variant.CHECK_LIST, today, openItemIds, completedItemIds)) { displayed, itemId ->
                 displayed.incrementImpressions(itemId)
             }
@@ -84,6 +87,7 @@ class RealNextStepsTelemetry @Inject constructor(
     override suspend fun onCtaClicked(variant: Variant, itemId: String) {
         update { state, today ->
             pixels.itemCtaClicked(variant, itemId, state.dayParams(today), state.impressionsSoFar(itemId))
+            metrics.onItemCtaClicked(itemId)
             state.copy(ctaClickedItemId = itemId)
         }
     }
@@ -93,6 +97,7 @@ class RealNextStepsTelemetry @Inject constructor(
             val reasons = completedIds.mapNotNull { itemId -> state.completionReason(itemId)?.let { itemId to it } }.toMap()
             reasons.forEach { (itemId, reason) ->
                 pixels.itemRemoved(variant, itemId, state.dayParams(today), reason, state.impressionsSoFar(itemId))
+                if (reason == RemovalReason.COMPLETED) metrics.onItemCompleted(itemId)
             }
             state.removeItems(reasons).copy(reportedCompletedItems = state.reportedCompletedItems + completedIds)
         }
@@ -121,7 +126,7 @@ class RealNextStepsTelemetry @Inject constructor(
         update { state, today -> state.sendCountsIfDayEnded(today) }
     }
 
-    private suspend fun update(transition: (state: NextStepsTelemetryState, today: Long) -> NextStepsTelemetryState) {
+    private suspend fun update(transition: suspend (state: NextStepsTelemetryState, today: Long) -> NextStepsTelemetryState) {
         withContext(dispatchers.io()) {
             mutex.withLock {
                 val today = currentTimeProvider.localDateTimeNow().toLocalDate().toEpochDay()

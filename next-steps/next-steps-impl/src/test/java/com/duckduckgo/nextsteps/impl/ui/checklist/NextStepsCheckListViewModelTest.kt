@@ -83,6 +83,7 @@ class NextStepsCheckListViewModelTest {
     private val telemetry = RealNextStepsTelemetry(
         RealNextStepsTelemetryStore(FakeSharedPreferencesProvider()),
         pixels,
+        mock(),
         clock,
         coroutineRule.testDispatcherProvider,
     )

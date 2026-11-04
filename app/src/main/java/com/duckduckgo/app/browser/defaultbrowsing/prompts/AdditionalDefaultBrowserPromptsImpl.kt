@@ -105,6 +105,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
     private val userBrowserProperties: UserBrowserProperties,
     private val pixel: Pixel,
+    private val nextStepsSetAsDefaultPromptMetrics: NextStepsSetAsDefaultPromptMetrics,
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, ModalEvaluator, PrivacyConfigCallbackPlugin {
 
@@ -304,6 +305,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     override fun onMessageDialogShown() {
         fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_IMPRESSION)
+        appCoroutineScope.launch { nextStepsSetAsDefaultPromptMetrics.onPromptShown() }
     }
 
     override fun onMessageDialogCanceled() {
@@ -312,6 +314,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     override fun onMessageDialogConfirmationButtonClicked() {
         fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_CLICK)
+        appCoroutineScope.launch { nextStepsSetAsDefaultPromptMetrics.onPromptConfirmationClicked() }
         launchBestSelectionWindow(trigger = PROMPT)
     }
 
@@ -333,7 +336,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     override fun onSystemDefaultBrowserDialogSuccess(trigger: SetAsDefaultActionTrigger) {
         appCoroutineScope.launch {
             when (trigger) {
-                PROMPT, MENU -> fireConversionPixel(trigger)
+                PROMPT -> {
+                    fireConversionPixel(trigger)
+                    nextStepsSetAsDefaultPromptMetrics.onPromptDefaultBrowserSet()
+                }
+                MENU -> fireConversionPixel(trigger)
                 MESSAGE -> {
                     // no-op
                     // the user selected the default browser from the message dialog and this is handled in evaluate()
@@ -357,7 +364,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         if (defaultBrowserDetector.isDefaultBrowser()) {
             appCoroutineScope.launch {
                 when (trigger) {
-                    PROMPT, MENU -> fireConversionPixel(trigger)
+                    PROMPT -> {
+                        fireConversionPixel(trigger)
+                        nextStepsSetAsDefaultPromptMetrics.onPromptDefaultBrowserSet()
+                    }
+                    MENU -> fireConversionPixel(trigger)
                     MESSAGE -> {
                         // no-op
                         // the user selected the default browser from the message dialog and this is handled in evaluate()

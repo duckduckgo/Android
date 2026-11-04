@@ -108,6 +108,8 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
     @Mock private lateinit var pixelMock: Pixel
 
+    @Mock private lateinit var nextStepsSetAsDefaultPromptMetricsMock: NextStepsSetAsDefaultPromptMetrics
+
     private lateinit var dataStoreMock: DefaultBrowserPromptsDataStore
 
     private lateinit var fakeUserAppStageFlow: MutableSharedFlow<AppStage>
@@ -407,6 +409,34 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         verify(dataStoreMock).storeStage(Stage.STAGE_1)
         verify(stageEvaluatorMock).evaluate(Stage.STAGE_1)
+    }
+
+    @Test
+    fun `if system dialog opened by the prompt succeeds, then report the prompt default browser conversion`() = runTest {
+        val testee = createTestee()
+
+        testee.onSystemDefaultBrowserDialogSuccess(trigger = PROMPT)
+
+        verify(nextStepsSetAsDefaultPromptMetricsMock).onPromptDefaultBrowserSet()
+    }
+
+    @Test
+    fun `if system dialog opened by the menu succeeds, then do not report the prompt default browser conversion`() = runTest {
+        val testee = createTestee()
+
+        testee.onSystemDefaultBrowserDialogSuccess(trigger = MENU)
+
+        verify(nextStepsSetAsDefaultPromptMetricsMock, never()).onPromptDefaultBrowserSet()
+    }
+
+    @Test
+    fun `if default apps screen opened by the prompt closes with the browser set as default, then report the prompt conversion`() = runTest {
+        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
+        val testee = createTestee()
+
+        testee.onSystemDefaultAppsActivityClosed(trigger = PROMPT)
+
+        verify(nextStepsSetAsDefaultPromptMetricsMock).onPromptDefaultBrowserSet()
     }
 
     @Test
@@ -752,6 +782,24 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
+    fun `if message dialog shown, then report the next steps prompt shown metric`() = runTest {
+        val testee = createTestee()
+
+        testee.onMessageDialogShown()
+
+        verify(nextStepsSetAsDefaultPromptMetricsMock).onPromptShown()
+    }
+
+    @Test
+    fun `if message dialog confirmation clicked, then report the next steps set as default metric`() = runTest {
+        val testee = createTestee()
+
+        testee.onMessageDialogConfirmationButtonClicked()
+
+        verify(nextStepsSetAsDefaultPromptMetricsMock).onPromptConfirmationClicked()
+    }
+
+    @Test
     fun `if menu item clicked, then send a pixel`() = runTest {
         val expectedParams = mapOf(
             PIXEL_PARAM_KEY_STAGE to "stage_1",
@@ -813,6 +861,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         stageEvaluator = experimentStageEvaluator,
         userBrowserProperties = userBrowserProperties,
         pixel = pixel,
+        nextStepsSetAsDefaultPromptMetrics = nextStepsSetAsDefaultPromptMetricsMock,
         moshi = moshi,
     )
 

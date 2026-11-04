@@ -56,10 +56,11 @@ class RealNextStepsTelemetryTest {
     }
     private val telemetryStore = RealNextStepsTelemetryStore(preferences)
     private val pixels: NextStepsPixels = mock()
+    private val metrics: NextStepsExperimentMetrics = mock()
     private val clock: CurrentTimeProvider = mock()
     private val firstDay = LocalDate.of(2026, 10, 21)
     private var today = firstDay
-    private val testee = RealNextStepsTelemetry(telemetryStore, pixels, clock, coroutineRule.testDispatcherProvider)
+    private val testee = RealNextStepsTelemetry(telemetryStore, pixels, metrics, clock, coroutineRule.testDispatcherProvider)
 
     init {
         whenever(clock.localDateTimeNow()).thenAnswer { today.atStartOfDay() }
@@ -71,7 +72,7 @@ class RealNextStepsTelemetryTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
         testee.onActiveMessageChanged(null)
         testee.onFrontCardShown("message2", B, setOf(B))
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
         restored.onFrontCardShown("message2", B, setOf(B))
 
         verify(pixels, times(1)).sectionShownUnique("message", STACKED_CARDS)
@@ -523,7 +524,7 @@ class RealNextStepsTelemetryTest {
     fun `state survives a restart`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
         testee.onCtaClicked(STACKED_CARDS, A)
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
 
         restored.onItemsCompleted(STACKED_CARDS, setOf(A))
         restored.onActiveMessageChanged(null)
@@ -657,7 +658,7 @@ class RealNextStepsTelemetryTest {
     fun `a new carousel after ending and restarting on the same day starts at day zero`() = runTest {
         testee.onFrontCardShown("old", A, setOf(A))
         testee.onActiveMessageChanged(null)
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
 
         restored.onFrontCardShown("new", A, setOf(A))
         restored.onCtaClicked(STACKED_CARDS, A)
@@ -686,7 +687,7 @@ class RealNextStepsTelemetryTest {
         )
         assertEquals(0, telemetryStore.state().activeDays)
         assertNull(telemetryStore.state().firstRenderDay)
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
         clearInvocations(pixels)
         today = today.plusDays(3)
 
@@ -796,7 +797,7 @@ class RealNextStepsTelemetryTest {
     @Test
     fun `the message leaving the slot ends the check list with reason auto across a restart`() = runTest {
         testee.onCheckListShown("message", setOf(A, B))
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
 
         restored.onActiveMessageChanged(null)
 
@@ -837,6 +838,56 @@ class RealNextStepsTelemetryTest {
             finishedElsewhere = 0,
             alreadyComplete = 0,
         )
+    }
+
+    @Test
+    fun `a stacked cards render reports only the front card as shown to the experiment metrics`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+
+        verify(metrics, never()).onSectionShown()
+        verify(metrics).onItemShown(A)
+        verify(metrics, never()).onItemShown(B)
+    }
+
+    @Test
+    fun `a check list render reports only the section as shown to the experiment metrics`() = runTest {
+        testee.onCheckListShown("message", setOf(A, B), completedItemIds = setOf(C))
+
+        verify(metrics).onSectionShown()
+        verify(metrics, never()).onItemShown(any())
+    }
+
+    @Test
+    fun `a cta tap is reported to the experiment metrics`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A))
+
+        testee.onCtaClicked(STACKED_CARDS, A)
+
+        verify(metrics).onItemCtaClicked(A)
+    }
+
+    @Test
+    fun `only cta completions are reported as completed to the experiment metrics`() = runTest {
+        testee.onItemsCompleted(STACKED_CARDS, setOf(C))
+        testee.onFrontCardShown("message", A, setOf(A, B))
+        testee.onCtaClicked(STACKED_CARDS, A)
+
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A, B))
+
+        verify(metrics).onItemCompleted(A)
+        verify(metrics, never()).onItemCompleted(B)
+        verify(metrics, never()).onItemCompleted(C)
+    }
+
+    @Test
+    fun `a dismissed card is not reported as completed to the experiment metrics`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A))
+        testee.onCtaClicked(STACKED_CARDS, A)
+
+        testee.onItemDismissed(A)
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
+
+        verify(metrics, never()).onItemCompleted(any())
     }
 
     private companion object {
