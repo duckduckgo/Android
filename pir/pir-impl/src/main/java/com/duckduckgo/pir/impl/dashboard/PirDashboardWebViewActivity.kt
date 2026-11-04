@@ -297,6 +297,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
             .setMessage(messageRes)
             .setPositiveButton(positiveButtonRes)
             .setNegativeButton(R.string.pirNotificationPermissionPromptNotNow)
+            .setCancellable(true)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onDialogShown() {
