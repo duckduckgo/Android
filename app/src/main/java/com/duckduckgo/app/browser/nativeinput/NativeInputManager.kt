@@ -196,6 +196,7 @@ interface NativeInputManager {
 
     fun onKeyboardAnimationChanged(isAnimating: Boolean)
     fun onTabVisibilityChanged(isVisible: Boolean)
+    fun requestTabInputFocus()
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -253,16 +254,31 @@ class RealNativeInputManager @Inject constructor(
     private val tabVisibility = MutableStateFlow(false)
     private val inputFocusJob = ConflatedJob()
     private val inputFocusPending = MutableStateFlow(false)
-    private var inputFocusUrl: String? = null
+    private var inputFocusUrlType = DuckAiChatUrlType.NotDuckAi
 
     override fun onTabVisibilityChanged(isVisible: Boolean) {
         if (tabVisibility.value == isVisible) return
         tabVisibility.value = isVisible
-        inputFocusPending.value = isVisible && !isPickingImage
+        if (!isVisible) {
+            releaseInputFocus()
+        } else if (isPickingImage && ::rootView.isInitialized) {
+            // The keyboard coming back normally clears this; after a cancelled picker it may not, and a stale flag
+            // stops later tab hides from releasing focus. Posted so this resume still sees the picker return.
+            rootView.post { isPickingImage = false }
+        }
     }
 
-    internal fun requestNewChatInputFocus() {
+    override fun requestTabInputFocus() {
         inputFocusPending.value = true
+    }
+
+    private fun releaseInputFocus() {
+        consumeInputFocusRequest()
+        if (isPickingImage || !::rootView.isInitialized || !omnibarController.isDuckAiMode()) return
+        omnibarWidget()?.takeIf { it.hasInputFocus() }?.let { widget ->
+            rootView.hideKeyboard()
+            widget.clearInputFocus()
+        }
     }
 
     private fun consumeInputFocusRequest(): Boolean = inputFocusPending.compareAndSet(true, false)
@@ -698,7 +714,9 @@ class RealNativeInputManager @Inject constructor(
         )
         syncBackArrowToNavBar()
         if (omnibarController.isDuckAiMode()) {
-            bindTabInputFocus(widgetView, lifecycleOwner, currentTabUrl)
+            // Image generation and text selection focus the input themselves; arming on attach would let the
+            // non-new-chat path close that keyboard again.
+            bindTabInputFocus(widgetView, lifecycleOwner, currentTabUrl, armOnAttach = !forceImageGeneration && textSelection == null)
         }
         lifecycleOwner.lifecycleScope.launch {
             if (isDuckAiSettingsUrl(currentTabUrl.firstOrNull())) widgetView.gone()
@@ -718,34 +736,39 @@ class RealNativeInputManager @Inject constructor(
         widgetView: View,
         lifecycleOwner: LifecycleOwner,
         currentTabUrl: Flow<String?>,
+        armOnAttach: Boolean,
     ) {
         widgetView.doOnAttach {
             if (widgetRoot !== widgetView) return@doOnAttach
-            if (tabVisibility.value && !isPickingImage) inputFocusPending.value = true
+            if (armOnAttach && tabVisibility.value) requestTabInputFocus()
+            var previousUrl: String? = null
             var previousUrlType: DuckAiChatUrlType? = null
             inputFocusJob += combine(
                 currentTabUrl.onEach { url ->
-                    val previousUrl = inputFocusUrl
-                    inputFocusUrl = url
                     val urlType = classifyDuckAiChatUrl(url, duckChat)
-                    when (urlType) {
-                        DuckAiChatUrlType.NewChat -> when (previousUrlType) {
-                            DuckAiChatUrlType.ExistingChat, DuckAiChatUrlType.NotDuckAi -> inputFocusPending.value = true
-                            DuckAiChatUrlType.PromptInProgress -> consumeInputFocusRequest()
-                            else -> Unit
-                        }
-                        DuckAiChatUrlType.ExistingChat -> {
-                            if (tabVisibility.value &&
-                                (previousUrlType != urlType || extractDuckAiChatId(previousUrl) != extractDuckAiChatId(url))
-                            ) {
-                                inputFocusPending.value = true
+                    inputFocusUrlType = urlType
+                    val isFirstUrl = previousUrlType == null
+                    if (armOnAttach || !isFirstUrl) {
+                        when (urlType) {
+                            DuckAiChatUrlType.NewChat -> when (previousUrlType) {
+                                DuckAiChatUrlType.ExistingChat, DuckAiChatUrlType.NotDuckAi -> inputFocusPending.value = true
+                                DuckAiChatUrlType.PromptInProgress -> consumeInputFocusRequest()
+                                else -> Unit
                             }
+                            DuckAiChatUrlType.ExistingChat -> {
+                                if (tabVisibility.value &&
+                                    (previousUrlType != urlType || extractDuckAiChatId(previousUrl) != extractDuckAiChatId(url))
+                                ) {
+                                    inputFocusPending.value = true
+                                }
+                            }
+                            DuckAiChatUrlType.PromptInProgress, DuckAiChatUrlType.OtherDuckAiPage -> {
+                                if (tabVisibility.value && previousUrl != url) inputFocusPending.value = true
+                            }
+                            DuckAiChatUrlType.NotDuckAi -> consumeInputFocusRequest()
                         }
-                        DuckAiChatUrlType.PromptInProgress, DuckAiChatUrlType.OtherDuckAiPage -> {
-                            if (tabVisibility.value && previousUrl != url) inputFocusPending.value = true
-                        }
-                        DuckAiChatUrlType.NotDuckAi -> consumeInputFocusRequest()
                     }
+                    previousUrl = url
                     previousUrlType = urlType
                 },
                 inputFocusPending,
@@ -763,7 +786,7 @@ class RealNativeInputManager @Inject constructor(
                         return@post
                     }
                     val widget = widgetFrom(widgetView) ?: return@post
-                    val urlType = classifyDuckAiChatUrl(inputFocusUrl, duckChat)
+                    val urlType = inputFocusUrlType
                     if (urlType == DuckAiChatUrlType.NotDuckAi) return@post
                     if (urlType != DuckAiChatUrlType.NewChat) {
                         if (!consumeInputFocusRequest()) return@post
@@ -786,7 +809,8 @@ class RealNativeInputManager @Inject constructor(
     }
 
     // canAutoFocus is part of the state so a request that bailed (keyboard up, other input focused) is
-    // retried once that clears, while unchanged layout passes stay deduplicated.
+    // retried once that clears, while unchanged layout passes stay deduplicated. It is only computed while a
+    // request is pending, since it walks the view tree on every layout pass.
     private data class InputViewState(val isReady: Boolean, val canAutoFocus: Boolean)
 
     private fun inputViewReady(view: View): Flow<InputViewState> = callbackFlow {
@@ -796,7 +820,7 @@ class RealNativeInputManager @Inject constructor(
             trySend(
                 InputViewState(
                     isReady = view.isAttachedToWindow && view.isShown && view.hasWindowFocus(),
-                    canAutoFocus = widget != null && canAutoFocus(widget),
+                    canAutoFocus = inputFocusPending.value && widget != null && canAutoFocus(widget),
                 ),
             )
         }
@@ -805,7 +829,7 @@ class RealNativeInputManager @Inject constructor(
             val widget = widgetFrom(view)
             if (
                 newFocus != null && widgetRoot === view && tabVisibility.value && view.isShown && view.hasWindowFocus() &&
-                widget != null && isNewDuckAiChat(inputFocusUrl, duckChat) && hasConflictingInputFocus(widget)
+                widget != null && inputFocusUrlType == DuckAiChatUrlType.NewChat && hasConflictingInputFocus(widget)
             ) {
                 consumeInputFocusRequest()
             }
@@ -970,7 +994,7 @@ class RealNativeInputManager @Inject constructor(
     private fun removeWidget(): Boolean {
         inputFocusJob.cancel()
         consumeInputFocusRequest()
-        inputFocusUrl = null
+        inputFocusUrlType = DuckAiChatUrlType.NotDuckAi
         animator.cancelAnimation()
         var removed = false
         rootView.findViewById<View?>(R.id.inputModeRoot)?.let {
@@ -1907,9 +1931,6 @@ internal fun shouldAnimateNavBar(currentShown: Boolean?, targetShown: Boolean): 
     currentShown != targetShown
 
 internal enum class DuckAiChatUrlType { NewChat, ExistingChat, PromptInProgress, OtherDuckAiPage, NotDuckAi }
-
-internal fun isNewDuckAiChat(rawUrl: String?, duckChat: DuckChat): Boolean =
-    classifyDuckAiChatUrl(rawUrl, duckChat) == DuckAiChatUrlType.NewChat
 
 internal fun classifyDuckAiChatUrl(rawUrl: String?, duckChat: DuckChat): DuckAiChatUrlType {
     if (rawUrl.isNullOrBlank()) return DuckAiChatUrlType.NotDuckAi

@@ -868,6 +868,7 @@ class BrowserTabFragment :
             if (result.resultCode == RESULT_OK) {
                 // Handle any result data if needed
                 result.data?.let { intent ->
+                    intent.getStringExtra(TabSwitcherActivity.EXTRA_KEY_SELECTED_TAB_ID)?.let { browserActivity?.onTabSelectedFromSwitcher(it) }
                     intent.extras?.let { extras ->
                         val deletedTabIds = extras.getStringArrayList(TabSwitcherActivity.EXTRA_KEY_DELETED_TAB_IDS)
                         if (!deletedTabIds.isNullOrEmpty()) {
@@ -5173,6 +5174,10 @@ class BrowserTabFragment :
                 isCustomTab = isActiveCustomTab(),
             ),
         )
+    }
+
+    fun requestNativeInputFocus() {
+        nativeInputManager.requestTabInputFocus()
     }
 
     private fun onTabHidden() {

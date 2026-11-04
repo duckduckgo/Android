@@ -83,4 +83,7 @@ class NewDuckAiChatUrlTest {
         assertFalse(isNewDuckAiChat("", duckChat))
         assertFalse(isNewDuckAiChat("invalid", duckChat))
     }
+
+    private fun isNewDuckAiChat(rawUrl: String?, duckChat: DuckChat): Boolean =
+        classifyDuckAiChatUrl(rawUrl, duckChat) == DuckAiChatUrlType.NewChat
 }
