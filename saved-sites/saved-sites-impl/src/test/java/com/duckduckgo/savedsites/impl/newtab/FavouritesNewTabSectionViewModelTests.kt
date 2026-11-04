@@ -259,6 +259,15 @@ class FavouritesNewTabSectionViewModelTests {
     }
 
     @Test
+    fun `when onTouchMove and dx only slightly greater than dy then do not return HORIZONTAL swipe`() {
+        testee.onTouchDown(0f, 0f)
+
+        val decision = testee.onTouchMove(x = 3f, y = 2.5f, touchSlop = 2)
+
+        assertEquals(SwipeDecision.CANCEL_LONG_PRESS, decision)
+    }
+
+    @Test
     fun `when onTouchMove and dy greater than dx and touchSlop then return VERTICAL swipe`() {
         testee.onTouchDown(0f, 0f)
 
