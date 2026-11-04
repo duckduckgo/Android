@@ -46,6 +46,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.DialogContextualDuckAiEntryBinding
@@ -374,7 +375,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     }
 
     private fun summarizePromptResource(): Int =
-        if (viewModel.viewState.value.attachedContext?.mimeType == "application/pdf") {
+        if (duckChatFeature.pdfPageContext().isEnabled() && viewModel.viewState.value.attachedContext?.mimeType == PDF_MIME_TYPE) {
             R.string.duckAIContextualPromptSummarizeDocument
         } else {
             R.string.duckAIContextualPromptSummarize
