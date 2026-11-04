@@ -44,6 +44,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.P
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsSetUpPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsSetUpPromotionViewModel.Command.DismissPromotion
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsSetUpPromotionViewModel.Command.LaunchSyncSetup
+import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView.ActionStyle
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import kotlinx.coroutines.Job
@@ -68,6 +69,12 @@ class SyncPasswordsSetUpPromotionView @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    internal var actionStyle: ActionStyle
+        get() = binding.promoMessage.actionStyle
+        set(value) {
+            binding.promoMessage.actionStyle = value
+        }
+
     private val binding: ViewSyncPasswordsSetUpPromotionBinding by viewBinding()
 
     private val viewModel: SyncPasswordsSetUpPromotionViewModel by lazy {
@@ -78,6 +85,7 @@ class SyncPasswordsSetUpPromotionView @JvmOverloads constructor(
 
     init {
         binding.promoMessage.apply {
+            onPrimaryButtonClicked { viewModel.setUpSync() }
             onToggleClicked { viewModel.setUpSync() }
             onCloseButtonClicked { viewModel.dismissPromotion() }
         }

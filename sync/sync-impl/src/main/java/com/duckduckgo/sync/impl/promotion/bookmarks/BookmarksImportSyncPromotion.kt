@@ -50,7 +50,7 @@ class RealBookmarksImportSyncPromotion @Inject constructor(
     }
 
     override suspend fun shouldUseToggle(): Boolean = withContext(dispatchers.io()) {
-        syncPromotionFeature.importPromosToggle().isEnabled()
+        syncPromotionFeature.shouldShowToggleInPromos().isEnabled()
     }
 
     private suspend fun isPromotionEnabled(): Boolean = withContext(dispatchers.io()) {

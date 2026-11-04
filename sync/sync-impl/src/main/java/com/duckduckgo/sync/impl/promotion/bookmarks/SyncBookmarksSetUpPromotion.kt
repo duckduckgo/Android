@@ -34,6 +34,8 @@ import kotlin.time.Duration.Companion.days
 
 interface SyncBookmarksSetUpPromotion {
     suspend fun canShowPromotion(savedBookmarks: Int): Boolean
+
+    suspend fun shouldUseToggle(): Boolean
 }
 
 @ContributesBinding(AppScope::class, binding = binding<SyncBookmarksSetUpPromotion>())
@@ -57,6 +59,10 @@ class RealSyncBookmarksSetUpPromotion @Inject constructor(
             ).awaitAll()
             preconditions.all { it }
         }
+    }
+
+    override suspend fun shouldUseToggle(): Boolean = withContext(dispatchers.io()) {
+        syncPromotionFeature.shouldShowToggleInPromos().isEnabled()
     }
 
     private suspend fun isPromotionEnabled(): Boolean = withContext(dispatchers.io()) {

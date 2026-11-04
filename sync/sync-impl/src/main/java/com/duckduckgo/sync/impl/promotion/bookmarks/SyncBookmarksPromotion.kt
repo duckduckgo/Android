@@ -43,6 +43,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.ReevalutePromo
+import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView.ActionStyle
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoSet
@@ -58,7 +59,9 @@ class SyncBookmarksPromotion @Inject constructor(
 
     override suspend fun getView(context: Context, numberSavedBookmarks: Int): View? {
         return when {
-            setUpPromotion.canShowPromotion(numberSavedBookmarks) -> SyncBookmarksSetUpPromotionView(context)
+            setUpPromotion.canShowPromotion(numberSavedBookmarks) -> SyncBookmarksSetUpPromotionView(context).apply {
+                actionStyle = if (setUpPromotion.shouldUseToggle()) ActionStyle.Toggle else ActionStyle.Buttons
+            }
             syncPromotions.canShowBookmarksPromotion(numberSavedBookmarks) -> SyncBookmarksPromotionView(context)
             else -> null
         }

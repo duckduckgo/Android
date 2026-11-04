@@ -45,6 +45,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
+import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView.ActionStyle
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
@@ -61,7 +62,9 @@ class SyncPasswordsPromotion @Inject constructor(
 
     override suspend fun getView(context: Context, numberSavedPasswords: Int): View? {
         return when {
-            setUpPromotion.canShowPromotion(numberSavedPasswords) -> SyncPasswordsSetUpPromotionView(context)
+            setUpPromotion.canShowPromotion(numberSavedPasswords) -> SyncPasswordsSetUpPromotionView(context).apply {
+                actionStyle = if (setUpPromotion.shouldUseToggle()) ActionStyle.Toggle else ActionStyle.Buttons
+            }
             syncPromotions.canShowPasswordsPromotion(numberSavedPasswords) -> SyncPasswordsPromotionView(context)
             else -> null
         }
