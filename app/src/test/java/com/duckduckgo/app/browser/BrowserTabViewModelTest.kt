@@ -317,6 +317,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
@@ -406,6 +407,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -419,6 +421,7 @@ import org.mockito.internal.util.DefaultMockingDetails
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
@@ -752,6 +755,7 @@ class BrowserTabViewModelTest {
     private val fakeCustomErrorPagesFeature = FakeFeatureToggleFactory.create(CustomErrorPagesFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
+    private val mockDuckAiEntryCallback: DuckAiEntryCallback = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockBrowserMenuAcknowledgement: BrowserMenuAcknowledgement = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
@@ -1099,6 +1103,7 @@ class BrowserTabViewModelTest {
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
+                duckAiEntryCallback = lazy { mockDuckAiEntryCallback },
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
             )
 
@@ -1402,6 +1407,30 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenSearchSubmittedFromDuckAiThenEntrySearchIntentReported() {
+        whenever(mockQueryUrlPredictor.isUrl("cats")).thenReturn(false)
+        val duckChatUrl = "https://duck.ai/"
+        whenever(mockDuckChat.isDuckChatUrl(duckChatUrl.toUri())).thenReturn(true)
+        loadUrl(duckChatUrl)
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(mockDuckAiEntryCallback).onSearchStarted("abc")
+    }
+
+    @Test
+    fun whenSearchSubmittedFromWebpageThenEntrySearchIntentNotReported() {
+        whenever(mockQueryUrlPredictor.isUrl("cats")).thenReturn(false)
+        loadUrl("https://example.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(mockDuckAiEntryCallback, never()).onSearchStarted(any())
     }
 
     @Test
@@ -2065,6 +2094,1454 @@ class BrowserTabViewModelTest {
         testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
         assertEquals(true, loadingViewState().isLoading)
     }
+
+    @Test
+    fun whenWillOverrideUrlAfterCompletionThenProgressEventsFlowWithoutWaitingForCommit() {
+        enableStartProgressAtIntent()
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // willOverrideUrl fires from shouldOverrideUrlLoading, well before pageStarted (commit)
+        testee.willOverrideUrl("http://example.com/next")
+
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenUserSubmittedQueryAfterCompletionThenProgressEventsFlowWithoutWaitingForCommit() {
+        enableStartProgressAtIntent()
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // App-initiated loads never reach shouldOverrideUrlLoading, so willOverrideUrl never fires
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        testee.onUserSubmittedQuery("foo")
+
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndWillOverrideUrlAfterCompletionThenProgressStaysGatedUntilPageStarted() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        completeLoadedPage()
+
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        reportProgress(30)
+        assertEquals(false, loadingViewState().isLoading)
+
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(30)
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndUserSubmittedQueryAfterCompletionThenProgressStaysGatedUntilPageStarted() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        completeLoadedPage()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+        reportProgress(30)
+        assertEquals(false, loadingViewState().isLoading)
+
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(30)
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndSslErrorAfterNavigationRequestedThenLoadingNotStuck() {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        givenCurrentSite(exampleUrl)
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        completeLoadedPage()
+        testee.willOverrideUrl(exampleUrl)
+        testee.onMainFrameNavigationDecided(true)
+        reportProgress(30)
+
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, aRSASslCertificate(), exampleUrl), EXPIRED, exampleUrl)
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+
+        assertCommandIssued<Command.ShowSSLError>()
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndWillOverrideUrlThenLoadingNotStartedBeforeProgressEvent() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenWillOverrideUrlThenLoadingStartsBeforeAnyProgressEvent() {
+        enableStartProgressAtIntent()
+
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(0, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenMainFrameNavigationDecidedAsLoadingInThisTabThenLoadingStartsAtProgressZero() {
+        enableStartProgressAtIntent()
+
+        testee.onMainFrameNavigationDecided(true)
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(0, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenMainFrameNavigationDecidedAsLoadingInThisTabWhileAlreadyLoadingThenBarNotRestarted() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+        val states = recordLoadingStates()
+
+        testee.onMainFrameNavigationDecided(true)
+
+        assertTrue(states.none { it.progress == 0 })
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenMainFrameNavigationDecidedAsLeavingThisTabAfterPreviousHopStartedBarThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onMainFrameNavigationDecided(false)
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenMainFrameNavigationDecidedAsLeavingThisTabWithNothingPendingThenNothingChanges() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+        val states = recordLoadingStates()
+
+        testee.onMainFrameNavigationDecided(false)
+
+        assertTrue(states.none { !it.isLoading })
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenMainFrameNavigationDecidedAsLeavingThisTabAfterCommitThenRunningBarKeepsRunning() {
+        enableStartProgressAtIntent()
+        testee.onMainFrameNavigationDecided(true)
+        testee.onMainFrameNavigationCommitted()
+        testee.onPageContentStart("http://example.com/next")
+
+        testee.onMainFrameNavigationDecided(false)
+
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenGoingHomeWhileNavigationPendingThenProgressEventsNoLongerSwallowed() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onUserPressedBack()
+        setBrowserShowing(true)
+        reportProgress(40)
+
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndMainFrameNavigationDecidedAsLoadingInThisTabThenLoadingNotStarted() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        val states = recordLoadingStates()
+
+        testee.onMainFrameNavigationDecided(true)
+
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenUserSubmittedQueryThenLoadingStartsBeforeNavigate() {
+        enableStartProgressAtIntent()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(0, loadingViewState().progress)
+        assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenOutgoingPageReaches100BeforeCommitThenBarIsNotCompleted() {
+        enableStartProgressAtIntent()
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenPageStartedAfterNavigationRequestedThenRealProgressFlowsAndCompletes() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        testee.progressChanged(40, WebViewNavigationState(mockStack, 40))
+        assertEquals(40, loadingViewState().progress)
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+        assertCommandIssued<Command.RefreshUserAgent>()
+        verify(mockNavigationAwareLoginDetector, atLeastOnce()).onEvent(NavigationEvent.PageFinished)
+    }
+
+    @Test
+    fun whenMainFrameNavigationCommittedAfterNavigationRequestedThenRealProgressFlows() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onMainFrameNavigationCommitted()
+        testee.progressChanged(40, WebViewNavigationState(mockStack, 40))
+
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenPreviousCommitCallbacksArriveAfterNewNavigationPendingThenOutgoingProgressStaysHeldBack() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/first")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onMainFrameNavigationCommitted()
+        testee.willOverrideUrl("http://example.com/client-redirect")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        testee.onPageContentStart("http://example.com/first")
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(0, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenPendingNavigationFinishesWithoutCommitThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+        assertEquals(true, loadingViewState().isLoading)
+
+        testee.onNavigationFinishedWithoutCommit()
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenPendingNavigationFinishesWithoutCommitThenProgressNoLongerHeldBack() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onNavigationFinishedWithoutCommit()
+        reportProgress(40)
+
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenRedirectedNavigationFinishesWithoutCommitThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/redirect")
+        testee.onMainFrameNavigationDecided(true)
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onNavigationFinishedWithoutCommit()
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenPendingNavigationFinishesWithoutCommitWhileOutgoingPageLoadingThenOutgoingProgressFlowsAgain() {
+        enableStartProgressAtIntent()
+        reportProgress(30)
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onNavigationFinishedWithoutCommit()
+        reportProgress(60)
+        assertEquals(60, loadingViewState().progress)
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenOutgoingPageCompletedWhilePendingAndNavigationFinishesWithoutCommitThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        reportProgress(30)
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+        reportProgress(100)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenNavigationFinishesWithoutCommitWithNothingPendingThenRunningBarUntouched() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndMainFrameNavigationCommittedThenProgressFlows() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        reportProgress(30)
+        val states = recordLoadingStates()
+
+        testee.onMainFrameNavigationCommitted()
+        reportProgress(60)
+
+        assertEquals(60, loadingViewState().progress)
+        assertTrue(states.drop(1).none { it.progress != 60 })
+    }
+
+    @Test
+    fun whenFlagOffAndCompletedPageAndNavigationFinishesWithoutCommitThenLoadingStateUntouched() {
+        enableStartProgressAtIntent()
+        reportProgress(30)
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        reportProgress(100)
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        val before = loadingViewState()
+        assertEquals(true, before.isLoading)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(before, loadingViewState())
+    }
+
+    @Test
+    fun whenBehaviourUpdateOffAndStartProgressAtIntentOnThenNewCallbacksChangeNothing() {
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        reportProgress(50)
+        val before = loadingViewState()
+
+        testee.onMainFrameNavigationCommitted()
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(before, loadingViewState())
+        reportProgress(70)
+        assertEquals(70, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenFlagFlippedOffWhilePendingAndAbandonedThenProgressNotSwallowedAfterFlippingBackOn() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        testee.onNavigationFinishedWithoutCommit()
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
+
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenFlagFlippedOffWhilePendingAndCommittedThenProgressNotSwallowedAfterFlippingBackOn() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        testee.onMainFrameNavigationCommitted()
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
+
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndNavigationFinishesWithoutCommitThenRunningBarUntouched() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        reportProgress(50)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenHttpsUpgradeCancelsHttpRequestThenSingleBarCycleAndProgressNeverGoesBackwards() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery("example.com")
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        testee.upgradedToHttps()
+        testee.onNavigationFinishedWithoutCommit()
+        assertEquals(true, loadingViewState().isLoading)
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals(1, states.loadingStarts())
+        assertEquals(0, states.progressDecreasesWhileLoading())
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenNoHttpsUpgradeAndNavigationFinishesWithoutCommitThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+
+        testee.onUserSubmittedQuery("example.com")
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHttpsUpgradeThenHttpsLoadFailsThenLoadingNoLongerHeldAndLaterAbandonEndsBar() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+
+        testee.onUserSubmittedQuery("example.com")
+        testee.upgradedToHttps()
+        testee.onReceivedError(BAD_URL, "https://example.com/", "ERROR_HOST_LOOKUP")
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHttpsUpgradeThenHttpsLoadFailsThenFinishedWithoutCommitEndsAgainOnNextPendingNavigation() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+        testee.onUserSubmittedQuery("example.com")
+        testee.upgradedToHttps()
+        testee.onReceivedError(BAD_URL, "https://example.com/", "ERROR_HOST_LOOKUP")
+
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHttpsUpgradeThenNewUserIntentThenFinishedWithoutCommitEndsBar() {
+        enableStartProgressAtIntent()
+        givenQueryConvertsTo("http://example.com")
+        testee.onUserSubmittedQuery("example.com")
+        testee.upgradedToHttps()
+
+        givenQueryConvertsTo("http://example.org/no-content")
+        testee.onUserSubmittedQuery("example.org/no-content")
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHttpsUpgradeThenNavigationAbandonedThenLaterFinishedWithoutCommitIsNotSwallowed() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/")
+        testee.onMainFrameNavigationDecided(true)
+        testee.upgradedToHttps()
+        testee.onMainFrameNavigationDecided(false)
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentDisabledAndHttpsUpgradedThenFinishedWithoutCommitLeavesBarAndNothingStaysMarked() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        reportProgress(50)
+
+        testee.upgradedToHttps()
+        testee.onNavigationFinishedWithoutCommit()
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onNavigationFinishedWithoutCommit()
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenNavigationRequestedBecomesDownloadThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/file.zip")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.requestFileDownload(
+            webView = mockWebView,
+            url = "blob:https://example.com/abc",
+            contentDisposition = null,
+            mimeType = "application/zip",
+            requestUserConfirmation = true,
+            isBlobDownloadWebViewFeatureEnabled = false,
+        )
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenNavigationRequestedOpensInNewTabThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.openLinkInNewTab(Uri.parse("http://example.com/next"))
+        testee.onMainFrameNavigationDecided(false)
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenVisibleMainFrameErrorBeforeCommitThenBarKeepsRunningAndErrorPageProgressFlows() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onReceivedError(BAD_URL, "http://example.com/next", "ERROR_HOST_LOOKUP")
+
+        assertEquals(true, loadingViewState().isLoading)
+        testee.progressChanged(40, WebViewNavigationState(mockStack, 40))
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenOmittedMainFrameErrorBeforeCommitThenBarKeepsRunningAndNewProgressFlows() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        val states = mutableListOf<LoadingViewState>()
+        testee.loadingViewState.observeForever { states.add(it) }
+
+        testee.onReceivedError(OMITTED, "http://example.com/next", "ERROR_UNKNOWN")
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+
+        assertTrue(states.none { !it.isLoading })
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(10, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenWillOverrideUrlWhileAlreadyLoadingAfterPendingClearedThenProgressNotReset() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onReceivedError(OMITTED, "http://example.com/next", "ERROR_UNKNOWN")
+        testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+
+        testee.willOverrideUrl("http://www.example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(30, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenWillOverrideUrlAfterCommitWhileStillLoadingThenProgressNotReset() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+
+        testee.willOverrideUrl("http://example.com/client-redirect")
+        testee.onMainFrameNavigationDecided(true)
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenHttpsUpgradeSequenceThenSingleBarCycleAndProgressNeverGoesBackwards() {
+        enableStartProgressAtIntent()
+        whenever(mockOmnibarConverter.convertQueryToUrl("example.com", null)).thenReturn("http://example.com")
+        val states = mutableListOf<LoadingViewState>()
+        testee.loadingViewState.observeForever { states.add(it) }
+
+        testee.onUserSubmittedQuery("example.com")
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        testee.onReceivedError(OMITTED, "http://example.com/", "ERROR_UNKNOWN")
+        testee.willOverrideUrl("https://www.example.com/")
+        testee.onMainFrameNavigationDecided(true)
+        testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        val starts = states.zipWithNext().count { (previous, current) -> !previous.isLoading && current.isLoading }
+        val backwards = states.zipWithNext().count { (previous, current) ->
+            previous.isLoading && current.isLoading && current.progress < previous.progress
+        }
+        assertEquals(1, starts)
+        assertEquals(0, backwards)
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenSecondRedirectHopAfterNavigationRequestedThenWebContentNotBlankedOut() =
+        runTest {
+            enableStartProgressAtIntent()
+            testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+            testee.willOverrideUrl("http://example.com/hop1")
+            testee.onMainFrameNavigationDecided(true)
+
+            testee.willOverrideUrl("http://example.com/hop2")
+            testee.onMainFrameNavigationDecided(true)
+            advanceTimeBy(2000)
+
+            assertCommandNotIssued<Command.HideWebContent>()
+            assertEquals(true, loadingViewState().isLoading)
+        }
+
+    @Test
+    fun whenSerpQuerySubmittedThenLoadingStartedBeforeNavigateCommand() {
+        enableStartProgressAtIntent()
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+        val loadingAtNavigate = recordLoadingAtNavigate()
+
+        testee.onUserSubmittedQuery("cats")
+
+        assertEquals(listOf(true), loadingAtNavigate)
+    }
+
+    @Test
+    fun whenAutocompleteSuggestionSelectedThenLoadingStartedBeforeNavigateCommand() =
+        runTest {
+            givenQueryConvertsTo("https://example.com/target")
+            enableStartProgressAtIntent()
+            val loadingAtNavigate = recordLoadingAtNavigate()
+
+            testee.userSelectedAutocomplete(AutoCompleteDefaultSuggestion("cats"))
+            advanceUntilIdle()
+
+            assertEquals(listOf(true), loadingAtNavigate)
+        }
+
+    @Test
+    fun whenBookmarkOpenedThenLoadingStartedBeforeNavigateCommand() {
+        givenQueryConvertsTo("https://example.com/target")
+        enableStartProgressAtIntent()
+        val loadingAtNavigate = recordLoadingAtNavigate()
+
+        testee.onUserSubmittedQuery("https://example.com/saved", FromBookmark)
+
+        assertEquals(listOf(true), loadingAtNavigate)
+    }
+
+    @Test
+    fun whenRefreshRequestedOnCompletedPageThenLoadingNotStarted() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        val states = recordLoadingStates()
+
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenRefreshRequestedWhileLoadingThenProgressKeepsFlowing() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+
+        testee.onRefreshRequested(triggeredByUser = true)
+        reportProgress(70)
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(70, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenRedirectChainOfThreeHopsThenSingleBarCycleAndNoBlankingBeforeCommit() =
+        runTest {
+            enableStartProgressAtIntent()
+            completeLoadedPage()
+            val states = recordLoadingStates()
+
+            testee.willOverrideUrl("http://example.com/hop1")
+            testee.onMainFrameNavigationDecided(true)
+            advanceTimeBy(2000)
+            assertCommandNotIssued<Command.HideWebContent>()
+            testee.willOverrideUrl("http://example.com/hop2")
+            testee.onMainFrameNavigationDecided(true)
+            testee.willOverrideUrl("http://example.com/hop3")
+            testee.onMainFrameNavigationDecided(true)
+            advanceTimeBy(2000)
+            testee.onMainFrameNavigationCommitted()
+            testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+            reportProgress(30)
+            reportProgress(100)
+
+            assertEquals(1, states.loadingStarts())
+            assertEquals(0, states.progressDecreasesWhileLoading())
+            assertCommandNotIssued<Command.HideWebContent>()
+            assertEquals(false, loadingViewState().isLoading)
+            assertEquals(100, loadingViewState().progress)
+        }
+
+    @Test
+    fun whenRedirectHopResolvesToAppLinkHandledExternallyThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/hop1")
+        testee.onMainFrameNavigationDecided(true)
+        whenever(mockAppLinksHandler.handleAppLink(any(), any(), any(), anyOrNull(), any(), any(), any(), any())).thenReturn(true)
+
+        val handled = testee.handleAppLink(SpecialUrlDetector.UrlType.AppLink(uriString = "http://app.example.com/hop2"), true, true)
+        testee.onMainFrameNavigationDecided(false)
+
+        assertTrue(handled)
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenRedirectHopResolvesToEmailThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/hop1")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.sendEmailRequested("someone@example.com")
+        testee.onMainFrameNavigationDecided(false)
+
+        assertCommandIssued<Command.SendEmail>()
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenRedirectHopResolvesToTelephoneThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/hop1")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.dialTelephoneNumberRequested("+1234567890")
+        testee.onMainFrameNavigationDecided(false)
+
+        assertCommandIssued<Command.DialNumber>()
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenRedirectHopResolvesToSmsThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/hop1")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.sendSmsRequested("+1234567890")
+        testee.onMainFrameNavigationDecided(false)
+
+        assertCommandIssued<Command.SendSms>()
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenRedirectHopResolvesToNonHttpAppLinkThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        testee.willOverrideUrl("http://example.com/hop1")
+        testee.onMainFrameNavigationDecided(true)
+
+        val handled = testee.handleNonHttpAppLink(SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), null))
+        testee.onMainFrameNavigationDecided(false)
+
+        assertTrue(handled)
+        assertCommandIssued<Command.HandleNonHttpAppLink>()
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenTrackingLinkProcessingStartsThenLoadingNotStartedEarlyAndProgressKeepsFlowing() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        val states = recordLoadingStates()
+
+        testee.startProcessingTrackingLink()
+
+        assertTrue(states.none { it.isLoading })
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(40)
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenTrackingLinkProcessingStartsWhileLoadingThenProgressKeepsFlowing() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+
+        testee.startProcessingTrackingLink()
+        reportProgress(60)
+
+        assertEquals(60, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenCloakedAmpLinkHandledThenLoadingNotStartedEarlyAndProgressKeepsFlowing() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+        val states = recordLoadingStates()
+
+        testee.handleCloakedAmpLink("http://example.com/amp")
+        reportProgress(60)
+
+        assertCommandIssued<Command.ExtractUrlFromCloakedAmpLink>()
+        assertTrue(states.none { it.progress == 0 })
+        assertEquals(60, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenCloakedAmpLinkSubmittedThenNoPendingNavigationBlocksProgress() {
+        givenQueryConvertsTo("https://example.com/target")
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.CloakedAmpLink("http://example.com/amp"))
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery("http://example.com/amp")
+
+        assertTrue(states.none { it.isLoading })
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(40)
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenInlinePdfRequestedAfterNavigationRequestedThenPdfLoadingDrivesBar() =
+        runTest {
+            enableStartProgressAtIntent()
+            completeLoadedPage()
+            testee.willOverrideUrl("https://example.com/doc.pdf")
+            testee.onMainFrameNavigationDecided(true)
+            whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+            whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR))
+                .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
+
+            testee.requestFileDownload(mockWebView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+
+            assertCommandIssued<Command.ShowPdfInTab>()
+            assertEquals(false, loadingViewState().isLoading)
+            reportProgress(40)
+            assertEquals(40, loadingViewState().progress)
+        }
+
+    @Test
+    fun whenLinkOpenedInNewTabRightAfterNavigationRequestedThenBarNeverShown() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        val states = recordLoadingStates()
+
+        testee.willOverrideUrl("http://example.com/next")
+        testee.openLinkInNewTab(Uri.parse("http://example.com/next"))
+        testee.onMainFrameNavigationDecided(false)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenOutgoingPageLoadingAndLinkBecomesDownloadThenOutgoingBarKeepsRunning() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+        val states = recordLoadingStates()
+
+        testee.willOverrideUrl("http://example.com/file.zip")
+        testee.onMainFrameNavigationDecided(true)
+        testee.requestFileDownload(mockWebView, "blob:https://example.com/abc", null, "application/zip", true, false)
+        reportProgress(70)
+
+        assertTrue(states.none { !it.isLoading })
+        assertEquals(70, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenOutgoingPageLoadingAndLinkOpensInNewTabThenOutgoingBarKeepsRunning() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+        val states = recordLoadingStates()
+
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        testee.openLinkInNewTab(Uri.parse("http://example.com/next"))
+        testee.onMainFrameNavigationDecided(false)
+        reportProgress(70)
+
+        assertTrue(states.none { !it.isLoading })
+        assertEquals(70, loadingViewState().progress)
+    }
+
+    @Ignore(
+        "Known gap, out of scope of the design: no commit and no error (e.g. HTTP 204) reaches the app, only the page load timeout releases the bar",
+    )
+    @Test
+    fun whenNavigationNeverCommitsAndPageFinishedThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/no-content")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://example.com/")
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHashOnlySubmitThenBarNotStartedAndLoadingNeverStuck() {
+        val states = givenCompletedPageThenSubmit("https://example.com/a", "https://example.com/a#b")
+
+        assertTrue(states.none { it.isLoading })
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = "https://example.com/a", currentUrl = "https://example.com/a#b"))
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHashOnlySubmitConvertsToSchemeLessUrlThenBarNotStarted() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        loadUrl("http://example.com/a")
+        givenQueryConvertsTo("example.com/a#b")
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery("example.com/a#b")
+
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenSubmitChangesFragmentOnlyThenBarNotStarted() {
+        val states = givenCompletedPageThenSubmit("https://example.com/a#b", "https://example.com/a#c")
+
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenSubmitRemovesFragmentThenBarStarted() {
+        val states = givenCompletedPageThenSubmit("https://example.com/a#b", "https://example.com/a")
+
+        assertEquals(1, states.loadingStarts())
+    }
+
+    @Test
+    fun whenSubmitDifferentPathWithFragmentThenBarStarted() {
+        val states = givenCompletedPageThenSubmit("https://example.com/a", "https://example.com/b#c")
+
+        assertEquals(1, states.loadingStarts())
+    }
+
+    @Test
+    fun whenSubmitSameUrlWithoutFragmentThenBarStarted() {
+        val states = givenCompletedPageThenSubmit("https://example.com/a", "https://example.com/a")
+
+        assertEquals(1, states.loadingStarts())
+    }
+
+    @Test
+    fun whenSubmitFragmentUrlWithNoCurrentPageThenBarStarted() {
+        givenQueryConvertsTo("https://example.com/a#b")
+        enableStartProgressAtIntent()
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery("https://example.com/a#b")
+
+        assertEquals(1, states.loadingStarts())
+    }
+
+    @Test
+    fun whenHashOnlySubmitAndFlagOffThenBarNotStarted() {
+        loadUrl("https://example.com/a")
+        givenQueryConvertsTo("https://example.com/a#b")
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery("https://example.com/a#b")
+
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenFlagOffAndOmittedErrorAfterCompletedPageThenProgressStillIgnoredUntilPageStarted() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        setBrowserShowing(true)
+        completeLoadedPage()
+
+        testee.onReceivedError(OMITTED, "http://example.com/next", "ERROR_UNKNOWN")
+        reportProgress(30)
+
+        assertEquals(100, loadingViewState().progress)
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(30)
+        assertEquals(30, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenFlagOffAndVisibleErrorAfterCompletedPageThenProgressStillIgnoredUntilPageStarted() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        setBrowserShowing(true)
+        completeLoadedPage()
+
+        testee.onReceivedError(BAD_URL, "http://example.com/next", "ERROR_UNKNOWN")
+        reportProgress(30)
+
+        assertEquals(100, loadingViewState().progress)
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(30)
+        assertEquals(30, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenSameDocumentUrlChangesAfterCommitThenBarNotStartedAndProgressNotBlocked() {
+        enableStartProgressAtIntent()
+        loadUrl("https://example.com/a")
+        val states = recordLoadingStates()
+
+        testee.onHistoryUrlChanged("https://example.com/a#b")
+        updateUrl("https://example.com/a", "https://example.com/a#c", isBrowserShowing = true)
+
+        assertTrue(states.none { it.isLoading })
+        reportProgress(40)
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenVisibleErrorBeforeCommitThenAtMostOneBarCycle() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        val states = recordLoadingStates()
+
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onReceivedError(BAD_URL, "http://example.com/next", "ERROR_HOST_LOOKUP")
+        assertEquals(true, loadingViewState().isLoading)
+        reportProgress(30)
+        reportProgress(100)
+
+        assertEquals(1, states.loadingStarts())
+    }
+
+    @Test
+    fun whenOmittedErrorThenNoFurtherLoadAndOutgoingProgress100ThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onReceivedError(OMITTED, "http://example.com/next", "ERROR_UNKNOWN")
+
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenSslErrorAfterNavigationRequestedThenLoadingEnds() {
+        givenNavigationRequestedThenSslError()
+
+        assertCommandIssued<Command.ShowSSLError>()
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenSslErrorProceededThenProgressOfCommittedPageIsNotSwallowed() {
+        givenNavigationRequestedThenSslError()
+
+        testee.onSSLCertificateWarningAction(Action.Proceed, exampleUrl, false)
+        setBrowserShowing(true)
+        reportProgress(40)
+
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenSslErrorLeftThenProgressOfCommittedPageIsNotSwallowed() {
+        givenNavigationRequestedThenSslError()
+
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, exampleUrl, false)
+        testee.recoverFromWarningPage(showBrowser = true)
+        reportProgress(40)
+
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenSslErrorLeftWithoutHistoryThenProgressOfCommittedPageIsNotSwallowed() {
+        givenNavigationRequestedThenSslError()
+
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, exampleUrl, false)
+        testee.recoverFromWarningPage(showBrowser = false)
+        setBrowserShowing(true)
+        reportProgress(40)
+
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenMaliciousSiteWarningAfterNavigationRequestedThenLoadingEndsAndVisitSiteRestartsAndCompletes() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        val maliciousUri = "https://www.malicious.com".toUri()
+        testee.willOverrideUrl(maliciousUri.toString())
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onReceivedMaliciousSiteWarning(maliciousUri, Feed.PHISHING, exempted = false, clientSideHit = false, isMainframe = true)
+
+        assertEquals(false, loadingViewState().isLoading)
+        testee.onMaliciousSiteUserAction(VisitSite, maliciousUri, Feed.PHISHING, activeCustomTab = false)
+        assertEquals(true, loadingViewState().isLoading)
+        setBrowserShowing(true)
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(60)
+        assertEquals(60, loadingViewState().progress)
+        reportProgress(100)
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenCommittedPageFailsWithHttpErrorThenSingleBarCycle() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        val states = recordLoadingStates()
+
+        testee.willOverrideUrl("http://example.com/missing")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(40)
+        reportProgress(100)
+
+        assertEquals(1, states.loadingStarts())
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenPageLoadTimesOutWhileNavigationPendingThenLoadingEnds() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl("http://example.com/slow")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onPageLoadTimeout()
+
+        assertCommandIssued<Command.WebViewError>()
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenBackPressedThenLoadingNotStartedEarly() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 1)
+        val states = recordLoadingStates()
+
+        assertTrue(testee.onUserPressedBack())
+
+        assertCommandIssued<NavigationCommand.NavigateBack>()
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenForwardPressedThenLoadingNotStartedEarly() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        setupNavigation(isBrowsing = true, canGoForward = true)
+        val states = recordLoadingStates()
+
+        testee.onUserPressedForward()
+
+        assertCommandIssued<NavigationCommand.NavigateForward>()
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenBackPressedWhileNavigationPendingThenCommitOfBackTargetCompletesBar() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 1)
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onUserPressedBack()
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(40)
+        assertEquals(40, loadingViewState().progress)
+        reportProgress(100)
+
+        assertCommandIssued<NavigationCommand.NavigateBack>()
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenGoingHomeWhileNavigationPendingThenLoadingEndsAndLaterCommitFlows() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onUserPressedBack()
+
+        assertEquals(false, loadingViewState().isLoading)
+        setBrowserShowing(true)
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(40)
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenWebSessionRestoredThenLoadingNotStartedEarly() =
+        runTest {
+            enableStartProgressAtIntent()
+            webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(true) }
+            val states = recordLoadingStates()
+
+            testee.restoreWebViewState(null, "foo.com")
+
+            assertTrue(states.none { it.isLoading })
+        }
+
+    @Test
+    fun whenWebSessionNotRestorableThenFallbackNavigationStartsLoadingBeforeNavigate() =
+        runTest {
+            givenQueryConvertsTo("https://example.com/target")
+            enableStartProgressAtIntent()
+            webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
+            val loadingAtNavigate = recordLoadingAtNavigate()
+
+            testee.restoreWebViewState(null, "foo.com")
+
+            assertEquals(listOf(true), loadingAtNavigate)
+        }
+
+    @Test
+    fun whenRapidRepeatedTapsWithoutCommitThenSingleBarCycleAndCommitCompletes() {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        val states = recordLoadingStates()
+
+        repeat(3) {
+            testee.willOverrideUrl("http://example.com/next")
+            testee.onMainFrameNavigationDecided(true)
+        }
+        testee.onMainFrameNavigationCommitted()
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(40)
+        reportProgress(100)
+
+        assertEquals(1, states.loadingStarts())
+        assertEquals(1, states.count { it.isLoading && it.progress == 0 })
+        assertEquals(0, states.progressDecreasesWhileLoading())
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenQuerySubmittedWhileLinkNavigationPendingThenSingleBarCycle() {
+        givenQueryConvertsTo("https://example.com/target")
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        val states = recordLoadingStates()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onUserSubmittedQuery("cats")
+
+        assertCommandIssued<Navigate>()
+        assertEquals(1, states.loadingStarts())
+        assertEquals(1, states.count { it.isLoading && it.progress == 0 })
+        assertEquals(0, states.progressDecreasesWhileLoading())
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenDuckAiLinkSubmittedAndOpensDuckAiScreenThenLoadingNotStarted() {
+        givenQueryConvertsTo("https://example.com/target")
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery("https://duckduckgo.com/?q=hi&ia=chat&duckai=5")
+
+        verify(mockDuckChat).openDuckChat(DuckChatEntryPoint.DIRECT_URL)
+        assertTrue(states.none { it.isLoading })
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(40)
+        assertEquals(40, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenBehaviourUpdateDisabledAndStartProgressAtIntentEnabledThenNoEarlyStart() {
+        givenQueryConvertsTo("https://example.com/target")
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = false))
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        val states = recordLoadingStates()
+
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        testee.onUserSubmittedQuery("cats")
+
+        assertTrue(states.none { it.isLoading })
+    }
+
+    @Test
+    fun whenBehaviourUpdateTurnedOffBetweenStartAndCommitThenProgressStillFlows() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = false))
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(80)
+
+        assertEquals(80, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentTurnedOffBetweenStartAndCommitThenProgressStillFlows() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(80)
+
+        assertEquals(80, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenCommittedPageReaches100AfterNavigationRequestedThenCompletionEffectsFireOnce() {
+        enableStartProgressAtIntent()
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        testee.onMainFrameLoadStarted(7L)
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+        reportProgress(96)
+        reportProgress(100)
+
+        verify(mockPageLoadWideEvent, times(1)).onProgressChanged(any(), eq(7L))
+        assertCommandIssuedTimes<Command.RefreshUserAgent>(1)
+        verify(mockNavigationAwareLoginDetector, times(1)).onEvent(NavigationEvent.PageFinished)
+    }
+
+    @Test
+    fun whenOutgoingPageReaches100WhileNavigationPendingThenItsCompletionEffectsStillFire() {
+        enableStartProgressAtIntent()
+        reportProgress(50)
+        testee.willOverrideUrl("http://example.com/next")
+        testee.onMainFrameNavigationDecided(true)
+
+        reportProgress(100)
+
+        assertCommandIssued<Command.RefreshUserAgent>()
+        verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.PageFinished)
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenAdBlockingBadgeDeferredDuringLoadAfterNavigationRequestedThenFlushedAtProgress100() =
+        runTest {
+            enableStartProgressAtIntent()
+            givenAdBlockingBadgeWillShow()
+            testee.willOverrideUrl("https://www.youtube.com/watch?v=abc")
+            testee.onMainFrameNavigationDecided(true)
+            testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+
+            loadUrl("https://www.youtube.com/watch?v=abc")
+            advanceUntilIdle()
+            assertCommandNotIssued<Command.StartAdBlockingAnimation>()
+            reportProgress(100)
+
+            assertCommandIssued<Command.StartAdBlockingAnimation>()
+        }
 
     @Test
     fun whenProgressBarUpgradeEnabledThenRawProgressPassedThrough() {
@@ -4183,6 +5660,85 @@ class BrowserTabViewModelTest {
         assertCommandIssued<HideOnboardingDaxBubbleCta>()
         verify(mockOnboardingInputScreenLaunchTarget).setOpenOnDuckAi()
         assertCommandIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenPromptSubmittedAfterOnboardingCompletionPromoThenEntryAndReturnSessionUsePromoSource() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatAutoPromptURL, null)).thenReturn(duckChatAutoPromptURL)
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        testee.openDuckAiQuery("hello", true, DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+
+        verify(mockDuckChat).reportDuckChatEntry(argThat { name == "ONBOARDING_COMPLETION_PROMO" }, eq(false), eq(true), eq(false))
+        verify(plugin).onAiPromptSubmitted("onboarding_completion_promo")
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoTabHiddenThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onViewHidden()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoAppStoppedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onViewStopped()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoTabSwipedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onTabSwipedAway()
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoPageLoadedThenLaterInputUsesOrdinarySource() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+        assertEquals(DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+
+        testee.onPageContentStart("https://example.com")
+
+        assertEquals(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.ADDRESS_BAR_PROMPT))
+    }
+
+    @Test
+    fun whenOnboardingCompletionPromoThenExplicitEntrySourcesArePreserved() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(DownloadReasonSelection.SEARCH)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertEquals(DuckChatEntryPoint.SUGGESTION_ASK_AI, testee.resolveDuckAiEntryPoint(DuckChatEntryPoint.SUGGESTION_ASK_AI))
     }
 
     @Test
@@ -9901,7 +11457,7 @@ class BrowserTabViewModelTest {
             assertCommandIssued<Command.OpenInNewTab> {
                 assertEquals(duckChatURL, query)
             }
-            verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any())
+            verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any(), any())
         }
 
     @Test
@@ -9916,7 +11472,7 @@ class BrowserTabViewModelTest {
         }
         verify(mockDuckChat).getDuckChatUrl(eq("hello"), eq(true), any())
         verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, opensNewTab = true, hasPrompt = true)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any())
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any(), any())
     }
 
     @Test
@@ -9969,6 +11525,16 @@ class BrowserTabViewModelTest {
         testee.openDuckAiChatById(chatUrl)
 
         assertCommandNotIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenDictatedPromptOpensDuckAiThenEntryRetainsSourceAndVoiceFlag() = runTest {
+        setBrowserShowing(true)
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
+
+        testee.openDuckAiQuery("hello", true, DuckChatEntryPoint.ADDRESS_BAR_PROMPT, voice = true)
+
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, opensNewTab = true, hasPrompt = true, voice = true)
     }
 
     @Test
@@ -10259,6 +11825,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -10277,6 +11844,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
             )
             // Not the single-slot command LiveData: a DuckChat reply can be held open for minutes
             // (the edit screen) while the fragment is stopped, so it goes on its own buffered channel.
@@ -10285,6 +11853,33 @@ class BrowserTabViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
             assertCommandNotIssued<Command.SendResponseToJs>()
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageForDuckChatThenPassTabUrlAsPageUrl() =
+        runTest {
+            val serpUrl = "https://duckduckgo.com/?q=test"
+            loadUrl(serpUrl)
+
+            testee.processJsCallbackMessage(
+                DUCK_CHAT_FEATURE_NAME,
+                "openAIChat",
+                "id",
+                data = null,
+                false,
+            ) { "someUrl" }
+
+            verify(mockDuckChatJSHelper).processJsCallbackMessage(
+                eq(DUCK_CHAT_FEATURE_NAME),
+                eq("openAIChat"),
+                eq("id"),
+                anyOrNull(),
+                any(),
+                anyOrNull(),
+                any(),
+                any(),
+                eq(serpUrl),
+            )
         }
 
     @Test
@@ -10301,6 +11896,7 @@ class BrowserTabViewModelTest {
                     anyOrNull(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -10319,6 +11915,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
             )
             testee.duckChatJsResponseFlow.test {
                 expectNoEvents()
@@ -10928,6 +12525,7 @@ class BrowserTabViewModelTest {
                     any(),
                     any(),
                     any(),
+                    anyOrNull(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -11819,6 +13417,186 @@ class BrowserTabViewModelTest {
         deviceInfo = mockDeviceInfo,
     )
 
+    @Test
+    fun whenAmazonLikeChallengeThenSingleBarThatNeverDecreasesAndCompletesOnRealPage() = runTest {
+        enableHoldProgressOnChallenge()
+        val url = "https://www.amazon.com/"
+        givenQueryConvertsTo(url)
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery(url)
+        commitMainFrame(202)
+        reportProgress(70)
+        reportProgress(100)
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), url)
+        assertEquals(true, loadingViewState().isLoading)
+        assertTrue(loadingViewState().progress < 100)
+
+        advanceTimeBy(220)
+        testee.willOverrideUrl(url)
+        testee.onMainFrameNavigationDecided(true)
+        commitMainFrame(200)
+        listOf(10, 21, 60, 100).forEach { reportProgress(it) }
+
+        assertEquals(1, states.loadingStarts())
+        assertEquals(0, states.progressDecreasesWhileLoading())
+        assertEquals(1, states.zipWithNext().count { (previous, current) -> previous.isLoading && !current.isLoading })
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenChallengeHeldAndNoFollowUpNavigationThenBarCompletesAfterCutoff() = runTest {
+        enableHoldProgressOnChallenge()
+        givenHeldChallengePage()
+
+        advanceTimeBy(2900)
+        assertEquals(true, loadingViewState().isLoading)
+        advanceTimeBy(200)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenCutoffReleasedBarThenNextPageStartsNormally() = runTest {
+        enableHoldProgressOnChallenge()
+        givenHeldChallengePage()
+        advanceTimeBy(3100)
+
+        testee.willOverrideUrl("https://www.amazon.com/next")
+        testee.onMainFrameNavigationDecided(true)
+        commitMainFrame(200)
+        reportProgress(30)
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertEquals(30, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenAcceptedStatusThenHeld() {
+        enableHoldProgressOnChallenge()
+        testee.onMainFrameNavigationDecided(true)
+        commitMainFrame(202)
+        reportProgress(100)
+
+        assertEquals(true, loadingViewState().isLoading)
+        assertTrue(loadingViewState().progress < 100)
+    }
+
+    @Test
+    fun whenForbiddenThenNotHeld() = assertErrorStatusNotHeld(403)
+
+    @Test
+    fun whenNotFoundThenNotHeld() = assertErrorStatusNotHeld(404)
+
+    @Test
+    fun whenServerErrorThenNotHeld() = assertErrorStatusNotHeld(500)
+
+    private fun assertErrorStatusNotHeld(status: Int) {
+        enableHoldProgressOnChallenge()
+        testee.onMainFrameNavigationDecided(true)
+        commitMainFrame(status)
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenUserSubmitsDuringHoldThenNewBarProgressIsNotSwallowed() = runTest {
+        enableHoldProgressOnChallenge()
+        givenHeldChallengePage()
+        givenQueryConvertsTo("https://example.com/other")
+
+        testee.onUserSubmittedQuery("https://example.com/other")
+        commitMainFrame(200)
+        reportProgress(10)
+
+        assertEquals(10, loadingViewState().progress)
+        reportProgress(100)
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHeldAndFollowUpLeavesTabThenBarCompletes() = runTest {
+        enableHoldProgressOnChallenge()
+        givenHeldChallengePage()
+
+        testee.willOverrideUrl("mailto:a@b.c")
+        testee.onMainFrameNavigationDecided(false)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenHeldAndErrorReceivedThenBarCompletes() = runTest {
+        enableHoldProgressOnChallenge()
+        givenHeldChallengePage()
+
+        testee.onReceivedError(BAD_URL, "https://www.amazon.com/", "ERROR_UNKNOWN")
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenHoldFlagOffThenChallengeCompletesBarImmediately() {
+        enableStartProgressAtIntent()
+        testee.onMainFrameNavigationDecided(true)
+        commitMainFrame(202)
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenStartProgressAtIntentOffThenHoldHasNoEffect() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = false))
+        fakeProgressBarUpgradeFeature.holdProgressOnChallengePage().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        commitMainFrame(202)
+        reportProgress(100)
+
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenNormalPageRenavigatesBeforeItFinishedThenProgressMayDrop() {
+        enableHoldProgressOnChallenge()
+        val states = recordLoadingStates()
+
+        testee.onMainFrameNavigationDecided(true)
+        commitMainFrame(200)
+        reportProgress(70)
+        testee.onMainFrameNavigationDecided(true)
+        commitMainFrame(200)
+        reportProgress(33)
+
+        assertEquals(1, states.progressDecreasesWhileLoading())
+        assertEquals(33, loadingViewState().progress)
+    }
+
+    private fun enableHoldProgressOnChallenge() {
+        enableStartProgressAtIntent()
+        fakeProgressBarUpgradeFeature.holdProgressOnChallengePage().setRawStoredState(State(enable = true))
+    }
+
+    private fun commitMainFrame(statusCode: Int) {
+        testee.onMainFrameNavigationCommitted()
+        testee.onMainFrameCommitted(statusCode)
+    }
+
+    private fun givenHeldChallengePage() {
+        testee.onMainFrameNavigationDecided(true)
+        commitMainFrame(202)
+        reportProgress(70)
+        reportProgress(100)
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "https://www.amazon.com/")
+    }
+
     private fun omnibarViewState() = testee.omnibarViewState.value!!
 
     private fun givenAdBlockingBadgeWillShow() {
@@ -11828,6 +13606,66 @@ class BrowserTabViewModelTest {
     }
 
     private fun loadingViewState() = testee.loadingViewState.value!!
+
+    private fun enableStartProgressAtIntent() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        fakeProgressBarUpgradeFeature.startProgressAtIntent().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+    }
+
+    private fun reportProgress(progress: Int) = testee.progressChanged(progress, WebViewNavigationState(mockStack, progress))
+
+    private fun completeLoadedPage() {
+        reportProgress(50)
+        reportProgress(100)
+    }
+
+    private fun givenCompletedPageThenSubmit(
+        currentUrl: String,
+        submittedUrl: String,
+    ): List<LoadingViewState> {
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        loadUrl(currentUrl)
+        givenQueryConvertsTo(submittedUrl)
+        val states = recordLoadingStates()
+
+        testee.onUserSubmittedQuery(submittedUrl)
+
+        return states
+    }
+
+    private fun recordLoadingStates(): List<LoadingViewState> {
+        val states = mutableListOf<LoadingViewState>()
+        testee.loadingViewState.observeForever { states.add(it) }
+        return states
+    }
+
+    private fun recordLoadingAtNavigate(): List<Boolean> {
+        val loadingAtNavigate = mutableListOf<Boolean>()
+        testee.command.observeForever { if (it is Navigate) loadingAtNavigate.add(loadingViewState().isLoading) }
+        return loadingAtNavigate
+    }
+
+    private fun List<LoadingViewState>.loadingStarts() = zipWithNext().count { (previous, current) -> !previous.isLoading && current.isLoading }
+
+    private fun List<LoadingViewState>.progressDecreasesWhileLoading() =
+        zipWithNext().count { (previous, current) -> previous.isLoading && current.isLoading && current.progress < previous.progress }
+
+    private fun givenQueryConvertsTo(url: String) {
+        whenever(mockOmnibarConverter.convertQueryToUrl(any(), anyOrNull(), any(), any())).thenReturn(url)
+    }
+
+    private fun givenNavigationRequestedThenSslError() {
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+        givenCurrentSite(exampleUrl)
+        enableStartProgressAtIntent()
+        completeLoadedPage()
+        testee.willOverrideUrl(exampleUrl)
+        testee.onMainFrameNavigationDecided(true)
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, aRSASslCertificate(), exampleUrl), EXPIRED, exampleUrl)
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+    }
 
     private fun autoCompleteViewState() = testee.autoCompleteViewState.value!!
 
@@ -12037,10 +13875,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewVoiceChatRequestedFromBrowsingMenuThenSourceMatchesViewMode() = runTest {
+        testee.openNewVoiceChat(ViewMode.NewTab)
+        testee.openNewVoiceChat(ViewMode.Browser("https://example.com"))
+        testee.openNewVoiceChat(ViewMode.DuckAI)
+
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_NTP)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.BROWSING_MENU_DUCKAI)
+    }
+
+    @Test
     fun whenNewVoiceChatRequestedFromChatMenuThenOpensVoiceChatAndFiresPixels() = runTest {
         testee.openNewVoiceChatFromChatMenu()
 
-        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        verify(mockDuckChat).openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY, type = Daily())
     }
@@ -12049,7 +13898,7 @@ class BrowserTabViewModelTest {
     fun whenNewImageRequestedFromChatMenuThenOpensImageGenerationAndFiresPixels() = runTest {
         testee.openNewImageDuckChatFromChatMenu()
 
-        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY, type = Daily())
     }

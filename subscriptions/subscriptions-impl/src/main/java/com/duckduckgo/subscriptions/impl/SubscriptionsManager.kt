@@ -153,10 +153,10 @@ interface SubscriptionsManager {
     suspend fun refreshSubscriptionData()
 
     /**
-     * Gets new access token from BE and saves it in internal storage.
-     * This operation also updates account email and entitlements.
+     * Rotates the token pair and saves it in internal storage. This operation also updates account email and entitlements.
+     * With [force] set to false, this is a no-op returning the stored access token if that token is still usable.
      */
-    suspend fun refreshAccessToken()
+    suspend fun refreshAccessToken(force: Boolean = false): AccessToken
 
     /**
      * Gets the account details from internal storage
@@ -637,7 +637,7 @@ class RealSubscriptionsManager @Inject constructor(
 
             // existing access token has to be invalidated after the purchase, because it doesn't have up-to-date entitlements
             authRepository.setAccessTokenV2(null)
-            refreshAccessToken()
+            refreshAccessToken(force = true)
 
             if (subscription.isActive()) {
                 val isFreeTrial = subscription.activeOffers.contains(ActiveOfferType.TRIAL)
@@ -752,9 +752,9 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    override suspend fun refreshAccessToken() {
+    override suspend fun refreshAccessToken(force: Boolean): AccessToken {
         // Moving token refresh to app-scoped coroutine to ensure it's not interrupted by caller cancellation.
-        coroutineScope.async {
+        return coroutineScope.async {
             tokenRefreshMutex.withLock {
                 try {
                     tokenRefreshWideEvent.onStart(subscriptionStatus())
@@ -762,7 +762,16 @@ class RealSubscriptionsManager @Inject constructor(
                     val lockResult = crossProcessLock.acquire(TOKEN_REFRESH_LOCK_KEY)
                     tokenRefreshWideEvent.onCrossProcessLockAcquired(lockResult)
 
-                    try {
+                    val accessToken = try {
+                        // A caller waiting on either lock may find the token already rotated by the previous holder.
+                        if (!force && isSkipValidAccessTokenRefreshEnabled()) {
+                            val storedAccessToken = authRepository.getAccessTokenV2()
+                            if (storedAccessToken != null && isAccessTokenUsable(storedAccessToken)) {
+                                tokenRefreshWideEvent.onSkipped()
+                                return@withLock storedAccessToken
+                            }
+                        }
+
                         doRefreshAccessToken()
                     } finally {
                         lockResult.getOrNull()?.let { lockHandle ->
@@ -771,6 +780,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     tokenRefreshWideEvent.onSuccess()
+                    accessToken
                 } catch (e: Exception) {
                     tokenRefreshWideEvent.onFailure(e)
                     throw e
@@ -779,7 +789,11 @@ class RealSubscriptionsManager @Inject constructor(
         }.await()
     }
 
-    private suspend fun doRefreshAccessToken() {
+    private suspend fun isSkipValidAccessTokenRefreshEnabled(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsFeature.value.skipValidAccessTokenRefresh().isEnabled()
+    }
+
+    private suspend fun doRefreshAccessToken(): AccessToken {
         val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
         tokenRefreshWideEvent.onTokenRead()
 
@@ -863,6 +877,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
 
         saveTokens(newTokens)
+        return AccessToken(newTokens.accessToken, newTokens.accessTokenClaims.expiresAt)
     }
 
     override suspend fun refreshSubscriptionData() {
@@ -1252,14 +1267,7 @@ class RealSubscriptionsManager @Inject constructor(
         return if (accessToken != null) {
             accessToken.jwt
         } else {
-            refreshAccessToken()
-
-            // Rotating auth credentials didn't throw an exception, so a valid access token is expected to be available
-            val newAccessToken = authRepository.getAccessTokenV2()
-            checkNotNull(newAccessToken)
-            check(isAccessTokenUsable(newAccessToken))
-
-            newAccessToken.jwt
+            refreshAccessToken().jwt
         }
     }
 

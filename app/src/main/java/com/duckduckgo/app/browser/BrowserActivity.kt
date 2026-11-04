@@ -129,6 +129,7 @@ import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.DuckAiContextualChat
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
@@ -209,6 +210,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject lateinit var duckAiEntryCallback: Lazy<DuckAiEntryCallback>
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -395,6 +398,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         intent?.sanitize()
+        if (savedInstanceState == null && intent != null && !intent.launchedFromRecents) {
+            trackDuckAiLaunchIntent(intent)
+        }
         logcat(INFO) { "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState" }
         if (savedInstanceState == null) {
             pendingLaunchSource = intent?.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
@@ -662,6 +668,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         logcat(INFO) { "onNewIntent: $intent" }
 
         intent.sanitize()
+        trackDuckAiLaunchIntent(intent)
         setIntent(intent)
         pendingLaunchSource = intent.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
 
@@ -776,6 +783,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             super.onKeyLongPress(keyCode, event)
         }
 
+    private fun trackDuckAiLaunchIntent(intent: Intent) {
+        duckAiEntryCallback.value.onLaunchIntentReceived(
+            opensDuckAi = intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
+                intent.intentText?.let { duckChat.isDuckChatUrl(it.toUri()) } == true,
+        )
+    }
+
     private fun launchNewSearchOrQuery(intent: Intent?) {
         logcat(INFO) { "launchNewSearchOrQuery: $intent" }
 
@@ -796,6 +810,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun processIntent(intent: Intent) {
+        try {
+            processLaunchIntent(intent)
+        } finally {
+            duckAiEntryCallback.value.onLaunchIntentHandled()
+        }
+    }
+
+    private fun processLaunchIntent(intent: Intent) {
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
             logcat(INFO) { "launch from default browser" }
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
@@ -1645,6 +1667,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             val tabId = tabPagerAdapter.getTabIdAtPosition(newPosition)
             if (tabId != null) {
+                val tab = tabManager.getTabById(tabId)
+                duckAiEntryCallback.value.onTabSwiped(tabId, tab?.url)
                 tabManager.switchToTab(tabId)
             }
         }

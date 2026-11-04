@@ -69,6 +69,7 @@ class EventHubDeduplicationSpecTest {
             coroutineTestRule.testScope,
             UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler),
             eventHubFeature,
+            metricsHandler = mock(),
         )
         timeProvider.time = PERIOD_START
         manager.onAppForegrounded()

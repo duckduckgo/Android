@@ -17,11 +17,8 @@
 package com.duckduckgo.macrobenchmark
 
 import android.util.Base64
-import androidx.test.platform.app.InstrumentationRegistry
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.RecordedRequest
 import okio.Buffer
-import org.json.JSONObject
 
 private const val CSS_COUNT = 20
 private const val JS_COUNT = 20
@@ -59,18 +56,27 @@ private val IMAGE_TRACKER_NAMES = listOf(
     "outbrain-pixel", "quantserve-pixel", "chartbeat-pixel", "adroll-pixel",
 )
 
-// Pinned rather than derived from raw/tds so the scenario is reproducible across TDS updates
-// (verifyBlockingTrackerDomains below asserts each one is still default=block).
+/**
+ * Must not be on Chromium's HSTS preload list: an http subresource to a preloaded host is upgraded to https and arrives
+ * at the proxy as a CONNECT instead of a GET.
+ *
+ * Pinned rather than derived from raw/tds so the scenario is reproducible across TDS updates;
+ * pageload_benchmark.py fails the run if any of them is not blocked by the app's pinned TDS.
+ */
 private val PINNED_TRACKER_DOMAINS = listOf(
     "quantserve.com", "criteo.com", "criteo.net", "taboola.com", "hotjar.com",
-    "segment.io", "mixpanel.com", "amplitude.com", "newrelic.com", "nr-data.net",
+    "segment.io", "casalemedia.com", "amplitude.com", "krxd.net", "nr-data.net",
     "adroll.com", "yieldmo.com", "adsrvr.org", "rubiconproject.com", "pubmatic.com",
     "openx.net", "demdex.net", "bluekai.com", "rlcdn.com", "fullstory.com",
 )
 
 internal interface PageLoadFixture {
     val name: String
-    fun respond(request: RecordedRequest): MockResponse
+
+    /**
+     * Response to a first-party (loopback) request; tracker hosts are answered by the server, not the fixture.
+     */
+    fun respond(path: String): MockResponse
 }
 
 private fun ordinaryIndexPage(cpmMarker: Boolean = false): String = buildString {
@@ -97,7 +103,7 @@ internal object NoTrackersFixture : PageLoadFixture {
     override val name = "no-trackers"
     private val indexPage = ordinaryIndexPage()
 
-    override fun respond(request: RecordedRequest): MockResponse = ordinaryResponse(request.path(), indexPage)
+    override fun respond(path: String): MockResponse = ordinaryResponse(path, indexPage)
 }
 
 internal object FirstPartyTrackersFixture : PageLoadFixture {
@@ -112,7 +118,7 @@ internal object FirstPartyTrackersFixture : PageLoadFixture {
         append("</body></html>")
     }
 
-    override fun respond(request: RecordedRequest): MockResponse = when (val path = request.path()) {
+    override fun respond(path: String): MockResponse = when (path) {
         "/" -> htmlResponse(indexPage)
         else -> when {
             path.endsWith(".css") -> cssResponse()
@@ -127,7 +133,7 @@ internal object CpmFixture : PageLoadFixture {
     override val name = "cpm"
     private val indexPage = ordinaryIndexPage(cpmMarker = true)
 
-    override fun respond(request: RecordedRequest): MockResponse = ordinaryResponse(request.path(), indexPage)
+    override fun respond(path: String): MockResponse = ordinaryResponse(path, indexPage)
 }
 
 internal object ManyTrackersBlockedFixture : PageLoadFixture {
@@ -155,7 +161,7 @@ internal object ManyTrackersBlockedFixture : PageLoadFixture {
         }
     }
 
-    override fun respond(request: RecordedRequest): MockResponse = ordinaryResponse(request.path(), indexPage)
+    override fun respond(path: String): MockResponse = ordinaryResponse(path, indexPage)
 }
 
 internal object AllScenariosFixture : PageLoadFixture {
@@ -188,7 +194,7 @@ internal object AllScenariosFixture : PageLoadFixture {
         }
     }
 
-    override fun respond(request: RecordedRequest): MockResponse = when (val path = request.path()) {
+    override fun respond(path: String): MockResponse = when (path) {
         "/" -> htmlResponse(indexPage)
         else -> when {
             path.endsWith(".css") -> cssResponse()
@@ -199,11 +205,14 @@ internal object AllScenariosFixture : PageLoadFixture {
     }
 }
 
-private val trackerDomains: List<String> by lazy {
+/**
+ * Every host the fixtures treat as a tracker; the server answers for them and the benchmark checks against them.
+ */
+internal val trackerDomains: List<String> by lazy {
     check(PINNED_TRACKER_DOMAINS.size >= TRACKER_HOST_COUNT) {
         "Need at least $TRACKER_HOST_COUNT pinned tracker domains, found ${PINNED_TRACKER_DOMAINS.size}"
     }
-    verifyBlockingTrackerDomains(PINNED_TRACKER_DOMAINS)
+    PINNED_TRACKER_DOMAINS
 }
 
 private fun trackerDomainCursor(): () -> String {
@@ -211,27 +220,8 @@ private fun trackerDomainCursor(): () -> String {
     return { trackerDomains[index++ % trackerDomains.size] }
 }
 
-private fun verifyBlockingTrackerDomains(domains: List<String>): List<String> {
-    val packageManager = InstrumentationRegistry.getInstrumentation().context.packageManager
-    val resources = packageManager.getResourcesForApplication(TARGET_PACKAGE)
-    val resourceId = resources.getIdentifier("tds", "raw", TARGET_PACKAGE)
-    check(resourceId != 0) { "Could not find the target app's raw/tds resource" }
-    val json = resources.openRawResource(resourceId).bufferedReader().use { it.readText() }
-    val trackers = JSONObject(json).getJSONObject("trackers")
-    domains.forEach { domain ->
-        val entry = trackers.optJSONObject(domain)
-        checkNotNull(entry) { "Pinned tracker domain '$domain' is no longer present in raw/tds; update PINNED_TRACKER_DOMAINS" }
-        val rules = entry.optJSONArray("rules")
-        val isBlockDefault = entry.optString("default") == "block" && (rules == null || rules.length() == 0)
-        check(isBlockDefault) { "Pinned tracker domain '$domain' is no longer default=block in raw/tds; update PINNED_TRACKER_DOMAINS" }
-    }
-    return domains
-}
-
-private fun RecordedRequest.path(): String = requestUrl?.encodedPath.orEmpty()
-
 private fun htmlResponse(body: String) = MockResponse().setHeader("Content-Type", "text/html; charset=utf-8").setBody(body)
 private fun cssResponse() = MockResponse().setHeader("Content-Type", "text/css").setBody("body{margin:0}")
 private fun jsResponse() = MockResponse().setHeader("Content-Type", "application/javascript").setBody("void 0;")
-private fun pngResponse() = MockResponse().setHeader("Content-Type", "image/png").setBody(Buffer().write(ONE_PIXEL_PNG))
-private fun gifResponse() = MockResponse().setHeader("Content-Type", "image/gif").setBody(Buffer().write(ONE_PIXEL_GIF))
+internal fun pngResponse() = MockResponse().setHeader("Content-Type", "image/png").setBody(Buffer().write(ONE_PIXEL_PNG))
+internal fun gifResponse() = MockResponse().setHeader("Content-Type", "image/gif").setBody(Buffer().write(ONE_PIXEL_GIF))

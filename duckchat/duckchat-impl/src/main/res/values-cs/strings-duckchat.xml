@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Spustit Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Více informací</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Zeptej se Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Chceš mít soukromý AI chat hned po ruce?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Vyhledejte nebo zadejte adresu</string>

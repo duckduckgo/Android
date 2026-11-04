@@ -312,4 +312,16 @@
     <string name="importBookmarksErrorGenericMessage">Midagi läks valesti</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Veenduge, et olete internetiga ühendatud ja proovige uuesti.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import on lõpetatud!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Ole kannatlik – hoia see aken avatuna. See ei tohiks võtta rohkem kui minut või kaks.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google võib küsida sinu parooli.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google saadab sulle e-kirja, mis kinnitab, et sinu andmed on eksporditud. Sa ei pea midagi tegema.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import on lõpetatud!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Imporditud järjehoidjaid: <b>%1$d</b>]]></string>
+
 </resources>

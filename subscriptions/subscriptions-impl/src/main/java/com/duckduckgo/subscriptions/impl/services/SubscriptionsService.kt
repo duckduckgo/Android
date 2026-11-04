@@ -23,6 +23,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 @ContributesNonCachingServiceApi(AppScope::class)
 interface SubscriptionsService {
@@ -42,6 +43,20 @@ interface SubscriptionsService {
 
     @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
     suspend fun features(@Path("sku") sku: String): FeaturesResponse
+
+    @GET("https://subscriptions.duckduckgo.com/api/v2/products")
+    suspend fun tierProducts(
+        @Query("region") region: String,
+        @Query("platform") platform: String,
+    ): TierProductsResponse
+
+    @AuthRequired
+    @GET("https://subscriptions.duckduckgo.com/api/subscription/withdraw")
+    suspend fun withdrawalEligibility(): WithdrawalEligibilityResponse
+
+    @AuthRequired
+    @POST("https://subscriptions.duckduckgo.com/api/subscription/withdraw")
+    suspend fun withdraw(): WithdrawResponse
 }
 
 data class PortalResponse(val customerPortalUrl: String)
@@ -95,4 +110,36 @@ data class ConfirmationEntitlement(
 
 data class FeaturesResponse(
     val features: List<String>,
+)
+
+data class TierProductsResponse(
+    val products: List<TierProductResponse>,
+)
+
+data class TierProductResponse(
+    val productName: String,
+    val tier: String,
+    val regions: List<String>,
+    val entitlements: List<TierFeatureResponse>,
+    val billingCycles: List<BillingCycleResponse>,
+)
+
+data class BillingCycleResponse(
+    val productId: String,
+    val period: String,
+    val price: String,
+    val currency: String,
+)
+
+data class WithdrawalEligibilityResponse(
+    val eligible: Boolean,
+    val eligibleUntil: Long?,
+    val refundAmount: String?,
+    val refundCurrency: String?,
+    val reason: String?,
+)
+
+data class WithdrawResponse(
+    val refundedAmount: String?,
+    val currency: String?,
 )

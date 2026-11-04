@@ -27,6 +27,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.WidgetType
@@ -86,6 +87,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val ctaViewModel: CtaViewModel,
     private val promptsCoordinator: PromptsCoordinator,
     private val promptExposureReporter: PromptExposureReporter,
+    private val onboardingFlowChecker: OnboardingFlowChecker,
     browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -142,6 +144,7 @@ class NewTabPageViewModel @AssistedInject constructor(
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
     private var lastRemoteMessageReportedId: String? = null
+    private var onboardingCompleteWhenOpened: Boolean? = null
     private val _viewState = MutableStateFlow(
         ViewState(showDaxLogo = showDaxLogo, isFireMode = browserMode == BrowserMode.FIRE),
     )
@@ -167,7 +170,7 @@ class NewTabPageViewModel @AssistedInject constructor(
                     if (favorites.isNotEmpty()) {
                         syncEngine.triggerSync(FEATURE_READ)
                     }
-                    ViewStateSnapshot(favorites, activeMessage)
+                    ViewStateSnapshot(favorites, activeMessage.withoutNextStepsUntilNewPage())
                 }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
@@ -213,6 +216,13 @@ class NewTabPageViewModel @AssistedInject constructor(
                 it.copy(appTpEnabled = appTrackingProtection.isEnabled())
             }
         }
+    }
+
+    // Next Steps wait for a New Tab Page opened after onboarding, so they never appear on the page where onboarding just finished
+    private suspend fun RemoteMessage?.withoutNextStepsUntilNewPage(): RemoteMessage? {
+        val onboardingCompleteWhenOpened = onboardingCompleteWhenOpened
+            ?: onboardingFlowChecker.isOnboardingComplete().also { onboardingCompleteWhenOpened = it }
+        return takeUnless { it?.content is Content.ActionableItems && !onboardingCompleteWhenOpened }
     }
 
     private fun reportRemoteMessageCardExposure(message: RemoteMessage?, onboardingComplete: Boolean) {

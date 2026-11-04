@@ -101,6 +101,29 @@ class WideEventRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun cleanUpWideEvent(
+        eventId: Long,
+        decide: (WideEventRepository.WideEvent) -> WideEventRepository.CleanupDecision?,
+    ) {
+        database.withTransaction {
+            val event = wideEventDao.getWideEventById(eventId) ?: return@withTransaction
+            if (event.status != null) return@withTransaction
+
+            val decision = decide(event.mapToRepositoryWideEvent()) ?: return@withTransaction
+            val dbStatus = decision.status.mapToDbWideEventStatus()
+
+            val updatedEvent =
+                event.copy(
+                    status = dbStatus,
+                    metadata = mergeMetadata(event.metadata, decision.metadata),
+                    isFirstDailyOccurrence = recordDailyOccurrence(event.name, dbStatus),
+                )
+
+            val updateSuccessful = wideEventDao.updateWideEvent(updatedEvent) == 1
+            check(updateSuccessful) { "Failed to clean up wide event" }
+        }
+    }
+
     override suspend fun getActiveWideEventIds(): List<Long> = wideEventDao.getActiveWideEventIds()
 
     override suspend fun getCompletedWideEventIds(): List<Long> = wideEventDao.getCompletedWideEventIds()

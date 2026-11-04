@@ -94,7 +94,6 @@
     <string name="purchaseError">Wir haben Probleme mit der Verbindung. Bitte versuche es zu einem späteren Zeitpunkt erneut.</string>
 
     <!-- PIR Settings-->
-    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
@@ -102,12 +101,6 @@
     <!-- Change Plan -->
     <string name="changePlanTitle">Tarif aktualisieren oder kündigen</string>
     <string name="changePlanDescription">Dein Abonnement wurde über den Apple App Store erworben. Um deinen Tarif oder deine Rechnungseinstellungen zu ändern, gehe auf einem Gerät, auf dem du mit derselben Apple-Konto angemeldet bist, die du für den Kauf deines Abonnements verwendet hast, zu Einstellungen &gt; Apple-Konto &gt; Abonnements.</string>
-
-    <!-- PIR Activity-->
-    <string name="pirTitle">Aktiviere DuckDuckGo-Abo auf dem Desktop, um Personal Information Removal einzurichten</string>
-    <string name="pirDescription">Gehe im DuckDuckGo-Browser für Desktop-Computer zu <b>Einstellungen &gt; DuckDuckGo abonnieren</b> und klicke auf <b>Ich habe ein Abonnement</b>, um loszulegen.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
 
     <string name="downloadsDownloadFinishedActionName">Öffnen</string>
     <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
@@ -202,5 +195,18 @@
     <!-- Content Descriptions -->
     <string name="subscriptionExpiredStatusIconContentDescription">Abonnement abgelaufen</string>
     <string name="subscriptionActiveStatusIconContentDescription">Abonnement aktiv</string>
+
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Vertrag widerrufen</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Du kannst bis zum %1$s widerrufen und erhältst eine vollständige Rückerstattung</string>
+    <string name="subscriptionWithdrawDialogTitle">Möchtest du dein Abonnement kündigen?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Dein %1$s -Abonnement endet sofort und dir werden %2$s innerhalb von 14 Tagen auf deine ursprüngliche Zahlungsmethode zurückerstattet.VPN, Personal Information Removal und erweiterte Duck.ai-Modelle funktionieren nicht mehr, sobald du bestätigst.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Auszahlung bestätigen</string>
+    <string name="subscriptionWithdrawDialogKeep">Abonnement behalten</string>
+    <string name="subscriptionStatusNotSubscribed">Nicht abonniert</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Du hast am %1$s widerrufen.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Deine Rückerstattung in Höhe von %1$s wird bearbeitet.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Deine Rückerstattung wird bearbeitet.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Wir konnten deine Kündigung nicht automatisch bearbeiten. Bitte besuche <annotation type="withdrawal_help_link">diese Seite</annotation>, um deine Kündigung abzuschließen.</string>
 
 </resources>

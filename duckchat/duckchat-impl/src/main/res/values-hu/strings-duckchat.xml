@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Duck.ai megnyitása</string>
     <string name="duck_ai_paid_settings_learn_more_title">További részletek</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Duck.ai kérdezése</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Szeretnél könnyebben hozzáférni a privát AI-csevegéshez?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Keresés vagy cím megadása</string>

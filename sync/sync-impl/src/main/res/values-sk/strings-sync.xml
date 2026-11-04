@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Zrušiť</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Nastavenie Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Ak chceš nastaviť službu Sync &amp; Backup, odomkni zariadenie.</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Pristupuj k svojim heslám na mobile aj počítači.</string>
+    <string name="sync_passwords_import_promo_primary_button">Zapni Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Maj prístup k svojim záložkám na mobile aj v počítači.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Zapni Sync &amp; Backup</string>
 </resources>

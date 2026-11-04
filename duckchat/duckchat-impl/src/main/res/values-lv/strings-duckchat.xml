@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Atver Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Uzzināt vairāk</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Pajautā Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Vēlies vieglāk piekļūt privātai MI tērzēšanai?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Meklē vai ievadi adresi</string>

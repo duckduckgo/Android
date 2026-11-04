@@ -224,6 +224,7 @@ import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
+import com.duckduckgo.app.browser.progressbar.NavigationProgressState
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
@@ -383,6 +384,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
+import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
@@ -615,6 +617,7 @@ class BrowserTabViewModel @Inject constructor(
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
     private val customErrorPagesFeature: CustomErrorPagesFeature,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val duckAiEntryCallback: Lazy<DuckAiEntryCallback>,
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
 ) : ViewModel(),
     WebViewClientListener,
@@ -653,6 +656,7 @@ class BrowserTabViewModel @Inject constructor(
 
     // if navigating from home, want to know if a site was loaded previously to decide whether to reset WebView
     private var returnedHomeAfterSiteLoaded = false
+    private var onboardingCompletionPromoPending = false
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
 
@@ -800,10 +804,11 @@ class BrowserTabViewModel @Inject constructor(
     // Needed for PageLoadWideEvent: it identifies which page load the progress events belong to.
     private var pageLoadNavigationId: Long? = null
     private var hasExitedFixedProgress = false
-    private var hasCompletedPageLoad = false
+    private var navigationState = NavigationProgressState()
 
     private var allowlistRefreshTriggerJob: Job? = null
     private var refreshTriggerJob: Job? = null
+    private var challengeHoldCutoffJob: Job? = null
     private var brokenSiteReportTriggerJob: Job? = null
 
     /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
@@ -1348,7 +1353,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onViewStopped() {
+        onboardingCompletionPromoPending = false
+    }
+
     fun onViewHidden() {
+        onboardingCompletionPromoPending = false
         newTabPageModalPresenterRegistry.unregister(this)
         ctaViewState.value?.cta.let {
             if (it is BrokenSitePromptDialogCta) {
@@ -1482,6 +1492,7 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
+        onboardingCompletionPromoPending = false
         if (submissionSource == QuerySubmissionSource.USER) {
             notifySpecificSubmission(query, queryOrigin)
         }
@@ -1613,6 +1624,8 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 site?.nextUrl = urlToNavigate
+                // Submitted query/URL loads bypass WebView, open the gate here
+                onNavigationIntent(urlToNavigate)
                 command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
@@ -1669,6 +1682,9 @@ class BrowserTabViewModel @Inject constructor(
         if (isUrlSubmission) {
             browserInteractionsPlugins.getPlugins().forEach { it.onUrlSubmitted() }
         } else {
+            if (url?.let { duckChat.isDuckChatUrl(it.toUri()) } == true) {
+                duckAiEntryCallback.value.onSearchStarted(tabId)
+            }
             browserInteractionsPlugins.getPlugins().forEach { it.onSearchSubmitted() }
         }
     }
@@ -1739,9 +1755,11 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun willOverrideUrl(newUrl: String) {
         site?.nextUrl = newUrl
+        // Link tap: shouldOverrideUrlLoading fires here, well before pageStarted, open the gate now
+        navigationState = navigationState.onNavigationRequested(isStartProgressAtIntentEnabled())
         logcat { "SSLError: willOverride is $newUrl" }
         navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
-        val previousSiteStillLoading = currentLoadingViewState().isLoading
+        val previousSiteStillLoading = currentLoadingViewState().isLoading && !isAwaitingCommitAtIntent()
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()
         }
@@ -2058,6 +2076,7 @@ class BrowserTabViewModel @Inject constructor(
         pdfDownloadJob.cancel()
         suggestRedirectJob.cancel()
         badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
+        onNavigationAbandoned()
         site = null
         onSiteChanged()
         webNavigationState = null
@@ -2077,7 +2096,7 @@ class BrowserTabViewModel @Inject constructor(
                 queryOrFullUrl = "",
                 forceExpand = true,
             )
-        loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+        finishLoading()
 
         deleteTabPreview(tabId)
     }
@@ -2189,8 +2208,155 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onPageContentStart(url: String) {
-        hasCompletedPageLoad = false
+        onboardingCompletionPromoPending = false
+        navigationState = navigationState.onNavigationCommitted()
         showWebContent()
+    }
+
+    override fun onMainFrameNavigationDecided(loadsInThisTab: Boolean) {
+        if (!isStartProgressAtIntentEnabled()) return
+        if (loadsInThisTab) {
+            challengeHoldCutoffJob?.cancel()
+            forgetChallengePage()
+            onNavigationPendingCommit()
+        } else {
+            onNavigationAbandoned()
+        }
+    }
+
+    fun onMainFrameCommitted(statusCode: Int) {
+        if (!isHoldProgressOnChallengeEnabled()) return
+        navigationState = navigationState.onMainFrameCommitted(statusCode)
+    }
+
+    // Without the commit callback a stale flag would hold a normal page; the next commit's response decides again
+    private fun forgetChallengePage() {
+        navigationState = navigationState.forgetChallengePage()
+    }
+
+    private fun isHoldProgressOnChallengeEnabled() =
+        isStartProgressAtIntentEnabled() && progressBarUpgradeFeature.holdProgressOnChallengePage().isEnabled()
+
+    // A held bar has no page left to complete it, so every path that ends the held page's story must come through here
+    private fun releaseHeldBar() {
+        challengeHoldCutoffJob?.cancel()
+        val wasHeld = navigationState.isHeld
+        navigationState = navigationState.releaseHold()
+        if (wasHeld && currentLoadingViewState().isLoading) finishLoading(finalProgress = 100)
+    }
+
+    private fun scheduleChallengeHoldCutoff() {
+        challengeHoldCutoffJob?.cancel()
+        challengeHoldCutoffJob = viewModelScope.launch {
+            delay(CHALLENGE_HOLD_CUTOFF_MS)
+            releaseHeldBar()
+        }
+    }
+
+    // Released here, not in pageStarted: it is posted and can land after the next navigation became pending.
+    override fun onMainFrameNavigationCommitted() {
+        navigationState = navigationState.releasePendingNavigation()
+    }
+
+    override fun onNavigationFinishedWithoutCommit() {
+        if (navigationState.isHttpsUpgradeInFlight) return
+        onNavigationAbandoned()
+    }
+
+    private fun isStartProgressAtIntentEnabled() =
+        progressBarUpgradeFeature.behaviourUpdate().isEnabled() && progressBarUpgradeFeature.startProgressAtIntent().isEnabled()
+
+    // Pending state is only meaningful with the flag on, so every read goes through here
+    private fun isAwaitingCommitAtIntent() = navigationState.isAwaitingCommitAtIntent(isStartProgressAtIntentEnabled())
+
+    // User tapped a link or submitted a URL that will load in this tab
+    private fun onNavigationIntent(url: String) {
+        if (!isStartProgressAtIntentEnabled()) return
+        if (!isSameDocumentNavigation(url)) {
+            challengeHoldCutoffJob?.cancel()
+            forgetChallengePage()
+            navigationState = navigationState.releaseHold()
+            navigationState = navigationState.onNavigationRequested(isStartProgressAtIntentEnabled())
+            onNavigationPendingCommit()
+        }
+    }
+
+    // The navigation is confirmed to load in this tab: show the bar until it commits
+    private fun onNavigationPendingCommit() {
+        val startAtIntent = isStartProgressAtIntentEnabled()
+        navigationState = navigationState.onNavigationPendingCommit(startAtIntent)
+        if (!startAtIntent) return
+        currentLoadingViewState().onIntentStart()?.let { loadingViewState.value = it }
+    }
+
+    // The navigation won't commit in this tab (external app, download, SSL warning, timeout, home), so end the bar we started
+    private fun onNavigationAbandoned() {
+        releaseHeldBar()
+        val awaitingCommit = isAwaitingCommitAtIntent()
+        navigationState = navigationState.onNavigationAbandoned()
+        if (!awaitingCommit) return
+        val loading = currentLoadingViewState()
+        val ended = loading.onNavigationAbandoned()
+        when {
+            ended != null -> loadingViewState.value = ended
+            // The outgoing page finished while its progress was held back, so nothing else will end its bar
+            loading.isLoading && navigationState.hasCompletedPageLoad -> finishLoading(finalProgress = 100)
+        }
+    }
+
+    private fun startLoading(
+        initialProgress: Int,
+        url: String = currentLoadingViewState().url,
+        trackersAnimationEnabled: Boolean = currentLoadingViewState().trackersAnimationEnabled,
+    ) {
+        loadingViewState.value = currentLoadingViewState().copy(
+            isLoading = true,
+            progress = initialProgress,
+            url = url,
+            trackersAnimationEnabled = trackersAnimationEnabled,
+        )
+    }
+
+    // Leaves progress untouched unless finalProgress is given
+    private fun finishLoading(
+        finalProgress: Int = currentLoadingViewState().progress,
+        url: String = currentLoadingViewState().url,
+        trackersAnimationEnabled: Boolean = currentLoadingViewState().trackersAnimationEnabled,
+    ) {
+        loadingViewState.value = currentLoadingViewState().copy(
+            isLoading = false,
+            progress = finalProgress,
+            url = url,
+            trackersAnimationEnabled = trackersAnimationEnabled,
+        )
+    }
+
+    private fun resetLoading() {
+        loadingViewState.value = LoadingViewState()
+    }
+
+    private fun updateLoadingProgress(
+        isLoading: Boolean,
+        progress: Int,
+    ) {
+        // Before the commit these events belong to the outgoing page, so they must not move or complete the bar started at intent
+        if (isAwaitingCommitAtIntent()) return
+        loadingViewState.value = currentLoadingViewState().copy(isLoading = isLoading, progress = progress, url = site?.url ?: "")
+    }
+
+    // Stale progress=100 from the previous page would trigger tracker animations before the new page's progress events arrive
+    private fun resetCompletedProgress() {
+        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && currentLoadingViewState().progress == 100) {
+            loadingViewState.value = currentLoadingViewState().copy(progress = 0)
+        }
+    }
+
+    // A fragment-only change is same-document: no commit follows, so a bar started for it would never end
+    private fun isSameDocumentNavigation(target: String): Boolean {
+        val current = url ?: return false
+        // The converter can return a scheme-less URL, which the WebView loads as http
+        val absoluteTarget = if (target.contains("://")) target else "http://$target"
+        return absoluteTarget.contains('#') && absoluteTarget.substringBefore('#') == current.substringBefore('#')
     }
 
     private fun showBlankContentfNewContentDelayed() {
@@ -2362,7 +2528,7 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
-        hasCompletedPageLoad = false
+        navigationState = navigationState.onPageChanged()
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -2609,6 +2775,7 @@ class BrowserTabViewModel @Inject constructor(
             (state.browserError == OMITTED || state.browserError == LOADING)
         if (!canShowError) return
 
+        onNavigationAbandoned()
         errorPagePendingDismissal = false
         browserViewState.value = state.copy(
             browserError = TIMEOUT,
@@ -2648,16 +2815,31 @@ class BrowserTabViewModel @Inject constructor(
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
-        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && hasCompletedPageLoad) return
+        if (navigationState.ignoresProgress(progressBarUpgradeFeature.behaviourUpdate().isEnabled())) return
 
-        val isLoading = newProgress < 100 || isProcessingTrackingLink
+        var isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
 
-        val reportedProgress = if (progressBarUpgradeFeature.behaviourUpdate().isEnabled()) {
+        var reportedProgress = if (progressBarUpgradeFeature.behaviourUpdate().isEnabled()) {
             newProgress
         } else {
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) FIXED_PROGRESS else newProgress
+        }
+
+        if (isHoldProgressOnChallengeEnabled()) {
+            // Never emit below the held value: the bar view restarts when progress goes backwards
+            if (navigationState.swallows(newProgress)) return
+            if (navigationState.isChallengePage) {
+                reportedProgress = minOf(reportedProgress, HELD_PROGRESS)
+                if (newProgress == 100) {
+                    isLoading = true
+                    navigationState = navigationState.hold()
+                    scheduleChallengeHoldCutoff()
+                }
+            } else if (navigationState.isHeld) {
+                navigationState = navigationState.releaseHold()
+            }
         }
 
         // Track the first time we escape from max progress threshold for Wide Events
@@ -2667,10 +2849,10 @@ class BrowserTabViewModel @Inject constructor(
             pageLoadNavigationId?.let { pageLoadWideEvent.onProgressChanged(tabId, it) }
         }
 
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = reportedProgress, url = site?.url ?: "")
+        updateLoadingProgress(isLoading, reportedProgress)
 
         if (newProgress == 100) {
-            hasCompletedPageLoad = true
+            navigationState = navigationState.onPageLoadCompleted()
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
@@ -2689,6 +2871,7 @@ class BrowserTabViewModel @Inject constructor(
             OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
             BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR, TIMEOUT -> Unit
         }
+        if (navigationState.isHeld) scheduleChallengeHoldCutoff()
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
@@ -2767,14 +2950,8 @@ class BrowserTabViewModel @Inject constructor(
                 maliciousSiteBlocked = false,
             )
         navigationStateChanged(webViewNavigationState)
-        hasCompletedPageLoad = false
-
-        // Reset progress so stale progress=100 from the previous page doesn't
-        // trigger tracker animations before the new page's progress events arrive
-        val progress = currentLoadingViewState()
-        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && progress.progress == 100) {
-            loadingViewState.value = progress.copy(progress = 0)
-        }
+        navigationState = navigationState.onNavigationCommitted()
+        resetCompletedProgress()
 
         command.value = Command.PageStarted
     }
@@ -2833,6 +3010,7 @@ class BrowserTabViewModel @Inject constructor(
     // This is called when interceptor upgrades to https
     override fun upgradedToHttps() {
         httpsUpgraded = true
+        navigationState = navigationState.onHttpsUpgraded(isStartProgressAtIntentEnabled())
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -2903,16 +3081,14 @@ class BrowserTabViewModel @Inject constructor(
                 pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
                 command.value = BypassMaliciousSiteWarning(siteUrl, feed)
                 val documentUrlString = siteUrl.toString()
-                loadingViewState.value =
-                    currentLoadingViewState().copy(
-                        isLoading = true,
-                        trackersAnimationEnabled = true,
-                        /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
-                         * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
-                         * showing in case the URL was blocked locally and therefore never started to show*/
-                        progress = 20,
-                        url = documentUrlString,
-                    )
+                startLoading(
+                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                     * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                     * showing in case the URL was blocked locally and therefore never started to show*/
+                    initialProgress = 20,
+                    url = documentUrlString,
+                    trackersAnimationEnabled = true,
+                )
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
                         omnibarText = if (isFullUrlEnabled.value) {
@@ -2977,6 +3153,7 @@ class BrowserTabViewModel @Inject constructor(
                 handler.cancel()
             } else {
                 badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
+                onNavigationAbandoned()
                 browserViewState.value =
                     currentBrowserViewState().copy(
                         browserShowing = false,
@@ -3631,7 +3808,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun initializeDefaultViewStates() {
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState()
-        loadingViewState.value = LoadingViewState()
+        resetLoading()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
@@ -4279,7 +4456,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun invalidateBrowsingActions() {
         globalLayoutState.value = Invalidated
-        loadingViewState.value = LoadingViewState()
+        resetLoading()
         findInPageViewState.value = FindInPageViewState()
     }
 
@@ -4323,6 +4500,7 @@ class BrowserTabViewModel @Inject constructor(
         requestUserConfirmation: Boolean,
         isBlobDownloadWebViewFeatureEnabled: Boolean,
     ) {
+        onNavigationAbandoned()
         if (url.startsWith("blob:")) {
             if (isBlobDownloadWebViewFeatureEnabled) {
                 postMessageToConvertBlobToDataUri(webView, url)
@@ -4349,12 +4527,12 @@ class BrowserTabViewModel @Inject constructor(
         forceRefresh: Boolean = false,
     ) {
         if (!forceRefresh) command.value = Command.ExpandOmnibar
-        loadingViewState.value = currentLoadingViewState().copy(isLoading = true, progress = FIXED_PROGRESS)
+        startLoading(initialProgress = FIXED_PROGRESS)
         pdfDownloadJob += viewModelScope.launch {
             // downloadToCache wraps its own work in withContext(io); viewModelScope.launch
             // defaults to Main, so we stay on Main for the LiveData updates below.
             val result = inlinePdfHandler.downloadToCache(url, forceRefresh = forceRefresh, browserMode = browserMode)
-            loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
+            finishLoading(finalProgress = 100)
             when (result) {
                 is PdfDownloadResult.Success -> {
                     val pdfTitle = inlinePdfHandler.extractFileName(url)
@@ -4736,6 +4914,9 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         errorCode: String,
     ) {
+        // An error page replaces the load: reopen the gate and end the pending navigation
+        releaseHeldBar()
+        navigationState = navigationState.onErrorReceived(isStartProgressAtIntentEnabled())
         if (errorType != OMITTED) {
             errorPagePendingDismissal = false
             browserViewState.value =
@@ -4808,13 +4989,7 @@ class BrowserTabViewModel @Inject constructor(
             logcat { "Received MaliciousSiteWarning for $url, feed: $feed, exempted: false, clientSideHit: $clientSideHit" }
 
             viewModelScope.launch(dispatchers.main()) {
-                loadingViewState.value =
-                    currentLoadingViewState().copy(
-                        isLoading = false,
-                        progress = 100,
-                        url = siteUrlString,
-                        trackersAnimationEnabled = false,
-                    )
+                finishLoading(finalProgress = 100, url = siteUrlString, trackersAnimationEnabled = false)
 
                 browserViewState.value =
                     browserStateModifier.copyForMaliciousSiteWarningShowing(currentBrowserViewState(), maliciousSiteStatus)
@@ -5186,6 +5361,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             DUCK_CHAT_FEATURE_NAME -> {
+                val pageUrl = url
                 viewModelScope.launch(dispatchers.io()) {
                     val response = duckChatJSHelper.processJsCallbackMessage(
                         featureName,
@@ -5194,6 +5370,7 @@ class BrowserTabViewModel @Inject constructor(
                         data,
                         tabId = tabId,
                         browserMode = browserMode,
+                        pageUrl = pageUrl,
                     )
                     withContext(dispatchers.main()) {
                         response?.let {
@@ -5456,7 +5633,7 @@ class BrowserTabViewModel @Inject constructor(
                     queryOrFullUrl = "",
                     forceExpand = true,
                 )
-            loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+            finishLoading()
             browserViewState.value =
                 currentBrowserViewState().copy(
                     showPrivacyShield = HighlightableButton.Visible(enabled = false),
@@ -5564,6 +5741,8 @@ class BrowserTabViewModel @Inject constructor(
             }
             is DaxEndBubbleCta -> {
                 if (cta.segmentedPathWithAiInput == DownloadReasonSelection.SEARCH) {
+                    onboardingCompletionPromoPending = !currentBrowserViewState().browserShowing &&
+                        url.isNullOrBlank() && omnibarTextStateFlow.value.isBlank()
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)
@@ -5757,6 +5936,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun resolveDuckAiEntryPoint(entryPoint: DuckChatEntryPoint): DuckChatEntryPoint =
+        if (onboardingCompletionPromoPending && entryPoint == DuckChatEntryPoint.ADDRESS_BAR_PROMPT &&
+            !currentBrowserViewState().browserShowing && url.isNullOrBlank()
+        ) {
+            DuckChatEntryPoint.ONBOARDING_COMPLETION_PROMO
+        } else {
+            entryPoint
+        }
+
     /**
      * Entry point for "open Duck.ai with a query" from the unified input — the Search/Duck.ai
      * toggle when Duck.ai is selected, and the "Ask Duck.ai" autocomplete row when Search is
@@ -5767,17 +5955,20 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         autoPrompt: Boolean,
         entryPoint: DuckChatEntryPoint,
+        voice: Boolean = false,
     ) {
         val duckAiUrl = duckChat.getDuckChatUrl(query, autoPrompt)
         val hasPrompt = hasAutoSubmittedPrompt(duckAiUrl)
+        val resolvedEntryPoint = if (hasPrompt) resolveDuckAiEntryPoint(entryPoint) else entryPoint
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
         if (hasPrompt) {
-            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = entryPoint.name.lowercase()) }
+            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = resolvedEntryPoint.name.lowercase()) }
         }
         navigateToDuckAi(
             url = duckAiUrl,
-            entryPoint = entryPoint,
+            entryPoint = resolvedEntryPoint,
             hasPrompt = hasPrompt,
+            voice = voice,
         )
     }
 
@@ -5811,9 +6002,10 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         entryPoint: DuckChatEntryPoint,
         hasPrompt: Boolean,
+        voice: Boolean = false,
     ) {
         val opensNewTab = currentBrowserViewState().browserShowing
-        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = opensNewTab, hasPrompt = hasPrompt)
+        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = opensNewTab, hasPrompt = hasPrompt, voice = voice)
         if (!opensNewTab) {
             submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
         } else {
@@ -5821,16 +6013,20 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun openNewVoiceChat(viewMode: ViewMode) {
+        duckChat.openVoiceDuckChat(browsingMenuDuckChatEntryPoint(viewMode))
+    }
+
     fun openNewVoiceChatFromChatMenu() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY, type = Daily())
-        duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+        duckChat.openVoiceDuckChat(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
     }
 
     fun openNewImageDuckChatFromChatMenu() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_DAILY, type = Daily())
-        duckChat.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        duckChat.openDuckChatImageGeneration(DuckChatEntryPoint.DUCK_AI_NEW_CHAT)
     }
 
     fun onNewTabFromChatMenuSelected() {
@@ -5853,13 +6049,15 @@ class BrowserTabViewModel @Inject constructor(
 
     /** New Chat from the browsing menu, which is reachable from any view mode. */
     fun openNewDuckChat(viewMode: ViewMode) {
-        val entryPoint = when (viewMode) {
-            ViewMode.NewTab -> DuckChatEntryPoint.BROWSING_MENU_NTP
-            ViewMode.DuckAI -> DuckChatEntryPoint.BROWSING_MENU_DUCKAI
-            else -> DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
-        }
+        val entryPoint = browsingMenuDuckChatEntryPoint(viewMode)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         openNewDuckChatTab(entryPoint, fromDuckAiChat = viewMode == ViewMode.DuckAI)
+    }
+
+    private fun browsingMenuDuckChatEntryPoint(viewMode: ViewMode): DuckChatEntryPoint = when (viewMode) {
+        ViewMode.NewTab -> DuckChatEntryPoint.BROWSING_MENU_NTP
+        ViewMode.DuckAI -> DuckChatEntryPoint.BROWSING_MENU_DUCKAI
+        else -> DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
     }
 
     private fun openNewDuckChatTab(
@@ -6000,6 +6198,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onTabSwipedAway() {
+        onboardingCompletionPromoPending = false
         command.value = GenerateWebViewPreviewImage
     }
 
@@ -6085,6 +6284,11 @@ class BrowserTabViewModel @Inject constructor(
     companion object {
         private const val FIXED_PROGRESS = 50
         private const val UPGRADED_PROGRESS_THRESHOLD = 95
+        private const val HELD_PROGRESS = NavigationProgressState.HELD_PROGRESS
+
+        // Safety release for a held challenge page that never navigates again, which nothing else would end.
+        // Normal pages are never delayed.
+        private const val CHALLENGE_HOLD_CUTOFF_MS = 3000L
 
         private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
 

@@ -94,7 +94,6 @@
     <string name="purchaseError">Αντιμετωπίζουμε κάποιο πρόβλημα σύνδεσης. Ξαναδοκιμάστε αργότερα.</string>
 
     <!-- PIR Settings-->
-    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
@@ -102,12 +101,6 @@
     <!-- Change Plan -->
     <string name="changePlanTitle">Ενημέρωση προγράμματος ή ακύρωση</string>
     <string name="changePlanDescription">Η συνδρομή σας αγοράστηκε μέσω του Apple Play Store. Για να αλλάξετε το πρόγραμμα ή τις ρυθμίσεις χρέωσης, μεταβείτε στις επιλογές Ρυθμίσεις &gt; Λογαριασμός Apple &gt; Συνδρομές, σε μια συσκευή που έχει συνδεθεί με τον ίδιο Λογαριασμό Apple που χρησιμοποιήθηκε για την αγορά της συνδρομής σας.</string>
-
-    <!-- PIR Activity-->
-    <string name="pirTitle">Ενεργοποιήστε τη συνδρομή DuckDuckGo στον υπολογιστή για να ρυθμίσετε το Personal Information Removal</string>
-    <string name="pirDescription">Στο πρόγραμμα περιήγησης DuckDuckGo για υπολογιστές, μεταβείτε στις επιλογές <b>Ρυθμίσεις &gt; Εγγραφή στο DuckDuckGo</b> και κάντε κλικ στην επιλογή <b>Έχω συνδρομή</b> για να ξεκινήσετε.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
 
     <string name="downloadsDownloadFinishedActionName">Άνοιγμα</string>
     <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
@@ -202,5 +195,18 @@
     <!-- Content Descriptions -->
     <string name="subscriptionExpiredStatusIconContentDescription">Η συνδρομή έληξε</string>
     <string name="subscriptionActiveStatusIconContentDescription">Ενεργή συνδρομή</string>
+
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Υπαναχώρηση από τη σύμβαση</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Μπορείτε να υπαναχωρήσετε και να λάβετε πλήρη επιστροφή χρημάτων μέχρι %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Θέλετε να υπαναχωρήσετε από τη συνδρομή σας;</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Η συνδρομή σας στο %1$s θα λήξει αμέσως και θα σας επιστραφούν τα χρήματα %2$s στην αρχική μέθοδο πληρωμής σας εντός 14 ημερών.\n\nΤο VPN, η λειτουργία Personal Information Removal και τα προηγμένα μοντέλα του Duck.ai θα σταματήσουν να λειτουργούν μόλις επιβεβαιώσετε.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Επιβεβαίωση υπαναχώρησης</string>
+    <string name="subscriptionWithdrawDialogKeep">Διατήρηση συνδρομής</string>
+    <string name="subscriptionStatusNotSubscribed">Δεν έχει γίνει εγγραφή</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Υπαναχωρήσατε %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Η επιστροφή χρημάτων σας ύψους %1$s διεκπεραιώνεται.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Η επιστροφή χρημάτων σας διεκπεραιώνεται.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Δεν μπορέσαμε να επεξεργαστούμε αυτόματα την υπαναχώρησή σας. Επισκεφθείτε <annotation type="withdrawal_help_link">αυτήν τη σελίδα</annotation> για να ολοκληρώσετε την υπαναχώρησή σας.</string>
 
 </resources>

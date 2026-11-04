@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -51,6 +52,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val selectionPayloadBuilder: TextSelectionPayloadBuilder,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
     private val inputOutcomeTracker: InputOutcomeTracker,
+    private val entryWideEvent: DuckAiEntryWideEvent,
 ) : ViewModel() {
 
     data class ViewState(
@@ -125,8 +127,8 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         submit(prompt, carriesTermsConsent = false)
     }
 
-    fun onPromptSubmitted(prompt: NativeInputPrompt) {
-        submit(prompt)
+    fun onPromptSubmitted(prompt: NativeInputPrompt, voice: Boolean = false) {
+        submit(prompt, voice = voice)
     }
 
     private fun fireUnifiedInputPromptSubmitted() {
@@ -148,6 +150,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private fun submit(
         prompt: NativeInputPrompt,
         carriesTermsConsent: Boolean = true,
+        voice: Boolean = false,
     ) {
         val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
         selectionsJson?.length()?.takeIf { it > 0 }?.let {
@@ -161,6 +164,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
                 serializedPageContext = _viewState.value.attachedContext?.serialized,
                 selectionsJson = selectionsJson,
                 carriesTermsConsent = carriesTermsConsent,
+                voice = voice,
             ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()
@@ -191,5 +195,6 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun onDismiss() {
         duckChatPixels.reportContextualFloatingInputDismissedWithoutSubmission()
         selectionJourney.onSurfaceDismissed(tabId)
+        entryWideEvent.onContextualSheetClosed(tabId)
     }
 }

@@ -84,49 +84,41 @@ class RealContingencyMessageHandlerTest {
         dispatchers = coroutineRule.testDispatcherProvider,
     )
 
-    private fun setToggles(uxImprovements: Boolean, contingency: Boolean) {
-        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(remoteEnableState = uxImprovements))
+    private fun setToggles(contingency: Boolean) {
         feature.enableContingencyMode().setRawStoredState(Toggle.State(remoteEnableState = contingency))
     }
 
     @Test
     fun whenAllGatesOpenAndYouTubeAndNotShownThenShouldShow() {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
 
         assertTrue(handler.shouldShow("https://youtube.com/watch?v=abc"))
     }
 
     @Test
     fun whenYouTubeSubdomainThenShouldShow() {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
 
         assertTrue(handler.shouldShow("https://m.youtube.com/watch?v=abc"))
     }
 
     @Test
     fun whenYouTubeNoCookieThenShouldShow() {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
 
         assertTrue(handler.shouldShow("https://youtube-nocookie.com/watch?v=abc"))
     }
 
     @Test
-    fun whenUxImprovementsDisabledThenShouldNotShow() {
-        setToggles(uxImprovements = false, contingency = true)
-
-        assertFalse(handler.shouldShow("https://youtube.com/watch?v=abc"))
-    }
-
-    @Test
     fun whenContingencyModeDisabledThenShouldNotShow() {
-        setToggles(uxImprovements = true, contingency = false)
+        setToggles(contingency = false)
 
         assertFalse(handler.shouldShow("https://youtube.com/watch?v=abc"))
     }
 
     @Test
     fun whenUrlIsNotYouTubeThenShouldNotShow() {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         whenever(mockDomainMatcher.matches(any<String>())).thenReturn(false)
 
         assertFalse(handler.shouldShow("https://example.com/watch?v=abc"))
@@ -134,14 +126,14 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenUrlIsNullThenShouldNotShow() {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
 
         assertFalse(handler.shouldShow(null))
     }
 
     @Test
     fun whenAlreadyShownThenShouldNotShow() {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         shownFlow.value = true
 
         assertFalse(handler.shouldShow("https://youtube.com/watch?v=abc"))
@@ -167,7 +159,7 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenPageLoadedRepeatedlyBeforeStoreWriteReflectsThenShowsOnlyOnce() = runTest {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         // Model DataStore write latency: setShown() never flips the observable value during the
         // test, so only the in-memory guard can prevent a repeat show.
         val handler = handlerWith(laggingStore())
@@ -182,7 +174,7 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenContingencyDisabledThenReenabledThenShowsAgain() = runTest {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         val handler = handlerWith(laggingStore())
         val webView = foregroundWebView()
 
@@ -195,7 +187,7 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenWebViewNotShownThenDoesNotShow() = runTest {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         val handler = handlerWith(laggingStore())
 
         handler.onPageLoaded(backgroundWebView(), YOUTUBE_URL)
@@ -205,7 +197,7 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenBackgroundLoadThenOneOffNotConsumedAndForegroundStillShows() = runTest {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         val store = laggingStore()
         val handler = handlerWith(store)
 
@@ -217,7 +209,7 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenViewDoesNotPresentThenOneOffNotConsumedAndNextLoadRetries() = runTest {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         val handler = handlerWith(laggingStore())
         val webView = foregroundWebView()
         view.presents = false
@@ -232,7 +224,7 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenPendingShowCancelledBeforeFocusThenNotShownAndOneOffNotConsumed() = runTest {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         val handler = handlerWith(laggingStore())
         view.deferralScope = this
         val webView = foregroundWebView()
@@ -247,13 +239,13 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenGatesCloseWhileDeferredThenNotShownAndOneOffNotConsumed() = runTest {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         val handler = handlerWith(laggingStore())
         view.deferralScope = this
         val webView = foregroundWebView()
 
         handler.onPageLoaded(webView, YOUTUBE_URL)
-        setToggles(uxImprovements = true, contingency = false)
+        setToggles(contingency = false)
         view.gate.complete(Unit)
         advanceUntilIdle()
 
@@ -262,7 +254,7 @@ class RealContingencyMessageHandlerTest {
 
     @Test
     fun whenPageLoadedRepeatedlyWhileDeferredThenLaunchesAndShowsOnce() = runTest {
-        setToggles(uxImprovements = true, contingency = true)
+        setToggles(contingency = true)
         val handler = handlerWith(laggingStore())
         view.deferralScope = this
         val webView = foregroundWebView()

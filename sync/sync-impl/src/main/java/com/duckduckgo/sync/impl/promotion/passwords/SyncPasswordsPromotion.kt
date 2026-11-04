@@ -56,13 +56,14 @@ import javax.inject.Inject
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
 class SyncPasswordsPromotion @Inject constructor(
     private val syncPromotions: SyncPromotions,
+    private val setUpPromotion: SyncPasswordsSetUpPromotion,
 ) : PasswordsScreenPromotionPlugin {
 
     override suspend fun getView(context: Context, numberSavedPasswords: Int): View? {
-        return if (syncPromotions.canShowPasswordsPromotion(numberSavedPasswords)) {
-            SyncPasswordsPromotionView(context)
-        } else {
-            null
+        return when {
+            setUpPromotion.canShowPromotion(numberSavedPasswords) -> SyncPasswordsSetUpPromotionView(context)
+            syncPromotions.canShowPasswordsPromotion(numberSavedPasswords) -> SyncPasswordsPromotionView(context)
+            else -> null
         }
     }
 }
@@ -122,7 +123,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswords.value))
+            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswords))
             context.startActivity(intent)
         }
     }

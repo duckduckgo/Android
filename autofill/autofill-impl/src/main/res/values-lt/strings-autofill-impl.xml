@@ -324,4 +324,16 @@
     <string name="importBookmarksErrorGenericMessage">Įvyko klaida</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Įsitikinkite, kad esate prisijungę prie interneto, ir bandykite dar kartą.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Baigta importuoti!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Luktelėk — neuždaryk šio lango. Tai neturėtų užtrukti ilgiau nei minutę ar dvi.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">„Google“ gali paprašyti tavo slaptažodžio.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">„Google“ atsiųs tau el. laišką, patvirtinantį, kad tavo duomenys eksportuoti. Tau nereikia nieko daryti.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Baigta importuoti!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importuota žymelių: <b>%1$d</b>]]></string>
+
 </resources>

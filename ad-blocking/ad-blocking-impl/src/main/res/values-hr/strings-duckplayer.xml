@@ -35,6 +35,6 @@
     <string name="duck_player_info_modal_button">Shvaćam!</string>
     <string name="duck_player_unavailable">Duck Player je nedostupan</string>
     <string name="duck_player_unavailable_learn_more">Saznajte više</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Otvaraj YouTube videozapise u Duck Playeru</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Otvori Duck Player u novoj kartici</string>
+    <string name="duck_player_open_videos_setting">Otvaraj YouTube videozapise u Duck Playeru</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Otvori Duck Player u novoj kartici</string>
 </resources>

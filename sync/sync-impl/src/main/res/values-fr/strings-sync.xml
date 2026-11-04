@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Annuler</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Configurer Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Déverrouiller l\'appareil pour configurer Sync &amp; Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Accède à tes mots de passe sur mobile et ordinateur.</string>
+    <string name="sync_passwords_import_promo_primary_button">Activer Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Accède à tes signets sur mobile et ordinateur.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Activer Sync &amp; Backup</string>
 </resources>

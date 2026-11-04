@@ -29,7 +29,6 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -53,7 +52,6 @@ import javax.inject.Inject
  * [WideEventClient.flowFinish].
  */
 @SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class, binding = binding<DuckAiSessionCallback>())
 @ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 class RealDuckAiSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,

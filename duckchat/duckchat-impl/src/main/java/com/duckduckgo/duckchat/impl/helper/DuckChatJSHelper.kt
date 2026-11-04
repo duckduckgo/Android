@@ -16,8 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
@@ -59,6 +61,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.selectChatSuggestions
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -87,6 +91,7 @@ interface DuckChatJSHelper {
         pageContext: String = "",
         tabId: String = "",
         browserMode: BrowserMode = BrowserMode.REGULAR,
+        pageUrl: String? = null,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -143,11 +148,15 @@ class RealDuckChatJSHelper @Inject constructor(
     private val editPromptSessionStore: EditPromptSessionStore,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val entryWideEvent: Lazy<DuckAiEntryWideEvent>,
     @RegularMode private val regularChatStore: DuckAiChatStore,
     @FireMode private val fireChatStore: DuckAiChatStore,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
     private val termsConsent: DuckAiTermsConsent,
     private val chatStateStore: ChatStateStore,
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val tabSessions: DuckAiTabSessionRepository,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -162,6 +171,7 @@ class RealDuckChatJSHelper @Inject constructor(
         pageContext: String,
         tabId: String,
         browserMode: BrowserMode,
+        pageUrl: String?,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -196,7 +206,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
                 id?.let {
-                    getAIChatNativePrompt(featureName, method, it, browserMode)
+                    getAIChatNativePrompt(featureName, method, it, mode, tabId, browserMode)
                 }
 
             METHOD_OPEN_AI_CHAT -> {
@@ -204,6 +214,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 dataStore.updateUserPreferences(payload)
                 val entryPoint = when {
                     mode == Mode.CONTEXTUAL -> DuckChatEntryPoint.CONTEXTUAL_CHAT
+                    pageUrl?.let(duckDuckGoUrlDetector::isDuckDuckGoQueryUrl) == true -> DuckChatEntryPoint.SERP
                     else -> DuckChatEntryPoint.DIRECT_URL
                 }
                 duckChat.openNewDuckChatSession(entryPoint)
@@ -228,6 +239,9 @@ class RealDuckChatJSHelper @Inject constructor(
                     ChatState
                         .fromValue(data?.optString("status"))
                         ?.let { status -> chatStateStore.update(tabId, status) }
+                }
+                if (mode == Mode.FULL && tabId.isNotEmpty()) {
+                    responseWaitWideEvent.onResponseState(tabId, data?.optString("status").orEmpty())
                 }
                 data?.optJSONObject("attachments")?.let { attachments ->
                     val usage = AIChatAttachmentUsage(
@@ -291,11 +305,19 @@ class RealDuckChatJSHelper @Inject constructor(
                 val source = data?.optString("source")?.takeIf { it.isNotBlank() }
 
                 reportMetric?.let {
-                    duckChatPixels.sendReportMetricPixel(it, modelTier, source)
-                    if (it == USER_DID_SUBMIT_PROMPT || it == USER_DID_SUBMIT_FIRST_PROMPT) {
-                        browserInteractionsPlugins.getPlugins().forEach { plugin -> plugin.onAiPromptSubmitted() }
+                    val isPrompt = it == USER_DID_SUBMIT_PROMPT || it == USER_DID_SUBMIT_FIRST_PROMPT
+                    val entrySource = if (isPrompt) {
+                        if (mode == Mode.CONTEXTUAL) "contextual_chat" else tabSessions.getEntryPointSource(tabId)
+                    } else {
+                        source
+                    }
+                    duckChatPixels.sendReportMetricPixel(it, modelTier, entrySource)
+                    if (isPrompt) {
+                        browserInteractionsPlugins.getPlugins().forEach { plugin -> plugin.onAiPromptSubmitted(entrySource) }
                         if (mode == Mode.FULL && tabId.isNotEmpty()) {
                             duckAiSessionCallback.onPromptSubmitted(tabId)
+                        } else if (mode == Mode.CONTEXTUAL && tabId.isNotEmpty()) {
+                            entryWideEvent.value.onPromptSubmitted(tabId)
                         }
                     }
                     if (it == ReportMetric.USER_DID_CREATE_NEW_CHAT && mode == Mode.FULL && tabId.isNotEmpty()) {
@@ -516,6 +538,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
                 put(SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS, supportsHomePageChatSuggestions)
                 put(SUPPORTS_BONUS_OFFER, duckChatFeature.duckAiPromoCampaigns().isEnabled())
+                put(SUPPORTS_PROMO_CARDS, duckChatFeature.duckAiPromoCards().isEnabled())
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
@@ -594,9 +617,14 @@ class RealDuckChatJSHelper @Inject constructor(
         featureName: String,
         method: String,
         id: String,
+        mode: Mode,
+        tabId: String,
         browserMode: BrowserMode,
     ): JsCallbackData {
         val pending = pendingNativePromptStore.consume()
+        if (pending != null && mode == Mode.FULL && tabId.isNotEmpty()) {
+            responseWaitWideEvent.onNativePromptSubmitted(tabId, browserMode, pending.reasoningEffort, pending.selectedTool)
+        }
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {
@@ -869,6 +897,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
         private const val SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS = "supportsHomePageChatSuggestions"
         private const val SUPPORTS_BONUS_OFFER = "supportsBonusOffer"
+        private const val SUPPORTS_PROMO_CARDS = "supportsPromoCards"
         private const val INSTALL_TYPE = "installType"
         private const val INSTALL_TYPE_NEW = "new"
         private const val INSTALL_TYPE_RETURNING = "returning"

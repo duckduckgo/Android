@@ -171,6 +171,11 @@ enum class PirPixel(
         type = Count,
     ),
 
+    PIR_BROKER_CUSTOM_STATS_OPTOUT_REMOVED_IDENTIFIER_FOUND(
+        baseName = "m_dbp_optoutjob_removed-identifier-found",
+        type = Count,
+    ),
+
     PIR_ENGAGEMENT_DAU(
         baseName = "m_dbp_engagement_dau",
         type = Count,
@@ -377,6 +382,10 @@ enum class PirPixel(
     ),
     PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE(
         baseName = "m_dbp_notification_sent_first_scan_complete",
+        type = Count,
+    ),
+    PIR_APP_SETTINGS_CLICK(
+        baseName = "m_privacy-pro_app-settings_personal-information-removal_click",
         type = Count,
     ),
     ;

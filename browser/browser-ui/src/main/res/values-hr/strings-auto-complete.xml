@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Odustani</string>
     <string name="autocompleteRemoveItemRemove">Ukloni</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Prebaci se na karticu · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Pitaj Duck.ai</string>
 </resources>

@@ -94,7 +94,6 @@
     <string name="purchaseError">Întâmpinăm probleme la conectare. Încearcă din nou mai târziu.</string>
 
     <!-- PIR Settings-->
-    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
@@ -102,12 +101,6 @@
     <!-- Change Plan -->
     <string name="changePlanTitle">Actualizează planul sau anulează</string>
     <string name="changePlanDescription">Abonamentul tău a fost achiziționat prin Apple App Store. Pentru a-ți modifica planul sau setările de facturare, accesează Setări &gt; Cont Apple &gt; Abonamente pe un dispozitiv conectat la același cont Apple folosit pentru achiziționarea abonamentului.</string>
-
-    <!-- PIR Activity-->
-    <string name="pirTitle">Activează abonamentul DuckDuckGo pe desktop pentru a configura Personal Information Removal</string>
-    <string name="pirDescription">În browserul DuckDuckGo pentru desktop, accesează <b>Setări &gt; Abonează-te la DuckDuckGo</b> și dă click pe <b>Am un abonament</b> pentru a începe.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
 
     <string name="downloadsDownloadFinishedActionName">Deschide</string>
     <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
@@ -202,5 +195,18 @@
     <!-- Content Descriptions -->
     <string name="subscriptionExpiredStatusIconContentDescription">Abonament expirat</string>
     <string name="subscriptionActiveStatusIconContentDescription">Abonament activ</string>
+
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Retrage-te din contract</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Te poți retrage și poți primi o rambursare integrală până la %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Renunți la abonament?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Abonamentul %1$s se va încheia imediat și ți se va rambursa suma de %2$s prin metoda inițială de plată în termen de 14 zile.\n\nVPN, Personal Information Removal și modelele avansate Duck.ai nu vor mai funcționa după ce confirmi.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Confirmă retragerea</string>
+    <string name="subscriptionWithdrawDialogKeep">Păstrează abonamentul</string>
+    <string name="subscriptionStatusNotSubscribed">Nu există un abonament</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Te-ai retras pe %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Rambursarea sumei de %1$s este în curs de prelucrare.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Rambursarea se prelucrează.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nu am putut prelucra automat retragerea. Accesează <annotation type="withdrawal_help_link">această pagină</annotation> pentru a finaliza retragerea.</string>
 
 </resources>

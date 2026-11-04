@@ -190,6 +190,22 @@ interface WebViewClientListener {
 
     fun onShouldOverride()
 
+    /**
+     * Called from shouldOverrideUrlLoading for main-frame navigations, after routing is decided.
+     * [loadsInThisTab] is false when the navigation leaves this tab (external app, mailto/tel/sms, new tab, Duck.ai...).
+     */
+    fun onMainFrameNavigationDecided(loadsInThisTab: Boolean)
+
+    /**
+     * Called synchronously from onPageStarted, so unlike [pageStarted] it can't land after a newer shouldOverrideUrlLoading.
+     */
+    fun onMainFrameNavigationCommitted()
+
+    /**
+     * For navigations that never commit, e.g. HTTP 204.
+     */
+    fun onNavigationFinishedWithoutCommit()
+
     fun pageFinished(
         webView: WebView,
         webViewNavigationState: WebViewNavigationState,

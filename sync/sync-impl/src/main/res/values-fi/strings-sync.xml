@@ -477,4 +477,12 @@
     <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Peruuta</string>
     <string name="sync_simplified_deep_link_auth_prompt_title">Määritä Sync &amp; Backup</string>
     <string name="sync_simplified_deep_link_auth_prompt_message">Avaa laitteen lukitus ja määritä Sync &amp; Backup</string>
+
+    <!-- Sync promo on passwords import success screen -->
+    <string name="sync_passwords_import_promo_title">Käytä salasanojasi mobiililaitteella ja tietokoneella.</string>
+    <string name="sync_passwords_import_promo_primary_button">Ota käyttöön Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks import success screen -->
+    <string name="sync_bookmarks_import_promo_title">Käytä kirjanmerkkejäsi mobiililaitteella ja tietokoneella.</string>
+    <string name="sync_bookmarks_import_promo_primary_button">Ota käyttöön Sync &amp; Backup</string>
 </resources>

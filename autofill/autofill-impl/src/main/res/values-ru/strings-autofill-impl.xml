@@ -324,4 +324,16 @@
     <string name="importBookmarksErrorGenericMessage">Что-то пошло не так</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Проверьте подключение к интернету и повторите попытку.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Импортирование завершено!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Подожди — не закрывай это окно. Это не должно занять больше минуты или двух.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google может попросить у тебя пароль.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google отправит тебе письмо с подтверждением экспорта данных. Тебе ничего не нужно делать.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Импортирование завершено!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Импортировано закладок: <b>%1$d</b>]]></string>
+
 </resources>

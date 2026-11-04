@@ -76,6 +76,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.stripe.StripePlansHandler
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
@@ -112,6 +113,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
     private val paywallUrlResolver: PaywallUrlResolver,
     private val subscriptionOnboardingStore: SubscriptionOnboardingStore,
+    private val stripePlansHandler: StripePlansHandler,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -153,6 +155,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     Waiting
                 }
                 is CurrentPurchase.Success -> {
+                    if (!it.isPlanSwitch) {
+                        pixelSender.reportPurchaseSuccessOrigin(launchOrigin, it.isFreeTrial)
+                    }
                     subscriptionsChecker.runChecker()
                     pendingScheduleNotificationDaysBeforeCancel?.let { days ->
                         if (subscriptionsFeature.subscriptionExpirationReminderNotification().isEnabled()) {
@@ -169,9 +174,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
-                        isFreeTrial = it.isFreeTrial,
                         launchOnboarding = launchOnboarding,
-                        isPlanSwitch = it.isPlanSwitch,
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
@@ -211,6 +214,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
             "getUserSettings" -> id?.let { getUserSettings(it) }
             "requestNotificationsPermission" -> id?.let { requestNotificationsPermission(it) }
+            "completeStripePayment" -> completeStripePayment(featureName, method, id)
             else -> {
                 // NOOP
             }
@@ -436,6 +440,17 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 return@launch
             }
 
+            // Stripe plan changes can't go through Play Billing
+            if (stripePlansHandler.shouldHandle(subscription)) {
+                val redirectEvent = stripePlansHandler.getRedirectEvent()
+                if (redirectEvent != null) {
+                    command.send(SendJsEvent(redirectEvent))
+                } else {
+                    _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
+                }
+                return@launch
+            }
+
             val currentTier = subscription?.productId?.let { SubscriptionTier.fromPlanId(it) } ?: SubscriptionTier.UNKNOWN
             val targetTier = SubscriptionTier.fromPlanId(targetPlanId)
 
@@ -592,6 +607,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
 
         viewModelScope.launch(dispatcherProvider.io()) {
+            val subscription = runCatching { subscriptionsManager.getSubscription() }.getOrNull()
+            if (stripePlansHandler.shouldHandle(subscription)) {
+                sendTierOptionJson(stripePlansHandler.getTierOptions())
+                return@launch
+            }
+
             val defaultOptions = SubscriptionTierOptionsJson(
                 products = emptyList(),
             )
@@ -691,6 +712,15 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
 
             sendTierOptionJson(subscriptionTierOptions)
+        }
+    }
+
+    private fun completeStripePayment(featureName: String, method: String, id: String?) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            stripePlansHandler.onPlanChangeCompleted()
+            id?.let {
+                command.send(SendResponseToJs(JsCallbackData(featureName = featureName, method = method, id = it, params = JSONObject())))
+            }
         }
     }
 
@@ -838,9 +868,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object InProgress : PurchaseStateView()
         data class Success(
             val subscriptionEventData: SubscriptionEventData,
-            val isFreeTrial: Boolean,
             val launchOnboarding: Boolean,
-            val isPlanSwitch: Boolean = false,
         ) : PurchaseStateView()
         data object Waiting : PurchaseStateView()
         data object Recovered : PurchaseStateView()
