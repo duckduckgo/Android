@@ -47,6 +47,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -550,10 +551,32 @@ class PirDashboardWebViewViewModelTest {
     @Test
     fun `test reports the granted pixel only when the permission is granted`() {
         testee.onNotificationPermissionResult(granted = false, shouldShowRationale = true)
-        verify(pirPixelSender, never()).reportNotificationPermissionGranted()
+        verify(pirPixelSender, never()).reportNotificationPermissionGranted(any())
 
         testee.onNotificationPermissionResult(granted = true, shouldShowRationale = false)
-        verify(pirPixelSender).reportNotificationPermissionGranted()
+        verify(pirPixelSender).reportNotificationPermissionGranted(PirNotificationPromptType.REQUEST_PERMISSION)
+    }
+
+    @Test
+    fun `test returning from settings with notifications turned on reports the granted pixel for the settings prompt`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = true)
+
+        testee.onResumed()
+
+        verify(pirPixelSender).reportNotificationPermissionGranted(PirNotificationPromptType.OPEN_SETTINGS)
+    }
+
+    @Test
+    fun `test returning from settings with notifications still off reports no granted pixel`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = false)
+
+        testee.onResumed()
+
+        verify(pirPixelSender, never()).reportNotificationPermissionGranted(any())
     }
 
     @Test

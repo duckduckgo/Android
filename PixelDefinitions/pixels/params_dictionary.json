@@ -333,6 +333,12 @@
         "type": "boolean",
         "description": "Whether the user is a free (freemium) PIR user."
     },
+    "pirNotificationPromptType": {
+        "key": "prompt_type",
+        "type": "string",
+        "description": "Which PIR notification permission dialog this refers to: request_permission (accepting launches the system permission request) or open_settings (accepting opens the app's notification settings, because the system request can't be shown or notifications are turned off for DuckDuckGo or the PIR channel).",
+        "enum": ["request_permission", "open_settings"]
+    },
     "duckAiSubscriptionFunnelOrigin": {
         "key": "origin",
         "type": "string",

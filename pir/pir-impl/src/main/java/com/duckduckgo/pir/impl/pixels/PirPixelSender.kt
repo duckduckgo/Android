@@ -788,7 +788,7 @@ interface PirPixelSender {
 
     fun reportNotificationPermissionPromptDismissed(promptType: PirNotificationPromptType)
 
-    fun reportNotificationPermissionGranted()
+    fun reportNotificationPermissionGranted(promptType: PirNotificationPromptType)
 }
 
 @ContributesBinding(AppScope::class)
@@ -1802,8 +1802,8 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_NOTIFICATION_PERMISSION_PROMPT_DISMISSED, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
     }
 
-    override fun reportNotificationPermissionGranted() {
-        fire(PIR_NOTIFICATION_PERMISSION_GRANTED)
+    override fun reportNotificationPermissionGranted(promptType: PirNotificationPromptType) {
+        fire(PIR_NOTIFICATION_PERMISSION_GRANTED, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
     }
 
     private fun usageParams(isAuthenticated: Boolean): Map<String, String> = mapOf(

@@ -170,7 +170,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
         shouldShowRationale: Boolean,
     ) {
         if (granted) {
-            pirPixelSender.reportNotificationPermissionGranted()
+            pirPixelSender.reportNotificationPermissionGranted(PirNotificationPromptType.REQUEST_PERMISSION)
             showScanNotificationIfRunning()
             return
         }
@@ -186,6 +186,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
         awaitingReturnFromNotificationSettings = false
 
         if (pirNotificationManager.canShowNotifications()) {
+            pirPixelSender.reportNotificationPermissionGranted(PirNotificationPromptType.OPEN_SETTINGS)
             showScanNotificationIfRunning()
         }
     }
