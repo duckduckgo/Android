@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.promotion.widget
+package com.duckduckgo.browser.ui.promo
 
 import android.content.Context
 import android.util.AttributeSet
@@ -23,15 +23,15 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
+import com.duckduckgo.browser.ui.R
+import com.duckduckgo.browser.ui.databinding.ViewPromoMiniMessageBinding
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.getDimensionFromAttr
-import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.ViewPromoMiniMessageBinding
 import com.google.android.material.card.MaterialCardView
 import com.duckduckgo.mobile.android.R as CommonR
 
-internal class PromoMiniMessageView @JvmOverloads constructor(
+class PromoMiniMessageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
