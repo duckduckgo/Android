@@ -91,6 +91,9 @@ class AppInstallSharedPreferences @Inject constructor(
 
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
+    // The first read on a migrated install pays for the one-time reset below (a default browser lookup and a disk write), on
+    // whichever thread reads first, usually the main thread from DefaultBrowserObserver.onResume. Later reads cost what any
+    // SharedPreferences read does.
     private val preferences: SharedPreferences by lazy {
         context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE).also { resetDefaultBrowserHistoryAfterTransfer(it) }
     }
