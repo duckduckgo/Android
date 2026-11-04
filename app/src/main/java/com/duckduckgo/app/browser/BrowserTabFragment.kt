@@ -1156,7 +1156,7 @@ class BrowserTabFragment :
                 delay(100)
                 webView?.onResume()
                 // The native input restores its own focus after the attachment picker; taking it here would close the keyboard.
-                if (!returningFromAttachmentPicker) webView?.requestFocus()
+                if (!returningFromAttachmentPicker && !nativeInputManager.hasInputFocus()) webView?.requestFocus()
             }
         }
 
@@ -1369,11 +1369,13 @@ class BrowserTabFragment :
             lifecycleOwner = viewLifecycleOwner,
             tabs = viewModel.tabs,
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
+            newChatInputFocusPending = viewModel.newChatInputFocusPending,
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
             forceImageGeneration = forceImageGeneration,
             textSelection = textSelection,
             callbacks = NativeInputCallbacks(
+                consumeNewChatInputFocusRequest = viewModel::consumeNewChatInputFocusRequest,
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
                     if (binding.autoCompleteSuggestionsList.isVisible) {
@@ -2038,6 +2040,7 @@ class BrowserTabFragment :
 
         omnibar.setExpanded(true)
 
+        updateNativeInputTabVisibility()
         viewModel.onViewResumed()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible and Duck.ai is not
@@ -2049,6 +2052,7 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
+        nativeInputManager.onTabVisibilityChanged(false)
         pdfDownloadTooltipPopup?.dismiss()
         pdfDownloadTooltipPopup = null
         dismissDownloadFragment()
@@ -2241,7 +2245,9 @@ class BrowserTabFragment :
                 it?.let {
                     val wasActive = isActiveTab
                     isActiveTab = it.tabId == tabId
+                    updateNativeInputTabVisibility()
                     if (wasActive && !isActiveTab) {
+                        viewModel.onNewChatTabHidden()
                         logcat { "Tab $tabId is newly inactive" }
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
@@ -5161,8 +5167,20 @@ class BrowserTabFragment :
         }
     }
 
+    private fun updateNativeInputTabVisibility() {
+        nativeInputManager.onTabVisibilityChanged(
+            isNativeInputTabVisible(
+                isResumed = isResumed,
+                isHidden = isHidden,
+                isSelected = viewModel.liveSelectedTab.value?.tabId == tabId,
+                isCustomTab = isActiveCustomTab(),
+            ),
+        )
+    }
+
     private fun onTabHidden() {
         if (!isAdded) return
+        nativeInputManager.onTabVisibilityChanged(false)
         viewModel.onViewHidden()
         webViewClient.onTabBackgrounded()
         downloadMessagesJob.cancel()
@@ -5171,6 +5189,7 @@ class BrowserTabFragment :
 
     private fun onTabVisible() {
         if (!isAdded) return
+        updateNativeInputTabVisibility()
         webViewClient.onTabForegrounded()
         webView?.onResume()
         // ViewPager2 can keep neighbors STARTED/RESUMED; expand so a bottom omnibar that was scrolled
@@ -6811,3 +6830,6 @@ private class JsOrientationHandler {
         const val NO_ACTIVITY_ERROR = """{"failure":{"name":"InvalidStateError","message":"The page is not tied to an activity"}}"""
     }
 }
+
+internal fun isNativeInputTabVisible(isResumed: Boolean, isHidden: Boolean, isSelected: Boolean, isCustomTab: Boolean): Boolean =
+    isResumed && !isHidden && (isSelected || isCustomTab)
