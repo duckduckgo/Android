@@ -49,18 +49,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.DuckSansProduct
 import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import com.duckduckgo.common.ui.compose.theme.OnboardingTheme
 import kotlinx.collections.immutable.toImmutableList
@@ -68,64 +64,52 @@ import kotlin.math.PI
 import kotlin.math.ceil
 import kotlin.math.cos
 
-private val StepIndicatorShape = RoundedCornerShape(64.dp)
-
-private val StepIndicatorLabelStyle = DuckDuckGoTextStyle(
-    TextStyle(
-        fontFamily = DuckSansProduct,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        platformStyle = PlatformTextStyle(includeFontPadding = false),
-    ),
-)
-
 @Composable
 internal fun AnimatedDaxOnboardingStepIndicator(
     step: DaxOnboardingDialogStep?,
     animate: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val previous = remember {
-        object {
-            var step: DaxOnboardingDialogStep? = null
-        }
-    }
-    val decision = remember(step, animate) {
-        val lastStep = previous.step
-        object {
-            val fadeOut = step == null && lastStep != null && animate
-            val displayedStep = step ?: lastStep.takeIf { fadeOut }
-            val animateDots = step != null && animate && lastStep != null && lastStep != step && step.current != 1
-            val transition = Animatable(if (animateDots) 0f else 1f)
-            val alpha = Animatable(1f)
-        }
-    }
-    var exited by remember(decision) { mutableStateOf(false) }
+    var previousStep by remember { mutableStateOf<DaxOnboardingDialogStep?>(null) }
+    val transition = remember(step, animate) { StepTransition(step = step, previousStep = previousStep, animate = animate) }
+    var exited by remember(transition) { mutableStateOf(false) }
 
-    SideEffect { previous.step = step }
+    SideEffect { previousStep = step }
 
-    LaunchedEffect(decision) {
+    LaunchedEffect(transition) {
         val duration = DaxOnboardingDialogDefaults.StepIndicatorTransitionDuration.inWholeMilliseconds.toInt()
-        if (decision.fadeOut) {
-            decision.alpha.animateTo(
+        if (transition.fadeOut) {
+            transition.alpha.animateTo(
                 0f,
                 tween(duration, easing = Easing { x -> ((cos((x + 1) * PI) / 2.0) + 0.5).toFloat() }),
             )
             exited = true
-        } else if (decision.animateDots) {
-            decision.transition.animateTo(1f, tween(duration, easing = FastOutSlowInEasing))
+        } else if (transition.animateDots) {
+            transition.progress.animateTo(1f, tween(duration, easing = FastOutSlowInEasing))
         }
     }
 
     if (!exited) {
-        decision.displayedStep?.let {
+        transition.displayedStep?.let {
             DaxOnboardingStepIndicator(
                 step = it,
-                modifier = modifier.graphicsLayer { alpha = decision.alpha.value },
-                transition = { decision.transition.value },
+                modifier = modifier.graphicsLayer { alpha = transition.alpha.value },
+                transition = { transition.progress.value },
             )
         }
     }
+}
+
+private class StepTransition(
+    step: DaxOnboardingDialogStep?,
+    previousStep: DaxOnboardingDialogStep?,
+    animate: Boolean,
+) {
+    val fadeOut = step == null && previousStep != null && animate
+    val displayedStep = step ?: previousStep.takeIf { fadeOut }
+    val animateDots = step != null && animate && previousStep != null && previousStep != step && step.current != 1
+    val progress = Animatable(if (animateDots) 0f else 1f)
+    val alpha = Animatable(1f)
 }
 
 @Composable
@@ -139,59 +123,33 @@ internal fun DaxOnboardingStepIndicator(
     val layoutDirection = LocalLayoutDirection.current
     val textMeasurer = rememberTextMeasurer()
     val metrics = LocalContext.current.resources.displayMetrics
-    val labelSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, metrics)
-    val style = StepIndicatorLabelStyle.textStyle.copy(fontSize = with(density) { labelSize.toSp() })
+    val labelStyle = DaxOnboardingDialogDefaults.StepIndicatorLabelStyle
+    // The View sizes this label through TypedValue, which applies non-linear font scaling.
+    val labelSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, labelStyle.fontSize.value, metrics)
+    val style = labelStyle.copy(fontSize = with(density) { labelSize.toSp() })
     val labelWidth = remember(step.labels, style, density.density, density.fontScale, textMeasurer, layoutDirection) {
         with(density) {
             ceil(step.labels.maxOf { textMeasurer.measure(it, style, softWrap = false).size.width }.toFloat()).toDp()
         }
     }
-    val activeDot = DaxOnboardingDialogDefaults.StepIndicatorActiveDot
-    val inactiveDot = DaxOnboardingDialogDefaults.StepIndicatorInactiveDot
-    val dotGap = DaxOnboardingDialogDefaults.StepIndicatorDotGap
-    val dotWidth = activeDot + (inactiveDot + dotGap) * (step.labels.size - 1)
+    val shape = RoundedCornerShape(DaxOnboardingDialogDefaults.StepIndicatorCornerRadius)
 
     Row(
         modifier = modifier
             .testTag("daxOnboardingStepIndicator")
             .clearAndSetSemantics { text = AnnotatedString(step.labels[step.current - 1]) }
-            .background(colors.surfaceTertiary, StepIndicatorShape)
-            .border(1.5.dp, colors.accentAltPrimary, StepIndicatorShape)
+            .background(colors.surfaceTertiary, shape)
+            .border(DaxOnboardingDialogDefaults.StepIndicatorBorderWidth, colors.accentAltPrimary, shape)
             .padding(
-                start = with(density) { 8.dp.toPx().toInt().toDp() },
-                end = with(density) { 10.dp.toPx().toInt().toDp() },
-                top = with(density) { 6.dp.toPx().toInt().toDp() },
-                bottom = with(density) { 6.dp.toPx().toInt().toDp() },
+                start = DaxOnboardingDialogDefaults.StepIndicatorStartPadding.floorToPx(density),
+                end = DaxOnboardingDialogDefaults.StepIndicatorEndPadding.floorToPx(density),
+                top = DaxOnboardingDialogDefaults.StepIndicatorVerticalPadding.floorToPx(density),
+                bottom = DaxOnboardingDialogDefaults.StepIndicatorVerticalPadding.floorToPx(density),
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(DaxOnboardingDialogDefaults.StepIndicatorLabelGap),
     ) {
-        Canvas(Modifier.size(width = with(density) { dotWidth.toPx().toInt().toDp() }, height = with(density) { activeDot.toPx().toInt().toDp() })) {
-            val progress = if (step.current == 1) 1f else transition().coerceIn(0f, 1f)
-            val currentIndex = step.current - 1
-            val activeDiameter = activeDot.toPx()
-            val inactiveDiameter = inactiveDot.toPx()
-            var x = 0f
-            repeat(step.labels.size) { index ->
-                val diameter = when (index) {
-                    currentIndex -> inactiveDiameter + (activeDiameter - inactiveDiameter) * progress
-                    currentIndex - 1 -> activeDiameter + (inactiveDiameter - activeDiameter) * progress
-                    else -> inactiveDiameter
-                }
-                val color = when {
-                    index < currentIndex -> colors.accentPrimary
-                    index == currentIndex -> lerp(colors.accentAltPrimary, colors.accentPrimary, progress)
-                    else -> colors.accentAltPrimary
-                }
-                val centerX = x + diameter / 2f
-                drawCircle(
-                    color = color,
-                    radius = diameter / 2f,
-                    center = Offset(if (layoutDirection == LayoutDirection.Rtl) size.width - centerX else centerX, size.height / 2f),
-                )
-                x += diameter + dotGap.toPx()
-            }
-        }
+        StepIndicatorDots(step = step, transition = transition)
         DaxText(
             text = step.labels[step.current - 1],
             modifier = Modifier.widthIn(min = labelWidth),
@@ -201,6 +159,49 @@ internal fun DaxOnboardingStepIndicator(
         )
     }
 }
+
+@Composable
+private fun StepIndicatorDots(
+    step: DaxOnboardingDialogStep,
+    transition: () -> Float,
+) {
+    val colors = LocalOnboardingColors.current
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
+    val activeDot = DaxOnboardingDialogDefaults.StepIndicatorActiveDot
+    val inactiveDot = DaxOnboardingDialogDefaults.StepIndicatorInactiveDot
+    val dotGap = DaxOnboardingDialogDefaults.StepIndicatorDotGap
+    val dotsWidth = activeDot + (inactiveDot + dotGap) * (step.labels.size - 1)
+
+    Canvas(Modifier.size(width = dotsWidth.floorToPx(density), height = activeDot.floorToPx(density))) {
+        val progress = if (step.current == 1) 1f else transition().coerceIn(0f, 1f)
+        val currentIndex = step.current - 1
+        val activeDiameter = activeDot.toPx()
+        val inactiveDiameter = inactiveDot.toPx()
+        var x = 0f
+        repeat(step.labels.size) { index ->
+            val diameter = when (index) {
+                currentIndex -> inactiveDiameter + (activeDiameter - inactiveDiameter) * progress
+                currentIndex - 1 -> activeDiameter + (inactiveDiameter - activeDiameter) * progress
+                else -> inactiveDiameter
+            }
+            val color = when {
+                index < currentIndex -> colors.accentPrimary
+                index == currentIndex -> lerp(colors.accentAltPrimary, colors.accentPrimary, progress)
+                else -> colors.accentAltPrimary
+            }
+            val centerX = x + diameter / 2f
+            drawCircle(
+                color = color,
+                radius = diameter / 2f,
+                center = Offset(if (layoutDirection == LayoutDirection.Rtl) size.width - centerX else centerX, size.height / 2f),
+            )
+            x += diameter + dotGap.toPx()
+        }
+    }
+}
+
+private fun Dp.floorToPx(density: Density): Dp = with(density) { toPx().toInt().toDp() }
 
 @PreviewLightDark
 @Composable
