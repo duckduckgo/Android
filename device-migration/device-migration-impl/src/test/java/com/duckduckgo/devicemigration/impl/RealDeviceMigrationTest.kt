@@ -26,6 +26,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.LOCAL_FILE
@@ -241,6 +242,34 @@ class RealDeviceMigrationTest {
 
         assertFalse(testee.isMigratedInstall())
         assertNull(testee.sourceDeviceIsNewInstall())
+    }
+
+    @Test
+    fun whenRestoredFromBackupAndUpdatedBeforeFirstOpenThenMigratedFromEstablishedPhone() = runTest {
+        unupdatedSinceFirstInstall = false
+        local.edit().putBoolean(KEY_RESTORED_FROM_BACKUP, true).commit()
+
+        assertTrue(testee.isMigratedInstall())
+        assertTrue(testee.isMigrationFlowPending())
+        assertEquals(false, testee.sourceDeviceIsNewInstall())
+    }
+
+    @Test
+    fun whenRestoredFromBackupWithTransferredMarkerThenTransferredSourceStateWins() = runTest {
+        transferred.edit().putBoolean(KEY_SEEN, true).putBoolean(KEY_IS_NEW_INSTALL, true).commit()
+        local.edit().putBoolean(KEY_RESTORED_FROM_BACKUP, true).commit()
+
+        assertTrue(testee.isMigratedInstall())
+        assertEquals(true, testee.sourceDeviceIsNewInstall())
+    }
+
+    @Test
+    fun whenRestoredFromBackupThenStillMigratedAfterRestart() = runTest {
+        local.edit().putBoolean(KEY_RESTORED_FROM_BACKUP, true).commit()
+        assertTrue(testee.isMigratedInstall())
+        onCreate()
+
+        assertTrue(newInstance().isMigratedInstall())
     }
 
     @Test

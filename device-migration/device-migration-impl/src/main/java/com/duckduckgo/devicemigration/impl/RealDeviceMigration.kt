@@ -29,6 +29,7 @@ import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_MIGRATED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_IS_NEW_INSTALL
@@ -150,6 +151,11 @@ class RealDeviceMigration @Inject constructor(
         val transferred = markerStore.transferred
         if (transferred.getBoolean(KEY_SEEN, false)) {
             return recordMigrated(source = transferred.getBoolean(KEY_IS_NEW_INSTALL, true))
+        }
+
+        // Set by DeviceMigrationBackupAgent on this phone; unlike the heuristic below, it survives an app update before first open.
+        if (local.getBoolean(KEY_RESTORED_FROM_BACKUP, false)) {
+            return recordMigrated(source = false)
         }
 
         if (installTimeComparison.isUnupdatedSinceFirstInstall() && statisticsDataStore.hasInstallationStatistics) {
