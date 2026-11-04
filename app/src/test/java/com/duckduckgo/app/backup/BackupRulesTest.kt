@@ -126,7 +126,6 @@ class BackupRulesTest {
             listOf(
                 "sharedpref" to "com.duckduckgo.devicemigration.local.xml",
                 "sharedpref" to "com.duckduckgo.app.devicemigration.cleanup.xml",
-                "sharedpref" to "com.duckduckgo.subscriptions.devicemigration.xml",
                 "sharedpref" to "com.duckduckgo.sync.devicemigration.xml",
                 "sharedpref" to "com.duckduckgo.mobile.android.vpn.devicemigration.cleanup.xml",
                 "sharedpref" to "com.duckduckgo.networkprotection.devicemigration.cleanup.xml",

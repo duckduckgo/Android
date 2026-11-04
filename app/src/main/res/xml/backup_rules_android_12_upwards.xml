@@ -31,7 +31,6 @@
         <include domain="root" path="."/>
         <exclude domain="sharedpref" path="com.duckduckgo.devicemigration.local.xml"/>
         <exclude domain="sharedpref" path="com.duckduckgo.app.devicemigration.cleanup.xml"/>
-        <exclude domain="sharedpref" path="com.duckduckgo.subscriptions.devicemigration.xml"/>
         <exclude domain="sharedpref" path="com.duckduckgo.sync.devicemigration.xml"/>
         <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.vpn.devicemigration.cleanup.xml"/>
         <exclude domain="sharedpref" path="com.duckduckgo.networkprotection.devicemigration.cleanup.xml"/>
