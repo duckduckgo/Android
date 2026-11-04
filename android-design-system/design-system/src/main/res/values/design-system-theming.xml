@@ -114,6 +114,11 @@
     <style name="Theme.DuckDuckGo.App" parent="Theme.DuckDuckGo.Light" />
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
+        <item name="daxThemeLight">@style/Theme.DuckDuckGo.Light</item>
+        <item name="daxThemeDark">@style/Theme.DuckDuckGo.Dark</item>
+        <item name="daxOnboardingThemeLight">@style/Theme.DuckDuckGo.Light.Onboarding</item>
+        <item name="daxOnboardingThemeDark">@style/Theme.DuckDuckGo.Dark.Onboarding</item>
+        <item name="daxOnboardingThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Onboarding</item>
 
         <item name="colorPrimary">?attr/daxColorBackground</item>
         <item name="colorPrimaryDark">?attr/daxColorSurface</item>

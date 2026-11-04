@@ -51,7 +51,7 @@
                 android:layout_marginVertical="@dimen/keyline_5"
                 android:layout_weight="1"
                 android:background="@drawable/background_qr_code_panel"
-                android:theme="@style/Theme.DuckDuckGo.Light">
+                android:theme="?attr/daxThemeLight">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/barcodeContainer"

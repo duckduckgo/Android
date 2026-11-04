@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.common.ui.store.NewThemeSetting
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -35,7 +36,8 @@ class CustomTabShieldDrawableFactoryTest {
     private val baseTheme: Resources.Theme = mock()
     private val drawableTheme: Resources.Theme = mock()
     private val drawable: Drawable = mock()
-    private val testee = CustomTabShieldDrawableFactory()
+    private val newThemeSetting: NewThemeSetting = mock()
+    private val testee = CustomTabShieldDrawableFactory(newThemeSetting)
 
     @Test
     fun whenToolbarIsLightThenShieldUsesDuckDuckGoLightTheme() {
@@ -53,6 +55,18 @@ class CustomTabShieldDrawableFactoryTest {
         testee.create(context, R.drawable.shield_alert_24, isLightMode = false)
 
         verify(drawableTheme).applyStyle(CommonR.style.Theme_DuckDuckGo_Dark, true)
+    }
+
+    @Test
+    fun whenNewThemeIsOnThenShieldUsesTheNewThemeOfTheSameMode() {
+        givenDrawableInflation()
+        whenever(newThemeSetting.useNewTheme).thenReturn(true)
+
+        testee.create(context, R.drawable.shield_alert_24, isLightMode = true)
+        testee.create(context, R.drawable.shield_alert_24, isLightMode = false)
+
+        verify(drawableTheme).applyStyle(CommonR.style.Theme_DuckDuckGo_New_Light, true)
+        verify(drawableTheme).applyStyle(CommonR.style.Theme_DuckDuckGo_New_Dark, true)
     }
 
     @Suppress("DEPRECATION")

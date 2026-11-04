@@ -26,7 +26,6 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat.getString
@@ -35,21 +34,16 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetNewAddressBarPickerBinding
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker.Transition
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.onboardingThemedContext
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.duckduckgo.mobile.android.R as CommonR
 
 // Night mode (not a light/dark flag) decides which onboarding theme applies, matching the onboarding content.
-private fun onboardingThemedContext(context: Context): Context {
+private fun pickerThemedContext(context: Context): Context {
     val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-    val themeRes = if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
-        CommonR.style.Theme_DuckDuckGo_Dark_Onboarding
-    } else {
-        CommonR.style.Theme_DuckDuckGo_Light_Onboarding
-    }
-    return ContextThemeWrapper(context, themeRes)
+    return context.onboardingThemedContext(isDark = nightMode == Configuration.UI_MODE_NIGHT_YES)
 }
 
 @SuppressLint("NoBottomSheetDialog")
@@ -58,7 +52,7 @@ class NewAddressBarPickerBottomSheetDialog(
     private val isLightMode: Boolean,
     private val callback: NewAddressBarCallback?,
 ) : BottomSheetDialog(
-    onboardingThemedContext(context),
+    pickerThemedContext(context),
     R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker_EdgeToEdge,
 ) {
 
