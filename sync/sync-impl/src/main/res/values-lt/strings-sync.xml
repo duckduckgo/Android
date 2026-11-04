@@ -480,13 +480,13 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Pasiek savo slaptažodžius mobiliajame įrenginyje ir kompiuteryje.</string>
     <string name="sync_passwords_import_promo_primary_button">Įjunk „Sync &amp; Backup“</string>
-    <string name="sync_passwords_import_promo_title_toggle">Sinchronizuokite savo slaptažodžius mobiliajame įrenginyje ir kompiuteryje su „Sync &amp; Backup“</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sinchronizuokite ir kurkite atsargines savo slaptažodžių kopijas mobiliajame įrenginyje ir kompiuteryje</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Pasiek savo žymeles mobiliajame įrenginyje ir kompiuteryje.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Įjunk „Sync &amp; Backup“</string>
-    <string name="sync_bookmarks_import_promo_title_toggle">Sinchronizuoti ir kurti atsargines savo žymių kopijas mobiliajame įrenginyje ir kompiuteryje</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sinchronizuokite ir kurkite atsargines savo žymių kopijas mobiliajame įrenginyje ir kompiuteryje</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
@@ -507,7 +507,7 @@
     <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Įjungti „Sync &amp; Backup“</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
-    <string name="sync_bookmark_added_multi_device_promo_title">Sinchronizuoti su mano kompiuterio programa</string>
+    <string name="sync_bookmark_added_multi_device_promo_title">Sinchronizuoti su kompiuterio programa</string>
     <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Daugiau parinkčių</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Slėpti</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Sinchronizuoti su kompiuteriu</string>
