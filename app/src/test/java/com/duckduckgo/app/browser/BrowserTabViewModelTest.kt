@@ -63,6 +63,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
+import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
@@ -302,6 +303,7 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
@@ -748,6 +750,12 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
+    private val fakeAutocompleteSpeedFeature = FakeFeatureToggleFactory.create(AutocompleteSpeedFeature::class.java)
+    private val fakeCurrentTimeProvider = object : CurrentTimeProvider {
+        override fun elapsedRealtime(): Long = coroutineRule.testDispatcher.scheduler.currentTime
+        override fun currentTimeMillis(): Long = coroutineRule.testDispatcher.scheduler.currentTime
+        override fun localDateTimeNow(): LocalDateTime = LocalDateTime.now()
+    }
     private val fakeNewTabReturnHatchFeature = FakeFeatureToggleFactory.create(NewTabReturnHatchFeature::class.java)
     private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
@@ -821,6 +829,7 @@ class BrowserTabViewModelTest {
                     tabRepositoryProvider,
                     BrowserMode.REGULAR,
                     mockAutocompleteTabsFeature,
+                    fakeAutocompleteSpeedFeature,
                     mockDuckChat,
                     mockHistory,
                     DefaultDispatcherProvider(),
@@ -828,6 +837,7 @@ class BrowserTabViewModelTest {
                     mockDeviceAppLookup,
                     coroutineRule.testScope,
                     AutoComplete.Config(),
+                    isOmnibar = true,
                 )
             val fireproofWebsiteRepositoryImpl =
                 FireproofWebsiteRepositoryImpl(
@@ -1105,6 +1115,8 @@ class BrowserTabViewModelTest {
                 duckAiSessionCallback = mockDuckAiSessionCallback,
                 duckAiEntryCallback = lazy { mockDuckAiEntryCallback },
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
+                autocompleteSpeedFeature = fakeAutocompleteSpeedFeature,
+                currentTimeProvider = fakeCurrentTimeProvider,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3800,6 +3812,59 @@ class BrowserTabViewModelTest {
         delay(500)
 
         assertTrue(testee.omnibarAutocompleteCache.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenSuggestQueriesNotThrottledThenQueryWaitsForTypingPause() = runTest {
+        stubAutoCompleteSourcesForQuery()
+
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(250)
+        assertEquals("", autoCompleteViewState().searchResults.query)
+
+        advanceTimeBy(100)
+        assertEquals("query", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenSuggestQueriesThrottledThenFirstQuerySentImmediately() = runTest {
+        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
+        stubAutoCompleteSourcesForQuery()
+
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+
+        assertEquals("query", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenSuggestQueriesThrottledAndUserKeepsTypingThenQueriesSentEveryThrottlePeriod() = runTest {
+        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
+        stubAutoCompleteSourcesForQuery()
+        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(emptyList())
+
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(100)
+        testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(50)
+        testee.triggerAutocomplete("que", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(40)
+        assertEquals("q", autoCompleteViewState().searchResults.query)
+
+        advanceTimeBy(20)
+        assertEquals("que", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenSuggestQueriesThrottledAndUserPausesThenNextQuerySentImmediately() = runTest {
+        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
+        stubAutoCompleteSourcesForQuery()
+        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(emptyList())
+
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(300)
+        testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
     }
 
     /** Stubs every autocomplete source so the AutoCompleteApi produces a non-empty result for "query". */

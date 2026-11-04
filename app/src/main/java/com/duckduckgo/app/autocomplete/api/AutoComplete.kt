@@ -19,6 +19,7 @@ package com.duckduckgo.app.autocomplete.api
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
+import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
 import com.duckduckgo.app.browser.UriString
@@ -41,7 +42,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.utils.AppUrl
@@ -63,9 +63,14 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -79,14 +84,14 @@ const val maximumNumberOfTopHits = 2
 const val minimumNumberInSuggestionGroup = 5
 
 /**
- * Provides a default [AutoComplete] instance with default configuration.
- * For dynamic configs, use [AutoCompleteFactory] instead.
+ * The omnibar's [AutoComplete]. Unlike instances from [com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory], it may
+ * emit local matches before the suggest query returns, so its first emission is not always the complete result.
  */
 @ContributesBinding(ActivityScope::class)
 class DefaultAutoComplete @Inject constructor(
-    factory: AutoCompleteFactory,
+    factory: AutoCompleteFactoryImpl,
     browserMode: BrowserMode,
-) : AutoComplete by factory.create(AutoComplete.Config(), browserMode)
+) : AutoComplete by factory.createForOmnibar(browserMode)
 
 class AutoCompleteApi constructor(
     private val autoCompleteService: AutoCompleteService,
@@ -96,6 +101,7 @@ class AutoCompleteApi constructor(
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val browserMode: BrowserMode,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
+    private val autocompleteSpeedFeature: AutocompleteSpeedFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
@@ -103,12 +109,20 @@ class AutoCompleteApi constructor(
     private val deviceAppLookup: DeviceAppLookup,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val config: AutoComplete.Config,
+    private val isOmnibar: Boolean = false,
 ) : AutoComplete {
 
     private val tabRepository: TabRepository
         get() = tabRepositoryProvider.forMode(browserMode)
 
     private var isAutocompleteTabsFeatureEnabled: Boolean? = null
+
+    private val localSuggestionsFirst: Boolean by lazy {
+        isOmnibar && autocompleteSpeedFeature.localSuggestionsFirst().isEnabled()
+    }
+
+    private val searchRequestsInFlight = mutableMapOf<String, Deferred<List<AutoCompleteSearchSuggestion>>>()
+    private val latestSearchResults = MutableStateFlow<SearchResults?>(null)
 
     init {
         if (config.showInstalledApps) {
@@ -121,6 +135,10 @@ class AutoCompleteApi constructor(
     override fun autoComplete(query: String): Flow<AutoCompleteResult> {
         if (query.isBlank()) {
             return flowOf(AutoCompleteResult(query = query, suggestions = emptyList()))
+        }
+
+        if (localSuggestionsFirst) {
+            return autoCompleteLocalSuggestionsFirst(query)
         }
 
         return combine(
@@ -139,22 +157,89 @@ class AutoCompleteApi constructor(
             val searchSuggestions = (topHits + middleSectionSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
             }
-            if (searchSuggestions.isNotEmpty() && deviceAppResults.isNotEmpty()) {
-                searchSuggestions.take(MAX_RESULTS_PER_GROUP_WITH_INSTALLED_APPS) + deviceAppResults.take(MAX_RESULTS_PER_GROUP_WITH_INSTALLED_APPS)
-            } else {
-                searchSuggestions + deviceAppResults
-            }
-        }.map { suggestions ->
-            val duckAIPrompt = mutableListOf<AutoCompleteSuggestion>()
-            if (duckChat.isEnabled()) {
-                duckAIPrompt.add(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query))
-            }
+            withDeviceApps(searchSuggestions, deviceAppResults)
+        }.map { suggestions -> toAutoCompleteResult(query, suggestions) }
+    }
 
-            AutoCompleteResult(
-                query = query,
-                suggestions = suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) } + duckAIPrompt,
-            )
+    /**
+     * Local matches are emitted without waiting for the search results, which keep their usual place between the top hits
+     * and the remaining local matches. Until they arrive, the latest search results received for an earlier query that
+     * still start with [query] stand in for them, so the list keeps updating while the user types.
+     */
+    private fun autoCompleteLocalSuggestionsFirst(query: String): Flow<AutoCompleteResult> {
+        return combine(
+            getAutoCompleteBookmarkResults(query),
+            getAutoCompleteFavoritesResults(query),
+            getAutocompleteSwitchToTabResults(query),
+            getAutoCompleteHistoryResults(query),
+            getSearchSuggestionsOrStandIns(query),
+            getDeviceAppResults(query),
+        ) { bookmarks, favorites, tabs, historyResults, searchResults, deviceAppResults ->
+            val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
+            val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
+            val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
+            val middleSectionSearchResults = getMiddleSearchResults(searchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
+
+            val suggestions = (topHits + middleSectionSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
+                Pair(it.phrase, it::class.java)
+            }
+            withDeviceApps(suggestions, deviceAppResults)
+        }.distinctUntilChanged().map { suggestions -> toAutoCompleteResult(query, suggestions) }
+    }
+
+    private fun getSearchSuggestionsOrStandIns(query: String): Flow<List<AutoCompleteSearchSuggestion>> = channelFlow {
+        val standIns = launch {
+            latestSearchResults
+                .filter { it?.query != query }
+                .collect { latest ->
+                    val standIn = latest?.suggestions.orEmpty().filter { it.phrase.startsWith(query, ignoreCase = true) }
+                    send(standIn)
+                }
         }
+        val suggestions = searchRequest(query).await()
+        standIns.cancel()
+        send(suggestions)
+    }
+
+    /**
+     * Runs in the app scope: the omnibar restarts its pipeline on every keystroke, and a request cancelled there would never
+     * return while the user keeps typing. Left to finish, its results stand in for the next query's.
+     */
+    private fun searchRequest(query: String): Deferred<List<AutoCompleteSearchSuggestion>> = synchronized(searchRequestsInFlight) {
+        searchRequestsInFlight.getOrPut(query) {
+            coroutineScope.async(dispatchers.io()) {
+                val result = runCatching { autoCompleteService.autoComplete(query).map { it.toSearchSuggestion() } }
+                synchronized(searchRequestsInFlight) { searchRequestsInFlight.remove(query) }
+                result.onSuccess { latestSearchResults.value = SearchResults(query, it) }
+                result.getOrDefault(emptyList())
+            }
+        }
+    }
+
+    private fun withDeviceApps(
+        suggestions: List<AutoCompleteSuggestion>,
+        deviceAppResults: List<AutoCompleteDeviceAppSuggestion>,
+    ): List<AutoCompleteSuggestion> {
+        return if (suggestions.isNotEmpty() && deviceAppResults.isNotEmpty()) {
+            suggestions.take(MAX_RESULTS_PER_GROUP_WITH_INSTALLED_APPS) + deviceAppResults.take(MAX_RESULTS_PER_GROUP_WITH_INSTALLED_APPS)
+        } else {
+            suggestions + deviceAppResults
+        }
+    }
+
+    private fun toAutoCompleteResult(
+        query: String,
+        suggestions: List<AutoCompleteSuggestion>,
+    ): AutoCompleteResult {
+        val duckAIPrompt = mutableListOf<AutoCompleteSuggestion>()
+        if (duckChat.isEnabled()) {
+            duckAIPrompt.add(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query))
+        }
+
+        return AutoCompleteResult(
+            query = query,
+            suggestions = suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) } + duckAIPrompt,
+        )
     }
 
     private fun combineBookmarksFavoritesTabsAndHistory(
@@ -360,16 +445,17 @@ class AutoCompleteApi constructor(
         runCatching {
             val rawResults = autoCompleteService.autoComplete(query)
             for (rawResult in rawResults) {
-                val searchSuggestion = AutoCompleteSearchSuggestion(
-                    phrase = rawResult.phrase.formatIfUrl(),
-                    isUrl = rawResult.isNav ?: UriString.isWebUrl(rawResult.phrase),
-                    isAllowedInTopHits = rawResult.isNav ?: UriString.isWebUrl(rawResult.phrase),
-                )
-                searchSuggestionsList.add(searchSuggestion)
+                searchSuggestionsList.add(rawResult.toSearchSuggestion())
             }
             emit(searchSuggestionsList.toList())
         }.getOrElse { emit(searchSuggestionsList.toList()) }
     }
+
+    private fun AutoCompleteServiceRawResult.toSearchSuggestion() = AutoCompleteSearchSuggestion(
+        phrase = phrase.formatIfUrl(),
+        isUrl = isNav ?: UriString.isWebUrl(phrase),
+        isAllowedInTopHits = isNav ?: UriString.isWebUrl(phrase),
+    )
 
     private fun getAutoCompleteBookmarkResults(query: String): Flow<List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
         runCatching {
@@ -567,6 +653,11 @@ class AutoCompleteApi constructor(
     private fun String.redactSchemeAndWwwSubDomain(): String {
         return this.toUri().toStringDropScheme().removePrefix("www.")
     }
+
+    private data class SearchResults(
+        val query: String,
+        val suggestions: List<AutoCompleteSearchSuggestion>,
+    )
 
     private data class RankedSuggestion<T : AutoCompleteSuggestion>(
         val suggestion: T,
