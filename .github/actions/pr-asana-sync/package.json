@@ -28,7 +28,7 @@
     "@actions/core": "^1.10.0",
     "@actions/github": "^6.0.0",
     "asana": "github:Asana/node-asana",
-    "markdown-it": "^14.0.0"
+    "markdown-it": "^14.3.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
