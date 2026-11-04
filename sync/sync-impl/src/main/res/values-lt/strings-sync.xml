@@ -492,6 +492,7 @@
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Sinchronizuoti žymes ir kurti jų atsargines kopijas</string>
     <string name="sync_bookmarks_promo_message">Naudojamas ištisinis šifravimas. Niekas negali matyti tavo žymių, net ir mes.</string>
+    <string name="sync_bookmarks_promo_primary_button">Įjungti „Sync &amp; Backup“</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -518,6 +519,7 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Sinchronizuoti slaptažodžius ir kurti jų atsargines kopijas</string>
     <string name="sync_passwords_promo_message">Ištisinis šifravimas (angl. „end-to-end encryption“) reiškia, kad niekas, išskyrus jus, negali pamatyti jūsų slaptažodžių, net mes.</string>
+    <string name="sync_passwords_promo_primary_button">Įjungti „Sync &amp; Backup“</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
