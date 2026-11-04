@@ -38,10 +38,13 @@ import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromEntryPoint
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromRemoteMessage
 import com.duckduckgo.pir.impl.dashboard.entrypoint.freeScanOrigin
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
+import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -73,6 +76,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
     private val pirFreemiumDataStore: PirFreemiumDataStore,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val pirDataStore: PirDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var purchaseFlowOutstanding = false
@@ -108,7 +112,60 @@ class PirDashboardWebViewViewModel @Inject constructor(
         id: String?,
         data: JSONObject?,
     ) {
-        // TODO Handle any JS messages that requires UI updates or other user actions
+        // only forwarded once onboarding has saved the profile and started the initial scan
+        if (method == PirDashboardWebMessages.SAVE_PROFILE.messageName) {
+            viewModelScope.launch {
+                command.send(Command.CheckNotificationPermission)
+            }
+        }
+    }
+
+    fun onNotificationPermissionStateComputed(
+        isAtLeastApi33: Boolean,
+        permissionGranted: Boolean,
+        shouldShowRationale: Boolean,
+    ) {
+        // below Android 13 notifications are allowed without a runtime permission
+        if (!isAtLeastApi33 || permissionGranted) return
+
+        viewModelScope.launch {
+            val hasRequestedBefore = withContext(dispatcherProvider.io()) { pirDataStore.hasRequestedNotificationPermission }
+            // the system request would return denied without showing anything, so only settings can grant it
+            val promptType = if (hasRequestedBefore && !shouldShowRationale) {
+                PirNotificationPromptType.OPEN_SETTINGS
+            } else {
+                PirNotificationPromptType.REQUEST_PERMISSION
+            }
+            command.send(Command.ShowNotificationPermissionPrompt(promptType))
+        }
+    }
+
+    fun onNotificationPermissionPromptShown(promptType: PirNotificationPromptType) {
+        pirPixelSender.reportNotificationPermissionPromptShown(promptType)
+    }
+
+    fun onNotificationPermissionPromptAccepted(promptType: PirNotificationPromptType) {
+        pirPixelSender.reportNotificationPermissionPromptAccepted(promptType)
+
+        viewModelScope.launch {
+            when (promptType) {
+                PirNotificationPromptType.REQUEST_PERMISSION -> {
+                    withContext(dispatcherProvider.io()) { pirDataStore.hasRequestedNotificationPermission = true }
+                    command.send(Command.RequestNotificationPermission)
+                }
+                PirNotificationPromptType.OPEN_SETTINGS -> command.send(Command.OpenNotificationSettings)
+            }
+        }
+    }
+
+    fun onNotificationPermissionPromptDismissed(promptType: PirNotificationPromptType) {
+        pirPixelSender.reportNotificationPermissionPromptDismissed(promptType)
+    }
+
+    fun onNotificationPermissionResult(granted: Boolean) {
+        if (granted) {
+            pirPixelSender.reportNotificationPermissionGranted()
+        }
     }
 
     fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow) {
@@ -200,5 +257,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
         ) : Command()
 
         data object ReloadWebView : Command()
+        data object CheckNotificationPermission : Command()
+        data class ShowNotificationPermissionPrompt(val promptType: PirNotificationPromptType) : Command()
+        data object RequestNotificationPermission : Command()
+        data object OpenNotificationSettings : Command()
     }
 }

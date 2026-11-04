@@ -38,6 +38,7 @@ class FakePirDataStore : PirDataStore {
     override var initialScanCompletionFlowId: Long = 0L
     override var initialScanCompletionForegroundRunCount: Int = 0
     override var initialScanCompletionScheduledRunCount: Int = 0
+    override var hasRequestedNotificationPermission: Boolean = false
     private var isScanCompleteNotificationPending = false
 
     override fun markScanCompleteNotificationPending() {

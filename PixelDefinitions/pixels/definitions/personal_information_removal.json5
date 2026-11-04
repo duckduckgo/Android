@@ -2277,6 +2277,58 @@
         "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_dbp_notification_permission_prompt_shown": {
+        "description": "Fired when the dialog explaining why PIR needs the notification permission is shown after onboarding saves a profile and starts the initial scan.",
+        "owners": ["landomen"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "prompt_type",
+                "description": "What accepting the dialog does: show the system permission request, or open the app's notification settings because the permission was permanently denied.",
+                "type": "string",
+                "enum": ["request_permission", "open_settings"]
+            }
+        ]
+    },
+    "m_dbp_notification_permission_prompt_accepted": {
+        "description": "Fired when the user taps the positive button on the PIR notification permission dialog.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "prompt_type",
+                "description": "What accepting the dialog does: show the system permission request, or open the app's notification settings because the permission was permanently denied.",
+                "type": "string",
+                "enum": ["request_permission", "open_settings"]
+            }
+        ]
+    },
+    "m_dbp_notification_permission_prompt_dismissed": {
+        "description": "Fired when the user taps the negative button on the PIR notification permission dialog or dismisses it with back or an outside tap.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "prompt_type",
+                "description": "What accepting the dialog would have done: show the system permission request, or open the app's notification settings because the permission was permanently denied.",
+                "type": "string",
+                "enum": ["request_permission", "open_settings"]
+            }
+        ]
+    },
+    "m_dbp_notification_permission_granted": {
+        "description": "Fired when the user grants the notification permission in the system request launched from the PIR notification permission dialog.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "wide_pir-initial-scan": {
         "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",
         "owners": ["karlenDimla", "landomen"],

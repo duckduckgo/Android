@@ -74,6 +74,10 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_MANUAL_RESET
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_PERMISSION_GRANTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_PERMISSION_PROMPT_ACCEPTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_PERMISSION_PROMPT_DISMISSED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_PERMISSION_PROMPT_SHOWN
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
@@ -777,6 +781,14 @@ interface PirPixelSender {
     fun reportFreemiumScanCompleteNotificationOpened()
 
     fun reportScanCompleteNotificationSent()
+
+    fun reportNotificationPermissionPromptShown(promptType: PirNotificationPromptType)
+
+    fun reportNotificationPermissionPromptAccepted(promptType: PirNotificationPromptType)
+
+    fun reportNotificationPermissionPromptDismissed(promptType: PirNotificationPromptType)
+
+    fun reportNotificationPermissionGranted()
 }
 
 @ContributesBinding(AppScope::class)
@@ -1778,6 +1790,22 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE)
     }
 
+    override fun reportNotificationPermissionPromptShown(promptType: PirNotificationPromptType) {
+        fire(PIR_NOTIFICATION_PERMISSION_PROMPT_SHOWN, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
+    }
+
+    override fun reportNotificationPermissionPromptAccepted(promptType: PirNotificationPromptType) {
+        fire(PIR_NOTIFICATION_PERMISSION_PROMPT_ACCEPTED, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
+    }
+
+    override fun reportNotificationPermissionPromptDismissed(promptType: PirNotificationPromptType) {
+        fire(PIR_NOTIFICATION_PERMISSION_PROMPT_DISMISSED, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
+    }
+
+    override fun reportNotificationPermissionGranted() {
+        fire(PIR_NOTIFICATION_PERMISSION_GRANTED)
+    }
+
     private fun usageParams(isAuthenticated: Boolean): Map<String, String> = mapOf(
         PARAM_KEY_IS_AUTHENTICATED to isAuthenticated.toString(),
         PARAM_KEY_FREE_SCAN to (!isAuthenticated).toString(),
@@ -1905,5 +1933,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_NOTIFICATIONS_PERMISSION = "notifications_permission_granted"
         private const val PARAM_KEY_DID_CRASH = "did_crash"
         private const val PARAM_KEY_CTA_STATE = "cta_state"
+        private const val PARAM_KEY_PROMPT_TYPE = "prompt_type"
     }
 }

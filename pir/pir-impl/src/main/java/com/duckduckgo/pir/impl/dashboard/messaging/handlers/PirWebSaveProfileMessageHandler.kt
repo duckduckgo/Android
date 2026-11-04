@@ -140,10 +140,27 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
 
             if (!hadExistingProfiles) {
                 subscriptionOnboardingExperimentMetrics.firePirActivated()
+
+                if (runMode != null) {
+                    promptForNotificationPermission(jsMessage, jsMessageCallback)
+                }
             }
 
             pirWebProfileStateHolder.clear()
         }
+    }
+
+    /**
+     * Asking for the permission needs the dashboard activity, which this handler cannot reach directly,
+     * so the completed save is forwarded to the activity's callback instead.
+     */
+    private fun promptForNotificationPermission(
+        jsMessage: JsMessage,
+        jsMessageCallback: JsMessageCallback?,
+    ) {
+        if (!pirRemoteFeatures.notificationPermissionPrompt().isEnabled()) return
+
+        jsMessageCallback?.process(jsMessage.featureName, jsMessage.method, jsMessage.id, null)
     }
 
     /**
