@@ -145,7 +145,7 @@
     <string name="deviceMigrationAllSetBody2">Same privacy as always, and AI only when you want it.</string>
     <string name="deviceMigrationAllSetPrimaryCta" instruction="Button that closes the screen and opens the browser">Let’s go!</string>
     <string name="syncAfterDeviceTransferDaxDialogTitle">Oh before I forget...</string>
-    <string name="syncAfterDeviceTransferDaxDialogDescription"><![CDATA[Want to keep your data in sync across your other devices?<br/><br/>Sync and Backup syncs bookmarks, autofill data, and Duck.ai chats with end-to-end encryption.]]></string>
-    <string name="syncAfterDeviceTransferDaxDialogPrimaryCta" instruction="Button that opens the screen to set up Sync and Backup">Turn on Sync &amp; Backup</string>
+    <string name="syncAfterDeviceTransferDaxDialogDescription"><![CDATA[If you lose this phone, your data doesn’t have to go with it.<br/><br/>Sync and Backup keeps an encrypted copy that only you can access.]]></string>
+    <string name="syncAfterDeviceTransferDaxDialogPrimaryCta" instruction="Button that opens the screen to set up Sync and Backup">Turn on Sync</string>
 
 </resources>
