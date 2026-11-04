@@ -39,7 +39,7 @@ class SponsorBlockContentScopeJsMessageHandler @Inject constructor() : ContentSc
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
-        override val allowedDomains: List<String> = listOf("youtube.com")
+        override val allowedDomains: List<String> = listOf("youtube.com", "youtube-nocookie.com")
         override val featureName: String = SPONSOR_BLOCK_FEATURE_NAME
         override val methods: List<String> = listOf("getSkipSegments", "segmentEntered", "segmentExited")
     }
