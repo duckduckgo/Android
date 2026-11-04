@@ -43,6 +43,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 class RealPirNotificationManagerTest {
@@ -204,6 +205,26 @@ class RealPirNotificationManagerTest {
         val notification = testee.createScanStatusNotification(title = "title", message = "message")
 
         assertTapReplacesAnOpenDashboard(notification)
+    }
+
+    @Test
+    fun whenPermissionGrantedThenHasNotificationPermission() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        assertTrue(testee.hasNotificationPermission())
+    }
+
+    @Test
+    fun whenPermissionDeniedThenHasNoNotificationPermission() {
+        shadowOf(application).denyPermissions(POST_NOTIFICATIONS)
+
+        assertFalse(testee.hasNotificationPermission())
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid13ThenHasNotificationPermissionWithoutTheRuntimePermission() {
+        assertTrue(testee.hasNotificationPermission())
     }
 
     private fun assertTapReplacesAnOpenDashboard(notification: Notification) {

@@ -40,6 +40,7 @@ import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.
 import com.duckduckgo.pir.impl.dashboard.entrypoint.freeScanOrigin
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
@@ -79,6 +80,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pirDataStore: PirDataStore,
     private val foregroundScanServiceStarter: PirForegroundScanServiceStarter,
+    private val pirNotificationManager: PirNotificationManager,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var purchaseFlowOutstanding = false
@@ -123,13 +125,8 @@ class PirDashboardWebViewViewModel @Inject constructor(
         }
     }
 
-    fun onNotificationPermissionStateComputed(
-        isAtLeastApi33: Boolean,
-        permissionGranted: Boolean,
-        shouldShowRationale: Boolean,
-    ) {
-        // below Android 13 notifications are allowed without a runtime permission
-        if (!isAtLeastApi33 || permissionGranted) return
+    fun onNotificationPermissionStateComputed(shouldShowRationale: Boolean) {
+        if (pirNotificationManager.hasNotificationPermission()) return
 
         viewModelScope.launch {
             val hasRequestedBefore = withContext(dispatcherProvider.io()) { pirDataStore.hasRequestedNotificationPermission }
@@ -175,11 +172,11 @@ class PirDashboardWebViewViewModel @Inject constructor(
         }
     }
 
-    fun onResumed(notificationPermissionGranted: Boolean) {
+    fun onResumed() {
         if (!awaitingReturnFromNotificationSettings) return
         awaitingReturnFromNotificationSettings = false
 
-        if (notificationPermissionGranted) {
+        if (pirNotificationManager.hasNotificationPermission()) {
             showScanNotificationIfRunning()
         }
     }

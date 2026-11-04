@@ -51,6 +51,9 @@ interface PirNotificationManager {
     fun showScanCompleteNotification(runMode: PirRunMode): Boolean
 
     fun cancelNotifications()
+
+    /** Whether POST_NOTIFICATIONS is granted. Always true below Android 13, where it is not a runtime permission. */
+    fun hasNotificationPermission(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -97,7 +100,7 @@ class RealPirNotificationManager @Inject constructor(
     }
 
     override fun showScanCompleteNotification(runMode: PirRunMode): Boolean = runCatching {
-        val hasPermission = VERSION.SDK_INT < 33 || ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
+        val hasPermission = hasNotificationPermission()
         if (hasPermission) {
             // the scan can finish in a :pir process that never ran the dashboard, which is where the channel is otherwise created
             createNotificationChannel()
@@ -113,6 +116,9 @@ class RealPirNotificationManager @Inject constructor(
     override fun cancelNotifications() {
         notificationManagerCompat.cancel(PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
     }
+
+    override fun hasNotificationPermission(): Boolean =
+        VERSION.SDK_INT < 33 || ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
 
     private fun createScanCompleteNotification(runMode: PirRunMode): Notification = when (runMode) {
         PirRunMode.SCAN_ONLY -> createFreemiumScanCompleteNotification()

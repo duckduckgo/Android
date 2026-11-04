@@ -19,7 +19,6 @@ package com.duckduckgo.pir.impl.dashboard
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -28,7 +27,6 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -130,7 +128,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.onResumed(notificationPermissionGranted = isNotificationPermissionGranted())
+        viewModel.onResumed()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -272,17 +270,11 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     }
 
     private fun checkNotificationPermission() {
-        val isAtLeastApi33 = Build.VERSION.SDK_INT >= 33
-        viewModel.onNotificationPermissionStateComputed(
-            isAtLeastApi33 = isAtLeastApi33,
-            permissionGranted = isAtLeastApi33 && isNotificationPermissionGranted(),
-            shouldShowRationale = isAtLeastApi33 &&
-                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS),
-        )
+        viewModel.onNotificationPermissionStateComputed(shouldShowRationale = shouldShowNotificationPermissionRationale())
     }
 
-    private fun isNotificationPermissionGranted(): Boolean = Build.VERSION.SDK_INT < 33 ||
-        ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED
+    private fun shouldShowNotificationPermissionRationale(): Boolean = Build.VERSION.SDK_INT >= 33 &&
+        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
 
     private fun showNotificationPermissionPrompt(promptType: PirNotificationPromptType) {
         val (messageRes, positiveButtonRes) = when (promptType) {
