@@ -68,7 +68,6 @@
     <string name="login_screen_cant_scan_label">Nevar noskenēt?</string>
     <string name="login_screen_cant_scan_button_text">Kopēt teksta kodu</string>
 
-
     <!-- Connect screen -->
     <string name="connect_screen_title">Kvadrātkoda skenēšana</string>
     <string name="connect_screen_scan_qr_hint">Atver savā citā ierīcē lietotni DuckDuckGo un dodies uz <b>Settings &gt; Sync &amp; Back Up &gt; Sync With Another Device</b>.</string>
@@ -481,8 +480,49 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Piekļūsti savām parolēm mobilajās ierīcēs un datorā.</string>
     <string name="sync_passwords_import_promo_primary_button">Ieslēgt Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sinhronizē un dublē savas paroles mobilajās ierīcēs un datorā</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Piekļūsti savām grāmatzīmēm mobilajās ierīcēs un datorā.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Ieslēgt Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sinhronizē un dublē savas grāmatzīmes mobilajās ierīcēs un datorā</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Sinhronizē un dublē savas grāmatzīmes</string>
+    <string name="sync_bookmarks_promo_message">Šifrēšana no gala līdz galam. Neviens nevar redzēt tavas grāmatzīmes, pat ne mēs.</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Sinhronizēt ar savu galddatora lietotni</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button">Sinhronizē grāmatzīmes</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Iegūt lietotni</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Sync &amp; Backup grāmatzīmes</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Citas iespējas</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Paslēpt</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Ieslēgt Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Sinhronizēt ar manu galddatora lietotni</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Citas iespējas</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Paslēpt</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Sinhronizēt ar galddatoru</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Iegūt galddatora lietotni</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Sinhronizēsim tavu galddatora lietotni!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Sinhronizēt ar galddatoru</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Man nav galddatora lietotnes</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Sinhronizē un dublē savas paroles</string>
+    <string name="sync_passwords_promo_message">Pilnīga šifrēšana nozīmē, ka tavas paroles vari redzēt tikai tu, un pat mēs tās neredzam.</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Sinhronizēt ar savu galddatora lietotni</string>
+    <string name="sync_passwords_multi_device_promo_primary_button">Sinhronizēt paroles</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Iegūt lietotni</string>
+
 </resources>
