@@ -46,6 +46,7 @@ import android.text.Spanned
 import android.text.SpannedString
 import android.text.TextUtils
 import android.view.ContextMenu
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -291,7 +292,6 @@ import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.onboardingThemedContext
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -3206,7 +3206,12 @@ class BrowserTabFragment :
     }
 
     private fun resolveOnboardingContext(context: Context): Context {
-        return context.onboardingThemedContext(isDark = !appTheme.isLightModeEnabled())
+        val themeRes = if (appTheme.isLightModeEnabled()) {
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light_Onboarding
+        } else {
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
+        }
+        return ContextThemeWrapper(context, themeRes)
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {

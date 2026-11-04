@@ -20,13 +20,10 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.core.content.res.ResourcesCompat
-import com.duckduckgo.common.ui.store.NewThemeSetting
-import com.duckduckgo.common.ui.themeIdFor
+import com.duckduckgo.mobile.android.R
 import javax.inject.Inject
 
-internal class CustomTabShieldDrawableFactory @Inject constructor(
-    private val newThemeSetting: NewThemeSetting,
-) {
+internal class CustomTabShieldDrawableFactory @Inject constructor() {
 
     fun create(
         context: Context,
@@ -35,7 +32,14 @@ internal class CustomTabShieldDrawableFactory @Inject constructor(
     ): Drawable {
         val theme = context.resources.newTheme().apply {
             setTo(context.theme)
-            applyStyle(themeIdFor(isDark = !isLightMode, useNewTheme = newThemeSetting.useNewTheme), true)
+            applyStyle(
+                if (isLightMode) {
+                    R.style.Theme_DuckDuckGo_Light
+                } else {
+                    R.style.Theme_DuckDuckGo_Dark
+                },
+                true,
+            )
         }
 
         return requireNotNull(ResourcesCompat.getDrawable(context.resources, drawableRes, theme))

@@ -25,6 +25,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -60,7 +61,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.onboardingThemedContext
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -941,7 +941,12 @@ abstract class DaxBubbleCta(
     }
 
     protected fun resolveOnboardingContext(context: Context): Context {
-        return context.onboardingThemedContext(isDark = !isLightTheme)
+        val themeRes = if (isLightTheme) {
+            DesignSystemR.style.Theme_DuckDuckGo_Light_Onboarding
+        } else {
+            DesignSystemR.style.Theme_DuckDuckGo_Dark_Onboarding
+        }
+        return ContextThemeWrapper(context, themeRes)
     }
 
     private fun styleDismissButton(button: ImageView) {

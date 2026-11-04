@@ -167,7 +167,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/background_duck_ai_tab_card_voice"
                 android:padding="@dimen/keyline_2"
-                android:theme="?attr/daxThemeDark"
+                android:theme="@style/Theme.DuckDuckGo.Dark"
                 android:visibility="gone">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView

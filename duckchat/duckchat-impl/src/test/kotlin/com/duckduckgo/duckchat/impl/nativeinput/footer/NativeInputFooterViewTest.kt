@@ -38,6 +38,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Shadows.shadowOf
+import com.duckduckgo.mobile.android.R as CommonR
 
 @RunWith(AndroidJUnit4::class)
 class NativeInputFooterViewTest {
@@ -47,7 +48,7 @@ class NativeInputFooterViewTest {
 
     private val context: Context = ContextThemeWrapper(
         ApplicationProvider.getApplicationContext(),
-        com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
+        CommonR.style.Theme_DuckDuckGo_Light,
     )
     private val testee = NativeInputFooterView(context)
     private val card get() = testee.getChildAt(0) as MaterialCardView
@@ -56,7 +57,7 @@ class NativeInputFooterViewTest {
     @Test
     fun whenCreatedThenCardUsesSecondarySurfaceColourAndElevation() {
         assertEquals(
-            context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurfaceSecondary),
+            context.getColorFromAttr(CommonR.attr.daxColorSurfaceSecondary),
             card.cardBackgroundColor.defaultColor,
         )
         assertTrue(card.cardElevation > 0f)
@@ -68,21 +69,21 @@ class NativeInputFooterViewTest {
     }
 
     @Test
-    fun whenThemeIsDarkThenCardIs2F2F2F() {
+    fun whenThemeIsDarkThenCardIs2B2B2B() {
         val dark = ContextThemeWrapper(
             ApplicationProvider.getApplicationContext(),
-            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark,
+            CommonR.style.Theme_DuckDuckGo_Dark,
         )
         val darkCard = NativeInputFooterView(dark).getChildAt(0) as MaterialCardView
 
-        assertEquals(0xFF2F2F2F.toInt(), darkCard.cardBackgroundColor.defaultColor)
+        assertEquals(0xFF2B2B2B.toInt(), darkCard.cardBackgroundColor.defaultColor)
     }
 
     @Test
     fun whenCreatedThenOnlyBottomCornersAreRounded() {
         val bounds = RectF(0f, 0f, 100f, 100f)
         val shape = card.shapeAppearanceModel
-        val radius = context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+        val radius = context.resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
 
         assertEquals(0f, shape.topLeftCornerSize.getCornerSize(bounds), 0f)
         assertEquals(0f, shape.topRightCornerSize.getCornerSize(bounds), 0f)
@@ -105,7 +106,7 @@ class NativeInputFooterViewTest {
         advanceUntilIdle()
 
         val rows = rowsContainer
-        val spacing = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        val spacing = context.resources.getDimensionPixelSize(CommonR.dimen.keyline_2)
         assertSame(first, rows.getChildAt(0))
         assertSame(second, rows.getChildAt(1))
         assertSame(third, rows.getChildAt(2))
