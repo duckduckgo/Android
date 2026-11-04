@@ -38,7 +38,6 @@ import javax.inject.Inject
 @SingleIn(AppScope::class)
 class AppBrandDesignUpdatePreWarmObserver @Inject constructor(
     private val toggles: AppBrandDesignUpdateToggles,
-    private val newThemeSetting: NewThemeSetting,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
@@ -46,7 +45,6 @@ class AppBrandDesignUpdatePreWarmObserver @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             toggles.self().isEnabled()
-            newThemeSetting.useNewTheme
         }
     }
 }

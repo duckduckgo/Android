@@ -130,7 +130,7 @@
         android:foreground="?attr/selectableItemBackgroundBorderless"
         android:outlineProvider="none"
         android:padding="8dp"
-        android:theme="?attr/daxOnboardingThemeOverlay"
+        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
         app:tint="?attr/onboardingIconsPrimary"
         android:translationZ="8dp"
         app:layout_constraintEnd_toEndOf="@id/brandDesignCardView"

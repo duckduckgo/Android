@@ -26,7 +26,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.Theming.Constants.BROADCAST_THEME_CHANGED
-import com.duckduckgo.common.ui.Theming.Constants.FIXED_DARK_THEME_ACTIVITIES
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
 import com.duckduckgo.mobile.android.R
 
@@ -50,8 +49,6 @@ object Theming {
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
         val FIXED_THEME_ACTIVITIES = listOf(
             "com.duckduckgo.autofill.impl.service.AutofillProviderFillSuggestionActivity",
-        )
-        val FIXED_DARK_THEME_ACTIVITIES = listOf(
             "com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeActivity",
             "com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeActivity",
         )
@@ -61,11 +58,9 @@ object Theming {
 fun AppCompatActivity.applyTheme(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
-    useNewTheme: Boolean = false,
 ): BroadcastReceiver? {
-    when {
-        FIXED_DARK_THEME_ACTIVITIES.contains(localClassName) -> setTheme(themeIdFor(isDark = true, useNewTheme = useNewTheme))
-        !FIXED_THEME_ACTIVITIES.contains(localClassName) -> setTheme(getThemeId(theme, isFireMode, useNewTheme))
+    if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
+        setTheme(getThemeId(theme, isFireMode))
     }
     return registerForThemeChangeBroadcast()
 }
@@ -73,29 +68,20 @@ fun AppCompatActivity.applyTheme(
 fun AppCompatActivity.getThemeId(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
-    useNewTheme: Boolean = false,
 ): Int {
-    val isDark = when (theme) {
-        SYSTEM_DEFAULT -> isInNightMode()
-        DARK -> true
-        else -> false
+    return when (theme) {
+        SYSTEM_DEFAULT -> getSystemDefaultTheme(isFireMode)
+        DARK -> if (isFireMode) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
+        else -> if (isFireMode) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
     }
-    return themeIdFor(isDark, isFireMode, useNewTheme)
 }
 
-/**
- * The theme for a mode, from the old or the new family. Use this instead of naming
- * `Theme_DuckDuckGo_Light` or `Theme_DuckDuckGo_Dark` where the mode is forced, so the toggle is followed.
- */
-fun themeIdFor(
-    isDark: Boolean,
-    isFireMode: Boolean = false,
-    useNewTheme: Boolean = false,
-): Int = when {
-    useNewTheme && isDark -> if (isFireMode) R.style.Theme_DuckDuckGo_New_Dark_Fire else R.style.Theme_DuckDuckGo_New_Dark
-    useNewTheme -> if (isFireMode) R.style.Theme_DuckDuckGo_New_Light_Fire else R.style.Theme_DuckDuckGo_New_Light
-    isDark -> if (isFireMode) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
-    else -> if (isFireMode) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
+private fun Context.getSystemDefaultTheme(isFireMode: Boolean): Int {
+    return if (isInNightMode()) {
+        if (isFireMode) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
+    } else {
+        if (isFireMode) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
+    }
 }
 
 fun Context.isInNightMode(): Boolean {

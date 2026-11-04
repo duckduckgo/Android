@@ -199,7 +199,6 @@
     <color name="black96">#F5000000</color>
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
-    <color name="black48">#7A000000</color>
     <color name="black36">#5C000000</color>
     <color name="black30">#4D000000</color>
     <color name="black20">#33000000</color>
@@ -259,13 +258,10 @@
 
     <!-- Dark Palette -->
     <!-- Accents -->
-    <color name="accent_content_primary_dark">@color/blue80</color>
 
     <!-- Backgrounds -->
     <color name="background_background_dark">#282828</color>
     <color name="background_surface_dark">#373737</color>
-    <color name="background_surface_secondary_dark">#2F2F2F</color>
-    <color name="background_surface_tertiary_dark">@color/gray85</color>
     <color name="background_window_dark">#3D3D3D</color>
     <color name="background_duck_ai_dark">#111111</color>
     <color name="background_canvas_dark">#1F1F1F</color>
@@ -288,17 +284,14 @@
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
-    <color name="controls_decoration_tertiary_dark">#B8F9F9F9</color>
 
     <!-- Light Palette -->
     <!-- Accents -->
-    <color name="accent_content_primary_light">@color/white</color>
 
     <!-- Backgrounds -->
     <color name="background_background_light">#F2F2F2</color>
     <color name="background_surface_light">#F9F9F9</color>
     <color name="background_surface_secondary_light">#FCFCFC</color>
-    <color name="background_surface_tertiary_light">@color/white</color>
     <color name="background_window_light">#FFFFFF</color>
     <color name="background_duck_ai_light">#FFFFFF</color>
 
@@ -320,7 +313,6 @@
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>
-    <color name="controls_decoration_tertiary_light">#991F1F1F</color>
 
     <!-- Fire Mode Accent -->
     <attr name="daxColorFireModeAccentLight" format="color"/>

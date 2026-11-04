@@ -19,7 +19,7 @@ package com.duckduckgo.app.onboarding.ui.view
 import android.content.Context
 import android.content.res.Configuration
 import android.util.AttributeSet
-import com.duckduckgo.common.ui.onboardingThemedContext
+import android.view.ContextThemeWrapper
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.button.MaterialButton
 
@@ -44,7 +44,12 @@ class OnboardingSelectionButton @JvmOverloads constructor(
     companion object {
         private fun resolveOnboardingContext(context: Context): Context {
             val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-            return context.onboardingThemedContext(isDark = nightMode == Configuration.UI_MODE_NIGHT_YES)
+            val themeRes = if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+                R.style.Theme_DuckDuckGo_Dark_Onboarding
+            } else {
+                R.style.Theme_DuckDuckGo_Light_Onboarding
+            }
+            return ContextThemeWrapper(context, themeRes)
         }
     }
 }
