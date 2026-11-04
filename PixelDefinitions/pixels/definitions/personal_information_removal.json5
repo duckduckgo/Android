@@ -2278,7 +2278,7 @@
         "parameters": ["appVersion"]
     },
     "m_dbp_notification_permission_prompt_shown": {
-        "description": "Fired when the dialog explaining why PIR needs notifications is shown: after onboarding saves a profile and starts the initial scan, or right after a system permission request ended without the user tapping Don't allow: the system denied it without showing its dialog, or the user dismissed its first dialog.",
+        "description": "Fired when the dialog explaining why PIR needs notifications permission is shown.",
         "owners": ["landomen"],
         "triggers": ["impression"],
         "suffixes": ["count_short", "form_factor"],
@@ -2299,7 +2299,7 @@
         "parameters": ["appVersion", "pirNotificationPromptType"]
     },
     "m_dbp_notification_permission_granted": {
-        "description": "Fired when notifications are turned on from the PIR notification permission dialog: the user grants the system request (request_permission), or turns notifications on in Settings and returns to the dashboard (open_settings).",
+        "description": "Fired when notifications are turned on from the PIR notification permission dialog.",
         "owners": ["landomen"],
         "triggers": ["user_interaction"],
         "suffixes": ["count_short", "form_factor"],

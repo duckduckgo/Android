@@ -336,7 +336,7 @@
     "pirNotificationPromptType": {
         "key": "prompt_type",
         "type": "string",
-        "description": "Which PIR notification permission dialog this refers to: request_permission (accepting launches the system permission request) or open_settings (accepting opens the app's notification settings, because the system request may no longer show its dialog, or notifications are turned off for DuckDuckGo or the PIR channel).",
+        "description": "Which PIR notification permission dialog this refers to: request_permission (accepting launches the system permission request) or open_settings (accepting opens the app's notification settings).",
         "enum": ["request_permission", "open_settings"]
     },
     "duckAiSubscriptionFunnelOrigin": {
