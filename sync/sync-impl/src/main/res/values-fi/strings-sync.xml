@@ -492,6 +492,7 @@
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Synkronoi ja varmuuskopioi kirjanmerkkisi</string>
     <string name="sync_bookmarks_promo_message">Päästä päähän salattu. Kukaan ei voi nähdä kirjanmerkkejäsi, emme edes me.</string>
+    <string name="sync_bookmarks_promo_primary_button">Ota käyttöön Sync &amp; Backup</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -518,6 +519,7 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Synkronoi ja varmuuskopioi salasanasi</string>
     <string name="sync_passwords_promo_message">Päästä päähän -salaus tarkoittaa, että sinun lisäksesi kukaan muu ei näe salasanojasi, emme edes me.</string>
+    <string name="sync_passwords_promo_primary_button">Ota käyttöön Sync &amp; Backup</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
