@@ -17,7 +17,6 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import androidx.annotation.StringRes
-import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -126,7 +125,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
     private val deviceMigration: DeviceMigration,
-    private val notificationManager: NotificationManagerCompat,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
 
@@ -415,11 +413,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.NOTIFICATION_PERMISSION,
             pixelName = pixelName,
-            precondition = {
-                appBuildConfig.sdkInt >= 33 &&
-                    !withContext(dispatchers.io()) { notificationManager.areNotificationsEnabled() } &&
-                    !sawMigrationFlow()
-            },
+            precondition = { !sawMigrationFlow() },
             resolveDialog = { NewUserOnboardingActivityDialog.NotificationPermission },
             transition = { event ->
                 when {

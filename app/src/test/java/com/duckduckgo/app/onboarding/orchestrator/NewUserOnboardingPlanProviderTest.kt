@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -160,7 +159,6 @@ class NewUserOnboardingPlanProviderTest {
 
     private val passwordImportExperiment: OnboardingPasswordImportExperimentManager = mock()
     private val deviceMigration: DeviceMigration = mock()
-    private val notificationManager: NotificationManagerCompat = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
@@ -176,7 +174,6 @@ class NewUserOnboardingPlanProviderTest {
         // Most flows are exercised without the widget prompt; widget tests opt in by clearing this.
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
         whenever(appBuildConfig.sdkInt).thenReturn(33)
-        whenever(notificationManager.areNotificationsEnabled()).thenReturn(false)
         runBlocking {
             whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
             whenever(deviceMigration.isMigrationFlowPending()).thenReturn(false)
@@ -215,7 +212,6 @@ class NewUserOnboardingPlanProviderTest {
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
             deviceMigration = deviceMigration,
-            notificationManager = notificationManager,
             appCoroutineScope = coroutineRule.testScope,
         )
     }
@@ -254,23 +250,22 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when notifications are already granted then the notification step is skipped`() = runTest {
-        whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+    fun `when notifications are already granted then the notification step still shows to a new user`() = runTest {
         start()
 
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
 
-        assertStep(NewUserOnboardingStepIds.INITIAL)
+        assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
     }
 
     @Test
-    fun `when below Android 13 then the notification step is skipped`() = runTest {
+    fun `when below Android 13 then the notification step still shows to a new user`() = runTest {
         whenever(appBuildConfig.sdkInt).thenReturn(32)
         start()
 
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
 
-        assertStep(NewUserOnboardingStepIds.INITIAL)
+        assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
     }
 
     private suspend fun start(
