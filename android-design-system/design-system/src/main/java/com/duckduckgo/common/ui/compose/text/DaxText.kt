@@ -39,9 +39,16 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBoxInverted
 /**
  * Base text component for the DuckDuckGo design system.
  *
+ * @param text The text to display.
  * @param color The text color. Should use colors from [DuckDuckGoTheme.textColors] for consistency
  * with the design system (e.g., [DuckDuckGoTheme.textColors.primary], [DuckDuckGoTheme.textColors.secondary]).
  * A lint rule will warn if arbitrary colors are used.
+ * @param modifier Modifier applied to the text.
+ * @param style Typography from [DuckDuckGoTheme.typography].
+ * @param textAlign Horizontal alignment within the text's bounds; `null` uses the style's alignment.
+ * @param overflow How visual overflow is handled; ellipsis by default.
+ * @param maxLines Maximum number of lines; text beyond it is handled by [overflow].
+ * @param onTextLayout Called with the layout result each time the text is laid out.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211634956773768
  * Figma reference: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=1313-19967
@@ -74,11 +81,18 @@ fun DaxText(
  * styling (bold spans, color spans, links, etc.). Build the [AnnotatedString]
  * with [buildAnnotatedString] or compose it from string resources.
  *
+ * @param text The styled text to display.
  * @param color The default text color applied to spans that do not override it via [SpanStyle].
+ * @param modifier Modifier applied to the text.
+ * @param style Typography from [DuckDuckGoTheme.typography].
+ * @param textAlign Horizontal alignment within the text's bounds; `null` uses the style's alignment.
+ * @param overflow How visual overflow is handled; ellipsis by default.
+ * @param maxLines Maximum number of lines; text beyond it is handled by [overflow].
+ * @param onTextLayout Called with the layout result each time the text is laid out.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211634956773768
  * Figma reference: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=1313-19967
- * */
+ */
 @Composable
 fun DaxText(
     text: AnnotatedString,

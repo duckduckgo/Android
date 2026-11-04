@@ -44,10 +44,6 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.R
 import kotlin.math.roundToInt
 
-/**
- * Temporary onboarding-only colour overlay. This is a for-now choice while onboarding Compose
- * theming settles; it intentionally overlays, rather than replacing, [DuckDuckGoTheme].
- */
 @Immutable
 internal data class OnboardingColors(
     val surfaceTertiary: Color,
@@ -64,7 +60,7 @@ internal val LocalOnboardingColors = compositionLocalOf<OnboardingColors> {
 }
 
 /**
- * Provides the temporary onboarding colour overlay inside [DuckDuckGoTheme].
+ * Provides the onboarding colour overlay inside [DuckDuckGoTheme].
  * Call this provider around every onboarding dialog; the dialog reads its colours from the
  * onboarding composition local, and omitting the provider causes that local to throw.
  *

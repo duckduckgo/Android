@@ -20,9 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.duckduckgo.common.ui.compose.theme.DuckSansProduct
 import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -70,6 +75,17 @@ object DaxOnboardingDialogDefaults {
     val StepIndicatorDotGap: Dp = 4.dp
     val StepIndicatorLabelGap: Dp = 20.dp
     val StepIndicatorTransitionDuration: Duration = 300.milliseconds
+    internal val StepIndicatorCornerRadius: Dp = 64.dp
+    internal val StepIndicatorBorderWidth: Dp = 1.5.dp
+    internal val StepIndicatorStartPadding: Dp = 8.dp
+    internal val StepIndicatorEndPadding: Dp = 10.dp
+    internal val StepIndicatorVerticalPadding: Dp = 6.dp
+    internal val StepIndicatorLabelStyle = TextStyle(
+        fontFamily = DuckSansProduct,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+    )
 
     internal val ContainerFadeDuration: Duration = 400.milliseconds
     internal val ContentFadeDuration: Duration = 200.milliseconds

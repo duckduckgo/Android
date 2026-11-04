@@ -107,7 +107,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
@@ -188,8 +187,6 @@ internal fun DaxOnboardingDialogCore(
     useNativeCtaInsets: Boolean = false,
     showScrollbar: Boolean = false,
 ) {
-    val titleMeasurer = rememberTextMeasurer()
-    val naturalTitleStyle = titleStyle.asTextStyle.copy(lineHeight = TextUnit.Unspecified)
     val inInspectionMode = LocalInspectionMode.current
     val compositionScope = rememberCoroutineScope()
     val motionScale = compositionScope.coroutineContext[MotionDurationScale]?.scaleFactor ?: 1f
@@ -347,12 +344,6 @@ internal fun DaxOnboardingDialogCore(
     val shellAlpha = { if (tailAtRest()) 1f else shell.cardAlpha.value }
     val colors = DaxOnboardingDialogDefaults.colors
     val onboardingIconsPrimary = LocalOnboardingColors.current.iconsPrimary
-    val alignment = if (textAlign == DaxOnboardingDialogTextAlign.Start) TextAlign.Start else TextAlign.Center
-    val titleMode = when {
-        intro.phase == IntroPhase.Typing -> TitleRenderMode.Typing
-        intro.phase == IntroPhase.Content || settled -> TitleRenderMode.Full
-        else -> TitleRenderMode.Hidden
-    }
     // Not `settled`: onContentReady requests focus before recomposition updates it.
     val contentGate = Modifier
         .focusProperties { if (intro.phase != IntroPhase.Settled) onEnter = { cancelFocusChange() } }
@@ -410,155 +401,39 @@ internal fun DaxOnboardingDialogCore(
                                 bottom = bottomPadding,
                             ),
                     ) {
-                        @Composable
-                        fun DialogText() {
-                            if (headerImage != null) {
-                                Image(
-                                    painter = headerImage,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentWidth(Alignment.CenterHorizontally)
-                                        .requiredSize(DaxOnboardingDialogDefaults.HeaderImageSize)
-                                        .drawAlpha { intro.headerAlpha.value },
-                                )
-                                Spacer(Modifier.size(DaxOnboardingDialogDefaults.HeaderTitleSpacing))
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = textHorizontalPadding),
-                                horizontalAlignment = if (textAlign == DaxOnboardingDialogTextAlign.Center) {
-                                    Alignment.CenterHorizontally
-                                } else {
-                                    Alignment.Start
-                                },
-                            ) {
-                                if (title.text.isNotEmpty()) {
-                                    Box(
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .layout { measurable, constraints ->
-                                                val placeable = measurable.measure(constraints)
-                                                val naturalHeight = titleMeasurer.measure(
-                                                    text = title,
-                                                    style = naturalTitleStyle,
-                                                    constraints = constraints.copy(minHeight = 0),
-                                                ).size.height
-                                                layout(
-                                                    placeable.width,
-                                                    constraints.constrainHeight(naturalHeight),
-                                                ) { placeable.place(0, 0) }
-                                            }
-                                            .then(if (titleMode == TitleRenderMode.Hidden) Modifier.clearAndSetSemantics { } else Modifier)
-                                            .alpha(
-                                                when (titleMode) {
-                                                    TitleRenderMode.Hidden -> 0f
-                                                    TitleRenderMode.Typing,
-                                                    TitleRenderMode.Full,
-                                                    -> 1f
-                                                },
-                                            ),
-                                    ) {
-                                        when (titleMode) {
-                                            TitleRenderMode.Typing -> DaxTypingText(
-                                                text = title,
-                                                modifier = Modifier.fillMaxWidth(),
-                                                style = titleStyle,
-                                                color = colors.content,
-                                                textAlign = alignment,
-                                                animate = sampledAnimate,
-                                                onFinished = intro::onTypingFinished,
-                                            )
-
-                                            TitleRenderMode.Hidden,
-                                            TitleRenderMode.Full,
-                                            -> DaxText(
-                                                text = title,
-                                                modifier = Modifier.fillMaxWidth(),
-                                                style = titleStyle,
-                                                color = colors.content,
-                                                textAlign = alignment,
-                                            )
-                                        }
-                                    }
-                                }
-
-                                if (body != null) {
-                                    if (title.text.isNotEmpty()) {
-                                        Spacer(
-                                            Modifier.size(
-                                                if (landscapeLayout) {
-                                                    DaxOnboardingDialogDefaults.LandscapeTitleBodySpacing
-                                                } else {
-                                                    titleBodySpacing
-                                                },
-                                            ),
-                                        )
-                                    }
-                                    Box(
-                                        contentGate
-                                            .then(if (title.text.isEmpty()) Modifier.fillMaxWidth() else Modifier)
-                                            .drawAlpha { intro.contentAlpha.value },
-                                    ) { body.invoke() }
-                                }
-                            }
-                        }
-
-                        @Composable
-                        fun DialogActions(landscape: Boolean) {
-                            val hasActions = content != null || primaryCta != null
-                            val density = LocalDensity.current
-                            val contentToPrimarySpacing = if (useNativeCtaInsets) {
-                                with(density) { (20.dp.roundToPx() + 4.dp.roundToPx()).toDp() }
-                            } else {
-                                DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing
-                            }
-                            val actionLayout = dialogActionLayout(
-                                hasContent = content != null,
-                                hasPrimaryCta = primaryCta != null,
-                                headerToActionsSpacing = headerToActionsSpacing,
-                                contentToPrimarySpacing = contentToPrimarySpacing,
-                            )
-                            if (!landscape && hasActions) {
-                                Spacer(Modifier.size(actionLayout.headerToActions))
-                            }
-
-                            if (content != null) {
-                                Box(
-                                    modifier = contentGate
-                                        .fillMaxWidth()
-                                        .padding(horizontal = contentHorizontalPadding)
-                                        .drawAlpha { intro.contentAlpha.value },
-                                ) {
-                                    contentSlot(content)
-                                }
-                            }
-
-                            if (primaryCta != null) {
-                                Spacer(Modifier.height(actionLayout.contentToPrimary))
-                                DaxOnboardingPrimaryButton(
-                                    text = primaryCta.text,
-                                    onClick = { if (intro.settled) primaryCta.onClick() },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = DaxOnboardingDialogDefaults.ContentHorizontalPadding)
-                                        .introCtaGate(settled, primaryCta.text)
-                                        .drawAlpha { intro.contentAlpha.value },
-                                    enabled = primaryCta.enabled,
-                                )
-                            }
-
-                            if (primaryCta != null) {
-                                Spacer(Modifier.height(4.dp))
-                            }
-                        }
-
                         Layout(
                             content = {
-                                Column { DialogText() }
-                                Column { DialogActions(landscapeLayout) }
+                                Column {
+                                    DialogText(
+                                        intro = intro,
+                                        title = title,
+                                        titleStyle = titleStyle,
+                                        textAlign = textAlign,
+                                        headerImage = headerImage,
+                                        body = body,
+                                        titleBodySpacing = if (landscapeLayout) {
+                                            DaxOnboardingDialogDefaults.LandscapeTitleBodySpacing
+                                        } else {
+                                            titleBodySpacing
+                                        },
+                                        textHorizontalPadding = textHorizontalPadding,
+                                        contentColor = colors.content,
+                                        contentGate = contentGate,
+                                    )
+                                }
+                                Column {
+                                    DialogActions(
+                                        intro = intro,
+                                        content = content,
+                                        contentSlot = contentSlot,
+                                        primaryCta = primaryCta,
+                                        landscape = landscapeLayout,
+                                        headerToActionsSpacing = headerToActionsSpacing,
+                                        contentHorizontalPadding = contentHorizontalPadding,
+                                        useNativeCtaInsets = useNativeCtaInsets,
+                                        contentGate = contentGate,
+                                    )
+                                }
                             },
                             modifier = Modifier.fillMaxWidth(),
                         ) { measurables, constraints ->
@@ -640,6 +515,172 @@ internal fun DaxOnboardingDialogCore(
                 }
                 .graphicsLayer { alpha = shellAlpha() },
         )
+    }
+}
+
+@Composable
+private fun DialogText(
+    intro: DaxOnboardingDialogIntro,
+    title: AnnotatedString,
+    titleStyle: DuckDuckGoTextStyle,
+    textAlign: DaxOnboardingDialogTextAlign,
+    headerImage: Painter?,
+    body: (@Composable () -> Unit)?,
+    titleBodySpacing: Dp,
+    textHorizontalPadding: Dp,
+    contentColor: Color,
+    contentGate: Modifier,
+) {
+    val titleMeasurer = rememberTextMeasurer()
+    val naturalTitleStyle = titleStyle.asTextStyle.copy(lineHeight = TextUnit.Unspecified)
+    val alignment = textAlign.composeTextAlign
+    val titleMode = when {
+        intro.phase == IntroPhase.Typing -> TitleRenderMode.Typing
+        intro.phase == IntroPhase.Content || intro.settled -> TitleRenderMode.Full
+        else -> TitleRenderMode.Hidden
+    }
+    if (headerImage != null) {
+        Image(
+            painter = headerImage,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .requiredSize(DaxOnboardingDialogDefaults.HeaderImageSize)
+                .drawAlpha { intro.headerAlpha.value },
+        )
+        Spacer(Modifier.size(DaxOnboardingDialogDefaults.HeaderTitleSpacing))
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = textHorizontalPadding),
+        horizontalAlignment = if (textAlign == DaxOnboardingDialogTextAlign.Center) {
+            Alignment.CenterHorizontally
+        } else {
+            Alignment.Start
+        },
+    ) {
+        if (title.text.isNotEmpty()) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .layout { measurable, constraints ->
+                        val placeable = measurable.measure(constraints)
+                        val naturalHeight = titleMeasurer.measure(
+                            text = title,
+                            style = naturalTitleStyle,
+                            constraints = constraints.copy(minHeight = 0),
+                        ).size.height
+                        layout(
+                            placeable.width,
+                            constraints.constrainHeight(naturalHeight),
+                        ) { placeable.place(0, 0) }
+                    }
+                    .then(if (titleMode == TitleRenderMode.Hidden) Modifier.clearAndSetSemantics { } else Modifier)
+                    .alpha(
+                        when (titleMode) {
+                            TitleRenderMode.Hidden -> 0f
+                            TitleRenderMode.Typing,
+                            TitleRenderMode.Full,
+                            -> 1f
+                        },
+                    ),
+            ) {
+                when (titleMode) {
+                    TitleRenderMode.Typing -> DaxTypingText(
+                        text = title,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = titleStyle,
+                        color = contentColor,
+                        textAlign = alignment,
+                        animate = intro.animate,
+                        onFinished = intro::onTypingFinished,
+                    )
+
+                    TitleRenderMode.Hidden,
+                    TitleRenderMode.Full,
+                    -> DaxText(
+                        text = title,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = titleStyle,
+                        color = contentColor,
+                        textAlign = alignment,
+                    )
+                }
+            }
+        }
+
+        if (body != null) {
+            if (title.text.isNotEmpty()) {
+                Spacer(Modifier.size(titleBodySpacing))
+            }
+            Box(
+                contentGate
+                    .then(if (title.text.isEmpty()) Modifier.fillMaxWidth() else Modifier)
+                    .drawAlpha { intro.contentAlpha.value },
+            ) { body.invoke() }
+        }
+    }
+}
+
+@Composable
+private fun DialogActions(
+    intro: DaxOnboardingDialogIntro,
+    content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)?,
+    contentSlot: @Composable (@Composable DaxOnboardingDialogContentScope.() -> Unit) -> Unit,
+    primaryCta: DaxOnboardingDialogCta?,
+    landscape: Boolean,
+    headerToActionsSpacing: Dp,
+    contentHorizontalPadding: Dp,
+    useNativeCtaInsets: Boolean,
+    contentGate: Modifier,
+) {
+    val hasActions = content != null || primaryCta != null
+    val density = LocalDensity.current
+    val contentToPrimarySpacing = if (useNativeCtaInsets) {
+        with(density) { (20.dp.roundToPx() + 4.dp.roundToPx()).toDp() }
+    } else {
+        DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing
+    }
+    val actionLayout = dialogActionLayout(
+        hasContent = content != null,
+        hasPrimaryCta = primaryCta != null,
+        headerToActionsSpacing = headerToActionsSpacing,
+        contentToPrimarySpacing = contentToPrimarySpacing,
+    )
+    if (!landscape && hasActions) {
+        Spacer(Modifier.size(actionLayout.headerToActions))
+    }
+
+    if (content != null) {
+        Box(
+            modifier = contentGate
+                .fillMaxWidth()
+                .padding(horizontal = contentHorizontalPadding)
+                .drawAlpha { intro.contentAlpha.value },
+        ) {
+            contentSlot(content)
+        }
+    }
+
+    if (primaryCta != null) {
+        Spacer(Modifier.height(actionLayout.contentToPrimary))
+        DaxOnboardingPrimaryButton(
+            text = primaryCta.text,
+            onClick = { if (intro.settled) primaryCta.onClick() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = DaxOnboardingDialogDefaults.ContentHorizontalPadding)
+                .introCtaGate(intro.settled, primaryCta.text)
+                .drawAlpha { intro.contentAlpha.value },
+            enabled = primaryCta.enabled,
+        )
+    }
+
+    if (primaryCta != null) {
+        Spacer(Modifier.height(4.dp))
     }
 }
 

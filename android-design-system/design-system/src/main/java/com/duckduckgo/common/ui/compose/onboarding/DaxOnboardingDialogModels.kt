@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.compose.onboarding
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.style.TextAlign
 import kotlinx.collections.immutable.ImmutableList
 
 /** Horizontal alignment options supported by the onboarding dialog variants. */
@@ -26,6 +27,12 @@ enum class DaxOnboardingDialogTextAlign {
     Start,
     Center,
 }
+
+internal val DaxOnboardingDialogTextAlign.composeTextAlign: TextAlign
+    get() = when (this) {
+        DaxOnboardingDialogTextAlign.Start -> TextAlign.Start
+        DaxOnboardingDialogTextAlign.Center -> TextAlign.Center
+    }
 
 /** A dialog CTA and the action it performs.
  *
