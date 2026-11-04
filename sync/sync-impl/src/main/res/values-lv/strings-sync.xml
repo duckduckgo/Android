@@ -492,6 +492,7 @@
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Sinhronizē un dublē savas grāmatzīmes</string>
     <string name="sync_bookmarks_promo_message">Šifrēšana no gala līdz galam. Neviens nevar redzēt tavas grāmatzīmes, pat ne mēs.</string>
+    <string name="sync_bookmarks_promo_primary_button">Ieslēgt Sync &amp; Backup</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -518,6 +519,7 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Sinhronizē un dublē savas paroles</string>
     <string name="sync_passwords_promo_message">Pilnīga šifrēšana nozīmē, ka tavas paroles vari redzēt tikai tu, un pat mēs tās neredzam.</string>
+    <string name="sync_passwords_promo_primary_button">Ieslēgt Sync &amp; Backup</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
