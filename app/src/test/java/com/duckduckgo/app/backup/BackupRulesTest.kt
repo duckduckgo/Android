@@ -32,8 +32,8 @@ class BackupRulesTest {
     fun cloudBackupExcludesEveryDomain() {
         val cloudBackup = modernRules.section("cloud-backup")
 
-        assertEquals(ALL_DOMAINS.map { it to "." }.toSet(), cloudBackup.rules("exclude").toSet())
-        assertTrue(cloudBackup.getElementsByTagName("include").length == 0)
+        assertEquals(CLOUD_RESTORE_WOULD_LOOK_LIKE_A_TRANSFER, ALL_DOMAINS.map { it to "." }.toSet(), cloudBackup.rules("exclude").toSet())
+        assertTrue(CLOUD_RESTORE_WOULD_LOOK_LIKE_A_TRANSFER, cloudBackup.getElementsByTagName("include").length == 0)
     }
 
     @Test
@@ -42,7 +42,11 @@ class BackupRulesTest {
 
         assertTrue(includes.length > 0)
         for (i in 0 until includes.length) {
-            assertEquals("deviceToDeviceTransfer", (includes.item(i) as Element).getAttribute("requireFlags"))
+            assertEquals(
+                CLOUD_RESTORE_WOULD_LOOK_LIKE_A_TRANSFER,
+                "deviceToDeviceTransfer",
+                (includes.item(i) as Element).getAttribute("requireFlags"),
+            )
         }
     }
 
@@ -119,6 +123,11 @@ class BackupRulesTest {
     }
 
     private companion object {
+        // The new phone cannot tell a cloud restore from a device transfer: DeviceMigrationBackupAgent marks any restore
+        // that wrote files, and detection also reads an ATB on a fresh package as transferred data.
+        const val CLOUD_RESTORE_WOULD_LOOK_LIKE_A_TRANSFER =
+            "Cloud backup must carry no data until device migration detection can tell a cloud restore from a device transfer"
+
         val ALL_DOMAINS = listOf("file", "database", "sharedpref", "external", "root")
         val TRANSFERRED_DOMAINS = listOf("file", "database", "sharedpref", "root")
 
