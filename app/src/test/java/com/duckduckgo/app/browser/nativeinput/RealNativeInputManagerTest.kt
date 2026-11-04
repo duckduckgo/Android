@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -101,7 +102,6 @@ class RealNativeInputManagerTest {
     private val nativeInputEventListener: NativeInputEventListener = mock()
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
     private val duckAiChatStore: DuckAiChatStore = mock()
-    private val newChatInputFocusPending = MutableStateFlow(false)
     private var autoFocusWidgetRoot: View? = null
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
@@ -139,28 +139,62 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenNewChatIsReadyThenWidgetFocusesOnlyOnceWhileVisible() {
+    fun whenExistingConversationBecomesVisibleThenPreviousKeyboardIsHidden() = runTest {
+        whenever(duckAiChatStore.hasMigrated()).thenReturn(false)
+        val widget = givenAutoFocusWidget(hasOtherFocus = true, url = MutableStateFlow("https://duck.ai/chat?chatID=existing"))
+        val root = requireNotNull(autoFocusWidgetRoot).parent as ViewGroup
+        val inputMethodManager = root.context.getSystemService(InputMethodManager::class.java)
+        inputMethodManager.showSoftInput(root.findFocus(), InputMethodManager.SHOW_IMPLICIT)
+        assertTrue(shadowOf(inputMethodManager).isSoftInputVisible)
+
+        testee.onTabVisibilityChanged(true)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertFalse(shadowOf(inputMethodManager).isSoftInputVisible)
+        verify(widget, never()).focusInput(any())
+        verify(widget, never()).requestInputFocus()
+    }
+
+    @Test
+    fun whenAttachmentPickerReturnsToExistingChatThenKeyboardIsNotDismissed() = runTest {
+        whenever(duckAiChatStore.hasMigrated()).thenReturn(false)
+        val widget = givenAutoFocusWidget(hasOtherFocus = true, url = MutableStateFlow("https://duck.ai/chat?chatID=existing"))
+        val root = requireNotNull(autoFocusWidgetRoot).parent as ViewGroup
+        val inputMethodManager = root.context.getSystemService(InputMethodManager::class.java)
+        testee.onTabVisibilityChanged(true)
+        shadowOf(Looper.getMainLooper()).idle()
+        clearInvocations(widget)
+        testee.setPickingImage(true)
+        testee.onTabVisibilityChanged(false)
+        inputMethodManager.showSoftInput(root.findFocus(), InputMethodManager.SHOW_IMPLICIT)
+
+        testee.onTabVisibilityChanged(true)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(shadowOf(inputMethodManager).isSoftInputVisible)
+        verify(widget, never()).clearInputFocus()
+    }
+
+    @Test
+    fun whenNewChatBecomesVisibleThenWidgetFocusesOnlyOnce() {
         val widget = givenAutoFocusWidget()
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget).focusInput(any())
-        assertFalse(newChatInputFocusPending.value)
         testee.onTabVisibilityChanged(true)
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget, times(1)).focusInput(any())
     }
 
     @Test
-    fun whenFocusIsReArmedWhileHiddenThenReturningToNewChatFocusesAgain() {
+    fun whenEmptyChatBecomesVisibleAgainThenKeyboardIsRequestedAgain() {
         val widget = givenAutoFocusWidget()
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget).focusInput(any())
 
         testee.onTabVisibilityChanged(false)
-        newChatInputFocusPending.value = true
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget, times(1)).focusInput(any())
 
@@ -176,7 +210,7 @@ class RealNativeInputManagerTest {
         autoFocusWidgetRoot?.visibility = View.GONE
         shadowOf(Looper.getMainLooper()).idle()
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget, never()).focusInput(any())
 
@@ -195,7 +229,7 @@ class RealNativeInputManagerTest {
         shadowOf(Looper.getMainLooper()).idle()
 
         url.value = "https://duck.ai/chat"
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(widget).focusInput(any())
@@ -204,7 +238,7 @@ class RealNativeInputManagerTest {
     @Test
     fun whenNewChatIsInBackgroundThenWidgetWaitsForVisibility() {
         val widget = givenAutoFocusWidget()
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget, never()).focusInput(any())
 
@@ -214,18 +248,10 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenNoFocusRequestIsPendingThenWidgetDoesNotFocus() {
-        val widget = givenAutoFocusWidget()
-        testee.onTabVisibilityChanged(true)
-        shadowOf(Looper.getMainLooper()).idle()
-        verify(widget, never()).focusInput(any())
-    }
-
-    @Test
     fun whenHardwareKeyboardConnectedThenWidgetOnlyRequestsFocus() {
         val widget = givenAutoFocusWidget(hardwareKeyboard = true)
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget).requestInputFocus()
         verify(widget, never()).focusInput(any())
@@ -236,7 +262,8 @@ class RealNativeInputManagerTest {
         val widget = givenAutoFocusWidget(hardwareKeyboard = true)
         testee.onTabVisibilityChanged(true)
         shadowOf(Looper.getMainLooper()).idle()
-        newChatInputFocusPending.value = true
+        clearInvocations(widget)
+        testee.requestNewChatInputFocus()
 
         val root = requireNotNull(autoFocusWidgetRoot).parent as ViewGroup
         val button = Button(root.context).apply { isFocusableInTouchMode = true }
@@ -246,27 +273,24 @@ class RealNativeInputManagerTest {
 
         verify(widget).requestInputFocus()
         verify(widget, never()).focusInput(any())
-        assertFalse(newChatInputFocusPending.value)
     }
 
     @Test
     fun whenAnotherInputHasFocusThenWidgetNeverStealsIt() {
         val widget = givenAutoFocusWidget(hasOtherFocus = true)
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget, never()).focusInput(any())
         verify(widget, never()).requestInputFocus()
-        assertTrue(newChatInputFocusPending.value)
     }
 
     @Test
     fun whenAnotherInputReleasesFocusThenPendingNewChatFocusIsRetried() {
         val widget = givenAutoFocusWidget(hasOtherFocus = true)
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
-        assertTrue(newChatInputFocusPending.value)
         verify(widget, never()).focusInput(any())
 
         val root = requireNotNull(autoFocusWidgetRoot).parent as ViewGroup
@@ -279,7 +303,6 @@ class RealNativeInputManagerTest {
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(widget).focusInput(any())
-        assertFalse(newChatInputFocusPending.value)
     }
 
     @Test
@@ -287,7 +310,8 @@ class RealNativeInputManagerTest {
         val widget = givenAutoFocusWidget()
         testee.onTabVisibilityChanged(true)
         shadowOf(Looper.getMainLooper()).idle()
-        newChatInputFocusPending.value = true
+        clearInvocations(widget)
+        testee.requestNewChatInputFocus()
 
         val root = requireNotNull(autoFocusWidgetRoot).parent as ViewGroup
         val otherInput = EditText(root.context)
@@ -295,7 +319,6 @@ class RealNativeInputManagerTest {
         otherInput.requestFocus()
         shadowOf(Looper.getMainLooper()).idle()
 
-        assertFalse(newChatInputFocusPending.value)
         verify(widget, never()).focusInput(any())
 
         val dummy = View(root.context).apply {
@@ -316,10 +339,9 @@ class RealNativeInputManagerTest {
         val widget = givenAutoFocusWidget()
         whenever(widget.hasInputFocus()).thenReturn(true)
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
 
-        assertFalse(newChatInputFocusPending.value)
         verify(widget).focusInput(any())
     }
 
@@ -327,8 +349,50 @@ class RealNativeInputManagerTest {
     fun whenPromptUrlThenWidgetDoesNotFocus() {
         val widget = givenAutoFocusWidget(url = MutableStateFlow("https://duck.ai/chat?prompt=1"))
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
+        verify(widget, never()).focusInput(any())
+    }
+
+    @Test
+    fun whenPromptParameterIsRemovedThenWidgetDoesNotAutoFocus() {
+        val url = MutableStateFlow<String?>("https://duck.ai/chat?prompt=1")
+        val widget = givenAutoFocusWidget(url = url)
+        testee.onTabVisibilityChanged(true)
+        testee.requestNewChatInputFocus()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        url.value = "https://duck.ai/chat"
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(widget, never()).focusInput(any())
+    }
+
+    @Test
+    fun whenNewChatUrlParametersChangeAfterFocusThenWidgetDoesNotFocusAgain() {
+        val url = MutableStateFlow<String?>("https://duck.ai/chat")
+        val widget = givenAutoFocusWidget(url = url)
+        testee.onTabVisibilityChanged(true)
+        testee.requestNewChatInputFocus()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        url.value = "https://duck.ai/chat?native-input=true"
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(widget, times(1)).focusInput(any())
+    }
+
+    @Test
+    fun whenPromptIsSubmittedBeforePostedFocusThenWidgetDoesNotFocus() {
+        val widget = givenAutoFocusWidget()
+        testee.onTabVisibilityChanged(true)
+        testee.requestNewChatInputFocus()
+        requireNotNull(autoFocusWidgetRoot)
+            .findViewById<TestNativeInputWidget>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget)
+            .submitMessage("A prompt")
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(nativeInputEventListener).onChatPromptSubmitted()
         verify(widget, never()).focusInput(any())
     }
 
@@ -336,22 +400,21 @@ class RealNativeInputManagerTest {
     fun whenFocusRequestIsCancelledBeforePostedAttemptThenWidgetDoesNotFocus() {
         val widget = givenAutoFocusWidget()
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
-        newChatInputFocusPending.value = false
+        testee.requestNewChatInputFocus()
+        testee.onTabVisibilityChanged(false)
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(widget, never()).focusInput(any())
     }
 
     @Test
-    fun whenExistingChatIsIneligibleThenFocusRequestRemainsForNewChat() = runTest {
+    fun whenExistingChatNavigatesToNewChatThenWidgetFocuses() = runTest {
         whenever(duckAiChatStore.hasMigrated()).thenReturn(false)
         val url = MutableStateFlow<String?>("https://duck.ai/chat?chatID=previous")
         val widget = givenAutoFocusWidget(url = url)
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
-        assertTrue(newChatInputFocusPending.value)
         verify(widget, never()).focusInput(any())
 
         url.value = "https://duck.ai/chat"
@@ -373,7 +436,7 @@ class RealNativeInputManagerTest {
         val nextActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
         nextActivity.setContentView(root)
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget, never()).focusInput(any())
 
@@ -383,17 +446,16 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenUrlBecomesIneligibleBeforePostedFocusThenRequestIsNotConsumed() = runTest {
+    fun whenUrlBecomesIneligibleBeforePostedFocusThenWidgetDoesNotFocus() = runTest {
         whenever(duckAiChatStore.hasMigrated()).thenReturn(false)
         val url = MutableStateFlow<String?>("https://duck.ai/chat")
         val widget = givenAutoFocusWidget(url = url)
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         url.value = "https://duck.ai/chat?chatID=previous"
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(widget, never()).focusInput(any())
-        assertTrue(newChatInputFocusPending.value)
     }
 
     @Test
@@ -403,7 +465,7 @@ class RealNativeInputManagerTest {
         verify(widget).focusInput(any())
 
         testee.onTabVisibilityChanged(true)
-        newChatInputFocusPending.value = true
+        testee.requestNewChatInputFocus()
         shadowOf(Looper.getMainLooper()).idle()
         verify(widget, times(2)).focusInput(any())
     }
@@ -426,6 +488,12 @@ class RealNativeInputManagerTest {
             )
             root.getChildAt(1).requestFocus()
         }
+        root.addView(
+            View(activity).apply {
+                id = R.id.focusDummy
+                isFocusableInTouchMode = true
+            },
+        )
         root.resources.configuration.keyboard = if (hardwareKeyboard) Configuration.KEYBOARD_QWERTY else Configuration.KEYBOARD_NOKEYS
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
@@ -452,9 +520,7 @@ class RealNativeInputManagerTest {
             tabs = mock<LiveData<List<TabEntity>>>(),
             currentTabUrl = url,
             forceImageGeneration = forceImageGeneration,
-            newChatInputFocusPending = newChatInputFocusPending,
             callbacks = NativeInputCallbacks(
-                consumeNewChatInputFocusRequest = { newChatInputFocusPending.compareAndSet(true, false) },
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
                 onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },

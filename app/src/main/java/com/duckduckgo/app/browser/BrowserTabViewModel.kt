@@ -208,8 +208,6 @@ import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.browser.nativeinput.DuckAiChatUrlType
-import com.duckduckgo.app.browser.nativeinput.classifyDuckAiChatUrl
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -399,7 +397,6 @@ import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -479,7 +476,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -634,65 +630,6 @@ class BrowserTabViewModel @Inject constructor(
     UrlExtractionListener,
     NavigationHistoryListener,
     NewTabPageModalPresenter {
-    private enum class NewChatInputFocus { Waiting, Pending, Handled, Blocked }
-
-    private val newChatInputFocus = MutableStateFlow(NewChatInputFocus.Waiting)
-    private var newChatInputHadChatId = false
-    val newChatInputFocusPending: Flow<Boolean> = newChatInputFocus.map { it == NewChatInputFocus.Pending }.distinctUntilChanged()
-
-    fun consumeNewChatInputFocusRequest(): Boolean =
-        newChatInputFocus.compareAndSet(NewChatInputFocus.Pending, NewChatInputFocus.Handled)
-
-    private fun skipNewChatInputFocus() {
-        newChatInputFocus.value = NewChatInputFocus.Blocked
-    }
-
-    fun onNewChatTabHidden() {
-        newChatInputFocus.compareAndSet(NewChatInputFocus.Handled, NewChatInputFocus.Pending)
-    }
-
-    private fun resetNewChatInputFocus() {
-        newChatInputHadChatId = false
-        newChatInputFocus.value = NewChatInputFocus.Waiting
-    }
-
-    private fun onNewChatInputUrlChanged(urlType: DuckAiChatUrlType) {
-        when (urlType) {
-            DuckAiChatUrlType.ExistingChat -> {
-                newChatInputHadChatId = true
-                skipNewChatInputFocus()
-            }
-            DuckAiChatUrlType.PromptInProgress -> skipNewChatInputFocus()
-            DuckAiChatUrlType.NewChat -> if (newChatInputHadChatId) resetNewChatInputFocus()
-            DuckAiChatUrlType.OtherDuckAiPage, DuckAiChatUrlType.NotDuckAi -> Unit
-        }
-    }
-
-    private fun onDuckAiInputFocusMessage(method: String, data: JSONObject?, sourceUrl: String?) {
-        val urlType = classifyDuckAiChatUrl(sourceUrl, duckChat)
-        if (urlType == DuckAiChatUrlType.NotDuckAi) return
-        onNewChatInputUrlChanged(urlType)
-        if (method == "reportMetric" && data?.optString("metricName") == "userDidCreateNewChat") {
-            newChatInputHadChatId = false
-            newChatInputFocus.update { current ->
-                when (current) {
-                    NewChatInputFocus.Pending, NewChatInputFocus.Handled -> NewChatInputFocus.Pending
-                    else -> NewChatInputFocus.Waiting
-                }
-            }
-        }
-        if (method != "responseState" || urlType != DuckAiChatUrlType.NewChat) return
-        val chatState = ChatState.fromValue(data?.optString("status"))
-        newChatInputFocus.update { current ->
-            if (current == NewChatInputFocus.Blocked) return@update current
-            when (chatState) {
-                ChatState.LOADING, ChatState.STREAMING, ChatState.START_STREAM_NEW_PROMPT -> NewChatInputFocus.Blocked
-                ChatState.READY -> if (current == NewChatInputFocus.Waiting) NewChatInputFocus.Pending else current
-                else -> current
-            }
-        }
-    }
-
     private var buildingSiteFactoryJob: Job? = null
     private var pendingVoiceSessionEndJob: Job? = null
     private var lastAutoCompleteState: AutoCompleteViewState? = null
@@ -2758,7 +2695,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun urlUpdated(url: String) {
-        onNewChatInputUrlChanged(classifyDuckAiChatUrl(url, duckChat))
         logcat(VERBOSE) { "Page url updated: $url" }
         // SPA url change: the page is already loaded, so decide and show immediately
         resetAdBlockingAnimationState()
@@ -2850,7 +2786,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onMainFrameLoadStarted(navigationId: Long) {
-        resetNewChatInputFocus()
         pageLoadNavigationId = navigationId
         hasExitedFixedProgress = false
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
@@ -5455,11 +5390,6 @@ class BrowserTabViewModel @Inject constructor(
 
             DUCK_CHAT_FEATURE_NAME -> {
                 val pageUrl = url
-                if (method == "responseState" || method == "reportMetric") {
-                    viewModelScope.launch(dispatchers.main()) {
-                        onDuckAiInputFocusMessage(method, data, pageUrl)
-                    }
-                }
                 viewModelScope.launch(dispatchers.io()) {
                     val response = duckChatJSHelper.processJsCallbackMessage(
                         featureName,

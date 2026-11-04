@@ -46,7 +46,11 @@ class NewDuckAiChatUrlTest {
     @Test
     fun whenChatIdIsPresentThenIneligible() {
         assertFalse(isNewDuckAiChat("https://duck.ai/chat?chatID=existing", duckChat))
-        assertFalse(isNewDuckAiChat("https://duck.ai/chat?chatID=", duckChat))
+    }
+
+    @Test
+    fun whenChatIdIsBlankThenEligible() {
+        assertTrue(isNewDuckAiChat("https://duck.ai/chat?chatID=", duckChat))
     }
 
     @Test

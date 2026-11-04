@@ -1369,13 +1369,11 @@ class BrowserTabFragment :
             lifecycleOwner = viewLifecycleOwner,
             tabs = viewModel.tabs,
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
-            newChatInputFocusPending = viewModel.newChatInputFocusPending,
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
             forceImageGeneration = forceImageGeneration,
             textSelection = textSelection,
             callbacks = NativeInputCallbacks(
-                consumeNewChatInputFocusRequest = viewModel::consumeNewChatInputFocusRequest,
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
                     if (binding.autoCompleteSuggestionsList.isVisible) {
@@ -2247,7 +2245,6 @@ class BrowserTabFragment :
                     isActiveTab = it.tabId == tabId
                     updateNativeInputTabVisibility()
                     if (wasActive && !isActiveTab) {
-                        viewModel.onNewChatTabHidden()
                         logcat { "Tab $tabId is newly inactive" }
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
