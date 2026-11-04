@@ -33,6 +33,7 @@ interface SponsorBlockSegmentsProvider {
     suspend fun getSegments(videoId: String): List<SponsorBlockSegment>
 }
 
+// TODO: replace with the real segments provider; this one never returns segments.
 @ContributesBinding(AppScope::class)
 class EmptySponsorBlockSegmentsProvider @Inject constructor() : SponsorBlockSegmentsProvider {
     override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> = emptyList()
