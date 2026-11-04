@@ -65,6 +65,7 @@ import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
@@ -197,7 +198,7 @@ class AutoCompleteApi constructor(
                 }
         }
         val suggestions = searchRequest(query).await()
-        standIns.cancel()
+        standIns.cancelAndJoin()
         send(suggestions)
     }
 
