@@ -453,7 +453,7 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
-    fun `test offers settings when the system request is answered without its dialog`() = runTest {
+    fun `test offers settings when the request is refused with no rationale before or after`() = runTest {
         advanceUntilIdle()
         givenNotifications(permissionGranted = false, canShow = false)
 

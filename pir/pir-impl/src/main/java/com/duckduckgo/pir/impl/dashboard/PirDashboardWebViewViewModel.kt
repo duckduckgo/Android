@@ -175,7 +175,8 @@ class PirDashboardWebViewViewModel @Inject constructor(
             return
         }
 
-        // no rationale before or after means the system answered without showing its dialog, so only settings can turn notifications on
+        // no rationale before or after means the system denied without showing its dialog, or its first dialog was dismissed unanswered;
+        // the two can't be told apart, and settings turns notifications on in both
         if (!shouldShowRationaleBeforeRequest && !shouldShowRationale) {
             showNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS)
         }
