@@ -17,10 +17,13 @@
 package com.duckduckgo.devicemigration.impl
 
 import android.annotation.SuppressLint
+import android.app.backup.BackupAgent.FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED
+import android.app.backup.BackupAgent.FLAG_DEVICE_TO_DEVICE_TRANSFER
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_TRANSFER_ALLOWED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.LOCAL_FILE
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -76,5 +79,31 @@ class DeviceMigrationBackupAgentTest {
         DeviceMigrationBackupAgent.recordRestore(context, restoredFileCount = 0)
 
         assertFalse(local.contains(KEY_RESTORED_FROM_BACKUP))
+    }
+
+    @Test
+    fun whenTransferNotAllowedThenDeviceTransferSendsNothing() {
+        local.edit().putBoolean(KEY_TRANSFER_ALLOWED, false).commit()
+
+        assertTrue(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_DEVICE_TO_DEVICE_TRANSFER))
+    }
+
+    @Test
+    fun whenTransferAllowedThenDeviceTransferSendsData() {
+        local.edit().putBoolean(KEY_TRANSFER_ALLOWED, true).commit()
+
+        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_DEVICE_TO_DEVICE_TRANSFER))
+    }
+
+    @Test
+    fun whenFlagNeverSavedThenDeviceTransferSendsData() {
+        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_DEVICE_TO_DEVICE_TRANSFER))
+    }
+
+    @Test
+    fun whenTransferNotAllowedThenCloudBackupIsLeftToTheRules() {
+        local.edit().putBoolean(KEY_TRANSFER_ALLOWED, false).commit()
+
+        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED))
     }
 }

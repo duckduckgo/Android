@@ -46,5 +46,6 @@ class DeviceMigrationMarkerStore(
         const val KEY_PREVIOUS_DEVICE_HAD_SYNC = "previousDeviceHadSync"
         const val KEY_SOURCE_SIGNED_IN_TO_SYNC = "sourceSignedInToSync"
         const val KEY_RESTORED_FROM_BACKUP = "restoredFromBackup"
+        const val KEY_TRANSFER_ALLOWED = "transferAllowed"
     }
 }

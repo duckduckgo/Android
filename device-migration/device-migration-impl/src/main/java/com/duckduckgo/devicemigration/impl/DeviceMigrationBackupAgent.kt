@@ -20,9 +20,11 @@ import android.annotation.SuppressLint
 import android.app.backup.BackupAgent
 import android.app.backup.BackupDataInput
 import android.app.backup.BackupDataOutput
+import android.app.backup.FullBackupDataOutput
 import android.content.Context
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_TRANSFER_ALLOWED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.LOCAL_FILE
 import java.io.File
 
@@ -31,7 +33,8 @@ import java.io.File
  *
  * The framework runs this agent in restricted mode, with the base Application instead of ours, so there is no DI graph here:
  * only plain Android APIs, and nothing that could fail the user's transfer. Backup itself is left to the default implementation
- * so the XML rules stay the single source of what transfers.
+ * so the XML rules stay the single source of what transfers, except that a device transfer sends nothing while the remote flag
+ * is off: the new phone then starts as a fresh install, with nothing to detect and nothing to act on later.
  */
 class DeviceMigrationBackupAgent : BackupAgent() {
 
@@ -41,6 +44,11 @@ class DeviceMigrationBackupAgent : BackupAgent() {
     override fun onBackup(oldState: ParcelFileDescriptor?, data: BackupDataOutput?, newState: ParcelFileDescriptor?) = Unit
 
     override fun onRestore(data: BackupDataInput?, appVersionCode: Int, newState: ParcelFileDescriptor?) = Unit
+
+    override fun onFullBackup(data: FullBackupDataOutput) {
+        if (shouldSendNothing(this, data.transportFlags)) return
+        super.onFullBackup(data)
+    }
 
     override fun onRestoreFile(data: ParcelFileDescriptor, size: Long, destination: File?, type: Int, mode: Long, mtime: Long) {
         super.onRestoreFile(data, size, destination, type, mode, mtime)
@@ -63,6 +71,20 @@ class DeviceMigrationBackupAgent : BackupAgent() {
     }
 
     internal companion object {
+        /**
+         * Only device transfers are held back; cloud backup already carries no data. A phone that never saved the flag, or whose
+         * file cannot be read, still transfers, matching the flag's default.
+         */
+        @SuppressLint("DenyListedApi") // no SharedPreferencesProvider in restricted mode; the app writes this file as plain prefs
+        fun shouldSendNothing(context: Context, transportFlags: Int): Boolean {
+            if (transportFlags and FLAG_DEVICE_TO_DEVICE_TRANSFER == 0) return false
+            return try {
+                !context.getSharedPreferences(LOCAL_FILE, Context.MODE_PRIVATE).getBoolean(KEY_TRANSFER_ALLOWED, true)
+            } catch (e: Exception) {
+                false
+            }
+        }
+
         /**
          * An empty restore is not a transfer: cloud backup excludes all data today, yet the framework may still run a restore.
          * The write is synchronous because the process is killed as soon as the restore ends.
