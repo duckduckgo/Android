@@ -70,8 +70,14 @@
                             "type": "object",
                             "additionalProperties": false,
                             "properties": {
-                                "from_plan": { "type": "string", "description": "Plan ID the user is switching from" },
-                                "to_plan": { "type": "string", "description": "Plan ID the user is switching to" },
+                                "from_plan": {
+                                    "type": "string",
+                                    "description": "Plan ID the user is switching from. Stripe plan IDs have the billing country removed"
+                                },
+                                "to_plan": {
+                                    "type": "string",
+                                    "description": "Plan ID the user is switching to. Stripe plan IDs have the billing country removed"
+                                },
                                 "from_tier": {
                                     "type": "string",
                                     "description": "Subscription tier the user is switching from",
@@ -127,9 +133,8 @@
                                     "enum": ["true"]
                                 },
                                 "step.stripe_redirect": {
-                                    "type": "string",
-                                    "description": "Whether the user was sent to Stripe to complete the plan change",
-                                    "enum": ["true", "false"]
+                                    "type": "boolean",
+                                    "description": "Whether the user was sent to Stripe to complete the plan change"
                                 },
                                 "step.confirm_switch": {
                                     "type": "string",

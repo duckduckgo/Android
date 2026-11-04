@@ -320,6 +320,70 @@ class SubscriptionSwitchWideEventTest {
     }
 
     @Test
+    fun `onStripeSwitchFlowStarted removes billing country from plan ids`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onStripeSwitchFlowStarted(
+            context = null,
+            fromPlan = "ddg-privacy-pro-monthly-renews-row-de",
+            toPlan = "ddg-subscription-pro-yearly-renews-ROW-DE",
+            fromTier = "plus",
+            toTier = "pro",
+            fromBillingPeriod = "monthly",
+            toBillingPeriod = "yearly",
+            change = "upgrade",
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = null,
+            metadata = mapOf(
+                "from_plan" to "ddg-privacy-pro-monthly-renews-row",
+                "to_plan" to "ddg-subscription-pro-yearly-renews-ROW",
+                "from_tier" to "plus",
+                "to_tier" to "pro",
+                "billing_cycle_switch_type" to "upgrade",
+                "tier_change_type" to "upgrade",
+                "purchase_platform" to "stripe",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+        )
+    }
+
+    @Test
+    fun `onStripeSwitchFlowStarted keeps us and row plan ids without billing country`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
+
+        subscriptionSwitchWideEvent.onStripeSwitchFlowStarted(
+            context = null,
+            fromPlan = SubscriptionsConstants.MONTHLY_PLAN_US,
+            toPlan = SubscriptionsConstants.MONTHLY_PLAN_ROW,
+            fromTier = "plus",
+            toTier = "plus",
+            fromBillingPeriod = "monthly",
+            toBillingPeriod = "monthly",
+            change = "crossgrade",
+        )
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-plan-change",
+            flowEntryPoint = null,
+            metadata = mapOf(
+                "from_plan" to SubscriptionsConstants.MONTHLY_PLAN_US,
+                "to_plan" to SubscriptionsConstants.MONTHLY_PLAN_ROW,
+                "from_tier" to "plus",
+                "to_tier" to "plus",
+                "billing_cycle_switch_type" to "none",
+                "tier_change_type" to "crossgrade",
+                "purchase_platform" to "stripe",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+        )
+    }
+
+    @Test
     fun `onStripeRedirected starts interval and sends successful step`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(123L)))

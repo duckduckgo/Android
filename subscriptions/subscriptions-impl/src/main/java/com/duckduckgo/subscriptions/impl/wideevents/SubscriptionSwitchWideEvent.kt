@@ -155,8 +155,8 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         startFlow(
             context = context,
             metadata = buildMap {
-                put(KEY_FROM_PLAN, fromPlan)
-                put(KEY_TO_PLAN, toPlan)
+                put(KEY_FROM_PLAN, fromPlan.withoutBillingCountry())
+                put(KEY_TO_PLAN, toPlan.withoutBillingCountry())
                 put(KEY_FROM_TIER, from.value)
                 put(KEY_TO_TIER, to.value)
                 switchType?.let { put(KEY_SWITCH_TYPE, it) }
@@ -199,6 +199,8 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
             cachedFlowId = null
         }
     }
+
+    private fun String.withoutBillingCountry(): String = replace(BILLING_COUNTRY_SUFFIX, "")
 
     private suspend fun startFlow(
         context: String?,
@@ -461,6 +463,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         const val PURCHASE_PLATFORM_STRIPE = "stripe"
         const val MONTHLY = "monthly"
         const val FAILURE_MISSING_ACCESS_TOKEN = "missing_access_token"
+        val BILLING_COUNTRY_SUFFIX = Regex("(?<=-row)-[a-z]{2}$", RegexOption.IGNORE_CASE)
 
         val DEFINITION = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1))
 
