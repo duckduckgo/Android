@@ -94,6 +94,7 @@ class SponsorBlockContentScopeJsMessageHandler @Inject constructor(
         return JSONObject(segmentsAdapter.toJson(SegmentsResponse(segments.sortedBy { it.start })))
     }
 
+    // TODO: send the user's SponsorBlock settings (on/off, skip mode) once they exist; skipMode is fixed to manual for now.
     private fun getConfig(): JSONObject =
         JSONObject(configAdapter.toJson(ConfigResponse(enabled = isEnabled(), skipMode = SKIP_MODE_MANUAL, version = CONTRACT_VERSION)))
 
