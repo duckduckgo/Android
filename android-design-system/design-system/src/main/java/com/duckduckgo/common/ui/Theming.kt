@@ -23,6 +23,7 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.TypedValue
+import androidx.annotation.AttrRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -77,6 +78,11 @@ fun AppCompatActivity.applyTheme(
 
 internal fun Resources.Theme.supportsRebrandOverlay(): Boolean =
     resolveAttribute(R.attr.daxColorRebrandButtonPrimaryContainer, TypedValue(), true)
+
+fun Context.isRebrandAreaEnabled(@AttrRes areaAttr: Int): Boolean {
+    val value = TypedValue()
+    return theme.resolveAttribute(areaAttr, value, true) && value.data != 0
+}
 
 fun AppCompatActivity.getThemeId(
     theme: DuckDuckGoTheme,
