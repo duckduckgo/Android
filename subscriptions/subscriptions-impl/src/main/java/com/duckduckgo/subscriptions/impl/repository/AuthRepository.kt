@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.impl.repository
 
+import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -75,6 +76,13 @@ interface AuthRepository {
     suspend fun removeLocalPurchasedAt()
     suspend fun setPendingPlans(pendingPlans: List<PendingPlan>)
     suspend fun getPendingPlans(): List<PendingPlan>
+    suspend fun saveTokensV2(accessToken: AccessToken, refreshToken: RefreshToken): Boolean
+    suspend fun isTokenStoreAvailable(): Boolean
+    suspend fun hasRefreshTokenV2Entry(): Boolean
+    suspend fun getTokenRefreshHistory(): TokenRefreshHistory
+    suspend fun recordTokenRefreshSuccess(at: Instant)
+    suspend fun recordTokenRefreshFailure()
+    suspend fun clearTokenRefreshHistory()
 }
 
 @BindingContainer
@@ -87,8 +95,15 @@ object AuthRepositoryModule {
         sharedPreferencesProvider: SharedPreferencesProvider,
         serpPromo: SerpPromo,
         subscriptionsFeature: Lazy<SubscriptionsFeature>,
+        @ProcessName processName: String,
     ): AuthRepository {
-        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo, subscriptionsFeature)
+        return RealAuthRepository(
+            SubscriptionsEncryptedDataStore(sharedPreferencesProvider),
+            dispatcherProvider,
+            serpPromo,
+            subscriptionsFeature,
+            processName,
+        )
     }
 }
 
@@ -97,6 +112,7 @@ internal class RealAuthRepository constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val serpPromo: SerpPromo,
     private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
+    private val processName: String = "main",
 ) : AuthRepository {
 
     private val moshi = Builder().build()
@@ -379,7 +395,58 @@ internal class RealAuthRepository constructor(
             }.getOrDefault(emptyList())
         } ?: emptyList()
     }
+
+    override suspend fun saveTokensV2(accessToken: AccessToken, refreshToken: RefreshToken): Boolean = withContext(dispatcherProvider.io()) {
+        val saved = subscriptionsDataStore.saveTokensV2(
+            accessToken = accessToken.jwt,
+            accessTokenExpiresAt = accessToken.expiresAt,
+            refreshToken = refreshToken.jwt,
+            refreshTokenExpiresAt = refreshToken.expiresAt,
+        )
+        if (saved) updateSerpPromoCookie()
+        saved
+    }
+
+    override suspend fun isTokenStoreAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.isAvailable()
+    }
+
+    override suspend fun hasRefreshTokenV2Entry(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.hasRefreshTokenV2Entry()
+    }
+
+    override suspend fun getTokenRefreshHistory(): TokenRefreshHistory = withContext(dispatcherProvider.io()) {
+        TokenRefreshHistory(
+            failureStreak = subscriptionsDataStore.tokenRefreshFailureStreak,
+            lastSuccessAt = subscriptionsDataStore.lastTokenRefreshSuccessAt?.let { Instant.ofEpochMilli(it) },
+            lastSuccessProcess = subscriptionsDataStore.lastTokenRefreshProcess,
+        )
+    }
+
+    override suspend fun recordTokenRefreshSuccess(at: Instant) = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.tokenRefreshFailureStreak = 0
+        subscriptionsDataStore.lastTokenRefreshSuccessAt = at.toEpochMilli()
+        subscriptionsDataStore.lastTokenRefreshProcess = processName
+    }
+
+    override suspend fun recordTokenRefreshFailure() = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.tokenRefreshFailureStreak += 1
+    }
+
+    override suspend fun clearTokenRefreshHistory() = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.tokenRefreshFailureStreak = 0
+        subscriptionsDataStore.lastTokenRefreshSuccessAt = null
+        subscriptionsDataStore.lastTokenRefreshProcess = null
+    }
 }
+
+data class TokenRefreshHistory(
+    val failureStreak: Int,
+    val lastSuccessAt: Instant?,
+    val lastSuccessProcess: String? = null,
+)
+
+class TokenStoreException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
 data class AccessToken(
     val jwt: String,

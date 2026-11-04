@@ -53,7 +53,23 @@ interface SubscriptionsDataStore {
     // Pending Plans (stored as JSON array string)
     var pendingPlans: String?
 
+    // Token refresh history, shared by every process that refreshes
+    var tokenRefreshFailureStreak: Int
+    var lastTokenRefreshSuccessAt: Long?
+    var lastTokenRefreshProcess: String?
+
     fun canUseEncryption(): Boolean
+
+    fun isAvailable(): Boolean
+
+    fun hasRefreshTokenV2Entry(): Boolean
+
+    fun saveTokensV2(
+        accessToken: String,
+        accessTokenExpiresAt: Instant,
+        refreshToken: String,
+        refreshTokenExpiresAt: Instant,
+    ): Boolean
 }
 
 /**
@@ -248,9 +264,57 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override var tokenRefreshFailureStreak: Int
+        get() = encryptedPreferences?.getInt(KEY_TOKEN_REFRESH_FAILURE_STREAK, 0) ?: 0
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putInt(KEY_TOKEN_REFRESH_FAILURE_STREAK, value)
+            }
+        }
+
+    override var lastTokenRefreshSuccessAt: Long?
+        get() = encryptedPreferences?.getLong(KEY_LAST_TOKEN_REFRESH_SUCCESS_AT, 0L).takeIf { it != 0L }
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_LAST_TOKEN_REFRESH_SUCCESS_AT)
+                } else {
+                    putLong(KEY_LAST_TOKEN_REFRESH_SUCCESS_AT, value)
+                }
+            }
+        }
+
+    override var lastTokenRefreshProcess: String?
+        get() = encryptedPreferences?.getString(KEY_LAST_TOKEN_REFRESH_PROCESS, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putString(KEY_LAST_TOKEN_REFRESH_PROCESS, value)
+            }
+        }
+
     override fun canUseEncryption(): Boolean {
         encryptedPreferences?.edit(commit = true) { putBoolean("test", true) }
         return encryptedPreferences?.getBoolean("test", false) == true
+    }
+
+    override fun isAvailable(): Boolean = encryptedPreferences != null
+
+    // A key that exists but reads as null is a value the store could not decrypt
+    override fun hasRefreshTokenV2Entry(): Boolean = encryptedPreferences?.contains(KEY_REFRESH_TOKEN_V2) == true
+
+    override fun saveTokensV2(
+        accessToken: String,
+        accessTokenExpiresAt: Instant,
+        refreshToken: String,
+        refreshTokenExpiresAt: Instant,
+    ): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor
+            .putString(KEY_ACCESS_TOKEN_V2, accessToken)
+            .putLong(KEY_ACCESS_TOKEN_V2_EXPIRES_AT, accessTokenExpiresAt.toEpochMilli())
+            .putString(KEY_REFRESH_TOKEN_V2, refreshToken)
+            .putLong(KEY_REFRESH_TOKEN_V2_EXPIRES_AT, refreshTokenExpiresAt.toEpochMilli())
+            .commit()
     }
 
     companion object {
@@ -275,5 +339,8 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_SUBSCRIPTION_ENTITLEMENTS = "KEY_SUBSCRIPTION_ENTITLEMENTS"
         const val KEY_FREE_TRIAL_ACTIVE = "KEY_FREE_TRIAL_ACTIVE"
         const val KEY_PENDING_PLANS = "KEY_PENDING_PLANS"
+        const val KEY_TOKEN_REFRESH_FAILURE_STREAK = "KEY_TOKEN_REFRESH_FAILURE_STREAK"
+        const val KEY_LAST_TOKEN_REFRESH_SUCCESS_AT = "KEY_LAST_TOKEN_REFRESH_SUCCESS_AT"
+        const val KEY_LAST_TOKEN_REFRESH_PROCESS = "KEY_LAST_TOKEN_REFRESH_PROCESS"
     }
 }
