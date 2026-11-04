@@ -492,6 +492,7 @@
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Sync &amp; Back Up за Вашите отметки</string>
     <string name="sync_bookmarks_promo_message">Криптирано от край до край. Никой не може да види Вашите отметки, дори ние.</string>
+    <string name="sync_bookmarks_promo_primary_button">Включване на Sync &amp; Backup</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -518,6 +519,7 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Sync &amp; Back Up за Вашите пароли</string>
     <string name="sync_passwords_promo_message">Криптирането от край до край означава, че никой освен Вас не може да вижда Вашите пароли, дори и ние.</string>
+    <string name="sync_passwords_promo_primary_button">Включване на Sync &amp; Backup</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
