@@ -107,6 +107,82 @@ class ContextualSuggestionsViewModelTest {
         verify(suggestedPromptsProvider, times(1)).resolveSuggestions(any())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `when metadata-only PDF context arrives then suggestions resolve without waiting for timeout`() = runTest {
+        val suggestion = ContextualSuggestedPrompt("summarize-page", "Summarize this page", "Summarize this page.", "summary")
+        stubProvider(listOf(suggestion))
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        viewModel.onPageContextUpdated(
+            """{"title":"Document.pdf","url":"https://example.com/document.pdf","content":"","mimeType":"application/pdf"}""",
+        )
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        assertFalse(viewModel.viewState.value.loading)
+        assertEquals(listOf(suggestion), viewModel.viewState.value.suggestions)
+        val captor = argumentCaptor<ResolvePageSuggestionsInput>()
+        verify(suggestedPromptsProvider).resolveSuggestions(captor.capture())
+        assertEquals("https://example.com/document.pdf", captor.lastValue.url)
+
+        coroutineRule.testDispatcher.scheduler.advanceTimeBy(5_000)
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        verify(suggestedPromptsProvider, times(1)).resolveSuggestions(any())
+        verify(duckChatPixels, never()).reportContextualSuggestionsContextCollectionTimedOut()
+    }
+
+    @Test
+    fun `when PDF context includes data then suggestions resolve without waiting for timeout`() = runTest {
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        viewModel.onPageContextUpdated(
+            """
+            {"title":"Document.pdf","url":"https://example.com/document.pdf","content":"","mimeType":"application/pdf","data":"JVBERi0="}
+            """.trimIndent(),
+        )
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        assertFalse(viewModel.viewState.value.loading)
+        verify(suggestedPromptsProvider).resolveSuggestions(any())
+        verify(duckChatPixels, never()).reportContextualSuggestionsContextCollectionTimedOut()
+    }
+
+    @Test
+    fun `when PDF context lacks title then suggestions keep waiting for context`() = runTest {
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        viewModel.onPageContextUpdated(
+            """{"url":"https://example.com/document.pdf","content":"","mimeType":"application/pdf"}""",
+        )
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        assertTrue(viewModel.viewState.value.loading)
+        verify(suggestedPromptsProvider, never()).resolveSuggestions(any())
+    }
+
+    @Test
+    fun `when non-PDF context has empty content then suggestions keep waiting for context`() = runTest {
+        viewModel.load()
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        viewModel.onPageContextUpdated(
+            """{"title":"Page","url":"https://example.com","content":"","mimeType":"text/html"}""",
+        )
+        coroutineRule.testDispatcher.scheduler.runCurrent()
+
+        assertTrue(viewModel.viewState.value.loading)
+        verify(suggestedPromptsProvider, never()).resolveSuggestions(any())
+
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(viewModel.viewState.value.loading)
+        verify(duckChatPixels).reportContextualSuggestionsContextCollectionTimedOut()
+    }
+
     @Test
     fun `when page context has page-type signals then they are parsed and passed to the provider`() = runTest {
         viewModel.onPageContextUpdated(
