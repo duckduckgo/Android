@@ -21,7 +21,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.ContextType
-import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -39,6 +38,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
+import com.duckduckgo.duckchat.api.PageContextTrigger as Trigger
 
 @RunWith(AndroidJUnit4::class)
 class RealPageContextJSHelperTest {

@@ -20,22 +20,24 @@ import android.os.SystemClock
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiPageContextLifecycle
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.ContextType
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Reason
-import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import com.duckduckgo.duckchat.api.PageContextTrigger as Trigger
 
-interface PageContextJSHelper {
+interface PageContextJSHelper : DuckAiPageContextLifecycle {
 
     suspend fun processPageContext(
         featureName: String,
@@ -43,8 +45,6 @@ interface PageContextJSHelper {
         data: JSONObject?,
         tabId: String,
     ): String?
-
-    fun clearTab(tabId: String)
 
     fun cancelCollection(tabId: String)
 
@@ -61,7 +61,8 @@ interface PageContextJSHelper {
 }
 
 @SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<PageContextJSHelper>())
+@ContributesBinding(AppScope::class, binding = binding<DuckAiPageContextLifecycle>())
 class RealPageContextJSHelper @Inject constructor(
     private val pixels: PageContextExtractionPixels,
     private val feature: DuckChatFeature,

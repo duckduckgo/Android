@@ -47,8 +47,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.api.DuckAiPageContextLifecycle
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
-import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -98,7 +98,7 @@ class TabDataRepositoryTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val mockDao: TabsDao = mock()
-    private val pageContextJSHelper: PageContextJSHelper = mock()
+    private val pageContextJSHelper: DuckAiPageContextLifecycle = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()

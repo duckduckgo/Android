@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.duckchat.api.PageContextTrigger
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -33,7 +34,7 @@ class PageContextExtractionPixelsTest {
     @Test fun `failure uses bounded latency and context type`() {
         testee.failed(
             PageContextExtractionPixels.Reason.DOCUMENT_UNAVAILABLE,
-            PageContextExtractionPixels.Trigger.USER_REQUEST,
+            PageContextTrigger.USER_REQUEST,
             PageContextExtractionPixels.ContextType.PDF,
             1000,
         )
@@ -49,7 +50,7 @@ class PageContextExtractionPixelsTest {
     }
 
     @Test fun `prevented omits context type and latency`() {
-        testee.prevented(PageContextExtractionPixels.Category.DOCUMENT_TOO_LARGE, PageContextExtractionPixels.Trigger.AUTO)
+        testee.prevented(PageContextExtractionPixels.Category.DOCUMENT_TOO_LARGE, PageContextTrigger.AUTO)
         verify(pixel).fire(
             "m_aichat_page_context_extraction_prevented_c",
             mapOf(

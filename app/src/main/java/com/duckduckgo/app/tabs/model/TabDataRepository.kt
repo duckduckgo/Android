@@ -38,8 +38,8 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.toStringDropScheme
+import com.duckduckgo.duckchat.api.DuckAiPageContextLifecycle
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
-import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -79,7 +79,7 @@ class TabDataRepository(
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val pageTitleFetcher: PageTitleFetcher,
-    private val pageContextJSHelper: PageContextJSHelper,
+    private val pageContextJSHelper: DuckAiPageContextLifecycle,
 ) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()

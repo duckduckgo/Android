@@ -18,10 +18,10 @@ package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import javax.inject.Inject
+import com.duckduckgo.duckchat.api.PageContextTrigger as Trigger
 
 class PageContextExtractionPixels @Inject constructor(private val pixel: Pixel) {
     enum class ContextType(val value: String) { PDF("pdf"), MARKDOWN("markdown") }
-    enum class Trigger(val value: String) { AUTO("auto"), NAVIGATION("navigation"), USER_REQUEST("user_request"), TAB_CONTENT("tab_content") }
     enum class Reason(val value: String) {
         EMPTY_CONTENT("empty_content"), DESERIALIZE_FAILED("deserialize_failed"), SCRIPT_ERROR("script_error"), TIMEOUT("timeout"),
         NO_WEBVIEW("no_webview"), POST_FAILED("post_failed"), TAB_EVICTED("tab_evicted"), DOCUMENT_UNAVAILABLE("document_unavailable"),
@@ -57,6 +57,14 @@ class PageContextExtractionPixels @Inject constructor(private val pixel: Pixel) 
             ),
         )
     }
+
+    private val Trigger.value: String
+        get() = when (this) {
+            Trigger.AUTO -> "auto"
+            Trigger.NAVIGATION -> "navigation"
+            Trigger.USER_REQUEST -> "user_request"
+            Trigger.TAB_CONTENT -> "tab_content"
+        }
 
     private fun fire(name: String, parameters: Map<String, String>) {
         pixel.fire(pixelName = "${name}_c", parameters = parameters)
