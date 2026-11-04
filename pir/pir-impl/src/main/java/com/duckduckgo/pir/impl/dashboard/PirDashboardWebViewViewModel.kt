@@ -46,7 +46,6 @@ import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
-import com.duckduckgo.pir.impl.store.PirDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -78,13 +77,13 @@ class PirDashboardWebViewViewModel @Inject constructor(
     private val pirFreemiumDataStore: PirFreemiumDataStore,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val pirDataStore: PirDataStore,
     private val foregroundScanServiceStarter: PirForegroundScanServiceStarter,
     private val pirNotificationManager: PirNotificationManager,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var purchaseFlowOutstanding = false
     private var awaitingReturnFromNotificationSettings = false
+    private var shouldShowRationaleBeforeRequest = false
 
     private val command = Channel<Command>(Channel.BUFFERED)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -126,16 +125,20 @@ class PirDashboardWebViewViewModel @Inject constructor(
     }
 
     fun onNotificationPermissionStateComputed(shouldShowRationale: Boolean) {
-        if (pirNotificationManager.hasNotificationPermission()) return
+        if (pirNotificationManager.canShowNotifications()) return
 
+        shouldShowRationaleBeforeRequest = shouldShowRationale
+        // with the permission granted, notifications are off for the app or the PIR channel, which only settings can change
+        val promptType = if (pirNotificationManager.hasNotificationPermission()) {
+            PirNotificationPromptType.OPEN_SETTINGS
+        } else {
+            PirNotificationPromptType.REQUEST_PERMISSION
+        }
+        showNotificationPermissionPrompt(promptType)
+    }
+
+    private fun showNotificationPermissionPrompt(promptType: PirNotificationPromptType) {
         viewModelScope.launch {
-            val hasRequestedBefore = withContext(dispatcherProvider.io()) { pirDataStore.hasRequestedNotificationPermission }
-            // the system request would return denied without showing anything, so only settings can grant it
-            val promptType = if (hasRequestedBefore && !shouldShowRationale) {
-                PirNotificationPromptType.OPEN_SETTINGS
-            } else {
-                PirNotificationPromptType.REQUEST_PERMISSION
-            }
             command.send(Command.ShowNotificationPermissionPrompt(promptType))
         }
     }
@@ -149,10 +152,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
 
         viewModelScope.launch {
             when (promptType) {
-                PirNotificationPromptType.REQUEST_PERMISSION -> {
-                    withContext(dispatcherProvider.io()) { pirDataStore.hasRequestedNotificationPermission = true }
-                    command.send(Command.RequestNotificationPermission)
-                }
+                PirNotificationPromptType.REQUEST_PERMISSION -> command.send(Command.RequestNotificationPermission)
                 PirNotificationPromptType.OPEN_SETTINGS -> {
                     awaitingReturnFromNotificationSettings = true
                     command.send(Command.OpenNotificationSettings)
@@ -165,10 +165,19 @@ class PirDashboardWebViewViewModel @Inject constructor(
         pirPixelSender.reportNotificationPermissionPromptDismissed(promptType)
     }
 
-    fun onNotificationPermissionResult(granted: Boolean) {
+    fun onNotificationPermissionResult(
+        granted: Boolean,
+        shouldShowRationale: Boolean,
+    ) {
         if (granted) {
             pirPixelSender.reportNotificationPermissionGranted()
             showScanNotificationIfRunning()
+            return
+        }
+
+        // no rationale before or after means the system answered without showing its dialog, so only settings can turn notifications on
+        if (!shouldShowRationaleBeforeRequest && !shouldShowRationale) {
+            showNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS)
         }
     }
 
@@ -176,7 +185,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
         if (!awaitingReturnFromNotificationSettings) return
         awaitingReturnFromNotificationSettings = false
 
-        if (pirNotificationManager.hasNotificationPermission()) {
+        if (pirNotificationManager.canShowNotifications()) {
             showScanNotificationIfRunning()
         }
     }

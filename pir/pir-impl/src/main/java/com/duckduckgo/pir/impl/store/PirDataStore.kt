@@ -52,11 +52,6 @@ interface PirDataStore {
     /** Number of scheduled worker runs that have contributed to the open completion flow. */
     var initialScanCompletionScheduledRunCount: Int
 
-    /**
-     * Set once PIR has launched the system notification permission request.
-     */
-    var hasRequestedNotificationPermission: Boolean
-
     /** Marked before every initial scan starts; the next run that finishes normally takes it. */
     fun markScanCompleteNotificationPending()
 
@@ -205,15 +200,6 @@ internal class RealPirDataStore(
             }
         }
 
-    // not cleared by reset() as the system keeps the permission state after PIR data is wiped
-    override var hasRequestedNotificationPermission: Boolean
-        get() = preferences.getBoolean(KEY_HAS_REQUESTED_NOTIFICATION_PERMISSION, false)
-        set(value) {
-            preferences.edit {
-                putBoolean(KEY_HAS_REQUESTED_NOTIFICATION_PERMISSION, value)
-            }
-        }
-
     override fun markScanCompleteNotificationPending() {
         // committed synchronously as the dashboard (:main) marks it and the run (:pir) takes it
         preferences.edit(commit = true) {
@@ -277,6 +263,5 @@ internal class RealPirDataStore(
         private const val KEY_INITIAL_SCAN_COMPLETION_FOREGROUND_RUN_COUNT = "KEY_INITIAL_SCAN_COMPLETION_FOREGROUND_RUN_COUNT"
         private const val KEY_INITIAL_SCAN_COMPLETION_SCHEDULED_RUN_COUNT = "KEY_INITIAL_SCAN_COMPLETION_SCHEDULED_RUN_COUNT"
         private const val KEY_SCAN_COMPLETE_NOTIFICATION_PENDING = "KEY_SCAN_COMPLETE_NOTIFICATION_PENDING"
-        private const val KEY_HAS_REQUESTED_NOTIFICATION_PERMISSION = "KEY_HAS_REQUESTED_NOTIFICATION_PERMISSION"
     }
 }

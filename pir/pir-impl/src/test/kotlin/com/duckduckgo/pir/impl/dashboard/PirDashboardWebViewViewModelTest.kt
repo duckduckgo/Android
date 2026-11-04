@@ -36,7 +36,6 @@ import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
-import com.duckduckgo.pir.impl.store.PirDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -48,7 +47,6 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -67,7 +65,6 @@ class PirDashboardWebViewViewModelTest {
     private val subscriptions: Subscriptions = mock()
     private val pirFreemiumDataStore: PirFreemiumDataStore = mock()
     private val subscriptionStatus = MutableStateFlow(SubscriptionStatus.UNKNOWN)
-    private val pirDataStore: PirDataStore = mock()
     private val foregroundScanServiceStarter: PirForegroundScanServiceStarter = mock()
     private val pirNotificationManager: PirNotificationManager = mock()
 
@@ -88,7 +85,6 @@ class PirDashboardWebViewViewModelTest {
             pirFreemiumDataStore = pirFreemiumDataStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
-            pirDataStore = pirDataStore,
             foregroundScanServiceStarter = foregroundScanServiceStarter,
             pirNotificationManager = pirNotificationManager,
         )
@@ -397,9 +393,9 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
-    fun `test does not prompt when the notification permission is granted`() = runTest {
+    fun `test does not prompt when PIR notifications can already be shown`() = runTest {
         advanceUntilIdle()
-        whenever(pirNotificationManager.hasNotificationPermission()).thenReturn(true)
+        givenNotifications(permissionGranted = true, canShow = true)
 
         testee.commands().test {
             testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
@@ -410,22 +406,9 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
-    fun `test prompts to request the permission when PIR has never requested it`() = runTest {
+    fun `test prompts to request the permission when the system can still explain it`() = runTest {
         advanceUntilIdle()
-        whenever(pirDataStore.hasRequestedNotificationPermission).thenReturn(false)
-
-        testee.commands().test {
-            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
-
-            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test prompts to request the permission when the system can still show the request`() = runTest {
-        advanceUntilIdle()
-        whenever(pirDataStore.hasRequestedNotificationPermission).thenReturn(true)
+        givenNotifications(permissionGranted = false, canShow = false)
 
         testee.commands().test {
             testee.onNotificationPermissionStateComputed(shouldShowRationale = true)
@@ -436,14 +419,84 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
-    fun `test prompts to open settings when the permission was permanently denied`() = runTest {
+    fun `test prompts to request the permission whenever it is not granted, whatever PIR requested before`() = runTest {
         advanceUntilIdle()
-        whenever(pirDataStore.hasRequestedNotificationPermission).thenReturn(true)
+        givenNotifications(permissionGranted = false, canShow = false)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
+            testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
+            testee.onNotificationPermissionResult(granted = false, shouldShowRationale = false)
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS), awaitItem())
+
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
+
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test prompts to open settings when notifications are off although the permission is granted`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = false)
 
         testee.commands().test {
             testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
 
             assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test offers settings when the system request is answered without its dialog`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = false, canShow = false)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
+            testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
+
+            testee.onNotificationPermissionResult(granted = false, shouldShowRationale = false)
+
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test does not offer settings after the first denial`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = false, canShow = false)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
+
+            testee.onNotificationPermissionResult(granted = false, shouldShowRationale = true)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test does not offer settings after the user denies the request again`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = false, canShow = false)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = true)
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
+
+            testee.onNotificationPermissionResult(granted = false, shouldShowRationale = false)
+
+            expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -456,14 +509,13 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
-    fun `test accepting the request prompt records the request and launches the system request`() = runTest {
+    fun `test accepting the request prompt launches the system request`() = runTest {
         advanceUntilIdle()
 
         testee.commands().test {
             testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
 
             assertEquals(Command.RequestNotificationPermission, awaitItem())
-            verify(pirDataStore).hasRequestedNotificationPermission = true
             verify(pirPixelSender).reportNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
             cancelAndConsumeRemainingEvents()
         }
@@ -477,7 +529,6 @@ class PirDashboardWebViewViewModelTest {
             testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
 
             assertEquals(Command.OpenNotificationSettings, awaitItem())
-            verify(pirDataStore, never()).hasRequestedNotificationPermission = any()
             verify(pirPixelSender).reportNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
             cancelAndConsumeRemainingEvents()
         }
@@ -498,16 +549,16 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test reports the granted pixel only when the permission is granted`() {
-        testee.onNotificationPermissionResult(granted = false)
+        testee.onNotificationPermissionResult(granted = false, shouldShowRationale = true)
         verify(pirPixelSender, never()).reportNotificationPermissionGranted()
 
-        testee.onNotificationPermissionResult(granted = true)
+        testee.onNotificationPermissionResult(granted = true, shouldShowRationale = false)
         verify(pirPixelSender).reportNotificationPermissionGranted()
     }
 
     @Test
     fun `test granting the permission shows the notification of the running scan`() = runTest {
-        testee.onNotificationPermissionResult(granted = true)
+        testee.onNotificationPermissionResult(granted = true, shouldShowRationale = false)
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter).showScanNotificationIfRunning()
@@ -515,18 +566,18 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test denying the permission does not show the scan notification`() = runTest {
-        testee.onNotificationPermissionResult(granted = false)
+        testee.onNotificationPermissionResult(granted = false, shouldShowRationale = true)
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
     }
 
     @Test
-    fun `test returning from settings with the permission granted shows the scan notification`() = runTest {
+    fun `test returning from settings with notifications turned on shows the scan notification`() = runTest {
         testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
         advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = true)
 
-        whenever(pirNotificationManager.hasNotificationPermission()).thenReturn(true)
         testee.onResumed()
         advanceUntilIdle()
 
@@ -534,9 +585,10 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
-    fun `test returning from settings without the permission does not show the scan notification`() = runTest {
+    fun `test returning from settings with notifications still off does not show the scan notification`() = runTest {
         testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
         advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = false)
 
         testee.onResumed()
         advanceUntilIdle()
@@ -546,7 +598,8 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test resuming without going to settings does not show the scan notification`() = runTest {
-        whenever(pirNotificationManager.hasNotificationPermission()).thenReturn(true)
+        givenNotifications(permissionGranted = true, canShow = true)
+
         testee.onResumed()
         advanceUntilIdle()
 
@@ -559,10 +612,18 @@ class PirDashboardWebViewViewModelTest {
         advanceUntilIdle()
 
         testee.onResumed()
-        whenever(pirNotificationManager.hasNotificationPermission()).thenReturn(true)
+        givenNotifications(permissionGranted = true, canShow = true)
         testee.onResumed()
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
+    }
+
+    private fun givenNotifications(
+        permissionGranted: Boolean,
+        canShow: Boolean,
+    ) {
+        whenever(pirNotificationManager.hasNotificationPermission()).thenReturn(permissionGranted)
+        whenever(pirNotificationManager.canShowNotifications()).thenReturn(canShow)
     }
 }

@@ -54,6 +54,9 @@ interface PirNotificationManager {
 
     /** Whether POST_NOTIFICATIONS is granted. Always true below Android 13, where it is not a runtime permission. */
     fun hasNotificationPermission(): Boolean
+
+    /** Whether PIR notifications reach the user: the runtime permission, the app's notification switch and the PIR channel all allow them. */
+    fun canShowNotifications(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -119,6 +122,14 @@ class RealPirNotificationManager @Inject constructor(
 
     override fun hasNotificationPermission(): Boolean =
         VERSION.SDK_INT < 33 || ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
+
+    override fun canShowNotifications(): Boolean {
+        // a channel that doesn't exist yet is created at default importance on first use
+        val channelImportance = notificationManagerCompat.getNotificationChannelCompat(PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)?.importance
+        return hasNotificationPermission() &&
+            notificationManagerCompat.areNotificationsEnabled() &&
+            channelImportance != NotificationManagerCompat.IMPORTANCE_NONE
+    }
 
     private fun createScanCompleteNotification(runMode: PirRunMode): Notification = when (runMode) {
         PirRunMode.SCAN_ONLY -> createFreemiumScanCompleteNotification()
