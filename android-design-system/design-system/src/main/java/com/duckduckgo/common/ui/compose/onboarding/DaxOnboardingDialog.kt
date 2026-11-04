@@ -19,87 +19,55 @@ package com.duckduckgo.common.ui.compose.onboarding
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import com.duckduckgo.common.ui.compose.text.DaxText
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.OnboardingTheme
-import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 import kotlin.time.Duration
 
 /**
- * Fully Compose onboarding dialog with centered 24sp/28sp title and 18sp/22sp body typography.
+ * Onboarding dialog drawn as a speech bubble, with a typed title, optional body, header image,
+ * content slot, primary button, close button and step indicator.
  *
- * [contentKey] identifies the current content. A new key or mount starts an intro; a same-key
- * update preserves it. Only the current content is composed; callers own navigation and step state.
- * [animate] and [entryDelay] are sampled when an intro starts. [entryDelay] is added to the 200ms
- * base entrance delay; settled tail and bounds changes use the latest [animate] value. Restore
- * completed host content with `animate = false` to avoid replaying its intro after recreation.
- * A same-key title change during typing shows the updated title fully and advances the intro.
- *
- * [onIntroFinished] is delivered once after composition for the completed run, including snap or
- * skip; replacing an unfinished run cancels its callback. It reports intro completion, not a
- * product-step completion. [DaxOnboardingDialogState.skip] only finishes an attached intro and
- * does not queue a skip. Disposal detaches state and resets its `isAnimating` to false.
- * The first pointer gesture during an intro finishes it and is consumed
- * completely; a subsequent gesture can activate a CTA.
- *
- * This composable must be called inside [OnboardingTheme]; it reads onboarding colours from that
- * provider, and omitting it causes the backing composition local to throw.
- *
- * The dialog owns one bounded vertical scroller, so caller content must not add a nested vertical
- * scroller. Content and scroll state are keyed by [contentKey]; the shell and tail are retained.
- * Cancel long-lived content work from a `DisposableEffect` and register
- * [DaxOnboardingDialogContentScope.onContentReady] for the shared ready signal. Scope `enabled`
- * becomes true when the intro settles, and the ready callback reports natural animation (`true`)
- * or snap/skip (`false`) once after composition. Bounds snap during the intro and animate settled
- * same-key changes. Inspection previews and reduced motion show settled content.
- * The primary CTA currently uses the existing ADS button placeholder; a dedicated onboarding
- * brand button is intentionally a separate component.
- * Tail geometry is logical-direction relative: `None` is flat, `BottomStart` is 80dp from logical
- * start, `BottomStartWide` is 96dp, and `BottomEnd` is 80dp from logical end. `tailExtended = false`
- * retracts the tail depth; `true` fully extends it. `dismiss` is a 32dp affordance at logical
- * top/end with a 4dp visual overhang; hit and semantics bounds remain inside the layout.
+ * Changing [contentKey] plays the intro again. Call inside [OnboardingTheme]. The dialog scrolls its
+ * own content, so content must not add another vertical scroller.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1207908166761516/task/1219997332635983
  * Figma reference: https://www.figma.com/design/wMxBpe0mKrRS0nVhtwMGO7/%F0%9F%9A%80-Onboarding-Components--2026-?node-id=3005-41695
  *
- * @param contentKey Stable identity for the current content; change it to start a new intro.
- * @param title Title text; pass an empty string for the no-title choreography case.
+ * @param contentKey Identifies the current content; changing it plays the intro for the new content.
+ * @param title Title typed out during the intro; an empty string skips the typing.
  * @param modifier Modifier applied to the dialog root.
- * @param state Hoisted state used to skip the current introduction.
- * @param animate Whether the next intro and settled tail/bounds changes animate.
- * @param entryDelay Extra delay added to the 200ms entrance delay.
- * @param textAlign Horizontal alignment for title and body text.
+ * @param state Lets the caller observe and skip the intro.
+ * @param animate Whether the intro and later tail and size changes animate.
+ * @param entryDelay Extra delay before the intro starts.
+ * @param textAlign Horizontal alignment for the title and body.
  * @param body Optional styled body text.
- * @param headerImage Optional image displayed above the title.
- * @param boundsAnimationDuration Duration used when the card bounds change.
- * @param tail Speech-bubble tail position.
- * @param tailExtended Whether the configured tail is fully extended.
- * @param primaryCta Optional primary CTA.
- * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
- * @param dismiss Optional dismiss action and accessible content description.
- * @param step Optional step indicator centred on the painted top edge; `null` hides it.
- * @param textHorizontalPadding Horizontal inset for the title and optional body.
- * @param contentHorizontalPadding Horizontal inset for the content slot, independent of CTA insets.
- * @param content Optional content-keyed arbitrary content slot.
+ * @param headerImage Optional image shown above the title.
+ * @param boundsAnimationDuration Duration of the card's size animation.
+ * @param tail Position of the speech-bubble tail.
+ * @param tailExtended Whether the tail is shown at full depth.
+ * @param primaryCta Optional primary button.
+ * @param onIntroFinished Called with the content key when its intro finishes or is skipped.
+ * @param dismiss Optional close button and its content description.
+ * @param step Optional step indicator shown on the top edge.
+ * @param headerToActionsSpacing Space between the text and the content or button.
+ * @param textHorizontalPadding Horizontal padding for the title and body.
+ * @param contentHorizontalPadding Horizontal padding for the content slot.
+ * @param content Optional content shown below the body.
  */
 @Composable
 fun DaxOnboardingDialog(
@@ -131,7 +99,7 @@ fun DaxOnboardingDialog(
         title = AnnotatedString(title),
         titleStyle = DuckDuckGoTheme.typography.onboardingTitle,
         modifier = modifier,
-        body = body?.let { dialogBody(it, DuckDuckGoTheme.typography.onboardingBody, textAlign) },
+        body = body?.let { { DaxOnboardingDialogBodyText(it, DuckDuckGoTheme.typography.onboardingBody, textAlign) } },
         state = state,
         animate = animate,
         entryDelay = entryDelay,
@@ -152,41 +120,9 @@ fun DaxOnboardingDialog(
 }
 
 /**
- * String-body overload of [DaxOnboardingDialog]. The body is converted to an [AnnotatedString]
- * before it reaches the stable core.
+ * String-body overload of [DaxOnboardingDialog]; see it for the other parameters.
  *
- * This composable must be called inside [OnboardingTheme]; it reads onboarding colours from that
- * provider, and omitting it causes the backing composition local to throw.
- *
- * The content-key, intro-callback, bounded-scroller, keyed content, cleanup, and CTA
- * contracts are the same as the primary overload. `animate` and `entryDelay` are sampled at
- * intro start; settled tail and bounds use the latest `animate`. The callback reports intro
- * completion rather than product-step completion.
- * Tail geometry is logical-direction relative: `None` is flat, `BottomStart` is 80dp from logical
- * start, `BottomStartWide` is 96dp, and `BottomEnd` is 80dp from logical end. `tailExtended = false`
- * retracts the tail depth; `true` fully extends it. `dismiss` is a 32dp affordance at logical
- * top/end with a 4dp visual overhang; hit and semantics bounds remain inside the layout.
- *
- * Asana Task: https://app.asana.com/1/137249556945/project/1207908166761516/task/1219997332635983
- * Figma reference: https://www.figma.com/design/wMxBpe0mKrRS0nVhtwMGO7/%F0%9F%9A%80-Onboarding-Components--2026-?node-id=3005-41695
- *
- * @param contentKey Stable identity for the current content; change it to start a new intro.
- * @param title Title text; pass an empty string for the no-title choreography case.
- * @param body Required plain body text.
- * @param modifier Modifier applied to the dialog root.
- * @param state Hoisted state used to skip the current introduction.
- * @param animate Whether the next intro and settled tail/bounds changes animate.
- * @param entryDelay Extra delay added to the 200ms entrance delay.
- * @param textAlign Horizontal alignment for title and body text.
- * @param headerImage Optional image displayed above the title.
- * @param boundsAnimationDuration Duration used when the card bounds change.
- * @param tail Speech-bubble tail position.
- * @param tailExtended Whether the configured tail is fully extended.
- * @param primaryCta Optional primary CTA.
- * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
- * @param dismiss Optional dismiss action and accessible content description.
- * @param step Optional step indicator centred on the painted top edge; `null` hides it.
- * @param content Optional content-keyed arbitrary content slot.
+ * @param body Plain body text.
  */
 @Composable
 fun DaxOnboardingDialog(
@@ -215,7 +151,7 @@ fun DaxOnboardingDialog(
         title = AnnotatedString(title),
         titleStyle = DuckDuckGoTheme.typography.onboardingTitle,
         modifier = modifier,
-        body = dialogBody(AnnotatedString(body), DuckDuckGoTheme.typography.onboardingBody, textAlign),
+        body = { DaxOnboardingDialogBodyText(AnnotatedString(body), DuckDuckGoTheme.typography.onboardingBody, textAlign) },
         state = state,
         animate = animate,
         entryDelay = entryDelay,
@@ -233,41 +169,10 @@ fun DaxOnboardingDialog(
 }
 
 /**
- * Composable-body overload of [DaxOnboardingDialog] for inline icons and other rich content.
+ * Composable-body overload of [DaxOnboardingDialog] for bodies with inline content. See [DaxOnboardingDialog]
+ * for the other parameters.
  *
- * The body lambda is required and is intentionally not trailing; the sole trailing lambda is the
- * content-keyed [content] slot. The content-key, intro-callback, bounded-scroller, cleanup, and
- * placeholder CTA contracts are the same as the primary overload. `animate` and `entryDelay` are
- * sampled at intro start; settled tail and bounds use the latest `animate`.
- *
- * This composable must be called inside [OnboardingTheme]; it reads onboarding colours from that
- * provider, and omitting it causes the backing composition local to throw.
- *
- * Tail geometry is logical-direction relative: `None` is flat, `BottomStart` is 80dp from logical
- * start, `BottomStartWide` is 96dp, and `BottomEnd` is 80dp from logical end. `tailExtended = false`
- * retracts the tail depth; `true` fully extends it. `dismiss` is a 32dp affordance at logical
- * top/end with a 4dp visual overhang; hit and semantics bounds remain inside the layout.
- *
- * Asana Task: https://app.asana.com/1/137249556945/project/1207908166761516/task/1219997332635983
- * Figma reference: https://www.figma.com/design/wMxBpe0mKrRS0nVhtwMGO7/%F0%9F%9A%80-Onboarding-Components--2026-?node-id=3005-41695
- *
- * @param contentKey Stable identity for the current content; change it to start a new intro.
- * @param title Title text; pass an empty string for the no-title choreography case.
- * @param body Composable body content, such as text containing inline content.
- * @param modifier Modifier applied to the dialog root.
- * @param state Hoisted state used to skip the current introduction.
- * @param animate Whether the next intro and settled tail/bounds changes animate.
- * @param entryDelay Extra delay added to the 200ms entrance delay.
- * @param textAlign Horizontal alignment for title and body text.
- * @param headerImage Optional image displayed above the title.
- * @param boundsAnimationDuration Duration used when the card bounds change.
- * @param tail Speech-bubble tail position.
- * @param tailExtended Whether the configured tail is fully extended.
- * @param primaryCta Optional primary CTA.
- * @param onIntroFinished Called after composition with the completed run’s content key; canceled runs do not call it.
- * @param dismiss Optional dismiss action and accessible content description.
- * @param step Optional step indicator centred on the painted top edge; `null` hides it.
- * @param content Optional content-keyed arbitrary content slot.
+ * @param body Body content.
  */
 @Composable
 fun DaxOnboardingDialog(
@@ -311,35 +216,6 @@ fun DaxOnboardingDialog(
         step = step,
         content = content,
     )
-}
-
-@SuppressLint("InvalidDaxTextColorUsage") // OnboardingTheme owns the binding-required content color.
-private fun dialogBody(
-    text: AnnotatedString,
-    style: DuckDuckGoTextStyle,
-    textAlign: DaxOnboardingDialogTextAlign,
-): @Composable () -> Unit = {
-    DaxText(
-        text = text,
-        modifier = Modifier.fillMaxWidth(),
-        style = style,
-        color = DaxOnboardingDialogDefaults.ContentColor,
-        textAlign = textAlign.toComposeTextAlign(),
-    )
-}
-
-private fun DaxOnboardingDialogTextAlign.toComposeTextAlign(): TextAlign = when (this) {
-    DaxOnboardingDialogTextAlign.Start -> TextAlign.Start
-    DaxOnboardingDialogTextAlign.Center -> TextAlign.Center
-}
-
-@Composable
-private fun OnboardingPreview(content: @Composable () -> Unit) {
-    DuckDuckGoTheme {
-        OnboardingTheme {
-            PreviewBox(modifier = Modifier.fillMaxWidth()) { content() }
-        }
-    }
 }
 
 @PreviewLightDark
@@ -446,22 +322,6 @@ private fun DaxOnboardingDialogLongContentPreview() {
             DaxText(
                 text = "Long content remains inside the dialog's single vertical scroller and is keyed to the content key.",
                 color = DaxOnboardingDialogDefaults.ContentColor,
-            )
-        }
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxOnboardingDialogRtlPreview() {
-    OnboardingPreview {
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            DaxOnboardingDialog(
-                contentKey = "centered-rtl",
-                title = "RTL tail placement",
-                body = "Start and end tails follow layout direction.",
-                animate = false,
-                tail = DaxOnboardingDialogTail.BottomEnd,
             )
         }
     }
