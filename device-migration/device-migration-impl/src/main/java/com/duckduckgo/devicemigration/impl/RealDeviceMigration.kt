@@ -109,14 +109,15 @@ class RealDeviceMigration @Inject constructor(
     }
 
     override fun onCreate(owner: LifecycleOwner) {
-        val sourceIsNewInstall = detection.sourceIsNewInstall
-        markerStore.transferred.edit()
-            .putBoolean(KEY_SEEN, true)
-            .putBoolean(KEY_IS_NEW_INSTALL, installTimeComparison.isUnupdatedSinceFirstInstall() && (sourceIsNewInstall ?: true))
-            .commit()
-        // Sync can be turned on or off between starts, so the stamp is refreshed every time. Off the main thread: reading the
-        // Sync account touches encrypted storage.
+        // Detection and the stamps write to disk, so none of it may run on the main thread at startup. Detection runs first:
+        // it has to read the transferred marker before this phone's stamp overwrites it.
         appCoroutineScope.launch(dispatchers.io()) {
+            val sourceIsNewInstall = detection.sourceIsNewInstall
+            markerStore.transferred.edit()
+                .putBoolean(KEY_SEEN, true)
+                .putBoolean(KEY_IS_NEW_INSTALL, installTimeComparison.isUnupdatedSinceFirstInstall() && (sourceIsNewInstall ?: true))
+                .commit()
+            // Sync can be turned on or off between starts, so the stamp is refreshed every time.
             try {
                 val signedIn = deviceSyncState.value.isUserSignedInOnDevice()
                 markerStore.transferred.edit().putBoolean(KEY_SIGNED_IN_TO_SYNC, signedIn).commit()
