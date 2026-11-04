@@ -43,6 +43,8 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.api.NextSteps
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
@@ -54,6 +56,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -110,6 +113,8 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
     @Mock private lateinit var nextStepsSetAsDefaultPromptMetricsMock: NextStepsSetAsDefaultPromptMetrics
 
+    @Mock private lateinit var nextStepsMock: NextSteps
+
     private lateinit var dataStoreMock: DefaultBrowserPromptsDataStore
 
     private lateinit var fakeUserAppStageFlow: MutableSharedFlow<AppStage>
@@ -126,6 +131,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         whenever(moshiMock.adapter<FeatureSettingsConfigModel>(any())).thenReturn(featureSettingsJsonAdapterMock)
         fakeUserAppStageFlow = MutableSharedFlow()
         whenever(userStageStoreMock.userAppStageFlow()).thenReturn(fakeUserAppStageFlow)
+        runBlocking { whenever(nextStepsMock.isSectionActive()).thenReturn(false) }
     }
 
     @Test
@@ -409,6 +415,45 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         verify(dataStoreMock).storeStage(Stage.STAGE_1)
         verify(stageEvaluatorMock).evaluate(Stage.STAGE_1)
+    }
+
+    @Test
+    fun `evaluate - if enough active days until stage 1 but the next steps section is active, then hold the stage`() = runTest {
+        val dataStoreMock = createDataStoreFake(
+            initialStage = Stage.STARTED,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
+        whenever(nextStepsMock.isSectionActive()).thenReturn(true)
+        mockFeatureSettings()
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceStart()).thenReturn(Result.success(1))
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
+        verify(dataStoreMock, never()).storeStage(Stage.STAGE_1)
+        verify(defaultBrowserPromptsAppUsageRepositoryMock).recordAppUsedNow()
+    }
+
+    @Test
+    fun `evaluate - if not started and the next steps section is active, then still start the flow`() = runTest {
+        val dataStoreMock = createDataStoreFake(
+            initialStage = Stage.NOT_STARTED,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
+        whenever(nextStepsMock.isSectionActive()).thenReturn(true)
+        whenever(stageEvaluatorMock.evaluate(Stage.STARTED)).thenReturn(DefaultBrowserPromptsFlowStageAction.disableAll)
+
+        testee.evaluate()
+
+        verify(dataStoreMock).storeStage(Stage.STARTED)
     }
 
     @Test
@@ -862,6 +907,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         userBrowserProperties = userBrowserProperties,
         pixel = pixel,
         nextStepsSetAsDefaultPromptMetrics = nextStepsSetAsDefaultPromptMetricsMock,
+        nextSteps = nextStepsMock,
         moshi = moshi,
     )
 

@@ -24,8 +24,11 @@ import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
 import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsView
 import com.duckduckgo.nextsteps.impl.ui.checklist.NextStepsCheckListView
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -34,6 +37,9 @@ import javax.inject.Inject
 class RealNextSteps @Inject constructor(
     private val nextStepsItemsFeatureToggles: NextStepsItemsExperimentToggles,
     private val appBuildConfig: AppBuildConfig,
+    private val remoteMessageModel: RemoteMessageModel,
+    private val completionChecker: NextStepsCompletionChecker,
+    private val itemsStore: NextStepsItemsStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : NextSteps {
 
@@ -49,6 +55,21 @@ class RealNextSteps @Inject constructor(
             Cohorts.STACKED_CARDS -> NextStepsStackedCardsView(context)
             Cohorts.CHECK_LIST -> NextStepsCheckListView(context)
             else -> null
+        }
+    }
+
+    override suspend fun isSectionActive(): Boolean = withContext(dispatcherProvider.io()) {
+        val cohort = treatmentCohort() ?: return@withContext false
+        val message = remoteMessageModel.getActiveMessage()?.takeIf { it.isNextStepsForNewTabPage() } ?: return@withContext false
+        when (cohort) {
+            // Done items stay on screen until the user closes the list, so the message alone decides.
+            Cohorts.CHECK_LIST -> true
+            // The stack is gone once no card is left, even before a New Tab Page render dismisses the message.
+            Cohorts.STACKED_CARDS -> {
+                val items = (message.content as? Content.ActionableItems)?.listItems.orEmpty()
+                completionChecker.hasRemainingItems(items, itemsStore.dismissedItemIds().first())
+            }
+            else -> false
         }
     }
 

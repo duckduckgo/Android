@@ -46,6 +46,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.squareup.moshi.Moshi
@@ -106,6 +107,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val pixel: Pixel,
     private val nextStepsSetAsDefaultPromptMetrics: NextStepsSetAsDefaultPromptMetrics,
+    private val nextSteps: NextSteps,
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, ModalEvaluator, PrivacyConfigCallbackPlugin {
 
@@ -237,6 +239,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             STARTED
         } else {
             logcat { "evaluate: current stage is other than NOT_STARTED and DuckDuckGo is NOT default browser." }
+
+            if (nextSteps.isSectionActive()) {
+                logcat { "evaluate: Next Steps section is active, holding the prompts back" }
+                return@withLock ModalEvaluator.EvaluationResult.Skipped
+            }
             val appActiveDaysUsedSinceStart = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceStart().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return@withLock ModalEvaluator.EvaluationResult.Skipped
