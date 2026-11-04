@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.PageContextTrigger
@@ -122,11 +123,20 @@ class DuckChatContextualWebViewViewModelTest {
         testee = buildViewModel()
     }
 
+    private fun pdfResult(data: String? = null) = PdfPageContextResolver.Result.Pdf(
+        DuckAiPdfMetadata(
+            "document.pdf",
+            "https://example.com/document.pdf",
+            DuckAiPdfMetadata.Availability.AVAILABLE,
+        ),
+        data,
+    )
+
     @Test
     fun `removing PDF during manual attachment prevents sending bytes`() = runTest {
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
-        val pending = kotlinx.coroutines.CompletableDeferred<String?>()
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
         whenever(
             pdfPageContextResolver.resolve(
                 "tab-1",
@@ -140,7 +150,7 @@ class DuckChatContextualWebViewViewModelTest {
             awaitItem()
             testee.addPageContext()
             testee.removePageContext()
-            pending.complete(JSONObject(pdf).put("data", "JVBERi0=").toString())
+            pending.complete(pdfResult("JVBERi0="))
             expectNoEvents()
         }
     }
@@ -171,12 +181,13 @@ class DuckChatContextualWebViewViewModelTest {
                 false,
                 PageContextTrigger.AUTO,
             ),
-        ).thenReturn(pdf)
+        ).thenReturn(pdfResult())
         testee.subscriptionEventDataFlow.test {
             testee.onPageContextReceived("tab-1", pdf)
             val context = awaitItem().params.getJSONObject("pageContext")
             assertEquals("document.pdf", context.getString("title"))
             assertFalse(context.has("data"))
+            assertFalse(context.getBoolean("attached"))
         }
         assertFalse(testee.viewState.value.showContext)
         assertEquals("application/pdf", testee.viewState.value.contextMimeType)
@@ -1039,5 +1050,104 @@ class DuckChatContextualWebViewViewModelTest {
         var nowMs: Long = 0L
 
         override fun currentTimeMillis(): Long = nowMs
+    }
+
+    @Test
+    fun `PDF entry handoff retains document when requested page metadata arrives during encoding`() = runTest {
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val prompt = NativeInputPrompt("Summarize this document", null, null, null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = pdf))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.USER_REQUEST)).doSuspendableAnswer { pending.await() }
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onWebAppReady()
+            testee.onPageContextReceived("tab-1", pdf)
+            assertEquals("submitAIChatPageContext", awaitItem().subscriptionName)
+            pending.complete(pdfResult("JVBERi0="))
+            val event = awaitItem()
+            assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+            assertTrue(event.params.has("pageContext"))
+            assertEquals("JVBERi0=", event.params.getJSONObject("pageContext").getString("data"))
+        }
+    }
+
+    @Test
+    fun `removing PDF during submission sends prompt without document`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.USER_REQUEST)).doSuspendableAnswer { pending.await() }
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            awaitItem()
+            testee.onPromptSent("Explain this document")
+            testee.removePageContext()
+            pending.complete(pdfResult("JVBERi0="))
+            val event = awaitItem()
+            assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+            assertFalse(event.params.has("pageContext"))
+            assertEquals("Explain this document", event.params.getJSONObject("query").getString("prompt"))
+        }
+    }
+
+    @Test
+    fun `closing sheet during PDF submission discards old prompt`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.USER_REQUEST)).doSuspendableAnswer { pending.await() }
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            awaitItem()
+            testee.onPromptSent("Explain this document")
+            testee.onSheetClosed()
+            pending.complete(pdfResult("JVBERi0="))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `request tokens are invalidated by removal and reset but permit a later explicit attach`() = runTest {
+        val beforeRemoval = testee.capturePageContextRequest()
+        testee.removePageContext()
+        assertFalse(testee.isPageContextRequestCurrent(beforeRemoval))
+        val afterRemoval = testee.capturePageContextRequest()
+        assertTrue(testee.isPageContextRequestCurrent(afterRemoval))
+        testee.onContextualFireConfirmed()
+        assertFalse(testee.isPageContextRequestCurrent(afterRemoval))
+    }
+
+    @Test
+    fun `removing PDF during automatic attachment prevents sending bytes`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.AUTO)).doSuspendableAnswer { pending.await() }
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            testee.removePageContext()
+            pending.complete(pdfResult("JVBERi0="))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `reset during automatic PDF attachment prevents sending old document`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.AUTO)).doSuspendableAnswer { pending.await() }
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            testee.onContextualFireConfirmed()
+            assertEquals("submitNewChatAction", awaitItem().subscriptionName)
+            pending.complete(pdfResult("JVBERi0="))
+            expectNoEvents()
+        }
     }
 }

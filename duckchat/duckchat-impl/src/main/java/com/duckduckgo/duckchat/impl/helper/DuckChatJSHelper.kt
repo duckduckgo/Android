@@ -94,6 +94,7 @@ interface DuckChatJSHelper {
         tabId: String = "",
         browserMode: BrowserMode = BrowserMode.REGULAR,
         pageUrl: String? = null,
+        allowAutomaticPageContextAttachment: Boolean = true,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -175,6 +176,7 @@ class RealDuckChatJSHelper @Inject constructor(
         tabId: String,
         browserMode: BrowserMode,
         pageUrl: String?,
+        allowAutomaticPageContextAttachment: Boolean,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -334,18 +336,22 @@ class RealDuckChatJSHelper @Inject constructor(
                 id?.let {
                     val reason = data?.optString(REASON) ?: REASON_USER_ACTION
                     if (pdfPageContextResolver.isEnabled()) {
-                        val includeData = reason == REASON_USER_ACTION || (reason == REASON_INIT && duckChat.isAutomaticContextAttachmentEnabled())
+                        val includeData = reason == REASON_USER_ACTION ||
+                            (reason == REASON_INIT && allowAutomaticPageContextAttachment && duckChat.isAutomaticContextAttachmentEnabled())
                         val resolved = pdfPageContextResolver.resolve(
                             tabId,
                             pageContext.takeIf { it.isNotEmpty() },
                             includeData,
                             if (reason == REASON_USER_ACTION) Trigger.USER_REQUEST else Trigger.AUTO,
                         )
-                        if (resolved == null || PdfPageContextResolver.isPdf(resolved)) {
+                        if (resolved == null || resolved is PdfPageContextResolver.Result.Pdf) {
+                            if (resolved is PdfPageContextResolver.Result.Pdf && reason == REASON_USER_ACTION && resolved.data != null) {
+                                duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
+                            }
                             return if (resolved == null) {
                                 getEmptyPageContextResponse(featureName, method, it)
                             } else {
-                                getPageContextResponse(featureName, method, it, resolved, tabId)
+                                getPageContextResponse(featureName, method, it, resolved.toJson())
                             }
                         }
                     }
@@ -353,12 +359,12 @@ class RealDuckChatJSHelper @Inject constructor(
                         when (reason) {
                             REASON_USER_ACTION -> {
                                 duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
-                                getPageContextResponse(featureName, method, it, pageContext, tabId)
+                                getPageContextResponse(featureName, method, it, JSONObject(pageContext))
                             }
 
                             REASON_INIT -> {
                                 if (duckChat.isAutomaticContextAttachmentEnabled()) {
-                                    getPageContextResponse(featureName, method, it, pageContext, tabId)
+                                    getPageContextResponse(featureName, method, it, JSONObject(pageContext))
                                 } else {
                                     getEmptyPageContextResponse(featureName, method, it)
                                 }
@@ -803,14 +809,13 @@ class RealDuckChatJSHelper @Inject constructor(
         featureName: String,
         method: String,
         id: String,
-        pageContext: String,
-        tabId: String,
+        pageContext: JSONObject,
     ): JsCallbackData {
         val params =
             JSONObject().apply {
                 put(
                     PAGE_CONTEXT,
-                    JSONObject(pageContext),
+                    pageContext,
                 )
             }
 

@@ -77,7 +77,6 @@ class TabDataRepository(
     private val duckChatContextualDataStore: DuckChatContextualDataStore,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
-    private val pdfPageContextProvider: com.duckduckgo.app.browser.pdf.RealPdfPageContextProvider,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val pageTitleFetcher: PageTitleFetcher,
     private val pageContextJSHelper: DuckAiPageContextLifecycle,
@@ -380,7 +379,6 @@ class TabDataRepository(
         tabVisitedSitesRepository.clearTab(tab.tabId)
         nativeInputStatePublisher.clearTab(tab.tabId)
         pageContextJSHelper.clearTab(tab.tabId)
-        pdfPageContextProvider.hide(tab.tabId)
     }
 
     override suspend fun deleteTabs(tabIds: List<String>) {
@@ -392,7 +390,6 @@ class TabDataRepository(
             tabVisitedSitesRepository.clearTab(it)
             nativeInputStatePublisher.clearTab(it)
             pageContextJSHelper.clearTab(it)
-            pdfPageContextProvider.hide(it)
         }
     }
 
@@ -405,7 +402,6 @@ class TabDataRepository(
         tabVisitedSitesRepository.clearTab(tabId)
         nativeInputStatePublisher.clearTab(tabId)
         pageContextJSHelper.clearTab(tabId)
-        pdfPageContextProvider.hide(tabId)
     }
 
     override suspend fun deleteSelectedBlankTabAndSelectTarget(
@@ -422,7 +418,6 @@ class TabDataRepository(
         tabVisitedSitesRepository.clearTab(currentTabId)
         nativeInputStatePublisher.clearTab(currentTabId)
         pageContextJSHelper.clearTab(currentTabId)
-        pdfPageContextProvider.hide(currentTabId)
         true
     }
 
@@ -472,7 +467,6 @@ class TabDataRepository(
             tabVisitedSitesRepository.clearTab(it)
             nativeInputStatePublisher.clearTab(it)
             pageContextJSHelper.clearTab(it)
-            pdfPageContextProvider.hide(it)
         }
 
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
@@ -508,13 +502,11 @@ class TabDataRepository(
         tabVisitedSitesRepository.clearTab(tabId)
         nativeInputStatePublisher.clearTab(tabId)
         pageContextJSHelper.clearTab(tabId)
-        pdfPageContextProvider.hide(tabId)
     }
 
     override suspend fun deleteAll() = withContext(dispatchers.io()) {
         logcat(INFO) { "Deleting tabs right now" }
         pageContextJSHelper.clearAll()
-        tabsDao.tabs().forEach { pdfPageContextProvider.hide(it.tabId) }
         tabsDao.deleteAllTabs()
         webViewPreviewPersister.deleteAll()
         faviconManager.deleteAllTemp()

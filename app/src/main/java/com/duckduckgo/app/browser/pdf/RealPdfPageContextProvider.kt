@@ -17,79 +17,139 @@
 package com.duckduckgo.app.browser.pdf
 
 import android.net.Uri
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.browser.api.pdf.PdfContentResult
 import com.duckduckgo.browser.api.pdf.PdfPageContext
 import com.duckduckgo.browser.api.pdf.PdfPageContext.Status
 import com.duckduckgo.browser.api.pdf.PdfPageContextProvider
+import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
-import java.util.Base64
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
 @SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<PdfPageContextProvider>())
+@ContributesBinding(AppScope::class, binding = binding<PdfPageContextRegistry>())
 class RealPdfPageContextProvider @Inject constructor(
     private val dispatchers: DispatcherProvider,
-) : PdfPageContextProvider {
-    private class Document(val uri: Uri?, val title: String, val url: String)
+    @RegularMode private val regularTabs: TabsDao,
+    @FireMode private val fireTabs: TabsDao,
+    @AppCoroutineScope private val scope: CoroutineScope,
+) : PdfPageContextProvider, PdfPageContextRegistry {
+    private class Document(val tabId: String, val uri: Uri?, val title: String, val url: String) : PdfPageContext.Snapshot
     private val documents = ConcurrentHashMap<String, Document>()
 
-    fun show(tabId: String, uri: Uri?, title: String, url: String) {
-        val old = documents[tabId]
-        if (old?.uri == uri && old?.title == title && old?.url == url) return
-        documents[tabId] = Document(uri, title, url)
+    init {
+        scope.launch(dispatchers.io()) {
+            merge(
+                regularTabs.flowAllTabIds().map { it.toSet() }.distinctUntilChanged(),
+                fireTabs.flowAllTabIds().map { it.toSet() }.distinctUntilChanged(),
+            ).collect {
+                documents.values.toList().forEach { discardRemovedTab(it) }
+            }
+        }
     }
 
-    fun hide(tabId: String) {
+    private fun discardRemovedTab(document: Document): Boolean {
+        val exists = regularTabs.tab(document.tabId) != null || fireTabs.tab(document.tabId) != null
+        if (!exists) documents.remove(document.tabId, document)
+        return exists
+    }
+
+    override fun show(tabId: String, uri: Uri?, title: String, url: String) {
+        val document = Document(tabId, uri, title, url)
+        documents[tabId] = document
+        scope.launch(dispatchers.io()) { discardRemovedTab(document) }
+    }
+
+    override fun hide(tabId: String) {
         documents.remove(tabId)
     }
 
-    override suspend fun get(tabId: String, includeData: Boolean): PdfPageContext? {
+    override suspend fun getMetadata(tabId: String): PdfPageContext? {
         val document = documents[tabId] ?: return null
-        val result = withContext(dispatchers.io()) {
-            read(document, includeData)
+        val status = withContext(dispatchers.io()) {
+            if (!discardRemovedTab(document)) return@withContext Status.STALE
+            val inspected = inspect(document)
+            if (discardRemovedTab(document)) inspected else Status.STALE
         }
         coroutineContext.ensureActive()
-        return if (documents[tabId] === document) result else result.copy(status = Status.STALE, data = null)
+        return PdfPageContext(document.title, document.url, if (isCurrent(document)) status else Status.STALE, document)
     }
 
-    private suspend fun read(document: Document, includeData: Boolean): PdfPageContext {
-        val metadata = PdfPageContext(document.title, document.url, Status.UNAVAILABLE)
-        val path = document.uri?.takeIf { it.scheme == "file" }?.path ?: return metadata
+    override suspend fun read(snapshot: PdfPageContext.Snapshot): PdfContentResult {
+        val document = snapshot as? Document ?: return PdfContentResult.Stale
+        if (!isCurrent(document)) return PdfContentResult.Stale
+        val result = withContext(dispatchers.io()) {
+            if (!discardRemovedTab(document) || !isCurrent(document)) return@withContext PdfContentResult.Stale
+            val content = readDocument(document)
+            if (discardRemovedTab(document)) content else PdfContentResult.Stale
+        }
+        coroutineContext.ensureActive()
+        return if (isCurrent(document)) result else PdfContentResult.Stale
+    }
+
+    private fun isCurrent(document: Document): Boolean = documents[document.tabId] === document
+
+    private fun file(document: Document): File? = document.uri?.takeIf { it.scheme == "file" }?.path?.let(::File)
+
+    private suspend fun inspect(document: Document): Status {
         try {
-            val file = File(path)
-            if (!file.isFile || file.length() == 0L) return metadata
-            if (file.length() > MAX_BYTES) return metadata.copy(status = Status.TOO_LARGE)
-            if (!includeData) return metadata.copy(status = Status.AVAILABLE)
+            coroutineContext.ensureActive()
+            val file = file(document) ?: return Status.UNAVAILABLE
+            if (!file.isFile || file.length() < PDF_MAGIC.size) return Status.UNAVAILABLE
+            if (file.length() > MAX_BYTES) return Status.TOO_LARGE
             file.inputStream().use { input ->
-                val output = ByteArrayOutputStream()
-                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                var total = 0
-                while (true) {
+                for (byte in PDF_MAGIC) if (input.read() != byte.toInt()) return Status.UNAVAILABLE
+            }
+            return Status.AVAILABLE
+        } catch (_: IOException) {
+            return Status.UNAVAILABLE
+        } catch (_: SecurityException) {
+            return Status.UNAVAILABLE
+        }
+    }
+
+    private suspend fun readDocument(document: Document): PdfContentResult {
+        try {
+            val file = file(document) ?: return PdfContentResult.Unavailable
+            val size = file.length()
+            if (!file.isFile || size < PDF_MAGIC.size) return PdfContentResult.Unavailable
+            if (size > MAX_BYTES) return PdfContentResult.TooLarge
+            file.inputStream().use { input ->
+                val bytes = ByteArray(size.toInt())
+                var offset = 0
+                while (offset < bytes.size) {
                     coroutineContext.ensureActive()
-                    val count = input.read(buffer)
-                    if (count < 0) break
-                    total += count
-                    if (total > MAX_BYTES) return metadata.copy(status = Status.TOO_LARGE)
-                    output.write(buffer, 0, count)
+                    val count = input.read(bytes, offset, minOf(DEFAULT_BUFFER_SIZE, bytes.size - offset))
+                    if (count < 0) return PdfContentResult.Unavailable
+                    offset += count
                 }
-                val bytes = output.toByteArray()
-                if (bytes.size < 5 || !bytes.copyOfRange(0, 5).contentEquals(PDF_MAGIC)) return metadata
+                if (input.read() != -1) return if (file.length() > MAX_BYTES) PdfContentResult.TooLarge else PdfContentResult.Unavailable
+                if (PDF_MAGIC.indices.any { bytes[it] != PDF_MAGIC[it] }) return PdfContentResult.Unavailable
                 coroutineContext.ensureActive()
-                return metadata.copy(status = Status.AVAILABLE, data = Base64.getEncoder().encodeToString(bytes))
+                return PdfContentResult.Success(bytes)
             }
         } catch (_: IOException) {
-            return metadata
+            return PdfContentResult.Unavailable
         } catch (_: SecurityException) {
-            return metadata
+            return PdfContentResult.Unavailable
         }
     }
 

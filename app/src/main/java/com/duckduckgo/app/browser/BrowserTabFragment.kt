@@ -3129,6 +3129,10 @@ class BrowserTabFragment :
                 omnibar.createAdBlockingAnimation(it.icon, it.text)
             }
 
+            is Command.PdfPageContextReceived -> {
+                sharedContextualViewModel.onPdfPageContextReceived(it.tabId, it.metadata)
+            }
+
             is Command.PageContextReceived -> {
                 sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
@@ -5165,8 +5169,9 @@ class BrowserTabFragment :
             if (pdfUrl != null && viewModel.isPdfPageContextEnabled()) {
                 val uri = bundle.getString("pdfContextUri")?.let { Uri.parse(it) }
                 val title = bundle.getString("pdfContextTitle").orEmpty()
-                viewModel.restorePdfPageContext(uri, title, pdfUrl)
-                if (uri != null) showPdf(pdfUrl, uri)
+                if (viewModel.restorePdfPageContext(uri, title, pdfUrl) && uri != null) {
+                    showPdf(pdfUrl, uri)
+                }
             }
         }
         viewModel.determineShowBrowser()

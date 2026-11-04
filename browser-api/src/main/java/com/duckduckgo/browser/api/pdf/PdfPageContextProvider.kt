@@ -16,22 +16,34 @@
 
 package com.duckduckgo.browser.api.pdf
 
-/** Reads the cached document currently displayed by a tab without fetching it again. */
+/** Reads the viewer's existing cache without fetching or persisting another document copy. */
 interface PdfPageContextProvider {
-    /**
-     * Null means no PDF is displayed. Unavailable PDFs must not fall back to the hidden page.
-     * [includeData] permits a bounded base64 read; false returns metadata without reading content.
-     * STALE results must be discarded because the tab changed during the read. Cancellation propagates.
-     */
-    suspend fun get(tabId: String, includeData: Boolean): PdfPageContext?
+    /** Null means no PDF. Other results must not fall back to the hidden web page. Cancellation propagates. */
+    suspend fun getMetadata(tabId: String): PdfPageContext?
+
+    /** Reads the inspected document only. Consumers own encoding and must exclude content from logs and page-context persistence. */
+    suspend fun read(snapshot: PdfPageContext.Snapshot): PdfContentResult
 }
 
-/** Document metadata and optional base64 bytes. Never persist or log [data]. */
+/** Metadata contains no attachment bytes. Title and URL are sensitive and must not be logged. */
 data class PdfPageContext(
     val title: String,
     val url: String,
     val status: Status,
-    val data: String? = null,
+    val snapshot: Snapshot,
 ) {
+    /** Opaque local document identity. Never serialize or persist this handle. */
+    interface Snapshot
     enum class Status { AVAILABLE, TOO_LARGE, UNAVAILABLE, STALE }
+    override fun toString(): String = "PdfPageContext(status=$status)"
+}
+
+sealed interface PdfContentResult {
+    /** Complete validated bytes, retained only for attachment delivery. Existing chat storage has its own retention policy. */
+    class Success(val bytes: ByteArray) : PdfContentResult {
+        override fun toString(): String = "PdfContentResult.Success"
+    }
+    data object TooLarge : PdfContentResult
+    data object Unavailable : PdfContentResult
+    data object Stale : PdfContentResult
 }

@@ -20,10 +20,12 @@ package com.duckduckgo.duckchat.api
 interface DuckAiPdfPageContext {
     fun isEnabled(): Boolean
 
-    /**
-     * Returns serialized page-context metadata without PDF bytes, or null when PDF context is
-     * disabled, no PDF is displayed, or the request became stale.
-     * Unavailable and oversized documents return metadata marked as non-attachable.
-     */
-    suspend fun getMetadata(tabId: String): String?
+    /** Null means disabled or no PDF. Stale and unavailable PDFs must not trigger extraction of the hidden page. */
+    suspend fun getMetadata(tabId: String): DuckAiPdfMetadata?
+}
+
+/** Contains no document bytes or serialized messaging payload. */
+data class DuckAiPdfMetadata(val title: String, val url: String, val availability: Availability) {
+    enum class Availability { AVAILABLE, TOO_LARGE, UNAVAILABLE, STALE }
+    override fun toString(): String = "DuckAiPdfMetadata(availability=$availability)"
 }

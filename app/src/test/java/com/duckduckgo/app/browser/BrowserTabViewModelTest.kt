@@ -154,6 +154,7 @@ import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
 import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
+import com.duckduckgo.app.browser.pdf.PdfPageContextRegistry
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
@@ -290,6 +291,8 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
+import com.duckduckgo.browser.api.pdf.PdfPageContext
+import com.duckduckgo.browser.api.pdf.PdfPageContextProvider
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -322,6 +325,7 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
@@ -706,6 +710,8 @@ class BrowserTabViewModelTest {
     }
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
+    private val pdfPageContextProvider: PdfPageContextProvider = mock()
+    private val pdfPageContextRegistry: PdfPageContextRegistry = mock()
     private val pdfPageContextResolver: com.duckduckgo.duckchat.api.DuckAiPdfPageContext = mock()
     private val mockPageContextJSHelper: PageContextJSHelper = mock()
     private val mockTabPageContextRepository: TabPageContextRepository = mock()
@@ -998,7 +1004,8 @@ class BrowserTabViewModelTest {
 
         testee =
             BrowserTabViewModel(
-                pdfPageContextProvider = mock(),
+                pdfPageContextProvider = pdfPageContextProvider,
+                pdfPageContextRegistry = pdfPageContextRegistry,
                 pdfPageContextResolver = pdfPageContextResolver,
                 statisticsUpdater = mockStatisticsUpdater,
                 queryUrlConverter = mockOmnibarConverter,
@@ -11961,6 +11968,7 @@ class BrowserTabViewModelTest {
                     any(),
                     any(),
                     anyOrNull(),
+                    eq(true),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -11980,6 +11988,7 @@ class BrowserTabViewModelTest {
                 any(),
                 any(),
                 anyOrNull(),
+                eq(true),
             )
             // Not the single-slot command LiveData: a DuckChat reply can be held open for minutes
             // (the edit screen) while the fragment is stopped, so it goes on its own buffered channel.
@@ -12014,6 +12023,7 @@ class BrowserTabViewModelTest {
                 any(),
                 any(),
                 eq(serpUrl),
+                eq(true),
             )
         }
 
@@ -12032,6 +12042,7 @@ class BrowserTabViewModelTest {
                     any(),
                     any(),
                     anyOrNull(),
+                    eq(true),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -12051,6 +12062,7 @@ class BrowserTabViewModelTest {
                 any(),
                 any(),
                 anyOrNull(),
+                eq(true),
             )
             testee.duckChatJsResponseFlow.test {
                 expectNoEvents()
@@ -12661,6 +12673,7 @@ class BrowserTabViewModelTest {
                     any(),
                     any(),
                     anyOrNull(),
+                    eq(true),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -14490,14 +14503,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCollectPageContextHasPdfMetadataThenEmitMetadataWithoutCollectingWebPage() = runTest {
-        val metadata = """{"title":"document.pdf","mimeType":"application/pdf","attached":false}"""
+        val metadata = DuckAiPdfMetadata("document.pdf", "https://example.com/document.pdf", DuckAiPdfMetadata.Availability.AVAILABLE)
         whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
         whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(metadata)
 
         testee.collectPageContext()
 
-        assertCommandIssued<Command.PageContextReceived> {
-            assertEquals(metadata, pageContext)
+        assertCommandIssued<Command.PdfPageContextReceived> {
+            assertEquals(metadata, this.metadata)
         }
         verify(mockPageContextJSHelper, never()).collectPageContext(any(), any(), anyOrNull(), any())
     }
@@ -14879,6 +14892,105 @@ class BrowserTabViewModelTest {
 
         // Manager is NOT called at exactly FIXED_PROGRESS (50) - only when progress > 50
         verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
+    }
+
+    @Test
+    fun whenRestoredPdfCacheExistsThenCachedDocumentCanBeShown() = runTest {
+        val uri = Uri.parse("file:///cache/restored.pdf")
+        val url = "https://example.com/restored.pdf"
+        whenever(pdfPageContextProvider.getMetadata(any())).thenReturn(
+            PdfPageContext("restored.pdf", url, PdfPageContext.Status.AVAILABLE, mock()),
+        )
+
+        assertTrue(testee.restorePdfPageContext(uri, "restored.pdf", url))
+
+        assertEquals(uri, browserViewState().currentPdfCachedUri)
+        verify(pdfPageContextRegistry).show(any(), eq(uri), eq("restored.pdf"), eq(url))
+        verify(mockInlinePdfHandler, never()).downloadToCache(any(), any(), any())
+    }
+
+    @Test
+    fun whenRestoredPdfCacheIsOversizedThenItRemainsViewableWithoutDownloadingAgain() = runTest {
+        val uri = Uri.parse("file:///cache/large.pdf")
+        val url = "https://example.com/large.pdf"
+        whenever(pdfPageContextProvider.getMetadata(any())).thenReturn(
+            PdfPageContext("large.pdf", url, PdfPageContext.Status.TOO_LARGE, mock()),
+        )
+
+        assertTrue(testee.restorePdfPageContext(uri, "large.pdf", url))
+
+        assertEquals(uri, browserViewState().currentPdfCachedUri)
+        verify(mockInlinePdfHandler, never()).downloadToCache(any(), any(), any())
+    }
+
+    @Test
+    fun whenRestoredPdfCacheIsMissingThenOnlyDownloadedReplacementIsShown() = runTest {
+        val missingUri = Uri.parse("file:///cache/missing.pdf")
+        val replacementUri = Uri.parse("file:///cache/replacement.pdf")
+        val url = "https://example.com/restored.pdf"
+        whenever(pdfPageContextProvider.getMetadata(any())).thenReturn(
+            PdfPageContext("restored.pdf", url, PdfPageContext.Status.UNAVAILABLE, mock()),
+        )
+        whenever(mockInlinePdfHandler.downloadToCache(url, forceRefresh = true, browserMode = BrowserMode.REGULAR))
+            .thenReturn(PdfDownloadResult.Success(replacementUri))
+        clearInvocations(mockCommandObserver)
+
+        assertFalse(testee.restorePdfPageContext(missingUri, "restored.pdf", url))
+
+        verify(mockInlinePdfHandler).downloadToCache(url, forceRefresh = true, browserMode = BrowserMode.REGULAR)
+        assertCommandIssued<Command.ShowPdfInTab> {
+            assertEquals(replacementUri, cachedFileUri)
+        }
+        assertEquals(replacementUri, browserViewState().currentPdfCachedUri)
+    }
+
+    @Test
+    fun whenRestoredPdfCannotBeDownloadedThenMissingFileIsNotShownOrUnregistered() = runTest {
+        val missingUri = Uri.parse("file:///cache/missing.pdf")
+        val url = "https://example.com/restored.pdf"
+        whenever(pdfPageContextProvider.getMetadata(any())).thenReturn(
+            PdfPageContext("restored.pdf", url, PdfPageContext.Status.UNAVAILABLE, mock()),
+        )
+        whenever(mockInlinePdfHandler.downloadToCache(url, forceRefresh = true, browserMode = BrowserMode.REGULAR))
+            .thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
+        clearInvocations(mockCommandObserver, pdfPageContextRegistry)
+
+        assertFalse(testee.restorePdfPageContext(missingUri, "restored.pdf", url))
+
+        assertCommandNotIssued<Command.ShowPdfInTab>()
+        assertNull(browserViewState().currentPdfCachedUri)
+        verify(pdfPageContextRegistry, never()).hide(any())
+    }
+
+    @Test
+    fun whenRestoredPdfBecomesStaleThenOldDocumentIsNotShownOrDownloaded() = runTest {
+        val uri = Uri.parse("file:///cache/stale.pdf")
+        val url = "https://example.com/stale.pdf"
+        whenever(pdfPageContextProvider.getMetadata(any())).thenReturn(
+            PdfPageContext("stale.pdf", url, PdfPageContext.Status.STALE, mock()),
+        )
+        clearInvocations(mockCommandObserver)
+
+        assertFalse(testee.restorePdfPageContext(uri, "stale.pdf", url))
+
+        assertCommandNotIssued<Command.ShowPdfInTab>()
+        verify(mockInlinePdfHandler, never()).downloadToCache(any(), any(), any())
+    }
+
+    @Test
+    fun whenRestoredLocalPdfCacheIsMissingThenNoNetworkDownloadIsAttempted() = runTest {
+        val uri = Uri.parse("file:///cache/missing.pdf")
+        val url = "content://documents/local.pdf"
+        whenever(pdfPageContextProvider.getMetadata(any())).thenReturn(
+            PdfPageContext("local.pdf", url, PdfPageContext.Status.UNAVAILABLE, mock()),
+        )
+        clearInvocations(mockCommandObserver)
+
+        assertFalse(testee.restorePdfPageContext(uri, "local.pdf", url))
+
+        assertCommandNotIssued<Command.ShowPdfInTab>()
+        verify(mockInlinePdfHandler, never()).downloadToCache(any(), any(), any())
+        verify(pdfPageContextRegistry, never()).hide(any())
     }
 
     // region PDF viewer tests
@@ -16010,5 +16122,17 @@ class BrowserTabViewModelTest {
         private const val ONBOARDING_URL = "https://duck.ai/chat?flow=mobile-app-onboarding"
         private const val FAILED_SITE = "http://nope.invalid"
         private const val NEW_SITE = "http://another-site.com"
+    }
+
+    @Test
+    fun whenPdfMetadataStaleThenDoNotCollectHiddenPage() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(
+            DuckAiPdfMetadata("private.pdf", "https://private.example", DuckAiPdfMetadata.Availability.STALE),
+        )
+        testee.collectPageContext()
+        verify(mockPageContextJSHelper, never()).collectPageContext(any(), any(), anyOrNull(), any())
+        assertCommandNotIssued<Command.PdfPageContextReceived>()
+        assertCommandNotIssued<Command.PageContextReceived>()
     }
 }

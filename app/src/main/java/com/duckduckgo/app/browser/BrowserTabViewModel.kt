@@ -223,9 +223,9 @@ import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
 import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
+import com.duckduckgo.app.browser.pdf.PdfPageContextRegistry
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
-import com.duckduckgo.app.browser.pdf.RealPdfPageContextProvider
 import com.duckduckgo.app.browser.progressbar.NavigationProgressState
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -352,6 +352,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
+import com.duckduckgo.browser.api.pdf.PdfPageContext
+import com.duckduckgo.browser.api.pdf.PdfPageContextProvider
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -390,6 +392,7 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckAiPdfPageContext
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
@@ -605,7 +608,8 @@ class BrowserTabViewModel @Inject constructor(
     private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
     private val brokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
-    private val pdfPageContextProvider: RealPdfPageContextProvider,
+    private val pdfPageContextProvider: PdfPageContextProvider,
+    private val pdfPageContextRegistry: PdfPageContextRegistry,
     private val pdfPageContextResolver: DuckAiPdfPageContext,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
@@ -1330,7 +1334,7 @@ class BrowserTabViewModel @Inject constructor(
     public override fun onCleared() {
         if (::tabId.isInitialized) {
             pageContextJSHelper.cancelCollection(tabId)
-            pdfPageContextProvider.hide(tabId)
+            pdfPageContextRegistry.hide(tabId)
         }
         newTabPageModalPresenterRegistry.unregister(this)
         buildingSiteFactoryJob?.cancel()
@@ -2122,7 +2126,7 @@ class BrowserTabViewModel @Inject constructor(
             duckChat.endVoiceChatSession(tabId)
         }
         pageContextJSHelper.cancelCollection(tabId)
-        pdfPageContextProvider.hide(tabId)
+        pdfPageContextRegistry.hide(tabId)
         pdfDownloadJob.cancel()
         suggestRedirectJob.cancel()
         badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
@@ -2792,7 +2796,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun pageCleared() {
         pageContextJSHelper.cancelCollection(tabId)
-        pdfPageContextProvider.hide(tabId)
+        pdfPageContextRegistry.hide(tabId)
         logcat(VERBOSE) { "Page cleared: $url" }
         site = null
         onSiteChanged()
@@ -4607,7 +4611,7 @@ class BrowserTabViewModel @Inject constructor(
                         currentPdfFileName = pdfTitle,
                     )
                     pageContextJSHelper.cancelCollection(tabId)
-                    pdfPageContextProvider.show(tabId, result.uri, pdfTitle, url)
+                    pdfPageContextRegistry.show(tabId, result.uri, pdfTitle, url)
                     command.value = ShowPdfInTab(url, result.uri)
                     if (pdfPageContextResolver.isEnabled()) collectPageContext()
                     if (customTab == null && pdfDownloadTooltipDataStore.canShow()) {
@@ -4660,7 +4664,7 @@ class BrowserTabViewModel @Inject constructor(
         currentWebViewCertificate: SslCertificate? = null,
     ) {
         pageContextJSHelper.cancelCollection(tabId)
-        pdfPageContextProvider.hide(tabId)
+        pdfPageContextRegistry.hide(tabId)
         if (currentBrowserViewState().currentPdfCachedUri == null) return
         browserViewState.value = currentBrowserViewState().copy(
             currentPdfCachedUri = null,
@@ -5468,7 +5472,7 @@ class BrowserTabViewModel @Inject constructor(
 
             PAGE_CONTEXT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    if (pdfPageContextResolver.isEnabled() && pdfPageContextProvider.get(tabId, false) != null) return@launch
+                    if (pdfPageContextResolver.isEnabled() && pdfPageContextProvider.getMetadata(tabId) != null) return@launch
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
                         val enrichedContext = duckChatJSHelper.enrichPageContextIfPossible(tabId, pageContext)
@@ -6192,9 +6196,23 @@ class BrowserTabViewModel @Inject constructor(
 
     fun isPdfPageContextEnabled(): Boolean = pdfPageContextResolver.isEnabled()
 
-    fun restorePdfPageContext(uri: Uri?, title: String, url: String) {
-        pdfPageContextProvider.show(tabId, uri, title, url)
-        browserViewState.value = currentBrowserViewState().copy(currentPdfCachedUri = uri, currentPdfFileName = title)
+    suspend fun restorePdfPageContext(uri: Uri?, title: String, url: String): Boolean {
+        pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextRegistry.show(tabId, uri, title, url)
+        return when (pdfPageContextProvider.getMetadata(tabId)?.status) {
+            PdfPageContext.Status.AVAILABLE, PdfPageContext.Status.TOO_LARGE -> {
+                browserViewState.value = currentBrowserViewState().copy(currentPdfCachedUri = uri, currentPdfFileName = title)
+                true
+            }
+            PdfPageContext.Status.UNAVAILABLE -> {
+                browserViewState.value = currentBrowserViewState().copy(currentPdfCachedUri = null, currentPdfFileName = null)
+                if (Uri.parse(url).scheme?.lowercase() in listOf("http", "https")) {
+                    handlePdfUrl(url, null, "application/pdf", requestUserConfirmation = false, forceRefresh = true)
+                }
+                false
+            }
+            PdfPageContext.Status.STALE, null -> false
+        }
     }
 
     fun collectPageContext() {
@@ -6210,7 +6228,9 @@ class BrowserTabViewModel @Inject constructor(
             if (pdfPageContextResolver.isEnabled()) {
                 val context = pdfPageContextResolver.getMetadata(tabId)
                 if (context != null) {
-                    command.value = Command.PageContextReceived(tabId, context)
+                    if (context.availability != DuckAiPdfMetadata.Availability.STALE) {
+                        command.value = Command.PdfPageContextReceived(tabId, context)
+                    }
                     return@launch
                 }
             }
