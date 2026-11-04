@@ -35,7 +35,7 @@ import java.io.File
  */
 class DeviceMigrationBackupAgent : BackupAgent() {
 
-    private var restoredFileCount = 0
+    private val tally = RestoreTally()
 
     // Full-data apps never use key-value backup (fullBackupOnly in the manifest); these stay empty.
     override fun onBackup(oldState: ParcelFileDescriptor?, data: BackupDataOutput?, newState: ParcelFileDescriptor?) = Unit
@@ -44,12 +44,22 @@ class DeviceMigrationBackupAgent : BackupAgent() {
 
     override fun onRestoreFile(data: ParcelFileDescriptor, size: Long, destination: File?, type: Int, mode: Long, mtime: Long) {
         super.onRestoreFile(data, size, destination, type, mode, mtime)
-        // A null destination is a file the rules refused; the framework still hands it over so its bytes can be skipped.
-        if (destination != null) restoredFileCount++
+        tally.record(destination)
     }
 
     override fun onRestoreFinished() {
-        recordRestore(this, restoredFileCount)
+        recordRestore(this, tally.restoredFileCount)
+    }
+
+    /** Counts the files a restore actually wrote. */
+    internal class RestoreTally {
+        var restoredFileCount = 0
+            private set
+
+        // A null destination is a file the rules refused; the framework still hands it over so its bytes can be skipped.
+        fun record(destination: File?) {
+            if (destination != null) restoredFileCount++
+        }
     }
 
     internal companion object {

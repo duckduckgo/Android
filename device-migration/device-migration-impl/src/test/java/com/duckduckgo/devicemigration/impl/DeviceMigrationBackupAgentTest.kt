@@ -22,10 +22,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.LOCAL_FILE
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class DeviceMigrationBackupAgentTest {
@@ -35,6 +37,32 @@ class DeviceMigrationBackupAgentTest {
     // Reads the plain file directly, as the app does through SharedPreferencesProvider once the agent has written it.
     @get:SuppressLint("DenyListedApi")
     private val local get() = context.getSharedPreferences(LOCAL_FILE, Context.MODE_PRIVATE)
+
+    @Test
+    fun whenRestoreWritesFilesThenTallyCountsThem() {
+        val tally = DeviceMigrationBackupAgent.RestoreTally()
+
+        tally.record(File("app.db"))
+        tally.record(File("shared_prefs/settings.xml"))
+
+        assertEquals(2, tally.restoredFileCount)
+    }
+
+    @Test
+    fun whenRulesRefuseFilesThenTallyLeavesThemOut() {
+        val tally = DeviceMigrationBackupAgent.RestoreTally()
+
+        tally.record(null)
+        tally.record(File("app.db"))
+        tally.record(null)
+
+        assertEquals(1, tally.restoredFileCount)
+    }
+
+    @Test
+    fun whenNothingRestoredThenTallyIsZero() {
+        assertEquals(0, DeviceMigrationBackupAgent.RestoreTally().restoredFileCount)
+    }
 
     @Test
     fun whenRestoreWroteFilesThenMarkerRecorded() {
