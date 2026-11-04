@@ -211,9 +211,16 @@ class RealDeviceMigrationTest {
     }
 
     @Test
-    fun whenMigratedWithoutSyncStampAndNoRestorePayloadThenPreviousDeviceHadSyncIsTrue() {
+    fun whenMigratedWithoutSyncStampAndNoRestorePayloadThenPreviousDeviceHadSyncIsFalse() {
         transferred.edit().putBoolean(KEY_SEEN, true).putBoolean(KEY_IS_NEW_INSTALL, false).commit()
         local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
+
+        assertFalse(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenRestoredFromBackupWithoutSyncStampAndRestorerNotRunThenPreviousDeviceHadSyncIsTrue() {
+        local.edit().putBoolean(KEY_RESTORED_FROM_BACKUP, true).commit()
 
         assertTrue(testee.previousDeviceHadSync())
     }
