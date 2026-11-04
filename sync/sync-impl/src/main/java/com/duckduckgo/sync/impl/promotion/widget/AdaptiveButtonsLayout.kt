@@ -111,7 +111,7 @@ internal class AdaptiveButtonsLayout @JvmOverloads constructor(
     private fun verticalGap(above: View, below: View): Int {
         val bottomInset = (above as? DaxButton)?.insetBottom ?: 0
         val topInset = (below as? DaxButton)?.insetTop ?: 0
-        return horizontalGap - bottomInset - topInset
+        return (horizontalGap - bottomInset - topInset).coerceAtLeast(0)
     }
 
     private fun visibleButtons(): List<View> = children.filter { it.isVisible }.toList()
