@@ -52,6 +52,7 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
 import com.duckduckgo.app.browser.SSLErrorType.GENERIC
@@ -362,6 +363,7 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
@@ -619,6 +621,8 @@ class BrowserTabViewModel @Inject constructor(
     private val duckAiSessionCallback: DuckAiSessionCallback,
     private val duckAiEntryCallback: Lazy<DuckAiEntryCallback>,
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
+    private val autocompleteSpeedFeature: AutocompleteSpeedFeature,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -767,6 +771,12 @@ class BrowserTabViewModel @Inject constructor(
         }.asLiveData(context = viewModelScope.coroutineContext)
 
     private var autoCompleteJob = ConflatedJob()
+
+    // Kept outside the pipeline because triggerAutocomplete restarts it on every keystroke.
+    @Volatile
+    private var lastAutoCompleteQueryAtMillis: Long? = null
+    private val throttleAutoCompleteQueries: Boolean by lazy { autocompleteSpeedFeature.throttleSuggestQueries().isEnabled() }
+
     private var serpLogoJob = ConflatedJob()
     private var favouriteSerpLogoUrl: String? = null
     private var pdfDownloadJob = ConflatedJob()
@@ -1250,14 +1260,28 @@ class BrowserTabViewModel @Inject constructor(
     private fun configureAutoComplete() {
         autoCompleteJob +=
             autoCompleteStateFlow
-                .debounce(300)
+                .debounce { autoCompleteQueryDelayMillis() }
                 .distinctUntilChanged()
+                .onEach { query ->
+                    if (query.isNotBlank()) lastAutoCompleteQueryAtMillis = currentTimeProvider.elapsedRealtime()
+                }
                 .flatMapLatest { autoComplete.autoComplete(it) }
                 .flowOn(dispatchers.io())
                 .onEach { result -> onAutoCompleteResultReceived(result) }
                 .flowOn(dispatchers.main())
                 .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
                 .launchIn(viewModelScope)
+    }
+
+    /**
+     * When throttling, a query goes out as soon as [AUTOCOMPLETE_THROTTLE_MILLIS] have passed since the previous one, so
+     * suggestions keep updating while the user types instead of waiting for a pause.
+     */
+    private fun autoCompleteQueryDelayMillis(): Long {
+        if (!throttleAutoCompleteQueries) return AUTOCOMPLETE_DEBOUNCE_MILLIS
+        val lastQueryAt = lastAutoCompleteQueryAtMillis ?: return 0
+        val sinceLastQuery = currentTimeProvider.elapsedRealtime() - lastQueryAt
+        return (AUTOCOMPLETE_THROTTLE_MILLIS - sinceLastQuery).coerceAtLeast(0)
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
@@ -3250,7 +3274,7 @@ class BrowserTabViewModel @Inject constructor(
         hasFocus: Boolean,
         hasQueryChanged: Boolean,
     ) {
-        configureAutoComplete()
+        autoCompleteJob.cancel()
 
         // When the omnibar gains focus on a non-SERP page, it programmatically expands the shortened URL
         // to the full URL. That isn't a user-initiated change, so treat the text as unchanged when it
@@ -3299,6 +3323,10 @@ class BrowserTabViewModel @Inject constructor(
         if (hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompleteStateFlow.value = query.trim()
         }
+
+        // Started after the query update so the new pipeline's first value is this query, not the previous one: with
+        // throttling, that first value is the one sent without delay.
+        configureAutoComplete()
     }
 
     /**
@@ -6291,6 +6319,8 @@ class BrowserTabViewModel @Inject constructor(
         private const val CHALLENGE_HOLD_CUTOFF_MS = 3000L
 
         private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
+        private const val AUTOCOMPLETE_DEBOUNCE_MILLIS = 300L
+        private const val AUTOCOMPLETE_THROTTLE_MILLIS = 200L
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.
