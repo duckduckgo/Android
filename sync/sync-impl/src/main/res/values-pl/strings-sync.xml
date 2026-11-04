@@ -68,7 +68,6 @@
     <string name="login_screen_cant_scan_label">Nie możesz skanować?</string>
     <string name="login_screen_cant_scan_button_text">Skopiuj kod tekstowy</string>
 
-
     <!-- Connect screen -->
     <string name="connect_screen_title">Zeskanuj kod QR</string>
     <string name="connect_screen_scan_qr_hint">Otwórz aplikację DuckDuckGo na innym urządzeniu i wybierz kolejno <b>Ustawienia &gt; Synchronizacja i kopia zapasowa &gt; Synchronizuj z innym urządzeniem</b>.</string>
@@ -481,8 +480,49 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Uzyskaj dostęp do swoich haseł na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="sync_passwords_import_promo_primary_button">Włącz Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_title_toggle">Synchronizuj i twórz kopie zapasowe swoich haseł na urządzeniach mobilnych i komputerach stacjonarnych</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Korzystaj z zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Włącz Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Synchronizuj i twórz kopie zapasowe swoich zakładek na urządzeniach mobilnych i komputerach stacjonarnych</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Synchronizuj i twórz kopie zapasowe zakładek</string>
+    <string name="sync_bookmarks_promo_message">Szyfrowane kompleksowo. Nikt nie może zobaczyć Twoich zakładek, nawet my.</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Synchronizuj ze swoją aplikacją komputerową</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button">Synchronizuj zakładki…</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Pobierz aplikację</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Synchronizuj i twórz kopie zapasowe zakładek</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Więcej opcji</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Ukryj</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Włącz Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Synchronizuj z moją aplikacją komputerową</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Więcej opcji</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Ukryj</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Synchronizuj z komputerem</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Pobierz aplikację komputerową</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Zsynchronizujmy Twoją aplikację komputerową!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Synchronizuj z komputerem</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Nie mam aplikacji komputerowej</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Synchronizuj i twórz kopie zapasowe haseł</string>
+    <string name="sync_passwords_promo_message">Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my.</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Synchronizuj ze swoją aplikacją komputerową</string>
+    <string name="sync_passwords_multi_device_promo_primary_button">Synchronizuj hasła</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Pobierz aplikację</string>
+
 </resources>
