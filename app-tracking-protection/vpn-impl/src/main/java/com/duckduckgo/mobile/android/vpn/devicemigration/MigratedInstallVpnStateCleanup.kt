@@ -16,12 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.devicemigration
 
-import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -44,7 +42,7 @@ import javax.inject.Inject
  * per-app exclusions the user chose. The running state would make the heartbeat monitor restart a VPN that was never enabled
  * here, so it is dropped once after a device transfer. This runs regardless of the device migration kill switch because it
  * keeps the VPN correct rather than adding to the migration experience.
- * The guard preference file is excluded from transfer, otherwise a chained transfer would skip the cleanup.
+ * The done mark never transfers, so a chained transfer runs the cleanup again on the next phone.
  */
 @SingleIn(AppScope::class)
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
@@ -52,16 +50,11 @@ class MigratedInstallVpnStateCleanup @Inject constructor(
     private val deviceMigration: DeviceMigration,
     private val vpnDatabase: VpnDatabase,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
-    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
     private val mutex = Mutex()
-
-    private val preferences by lazy {
-        sharedPreferencesProvider.getSharedPreferences(PREFERENCES_FILE_NAME, false, false)
-    }
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.io()) { cleanUpIfNeeded() }
@@ -73,7 +66,7 @@ class MigratedInstallVpnStateCleanup @Inject constructor(
      */
     suspend fun cleanUpIfNeeded(): Boolean = withContext(dispatchers.io()) {
         mutex.withLock {
-            if (preferences.getBoolean(KEY_CLEANUP_DONE, false)) return@withLock true
+            if (deviceMigration.isDoneOnThisInstall(DONE_KEY)) return@withLock true
 
             try {
                 if (!deviceMigration.isMigratedInstall()) return@withLock true
@@ -88,13 +81,12 @@ class MigratedInstallVpnStateCleanup @Inject constructor(
                 logcat(ERROR) { "Migrated install VPN cleanup failed, will retry on next start: ${e.javaClass.simpleName}" }
                 return@withLock false
             }
-            preferences.edit(commit = true) { putBoolean(KEY_CLEANUP_DONE, true) }
+            deviceMigration.markDoneOnThisInstall(DONE_KEY)
             true
         }
     }
 
     private companion object {
-        const val PREFERENCES_FILE_NAME = "com.duckduckgo.mobile.android.vpn.devicemigration.cleanup"
-        const val KEY_CLEANUP_DONE = "cleanupDone"
+        const val DONE_KEY = "vpn.migratedInstallStateCleanup"
     }
 }

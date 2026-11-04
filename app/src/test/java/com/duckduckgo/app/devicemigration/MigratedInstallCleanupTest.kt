@@ -24,10 +24,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -40,7 +37,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
-import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -53,17 +50,16 @@ class MigratedInstallCleanupTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    private val deviceMigration: DeviceMigration = mock()
-    private val pendingPixelDao: PendingPixelDao = mock()
+    private val doneOnThisInstall = mutableSetOf<String>()
+    private val deviceMigration: DeviceMigration = mock {
+        on { isDoneOnThisInstall(any()) } doAnswer { it.getArgument<String>(0) in doneOnThisInstall }
+        on { markDoneOnThisInstall(any()) } doAnswer { doneOnThisInstall += it.getArgument<String>(0) }
+    }
     private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
     private val pagePaintedPixelDao: PagePaintedPixelDao = mock()
     private val defaultBrowserPromptsAppUsageDao: DefaultBrowserPromptsAppUsageDao = mock()
     private val appInstallStore: AppInstallStore = mock()
     private var promptsDataStore = previousPhonePrompts(Stage.STAGE_2)
-    private val preferences = InMemorySharedPreferences()
-    private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
-        on { getSharedPreferences(any(), any(), any()) } doReturn preferences
-    }
 
     init {
         runBlocking { whenever(deviceMigration.isMigrationExperienceEnabled()).thenReturn(true) }
@@ -71,24 +67,21 @@ class MigratedInstallCleanupTest {
 
     private val testee get() = MigratedInstallCleanup(
         deviceMigration = deviceMigration,
-        pendingPixelDao = pendingPixelDao,
         pageLoadedPixelDao = pageLoadedPixelDao,
         pagePaintedPixelDao = pagePaintedPixelDao,
         defaultBrowserPromptsAppUsageDao = defaultBrowserPromptsAppUsageDao,
         appInstallStore = appInstallStore,
         defaultBrowserPromptsDataStore = promptsDataStore,
-        sharedPreferencesProvider = sharedPreferencesProvider,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
     )
 
     @Test
-    fun whenMigratedThenPixelQueuesCleared() = runTest {
+    fun whenMigratedThenPageLoadPixelQueuesCleared() = runTest {
         whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
 
         testee.onCreate(mock())
 
-        verify(pendingPixelDao).deleteAll()
         verify(pageLoadedPixelDao).deleteAll()
         verify(pagePaintedPixelDao).deleteAll()
     }
@@ -118,7 +111,7 @@ class MigratedInstallCleanupTest {
         testee.onCreate(mock())
 
         verifyNothingCleared()
-        assertFalse(preferences.getBoolean("cleanupDone", false))
+        assertTrue(doneOnThisInstall.isEmpty())
     }
 
     @Test
@@ -126,7 +119,6 @@ class MigratedInstallCleanupTest {
         whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
         testee.onCreate(mock())
         clearInvocations(
-            pendingPixelDao,
             pageLoadedPixelDao,
             pagePaintedPixelDao,
             defaultBrowserPromptsAppUsageDao,
@@ -145,7 +137,7 @@ class MigratedInstallCleanupTest {
 
         testee.onCreate(mock())
 
-        assertFalse(preferences.getBoolean("cleanupDone", false))
+        assertTrue(doneOnThisInstall.isEmpty())
     }
 
     @Test
@@ -154,11 +146,10 @@ class MigratedInstallCleanupTest {
 
         testee.onCreate(mock())
 
-        assertTrue(preferences.getBoolean("cleanupDone", false))
+        assertTrue(doneOnThisInstall.isNotEmpty())
     }
 
     private fun verifyNothingCleared() {
-        verify(pendingPixelDao, never()).deleteAll()
         verify(pageLoadedPixelDao, never()).deleteAll()
         verify(pagePaintedPixelDao, never()).deleteAll()
         verify(defaultBrowserPromptsAppUsageDao, never()).deleteAll()
@@ -173,7 +164,7 @@ class MigratedInstallCleanupTest {
         testee.onCreate(mock())
 
         verifyNothingCleared()
-        assertFalse(preferences.getBoolean("cleanupDone", false))
+        assertTrue(doneOnThisInstall.isEmpty())
     }
 
     @Test
@@ -186,8 +177,8 @@ class MigratedInstallCleanupTest {
         testee.onCreate(mock())
         testee.onCreate(mock())
 
-        verify(pendingPixelDao, times(1)).deleteAll()
-        assertTrue(preferences.getBoolean("cleanupDone", false))
+        verify(pageLoadedPixelDao, times(1)).deleteAll()
+        assertTrue(doneOnThisInstall.isNotEmpty())
     }
 
     @Test

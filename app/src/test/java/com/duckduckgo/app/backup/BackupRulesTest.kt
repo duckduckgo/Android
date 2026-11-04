@@ -134,10 +134,6 @@ class BackupRulesTest {
         val ENCRYPTED_AND_NON_TRANSFERABLE =
             listOf(
                 "sharedpref" to "com.duckduckgo.devicemigration.local.xml",
-                "sharedpref" to "com.duckduckgo.app.devicemigration.cleanup.xml",
-                "sharedpref" to "com.duckduckgo.sync.devicemigration.xml",
-                "sharedpref" to "com.duckduckgo.mobile.android.vpn.devicemigration.cleanup.xml",
-                "sharedpref" to "com.duckduckgo.networkprotection.devicemigration.cleanup.xml",
                 "sharedpref" to "com.duckduckgo.app.email.settings.xml",
                 "sharedpref" to "com.duckduckgo.app.email.settings.encryptiontest.xml",
                 "sharedpref" to "com.duckduckgo.sync.store.v1.xml",

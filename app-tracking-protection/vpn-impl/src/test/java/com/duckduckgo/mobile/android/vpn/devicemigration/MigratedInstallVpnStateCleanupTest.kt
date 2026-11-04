@@ -21,7 +21,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -45,7 +44,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -61,11 +60,12 @@ class MigratedInstallVpnStateCleanupTest {
     private lateinit var repository: AppTrackerBlockingStatsRepository
     private lateinit var testee: MigratedInstallVpnStateCleanup
 
-    private val deviceMigration: DeviceMigration = mock()
-    private val preferences = InMemorySharedPreferences()
-    private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
-        on { getSharedPreferences(any(), any(), any()) } doReturn preferences
+    private val doneOnThisInstall = mutableSetOf<String>()
+    private val deviceMigration: DeviceMigration = mock {
+        on { isDoneOnThisInstall(any()) } doAnswer { it.getArgument<String>(0) in doneOnThisInstall }
+        on { markDoneOnThisInstall(any()) } doAnswer { doneOnThisInstall += it.getArgument<String>(0) }
     }
+    private val preferences = InMemorySharedPreferences()
 
     @Before
     fun setup() {
@@ -77,7 +77,6 @@ class MigratedInstallVpnStateCleanupTest {
             deviceMigration = deviceMigration,
             vpnDatabase = db,
             appTrackerBlockingStatsRepository = repository,
-            sharedPreferencesProvider = sharedPreferencesProvider,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
         )

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.devicemigration
 
-import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
@@ -27,9 +26,7 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesIntoSet
@@ -44,40 +41,30 @@ import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
 
-/** Preferences that describe this phone only; the backup rules exclude this file from a device transfer. */
-internal const val MIGRATED_INSTALL_PREFERENCES_FILE = "com.duckduckgo.app.devicemigration.cleanup"
-
 /**
- * Pixel queues and default-browser prompt state describe the previous phone, so they are dropped once after a device transfer.
- * The guard preference file is excluded from transfer, otherwise a chained transfer would skip the cleanup.
+ * Page-load pixel queues and default-browser prompt state describe the previous phone, so they are dropped once after a device
+ * transfer. The pending pixel queue is cleared by the pixel sender itself, before its first send.
  */
 @SingleIn(AppScope::class)
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class MigratedInstallCleanup @Inject constructor(
     private val deviceMigration: DeviceMigration,
-    private val pendingPixelDao: PendingPixelDao,
     private val pageLoadedPixelDao: PageLoadedPixelDao,
     private val pagePaintedPixelDao: PagePaintedPixelDao,
     private val defaultBrowserPromptsAppUsageDao: DefaultBrowserPromptsAppUsageDao,
     private val appInstallStore: AppInstallStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
-    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
-    private val preferences by lazy {
-        sharedPreferencesProvider.getSharedPreferences(MIGRATED_INSTALL_PREFERENCES_FILE, false, false)
-    }
-
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.io()) {
-            if (preferences.getBoolean(KEY_CLEANUP_DONE, false)) return@launch
+            if (deviceMigration.isDoneOnThisInstall(DONE_KEY)) return@launch
             if (!deviceMigration.isMigratedInstall()) return@launch
             if (!deviceMigration.isMigrationExperienceEnabled()) return@launch
 
             try {
-                pendingPixelDao.deleteAll()
                 pageLoadedPixelDao.deleteAll()
                 pagePaintedPixelDao.deleteAll()
                 defaultBrowserPromptsAppUsageDao.deleteAll()
@@ -89,13 +76,13 @@ class MigratedInstallCleanup @Inject constructor(
                 logcat(ERROR) { "Migrated install cleanup failed, will retry on next start: ${e.message}" }
                 return@launch
             }
-            preferences.edit(commit = true) { putBoolean(KEY_CLEANUP_DONE, true) }
+            deviceMigration.markDoneOnThisInstall(DONE_KEY)
         }
     }
 
     /** True while the previous phone's state is still in place on a migrated install that will clean it up. */
     suspend fun isPending(): Boolean = withContext(dispatchers.io()) {
-        !preferences.getBoolean(KEY_CLEANUP_DONE, false) &&
+        !deviceMigration.isDoneOnThisInstall(DONE_KEY) &&
             deviceMigration.isMigratedInstall() &&
             deviceMigration.isMigrationExperienceEnabled()
     }
@@ -111,6 +98,6 @@ class MigratedInstallCleanup @Inject constructor(
     }
 
     private companion object {
-        const val KEY_CLEANUP_DONE = "cleanupDone"
+        const val DONE_KEY = "app.migratedInstallCleanup"
     }
 }

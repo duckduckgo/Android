@@ -108,6 +108,12 @@ class RealDeviceMigration @Inject constructor(
         deviceMigrationFeature.self().isEnabled()
     }
 
+    override fun isDoneOnThisInstall(key: String): Boolean = markerStore.local.getBoolean(DONE_ON_THIS_INSTALL_PREFIX + key, false)
+
+    override fun markDoneOnThisInstall(key: String) {
+        markerStore.local.edit().putBoolean(DONE_ON_THIS_INSTALL_PREFIX + key, true).commit()
+    }
+
     override fun onCreate(owner: LifecycleOwner) {
         // Detection and the stamps write to disk, so none of it may run on the main thread at startup. Detection runs first:
         // it has to read the transferred marker before this phone's stamp overwrites it.
@@ -186,5 +192,8 @@ class RealDeviceMigration @Inject constructor(
 
     private companion object {
         const val ATB_INIT_TIMEOUT_MS = 1_000L
+
+        // Kept apart from the detection keys that share the local file.
+        const val DONE_ON_THIS_INSTALL_PREFIX = "doneOnThisInstall."
     }
 }

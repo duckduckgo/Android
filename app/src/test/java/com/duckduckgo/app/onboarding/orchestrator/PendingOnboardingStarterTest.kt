@@ -324,5 +324,10 @@ class PendingOnboardingStarterTest {
         }
         override fun previousDeviceHadSync(): Boolean = false
         override suspend fun isMigrationExperienceEnabled(): Boolean = experienceEnabled
+        private val done = mutableSetOf<String>()
+        override fun isDoneOnThisInstall(key: String): Boolean = key in done
+        override fun markDoneOnThisInstall(key: String) {
+            done += key
+        }
     }
 }

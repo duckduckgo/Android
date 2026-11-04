@@ -16,8 +16,6 @@
 
 package com.duckduckgo.sync.impl.promotion.devicemigration
 
-import androidx.core.content.edit
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -28,19 +26,16 @@ import javax.inject.Inject
 /**
  * The previous phone's Sync state is checked through [DeviceMigration.previousDeviceHadSync], which stays true until it is known,
  * so the suggestion never competes with the silent restore of an existing account.
- * The dismissal lives in its own preference file, excluded from transfer, so it never travels to a later phone.
+ * The dismissal is a done mark on this install, so it never travels to a later phone.
  */
 @ContributesBinding(AppScope::class)
 class RealSyncAfterDeviceTransferPrompt @Inject constructor(
     private val deviceMigration: DeviceMigration,
     private val deviceSyncState: DeviceSyncState,
-    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : SyncAfterDeviceTransferPrompt {
 
-    private val preferences by lazy { sharedPreferencesProvider.getSharedPreferences(PREFERENCES_FILE_NAME) }
-
     override suspend fun shouldShow(): Boolean {
-        if (preferences.getBoolean(KEY_DISMISSED, false)) return false
+        if (deviceMigration.isDoneOnThisInstall(DISMISSED_KEY)) return false
         if (!deviceMigration.isMigratedInstall()) return false
         if (!deviceMigration.isMigrationExperienceEnabled()) return false
         if (deviceMigration.previousDeviceHadSync()) return false
@@ -49,11 +44,10 @@ class RealSyncAfterDeviceTransferPrompt @Inject constructor(
     }
 
     override suspend fun dismiss() {
-        preferences.edit { putBoolean(KEY_DISMISSED, true) }
+        deviceMigration.markDoneOnThisInstall(DISMISSED_KEY)
     }
 
     private companion object {
-        const val PREFERENCES_FILE_NAME = "com.duckduckgo.sync.devicemigration"
-        const val KEY_DISMISSED = "enable_sync_card_dismissed"
+        const val DISMISSED_KEY = "sync.afterDeviceTransferPromptDismissed"
     }
 }

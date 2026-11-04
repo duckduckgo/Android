@@ -38,6 +38,7 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':data-store-api')
     implementation project(path: ':anrs-api')
+    implementation project(path: ':device-migration-api')
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android

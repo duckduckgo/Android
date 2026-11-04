@@ -23,11 +23,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.devicemigration.MIGRATED_INSTALL_PREFERENCES_FILE
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -60,7 +58,6 @@ class AppInstallSharedPreferences @Inject constructor(
     private val context: Context,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val deviceMigration: Lazy<DeviceMigration>, // break any possible DI dependency cycle
     private val defaultBrowserDetector: Lazy<DefaultBrowserDetector>, // break any possible DI dependency cycle
 ) : AppInstallStore {
@@ -104,8 +101,7 @@ class AppInstallSharedPreferences @Inject constructor(
      * before any reader sees it, and regardless of the device migration kill switch because it keeps that signal correct.
      */
     private fun resetDefaultBrowserHistoryAfterTransfer(preferences: SharedPreferences) = synchronized(RESET_LOCK) {
-        val migratedInstallPreferences = sharedPreferencesProvider.getSharedPreferences(MIGRATED_INSTALL_PREFERENCES_FILE, false, false)
-        if (migratedInstallPreferences.getBoolean(KEY_DEFAULT_BROWSER_HISTORY_RESET, false)) return@synchronized
+        if (deviceMigration.value.isDoneOnThisInstall(DEFAULT_BROWSER_HISTORY_RESET_DONE_KEY)) return@synchronized
         // Synchronous stand-in for isMigratedInstall(): it is non-null exactly on a migrated install.
         if (deviceMigration.value.sourceDeviceIsNewInstall() == null) return@synchronized
 
@@ -114,7 +110,7 @@ class AppInstallSharedPreferences @Inject constructor(
             putBoolean(KEY_DEFAULT_BROWSER, isDefaultBrowser)
             putBoolean(KEY_WAS_EVER_DEFAULT_BROWSER, isDefaultBrowser)
         }
-        migratedInstallPreferences.edit(commit = true) { putBoolean(KEY_DEFAULT_BROWSER_HISTORY_RESET, true) }
+        deviceMigration.value.markDoneOnThisInstall(DEFAULT_BROWSER_HISTORY_RESET_DONE_KEY)
     }
 
     @UiThread
@@ -136,7 +132,7 @@ class AppInstallSharedPreferences @Inject constructor(
         const val KEY_WAS_EVER_DEFAULT_BROWSER = "KEY_WAS_EVER_DEFAULT_BROWSER"
         const val KEY_DEFAULT_BROWSER_CHANGED_SURVEY_DONE = "KEY_DEFAULT_BROWSER_CHANGED_SURVEY_DONE"
         private const val ROLE_MANAGER_BROWSER_DIALOG_KEY = "ROLE_MANAGER_BROWSER_DIALOG_KEY"
-        private const val KEY_DEFAULT_BROWSER_HISTORY_RESET = "defaultBrowserHistoryReset"
+        private const val DEFAULT_BROWSER_HISTORY_RESET_DONE_KEY = "app.defaultBrowserHistoryReset"
 
         // Instances are not shared, so the one-time reset is serialised across all of them.
         private val RESET_LOCK = Any()

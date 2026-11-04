@@ -45,6 +45,7 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import io.reactivex.Completable
@@ -95,6 +96,7 @@ class RxPixelSenderTest {
     private val pixelFiredRepository = FakePixelFiredRepository()
     private val pixelSenderFeature = FakeFeatureToggleFactory.create(PixelSenderFeature::class.java)
     private val concurrencyLimitFeature = FakeFeatureToggleFactory.create(PixelConcurrencyLimitFeature::class.java)
+    private val deviceMigration = FakeDeviceMigration()
     private var pixelsRequiringAtb: List<String> = emptyList()
     private var pixelsRequiringAtbSecondPlugin: List<String> = emptyList()
     private val pixelRequiringAtbPlugins = object : PluginPoint<PixelRequiringAtbPlugin> {
@@ -131,6 +133,7 @@ class RxPixelSenderTest {
         lazy { pixelSenderFeature },
         pixelRequiringAtbPlugins,
         lazy { concurrencyLimitFeature },
+        lazy { deviceMigration },
     )
 
     @After
@@ -274,6 +277,47 @@ class RxPixelSenderTest {
             pixelEntity.additionalQueryParams,
             pixelEntity.encodedQueryParams,
         )
+    }
+
+    @Test
+    fun whenMigratedInstallForegroundedThenPreviousPhoneQueueDroppedUnsent() {
+        givenPixelApiSucceeds()
+        deviceMigration.migrated = true
+        pendingPixelDao.insert(queuedPixel())
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api, never()).fire(any(), any(), any(), any(), any(), any())
+        assertTrue(pendingPixelDao.pixels().test().assertNoErrors().values().last().isEmpty())
+    }
+
+    @Test
+    fun whenMigratedInstallForegroundedAgainThenQueueNotDroppedTwice() {
+        givenPixelApiSucceeds()
+        deviceMigration.migrated = true
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+        testee.onStart(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
+        val ownPixel = queuedPixel()
+        pendingPixelDao.insert(ownPixel)
+
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api).fire(ownPixel.pixelName, "phone", ownPixel.atb, ownPixel.additionalQueryParams, ownPixel.encodedQueryParams)
+    }
+
+    @Test
+    fun whenNotMigratedInstallForegroundedThenQueueSentAndNotCheckedAgain() {
+        givenPixelApiSucceeds()
+        val pixelEntity = queuedPixel()
+        pendingPixelDao.insert(pixelEntity)
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api).fire(pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams)
+        assertTrue(deviceMigration.done.isNotEmpty())
     }
 
     @Test
@@ -904,6 +948,28 @@ class RxPixelSenderTest {
 
     private fun givenPixelApiFails() {
         whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+    }
+
+    private fun queuedPixel() = PixelEntity(
+        pixelName = "test",
+        atb = "atbvariant",
+        additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+        encodedQueryParams = emptyMap(),
+    )
+
+    private class FakeDeviceMigration : DeviceMigration {
+        var migrated = false
+        val done = mutableSetOf<String>()
+        override suspend fun isMigratedInstall() = migrated
+        override suspend fun isMigrationFlowPending() = false
+        override fun sourceDeviceIsNewInstall(): Boolean? = if (migrated) false else null
+        override suspend fun markMigrationFlowCompleted() = Unit
+        override fun previousDeviceHadSync() = migrated
+        override suspend fun isMigrationExperienceEnabled() = true
+        override fun isDoneOnThisInstall(key: String) = key in done
+        override fun markDoneOnThisInstall(key: String) {
+            done += key
+        }
     }
 
     private fun PendingPixelDao.insert(

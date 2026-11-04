@@ -85,6 +85,34 @@ class RealDeviceMigrationTest {
     private fun onCreate() = testee.onCreate(mock<LifecycleOwner>())
 
     @Test
+    fun whenKeyNotMarkedThenNotDoneOnThisInstall() {
+        assertFalse(testee.isDoneOnThisInstall("feature.step"))
+    }
+
+    @Test
+    fun whenKeyMarkedThenDoneOnThisInstallAcrossInstances() {
+        testee.markDoneOnThisInstall("feature.step")
+
+        assertTrue(newInstance().isDoneOnThisInstall("feature.step"))
+        assertFalse(newInstance().isDoneOnThisInstall("feature.other"))
+    }
+
+    @Test
+    fun whenKeyMarkedThenStoredInTheFileThatNeverTransfers() {
+        testee.markDoneOnThisInstall("feature.step")
+
+        assertTrue(local.all.keys.any { it.endsWith("feature.step") })
+        assertFalse(transferred.all.keys.any { it.endsWith("feature.step") })
+    }
+
+    @Test
+    fun whenKeyMarkedThenDetectionKeysAreUntouched() {
+        testee.markDoneOnThisInstall(KEY_LAUNCHED)
+
+        assertFalse(local.getBoolean(KEY_LAUNCHED, false))
+    }
+
+    @Test
     fun localFileNameMatchesTheBackupRulesExclude() {
         // :app's backup rules exclude this exact file from a device transfer; renaming it would let it transfer.
         assertEquals("com.duckduckgo.devicemigration.local", LOCAL_FILE)

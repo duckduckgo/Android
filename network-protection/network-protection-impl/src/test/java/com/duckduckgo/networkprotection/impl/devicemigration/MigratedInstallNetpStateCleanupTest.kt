@@ -31,6 +31,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,7 +45,11 @@ class MigratedInstallNetpStateCleanupTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    private val deviceMigration: DeviceMigration = mock()
+    private val doneOnThisInstall = mutableSetOf<String>()
+    private val deviceMigration: DeviceMigration = mock {
+        on { isDoneOnThisInstall(any()) } doAnswer { it.getArgument<String>(0) in doneOnThisInstall }
+        on { markDoneOnThisInstall(any()) } doAnswer { doneOnThisInstall += it.getArgument<String>(0) }
+    }
     private val preferenceFiles = mutableMapOf<String, SharedPreferences>()
     private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
         on { getSharedPreferences(any(), any(), any()) } doAnswer { invocation ->
@@ -59,7 +64,6 @@ class MigratedInstallNetpStateCleanupTest {
     private val testee = MigratedInstallNetpStateCleanup(
         deviceMigration = deviceMigration,
         geoswitchingRepository = geoswitchingRepository,
-        sharedPreferencesProvider = sharedPreferencesProvider,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
     )
@@ -132,6 +136,7 @@ class MigratedInstallNetpStateCleanupTest {
         startApp()
 
         assertFalse(preferenceFiles.getValue(NETP_PREFS_FILE).all.keys.any { it.contains("cleanup", ignoreCase = true) })
+        assertTrue(doneOnThisInstall.isNotEmpty())
     }
 
     @Test

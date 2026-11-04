@@ -29,8 +29,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Assert.assertFalse
@@ -55,19 +53,16 @@ class MigratedInstallDefaultBrowserTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val context: Context = ApplicationProvider.getApplicationContext()
-    private val deviceMigration: DeviceMigration = mock()
+    private val doneOnThisInstall = mutableSetOf<String>()
+    private val deviceMigration: DeviceMigration = mock {
+        on { isDoneOnThisInstall(any()) } doAnswer { it.getArgument<String>(0) in doneOnThisInstall }
+        on { markDoneOnThisInstall(any()) } doAnswer { doneOnThisInstall += it.getArgument<String>(0) }
+    }
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val pixel: Pixel = mock()
     private val surveyToggle: Toggle = mock { on { isEnabled() } doReturn true }
     private val surveyFeature: DefaultBrowserChangedSurveyFeature = mock { on { self() } doReturn surveyToggle }
     private val appBuildConfig: AppBuildConfig = mock { on { deviceLocale } doReturn Locale.US }
-
-    private val preferenceFiles = mutableMapOf<String, InMemorySharedPreferences>()
-    private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
-        on { getSharedPreferences(any(), any(), any()) } doAnswer { invocation ->
-            preferenceFiles.getOrPut(invocation.getArgument(0)) { InMemorySharedPreferences() }
-        }
-    }
 
     private lateinit var appInstallStore: AppInstallSharedPreferences
 
@@ -85,7 +80,6 @@ class MigratedInstallDefaultBrowserTest {
         context = context,
         appCoroutineScope = coroutineTestRule.testScope,
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-        sharedPreferencesProvider = sharedPreferencesProvider,
         deviceMigration = lazyOf(deviceMigration),
         defaultBrowserDetector = lazyOf(defaultBrowserDetector),
     )

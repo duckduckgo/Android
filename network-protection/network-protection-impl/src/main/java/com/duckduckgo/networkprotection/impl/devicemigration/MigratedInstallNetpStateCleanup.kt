@@ -16,12 +16,10 @@
 
 package com.duckduckgo.networkprotection.impl.devicemigration
 
-import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
@@ -41,25 +39,20 @@ import javax.inject.Inject
  * timer would count from the previous phone. Only the preferred location is kept, so keys older installs left behind
  * (tunnel IPs, keys, server details) are dropped too. This runs regardless of the device migration kill switch because it
  * keeps NetP correct rather than adding to the migration experience.
- * The guard preference file is excluded from transfer, otherwise a chained transfer would skip the cleanup.
+ * The done mark never transfers, so a chained transfer runs the cleanup again on the next phone.
  */
 @SingleIn(AppScope::class)
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class MigratedInstallNetpStateCleanup @Inject constructor(
     private val deviceMigration: DeviceMigration,
     private val geoswitchingRepository: NetPGeoswitchingRepository,
-    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
-    private val preferences by lazy {
-        sharedPreferencesProvider.getSharedPreferences(PREFERENCES_FILE_NAME, false, false)
-    }
-
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.io()) {
-            if (preferences.getBoolean(KEY_CLEANUP_DONE, false)) return@launch
+            if (deviceMigration.isDoneOnThisInstall(DONE_KEY)) return@launch
 
             try {
                 if (!deviceMigration.isMigratedInstall()) return@launch
@@ -70,12 +63,11 @@ class MigratedInstallNetpStateCleanup @Inject constructor(
                 logcat(ERROR) { "Migrated install NetP cleanup failed, will retry on next start: ${e.javaClass.simpleName}" }
                 return@launch
             }
-            preferences.edit(commit = true) { putBoolean(KEY_CLEANUP_DONE, true) }
+            deviceMigration.markDoneOnThisInstall(DONE_KEY)
         }
     }
 
     private companion object {
-        const val PREFERENCES_FILE_NAME = "com.duckduckgo.networkprotection.devicemigration.cleanup"
-        const val KEY_CLEANUP_DONE = "cleanupDone"
+        const val DONE_KEY = "netp.migratedInstallStateCleanup"
     }
 }

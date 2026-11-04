@@ -21,8 +21,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.mobile.android.vpn.devicemigration.MigratedInstallVpnStateCleanup
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -35,7 +33,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -48,11 +46,12 @@ class VpnServiceHeartbeatMonitorWorkerTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val deviceMigration: DeviceMigration = mock()
-    private val deviceShieldPixels: DeviceShieldPixels = mock()
-    private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
-        on { getSharedPreferences(any(), any(), any()) } doReturn InMemorySharedPreferences()
+    private val doneOnThisInstall = mutableSetOf<String>()
+    private val deviceMigration: DeviceMigration = mock {
+        on { isDoneOnThisInstall(any()) } doAnswer { it.getArgument<String>(0) in doneOnThisInstall }
+        on { markDoneOnThisInstall(any()) } doAnswer { doneOnThisInstall += it.getArgument<String>(0) }
     }
+    private val deviceShieldPixels: DeviceShieldPixels = mock()
     private lateinit var db: VpnDatabase
 
     @Before
@@ -106,7 +105,6 @@ class VpnServiceHeartbeatMonitorWorkerTest {
                 deviceMigration = deviceMigration,
                 vpnDatabase = db,
                 appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider),
-                sharedPreferencesProvider = sharedPreferencesProvider,
                 dispatchers = coroutineTestRule.testDispatcherProvider,
                 appCoroutineScope = coroutineTestRule.testScope,
             )

@@ -1138,5 +1138,10 @@ class WelcomePageViewModelTest {
         }
         override fun previousDeviceHadSync(): Boolean = false
         override suspend fun isMigrationExperienceEnabled(): Boolean = true
+        private val done = mutableSetOf<String>()
+        override fun isDoneOnThisInstall(key: String): Boolean = key in done
+        override fun markDoneOnThisInstall(key: String) {
+            done += key
+        }
     }
 }

@@ -21,10 +21,6 @@
     <include domain="sharedpref" path="." requireFlags="deviceToDeviceTransfer"/>
     <include domain="root" path="." requireFlags="deviceToDeviceTransfer"/>
     <exclude domain="sharedpref" path="com.duckduckgo.devicemigration.local.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.app.devicemigration.cleanup.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.sync.devicemigration.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.vpn.devicemigration.cleanup.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.networkprotection.devicemigration.cleanup.xml"/>
     <exclude domain="sharedpref" path="com.duckduckgo.app.email.settings.xml"/>
     <exclude domain="sharedpref" path="com.duckduckgo.app.email.settings.encryptiontest.xml"/>
     <exclude domain="sharedpref" path="com.duckduckgo.sync.store.v1.xml"/>

@@ -22,8 +22,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -45,14 +43,12 @@ class AppInstallSharedPreferencesTest {
     private lateinit var testee: AppInstallSharedPreferences
 
     private val context: Context = ApplicationProvider.getApplicationContext()
-    private val deviceMigration: DeviceMigration = mock()
-    private val defaultBrowserDetector: DefaultBrowserDetector = mock()
-    private val preferenceFiles = mutableMapOf<String, InMemorySharedPreferences>()
-    private val sharedPreferencesProvider: SharedPreferencesProvider = mock {
-        on { getSharedPreferences(any(), any(), any()) } doAnswer { invocation ->
-            preferenceFiles.getOrPut(invocation.getArgument(0)) { InMemorySharedPreferences() }
-        }
+    private val doneOnThisInstall = mutableSetOf<String>()
+    private val deviceMigration: DeviceMigration = mock {
+        on { isDoneOnThisInstall(any()) } doAnswer { it.getArgument<String>(0) in doneOnThisInstall }
+        on { markDoneOnThisInstall(any()) } doAnswer { doneOnThisInstall += it.getArgument<String>(0) }
     }
+    private val defaultBrowserDetector: DefaultBrowserDetector = mock()
 
     @Before
     fun setup() {
@@ -64,7 +60,6 @@ class AppInstallSharedPreferencesTest {
         context = context,
         appCoroutineScope = coroutineTestRule.testScope,
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-        sharedPreferencesProvider = sharedPreferencesProvider,
         deviceMigration = lazyOf(deviceMigration),
         defaultBrowserDetector = lazyOf(defaultBrowserDetector),
     )
@@ -133,7 +128,7 @@ class AppInstallSharedPreferencesTest {
 
         testee.defaultBrowser
 
-        assertTrue(preferenceFiles.getValue(MIGRATED_INSTALL_FILE).all.isNotEmpty())
+        assertTrue(doneOnThisInstall.isNotEmpty())
     }
 
     @Test
@@ -207,6 +202,5 @@ class AppInstallSharedPreferencesTest {
     }
 
     private companion object {
-        const val MIGRATED_INSTALL_FILE = "com.duckduckgo.app.devicemigration.cleanup"
     }
 }

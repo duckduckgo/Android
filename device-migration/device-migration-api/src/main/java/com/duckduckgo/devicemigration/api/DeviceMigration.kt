@@ -46,4 +46,15 @@ interface DeviceMigration {
      * [isMigratedInstall] and [isMigrationFlowPending] do not depend on it.
      */
     suspend fun isMigrationExperienceEnabled(): Boolean
+
+    /**
+     * True once [markDoneOnThisInstall] has recorded [key] on this install. These marks never travel in a device transfer, so a
+     * step that must run once per install (a cleanup of the previous phone's state, a dismissal) runs again on the next phone
+     * without each feature having to keep its own file out of the backup rules. Keys share one namespace: prefix them with the
+     * feature's name. Reads from disk: call it off the main thread where possible.
+     */
+    fun isDoneOnThisInstall(key: String): Boolean
+
+    /** Records [key] as done on this install only; see [isDoneOnThisInstall]. Writes to disk synchronously. */
+    fun markDoneOnThisInstall(key: String)
 }

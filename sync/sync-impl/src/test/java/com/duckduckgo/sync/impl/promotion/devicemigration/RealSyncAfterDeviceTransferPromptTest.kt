@@ -16,9 +16,6 @@
 
 package com.duckduckgo.sync.impl.promotion.devicemigration
 
-import android.content.SharedPreferences
-import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.runTest
@@ -35,9 +32,7 @@ class RealSyncAfterDeviceTransferPromptTest {
         whenever(isFeatureEnabled()).thenReturn(true)
         whenever(isUserSignedInOnDevice()).thenReturn(false)
     }
-    private val sharedPreferencesProvider = SingleFileSharedPreferencesProvider()
-
-    private fun newPrompt() = RealSyncAfterDeviceTransferPrompt(deviceMigration, deviceSyncState, sharedPreferencesProvider)
+    private fun newPrompt() = RealSyncAfterDeviceTransferPrompt(deviceMigration, deviceSyncState)
 
     @Test
     fun whenMigratedInstallWithoutSyncOnEitherPhoneAndFlowFinishedThenShows() = runTest {
@@ -103,11 +98,10 @@ class RealSyncAfterDeviceTransferPromptTest {
     }
 
     @Test
-    fun dismissalIsStoredInTheSyncDeviceMigrationPreferenceFile() = runTest {
+    fun dismissalIsADoneMarkOnThisInstall() = runTest {
         newPrompt().dismiss()
 
-        assertTrue(sharedPreferencesProvider.requestedNames.all { it == "com.duckduckgo.sync.devicemigration" })
-        assertTrue(sharedPreferencesProvider.requestedNames.isNotEmpty())
+        assertTrue(deviceMigration.done.isNotEmpty())
     }
 
     private class FakeDeviceMigration : DeviceMigration {
@@ -124,22 +118,11 @@ class RealSyncAfterDeviceTransferPromptTest {
         }
         override fun previousDeviceHadSync(): Boolean = migrated && previousDeviceHadSync
         override suspend fun isMigrationExperienceEnabled(): Boolean = experienceEnabled
-    }
 
-    private class SingleFileSharedPreferencesProvider : SharedPreferencesProvider {
-        private val files = mutableMapOf<String, SharedPreferences>()
-        val requestedNames = mutableListOf<String>()
-
-        override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
-            requestedNames += name
-            return files.getOrPut(name) { InMemorySharedPreferences() }
+        val done = mutableSetOf<String>()
+        override fun isDoneOnThisInstall(key: String): Boolean = key in done
+        override fun markDoneOnThisInstall(key: String) {
+            done += key
         }
-
-        override fun getEncryptedSharedPreferences(name: String, multiprocess: Boolean): SharedPreferences = throw UnsupportedOperationException()
-
-        override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? = throw UnsupportedOperationException()
-
-        override suspend fun getMigratedEncryptedSharedPreferences(origin: SharedPreferences, name: String): SharedPreferences? =
-            throw UnsupportedOperationException()
     }
 }
