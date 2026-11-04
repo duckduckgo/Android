@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.pir.impl.store.PirDataStore
@@ -66,6 +67,7 @@ class PirDashboardWebViewViewModelTest {
     private val pirFreemiumDataStore: PirFreemiumDataStore = mock()
     private val subscriptionStatus = MutableStateFlow(SubscriptionStatus.UNKNOWN)
     private val pirDataStore: PirDataStore = mock()
+    private val foregroundScanServiceStarter: PirForegroundScanServiceStarter = mock()
 
     private val route = PirPurchaseRoute.NativePurchaseFlow(origin = "funnel_freescan_android", featurePage = "pir")
 
@@ -85,6 +87,7 @@ class PirDashboardWebViewViewModelTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
             pirDataStore = pirDataStore,
+            foregroundScanServiceStarter = foregroundScanServiceStarter,
         )
     }
 
@@ -508,5 +511,63 @@ class PirDashboardWebViewViewModelTest {
 
         testee.onNotificationPermissionResult(granted = true)
         verify(pirPixelSender).reportNotificationPermissionGranted()
+    }
+
+    @Test
+    fun `test granting the permission shows the notification of the running scan`() = runTest {
+        testee.onNotificationPermissionResult(granted = true)
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test denying the permission does not show the scan notification`() = runTest {
+        testee.onNotificationPermissionResult(granted = false)
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test returning from settings with the permission granted shows the scan notification`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+
+        testee.onResumed(notificationPermissionGranted = true)
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test returning from settings without the permission does not show the scan notification`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+
+        testee.onResumed(notificationPermissionGranted = false)
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test resuming without going to settings does not show the scan notification`() = runTest {
+        testee.onResumed(notificationPermissionGranted = true)
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test only the first resume after settings shows the scan notification`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+
+        testee.onResumed(notificationPermissionGranted = false)
+        testee.onResumed(notificationPermissionGranted = true)
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
     }
 }

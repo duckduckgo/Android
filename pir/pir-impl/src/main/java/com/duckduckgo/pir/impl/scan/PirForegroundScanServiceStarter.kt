@@ -20,20 +20,35 @@ import android.content.Context
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import dev.zacsweers.metro.ContributesBinding
+import logcat.LogPriority.WARN
+import logcat.logcat
 import javax.inject.Inject
 
-/** Starts [PirForegroundScanService] to resume an interrupted initial scan from the dashboard. */
+/** Starts [PirForegroundScanService] from the dashboard. */
 interface PirForegroundScanServiceStarter {
+    /** Resumes an interrupted initial scan. */
     fun startResumeScan()
+
+    /** Shows the notification of a scan that is already running, e.g. once the notification permission is granted. */
+    fun showScanNotificationIfRunning()
 }
 
 @ContributesBinding(ActivityScope::class)
 class RealPirForegroundScanServiceStarter @Inject constructor(
     private val context: Context,
+    private val pirForegroundScanServiceMonitor: PirForegroundScanServiceMonitor,
 ) : PirForegroundScanServiceStarter {
     override fun startResumeScan() {
         context.startForegroundService(
             PirForegroundScanService.intentFor(context, PirExecutionType.MANUAL_INITIAL_RESUME),
         )
+    }
+
+    override fun showScanNotificationIfRunning() {
+        if (!pirForegroundScanServiceMonitor.isRunning()) return
+
+        // not startForegroundService, which crashes if the scan finishes before the service can call startForeground
+        runCatching { context.startService(PirForegroundScanService.intentForShowScanNotification(context)) }
+            .onFailure { logcat(WARN) { "PIR-SCAN: Could not show the scan notification: ${it.message}" } }
     }
 }

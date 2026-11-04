@@ -43,6 +43,7 @@ import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchas
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -77,9 +78,11 @@ class PirDashboardWebViewViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pirDataStore: PirDataStore,
+    private val foregroundScanServiceStarter: PirForegroundScanServiceStarter,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var purchaseFlowOutstanding = false
+    private var awaitingReturnFromNotificationSettings = false
 
     private val command = Channel<Command>(Channel.BUFFERED)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -153,7 +156,10 @@ class PirDashboardWebViewViewModel @Inject constructor(
                     withContext(dispatcherProvider.io()) { pirDataStore.hasRequestedNotificationPermission = true }
                     command.send(Command.RequestNotificationPermission)
                 }
-                PirNotificationPromptType.OPEN_SETTINGS -> command.send(Command.OpenNotificationSettings)
+                PirNotificationPromptType.OPEN_SETTINGS -> {
+                    awaitingReturnFromNotificationSettings = true
+                    command.send(Command.OpenNotificationSettings)
+                }
             }
         }
     }
@@ -165,6 +171,23 @@ class PirDashboardWebViewViewModel @Inject constructor(
     fun onNotificationPermissionResult(granted: Boolean) {
         if (granted) {
             pirPixelSender.reportNotificationPermissionGranted()
+            showScanNotificationIfRunning()
+        }
+    }
+
+    fun onResumed(notificationPermissionGranted: Boolean) {
+        if (!awaitingReturnFromNotificationSettings) return
+        awaitingReturnFromNotificationSettings = false
+
+        if (notificationPermissionGranted) {
+            showScanNotificationIfRunning()
+        }
+    }
+
+    // the scan started before the permission was granted, so its notification was never shown
+    private fun showScanNotificationIfRunning() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            foregroundScanServiceStarter.showScanNotificationIfRunning()
         }
     }
 

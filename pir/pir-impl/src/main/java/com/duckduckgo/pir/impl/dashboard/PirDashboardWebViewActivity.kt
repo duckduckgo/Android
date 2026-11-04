@@ -128,6 +128,11 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         )
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResumed(notificationPermissionGranted = isNotificationPermissionGranted())
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         viewModel.resolvedFreeScanEntryPoint?.let { outState.putString(KEY_FREE_SCAN_ENTRY_POINT, it.name) }
@@ -270,12 +275,14 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         val isAtLeastApi33 = Build.VERSION.SDK_INT >= 33
         viewModel.onNotificationPermissionStateComputed(
             isAtLeastApi33 = isAtLeastApi33,
-            permissionGranted = isAtLeastApi33 &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED,
+            permissionGranted = isAtLeastApi33 && isNotificationPermissionGranted(),
             shouldShowRationale = isAtLeastApi33 &&
                 ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS),
         )
     }
+
+    private fun isNotificationPermissionGranted(): Boolean = Build.VERSION.SDK_INT < 33 ||
+        ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED
 
     private fun showNotificationPermissionPrompt(promptType: PirNotificationPromptType) {
         val (messageRes, positiveButtonRes) = when (promptType) {
