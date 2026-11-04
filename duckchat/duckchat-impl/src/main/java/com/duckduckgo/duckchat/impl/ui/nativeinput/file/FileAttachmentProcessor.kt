@@ -23,6 +23,7 @@ import android.provider.OpenableColumns
 import android.util.Base64
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -51,7 +52,7 @@ class RealFileAttachmentProcessor @Inject constructor(
             // size-limit checks always see a non-zero value for non-empty files.
             val sizeBytes = reportedSize ?: bytes.size.toLong()
 
-            val pageCount = if (mimeType == "application/pdf") {
+            val pageCount = if (mimeType == PDF_MIME_TYPE) {
                 runCatching {
                     context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
                         PdfRenderer(pfd).use { it.pageCount }

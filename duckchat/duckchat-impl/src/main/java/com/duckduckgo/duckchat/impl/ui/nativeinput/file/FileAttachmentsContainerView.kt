@@ -24,6 +24,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.browser.ui.R as BrowserUiR
 import com.duckduckgo.mobile.android.R as CommonR
@@ -75,7 +76,7 @@ class FileAttachmentsContainerView @JvmOverloads constructor(
         val itemView = LayoutInflater.from(context).inflate(R.layout.view_file_attachment_item, this, false)
         val fileNameText = itemView.findViewById<DaxTextView>(R.id.fileName)
         fileNameText.text = attachment.fileName
-        if (attachment.mimeType == "application/pdf") {
+        if (attachment.mimeType == PDF_MIME_TYPE) {
             itemView.findViewById<ImageView>(R.id.fileIcon).setImageResource(BrowserUiR.drawable.ic_document_pdf_color_24)
         }
         itemView.findViewById<DaxTextView>(R.id.fileSize).text = Formatter.formatFileSize(context, attachment.sizeBytes)

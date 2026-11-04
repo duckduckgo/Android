@@ -24,6 +24,7 @@ import android.widget.LinearLayout
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.duckduckgo.browser.ui.R as BrowserUiR
@@ -46,7 +47,7 @@ class PageContextAttachmentView @JvmOverloads constructor(
 
     fun current(): PageContextAttachment? = attachment
 
-    fun faviconView(): ImageView? = faviconView.takeUnless { attachment?.mimeType == "application/pdf" }
+    fun faviconView(): ImageView? = faviconView.takeUnless { attachment?.mimeType == PDF_MIME_TYPE }
 
     fun show(attachment: PageContextAttachment, onRemoved: () -> Unit) {
         this.attachment = attachment
@@ -55,7 +56,7 @@ class PageContextAttachmentView @JvmOverloads constructor(
         itemView.findViewById<DaxTextView>(R.id.pageContextTitle).text = attachment.title
         itemView.findViewById<ImageView>(R.id.pageContextRemove).setOnClickListener { onRemoved() }
         faviconView = itemView.findViewById(R.id.pageContextFavicon)
-        if (attachment.mimeType == "application/pdf") faviconView?.setImageResource(BrowserUiR.drawable.ic_document_pdf_color_24)
+        if (attachment.mimeType == PDF_MIME_TYPE) faviconView?.setImageResource(BrowserUiR.drawable.ic_document_pdf_color_24)
         addView(itemView)
         show()
     }
