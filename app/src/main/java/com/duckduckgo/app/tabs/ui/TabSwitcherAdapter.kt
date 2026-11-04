@@ -30,6 +30,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -77,9 +78,11 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.firstLineCenterY
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
@@ -159,12 +162,29 @@ class TabSwitcherAdapter(
                 TabSwitcherViewHolder.RichDuckAiGridViewHolder(duckAiTabGridItemRenderer.create(parent.context, lifecycleOwner.lifecycleScope))
             }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
-                val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
+                val isRebrandEnabled = parent.context.isRebrandAreaEnabled(CommonR.attr.daxRebrandInfoPanels)
+                val binding = ItemTabSwitcherAnimationInfoPanelBinding.bind(inflater.inflate(trackerInfoPanelLayout(isRebrandEnabled), parent, false))
+                if (isRebrandEnabled) binding.centreShieldOnFirstLine()
                 TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
             }
             else -> throw IllegalArgumentException("Unknown viewType: $viewType")
         }
     }
+
+    private fun ItemTabSwitcherAnimationInfoPanelBinding.centreShieldOnFirstLine() {
+        val textTop = (infoPanelText.layoutParams as ViewGroup.MarginLayoutParams).topMargin
+        infoPanelAnimatedImage.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            topMargin = textTop + infoPanelText.firstLineCenterY - height / 2
+        }
+    }
+
+    @VisibleForTesting
+    internal fun trackerInfoPanelLayout(isRebrandEnabled: Boolean): Int =
+        if (isRebrandEnabled) {
+            R.layout.item_tab_switcher_animation_info_panel_rebrand
+        } else {
+            R.layout.item_tab_switcher_animation_info_panel
+        }
 
     override fun getItemViewType(position: Int): Int =
         when (val item = differ.currentList[position]) {

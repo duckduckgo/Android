@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.view.text
 
 import android.content.Context
 import android.util.AttributeSet
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.TypedArrayUtils
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.Body1
@@ -177,3 +178,14 @@ constructor(
         }
     }
 }
+
+/**
+ * Distance from the top of this view to the vertical centre of its first line of text, for centring an icon on that line.
+ * Line spacing is added below each line, so the first line's glyphs sit at the top of its line box.
+ */
+val TextView.firstLineCenterY: Int
+    get() {
+        val metrics = paint.fontMetricsInt
+        val firstBaseline = paddingTop - if (includeFontPadding) metrics.top else metrics.ascent
+        return firstBaseline + (metrics.ascent + metrics.descent) / 2
+    }
