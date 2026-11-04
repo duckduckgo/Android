@@ -48,6 +48,7 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
+import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -97,6 +98,7 @@ class TabDataRepositoryTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val mockDao: TabsDao = mock()
+    private val pageContextJSHelper: PageContextJSHelper = mock()
 
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
@@ -471,6 +473,7 @@ class TabDataRepositoryTest {
         verify(mockDao).deleteTabAndUpdateSelection(any())
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
         verify(mockTabVisitedSitesRepository).clearTab(addedTabId)
+        verify(pageContextJSHelper).clearTab(addedTabId)
     }
 
     @Test
@@ -494,6 +497,7 @@ class TabDataRepositoryTest {
         verify(mockDuckChatContextualDataStore).clearTabChatUrl("current")
         verify(mockTabVisitedSitesRepository).clearTab("current")
         verify(mockNativeInputStatePublisher).clearTab("current")
+        verify(pageContextJSHelper).clearTab("current")
         assertNotSame(siteData, testee.retrieveSiteData("current"))
         testee.update("current", site)
         verify(mockDao, times(2)).updateUrlAndTitle("current", "https://example.com", "Example", true)
@@ -540,6 +544,8 @@ class TabDataRepositoryTest {
         val addedTabId = testee.add()
         val siteData = testee.retrieveSiteData(addedTabId)
 
+        whenever(mockDao.tabs()).thenReturn(listOf(TabEntity(tabId = addedTabId, position = 0), TabEntity(tabId = "other", position = 1)))
+
         testee.deleteAll()
 
         verify(mockDao).deleteAllTabs()
@@ -550,6 +556,9 @@ class TabDataRepositoryTest {
         verify(mockDuckChatContextualDataStore).clearAll()
         verify(mockTabVisitedSitesRepository).clearAll()
         verify(mockNativeInputStatePublisher).clearAll()
+        verify(pageContextJSHelper).clearTab(addedTabId)
+        verify(pageContextJSHelper).clearTab("other")
+        org.mockito.kotlin.verifyNoMoreInteractions(pageContextJSHelper)
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 
@@ -685,6 +694,7 @@ class TabDataRepositoryTest {
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
         verify(mockTabVisitedSitesRepository).clearTab("tabToDeleteId")
+        verify(pageContextJSHelper).clearTab("tabToDeleteId")
     }
 
     @Test
@@ -975,6 +985,7 @@ class TabDataRepositoryTest {
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
             verify(mockNativeInputStatePublisher).clearTab(tabId)
+            verify(pageContextJSHelper).clearTab(tabId)
         }
     }
 
@@ -994,6 +1005,7 @@ class TabDataRepositoryTest {
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
             verify(mockNativeInputStatePublisher).clearTab(tabId)
+            verify(pageContextJSHelper).clearTab(tabId)
         }
     }
 
@@ -1086,6 +1098,7 @@ class TabDataRepositoryTest {
         verify(mockWebViewSessionStorage).deleteSession(TAB_ID)
         verify(mockTabVisitedSitesRepository).clearTab(TAB_ID)
         verify(mockNativeInputStatePublisher).clearTab(TAB_ID)
+        verify(pageContextJSHelper).clearTab(TAB_ID)
     }
 
     private fun tabDataRepository(
@@ -1132,6 +1145,7 @@ class TabDataRepositoryTest {
             nativeInputStatePublisher,
             duckAiTabSessionRepository,
             pageTitleFetcher,
+            pageContextJSHelper,
         )
     }
 
@@ -1160,6 +1174,7 @@ class TabDataRepositoryTest {
         verify(mockDuckChatContextualDataStore, never()).clearTabChatUrl(tabId)
         verify(mockTabVisitedSitesRepository, never()).clearTab(tabId)
         verify(mockNativeInputStatePublisher, never()).clearTab(tabId)
+        verify(pageContextJSHelper, never()).clearTab(tabId)
     }
 
     private fun now(): LocalDateTime {

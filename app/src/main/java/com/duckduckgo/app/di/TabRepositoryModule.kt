@@ -39,6 +39,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
+import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.Binds
@@ -84,6 +85,7 @@ abstract class TabRepositoryModule {
             nativeInputStatePublisher: NativeInputStatePublisher,
             duckAiTabSessionRepository: DuckAiTabSessionRepository,
             pageTitleFetcher: PageTitleFetcher,
+            pageContextJSHelper: PageContextJSHelper,
         ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
@@ -101,6 +103,7 @@ abstract class TabRepositoryModule {
             nativeInputStatePublisher = nativeInputStatePublisher,
             duckAiTabSessionRepository = duckAiTabSessionRepository,
             pageTitleFetcher = pageTitleFetcher,
+            pageContextJSHelper = pageContextJSHelper,
         )
 
         @Provides
@@ -123,6 +126,7 @@ abstract class TabRepositoryModule {
             nativeInputStatePublisher: NativeInputStatePublisher,
             duckAiTabSessionRepository: DuckAiTabSessionRepository,
             pageTitleFetcher: PageTitleFetcher,
+            pageContextJSHelper: PageContextJSHelper,
         ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
@@ -140,6 +144,7 @@ abstract class TabRepositoryModule {
             nativeInputStatePublisher = nativeInputStatePublisher,
             duckAiTabSessionRepository = duckAiTabSessionRepository,
             pageTitleFetcher = pageTitleFetcher,
+            pageContextJSHelper = pageContextJSHelper,
         )
     }
 }

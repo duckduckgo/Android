@@ -115,6 +115,55 @@ class RealPageContextJSHelperTest {
         verify(pixels, times(2)).success(ContextType.MARKDOWN)
     }
 
+    @Test
+    fun `cancel preserves navigation deduplication`() = runTest {
+        val pixels = mock<PageContextExtractionPixels>()
+        val helper = reportingHelper(pixels, backgroundScope, testScheduler)
+        helper.collectPageContext("tab", navigationId = 1L)
+        helper.deliverMarkdown("tab")
+
+        helper.cancelCollection("tab")
+        helper.collectPageContext("tab", navigationId = 1L)
+        helper.deliverMarkdown("tab")
+
+        verify(pixels, times(1)).success(ContextType.MARKDOWN)
+        verifyNoMoreInteractions(pixels)
+    }
+
+    @Test
+    fun `clear tab removes navigation deduplication but preserves other tabs`() = runTest {
+        val pixels = mock<PageContextExtractionPixels>()
+        val helper = reportingHelper(pixels, backgroundScope, testScheduler)
+        listOf("closed", "open").forEach {
+            helper.collectPageContext(it, navigationId = 1L)
+            helper.deliverMarkdown(it)
+        }
+
+        helper.clearTab("closed")
+        listOf("closed", "open").forEach {
+            helper.collectPageContext(it, navigationId = 1L)
+            helper.deliverMarkdown(it)
+        }
+
+        verify(pixels, times(3)).success(ContextType.MARKDOWN)
+        verifyNoMoreInteractions(pixels)
+    }
+
+    @Test
+    fun `clear tab discards pending results and timeouts`() = runTest {
+        val pixels = mock<PageContextExtractionPixels>()
+        val helper = reportingHelper(pixels, backgroundScope, testScheduler)
+        helper.collectPageContext("result", navigationId = 1L)
+        helper.collectPageContext("timeout", navigationId = 1L)
+
+        helper.clearTab("result")
+        helper.clearTab("timeout")
+        helper.deliverMarkdown("result")
+        advanceTimeBy(31_000)
+
+        verifyNoInteractions(pixels)
+    }
+
     private fun reportingHelper(
         pixels: PageContextExtractionPixels,
         scope: CoroutineScope,

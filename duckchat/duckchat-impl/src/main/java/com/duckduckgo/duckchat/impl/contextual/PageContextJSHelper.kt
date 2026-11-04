@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Reason
 import com.duckduckgo.duckchat.impl.pixel.PageContextExtractionPixels.Trigger
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -43,6 +44,8 @@ interface PageContextJSHelper {
         tabId: String,
     ): String?
 
+    fun clearTab(tabId: String)
+
     fun cancelCollection(tabId: String)
 
     /**
@@ -57,6 +60,7 @@ interface PageContextJSHelper {
     ): SubscriptionEventData
 }
 
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPageContextJSHelper @Inject constructor(
     private val pixels: PageContextExtractionPixels,
@@ -79,7 +83,10 @@ class RealPageContextJSHelper @Inject constructor(
         }
 
         val serializedPageData = data?.optString(KEY_SERIALIZED_PAGE_DATA, null)
-        requests.remove(tabId)?.takeIf { claimReport(tabId, it) }?.let { request ->
+        val request = synchronized(requests) {
+            requests.remove(tabId)?.takeIf { claimReport(tabId, it) }
+        }
+        request?.let { request ->
             val json = serializedPageData?.let { runCatching { JSONObject(it) }.getOrNull() }
             val reason = when {
                 serializedPageData.isNullOrBlank() -> Reason.EMPTY_CONTENT
@@ -99,8 +106,17 @@ class RealPageContextJSHelper @Inject constructor(
         return null
     }
 
+    override fun clearTab(tabId: String) {
+        synchronized(requests) {
+            requests.remove(tabId)
+            reportedNavigations.remove(tabId)
+        }
+    }
+
     override fun cancelCollection(tabId: String) {
-        requests.remove(tabId)
+        synchronized(requests) {
+            requests.remove(tabId)
+        }
     }
 
     override fun collectPageContext(
@@ -111,10 +127,13 @@ class RealPageContextJSHelper @Inject constructor(
     ): SubscriptionEventData {
         if (isDuckAiVisible && feature.pdfPageContext().isEnabled()) {
             val request = Request(SystemClock.elapsedRealtime(), trigger, navigationId)
-            requests[tabId] = request
+            synchronized(requests) { requests[tabId] = request }
             scope.launch(dispatchers.io()) {
                 delay(30_000)
-                if (requests.remove(tabId, request) && feature.pdfPageContext().isEnabled() && claimReport(tabId, request)) {
+                val shouldReport = synchronized(requests) {
+                    requests.remove(tabId, request) && feature.pdfPageContext().isEnabled() && claimReport(tabId, request)
+                }
+                if (shouldReport) {
                     pixels.failed(Reason.TIMEOUT, trigger, ContextType.MARKDOWN)
                 }
             }
