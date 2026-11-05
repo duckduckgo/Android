@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -24,19 +24,15 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace "com.duckduckgo.onboarding.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':onboarding-api')
     implementation project(':di')
 
     implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4

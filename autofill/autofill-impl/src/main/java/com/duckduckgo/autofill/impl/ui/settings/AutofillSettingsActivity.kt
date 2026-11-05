@@ -25,8 +25,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.AutofillSettings
@@ -43,6 +41,8 @@ import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Comman
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigatePasswordList
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigateToHowToSyncWithDesktop
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE

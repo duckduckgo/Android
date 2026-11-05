@@ -24,7 +24,7 @@ import com.duckduckgo.referral.api.ParsedReferrerResult.EuAuctionBrowserChoiceRe
 import com.duckduckgo.referral.api.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
 import com.duckduckgo.referral.api.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.referral.api.ReferrerParserPlugin
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN

@@ -21,9 +21,9 @@ import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult.Er
 import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult.Success
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import de.siegmar.fastcsv.reader.CsvReader
 import de.siegmar.fastcsv.reader.CsvRow
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO

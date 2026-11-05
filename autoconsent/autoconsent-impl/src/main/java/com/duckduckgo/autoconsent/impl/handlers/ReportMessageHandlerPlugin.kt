@@ -26,16 +26,16 @@ import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ReportMessageHandlerPlugin @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val autoconsentFeature: AutoconsentFeature,

@@ -77,7 +77,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_S
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 
 enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName {
     AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN("autofill_logins_save_login_inline_onboarding_displayed"),
@@ -263,9 +264,9 @@ object AutofillPixelParameters {
     const val LAST_USED_PIXEL_KEY = "last_used"
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
+    binding = binding<PixelParamRemovalPlugin>(),
 )
 object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

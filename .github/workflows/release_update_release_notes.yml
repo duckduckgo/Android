@@ -19,7 +19,7 @@ env:
 jobs:
   update-release-notes:
     name: Update release notes in Play Store and Github
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository

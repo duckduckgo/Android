@@ -20,14 +20,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.Toast
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ViewStatisticsAttributedMetricsBinding
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.referral.api.AppReferrer
-import dagger.android.support.AndroidSupportInjection
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject

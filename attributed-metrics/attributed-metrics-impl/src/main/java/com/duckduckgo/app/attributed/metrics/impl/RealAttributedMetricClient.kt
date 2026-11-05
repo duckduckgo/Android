@@ -28,16 +28,17 @@ import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppReferrer
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class, AttributedMetricClient::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<AttributedMetricClient>())
+@SingleIn(AppScope::class)
 class RealAttributedMetricClient @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,

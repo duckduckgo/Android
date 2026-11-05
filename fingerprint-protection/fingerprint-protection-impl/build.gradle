@@ -16,16 +16,13 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.fingerprintprotection.impl'
     compileOptions {
         coreLibraryDesugaringEnabled = true
@@ -33,8 +30,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':fingerprint-protection-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
@@ -65,9 +62,6 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     testImplementation AndroidX.room.testing
-
-    // Dagger
-    implementation Google.dagger
 
     implementation KotlinX.coroutines.core
 

@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -28,6 +27,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFl
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator

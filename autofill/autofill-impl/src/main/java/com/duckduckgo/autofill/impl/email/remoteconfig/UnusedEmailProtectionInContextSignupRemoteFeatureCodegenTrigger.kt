@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.impl.email.remoteconfig
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesRemoteFeature(

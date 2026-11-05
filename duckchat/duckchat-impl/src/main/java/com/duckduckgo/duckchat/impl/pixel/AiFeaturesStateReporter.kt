@@ -22,7 +22,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.settings.api.HideAiGeneratedImages
 import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 

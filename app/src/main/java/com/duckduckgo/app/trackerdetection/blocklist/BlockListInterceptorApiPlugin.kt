@@ -26,10 +26,11 @@ import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
@@ -37,9 +38,9 @@ import okhttp3.Response
 import retrofit2.Invocation
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class BlockListInterceptorApiPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,

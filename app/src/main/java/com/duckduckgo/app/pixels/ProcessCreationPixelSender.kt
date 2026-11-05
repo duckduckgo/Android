@@ -21,15 +21,16 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ProcessCreationMainPixelSender @Inject constructor(
     private val pixel: Pixel,
 ) : MainProcessLifecycleObserver {
@@ -39,11 +40,11 @@ class ProcessCreationMainPixelSender @Inject constructor(
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = VpnProcessLifecycleObserver::class,
+    binding = binding<VpnProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ProcessCreationVpnPixelSender @Inject constructor(
     private val pixel: Pixel,
 ) : VpnProcessLifecycleObserver {

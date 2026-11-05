@@ -1004,4 +1004,5 @@
     <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">A server with the specified hostname could not be found.</string>
     <string name="webViewErrorSslProtocol" instruction="Message shown when the website's SSL certificate is invalid. Placeholder is the website's address"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
     <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Did you mean <annotation type="redirect_link">^1</annotation>?</string>
+    <string name="webViewErrorTimeout" instruction="Message shown when a website is taking too long to load">This page is taking too long to load.</string>
 </resources>

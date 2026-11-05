@@ -23,8 +23,8 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.domain
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -34,7 +34,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealUserAllowListRepository @Inject constructor(
     private val userAllowListDao: UserAllowListDao,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,

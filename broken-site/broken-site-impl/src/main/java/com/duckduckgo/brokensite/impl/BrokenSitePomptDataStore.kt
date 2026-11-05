@@ -31,8 +31,8 @@ import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.
 import com.duckduckgo.brokensite.impl.SharedPreferencesDuckPlayerDataStore.Keys.NEXT_SHOWN_DATE
 import com.duckduckgo.brokensite.impl.di.BrokenSitePrompt
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -64,7 +64,7 @@ interface BrokenSitePromptDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SharedPreferencesDuckPlayerDataStore @Inject constructor(
     @BrokenSitePrompt private val store: DataStore<Preferences>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

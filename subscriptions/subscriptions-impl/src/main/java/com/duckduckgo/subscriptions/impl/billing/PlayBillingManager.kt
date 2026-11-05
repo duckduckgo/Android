@@ -46,9 +46,10 @@ import com.duckduckgo.subscriptions.impl.wideevents.BillingFlowInitFailureContex
 import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -112,9 +113,9 @@ interface PlayBillingManager {
     suspend fun getLatestPurchase(): LatestPurchaseResult
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = PlayBillingManager::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<PlayBillingManager>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealPlayBillingManager @Inject constructor(
     @AppCoroutineScope val coroutineScope: CoroutineScope,
     private val pixelSender: SubscriptionPixelSender,

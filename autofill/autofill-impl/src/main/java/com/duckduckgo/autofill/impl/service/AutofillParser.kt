@@ -21,8 +21,8 @@ import android.app.assist.AssistStructure.ViewNode
 import android.app.assist.AssistStructure.WindowNode
 import android.view.autofill.AutofillId
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -57,7 +57,7 @@ enum class AutofillFieldType {
     UNKNOWN,
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAutofillParser @Inject constructor(
     private val viewNodeClassifier: ViewNodeClassifier,

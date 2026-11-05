@@ -23,14 +23,15 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.Started
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class StartedEventHandler @Inject constructor() : EventHandler {
     override val event: KClass<out Event> = Started::class

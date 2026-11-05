@@ -33,7 +33,7 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Su
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject

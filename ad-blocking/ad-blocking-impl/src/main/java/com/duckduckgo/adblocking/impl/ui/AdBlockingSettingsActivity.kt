@@ -18,36 +18,150 @@ package com.duckduckgo.adblocking.impl.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.widget.Toolbar
+import android.widget.CompoundButton
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
+import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.common.ui.view.listitem.DaxListItem
-import com.duckduckgo.common.ui.view.listitem.OneLineListItem
-import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
+import com.duckduckgo.browser.api.ui.BrowserScreens
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.StatusIndicatorView
+import com.duckduckgo.common.ui.view.addClickableSpan
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AdBlockingSettingsNoParams::class)
-class AdBlockingSettingsActivity : BaseAdBlockingSettingsActivity() {
+class AdBlockingSettingsActivity : DuckDuckGoActivity() {
+
+    private val viewModel: AdBlockingSettingsViewModel by bindViewModel()
 
     private val binding: ActivityAdBlockingSettingsBinding by viewBinding()
 
-    override val toolbar: Toolbar get() = binding.includeToolbar.toolbar
-    override val blockAdsToggle: OneLineListItem get() = binding.blockAdsToggle
-    override val adBlockingDescription: DaxTextView get() = binding.adBlockingDescription
-    override val duckPlayerEntry: DaxListItem get() = binding.duckPlayerEntry
-    override val duckPlayerDescription: DaxTextView get() = binding.duckPlayerDescription
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
-    override val rootView: View get() = binding.root
-    override val appBarLayout: View get() = binding.includeToolbar.appBarLayout
-    override val contentScrollView: View get() = binding.contentScrollView
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    private val blockAdsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onBlockAdsToggled(isChecked)
+    }
+
+    private val untilRelaunchToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onBlockAdsToggled(isChecked)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        configure()
+        setTitle(R.string.ad_blocking_settings_title_v2)
+        binding.adBlockingStatusIndicator.setStatus(StatusIndicatorView.Status.ALWAYS_ON)
+        setupToolbar(binding.includeToolbar.toolbar)
+
+        binding.duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
+        binding.duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
+        binding.duckPlayerSettingsLink.setOnClickListener { viewModel.onDuckPlayerClicked() }
+
+        configureEdgeToEdgeInsets()
+        observeViewModel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+    }
+
+    private fun render(state: AdBlockingSettingsViewModel.ViewState) {
+        binding.blockAdsToggle.quietlySetIsChecked(state.isEnabled, blockAdsToggleListener)
+        renderDescription(state.showConsentDescription)
+        binding.blockAdsToggle.isVisible = !state.disabledUntilRelaunch && !state.isContingencyMode
+        binding.blockAdsToggleUntilRelaunch.isVisible = state.disabledUntilRelaunch && !state.isContingencyMode
+        if (state.disabledUntilRelaunch) {
+            binding.blockAdsToggleUntilRelaunch.quietlySetIsChecked(state.isEnabled, untilRelaunchToggleListener)
+        }
+        binding.duckPlayerEntry.isVisible = state.duckPlayerSection == DuckPlayerSection.Entry
+        binding.duckPlayerDescription.isVisible = state.duckPlayerSection == DuckPlayerSection.Entry
+        binding.duckPlayerSettingsLink.isVisible = state.duckPlayerSection == DuckPlayerSection.Link
+        binding.duckPlayerEntry.setSecondaryText(
+            when (state.duckPlayerMode) {
+                Enabled -> getString(R.string.duck_player_mode_always)
+                Disabled -> getString(R.string.duck_player_mode_never)
+                else -> getString(R.string.duck_player_mode_always_ask)
+            },
+        )
+        if (state.isContingencyMode) {
+            binding.adBlockingDescription.gone()
+            binding.contingencyModeItem.show()
+        } else {
+            binding.contingencyModeItem.gone()
+        }
+    }
+
+    private fun renderDescription(showConsentDescription: Boolean?) {
+        if (showConsentDescription == null) {
+            binding.adBlockingDescription.gone()
+            return
+        }
+        val descriptionRes = if (showConsentDescription) {
+            R.string.ad_blocking_settings_description_with_consent
+        } else {
+            R.string.ad_blocking_settings_description
+        }
+        binding.adBlockingDescription.addClickableSpan(
+            textSequence = getText(descriptionRes),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreClicked()
+                    }
+                },
+            ),
+        )
+        binding.adBlockingDescription.show()
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { render(it) }
+            .launchIn(lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { command ->
+                when (command) {
+                    is AdBlockingSettingsViewModel.Command.OpenLearnMore -> globalActivityStarter.start(
+                        this,
+                        BrowserScreens.WebViewActivityWithParams(
+                            url = command.url,
+                            screenTitle = getString(R.string.ad_blocking_settings_title_v2),
+                        ),
+                    )
+                    AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings -> globalActivityStarter.start(
+                        this,
+                        DuckPlayerSettingsNoParams,
+                    )
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 }

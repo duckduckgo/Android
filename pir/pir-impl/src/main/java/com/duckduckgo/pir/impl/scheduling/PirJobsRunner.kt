@@ -47,8 +47,8 @@ import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
@@ -78,7 +78,7 @@ interface PirJobsRunner {
 }
 
 @ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirJobsRunner @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirRepository: PirRepository,

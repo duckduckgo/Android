@@ -23,7 +23,7 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PirFeatureDataCleaner {

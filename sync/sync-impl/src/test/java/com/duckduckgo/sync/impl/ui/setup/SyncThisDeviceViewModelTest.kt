@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.AbortSyncing
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.FinishSyncing
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.ShowAuthError
@@ -84,7 +85,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             assertIs<FinishSyncing>(awaitItem())
 
             cancel()
@@ -98,7 +99,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             assertEquals(connectedDevice, (awaitItem() as FinishSyncing).device)
 
             cancel()
@@ -112,7 +113,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncAccountRepository, never()).createAccount()
@@ -130,11 +131,11 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             assertIs<FinishSyncing>(awaitItem())
 
             verify(syncAccountRepository).createAccount()
-            verify(syncPixels).fireSignupDirectPixel(source = null)
+            verify(syncPixels).fireSignupDirectPixel(launchSource = SyncLaunchSource.Other)
 
             cancel()
         }
@@ -148,10 +149,10 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = "foo")
+            testee.syncThisDevice(launchSource = SyncLaunchSource.PromotionBookmarks)
             skipItems(1)
 
-            verify(syncPixels).fireSignupDirectPixel(source = "foo")
+            verify(syncPixels).fireSignupDirectPixel(launchSource = SyncLaunchSource.PromotionBookmarks)
 
             cancel()
         }
@@ -165,7 +166,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreated()
@@ -181,7 +182,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncSetupWideEvent).onSyncEnabled()
@@ -198,7 +199,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreationFailed()
@@ -215,7 +216,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             assertIs<ShowError>(awaitItem())
 
             verify(syncPixels, never()).fireSignupDirectPixel(anyOrNull())
@@ -232,7 +233,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             assertIs<ShowError>(awaitItem())
 
             cancel()
@@ -247,7 +248,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreationFailed()
@@ -313,7 +314,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncPixels).fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
@@ -343,7 +344,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             assertEquals(1, deviceAuthenticator.requests.size)
@@ -359,7 +360,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee(isAuthRequired = false)
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             assertIs<FinishSyncing>(awaitItem())
 
             assertTrue(deviceAuthenticator.requests.isEmpty())
@@ -375,7 +376,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             expectNoEvents()
 
             verify(syncSetupWideEvent, never()).onSyncEnabled()
@@ -392,7 +393,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             expectNoEvents()
 
             verify(syncSetupWideEvent, never()).onSyncEnabled()
@@ -411,7 +412,7 @@ class SyncThisDeviceViewModelTest {
         testee.viewState.test {
             assertFalse(awaitItem().isSyncing)
 
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             expectNoEvents()
 
             cancel()
@@ -427,7 +428,7 @@ class SyncThisDeviceViewModelTest {
         testee.viewState.test {
             assertFalse(awaitItem().isSyncing)
 
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             expectNoEvents()
 
             cancel()
@@ -440,8 +441,8 @@ class SyncThisDeviceViewModelTest {
 
         val testee = createTestee()
 
-        testee.syncThisDevice(launchSource = null)
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
+        testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
 
         assertEquals(1, deviceAuthenticator.requests.size)
         verify(syncPixels).fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
@@ -453,8 +454,8 @@ class SyncThisDeviceViewModelTest {
 
         val testee = createTestee()
 
-        testee.syncThisDevice(launchSource = null)
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
+        testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
 
         assertEquals(2, deviceAuthenticator.requests.size)
     }
@@ -466,7 +467,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             assertIs<ShowAuthError>(awaitItem())
 
             verify(syncAccountRepository, never()).createAccount()
@@ -539,7 +540,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncSetupWideEvent).onUserAuthSuccess()
@@ -556,7 +557,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncSetupWideEvent).onUserAuthSuccess()
@@ -570,7 +571,7 @@ class SyncThisDeviceViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
 
         val testee = createTestee()
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
 
         verify(syncSetupWideEvent, never()).onUserAuthCancelled()
         verify(syncSetupWideEvent, never()).onUserAuthSuccess()
@@ -583,7 +584,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncSetupWideEvent, never()).onUserAuthCancelled()
@@ -599,7 +600,7 @@ class SyncThisDeviceViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.EnrollmentClosed
 
         val testee = createTestee()
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
 
         verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
     }
@@ -610,7 +611,7 @@ class SyncThisDeviceViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.EnrollmentClosed
 
         val testee = createTestee()
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
 
         verify(syncSetupWideEvent, never()).onEnrollDeviceAuthDialogShown()
     }
@@ -621,7 +622,7 @@ class SyncThisDeviceViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.EnrollmentClosed
 
         val testee = createTestee()
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
 
         verify(syncSetupWideEvent, never()).onUserAuthSuccess()
         verify(syncSetupWideEvent, never()).onUserAuthCancelled()
@@ -648,7 +649,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee(isAuthRequired = false)
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
             verify(syncSetupWideEvent, never()).onUserAuthSuccess()

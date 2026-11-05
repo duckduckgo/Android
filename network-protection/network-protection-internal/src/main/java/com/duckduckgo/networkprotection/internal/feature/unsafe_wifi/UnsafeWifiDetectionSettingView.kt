@@ -27,11 +27,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.networkprotection.impl.settings.VpnSettingPlugin
@@ -44,8 +45,7 @@ import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiD
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State.Enable
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State.Idle
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionViewModel.Factory
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -137,7 +137,7 @@ class UnsafeWifiDetectionSettingView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(UNSAFE_WIFI_DETECTION_PRIORITY)
 class UnsafeWifiDetectionSettingViewPlugin @Inject constructor(
     private val appBuildConfig: AppBuildConfig,

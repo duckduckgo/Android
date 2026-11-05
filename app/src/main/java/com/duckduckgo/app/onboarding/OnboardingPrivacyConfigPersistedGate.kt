@@ -18,9 +18,10 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -43,9 +44,9 @@ interface OnboardingPrivacyConfigPersistedGate {
     suspend fun awaitPersisted(): Boolean
 }
 
-@ContributesBinding(AppScope::class, boundType = OnboardingPrivacyConfigPersistedGate::class)
-@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<OnboardingPrivacyConfigPersistedGate>())
+@ContributesIntoSet(AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
+@SingleIn(AppScope::class)
 class OnboardingPrivacyConfigPersistedGateImpl @Inject constructor() : OnboardingPrivacyConfigPersistedGate, PrivacyConfigCallbackPlugin {
 
     private val privacyPersisted = CompletableDeferred<Unit>()

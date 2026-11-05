@@ -22,15 +22,15 @@ import com.duckduckgo.common.utils.formatters.time.model.dateOfLastDay
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class VpnLastTrackersBlockedCollector @Inject constructor(
     private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,

@@ -20,8 +20,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -61,9 +62,9 @@ interface UrlDisplayRepository {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = UrlDisplayRepository::class,
+    binding = binding<UrlDisplayRepository>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealUrlDisplayRepository @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val appBuildConfig: AppBuildConfig,

@@ -25,7 +25,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnelStep.FeatureEnabled
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnelStep.FullyConverted
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnelStep.OmnibarInteracted
@@ -39,7 +38,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FIRST_SETTINGS_VIEWED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FULL_CONVERSION_USER
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -50,8 +48,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -64,9 +60,6 @@ class InputScreenDiscoveryFunnelImplTest {
 
     private lateinit var testDataStore: DataStore<Preferences>
     private val mockPixel: Pixel = mock()
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
-
-    private val showInputScreenFlow = MutableStateFlow(true)
 
     private lateinit var testee: InputScreenDiscoveryFunnelImpl
 
@@ -76,22 +69,16 @@ class InputScreenDiscoveryFunnelImplTest {
             scope = coroutineRule.testScope,
             produceFile = { context.preferencesDataStoreFile("input_screen_discovery_funnel_test") },
         )
-        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(showInputScreenFlow)
 
         testee = InputScreenDiscoveryFunnelImpl(
             coroutineScope = coroutineRule.testScope,
             dataStore = testDataStore,
             pixel = mockPixel,
-            duckAiFeatureState = mockDuckAiFeatureState,
         )
     }
 
     @Test
-    fun `when onDuckAiSettingsSeen called and input screen is disabled then settings seen step is processed`() = runTest {
-        // Given input screen is disabled
-        showInputScreenFlow.value = false
-
-        // When
+    fun `when onDuckAiSettingsSeen called then settings seen step is processed`() = runTest {
         testee.onDuckAiSettingsSeen()
         advanceUntilIdle()
 
@@ -100,19 +87,6 @@ class InputScreenDiscoveryFunnelImplTest {
         // Verify the preference was set
         val preferences = testDataStore.data.firstOrNull()!!
         assert(preferences[SettingsSeen.prefKey] == true)
-    }
-
-    @Test
-    fun `when onDuckAiSettingsSeen called and input screen is enabled then settings seen step is not processed`() = runTest {
-        // Given input screen is enabled
-        showInputScreenFlow.value = true
-
-        // When
-        testee.onDuckAiSettingsSeen()
-        advanceUntilIdle()
-
-        // Then
-        verifyNoInteractions(mockPixel)
     }
 
     @Test
@@ -347,9 +321,6 @@ class InputScreenDiscoveryFunnelImplTest {
 
     @Test
     fun `when complete funnel flow is executed then all individual step pixels are fired in correct order`() = runTest {
-        // Set input screen as disabled initially
-        showInputScreenFlow.value = false
-
         // Step 1: Settings seen
         testee.onDuckAiSettingsSeen()
         advanceUntilIdle()

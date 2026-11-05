@@ -39,8 +39,9 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -53,9 +54,9 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, AutofillDeclineStore::class)
-@ContributesBinding(AppScope::class, InternalAutofillStore::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<AutofillDeclineStore>())
+@ContributesBinding(AppScope::class, binding = binding<InternalAutofillStore>())
 class SecureStoreBackedAutofillStore @Inject constructor(
     private val secureStorage: SecureStorage,
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,

@@ -17,13 +17,13 @@
 package com.duckduckgo.subscriptions.impl.onboarding.completion
 
 import androidx.fragment.app.Fragment
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(400)
 class SubscriptionOnboardingCompletionStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 

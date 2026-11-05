@@ -16,12 +16,17 @@
 
 package com.duckduckgo.app.fire
 
+import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
+import com.duckduckgo.app.dispatchers.IntentDispatcherActivity
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -31,11 +36,20 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -66,21 +80,278 @@ class AutomaticDataClearerTest {
         coroutineTestRule.testDispatcherProvider,
     )
 
+    private val customTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java).apply {
+        keepCustomTabOnAppSwitch().setRawStoredState(State(enable = true))
+    }
+
     private lateinit var testee: AutomaticDataClearer
 
     @UiThreadTest
     @Before
     fun setup() {
-        testee = AutomaticDataClearer(
-            workManager = workManager,
-            settingsDataStore = settingsDataStore,
-            clearDataAction = clearDataAction,
-            dataClearing = dataClearing,
-            dataClearerForegroundAppRestartPixel = restartPixel,
-            dispatchers = coroutineTestRule.testDispatcherProvider,
-            fireDataStore = fireDataStore,
-            dataClearingWideEvent = dataClearingWideEvent,
+        runBlocking { whenever(fireDataStore.getAutomaticClearOptions()).thenReturn(setOf(FireClearOption.DATA)) }
+        testee = createTestee(coroutineTestRule.testDispatcherProvider)
+    }
+
+    private fun createTestee(dispatchers: DispatcherProvider) = AutomaticDataClearer(
+        workManager = workManager,
+        settingsDataStore = settingsDataStore,
+        clearDataAction = clearDataAction,
+        dataClearing = dataClearing,
+        dataClearerForegroundAppRestartPixel = restartPixel,
+        dispatchers = dispatchers,
+        fireDataStore = fireDataStore,
+        dataClearingWideEvent = dataClearingWideEvent,
+        customTabsFeature = customTabsFeature,
+    )
+
+    @UiThreadTest
+    @Test
+    fun whenOpenedByCustomTabThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onOpen(isFreshLaunch = true)
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+        verify(workManager).cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOpenedByCustomTabThenAppIsMarkedAsUsed() = runTest {
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onOpen(isFreshLaunch = true)
+
+        verify(settingsDataStore).appUsedSinceLastClear = true
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenBrowserStartsAfterCustomTabFreshLaunchThenDataIsClearedAsFreshLaunch() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(true, true, false)).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
+        whenever(fireDataStore.getAutomaticallyClearWhenOption()).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
+        val customTab = CustomTabActivity()
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = true)
+        testee.onActivityStopped(customTab)
+        testee.onClose()
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(BrowserActivity())
+
+        verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenBrowserStartsUnderDispatcherThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+
+        val dispatcher = IntentDispatcherActivity()
+        testee.onActivityCreated(dispatcher, null)
+        testee.onActivityStarted(dispatcher)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(BrowserActivity())
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onActivityStopped(dispatcher)
+        testee.onActivityDestroyed(dispatcher)
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenDispatcherOpensBrowserThenDataIsClearedOnceDispatcherIsDestroyed() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
+
+        val dispatcher = IntentDispatcherActivity()
+        testee.onActivityCreated(dispatcher, null)
+        testee.onActivityStarted(dispatcher)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(BrowserActivity())
+        testee.onActivityStopped(dispatcher)
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+
+        testee.onActivityDestroyed(dispatcher)
+
+        verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenCustomTabStopsWithBrowserInFrontThenDataIsCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
+
+        val customTab = CustomTabActivity()
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(BrowserActivity())
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+
+        testee.onActivityStopped(customTab)
+
+        verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOpenIsReportedBeforeCustomTabStartsThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+        val queuedDispatcher = StandardTestDispatcher(testScheduler)
+        val testee = createTestee(
+            object : DispatcherProvider {
+                override fun computation(): CoroutineDispatcher = queuedDispatcher
+                override fun io(): CoroutineDispatcher = queuedDispatcher
+                override fun main(): CoroutineDispatcher = queuedDispatcher
+                override fun unconfined(): CoroutineDispatcher = queuedDispatcher
+            },
         )
+
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(CustomTabActivity())
+        advanceUntilIdle()
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+        verify(workManager).cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenBrowserStartsBeforeDispatcherThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+
+        val dispatcher = IntentDispatcherActivity()
+        testee.onActivityCreated(dispatcher, null)
+        testee.onActivityStarted(BrowserActivity())
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(dispatcher)
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onActivityStopped(dispatcher)
+        testee.onActivityDestroyed(dispatcher)
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @Test
+    fun whenBrowserOpensFromCustomTabWhileClearIsPendingThenRestartKeepsTheQuery() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(false, true, false)).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+        lateinit var customTab: CustomTabActivity
+        lateinit var dispatcher: IntentDispatcherActivity
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            customTab = CustomTabActivity()
+            dispatcher = IntentDispatcherActivity()
+        }
+
+        testee.isFreshAppLaunch = false
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityCreated(dispatcher, null)
+        testee.onActivityStarted(dispatcher)
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { testee.onActivityStarted(BrowserActivity()) }
+        testee.deferredQuery = "https://example.com"
+        testee.onActivityStopped(customTab)
+        testee.onActivityStopped(dispatcher)
+        testee.onActivityDestroyed(dispatcher)
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true, query = "https://example.com")
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOtherScreenOpensFromCustomTabThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+
+        val customTab = CustomTabActivity()
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStarted(Activity())
+        testee.onActivityStopped(customTab)
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenNoAutomaticClearOptionsThenOpeningCustomTabIsNotDeferred() = runTest {
+        whenever(fireDataStore.getAutomaticClearOptions()).thenReturn(emptySet())
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(false)
+
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onOpen(isFreshLaunch = false)
+
+        verify(dataClearing).shouldClearDataAutomatically(any(), any(), any())
+    }
+
+    @Test
+    fun whenFreshLaunchClearWasDeferredForCustomTabThenProcessIsRestarted() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(true, true, false)).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+        lateinit var customTab: CustomTabActivity
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { customTab = CustomTabActivity() }
+
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = true)
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { testee.onActivityStarted(BrowserActivity()) }
+        testee.onActivityStopped(customTab)
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnlyCustomTabStopsThenDataIsNotCleared() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(true)
+
+        val customTab = CustomTabActivity()
+        testee.onActivityStarted(customTab)
+        testee.onOpen(isFreshLaunch = false)
+        testee.onActivityStopped(customTab)
+
+        verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenClosedWhileClearIsPendingThenBackgroundTimestampIsKept() = runTest {
+        whenever(fireDataStore.getAutomaticallyClearWhenOption()).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onOpen(isFreshLaunch = false)
+        testee.onClose()
+
+        verify(settingsDataStore, never()).appBackgroundedTimestamp = any()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOpenedByCustomTabAndKeepCustomTabDisabledThenDataIsCleared() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = false))
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(true, true, false)).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(false)
+
+        testee.onActivityStarted(CustomTabActivity())
+        testee.onOpen(isFreshLaunch = true)
+
+        verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
     }
 
     @UiThreadTest
@@ -90,7 +361,7 @@ class AutomaticDataClearerTest {
         whenever(dataClearing.shouldClearDataAutomatically(true, true, false)).thenReturn(false)
 
         testee.isFreshAppLaunch = true
-        testee.onAppForegroundedAsync()
+        testee.onBrowserOpenedAsync()
 
         verify(dataClearing, never()).clearDataUsingAutomaticFireOptions(any())
     }
@@ -103,10 +374,10 @@ class AutomaticDataClearerTest {
         whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
 
         testee.isFreshAppLaunch = true
-        testee.onAppForegroundedAsync()
+        testee.onBrowserOpenedAsync()
 
         verify(dataClearing).clearDataUsingAutomaticFireOptions(false)
-        verify(clearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(clearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -116,12 +387,40 @@ class AutomaticDataClearerTest {
         whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
 
         testee.isFreshAppLaunch = false
-        testee.onAppForegroundedAsync()
+        testee.onBrowserOpenedAsync()
         Thread.sleep(200)
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
         verify(clearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenAutomaticClearFinishesWithoutRestartThenDeferredQueryIsDropped() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(any(), any(), any())).thenReturn(false)
+
+        testee.deferredQuery = "https://example.com"
+        testee.onBrowserOpenedAsync()
+
+        assertNull(testee.deferredQuery)
+    }
+
+    @Test
+    fun whenAutomaticClearNeedsRestartWithDeferredQueryThenQueryIsPassedToRestart() = runTest {
+        whenever(settingsDataStore.appUsedSinceLastClear).thenReturn(true)
+        whenever(dataClearing.shouldClearDataAutomatically(false, true, false)).thenReturn(true)
+        whenever(dataClearing.clearDataUsingAutomaticFireOptions(false)).thenReturn(true)
+
+        testee.isFreshAppLaunch = false
+        testee.deferredQuery = "https://example.com"
+        testee.onBrowserOpenedAsync()
+        Thread.sleep(200)
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+        verify(clearDataAction).killAndRestartProcess(notifyDataCleared = true, query = "https://example.com")
+        assertNull(testee.deferredQuery)
     }
 
     @Test

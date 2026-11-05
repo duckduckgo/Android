@@ -28,14 +28,14 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class NetPDisabledNotificationScheduler @Inject constructor(
     private val context: Context,
     private val notificationManager: NotificationManagerCompat,

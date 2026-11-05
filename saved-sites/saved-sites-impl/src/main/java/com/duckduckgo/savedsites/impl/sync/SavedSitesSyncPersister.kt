@@ -27,15 +27,16 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableDataPersister>())
 class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val savedSitesSyncRepository: SyncSavedSitesRepository,

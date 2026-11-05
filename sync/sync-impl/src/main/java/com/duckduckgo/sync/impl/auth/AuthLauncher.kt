@@ -26,7 +26,7 @@ import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.auth.AuthLauncher.AuthResult
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject

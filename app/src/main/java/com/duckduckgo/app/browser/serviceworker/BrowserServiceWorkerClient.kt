@@ -23,15 +23,15 @@ import androidx.core.net.toUri
 import androidx.webkit.ServiceWorkerClientCompat
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class BrowserServiceWorkerClient @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
 ) : ServiceWorkerClientCompat() {

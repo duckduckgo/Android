@@ -23,16 +23,17 @@ import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.SyncService
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class SyncInvalidTokenInterceptor @Inject constructor(
     private val context: Context,

@@ -21,9 +21,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.GridLayoutManager
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppIconsBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding

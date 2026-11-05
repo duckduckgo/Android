@@ -32,6 +32,7 @@
     <string name="removeAll">Eliminar todo</string>
     <string name="undo">Deshacer</string>
     <string name="cancel">Cancelar</string>
+    <string name="done">Hecho</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Siempre activado</string>

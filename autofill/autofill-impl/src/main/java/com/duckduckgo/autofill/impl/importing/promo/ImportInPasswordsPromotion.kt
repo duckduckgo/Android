@@ -24,8 +24,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Companion.PRIORITY_KEY_IMPORT_PROMO
@@ -35,6 +33,8 @@ import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExcha
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
 import com.duckduckgo.autofill.impl.importing.resolvePasswordsKeychainAnimationAsset
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
@@ -43,17 +43,17 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class)
+@ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_IMPORT_PROMO)
 class ImportInPasswordsPromotion @Inject constructor(
     private val importInPasswordsVisibility: ImportInPasswordsVisibility,

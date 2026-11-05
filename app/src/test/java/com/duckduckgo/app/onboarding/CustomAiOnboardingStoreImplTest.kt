@@ -22,7 +22,6 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import com.duckduckgo.referral.api.ParsedReferrerResult
-import dagger.Lazy
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -60,7 +59,7 @@ class CustomAiOnboardingStoreImplTest {
     private fun store(listener: AppInstallationReferrerStateListener = resolvedListener) =
         CustomAiOnboardingStoreImpl(
             sharedPreferencesProvider = sharedPreferencesProvider,
-            referrerStateListener = Lazy { listener },
+            referrerStateListener = lazy { listener },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             customAiOnboardingFeature = customAiOnboardingFeature,
         )

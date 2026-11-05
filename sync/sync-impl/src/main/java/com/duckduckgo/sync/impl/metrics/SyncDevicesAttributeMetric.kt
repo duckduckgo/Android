@@ -25,8 +25,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
@@ -34,9 +35,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class, AttributedMetric::class)
-@ContributesMultibinding(AppScope::class, MainProcessLifecycleObserver::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<AttributedMetric>())
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
+@SingleIn(AppScope::class)
 class SyncDevicesAttributeMetric @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,

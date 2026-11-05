@@ -21,7 +21,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.survey.api.SurveyParameterManager
 import com.duckduckgo.survey.api.SurveyParameterPlugin
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.api
 
-import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
+import com.duckduckgo.codegen.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.GET

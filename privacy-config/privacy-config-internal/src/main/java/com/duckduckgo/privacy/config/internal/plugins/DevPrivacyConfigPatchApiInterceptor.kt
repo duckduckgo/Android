@@ -23,7 +23,8 @@ import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.internal.BuildConfig
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.flipkart.zjsonpatch.JsonPatch
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import okhttp3.Interceptor
@@ -32,9 +33,9 @@ import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class DevPrivacyConfigPatchApiInterceptor @Inject constructor(
     private val context: Context,

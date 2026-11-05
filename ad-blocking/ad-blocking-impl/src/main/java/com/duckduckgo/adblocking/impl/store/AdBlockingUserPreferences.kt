@@ -22,8 +22,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.duckduckgo.adblocking.impl.di.AdBlockingPreferences
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -38,7 +38,7 @@ interface AdBlockingUserPreferences {
     suspend fun disable()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAdBlockingUserPreferences @Inject constructor(
     @AdBlockingPreferences private val dataStore: DataStore<Preferences>,

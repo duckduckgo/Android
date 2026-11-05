@@ -26,15 +26,16 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class ExchangeV2RecoverCodeDonePixelObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

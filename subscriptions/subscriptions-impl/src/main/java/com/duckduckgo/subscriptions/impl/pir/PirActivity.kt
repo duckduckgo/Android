@@ -17,8 +17,8 @@
 package com.duckduckgo.subscriptions.impl.pir
 
 import android.os.Bundle
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding

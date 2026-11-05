@@ -28,15 +28,16 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.widget.AppWidgetManagerAddWidgetLauncher.Companion.ACTION_ADD_WIDGET
 import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class WidgetAddedReceiver @Inject constructor(
     private val context: Context,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {

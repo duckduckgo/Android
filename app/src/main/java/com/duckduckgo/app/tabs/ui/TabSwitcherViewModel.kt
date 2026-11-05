@@ -21,7 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -61,6 +60,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -86,6 +86,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -186,11 +187,13 @@ class TabSwitcherViewModel @Inject constructor(
         combine(
             repo.flowTabs.debounce(100.milliseconds),
             repo.flowSelectedTab,
-            _viewState,
+            // Only the mode shapes the items; other view state changes would otherwise rebuild the whole list.
+            _viewState.map { it.mode }.distinctUntilChanged(),
             tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
             currentMode,
-        ) { tabEntities, activeTab, viewState, isAnimationTileDismissed, browserMode ->
-            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode)
+            repo.tabSwitcherData.map { it.layoutType }.distinctUntilChanged(),
+        ) { tabEntities, activeTab, mode, isAnimationTileDismissed, browserMode, layoutType ->
+            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, mode, browserMode, layoutType)
         }
             .map<List<TabSwitcherItem>, TabItems> { TabItems.Loaded(it) }
             .onStart { emit(TabItems.NotInitialized) }
@@ -745,16 +748,22 @@ class TabSwitcherViewModel @Inject constructor(
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
         browserMode: BrowserMode,
+        layoutType: LayoutType,
     ): List<TabSwitcherItem> {
+        val duckAiTabIds = tabEntities.filter { it.isDuckAi() }.map { it.tabId }.toSet()
+        // Each rich card resolves its own content, so building the list never waits on chat storage.
+        val shouldUseRichDuckAiCards = layoutType == GRID &&
+            duckAiTabIds.isNotEmpty() &&
+            withContext(dispatcherProvider.io()) { tabManagerFeatureFlags.richDuckAiGridTabItem().isEnabled() }
+
         if (mode is Selection) {
             return tabEntities.map { entity ->
-                val uri = entity.url?.toUri()
-                val isDuckAi = uri != null && duckChat.isDuckChatUrl(uri)
                 SelectableTab(
                     entity = entity,
                     isSelected = entity.tabId in mode.selectedTabs,
-                    isDuckAi = isDuckAi,
+                    isDuckAi = entity.tabId in duckAiTabIds,
                     title = tabTitleResolver.resolveTitle(entity, browserMode),
+                    isRichDuckAiCard = shouldUseRichDuckAiCards && entity.tabId in duckAiTabIds,
                 )
             }
         }
@@ -762,9 +771,8 @@ class TabSwitcherViewModel @Inject constructor(
         val tabs = tabEntities.map { entity ->
             val isActive = entity.tabId == activeTab?.tabId
             val title = tabTitleResolver.resolveTitle(entity, browserMode)
-            val uri = entity.url?.toUri()
-            if (uri != null && duckChat.isDuckChatUrl(uri)) {
-                DuckAiTab(entity, isActive, title)
+            if (entity.tabId in duckAiTabIds) {
+                DuckAiTab(entity, isActive, title, isRichDuckAiCard = shouldUseRichDuckAiCards)
             } else {
                 NormalTab(entity, isActive, title)
             }
@@ -776,6 +784,11 @@ class TabSwitcherViewModel @Inject constructor(
         } else {
             tabs
         }
+    }
+
+    private fun TabEntity.isDuckAi(): Boolean {
+        val uri = url?.toUri() ?: return false
+        return duckChat.isDuckChatUrl(uri)
     }
 
     sealed class TabItems {

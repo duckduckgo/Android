@@ -22,10 +22,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.store.ALL_MIGRATIONS
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDao
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDatabase
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import java.util.concurrent.Executors
@@ -35,11 +35,11 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class EventHubDispatcher
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object EventHubModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideEventHubPixelStateDatabase(databaseProvider: DatabaseProvider): EventHubPixelStateDatabase {
         return databaseProvider.buildRoomDatabase(
@@ -57,7 +57,7 @@ object EventHubModule {
         return database.pixelStateDao()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @EventHubDispatcher
     @Provides
     fun provideEventHubDispatcher(): CoroutineDispatcher {

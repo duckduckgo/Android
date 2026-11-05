@@ -18,12 +18,12 @@ package com.duckduckgo.contentscopescripts.impl.features.apimanipulation
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 const val API_MANIPULATION_FEATURE_NAME = "apiManipulation"
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ApiManipulationContentScopeConfigPlugin @Inject constructor(
     private val apiManipulationRepository: ApiManipulationRepository,
 ) : ContentScopeConfigPlugin {

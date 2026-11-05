@@ -24,8 +24,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import com.duckduckgo.autofill.impl.reporting.remoteconfig.AutofillSiteBreakageReporting
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ interface AutofillSiteBreakageReportingDataStore {
     suspend fun clearAllReports()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AutofillSiteBreakageReportingDataStoreImpl @Inject constructor(
     @AutofillSiteBreakageReporting private val store: DataStore<Preferences>,

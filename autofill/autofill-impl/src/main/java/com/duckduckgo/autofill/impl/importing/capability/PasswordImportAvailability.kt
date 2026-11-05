@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl.importing.capability
 
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /**

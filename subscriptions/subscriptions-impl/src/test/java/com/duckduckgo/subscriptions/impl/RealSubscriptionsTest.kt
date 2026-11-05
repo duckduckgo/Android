@@ -103,10 +103,10 @@ class RealSubscriptionsTest {
             subscriptionsManager = mockSubscriptionsManager,
             globalActivityStarter = globalActivityStarter,
             pixel = pixel,
-            subscriptionsFeature = { subscriptionFeature },
+            subscriptionsFeature = lazy { subscriptionFeature },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             subscriptionsUrlProvider = subscriptionsUrlProvider,
-            paywallPathProvider = {
+            paywallPathProvider = lazy {
                 RealPaywallPathProvider(
                     subscriptionsFeature = subscriptionFeature,
                     moshi = Moshi.Builder().build(),
@@ -591,10 +591,10 @@ class RealSubscriptionsTest {
             subscriptionsManager = mockSubscriptionsManager,
             globalActivityStarter = globalActivityStarter,
             pixel = pixel,
-            subscriptionsFeature = { subscriptionFeature },
+            subscriptionsFeature = lazy { subscriptionFeature },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             subscriptionsUrlProvider = stagingUrlProvider,
-            paywallPathProvider = {
+            paywallPathProvider = lazy {
                 RealPaywallPathProvider(
                     subscriptionsFeature = subscriptionFeature,
                     moshi = Moshi.Builder().build(),

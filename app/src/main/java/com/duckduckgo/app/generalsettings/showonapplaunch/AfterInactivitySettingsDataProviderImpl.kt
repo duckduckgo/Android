@@ -28,8 +28,9 @@ import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.settings.api.AfterInactivityReturnDestination
 import com.duckduckgo.settings.api.AfterInactivitySettings
 import com.duckduckgo.settings.api.AfterInactivitySettingsDataProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -37,8 +38,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class, boundType = AfterInactivitySettingsDataProvider::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<AfterInactivitySettingsDataProvider>())
+@SingleIn(AppScope::class)
 class AfterInactivitySettingsDataProviderImpl @Inject constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val settingsDataStore: SettingsDataStore,

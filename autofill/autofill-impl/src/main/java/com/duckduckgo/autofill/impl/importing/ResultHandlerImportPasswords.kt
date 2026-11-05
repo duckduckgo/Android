@@ -29,12 +29,12 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ResultHandlerImportPasswords @Inject constructor(
     private val autofillResponseWriter: AutofillResponseWriter,
     private val autofillAvailableInputTypesProvider: AutofillAvailableInputTypesProvider,

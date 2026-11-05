@@ -22,8 +22,8 @@ import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -40,7 +40,7 @@ interface SubscriptionExpirationReminderScheduler {
     fun cancelScheduledNotification()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class SubscriptionExpirationReminderSchedulerImpl @Inject constructor(
     private val workManager: WorkManager,

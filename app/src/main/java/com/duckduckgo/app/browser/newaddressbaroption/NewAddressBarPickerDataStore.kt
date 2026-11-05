@@ -24,8 +24,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import com.duckduckgo.app.di.NewAddressBarPicker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -38,7 +38,7 @@ interface NewAddressBarPickerDataStore {
     suspend fun incrementDisplayCount(): Int
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class SharedPreferencesNewAddressBarPickerDataStore @Inject constructor(
     @NewAddressBarPicker private val dataStore: DataStore<Preferences>,

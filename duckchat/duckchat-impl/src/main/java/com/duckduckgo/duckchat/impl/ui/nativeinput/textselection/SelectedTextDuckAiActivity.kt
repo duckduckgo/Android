@@ -18,8 +18,8 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
 
 import android.content.Intent
 import android.os.Bundle
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal

@@ -23,13 +23,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
 import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsView
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import com.duckduckgo.nextsteps.impl.ui.checklist.NextStepsCheckListView
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealNextSteps @Inject constructor(
     private val nextStepsItemsFeatureToggles: NextStepsItemsExperimentToggles,
     private val appBuildConfig: AppBuildConfig,
@@ -44,10 +45,20 @@ class RealNextSteps @Inject constructor(
     }
 
     override suspend fun provideSectionView(context: Context): View? {
-        val showStackedCards = withContext(dispatcherProvider.io()) {
-            nextStepsItemsFeatureToggles.self().isEnabled() &&
-                nextStepsItemsFeatureToggles.nextStepsItemsExperiment().isEnrolledAndEnabled(Cohorts.STACKED_CARDS)
+        return when (withContext(dispatcherProvider.io()) { treatmentCohort() }) {
+            Cohorts.STACKED_CARDS -> NextStepsStackedCardsView(context)
+            Cohorts.CHECK_LIST -> NextStepsCheckListView(context)
+            else -> null
         }
-        return if (showStackedCards) NextStepsStackedCardsView(context) else null
+    }
+
+    private suspend fun treatmentCohort(): Cohorts? {
+        if (!nextStepsItemsFeatureToggles.self().isEnabled()) return null
+        val experiment = nextStepsItemsFeatureToggles.nextStepsItemsExperiment()
+        return when {
+            experiment.isEnrolledAndEnabled(Cohorts.STACKED_CARDS) -> Cohorts.STACKED_CARDS
+            experiment.isEnrolledAndEnabled(Cohorts.CHECK_LIST) -> Cohorts.CHECK_LIST
+            else -> null
+        }
     }
 }

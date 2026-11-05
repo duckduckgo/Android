@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
@@ -40,6 +39,7 @@ import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.ImportPasswordsFromGoogle
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigatePasswordList
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigateToHowToSyncWithDesktop
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope

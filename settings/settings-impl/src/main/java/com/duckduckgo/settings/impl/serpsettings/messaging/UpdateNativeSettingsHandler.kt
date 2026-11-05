@@ -26,7 +26,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,7 +34,7 @@ import javax.inject.Inject
 /**
  * Handles the updateNativeSettings message from SERP to persist setting changes.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class UpdateNativeSettingsHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,

@@ -21,7 +21,7 @@ import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResul
 import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResult.BackFillNotSupported
 import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResult.BackFillSupported
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject

@@ -21,8 +21,8 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -68,7 +68,7 @@ interface EffectiveModelProvider {
 
 // ActivityScope, not AppScope: the unqualified DuckAiChatStore is bound per activity so it can resolve
 // the browser mode. One instance per activity is what the plugins sharing a widget need anyway.
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class RealEffectiveModelProvider @Inject constructor(
     private val modelManager: DuckAiModelManager,

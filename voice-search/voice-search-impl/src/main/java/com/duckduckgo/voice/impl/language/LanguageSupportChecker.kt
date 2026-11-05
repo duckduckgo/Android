@@ -26,8 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.impl.VoiceSearchAvailabilityConfigProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,7 +39,7 @@ interface LanguageSupportChecker {
 
 @SuppressLint("NewApi")
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealLanguageSupportChecker @Inject constructor(
     private val context: Context,
     configProvider: VoiceSearchAvailabilityConfigProvider,

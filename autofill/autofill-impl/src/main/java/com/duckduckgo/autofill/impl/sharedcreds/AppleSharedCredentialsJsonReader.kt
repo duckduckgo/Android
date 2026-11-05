@@ -18,9 +18,9 @@ package com.duckduckgo.autofill.impl.sharedcreds
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
@@ -30,7 +30,7 @@ interface SharedCredentialJsonReader {
     suspend fun read(): String?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AppleSharedCredentialsJsonReader @Inject constructor(
     private val moshi: Moshi,

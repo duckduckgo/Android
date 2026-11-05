@@ -27,8 +27,8 @@ import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.sync.api.engine.SyncEngine
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -52,7 +52,7 @@ interface ChatHistoryRepository {
 }
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class RealChatHistoryRepository @Inject constructor(
     private val chatStore: DuckAiChatStore,
     private val dispatchers: DispatcherProvider,

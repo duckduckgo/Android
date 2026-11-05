@@ -17,12 +17,12 @@
 package com.duckduckgo.app.fire.store
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealTabVisitedSitesRepository @Inject constructor(
     private val dao: TabVisitedSitesDao,
 ) : TabVisitedSitesRepository {

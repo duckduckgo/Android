@@ -21,8 +21,9 @@ import com.duckduckgo.app.onboarding.SegmentedOnboardingFeatureToggles.Cohorts
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -35,8 +36,8 @@ interface SegmentedOnboardingExperimentManager {
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = SegmentedOnboardingExperimentManager::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<SegmentedOnboardingExperimentManager>())
+@SingleIn(AppScope::class)
 class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
     private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,

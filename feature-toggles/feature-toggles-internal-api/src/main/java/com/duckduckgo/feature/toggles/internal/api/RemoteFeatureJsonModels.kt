@@ -27,7 +27,7 @@ import org.json.JSONObject
 
 /**
  * Shared JSON model classes and a pre-built [Moshi] instance used exclusively by
- * [com.duckduckgo.anvil.annotations.ContributesRemoteFeature]-generated `_RemoteFeature` classes.
+ * [com.duckduckgo.codegen.annotations.ContributesRemoteFeature]-generated `_RemoteFeature` classes.
  *
  * These types are public because they must be visible to generated code that lands in arbitrary
  * feature modules. They are an internal implementation detail of the remote feature framework

@@ -25,9 +25,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
@@ -43,9 +44,9 @@ interface DuckAiMetricCollector {
     fun onMessageSent()
 }
 
-@ContributesMultibinding(AppScope::class, AttributedMetric::class)
-@ContributesBinding(AppScope::class, DuckAiMetricCollector::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<AttributedMetric>())
+@ContributesBinding(AppScope::class, binding = binding<DuckAiMetricCollector>())
+@SingleIn(AppScope::class)
 class DuckAiAttributedMetric @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,

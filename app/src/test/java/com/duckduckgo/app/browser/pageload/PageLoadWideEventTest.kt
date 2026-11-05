@@ -77,7 +77,7 @@ class PageLoadWideEventTest {
             webViewVersionProvider = webViewVersionProvider,
             autoconsent = autoconsent,
             contentScopeOptimizations = contentScopeOptimizations,
-            androidBrowserConfigFeature = { androidBrowserConfigFeature },
+            androidBrowserConfigFeature = lazy { androidBrowserConfigFeature },
             currentTimeProvider = currentTimeProvider,
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,

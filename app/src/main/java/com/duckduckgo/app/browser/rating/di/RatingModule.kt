@@ -20,7 +20,6 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDatabaseRepository
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.*
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
@@ -29,19 +28,19 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class RatingModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     @IntoSet
     fun appEnjoymentManagerObserver(
@@ -61,12 +60,12 @@ class RatingModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun appEnjoymentPromptEmitter(): AppEnjoymentPromptEmitter {
         return AppEnjoymentLiveDataEmitter()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun appEnjoymentUserEventRecorder(
         appEnjoymentRepository: AppEnjoymentRepository,
@@ -94,13 +93,7 @@ class RatingModule {
         )
     }
 
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {
-        return database.appEnjoymentDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun appEnjoymentRepository(appEnjoymentDao: AppEnjoymentDao): AppEnjoymentRepository {
         return AppEnjoymentDatabaseRepository(appEnjoymentDao)

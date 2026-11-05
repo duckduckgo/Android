@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.contextual
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import org.json.JSONObject
 import javax.inject.Inject
 

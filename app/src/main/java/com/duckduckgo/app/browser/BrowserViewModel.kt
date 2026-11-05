@@ -21,8 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DoNotAskAgainSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
@@ -64,6 +62,8 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope

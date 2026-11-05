@@ -17,8 +17,8 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
@@ -35,7 +35,7 @@ interface OnboardingInputScreenLaunchTarget {
     fun consumeOpenOnDuckAi(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class OnboardingInputScreenLaunchTargetImpl @Inject constructor() : OnboardingInputScreenLaunchTarget {
 

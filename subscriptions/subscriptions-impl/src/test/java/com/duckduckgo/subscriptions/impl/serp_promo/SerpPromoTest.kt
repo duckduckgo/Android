@@ -28,7 +28,7 @@ class SerpPromoTest {
     private lateinit var lifecycleOwner: LifecycleOwner
     private var subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
-    private val serpPromo = RealSerpPromo(cookieManager, coroutineRule.testDispatcherProvider, { subscriptionsFeature }, { subscriptions })
+    private val serpPromo = RealSerpPromo(cookieManager, coroutineRule.testDispatcherProvider, lazy { subscriptionsFeature }, lazy { subscriptions })
 
     @Before
     fun setup() {

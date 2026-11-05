@@ -1041,4 +1041,5 @@
     <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Nije bilo moguće pronaći poslužitelj s navedenim nazivom glavnog računala.</string>
     <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certifikat za ovaj poslužitelj nije valjan. Možda se povezuješ s poslužiteljem koji se pretvara da je <b>%1$s</b>, što bi moglo ugroziti tvoje povjerljive podatke.]]></string>
     <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Jesi li mislio <annotation type="redirect_link">^1</annotation>?</string>
+    <string name="webViewErrorTimeout" instruction="Message shown when a website is taking too long to load">Učitavanje ove stranice traje predugo.</string>
 </resources>

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.webview
 
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface WebContentDebugging {

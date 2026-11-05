@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.FREE_SCAN_BACKGROUND_WINDOW_DAYS
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -37,7 +37,7 @@ interface PirFreeScanWorkWindow {
     suspend fun isOpen(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPirFreeScanWorkWindow @Inject constructor(
     private val pirFreeScanBrokerFilter: PirFreeScanBrokerFilter,

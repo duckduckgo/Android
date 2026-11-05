@@ -23,8 +23,8 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.eventhub.impl.di.EventHubDispatcher
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -62,7 +62,7 @@ interface EventHubPixelManager {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealEventHubPixelManager @Inject constructor(
     private val repository: EventHubRepository,
     private val pixel: Pixel,

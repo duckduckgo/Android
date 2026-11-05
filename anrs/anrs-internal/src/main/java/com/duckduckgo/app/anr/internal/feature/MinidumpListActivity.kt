@@ -27,10 +27,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.android_crashkit.Crashpad
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.anr.internal.R
 import com.duckduckgo.app.anr.internal.databinding.ActivityMinidumpListBinding
 import com.duckduckgo.app.anr.internal.databinding.ItemMinidumpBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler

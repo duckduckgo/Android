@@ -23,14 +23,14 @@ import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler

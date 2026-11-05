@@ -19,7 +19,7 @@ package com.duckduckgo.cookies.impl
 import com.duckduckgo.cookies.api.CookieRemover
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 

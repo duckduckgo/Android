@@ -23,8 +23,9 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Fi
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
@@ -38,11 +39,11 @@ import javax.inject.Inject
  * process start keeps this independent of whichever caller launched the flow, and means the replay cache
  * is always empty when collection begins — so every import is reported exactly once.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ImportPasswordsResultPixelObserver @Inject constructor(
     private val credentialImporter: CredentialImporter,
     private val importPasswordsPixelSender: ImportPasswordsPixelSender,

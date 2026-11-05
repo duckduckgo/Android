@@ -34,7 +34,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus.NO_MATCH_FOUND
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject

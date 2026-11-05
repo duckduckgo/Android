@@ -23,10 +23,10 @@ import com.duckduckgo.credentialexchange.api.ExchangedCredential
 import com.duckduckgo.credentialexchange.impl.CxfParseResult.Malformed
 import com.duckduckgo.credentialexchange.impl.CxfParseResult.Parsed
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat

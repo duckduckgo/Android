@@ -41,7 +41,7 @@ import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.feature.SitePermissionsSystemRecoveryFeature
 import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject

@@ -133,9 +133,9 @@ interface GlobalActivityStarter {
 
     /**
      * Implement this mapper that will return [Activity] class for the given parameters.
-     * Once implemented it, you need to contribute it as a multibinding using [ContributesMultibinding] into the [AppScope].
+     * Once implemented it, you need to contribute it as a multibinding using `@ContributesIntoSet` into the [AppScope].
      * ```kotlin
-     * @ContributesMultibinding(AppScope::class)
+     * @ContributesIntoSet(AppScope::class)
      * class ExampleParamToActivityMapper @Inject constructor(...) : ParamToActivityMapper {
      *   fun fun map(params: ActivityParams): Class<out AppCompatActivity>? {
      *     return if (params is ExampleActivityParams) {

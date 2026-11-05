@@ -17,8 +17,8 @@
 package com.duckduckgo.subscriptions.impl.internal
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface SubscriptionsUrlProvider {
@@ -30,7 +30,7 @@ interface SubscriptionsUrlProvider {
     val upgradeToProUrl: String
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsUrlProvider @Inject constructor(
     private val subscriptionsBaseUrl: SubscriptionsBaseUrl,

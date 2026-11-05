@@ -18,8 +18,8 @@ package com.duckduckgo.app.global.rating
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope

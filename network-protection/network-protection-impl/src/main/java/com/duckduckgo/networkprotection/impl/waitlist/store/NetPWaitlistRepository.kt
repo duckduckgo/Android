@@ -19,12 +19,13 @@ package com.duckduckgo.networkprotection.impl.waitlist.store
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.store.NetpDataStore
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
+    binding = binding<NetPFeatureRemover.NetPStoreRemovalPlugin>(),
 )
 class RealNetPWaitlistRepository @Inject constructor(
     private val dataStore: NetpDataStore,

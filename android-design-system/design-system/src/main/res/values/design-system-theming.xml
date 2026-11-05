@@ -302,6 +302,7 @@
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
         <item name="daxColorAccentAltPrimary">@color/blue60</item>
         <item name="daxColorAccentAltContentPrimary">@color/blue0</item>
+        <item name="daxColorTabDuckAiContentTypeBorder">@color/white36</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray50</item>
@@ -479,6 +480,7 @@
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
         <item name="daxColorAccentAltPrimary">@color/blue0</item>
         <item name="daxColorAccentAltContentPrimary">@color/blue80</item>
+        <item name="daxColorTabDuckAiContentTypeBorder">@color/black20</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray60</item>

@@ -24,8 +24,6 @@
     <string name="devSettingsScreenResetTdsSubtitle">Clear the stored TDS and download it again</string>
     <string name="devStartupTracing">Start-up tracing</string>
     <string name="devStartupTracingByline">Enable/disable start-up tracing</string>
-    <string name="devSettingsTriggerAnr">Trigger ANR</string>
-    <string name="devSettingsTriggerAnrSubtitle">Click here to trigger an ANR in the app</string>
     <string name="devSettingsUseSandBoxSurvey">Use Sandbox Survey</string>
     <string name="devEnableWebContentDebuggingTitle">Web Content Debugging</string>
     <string name="devEnableWebContentDebuggingByline">Enable WebView debugging in Chrome DevTools</string>

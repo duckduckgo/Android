@@ -17,6 +17,8 @@
 package com.duckduckgo.app.email
 
 import android.annotation.SuppressLint
+import android.webkit.WebBackForwardList
+import android.webkit.WebHistoryItem
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
@@ -24,6 +26,7 @@ import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -34,6 +37,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -46,6 +50,7 @@ class EmailJavascriptInterfaceTest {
     private val mockWebView: WebView = mock()
     private lateinit var autofillFeature: AutofillFeature
     private val mockAutofill: Autofill = mock()
+    private val originCheckFeature = FakeFeatureToggleFactory.create(EmailBridgeOriginCheckFeature::class.java)
     lateinit var testee: EmailJavascriptInterface
     private var counter = 0
 
@@ -61,6 +66,7 @@ class EmailJavascriptInterfaceTest {
             coroutineRule.testDispatcherProvider,
             autofillFeature,
             mockAutofill,
+            originCheckFeature,
         ) { counter++ }
 
         autofillFeature.self().setRawStoredState(Toggle.State(enable = true))
@@ -69,7 +75,7 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenIsSignedInAndUrlIsDuckDuckGoEmailThenIsSignedInCalled() {
-        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+        givenUrl(DUCKDUCKGO_EMAIL_URL)
 
         testee.isSignedIn()
 
@@ -78,7 +84,7 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenIsSignedInAndUrlIsNotDuckDuckGoEmailThenIsSignedInNotCalled() {
-        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        givenUrl(NON_EMAIL_URL)
 
         testee.isSignedIn()
 
@@ -87,7 +93,7 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenStoreCredentialsAndUrlIsDuckDuckGoEmailThenStoreCredentialsCalledWithCorrectParameters() {
-        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+        givenUrl(DUCKDUCKGO_EMAIL_URL)
 
         testee.storeCredentials("token", "username", "cohort")
 
@@ -96,7 +102,7 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenStoreCredentialsAndUrlIsNotDuckDuckGoEmailThenStoreCredentialsNotCalled() {
-        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        givenUrl(NON_EMAIL_URL)
 
         testee.storeCredentials("token", "username", "cohort")
 
@@ -105,7 +111,7 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenGetUserDataAndUrlIsDuckDuckGoEmailThenGetUserDataCalled() {
-        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+        givenUrl(DUCKDUCKGO_EMAIL_URL)
 
         testee.getUserData()
 
@@ -114,7 +120,7 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenGetUserDataAndUrlIsNotDuckDuckGoEmailThenGetUserDataIsNotCalled() {
-        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        givenUrl(NON_EMAIL_URL)
 
         testee.getUserData()
 
@@ -123,7 +129,7 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenShowTooltipThenLambdaCalled() {
-        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        givenUrl(NON_EMAIL_URL)
 
         testee.showTooltip()
 
@@ -133,7 +139,7 @@ class EmailJavascriptInterfaceTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenShowTooltipAndFeatureDisabledThenLambdaNotCalled() {
-        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        givenUrl(NON_EMAIL_URL)
         autofillFeature.self().setRawStoredState(Toggle.State(enable = false))
 
         testee.showTooltip()
@@ -143,7 +149,7 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenShowTooltipAndUrlIsAnExceptionThenLambdaNotCalled() {
-        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        givenUrl(NON_EMAIL_URL)
         whenever(mockAutofill.isAnException(any())).thenReturn(true)
 
         testee.showTooltip()
@@ -153,16 +159,85 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenGetDeviceCapabilitiesAndUrlIsDuckDuckGoEmailThenReturnNonEmptyString() {
-        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+        givenUrl(DUCKDUCKGO_EMAIL_URL)
 
         assert(testee.getDeviceCapabilities().isNotBlank())
     }
 
     @Test
     fun whenGetDeviceCapabilitiesAndUrlIsNotDuckDuckGoEmailThenReturnEmptyString() {
-        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        givenUrl(NON_EMAIL_URL)
 
         assert(testee.getDeviceCapabilities().isBlank())
+    }
+
+    @Test
+    fun whenGetUserDataAndCommittedPageIsNotDuckDuckGoEmailThenGetUserDataNotCalled() {
+        givenUrl(DUCKDUCKGO_EMAIL_URL, committedUrl = NON_EMAIL_URL)
+
+        testee.getUserData()
+
+        verify(mockEmailManager, never()).getUserData()
+    }
+
+    @Test
+    fun whenStoreCredentialsAndCommittedPageIsNotDuckDuckGoEmailThenStoreCredentialsNotCalled() {
+        givenUrl(DUCKDUCKGO_EMAIL_URL, committedUrl = NON_EMAIL_URL)
+
+        testee.storeCredentials("token", "username", "cohort")
+
+        verify(mockEmailManager, never()).storeCredentials("token", "username", "cohort")
+    }
+
+    @Test
+    fun whenRemoveCredentialsAndCommittedPageIsNotDuckDuckGoEmailThenSignOutNotCalled() {
+        givenUrl(DUCKDUCKGO_EMAIL_URL, committedUrl = NON_EMAIL_URL)
+
+        testee.removeCredentials()
+
+        verify(mockEmailManager, never()).signOut()
+    }
+
+    @Test
+    fun whenHistoryReadFailsThenSensitiveReadsReturnEmpty() {
+        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+        whenever(mockWebView.copyBackForwardList()).thenThrow(NullPointerException())
+
+        assertEquals("", testee.isSignedIn())
+        assertEquals("", testee.getUserData())
+        assertEquals("", testee.getDeviceCapabilities())
+        verifyNoInteractions(mockEmailManager)
+    }
+
+    @Test
+    fun whenHistoryReadFailsThenCredentialWritesAreDenied() {
+        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+        whenever(mockWebView.copyBackForwardList()).thenThrow(NullPointerException())
+
+        testee.storeCredentials("token", "username", "cohort")
+        testee.removeCredentials()
+
+        verifyNoInteractions(mockEmailManager)
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenOriginCheckDisabledAndCommittedPageIsNotDuckDuckGoEmailThenGetUserDataCalled() {
+        originCheckFeature.self().setRawStoredState(Toggle.State(enable = false))
+        givenUrl(DUCKDUCKGO_EMAIL_URL, committedUrl = NON_EMAIL_URL)
+
+        testee.getUserData()
+
+        verify(mockEmailManager).getUserData()
+    }
+
+    private fun givenUrl(url: String?, committedUrl: String? = url) {
+        val currentItem: WebHistoryItem = mock()
+        whenever(currentItem.url).thenReturn(committedUrl)
+        val backForwardList: WebBackForwardList = mock()
+        whenever(backForwardList.currentItem).thenReturn(currentItem)
+        whenever(mockWebView.url).thenReturn(url)
+        whenever(mockWebView.copyBackForwardList()).thenReturn(backForwardList)
     }
 
     companion object {

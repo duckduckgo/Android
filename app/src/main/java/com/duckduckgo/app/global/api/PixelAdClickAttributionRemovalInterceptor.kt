@@ -20,10 +20,10 @@ import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class)
+@ContributesIntoSet(scope = AppScope::class)
 class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : PixelParamRemovalPlugin {
 
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

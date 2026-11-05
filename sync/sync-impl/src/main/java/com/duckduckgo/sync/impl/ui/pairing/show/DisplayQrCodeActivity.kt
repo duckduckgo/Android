@@ -27,7 +27,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
@@ -42,6 +42,7 @@ import com.duckduckgo.sync.impl.databinding.DialogSyncCheckOtherDeviceBinding
 import com.duckduckgo.sync.impl.databinding.DialogSyncConnectingBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command
@@ -77,7 +78,10 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var shareAction: ShareAction
 
-    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+    private val launchSource
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, LAUNCH_SOURCE_EXTRA_KEY, SyncLaunchSource::class.java)) {
+            "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
+        }
 
     private val syncEntryPoint
         get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
@@ -285,7 +289,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             syncEntryPoint: SyncEntryPoint,
-            launchSource: String?,
+            launchSource: SyncLaunchSource,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)

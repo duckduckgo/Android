@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.email.remoteconfig
 
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface EmailProtectionInContextExceptions {
@@ -27,7 +27,7 @@ interface EmailProtectionInContextExceptions {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class EmailProtectionInContextExceptionsImpl @Inject constructor(
     private val repository: EmailProtectionInContextFeatureRepository,
 ) : EmailProtectionInContextExceptions {

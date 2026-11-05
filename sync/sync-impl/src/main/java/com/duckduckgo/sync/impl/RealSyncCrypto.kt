@@ -22,7 +22,7 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

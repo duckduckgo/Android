@@ -27,8 +27,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
@@ -148,7 +148,7 @@ private fun WideEventRepository.WideEventStatus.toParamValue(): String =
         UNKNOWN -> "UNKNOWN"
     }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WideEventPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParamRemovalPlugin.PixelParameter>>> =
         listOf(PIXEL_NAME_PREFIX to PixelParamRemovalPlugin.PixelParameter.Companion.removeAll())

@@ -24,8 +24,8 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -34,8 +34,8 @@ import kotlinx.coroutines.flow.stateIn
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     repository: AdBlockingExtensionRepository,

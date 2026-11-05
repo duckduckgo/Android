@@ -16,8 +16,8 @@
 
 package com.duckduckgo.brokensite.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
@@ -25,11 +25,11 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,7 +46,7 @@ interface BrokenSitePromptRCFeature {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @RemoteFeatureStoreNamed(BrokenSitePromptRCFeature::class)
 class BrokenSitePromptRCFeatureStore @Inject constructor(
     private val repository: BrokenSiteReportRepository,

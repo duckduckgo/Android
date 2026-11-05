@@ -28,14 +28,14 @@ import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import javax.inject.Inject
 import kotlin.to
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
     private val appTheme: AppTheme,
     private val omnibarRepository: OmnibarRepository,

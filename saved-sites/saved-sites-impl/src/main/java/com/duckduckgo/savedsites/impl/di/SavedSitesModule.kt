@@ -18,9 +18,9 @@ package com.duckduckgo.savedsites.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.*
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -45,18 +45,18 @@ import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.*
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class SavedSitesModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun savedSitesImporter(
         context: Context,
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
@@ -68,13 +68,13 @@ class SavedSitesModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun savedSitesParser(): SavedSitesParser {
         return RealSavedSitesParser()
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun savedSitesExporter(
         context: Context,
         savedSitesParser: SavedSitesParser,
@@ -85,7 +85,7 @@ class SavedSitesModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun bookmarkManager(
         savedSitesImporter: SavedSitesImporter,
         savedSitesExporter: SavedSitesExporter,
@@ -95,7 +95,7 @@ class SavedSitesModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesSavedSitesRepository(
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
@@ -107,7 +107,7 @@ class SavedSitesModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesSyncSavedSitesRepository(
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
@@ -118,7 +118,7 @@ class SavedSitesModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesSavedSitesSettingsStore(
         context: Context,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
@@ -127,7 +127,7 @@ class SavedSitesModule {
         return SavedSitesSettingsSharedPrefStore(context, appCoroutineScope, dispatcherProvider)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideSavedSitesDatabase(context: Context): SavedSitesSyncMetadataDatabase {
         return Room.databaseBuilder(context, SavedSitesSyncMetadataDatabase::class.java, "saved_sites_metadata.db")
@@ -136,7 +136,7 @@ class SavedSitesModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideSavedSitesSyncMetadataDao(database: SavedSitesSyncMetadataDatabase): SavedSitesSyncMetadataDao {
         return database.syncMetadataDao()

@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.metric.nativeinput.retention
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import javax.inject.Inject

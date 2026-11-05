@@ -37,7 +37,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Allowed
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import javax.inject.Inject
 

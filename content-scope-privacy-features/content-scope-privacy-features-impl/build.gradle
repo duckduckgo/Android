@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -16,13 +16,9 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':data-store-api')
 
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true
-    }
     namespace 'com.duckduckgo.contentscopeprivacyfeatures.impl'
 }

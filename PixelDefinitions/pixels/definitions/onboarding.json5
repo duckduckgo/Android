@@ -144,6 +144,8 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
+            "inputPreviewAction",
             {
                 "key": "value",
                 "type": "string",
@@ -301,6 +303,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "value",
                 "type": "string",

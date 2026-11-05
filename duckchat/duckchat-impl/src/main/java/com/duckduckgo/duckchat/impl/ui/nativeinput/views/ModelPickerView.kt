@@ -37,12 +37,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
@@ -56,7 +57,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.google.android.material.chip.Chip
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -147,7 +147,6 @@ class ModelPickerView @JvmOverloads constructor(
         chip.setOnClickListener { showMenu() }
         chip.setOnCloseIconClickListener { showMenu() }
 
-        viewModel.fetchModels()
         observeState()
         observeInputContext()
     }
@@ -157,6 +156,7 @@ class ModelPickerView @JvmOverloads constructor(
         inputContextJob?.cancel()
         inputContextJob = nativeInputStateProvider.state
             .onEach { state ->
+                if (shouldFetchModels(previous = lastNativeInputState, current = state)) viewModel.fetchModels()
                 lastInputContext = state.inputContext
                 lastNativeInputState = state
                 updateVisibility()
@@ -481,3 +481,9 @@ internal fun shouldShowModelPicker(
     hasModels: Boolean,
     isEditMode: Boolean,
 ): Boolean = pickerEnabled && hasModels && nativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true
+
+internal fun shouldFetchModels(
+    previous: NativeInputState?,
+    current: NativeInputState,
+): Boolean = current.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI &&
+    previous?.toggleSelection != NativeInputState.ToggleSelection.DUCK_AI

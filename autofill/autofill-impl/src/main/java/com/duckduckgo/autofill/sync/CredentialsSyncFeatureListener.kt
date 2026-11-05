@@ -24,7 +24,7 @@ import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
 import com.duckduckgo.sync.api.engine.FeatureSyncError.INVALID_REQUEST
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject

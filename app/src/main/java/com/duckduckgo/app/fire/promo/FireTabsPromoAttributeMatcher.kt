@@ -23,8 +23,9 @@ import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 /**
@@ -32,15 +33,15 @@ import javax.inject.Inject
  *  - `fireModeAvailable` — whether Fire Mode is available on this device/build.
  *  - `fireModeUsed` — whether the user has ever entered Fire Mode (used in exclusionRules).
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = JsonToMatchingAttributeMapper::class,
+    binding = binding<JsonToMatchingAttributeMapper>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = AttributeMatcherPlugin::class,
+    binding = binding<AttributeMatcherPlugin>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class FireTabsPromoAttributeMatcher @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
     private val fireDataStore: FireDataStore,

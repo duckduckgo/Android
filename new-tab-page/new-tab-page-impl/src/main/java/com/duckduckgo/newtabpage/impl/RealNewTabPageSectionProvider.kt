@@ -16,7 +16,7 @@
 
 package com.duckduckgo.newtabpage.impl
 
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -25,7 +25,7 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import logcat.logcat

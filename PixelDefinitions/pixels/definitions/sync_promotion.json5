@@ -10,7 +10,7 @@
                 "key": "source",
                 "type": "string",
                 "description": "The surface where the Sync promotion was shown",
-                "enum": ["bookmarks", "passwords", "ai_chat"]
+                "enum": ["bookmarks", "passwords", "ai_chat", "passwords_import", "bookmarks_import"]
             }
         ]
     },
@@ -25,7 +25,7 @@
                 "key": "source",
                 "type": "string",
                 "description": "The surface where the Sync promotion was shown",
-                "enum": ["bookmarks", "passwords", "ai_chat"]
+                "enum": ["bookmarks", "passwords", "ai_chat", "passwords_import", "bookmarks_import"]
             }
         ]
     },

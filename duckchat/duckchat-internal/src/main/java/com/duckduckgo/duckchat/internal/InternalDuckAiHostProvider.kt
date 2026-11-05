@@ -20,10 +20,10 @@ import androidx.core.net.toUri
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.internal.store.DuckAiInternalSettingsDataStore
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class InternalDuckAiHostProvider @Inject constructor(
     private val dataStore: DuckAiInternalSettingsDataStore,
 ) : DuckAiHostProvider {

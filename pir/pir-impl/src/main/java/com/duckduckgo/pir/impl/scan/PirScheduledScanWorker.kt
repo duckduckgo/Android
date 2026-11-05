@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Process
 import androidx.work.WorkerParameters
 import androidx.work.multiprocess.RemoteCoroutineWorker
-import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner

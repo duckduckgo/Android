@@ -29,10 +29,10 @@ import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentP
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.notification.NotificationActionReportIssue
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AppTpRevokedContentPlugin @Inject constructor(
     private val context: Context,
 ) : VpnReminderNotificationContentPlugin {

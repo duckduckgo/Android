@@ -17,18 +17,19 @@
 package com.duckduckgo.feature.toggles.impl
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.MetricsPixelExtensionProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
 import java.time.LocalDate
@@ -38,7 +39,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealMetricsPixelSender @Inject constructor(
     private val pixel: Pixel,
@@ -147,9 +148,9 @@ internal fun MetricsPixel.getPixelDefinitions(): List<PixelDefinition> {
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoMap(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 @PriorityKey(1)
 class MetricsPixelExtensionProviderObserver @Inject constructor(

@@ -20,7 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.di.scopes.AppScope
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface NewAddressBarPickerBottomSheetDialogFactory {

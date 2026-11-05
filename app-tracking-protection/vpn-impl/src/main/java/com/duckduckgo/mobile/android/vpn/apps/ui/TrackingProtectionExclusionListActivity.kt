@@ -28,10 +28,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.*
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -63,7 +63,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 import com.duckduckgo.mobile.android.R as commonR
 
 @InjectWith(ActivityScope::class)
@@ -83,7 +82,7 @@ class TrackingProtectionExclusionListActivity :
     @Inject
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
-    @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+    @Inject lateinit var reportBreakageContract: () -> ReportBreakageContract
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -106,7 +105,7 @@ class TrackingProtectionExclusionListActivity :
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
 
-        reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
+        reportBreakage = registerForActivityResult(reportBreakageContract()) { result ->
             if (!result.isEmpty()) {
                 Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, LENGTH_LONG).show()
             }

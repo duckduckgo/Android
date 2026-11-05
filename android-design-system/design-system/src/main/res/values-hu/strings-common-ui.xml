@@ -32,6 +32,7 @@
     <string name="removeAll">Összes eltávolítása</string>
     <string name="undo">Visszavonás</string>
     <string name="cancel">Mégsem</string>
+    <string name="done">Kész</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Mindig be van kapcsolva</string>

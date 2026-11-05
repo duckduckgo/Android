@@ -23,10 +23,10 @@ import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PirFreemiumAttributeMatcherPlugin @Inject constructor(
     private val pirFreemium: PirFreemium,
     private val pirFreemiumDataStore: PirFreemiumDataStore,

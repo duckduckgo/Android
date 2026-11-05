@@ -50,8 +50,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.transition.Fade
 import androidx.transition.TransitionManager
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
@@ -86,6 +84,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithParams
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
@@ -108,9 +108,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.duckchat.api.DuckAiChatsMenu
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
+import com.duckduckgo.duckchat.api.tabswitcher.DuckAiTabGridItemRenderer
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
-import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -155,6 +155,9 @@ class TabSwitcherActivity :
     lateinit var addressDisplayFormatter: com.duckduckgo.app.browser.AddressDisplayFormatter
 
     @Inject
+    lateinit var duckAiTabGridItemRenderer: DuckAiTabGridItemRenderer
+
+    @Inject
     lateinit var urlDisplayRepository: com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 
     @Inject
@@ -189,6 +192,7 @@ class TabSwitcherActivity :
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
             addressDisplayFormatter = addressDisplayFormatter,
+            duckAiTabGridItemRenderer = duckAiTabGridItemRenderer,
         )
     }
 
@@ -938,7 +942,7 @@ class TabSwitcherActivity :
 
     private fun showDuckAiChatsMenu() {
         lifecycleScope.launch {
-            duckAiChatsMenu.get().show(
+            duckAiChatsMenu.value.show(
                 anchorView = findViewById(R.id.duckAIToolbarButton),
                 options = DuckAiChatsMenu.Options(
                     chatHistorySource = DuckChatHistorySource.TAB_SWITCHER,
@@ -985,7 +989,7 @@ class TabSwitcherActivity :
         if (viewState.isDuckAiChatsMenuEnabled) {
             menu.findItem(R.id.duckAIToolbarButton).setIcon(CommonR.drawable.ic_chats_24)
             // Creating the menu starts loading recent chats, so the popup opens without waiting on the read.
-            duckAiChatsMenu.get()
+            duckAiChatsMenu.value
         }
 
         menu.findItem(R.id.newTabToolbarButton).setTitle(

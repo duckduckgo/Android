@@ -28,7 +28,7 @@ import android.widget.TextView
 import androidx.core.os.postDelayed
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.*
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show

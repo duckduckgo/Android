@@ -17,8 +17,8 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature

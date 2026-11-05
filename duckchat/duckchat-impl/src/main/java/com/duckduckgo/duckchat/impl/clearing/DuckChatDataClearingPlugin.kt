@@ -30,11 +30,11 @@ import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.sync.api.engine.SyncEngine
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DuckChatDataClearingPlugin @Inject constructor(
     private val duckChatDeleter: DuckChatDeleter,
     @param:FireMode private val fireChatStore: DuckAiChatStore,

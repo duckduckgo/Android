@@ -18,12 +18,12 @@ package com.duckduckgo.duckchat.impl.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.RegularMode
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.FragmentScope

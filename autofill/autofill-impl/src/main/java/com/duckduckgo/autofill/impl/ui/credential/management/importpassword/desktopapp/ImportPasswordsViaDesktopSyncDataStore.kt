@@ -21,8 +21,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
@@ -33,7 +33,7 @@ interface ImportPasswordsViaDesktopSyncDataStore {
     suspend fun clearUserJourneyStartTime()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class ImportPasswordsViaDesktopSyncDataStoreImpl @Inject constructor(
     @ImportPasswordDesktopSync private val store: DataStore<Preferences>,

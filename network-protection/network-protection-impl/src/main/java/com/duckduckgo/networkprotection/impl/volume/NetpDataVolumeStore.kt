@@ -19,7 +19,7 @@ package com.duckduckgo.networkprotection.impl.volume
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore.DataVolume
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface NetpDataVolumeStore {

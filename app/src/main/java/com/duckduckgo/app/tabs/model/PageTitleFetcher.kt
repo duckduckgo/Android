@@ -21,8 +21,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -33,7 +33,7 @@ interface PageTitleFetcher {
     suspend fun fetchTitle(url: String): String?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPageTitleFetcher @Inject constructor(
     private val userAgentProvider: UserAgentProvider,

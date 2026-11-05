@@ -18,7 +18,7 @@ package com.duckduckgo.app.attributed.metrics.store
 
 import com.duckduckgo.app.attributed.metrics.api.EventStats
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface EventRepository {

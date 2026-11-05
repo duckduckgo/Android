@@ -120,6 +120,15 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenCloseCustomTabsCalledThenTabsClearedCountIsIncremented() = runTest {
+        whenever(mockSettingsDataStore.tabsClearedCount).thenReturn(2)
+
+        testee.closeCustomTabs()
+
+        verify(mockSettingsDataStore).tabsClearedCount = 3
+    }
+
+    @Test
     fun whenClearTabsOnlyCalledThenTabsCleared() = runTest {
         testee.clearTabsOnly()
         verify(mockTabRepository).deleteAll()

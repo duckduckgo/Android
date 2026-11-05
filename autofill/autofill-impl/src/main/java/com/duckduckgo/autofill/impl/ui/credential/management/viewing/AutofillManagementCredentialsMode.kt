@@ -35,7 +35,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -59,6 +58,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.NotSignedIn
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT

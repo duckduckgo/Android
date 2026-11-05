@@ -29,7 +29,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.VPN_FEATURE_PAGE
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature.PerformanceOptimizedPaywallsCohorts
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

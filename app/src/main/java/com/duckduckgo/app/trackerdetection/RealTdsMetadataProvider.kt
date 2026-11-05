@@ -18,7 +18,7 @@ package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

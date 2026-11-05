@@ -35,6 +35,6 @@
     <string name="duck_player_info_modal_button">Το κατάλαβα!</string>
     <string name="duck_player_unavailable">Το Duck Player δεν είναι διαθέσιμο</string>
     <string name="duck_player_unavailable_learn_more">Μάθετε περισσότερα</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Ανοίξτε τα βίντεο του YouTube στο Duck Player</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Ανοίξτε το Duck Player σε νέα καρτέλα</string>
+    <string name="duck_player_open_videos_setting">Ανοίξτε τα βίντεο του YouTube στο Duck Player</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Ανοίξτε το Duck Player σε νέα καρτέλα</string>
 </resources>

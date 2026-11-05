@@ -30,8 +30,8 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsW
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.credentialexchange.api.CredentialExchangeFailure
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
@@ -66,7 +66,7 @@ interface CredentialImportWideEvent {
     fun onWebFlowFailed(reason: UserCannotImportReason)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealCredentialImportWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,

@@ -19,7 +19,6 @@ package com.duckduckgo.app.permissions
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
@@ -28,6 +27,7 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel

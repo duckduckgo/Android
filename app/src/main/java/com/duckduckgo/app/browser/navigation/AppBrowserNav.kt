@@ -23,12 +23,12 @@ import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class AppBrowserNav @Inject constructor() : BrowserNav {
     override fun openInNewTab(
         context: Context,

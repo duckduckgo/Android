@@ -26,8 +26,9 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.connectivity.VpnConnectivityLossListenerPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,15 +36,15 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnConnectivityLossListenerPlugin::class,
+    binding = binding<VpnConnectivityLossListenerPlugin>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class,
+    binding = binding<VpnServiceCallbacks>(),
 )
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class AppTPVpnConnectivityLossListener @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val appTrackingProtection: AppTrackingProtection,

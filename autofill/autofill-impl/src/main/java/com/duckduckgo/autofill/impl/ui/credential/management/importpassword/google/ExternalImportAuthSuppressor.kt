@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goo
 
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -43,7 +43,7 @@ interface ExternalImportAuthSuppressor {
     fun consumeSuppression(): Boolean
 }
 
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class RealExternalImportAuthSuppressor @Inject constructor(
     private val timeProvider: TimeProvider,

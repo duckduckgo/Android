@@ -26,8 +26,8 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.In
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -58,7 +58,7 @@ interface CredentialImporter {
     }
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class CredentialImporterImpl @Inject constructor(
     private val autofillStore: InternalAutofillStore,

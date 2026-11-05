@@ -30,8 +30,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -45,7 +45,7 @@ interface NewAddressBarPickerManager {
     suspend fun showChoiceScreen(activity: DuckDuckGoActivity)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealNewAddressBarPickerManager @Inject constructor(
     private val duckChat: DuckChat,

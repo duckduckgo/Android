@@ -57,6 +57,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningEffort
 import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
@@ -70,6 +71,7 @@ import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -107,6 +109,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
@@ -148,10 +151,13 @@ class NativeInputModeWidgetViewModelTest {
     private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
+    private val chatStateStore = ChatStateStore()
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
     private val realNativeInputStateStore = RealNativeInputStateStore(
-        dagger.Lazy { tabRepositoryProvider },
+        lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
+        RealTextSelectionRepository(lazy { mock() }, mock()),
+        chatStateStore,
     )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
@@ -159,7 +165,6 @@ class NativeInputModeWidgetViewModelTest {
     private val showSettingsFlow = MutableStateFlow(false)
     private val duckChatUserEnabledFlow = MutableStateFlow(false)
     private val inputScreenUserSettingFlow = MutableStateFlow(false)
-    private val chatStateFlow = MutableStateFlow(ChatState.READY)
     private val chatSuggestionsUserEnabledFlow = MutableStateFlow(true)
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val modelStateFlow = MutableStateFlow(ModelState())
@@ -181,7 +186,6 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.observeEnableDuckChatUserSetting()).thenReturn(duckChatUserEnabledFlow)
         whenever(duckChatInternal.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(duckChatInternal.observeChatSuggestionsUserSettingEnabled()).thenReturn(chatSuggestionsUserEnabledFlow)
-        whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
         whenever(duckChatInternal.editPromptRequests).thenReturn(editPromptRequestsFlow)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
@@ -260,6 +264,8 @@ class NativeInputModeWidgetViewModelTest {
             duckChatFeature = duckChatFeature,
             inputOutcomeTracker = inputOutcomeTracker,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
+            chatStateStore = chatStateStore,
+            responseWaitWideEvent = responseWaitWideEvent,
         )
     }
 
@@ -701,51 +707,56 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun `state isChatStreaming is true when chatState is STREAMING`() = runTest {
-        chatStateFlow.value = ChatState.STREAMING
+        chatStateStore.update("test-tab", ChatState.STREAMING)
         assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
     fun `state isChatStreaming is true when chatState is LOADING`() = runTest {
-        chatStateFlow.value = ChatState.LOADING
+        chatStateStore.update("test-tab", ChatState.LOADING)
         assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
     fun `state isChatStreaming is false when chatState is READY`() = runTest {
-        chatStateFlow.value = ChatState.READY
+        chatStateStore.update("test-tab", ChatState.READY)
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
     fun `state isChatStreaming is false when chatState is HIDE`() = runTest {
-        chatStateFlow.value = ChatState.HIDE
+        chatStateStore.update("test-tab", ChatState.HIDE)
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
     fun `state isChatStreaming is false for the edit widget even when chatState is STREAMING`() = runTest {
-        // chatState is global, not scoped to a tab — a real chat streaming on another tab must not
-        // leak into the edit widget's own synthetic-key state.
-        chatStateFlow.value = ChatState.STREAMING
+        chatStateStore.update("test-tab", ChatState.STREAMING)
         testee.configureForEdit(sessionId = "session-1")
 
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
+    fun `state isChatStreaming ignores another tab streaming`() = runTest {
+        chatStateStore.update("other-tab", ChatState.STREAMING)
+
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
     fun whenChatStateFlowEmitsThenViewModelChatStateMirrorsIt() = runTest {
-        chatStateFlow.value = ChatState.STREAMING
+        chatStateStore.update("test-tab", ChatState.STREAMING)
 
         assertEquals(ChatState.STREAMING, testee.chatState.firstOrNull()!!)
     }
 
     @Test
     fun whenChatStateFlowFlipsThenSubsequentValueObserved() = runTest {
-        chatStateFlow.value = ChatState.LOADING
+        chatStateStore.update("test-tab", ChatState.LOADING)
         assertEquals(ChatState.LOADING, testee.chatState.firstOrNull()!!)
 
-        chatStateFlow.value = ChatState.HIDE
+        chatStateStore.update("test-tab", ChatState.HIDE)
 
         assertEquals(ChatState.HIDE, testee.chatState.firstOrNull()!!)
     }
@@ -1918,6 +1929,72 @@ class NativeInputModeWidgetViewModelTest {
         )
         verify(duckChatPixels).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
+    }
+
+    @Test
+    fun whenPromptSubmittedInDuckAiTabThenResponseWaitGetsTabModeEffortAndTool() = runTest {
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("medium")
+        whenever(termsRepository.observeTermsAccepted(BrowserMode.FIRE)).thenReturn(termsAccepted)
+        val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+
+        verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", BrowserMode.FIRE, "medium", Tool.IMAGE_GENERATION.rawValue)
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarThenResponseWaitIsNotCalled() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+
+        verifyNoInteractions(responseWaitWideEvent)
+    }
+
+    @Test
+    fun whenEditedPromptSubmittedThenResponseWaitIsNotCalled() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureForEdit(sessionId = "session-1")
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+        viewModel.fireStopGenerationTapped()
+
+        verifyNoInteractions(responseWaitWideEvent)
+    }
+
+    @Test
+    fun whenStopTappedInDuckAiTabThenResponseWaitGetsOnStopTapped() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireStopGenerationTapped()
+
+        verify(responseWaitWideEvent).onStopTapped("tab-A")
     }
 
     @Test

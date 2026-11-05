@@ -83,12 +83,12 @@ class ContentScopePrivacyFeatureProcessor(
             |import com.duckduckgo.common.utils.DispatcherProvider
             |import com.duckduckgo.data.store.api.SharedPreferencesProvider
             |import com.duckduckgo.di.scopes.AppScope
-            |import dagger.SingleInstanceIn
+            |import dev.zacsweers.metro.SingleIn
             |import javax.inject.Inject
             |import kotlinx.coroutines.CoroutineScope
             |import kotlinx.coroutines.launch
             |
-            |@SingleInstanceIn(AppScope::class)
+            |@SingleIn(AppScope::class)
             |class $className @Inject constructor(
             |    private val sharedPreferencesProvider: SharedPreferencesProvider,
             |    private val dispatcherProvider: DispatcherProvider,
@@ -139,10 +139,10 @@ class ContentScopePrivacyFeatureProcessor(
             |
             |import com.duckduckgo.di.scopes.AppScope
             |import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-            |import com.squareup.anvil.annotations.ContributesMultibinding
+            |import dev.zacsweers.metro.ContributesIntoSet
             |import javax.inject.Inject
             |
-            |@ContributesMultibinding(AppScope::class)
+            |@ContributesIntoSet(AppScope::class)
             |class $className @Inject constructor(
             |    private val repository: $repoClassName,
             |) : PrivacyFeaturePlugin {
@@ -170,10 +170,10 @@ class ContentScopePrivacyFeatureProcessor(
             |
             |import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
             |import com.duckduckgo.di.scopes.AppScope
-            |import com.squareup.anvil.annotations.ContributesMultibinding
+            |import dev.zacsweers.metro.ContributesIntoSet
             |import javax.inject.Inject
             |
-            |@ContributesMultibinding(AppScope::class)
+            |@ContributesIntoSet(AppScope::class)
             |class $className @Inject constructor(
             |    private val repository: $repoClassName,
             |) : ContentScopeConfigPlugin {

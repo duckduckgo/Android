@@ -18,11 +18,11 @@ package com.duckduckgo.subscriptions.impl.internal
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface PaywallPathProvider {
@@ -31,7 +31,7 @@ interface PaywallPathProvider {
     fun getFeaturePage(path: String): String?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPaywallPathProvider @Inject constructor(
     private val subscriptionsFeature: SubscriptionsFeature,

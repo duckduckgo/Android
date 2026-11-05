@@ -23,12 +23,12 @@ import com.duckduckgo.user.agent.store.UserAgentFeatureName
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggle
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleRepository
 import com.duckduckgo.user.agent.store.UserAgentRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class UserAgentPlugin @Inject constructor(
     private val userAgentRepository: UserAgentRepository,
     private val userAgentFeatureToggleRepository: UserAgentFeatureToggleRepository,

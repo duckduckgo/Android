@@ -27,8 +27,9 @@ import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
@@ -37,9 +38,9 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class, AtbLifecyclePlugin::class)
-@ContributesMultibinding(AppScope::class, AttributedMetric::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<AtbLifecyclePlugin>())
+@ContributesIntoSet(AppScope::class, binding = binding<AttributedMetric>())
+@SingleIn(AppScope::class)
 class RetentionMonthAttributedMetric @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,

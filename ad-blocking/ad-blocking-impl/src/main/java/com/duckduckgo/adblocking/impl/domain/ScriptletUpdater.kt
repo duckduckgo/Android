@@ -30,8 +30,8 @@ import com.duckduckgo.adblocking.impl.ScriptletDownloader
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -50,7 +50,7 @@ interface ScriptletUpdater {
     suspend fun update(settings: AdBlockingExtensionSettings): ScriptletUpdateResult
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealScriptletUpdater @Inject constructor(
     private val repository: AdBlockingExtensionRepository,

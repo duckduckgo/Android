@@ -23,7 +23,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -33,8 +34,8 @@ interface InternalNavigationHistory : NavigationHistory {
     suspend fun clearOldEntries()
 }
 
-@ContributesBinding(AppScope::class, boundType = NavigationHistory::class)
-@ContributesBinding(AppScope::class, boundType = InternalNavigationHistory::class)
+@ContributesBinding(AppScope::class, binding = binding<NavigationHistory>())
+@ContributesBinding(AppScope::class, binding = binding<InternalNavigationHistory>())
 class RealNavigationHistory @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,

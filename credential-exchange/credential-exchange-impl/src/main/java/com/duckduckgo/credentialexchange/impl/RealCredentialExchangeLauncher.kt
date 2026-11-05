@@ -34,7 +34,7 @@ import com.duckduckgo.credentialexchange.api.CredentialExchangeResult.Cancelled
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult.Failure
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult.Success
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext

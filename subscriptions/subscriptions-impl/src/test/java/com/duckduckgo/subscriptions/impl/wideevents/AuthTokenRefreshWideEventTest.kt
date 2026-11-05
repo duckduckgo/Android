@@ -84,9 +84,9 @@ class AuthTokenRefreshWideEventTest {
 
         authWideEvent = AuthTokenRefreshWideEventImpl(
             wideEventClient = wideEventClient,
-            subscriptionsFeature = { subscriptionsFeature },
+            subscriptionsFeature = lazy { subscriptionsFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
-            networkProtectionState = { networkProtectionState },
+            networkProtectionState = lazy { networkProtectionState },
             processName = "main",
         )
     }
@@ -514,6 +514,23 @@ class AuthTokenRefreshWideEventTest {
 
         reset(wideEventClient)
         authWideEvent.onTokensValidated()
+        verifyNoInteractions(wideEventClient)
+    }
+
+    @Test
+    fun `onSkipped aborts flow and clears id`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(21L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onSkipped()
+
+        verify(wideEventClient).flowAbort(21L)
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        verify(wideEventClient, never()).intervalEnd(eq(21L), eq("total_duration_ms_bucketed"))
+
+        reset(wideEventClient)
+        authWideEvent.onSuccess()
         verifyNoInteractions(wideEventClient)
     }
 

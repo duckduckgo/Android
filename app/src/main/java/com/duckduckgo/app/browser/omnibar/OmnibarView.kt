@@ -29,14 +29,11 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
-import kotlinx.coroutines.flow.Flow
 
 interface OmnibarView {
     val omnibarType: OmnibarType
     var isScrollingEnabled: Boolean
     var isUiLocked: Boolean
-    val isEditing: Boolean
-    val isEditingFlow: Flow<Boolean>
     val findInPage: IncludeFindInPageBinding
     val omnibarTextInput: KeyboardAwareEditText
     val omniBarContainer: View

@@ -18,10 +18,10 @@ package com.duckduckgo.subscriptions.impl.services
 
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SubscriptionsCacheExclusionPlugin @Inject constructor() : AppCacheExclusionPlugin {
     override fun filenamesExcludedFromDeletion(): List<String> {
         return listOf(SubscriptionNetworkModule.SUBSCRIPTION_CACHE_FILE)

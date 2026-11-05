@@ -26,17 +26,17 @@ import androidx.core.content.edit
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
 import com.duckduckgo.subscriptions.internal.databinding.SubsOverrideLocalPurchasedAtViewBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -98,7 +98,7 @@ class OverrideSubscriptionLocalPurchasedAtView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class OverrideSubscriptionLocalPurchasedAtViewPlugin @Inject constructor() : SubsSettingPlugin {
     override fun getView(context: Context): View {
         return OverrideSubscriptionLocalPurchasedAtView(context)

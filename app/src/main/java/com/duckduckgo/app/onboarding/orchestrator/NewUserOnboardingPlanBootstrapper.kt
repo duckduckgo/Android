@@ -24,7 +24,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import javax.inject.Inject
  * them before emitting [Completed] / [Skipped], so the [AppStage] write is visible to any listener
  * that routes off the terminal state.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class NewUserOnboardingPlanBootstrapper @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
     private val planProvider: NewUserOnboardingPlanProvider,

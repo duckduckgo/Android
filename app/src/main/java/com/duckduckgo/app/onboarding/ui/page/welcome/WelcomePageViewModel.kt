@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
@@ -44,6 +43,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStatus
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.onboarding.api.LinearOnboardingHost

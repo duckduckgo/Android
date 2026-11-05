@@ -17,7 +17,7 @@
 package com.duckduckgo.app.anr.internal.feature
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(AppScope::class)

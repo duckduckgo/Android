@@ -39,7 +39,7 @@ class MissingExplicitReturnTypeOnProvidesBindsDetector : Detector(), SourceCodeS
 
     internal class Handler(private val context: JavaContext) : UElementHandler() {
         override fun visitMethod(node: UMethod) {
-            val isProvidesOrBinds = node.uAnnotations.any { it.qualifiedName in DAGGER_BINDING_ANNOTATIONS }
+            val isProvidesOrBinds = node.uAnnotations.any { it.qualifiedName in BINDING_ANNOTATIONS }
             if (!isProvidesOrBinds) return
 
             // Java methods always have an explicit return type. Only Kotlin expression-body
@@ -58,13 +58,16 @@ class MissingExplicitReturnTypeOnProvidesBindsDetector : Detector(), SourceCodeS
     }
 
     companion object {
-        private val DAGGER_BINDING_ANNOTATIONS = setOf("dagger.Provides", "dagger.Binds")
+        private val BINDING_ANNOTATIONS = setOf(
+            "dev.zacsweers.metro.Provides",
+            "dev.zacsweers.metro.Binds",
+        )
 
         val MISSING_EXPLICIT_RETURN_TYPE = Issue.create(
             "MissingExplicitReturnTypeOnProvidesBinds",
             "@Provides/@Binds method is missing an explicit return type",
             """
-                Dagger @Provides and @Binds methods must declare an explicit return type. Metro DI
+                @Provides and @Binds functions must declare an explicit return type. Metro DI
                 cannot rely on Kotlin return-type inference: it needs the declared type to wire the
                 binding into the dependency graph.
 

@@ -21,13 +21,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.*
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
 import com.duckduckgo.app.pixels.AppPixelName.SURVEY_SURVEY_DISMISSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone

@@ -27,11 +27,11 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.pdf.PdfViewerAvailability
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone

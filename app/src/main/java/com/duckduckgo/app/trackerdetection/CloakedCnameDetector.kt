@@ -24,8 +24,9 @@ import com.duckduckgo.app.trackerdetection.flags.OptimizeCnameDetectionRCWrapper
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -35,9 +36,9 @@ interface CloakedCnameRefresher {
     fun refresh()
 }
 
-@ContributesBinding(AppScope::class, boundType = CloakedCnameDetector::class)
-@ContributesBinding(AppScope::class, boundType = CloakedCnameRefresher::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<CloakedCnameDetector>())
+@ContributesBinding(AppScope::class, binding = binding<CloakedCnameRefresher>())
+@SingleIn(AppScope::class)
 class CloakedCnameDetectorImpl @Inject constructor(
     private val tdsCnameEntityDao: TdsCnameEntityDao,
     private val trackerAllowlist: TrackerAllowlist,

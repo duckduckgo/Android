@@ -17,15 +17,15 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
@@ -34,7 +34,6 @@ dependencies {
     implementation project(path: ':experiments-api')
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
@@ -51,9 +50,6 @@ dependencies {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.privacyreport
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler

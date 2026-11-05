@@ -17,14 +17,10 @@
 plugins {
     id 'com.android.library'
     id 'com.google.devtools.ksp'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-anvil {
-    generateDaggerFactories = true // default is false
-}
 
 android {
     lintOptions {
@@ -43,8 +39,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
 
     implementation KotlinX.coroutines.core
@@ -58,8 +54,6 @@ dependencies {
 
     // Android KTX
     implementation AndroidX.core.ktx
-
-    implementation Google.dagger
 
     implementation "com.squareup.logcat:logcat:_"
 

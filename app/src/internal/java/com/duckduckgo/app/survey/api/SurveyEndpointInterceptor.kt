@@ -18,7 +18,8 @@ package com.duckduckgo.app.survey.api
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import okhttp3.Interceptor
@@ -26,9 +27,9 @@ import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class SurveyEndpointInterceptor @Inject constructor(
     private val surveyEndpointDataStore: SurveyEndpointDataStore,

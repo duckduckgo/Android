@@ -21,7 +21,7 @@ import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.En
 import com.duckduckgo.autofill.store.SecureStorageKeyRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okio.ByteString.Companion.toByteString

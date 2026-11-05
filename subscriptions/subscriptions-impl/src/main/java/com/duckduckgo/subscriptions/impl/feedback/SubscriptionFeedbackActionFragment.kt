@@ -18,7 +18,7 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import android.os.Bundle
 import android.view.View
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.impl.R

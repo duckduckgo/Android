@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -50,6 +51,7 @@ import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
 import com.duckduckgo.duckchat.impl.feature.recentDaysCutoff
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -58,11 +60,12 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.selectChatSuggestions
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -86,6 +89,7 @@ interface DuckChatJSHelper {
         pageContext: String = "",
         tabId: String = "",
         browserMode: BrowserMode = BrowserMode.REGULAR,
+        pageUrl: String? = null,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -146,6 +150,9 @@ class RealDuckChatJSHelper @Inject constructor(
     @FireMode private val fireChatStore: DuckAiChatStore,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
     private val termsConsent: DuckAiTermsConsent,
+    private val chatStateStore: ChatStateStore,
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -160,6 +167,7 @@ class RealDuckChatJSHelper @Inject constructor(
         pageContext: String,
         tabId: String,
         browserMode: BrowserMode,
+        pageUrl: String?,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -194,7 +202,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
                 id?.let {
-                    getAIChatNativePrompt(featureName, method, it, browserMode)
+                    getAIChatNativePrompt(featureName, method, it, mode, tabId, browserMode)
                 }
 
             METHOD_OPEN_AI_CHAT -> {
@@ -202,6 +210,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 dataStore.updateUserPreferences(payload)
                 val entryPoint = when {
                     mode == Mode.CONTEXTUAL -> DuckChatEntryPoint.CONTEXTUAL_CHAT
+                    pageUrl?.let(duckDuckGoUrlDetector::isDuckDuckGoQueryUrl) == true -> DuckChatEntryPoint.SERP
                     else -> DuckChatEntryPoint.DIRECT_URL
                 }
                 duckChat.openNewDuckChatSession(entryPoint)
@@ -222,9 +231,14 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_RESPONSE_STATE -> {
-                ChatState
-                    .fromValue(data?.optString("status"))
-                    ?.let { status -> duckChat.updateChatState(status) }
+                if (tabId.isNotEmpty()) {
+                    ChatState
+                        .fromValue(data?.optString("status"))
+                        ?.let { status -> chatStateStore.update(tabId, status) }
+                }
+                if (mode == Mode.FULL && tabId.isNotEmpty()) {
+                    responseWaitWideEvent.onResponseState(tabId, data?.optString("status").orEmpty())
+                }
                 data?.optJSONObject("attachments")?.let { attachments ->
                     val usage = AIChatAttachmentUsage(
                         imagesUsed = attachments.optInt("imagesUsed", 0),
@@ -238,12 +252,12 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_HIDE_CHAT_INPUT -> {
-                duckChat.updateChatState(HIDE)
+                if (tabId.isNotEmpty()) chatStateStore.update(tabId, HIDE)
                 null
             }
 
             METHOD_SHOW_CHAT_INPUT -> {
-                duckChat.updateChatState(SHOW)
+                if (tabId.isNotEmpty()) chatStateStore.update(tabId, SHOW)
                 null
             }
             METHOD_DISABLE_CHAT_INPUT -> {
@@ -590,9 +604,14 @@ class RealDuckChatJSHelper @Inject constructor(
         featureName: String,
         method: String,
         id: String,
+        mode: Mode,
+        tabId: String,
         browserMode: BrowserMode,
     ): JsCallbackData {
         val pending = pendingNativePromptStore.consume()
+        if (pending != null && mode == Mode.FULL && tabId.isNotEmpty()) {
+            responseWaitWideEvent.onNativePromptSubmitted(tabId, browserMode, pending.reasoningEffort, pending.selectedTool)
+        }
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {

@@ -20,11 +20,11 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.survey.api.SurveyParameterPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SubscriptionPurchasePlatformSurveyParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : SurveyParameterPlugin {
@@ -33,7 +33,7 @@ class SubscriptionPurchasePlatformSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = subscriptionsManager.getSubscription()?.platform?.lowercase() ?: ""
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SubscriptionBillingParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : SurveyParameterPlugin {
@@ -44,7 +44,7 @@ class SubscriptionBillingParameterPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SubscriptionDaysSincePurchaseSurveyParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -59,7 +59,7 @@ class SubscriptionDaysSincePurchaseSurveyParameterPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SubscriptionDaysUntilExpirySurveyParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -74,7 +74,7 @@ class SubscriptionDaysUntilExpirySurveyParameterPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SubscriptionStatusParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : SurveyParameterPlugin {

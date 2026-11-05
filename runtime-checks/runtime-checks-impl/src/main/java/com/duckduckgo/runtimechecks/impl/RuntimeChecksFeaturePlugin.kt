@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.runtimechecks.store.RuntimeChecksEntity
 import com.duckduckgo.runtimechecks.store.RuntimeChecksRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class RuntimeChecksFeaturePlugin @Inject constructor(
     private val runtimeChecksRepository: RuntimeChecksRepository,
 ) : PrivacyFeaturePlugin {

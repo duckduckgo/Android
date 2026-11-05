@@ -27,7 +27,7 @@ import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.impl.hostAndParentCandidates
 import com.duckduckgo.site.permissions.impl.isSiteUnprotectedByUser
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

@@ -32,7 +32,7 @@ import com.duckduckgo.dataclearing.api.toggles.DataClearingSource.TRACKER_STATS
 import com.duckduckgo.dataclearing.api.toggles.DataClearingSource.WEB_STORAGE
 import com.duckduckgo.dataclearing.api.toggles.DataClearingSource.WEB_STORAGE_SINGLE_TAB
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

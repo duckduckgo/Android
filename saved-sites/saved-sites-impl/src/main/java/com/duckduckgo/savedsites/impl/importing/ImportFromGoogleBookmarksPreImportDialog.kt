@@ -24,10 +24,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ContentImportBookmarksFromGooglePreimportDialogBinding
@@ -35,7 +36,6 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.parcelize.Parcelize
 import logcat.LogPriority.VERBOSE
 import logcat.logcat

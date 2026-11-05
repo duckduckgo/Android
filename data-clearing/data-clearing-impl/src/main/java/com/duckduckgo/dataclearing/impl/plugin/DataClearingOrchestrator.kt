@@ -21,8 +21,8 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import logcat.LogPriority.ERROR
@@ -30,7 +30,7 @@ import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class DataClearingOrchestrator @Inject constructor(
     private val plugins: PluginPoint<DataClearingPlugin>,

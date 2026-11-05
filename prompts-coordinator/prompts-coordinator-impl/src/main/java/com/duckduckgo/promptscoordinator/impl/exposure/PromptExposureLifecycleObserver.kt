@@ -26,8 +26,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.DAYS_SINCE_INSTALL
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.PROMPT_SHOWN
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
@@ -47,11 +48,11 @@ internal const val SESSION_SAMPLE_RATE = 0.05
  * The weekly denominator fires on the first foreground of each install-week rather than for the week just
  * gone: a previous-week pixel would never fire for users who churn, while their exposures already had.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class PromptExposureLifecycleObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val weekTracker: PromptExposureWeekTracker,

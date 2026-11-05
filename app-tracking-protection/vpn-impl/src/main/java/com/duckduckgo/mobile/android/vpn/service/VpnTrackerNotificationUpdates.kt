@@ -28,16 +28,16 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.notification.VpnNotificationStore
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
+@SingleIn(VpnScope::class)
 class VpnTrackerNotificationUpdates @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,

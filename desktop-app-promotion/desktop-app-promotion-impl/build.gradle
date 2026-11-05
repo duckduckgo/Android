@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -24,14 +24,11 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.desktopapppromotion.impl'
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
 
     implementation project(':desktop-app-promotion-api')
 
@@ -51,9 +48,6 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
     implementation KotlinX.coroutines.android
-
-    // Dagger
-    implementation Google.dagger
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

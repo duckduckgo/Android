@@ -23,7 +23,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.MainAppSettings
 import com.duckduckgo.autofill.impl.R
@@ -34,6 +33,7 @@ import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_IMPORT_SUCCESS
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -41,13 +41,13 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(100)
 class ImportGooglePasswordMainAppSettings @Inject constructor(
     private val pixel: Pixel,

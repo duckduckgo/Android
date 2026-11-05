@@ -48,7 +48,7 @@ import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PERSISTER_ERR
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PROVIDER_ERROR
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import java.time.Duration

@@ -20,7 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

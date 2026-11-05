@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
@@ -37,6 +36,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.TakeoutMessageResu
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.WebAutomationError
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.autofill.impl.store.ReauthenticationHandler
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -163,7 +163,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     }
 
     fun firstPageLoading() {
-        _viewState.value = ShowWebPage
+        _viewState.value = ViewState.FirstPageLoading
     }
 
     suspend fun getReauthData(originalUrl: String): ReAuthenticationDetails? =
@@ -304,6 +304,8 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
         data object ShowWebPage : ViewState
 
         data object HideWebPage : ViewState
+
+        data object FirstPageLoading : ViewState
 
         data class LoadingWebPage(
             val url: String,

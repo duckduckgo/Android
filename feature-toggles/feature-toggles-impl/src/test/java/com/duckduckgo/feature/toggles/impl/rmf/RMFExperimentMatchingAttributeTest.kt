@@ -17,7 +17,7 @@
 package com.duckduckgo.feature.toggles.impl.rmf
 
 import android.annotation.SuppressLint
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles

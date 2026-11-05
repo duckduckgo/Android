@@ -59,7 +59,7 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSe
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN

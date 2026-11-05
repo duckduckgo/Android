@@ -21,7 +21,7 @@ import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import java.time.Duration
 import java.time.OffsetDateTime

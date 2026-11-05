@@ -21,7 +21,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialL
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsGrouper.Groups
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named

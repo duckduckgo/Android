@@ -31,16 +31,17 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.M
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScannedBroker
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardMaintenanceScanDataProvider
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardMaintenanceScanDataProvider.DashboardBrokerMatch
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = ActivityScope::class,
-    boundType = PirWebJsMessageHandler::class,
+    binding = binding<PirWebJsMessageHandler>(),
 )
 class PirWebMaintenanceScanStatusMessageHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,

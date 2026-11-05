@@ -32,10 +32,10 @@ import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
@@ -49,15 +49,15 @@ import javax.inject.Inject
 private const val LRU_CACHE_SIZE = 2048
 private const val EMFILE_ERRNO = 24
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnNetworkStack::class,
+    binding = binding<VpnNetworkStack>(),
 )
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkCallback::class,
+    binding = binding<VpnNetworkCallback>(),
 )
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class NgVpnNetworkStack @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val vpnNetwork: Lazy<VpnNetwork>,
@@ -124,7 +124,7 @@ class NgVpnNetworkStack @Inject constructor(
 
         return Result.success(
             VpnTunnelConfig(
-                mtu = vpnNetwork.get().mtu(),
+                mtu = vpnNetwork.value.mtu(),
                 addresses = mapOf(
                     InetAddress.getByName("10.0.0.2") to 32,
                     InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
@@ -291,7 +291,7 @@ class NgVpnNetworkStack @Inject constructor(
 
     private fun Lazy<VpnNetwork>.safeGet(): Result<VpnNetwork> {
         return runCatching {
-            get()
+            value
         }.onFailure {
             logcat(ERROR) { it.asLog() }
             Result.failure<VpnNetwork>(it)

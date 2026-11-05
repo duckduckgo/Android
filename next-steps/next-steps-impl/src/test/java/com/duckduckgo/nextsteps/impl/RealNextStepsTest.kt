@@ -133,15 +133,6 @@ class RealNextStepsTest {
         assertNull(testee.provideSectionView(mock()))
     }
 
-    @Test
-    fun `when user is in check list cohort then no section view is provided yet`() = runTest {
-        givenKillSwitch(enabled = true)
-        givenCohortEnabled(Cohorts.CHECK_LIST)
-        toggles.nextStepsItemsExperiment().enroll()
-
-        assertNull(testee.provideSectionView(mock()))
-    }
-
     private suspend fun givenKillSwitch(enabled: Boolean) {
         toggles.self().setRawStoredState(Toggle.State(enable = enabled))
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)

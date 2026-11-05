@@ -32,8 +32,9 @@ import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.observeSetting
 import com.duckduckgo.settings.api.setSetting
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -52,8 +53,8 @@ interface OnboardingPreferenceCatalog {
     suspend fun apply(selections: Map<OnboardingPreference, Boolean>)
 }
 
-@ContributesBinding(AppScope::class, boundType = OnboardingPreferenceCatalog::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<OnboardingPreferenceCatalog>())
+@SingleIn(AppScope::class)
 class OnboardingPreferenceCatalogImpl @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,

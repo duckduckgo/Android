@@ -46,7 +46,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
@@ -489,13 +489,4 @@ internal fun addressBarAnimationContext(
     ContextThemeWrapper(context, DesignSystemR.style.ThemeOverlay_Rebrand_AddressBarAnimation)
 } else {
     context
-}
-
-sealed class TrackerLogo() {
-    class ImageLogo(val resId: Int) : TrackerLogo()
-    class LetterLogo(
-        val trackerLetter: String = "",
-    ) : TrackerLogo()
-
-    class StackedLogo(val resId: Int = R.drawable.network_logo_more) : TrackerLogo()
 }

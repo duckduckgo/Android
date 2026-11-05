@@ -16,13 +16,16 @@
 
 package com.duckduckgo.app.global.view
 
+import android.app.ActivityManager
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import androidx.core.content.getSystemService
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.SiteDataCleaner
@@ -63,6 +66,11 @@ interface ClearDataAction {
     suspend fun clearTabsOnly()
 
     /**
+     * Closes the custom tabs that are open now, including those in other apps' tasks.
+     */
+    suspend fun closeCustomTabs()
+
+    /**
      * Clears browser data except tabs and chats.
      * @param shouldFireDataClearPixel whether to fire the data clear pixel
      */
@@ -98,8 +106,14 @@ interface ClearDataAction {
      * @param notifyDataCleared whether to notify that data has been cleared
      * @param enableTransitionAnimation whether to enable transition animation during restart
      * @param deletedTabCount number of tabs that were deleted (shown in the snackbar)
+     * @param query opened in the browser after the restart
      */
-    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true, deletedTabCount: Int = 0)
+    fun killAndRestartProcess(
+        notifyDataCleared: Boolean,
+        enableTransitionAnimation: Boolean = true,
+        deletedTabCount: Int = 0,
+        query: String? = null,
+    )
 }
 
 class ClearPersonalDataAction(
@@ -125,9 +139,9 @@ class ClearPersonalDataAction(
     private val sitePreferencesDataClearer: SitePreferencesDataClearer,
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int, query: String?) {
         logcat(INFO) { "Restarting process" }
-        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation, deletedTabCount)
+        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation, deletedTabCount, query)
     }
 
     override fun killProcess() {
@@ -139,6 +153,17 @@ class ClearPersonalDataAction(
         withContext(dispatchers.io()) {
             tabRepository.deleteAll()
             logcat { "Finished clearing tabs" }
+        }
+    }
+
+    override suspend fun closeCustomTabs() {
+        withContext(dispatchers.io()) {
+            settingsDataStore.tabsClearedCount++
+
+            // Tabs in their own task aren't closed by clearing the browser's tabs, so close them here.
+            context.getSystemService<ActivityManager>()?.appTasks
+                ?.filter { it.taskInfo.baseIntent.component?.className == CustomTabActivity::class.java.name }
+                ?.forEach { it.finishAndRemoveTask() }
         }
     }
 

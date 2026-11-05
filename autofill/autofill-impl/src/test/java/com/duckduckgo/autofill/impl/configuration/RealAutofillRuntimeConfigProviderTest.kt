@@ -28,6 +28,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -100,6 +101,92 @@ class RealAutofillRuntimeConfigProviderTest {
                 partialFormSaves = any(),
             ),
         ).thenReturn("")
+    }
+
+    @Test
+    fun whenPlaceholdersPresentThenEachIsReplacedWithGeneratedValue() = runTest {
+        givenGeneratedConfig()
+        val rawJs = """
+            before
+            // INJECT contentScope HERE
+            // INJECT userUnprotectedDomains HERE
+            // INJECT userPreferences HERE
+            // INJECT availableInputTypes HERE
+            after
+        """.trimIndent()
+
+        val result = testee.getRuntimeConfiguration(rawJs, EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
+
+        val expected = """
+            javascript:before
+            contentScope = {};
+            userUnprotectedDomains = [];
+            userPreferences = {};
+            availableInputTypes = {}
+            after
+        """.trimIndent()
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun whenPlaceholdersInterleavedWithCodeThenOnlyPlaceholdersAreReplaced() = runTest {
+        givenGeneratedConfig()
+        val rawJs = """
+            before
+            // INJECT contentScope HERE
+            afterContentScope
+            // INJECT userUnprotectedDomains HERE
+            afterUserUnprotectedDomains
+            // INJECT userPreferences HERE
+            afterUserPreferences
+            // INJECT availableInputTypes HERE
+            after
+        """.trimIndent()
+
+        val result = testee.getRuntimeConfiguration(rawJs, EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
+
+        val expected = """
+            javascript:before
+            contentScope = {};
+            afterContentScope
+            userUnprotectedDomains = [];
+            afterUserUnprotectedDomains
+            userPreferences = {};
+            afterUserPreferences
+            availableInputTypes = {}
+            after
+        """.trimIndent()
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun whenPlaceholdersOutOfOrderThenEachIsReplacedInPlace() = runTest {
+        givenGeneratedConfig()
+        val rawJs = "a // INJECT availableInputTypes HERE b // INJECT contentScope HERE c"
+
+        val result = testee.getRuntimeConfiguration(rawJs, EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
+
+        assertEquals("javascript:a availableInputTypes = {} b contentScope = {}; c", result)
+    }
+
+    @Test
+    fun whenSomePlaceholdersMissingThenRemainingAreReplacedAndRestIsUnchanged() = runTest {
+        givenGeneratedConfig()
+        val rawJs = "start // INJECT userPreferences HERE end"
+
+        val result = testee.getRuntimeConfiguration(rawJs, EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
+
+        assertEquals("javascript:start userPreferences = {}; end", result)
+    }
+
+    @Test
+    fun whenNoPlaceholdersThenJavascriptIsOnlyPrefixed() = runTest {
+        givenGeneratedConfig()
+        val rawJs = "console.log('ü ✓');"
+
+        val result = testee.getRuntimeConfiguration(rawJs, EXAMPLE_URL, emptyReAuthenticationDetails(), BrowserMode.REGULAR)
+
+        assertEquals("javascript:$rawJs", result)
     }
 
     @Test
@@ -238,6 +325,27 @@ class RealAutofillRuntimeConfigProviderTest {
             canCategorizePasswordVariant = any(),
             partialFormSaves = any(),
         )
+    }
+
+    private suspend fun givenGeneratedConfig() {
+        configureAutofillCapabilities(enabled = false)
+        val siteSpecificFixes = AutofillSiteSpecificFixesSettings(javascriptConfigSiteSpecificFixes = "{}", canApplySiteSpecificFixes = false)
+        whenever(siteSpecificFixesStore.getConfig()).thenReturn(siteSpecificFixes)
+        whenever(runtimeConfigurationWriter.generateContentScope(siteSpecificFixes)).thenReturn("contentScope = {};")
+        whenever(runtimeConfigurationWriter.generateUserUnprotectedDomains()).thenReturn("userUnprotectedDomains = [];")
+        whenever(runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(any())).thenReturn("{}")
+        whenever(
+            runtimeConfigurationWriter.generateUserPreferences(
+                autofillCredentials = any(),
+                credentialSaving = any(),
+                passwordGeneration = any(),
+                showInlineKeyIcon = any(),
+                showInContextEmailProtectionSignup = any(),
+                unknownUsernameCategorization = any(),
+                canCategorizePasswordVariant = any(),
+                partialFormSaves = any(),
+            ),
+        ).thenReturn("userPreferences = {};")
     }
 
     companion object {

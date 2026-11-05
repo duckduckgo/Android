@@ -25,14 +25,17 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
@@ -53,15 +56,16 @@ import kotlin.time.Duration.Companion.seconds
  * Session start waits for [FirstScreenHandlerImpl] to finish applying the opening-screen decision.
  * This makes `after_idle` and `landed_on` authoritative at [WideEventClient.flowStart].
  */
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = ReturnSessionLandingListener::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserInteractionsPlugin::class)
-@ContributesMultibinding(AppScope::class, boundType = HatchInteractionsPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<ReturnSessionLandingListener>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserInteractionsPlugin>())
+@ContributesIntoSet(AppScope::class, binding = binding<HatchInteractionsPlugin>())
 class RealReturnSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val settingsDataStore: SettingsDataStore,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val returnSessionWideEventFeature: Lazy<ReturnSessionWideEventFeature>,
+    private val duckChatInputModeState: DuckChatInputModeState,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
 ) : BrowserInteractionsPlugin, HatchInteractionsPlugin, ReturnSessionLandingListener {
@@ -106,8 +110,11 @@ class RealReturnSessionWideEvent @Inject constructor(
                 pendingLandingFocus = null
                 val landingEngagement = pendingEngagement
                 pendingEngagement = false
+                val toggleEnabled = duckChatInputModeState.getSelectedInputMode() == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+                val togglePosition = if (toggleEnabled) duckChatInputModeState.getInitialToggleSelection().pixelValue() else null
                 val startResult = wideEventClient.flowStart(
                     name = FEATURE_NAME,
+                    definition = WideEventDefinition(version = DEFINITION_VERSION),
                     cleanupPolicy = CleanupPolicy.OnProcessStart(
                         ignoreIfIntervalTimeoutPresent = false,
                         flowStatus = FlowStatus.Unknown,
@@ -116,6 +123,8 @@ class RealReturnSessionWideEvent @Inject constructor(
                         put(KEY_AFTER_IDLE, result.afterIdle.toString())
                         put(KEY_LANDED_ON, result.landing.value)
                         timeAwayMsBucketed()?.let { put(KEY_TIME_AWAY, it) }
+                        put(KEY_TOGGLE_ENABLED, toggleEnabled.toString())
+                        togglePosition?.let { put(KEY_TOGGLE_POSITION, it) }
                         // Default in case the process is killed before a real terminal reason lands.
                         // OnProcessStart cleanup sends whatever metadata is already persisted.
                         put(KEY_STATUS_REASON, REASON_APP_TERMINATED)
@@ -174,6 +183,11 @@ class RealReturnSessionWideEvent @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun NativeInputState.ToggleSelection.pixelValue(): String = when (this) {
+        NativeInputState.ToggleSelection.SEARCH -> "search"
+        NativeInputState.ToggleSelection.DUCK_AI -> "duck_ai"
     }
 
     private fun timeAwayMsBucketed(): String? {
@@ -333,7 +347,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        returnSessionWideEventFeature.get().self().isEnabled()
+        returnSessionWideEventFeature.value.self().isEnabled()
     }
 
     private class SessionState(
@@ -352,6 +366,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     private companion object {
         const val TAG = "RealReturnSessionWideEvent"
         const val FEATURE_NAME = "return_session"
+        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 1)
         const val REASON_SEARCH_SUBMITTED = "search_submitted"
         const val REASON_URL_SUBMITTED = "url_submitted"
         const val REASON_AI_PROMPT_SUBMITTED = "ai_prompt_submitted"
@@ -365,6 +380,8 @@ class RealReturnSessionWideEvent @Inject constructor(
         const val KEY_AFTER_IDLE = "after_idle"
         const val KEY_LANDED_ON = "landed_on"
         const val KEY_TIME_AWAY = "time_away_ms_bucketed"
+        const val KEY_TOGGLE_ENABLED = "toggle_enabled"
+        const val KEY_TOGGLE_POSITION = "toggle_position"
         const val KEY_STATUS_REASON = "status_reason"
         const val KEY_FOCUSED = "focused"
         const val KEY_PAGE_ENGAGED = "page_engaged"

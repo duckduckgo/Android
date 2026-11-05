@@ -37,7 +37,7 @@
     <init>(...);
 }
 
-# required for reflective Dagger injection (used by AndroidInjector)
+# required for reflective injection (used by AndroidInjector)
 -keepclassmembers class * {
     void inject(***);
 }

@@ -1,7 +1,7 @@
 {
   "name": "PeopleFinders",
   "url": "peoplefinders.com",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "addedDatetime": 1677132000000,
   "optOutUrl": "https://www.peoplefinders.com/opt-out",
   "mirrorSites": [
@@ -94,17 +94,6 @@
           "url": "https://www.peoplefinders.com/opt-out"
         },
         {
-          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
-            }
-          ],
-          "id": "cft-29020501-0911-42c4-be7e-58e3b7ddd75a"
-        },
-        {
           "_comment": "Wait for CF challenge interstitial to complete",
           "actionType": "expectation",
           "expectations": [
@@ -163,14 +152,15 @@
           "id": "5ec1e28f-c179-424d-a50c-8808040668c3"
         },
         {
-          "actionType": "getCaptchaInfo",
-          "id": "fcf4b0cf-9bb4-42e6-a2a9-68e4f2a25a2c",
-          "selector": ".v-recaptcha"
-        },
-        {
-          "actionType": "solveCaptcha",
-          "id": "25c7fbb0-0508-4f93-aeb8-3642ecef8c33",
-          "selector": ".v-recaptcha"
+          "_comment": "PeopleFinders swapped reCAPTCHA for an explicitly rendered Cloudflare Turnstile on 2026-10-14. It has no data-sitekey for solveCaptcha and completes on its own, so wait for its token inside v-out-out-form.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[contains(@class,'v-out-out-form')]//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-fcf4b0cf-9bb4-42e6-a2a9-68e4f2a25a2c"
         },
         {
           "actionType": "click",
@@ -255,14 +245,15 @@
           "id": "3a6a98ff-0ad6-4d0e-9537-a0844ced4598"
         },
         {
-          "actionType": "getCaptchaInfo",
-          "id": "45f59ed0-3a36-4ab6-9c45-e906471fb3e4",
-          "selector": ".v-recaptcha"
-        },
-        {
-          "actionType": "solveCaptcha",
-          "id": "85469ad1-8870-449d-961e-22ea10738ec0",
-          "selector": ".v-recaptcha"
+          "_comment": "PeopleFinders swapped reCAPTCHA for an explicitly rendered Cloudflare Turnstile on 2026-10-14. It has no data-sitekey for solveCaptcha and completes on its own, so wait for its token inside v-out-out-record-removal-form.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[contains(@class,'v-out-out-record-removal-form')]//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-45f59ed0-3a36-4ab6-9c45-e906471fb3e4"
         },
         {
           "actionType": "click",

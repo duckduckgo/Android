@@ -23,11 +23,12 @@ import android.view.ViewGroup
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeManualBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -43,11 +44,16 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
             "Missing fragment argument: '$ENTRY_POINT_ARG'"
         }
 
+    private val launchSource: SyncLaunchSource
+        get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), LAUNCH_SOURCE_ARG, SyncLaunchSource::class.java)) {
+            "Missing fragment argument: '$LAUNCH_SOURCE_ARG'"
+        }
+
     @Inject
     lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
 
     private val viewModel by activityViewModels<ReadSyncCodeViewModel> {
-        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint)
+        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint, launchSource)
     }
 
     override fun onCreateView(
@@ -79,9 +85,16 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
 
     companion object {
         private const val ENTRY_POINT_ARG = "entry_point"
+        private const val LAUNCH_SOURCE_ARG = "launch_source"
 
-        fun instance(entryPoint: SyncEntryPoint) = ReadSyncCodeManualFragment().apply {
-            arguments = bundleOf(ENTRY_POINT_ARG to entryPoint)
+        fun instance(
+            entryPoint: SyncEntryPoint,
+            launchSource: SyncLaunchSource,
+        ) = ReadSyncCodeManualFragment().apply {
+            arguments = bundleOf(
+                ENTRY_POINT_ARG to entryPoint,
+                LAUNCH_SOURCE_ARG to launchSource,
+            )
         }
     }
 }

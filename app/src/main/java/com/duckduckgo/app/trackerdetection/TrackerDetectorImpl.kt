@@ -31,16 +31,17 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.tracker.detection.api.TrackerDetector
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class, boundType = TrackerDetector::class)
-@ContributesBinding(AppScope::class, boundType = TrackerDetectorClientProvider::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<TrackerDetector>())
+@ContributesBinding(AppScope::class, binding = binding<TrackerDetectorClientProvider>())
+@SingleIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
     private val userAllowListRepository: UserAllowListRepository,

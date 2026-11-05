@@ -22,10 +22,10 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PAS
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ImportPasswordsDesktopAppPromotionInteractionHandler @Inject constructor(
     private val pixel: Pixel,
 ) : DesktopAppPromotionInteractionHandler {

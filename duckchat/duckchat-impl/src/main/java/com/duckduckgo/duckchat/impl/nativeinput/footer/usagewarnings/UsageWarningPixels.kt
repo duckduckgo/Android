@@ -44,8 +44,8 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarnin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningPixelName.USAGE_WARNING_WEEKLY_LIMIT_TAPPED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -142,7 +142,7 @@ class RealUsageWarningPixelSender @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class UsageWarningPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> =
         UsageWarningPixelName.entries.flatMap { name ->

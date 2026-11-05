@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.ScopedPassword
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /** Wraps a freshly-minted keypair's private key for the 3party credential. */

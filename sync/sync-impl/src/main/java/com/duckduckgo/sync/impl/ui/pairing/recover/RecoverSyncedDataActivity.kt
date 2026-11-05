@@ -20,10 +20,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -32,6 +33,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.auth.AuthPromptRenderer
 import com.duckduckgo.sync.impl.databinding.ActivityRecoverSyncedDataBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeContract
 import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataViewModel.Command
@@ -54,7 +56,10 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var vmFactory: RecoverSyncedDataViewModel.Factory
 
-    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+    private val launchSource
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, LAUNCH_SOURCE_EXTRA_KEY, SyncLaunchSource::class.java)) {
+            "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
+        }
 
     private val isAuthRequired get() = intent.getBooleanExtra(IS_AUTH_REQUIRED_EXTRA_KEY, true)
 
@@ -136,7 +141,7 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            launchSource: String?,
+            launchSource: SyncLaunchSource,
             isAuthRequired: Boolean,
         ): Intent {
             return Intent(context, RecoverSyncedDataActivity::class.java).apply {

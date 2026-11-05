@@ -20,12 +20,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.AdvertisedExchangeV2Version
 import com.duckduckgo.sync.impl.exchange.v2.RealAdvertisedExchangeV2Version
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(scope = AppScope::class, replaces = [RealAdvertisedExchangeV2Version::class])
 class SyncInternalAdvertisedExchangeV2Version @Inject constructor(
     private val real: RealAdvertisedExchangeV2Version,

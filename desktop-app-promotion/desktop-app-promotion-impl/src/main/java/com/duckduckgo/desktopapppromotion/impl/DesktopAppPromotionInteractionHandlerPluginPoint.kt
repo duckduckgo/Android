@@ -16,7 +16,7 @@
 
 package com.duckduckgo.desktopapppromotion.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler
 import com.duckduckgo.di.scopes.AppScope
 

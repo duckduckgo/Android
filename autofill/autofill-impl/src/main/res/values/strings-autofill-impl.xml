@@ -308,4 +308,16 @@
     <string name="importBookmarksErrorGenericMessage">Something went wrong</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Please make sure you\'re connected to the internet and try again.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import complete!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Hang tight — keep this window open. It shouldn’t take more than a minute or two.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google may ask for your password.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google will email you confirming your data has been exported. You don’t need to do anything.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import complete!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported">Bookmarks imported: <![CDATA[<b>%1$d</b>]]></string>
+
 </resources>

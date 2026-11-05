@@ -20,14 +20,11 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
@@ -44,6 +41,7 @@ import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActi
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
 import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -105,11 +103,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.enableWebContentDebugging.quietlySetIsChecked(webContentDebuggingFeature.webContentDebugging().isEnabled()) { _, isChecked ->
             webContentDebuggingFeature.webContentDebugging().setRawStoredState(Toggle.State(enable = isChecked))
-        }
-        binding.triggerAnr.setOnClickListener {
-            Handler(Looper.getMainLooper()).post {
-                Thread.sleep(10000)
-            }
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }

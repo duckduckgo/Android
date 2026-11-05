@@ -17,10 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.worker
 
 import androidx.work.multiprocess.RemoteWorkerService
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.ProcessName
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.VpnScope
-import dagger.android.AndroidInjection
 import logcat.logcat
 import javax.inject.Inject
 

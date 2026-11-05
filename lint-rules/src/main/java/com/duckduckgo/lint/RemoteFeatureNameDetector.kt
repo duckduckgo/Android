@@ -32,7 +32,7 @@ import org.jetbrains.uast.UElement
 import java.util.EnumSet
 
 /**
- * Detects underscores in [com.duckduckgo.anvil.annotations.ContributesRemoteFeature] interface
+ * Detects underscores in [com.duckduckgo.codegen.annotations.ContributesRemoteFeature] interface
  * method names and in the `featureName` annotation parameter.
  *
  * SharedPreferences keys are stored as `"featureName_methodName"`. If either part contains an
@@ -78,7 +78,7 @@ class RemoteFeatureNameDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        private const val CONTRIBUTES_REMOTE_FEATURE_FQN = "com.duckduckgo.anvil.annotations.ContributesRemoteFeature"
+        private const val CONTRIBUTES_REMOTE_FEATURE_FQN = "com.duckduckgo.codegen.annotations.ContributesRemoteFeature"
 
         val UNDERSCORE_IN_FEATURE_NAME = Issue.create(
             id = "RemoteFeatureNameWithUnderscore",

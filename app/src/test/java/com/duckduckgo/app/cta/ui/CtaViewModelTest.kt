@@ -75,7 +75,6 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -171,11 +170,6 @@ class CtaViewModelTest {
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
-    private val showInputScreenFlow = MutableStateFlow(true)
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock {
-        on { showInputScreen } doReturn showInputScreenFlow
-    }
-
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -248,7 +242,6 @@ class CtaViewModelTest {
             linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
                 on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
             },
-            duckAiFeatureState = mockDuckAiFeatureState,
             onboardingPixelSender = mockOnboardingPixelSender,
             contextualOnboardingTimeLimit = fakeContextualOnboardingTimeLimit,
         )
@@ -1152,7 +1145,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenDuckAiOnboardingFlowAndDuckAiEndNotShownThenRefreshCtaOnHomeSuppressedEvenIfSubscriptionAvailable() = runTest {
+    fun whenDuckAiOnboardingFlowAndDuckAiEndNotShownThenRefreshCtaOnHomeShowsDuckAiEndEvenIfSubscriptionAvailable() = runTest {
         givenDaxOnboardingActive()
         givenDuckAiOnboardingFlowArmed()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_FIRE_BUTTON)).thenReturn(true)
@@ -1167,7 +1160,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertNull(value)
+        assertTrue(value is DaxDuckAiEndBubbleCta)
     }
 
     @Test
@@ -1471,7 +1464,6 @@ class CtaViewModelTest {
     fun whenDuckAiOnboardingFlowEndedThenDuckAiEndCtaNotReturnedOnHome() = runTest {
         givenOnboardingEndedByTimeLimit()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1933,13 +1925,12 @@ class CtaViewModelTest {
         verify(mockDuckChat, never()).setInputScreenUserSetting(any())
     }
 
-    // region DAX_DUCK_AI_END home bubble (nativeInputField path)
+    // region DAX_DUCK_AI_END home bubble
 
     @Test
-    fun whenNativeInputActiveAndCanShowDuckAiEndCtaThenHomeCtaIsBrandDesignBubble() = runTest {
+    fun whenCanShowDuckAiEndCtaThenHomeCtaIsBrandDesignBubble() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
 
         val cta = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1955,7 +1946,6 @@ class CtaViewModelTest {
     fun whenCanShowDuckAiEndCtaOnSegmentedAiPathThenHomeCtaCarriesTheAiPath() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val cta = testee.refreshCta(
@@ -1972,26 +1962,9 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenInputScreenEnabledAndCanShowDuckAiEndCtaThenHomeCtaIsNullSoLegacyInputScreenFlowOwnsIt() = runTest {
+    fun whenCanShowDuckAiEndCtaThenInputScreenUserSettingEnabledJustInTime() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = true
-
-        val cta = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertNull(cta)
-    }
-
-    @Test
-    fun whenNativeInputActiveAndCanShowDuckAiEndCtaThenInputScreenUserSettingEnabledJustInTime() = runTest {
-        givenDaxOnboardingActive()
-        givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
 
         testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -2001,23 +1974,6 @@ class CtaViewModelTest {
         )
 
         verify(mockDuckChat).setInputScreenUserSetting(true)
-    }
-
-    @Test
-    fun whenInputScreenEnabledAndCanShowDuckAiEndCtaThenGetHomeCtaDoesNotApplyInputScreenUserSetting() = runTest {
-        givenDaxOnboardingActive()
-        givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = true
-
-        testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        // The legacy input-screen path applies the toggle in prepareAndMarkDuckAiEndCtaForInputScreen, not here.
-        verify(mockDuckChat, never()).setInputScreenUserSetting(any())
     }
 
     @Test

@@ -91,6 +91,8 @@ data class WideEventEntity(
         abstract val metadata: Map<String, String>
 
         data class OnProcessStart(
+            @Json(name = "ownerProcessName")
+            val ownerProcessName: String,
             @Json(name = "ignore_if_interval_timeout_present")
             val ignoreIfIntervalTimeoutPresent: Boolean,
             @Json(name = "status")

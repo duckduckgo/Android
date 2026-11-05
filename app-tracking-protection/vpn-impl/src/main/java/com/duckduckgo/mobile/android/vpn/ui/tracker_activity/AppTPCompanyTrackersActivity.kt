@@ -27,9 +27,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.InfoPanel
@@ -69,7 +69,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
 @InjectWith(ActivityScope::class)
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
@@ -88,7 +87,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
-    @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+    @Inject lateinit var reportBreakageContract: () -> ReportBreakageContract
 
     @Inject
     @AppTpBreakageCategories
@@ -116,7 +115,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
 
-        reportBreakage = registerForActivityResult(reportBreakageContract.get()) {
+        reportBreakage = registerForActivityResult(reportBreakageContract()) {
             if (!it.isEmpty()) {
                 Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
             }

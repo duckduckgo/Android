@@ -18,11 +18,11 @@ package com.duckduckgo.contentscopescripts.impl.features.apimanipulation
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ApiManipulationFeaturePlugin @Inject constructor(
     private val apiManipulationRepository: ApiManipulationRepository,
 ) : PrivacyFeaturePlugin {

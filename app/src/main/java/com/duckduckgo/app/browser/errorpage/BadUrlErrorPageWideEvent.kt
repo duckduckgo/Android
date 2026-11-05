@@ -31,9 +31,8 @@ import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
@@ -119,7 +118,7 @@ interface BadUrlErrorPageWideEvent {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealBadUrlErrorPageWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val badUrlErrorPageWideEventFeature: Lazy<BadUrlErrorPageWideEventFeature>,
@@ -361,7 +360,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
 
     private suspend fun isRecordingEnabled(): Boolean = withContext(dispatchers.io()) {
         // Suggest redirect feature conditions to be removed once we remove its feature flag
-        badUrlErrorPageWideEventFeature.get().self().isEnabled() &&
+        badUrlErrorPageWideEventFeature.value.self().isEnabled() &&
             suggestRedirectFeature.self().isEnabled() &&
             suggestRedirectFeature.suggestRedirect().isEnabled()
     }

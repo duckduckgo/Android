@@ -17,11 +17,11 @@
 package com.duckduckgo.site.permissions.impl.drm
 
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DrmSessionStore @Inject constructor() {
     private val sessions = ConcurrentHashMap<String, Boolean>()
     private val autoGrantsReported = ConcurrentHashMap<String, Boolean>()

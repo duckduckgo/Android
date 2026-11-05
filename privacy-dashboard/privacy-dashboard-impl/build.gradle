@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -27,8 +27,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':di')
     implementation project(':privacy-dashboard-api')
     implementation project(':privacy-config-api')
@@ -44,7 +44,6 @@ dependencies {
     implementation project(':broken-site-api')
     api AndroidX.dataStore.preferences
 
-    implementation Google.dagger
     implementation AndroidX.appCompat
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
@@ -83,9 +82,6 @@ dependencies {
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

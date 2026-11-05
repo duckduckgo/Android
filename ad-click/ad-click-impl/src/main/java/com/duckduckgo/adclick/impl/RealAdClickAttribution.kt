@@ -22,7 +22,7 @@ import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionRepository
 import com.duckduckgo.adclick.impl.store.AdClickAttributionLinkFormatEntity
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

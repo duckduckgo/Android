@@ -20,7 +20,7 @@ import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /**

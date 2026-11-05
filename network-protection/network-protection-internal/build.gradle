@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -27,15 +27,12 @@ android {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.networkprotection.internal'
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
 
     implementation project(':browser-api')
     implementation project(':network-protection-impl')
@@ -65,9 +62,6 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.work.runtimeKtx
-
-    // Dagger
-    implementation Google.dagger
 
     implementation KotlinX.coroutines.core
 

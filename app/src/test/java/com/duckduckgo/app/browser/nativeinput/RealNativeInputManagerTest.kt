@@ -61,7 +61,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -97,7 +96,6 @@ class RealNativeInputManagerTest {
     private val duckAiChatStore: DuckAiChatStore = mock()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
-    private val nativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val rootView: ViewGroup = FrameLayout(context)
@@ -113,7 +111,6 @@ class RealNativeInputManagerTest {
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
         whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(MutableStateFlow(false))
-        nativeInputOmnibarFeature.self().setRawStoredState(State(enable = false))
         nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = true))
         testee = RealNativeInputManager(
             duckChat,
@@ -126,11 +123,61 @@ class RealNativeInputManagerTest {
             pixel,
             nativeInputStateBugKillSwitch,
             nativeInputUrlClearingFeature,
-            nativeInputOmnibarFeature,
             nativeInputEventListener,
             edgeToEdgeHandler,
             duckAiChatStore,
         )
+    }
+
+    @Test
+    fun whenDuckAiWidgetIsAddedThenBottomCardChromeIsAlreadyApplied() {
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
+        whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
+        whenever(omnibar.getText()).thenReturn("")
+        testee.init(omnibar, rootView, lifecycleOwner)
+        rootView.addView(FrameLayout(context).apply { id = R.id.includeNewBrowserTab })
+        val widgetDelegate: NativeInputWidget = mock()
+        val widget = TestNativeInputWidget(context, widgetDelegate).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget }
+        val widgetView = FrameLayout(context).apply {
+            id = R.id.inputModeRoot
+            addView(widget)
+        }
+        val inflater: LayoutInflater = mock()
+        whenever(inflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)
+        var inspectedBeforeConfiguration = false
+        rootView.setOnHierarchyChangeListener(
+            object : ViewGroup.OnHierarchyChangeListener {
+                override fun onChildViewAdded(parent: View, child: View) {
+                    if (child !== widgetView) return
+                    inspectedBeforeConfiguration = true
+                    verify(widgetDelegate).setOmnibarPosition(true)
+                    verify(widgetDelegate, never()).configure(any(), any(), any(), any())
+                }
+
+                override fun onChildViewRemoved(parent: View, child: View) = Unit
+            },
+        )
+
+        testee.showNativeInput(
+            tabId = "tab",
+            layoutInflater = inflater,
+            lifecycleOwner = lifecycleOwner,
+            tabs = mock<LiveData<List<TabEntity>>>(),
+            currentTabUrl = emptyFlow(),
+            callbacks = NativeInputCallbacks(
+                onSearchTextChanged = {},
+                onSearchSubmitted = {},
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onChatSuggestionSelected = {},
+                onClearAutocomplete = {},
+                onStopTapped = {},
+            ),
+        )
+
+        assertTrue(inspectedBeforeConfiguration)
+        verify(widgetDelegate).configure(tabId = "tab", isDuckAiMode = true, isBottom = true, forceImageGeneration = false)
     }
 
     @Test
@@ -184,8 +231,7 @@ class RealNativeInputManagerTest {
     @Test
     fun whenKeyboardAppearsDuringDismissalFadeThenToolbarIsNotHidden() {
         givenDismissibleWidget()
-        assertTrue(testee.isNativeInputEnabled())
-        assertTrue(rootView.findViewById<View>(R.id.inputModeWidget) is NativeInputWidget)
+        assertTrue(rootView.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget) is NativeInputWidget)
         testee.onKeyboardVisibilityChanged(true)
         verify(omnibar).hide()
         testee.hideNativeInput(isNavigation = true)
@@ -228,7 +274,6 @@ class RealNativeInputManagerTest {
     }
 
     private fun givenDismissibleWidget(): ViewPropertyAnimator {
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.NewTab)
         testee.init(omnibar, rootView, lifecycleOwner)
@@ -236,7 +281,7 @@ class RealNativeInputManagerTest {
         val card = object : FrameLayout(context) {
             override fun animate(): ViewPropertyAnimator = fade
         }.apply { id = R.id.inputModeWidgetCard }
-        card.addView(TestNativeInputWidget(context).apply { id = R.id.inputModeWidget })
+        card.addView(TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
         rootView.addView(
             FrameLayout(context).apply {
                 id = R.id.inputModeRoot
@@ -268,7 +313,12 @@ class RealNativeInputManagerTest {
         val endAction = argumentCaptor<Runnable>()
         verify(fade).withEndAction(endAction.capture())
         endAction.firstValue.run()
-        rootView.addView(TestNativeInputWidget(context).apply { id = R.id.inputModeWidget })
+        rootView.addView(
+            FrameLayout(context).apply {
+                id = R.id.inputModeRoot
+                addView(TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
+            },
+        )
         clearInvocations(omnibar)
 
         testee.onKeyboardVisibilityChanged(true)
@@ -278,7 +328,6 @@ class RealNativeInputManagerTest {
 
     @Test
     fun whenDuckAiModeAndNativeChatInputDisabledThenShowNativeInputRemovesWidget() {
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
         testee.init(omnibar, rootView, lifecycleOwner)
@@ -290,20 +339,7 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenNativeInputFieldDisabledThenShowNativeInputLeavesWidgetUntouched() {
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(false))
-        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
-        testee.init(omnibar, rootView, lifecycleOwner)
-        rootView.addView(View(context).apply { id = R.id.inputModeRoot })
-
-        showNativeInput()
-
-        assertNotNull(rootView.findViewById<View?>(R.id.inputModeRoot))
-    }
-
-    @Test
     fun whenInputModeBecomesSearchOnlyWhileWidgetShownThenWidgetRemoved() {
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         testee.init(omnibar, rootView, lifecycleOwner)
         rootView.addView(View(context).apply { id = R.id.inputModeRoot })
@@ -316,7 +352,6 @@ class RealNativeInputManagerTest {
     @Test
     fun whenNativeChatInputFlipsOffInDuckAiModeThenWidgetRemoved() {
         val nativeChatInputEnabled = MutableStateFlow(true)
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabled)
         whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
         testee.init(omnibar, rootView, lifecycleOwner)
@@ -328,8 +363,25 @@ class RealNativeInputManagerTest {
     }
 
     @Test
+    fun whenContextualSheetWidgetIsAttachedThenInputFocusIsReadFromOmnibarWidget() {
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.NewTab)
+        testee.init(omnibar, rootView, lifecycleOwner)
+        val sheetWidget: NativeInputWidget = mock()
+        whenever(sheetWidget.hasInputFocus()).thenReturn(true)
+        rootView.addView(TestNativeInputWidget(context, sheetWidget).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
+        rootView.addView(
+            FrameLayout(context).apply {
+                id = R.id.inputModeRoot
+                addView(TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
+            },
+        )
+
+        assertFalse(testee.hasInputFocus())
+    }
+
+    @Test
     fun whenWidgetRemovedThenNavBarAlsoRemoved() {
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
         testee.init(omnibar, rootView, lifecycleOwner)
@@ -466,7 +518,6 @@ class RealNativeInputManagerTest {
         duckAiMode: Boolean = false,
         existingListeners: FakeInput.() -> Unit = {},
     ): FakeInput {
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
         whenever(omnibar.viewMode).thenReturn(if (duckAiMode) Omnibar.ViewMode.DuckAI else Omnibar.ViewMode.Browser(null))
         whenever(queryUrlPredictor.isUrl(URL)).thenReturn(true)
@@ -475,7 +526,7 @@ class RealNativeInputManagerTest {
         testee.init(omnibar, rootView, lifecycleOwner)
 
         val input = FakeInput(context).apply {
-            id = R.id.inputModeWidget
+            id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget
             this.text = text
             existingListeners()
         }
@@ -595,7 +646,6 @@ class RealNativeInputManagerTest {
         currentTabUrl: Flow<String?> = emptyFlow(),
         onDuckAiQuerySubmitted: (String, DuckChatEntryPoint) -> Unit,
     ): TestNativeInputWidget {
-        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
         whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))
@@ -606,8 +656,11 @@ class RealNativeInputManagerTest {
             rootView.addView(FrameLayout(context).apply { id = R.id.includeNewBrowserTab })
         }
 
-        val widget = TestNativeInputWidget(context).apply { id = R.id.inputModeWidget }
-        val widgetView = FrameLayout(context).apply { addView(widget) }
+        val widget = TestNativeInputWidget(context).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget }
+        val widgetView = FrameLayout(context).apply {
+            id = R.id.inputModeRoot
+            addView(widget)
+        }
         val layoutInflater: LayoutInflater = mock()
         whenever(layoutInflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)
         testee.showNativeInput(

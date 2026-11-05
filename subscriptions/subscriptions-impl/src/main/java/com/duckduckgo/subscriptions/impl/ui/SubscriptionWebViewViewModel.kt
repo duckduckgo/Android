@@ -19,7 +19,7 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -153,6 +153,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     Waiting
                 }
                 is CurrentPurchase.Success -> {
+                    if (!it.isPlanSwitch) {
+                        pixelSender.reportPurchaseSuccessOrigin(launchOrigin, it.isFreeTrial)
+                    }
                     subscriptionsChecker.runChecker()
                     pendingScheduleNotificationDaysBeforeCancel?.let { days ->
                         if (subscriptionsFeature.subscriptionExpirationReminderNotification().isEnabled()) {
@@ -169,7 +172,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
-                        isFreeTrial = it.isFreeTrial,
                         launchOnboarding = launchOnboarding,
                     )
                 }
@@ -837,7 +839,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object InProgress : PurchaseStateView()
         data class Success(
             val subscriptionEventData: SubscriptionEventData,
-            val isFreeTrial: Boolean,
             val launchOnboarding: Boolean,
         ) : PurchaseStateView()
         data object Waiting : PurchaseStateView()

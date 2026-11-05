@@ -72,7 +72,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -132,23 +132,16 @@ interface NativeInputManager {
         omnibar: Omnibar,
         rootView: ViewGroup,
         lifecycleOwner: LifecycleOwner,
-        onDisabled: () -> Unit = {},
     )
-
-    fun isNativeInputEnabled(): Boolean
-
-    /**
-     * Whether the native input should actually be used for the current context, as opposed to the
-     * legacy omnibar. True when the field is enabled AND either we're in Duck.ai or the config is not
-     * search-only. In search-only mode the browser omnibar falls back to the legacy text input.
-     */
-    fun isNativeInputActive(): Boolean
 
     /** True when the native input widget is currently attached (top or bottom omnibar). */
     fun isNativeInputShown(): Boolean
 
     /** True when the widget is shown with the chat tab selected. */
     fun isChatTabSelected(): Boolean
+
+    /** True when the widget is shown and its text field has focus. */
+    fun hasInputFocus(): Boolean
 
     fun showNativeInput(
         tabId: String,
@@ -208,7 +201,6 @@ class RealNativeInputManager @Inject constructor(
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
     private val nativeInputUrlClearingFeature: NativeInputUrlClearingFeature,
-    private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
@@ -216,7 +208,6 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
-    private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
     private var isNavBarFeatureEnabled: Boolean = false
     private var inputModeCapability: NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY
@@ -255,31 +246,20 @@ class RealNativeInputManager @Inject constructor(
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
-        return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
+        return widgetView.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidget) as? NativeInputWidget
     }
+
+    // The contextual sheet's widget shares the id and also lives under rootView, so look inside the omnibar wrapper only.
+    private fun omnibarWidget(): NativeInputWidget? = rootView.findViewById<View?>(R.id.inputModeRoot)?.let(::widgetFrom)
 
     override fun init(
         omnibar: Omnibar,
         rootView: ViewGroup,
         lifecycleOwner: LifecycleOwner,
-        onDisabled: () -> Unit,
     ) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
-        duckChat.observeNativeInputFieldUserSettingEnabled()
-            .onEach { isEnabled ->
-                if (isNativeInputFieldEnabled && !isEnabled) {
-                    // Instant teardown before clearing the flag. Settings toggles often fire while the
-                    // tab is paused, so an animated exit's waitForLayout may never run; and once the
-                    // flag is false, hideNativeInput used to no-op and leave UTI chrome / a missing
-                    // address field on return to NTP.
-                    hideNativeInput(animate = false)
-                    onDisabled()
-                }
-                isNativeInputFieldEnabled = isEnabled
-            }
-            .launchIn(lifecycleOwner.lifecycleScope)
         duckChat.observeNativeChatInputEnabled()
             .onEach { isEnabled ->
                 val wasEnabled = isNativeChatInputEnabled
@@ -296,13 +276,10 @@ class RealNativeInputManager @Inject constructor(
         duckChatInputModeState.inputModeCapability
             .onEach {
                 inputModeCapability = it
-                // Rebuild on the next focus (rather than half-update in place) when the new search mode no
-                // longer fits the open widget: native input is now inactive, or,with search-only on, it's
-                // the browser omnibar, whose two search layouts differ. An active Duck.ai input is unaffected,
-                // so just refresh its nav bar.
-                val rebuildOnRefocus = !isNativeInputActive() ||
-                    (isSearchOnlyRestoreEnabled() && !omnibarController.isDuckAiMode())
-                if (rebuildOnRefocus) {
+                // Rebuild the browser omnibar's widget on the next focus (rather than half-update in place),
+                // since its two search layouts differ. An active Duck.ai input is unaffected, so just refresh
+                // its nav bar.
+                if (!omnibarController.isDuckAiMode()) {
                     hideNativeInput(animate = false)
                 } else {
                     refreshNavBarVisibility()
@@ -316,24 +293,9 @@ class RealNativeInputManager @Inject constructor(
             }
             .launchIn(lifecycleOwner.lifecycleScope)
         voiceSearchAvailability.observeVoiceSearchAvailability()
-            .onEach { widgetFrom(rootView)?.let { widget -> updateVoiceButtons(widget) } }
+            .onEach { omnibarWidget()?.let { widget -> updateVoiceButtons(widget) } }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
-
-    override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
-
-    override fun isNativeInputActive(): Boolean {
-        if (!isNativeInputFieldEnabled) return false
-        // Native input is used in Duck.ai mode, in Search & Duck.ai mode, and in search-only mode
-        // only when the search-only feature flag is on.
-        val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
-        return inDuckAi ||
-            inputModeCapability == NativeInputState.InputMode.SEARCH_AND_DUCK_AI ||
-            (isSearchOnlyRestoreEnabled() && inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY)
-    }
-
-    private fun isSearchOnlyRestoreEnabled(): Boolean =
-        nativeInputOmnibarFeature.self().isEnabled() && nativeInputOmnibarFeature.nativeInputSearchOnly().isEnabled()
 
     override fun isNativeInputShown(): Boolean {
         if (!::rootView.isInitialized) return false
@@ -343,8 +305,13 @@ class RealNativeInputManager @Inject constructor(
 
     override fun isChatTabSelected(): Boolean {
         if (!::rootView.isInitialized) return false
-        val widget = widgetFrom(rootView) ?: return false
+        val widget = omnibarWidget() ?: return false
         return widget.isChatTabSelected()
+    }
+
+    override fun hasInputFocus(): Boolean {
+        if (!::rootView.isInitialized) return false
+        return omnibarWidget()?.hasInputFocus() == true
     }
 
     override fun setPickingImage(picking: Boolean) {
@@ -355,30 +322,30 @@ class RealNativeInputManager @Inject constructor(
 
     override fun setText(text: String) {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.text = text
     }
 
     override fun refreshChatSuggestions() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.refreshChatSuggestions()
     }
 
     override fun onChatDeleteConfirmed() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.onChatDeleteConfirmed()
     }
 
     override fun onChatDeleteCancelled() {
         if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         widget.onChatDeleteCancelled()
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
-        val widget = widgetFrom(rootView)
+        val widget = omnibarWidget()
         if (widget != null) {
             widget.nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
             try {
@@ -401,9 +368,6 @@ class RealNativeInputManager @Inject constructor(
             ?: return false
         if (isExiting && animate) return !omnibarController.isDuckAiMode()
         isExiting = true
-
-        // Do not require isNativeInputFieldEnabled: teardown must still run after the setting flips
-        // off (and after a paused animated hide left the widget attached).
 
         // Clear focus before hiding the IME. In SEARCH_ONLY mode the input field still holds focus
         // when the widget is dismissed, and a focused, attached EditText remains the IME target —
@@ -533,9 +497,9 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
-        if (!isNativeInputFieldEnabled) return
+        if (!::rootView.isInitialized) return
         if (isExiting) return
-        val widget = widgetFrom(rootView) ?: return
+        val widget = omnibarWidget() ?: return
         val widgetRoot = widgetRoot
 
         if (omnibarController.isDuckAiMode()) {
@@ -620,7 +584,7 @@ class RealNativeInputManager @Inject constructor(
         forceImageGeneration: Boolean,
         textSelection: String?,
     ) {
-        if (!isNativeInputFieldEnabled) return
+        if (!::rootView.isInitialized) return
 
         // When native chat input is disabled, Duck.ai renders its own web input — don't overlay
         // the native widget. Remove any widget left over from a previous (non-Duck.ai) state.
@@ -629,7 +593,7 @@ class RealNativeInputManager @Inject constructor(
             return
         }
 
-        if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(R.id.inputModeWidget) != null) return
+        if (omnibarController.isDuckAiMode() && omnibarWidget() != null) return
 
         animator.cancelAnimation()
         isExiting = false
@@ -840,8 +804,9 @@ class RealNativeInputManager @Inject constructor(
         navBarTabCountObserver?.let { existing -> navBarTabCountLiveData?.removeObserver(existing) }
         navBarTabCountObserver = null
         navBarTabCountLiveData = null
-        floatingSubmitContainer?.let {
-            (it.parent as? ViewGroup)?.removeView(it)
+        floatingSubmitContainer?.let { container ->
+            val parent = container.parent as? ViewGroup
+            if (parent?.isInLayout == true) parent.post { parent.removeView(container) } else parent?.removeView(container)
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
@@ -860,20 +825,20 @@ class RealNativeInputManager @Inject constructor(
 
     private fun createWidgetView(layoutInflater: LayoutInflater, isBottom: Boolean): View {
         val view = layoutInflater.inflate(R.layout.input_mode_widget_card_view, rootView, false)
+        widgetFrom(view)?.setOmnibarPosition(isBottom)
         applyPositionChrome(view, isBottom)
         return view
     }
 
     /**
-     * One layout serves both positions; the per-position chrome that used to live in the two wrapper
-     * XMLs is set here from [isBottom]: the row's side paddings, the card's background/elevation/
-     * compat-padding/resting margins, the input field's content padding, and the inline nav buttons'
-     * gravity and margins. The card's shape and horizontal insets stay state-driven inside the widget
-     * (applyOmnibarShape); the leading fire is gated on bottom by the widget itself.
+     * One layout serves both positions; the per-position placement that used to live in the two wrapper
+     * XMLs is set here from [isBottom]: the row's side paddings, the card's resting margins, the inline nav
+     * buttons' gravity and margins, and the footer's bottom margin. The card's surface is set before attachment,
+     * since attaching starts state collection before configure runs. Its shape and horizontal insets stay
+     * state-driven (the card's applyOmnibarShape); the leading fire is gated on bottom by the widget itself.
      */
     private fun applyPositionChrome(view: View, isBottom: Boolean) {
-        val card = view.findViewById<MaterialCardView>(R.id.inputModeWidgetCard) ?: return
-        val widget = view.findViewById<View>(R.id.inputModeWidget) ?: return
+        val card = view.findViewById<View>(R.id.inputModeWidgetCard) ?: return
         val buttons = view.findViewById<View>(R.id.inlineNavButtonsContainer) ?: return
         // The card sits in the row LinearLayout, nested inside the footer dock, so reach it via the card
         // rather than the root's first child (which is the dock).
@@ -883,19 +848,12 @@ class RealNativeInputManager @Inject constructor(
         val keyline1 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         val keyline2 = res.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         footer?.updateLayoutParams<MarginLayoutParams> { bottomMargin = if (isBottom) keyline2 else 0 }
-        // Resolve the card background against the card's own context, not the root's: the card carries the
-        // daxInputModeCardThemeOverlay (android:theme), which in a Fire Tab remaps daxColorSurface/Window to
-        // the fire card colour. Reading it off the root would paint the non-fire colour.
         if (isBottom) {
             row.setPaddingRelative(keyline2, 0, keyline1, 0)
-            card.setCardBackgroundColor(card.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
-            card.cardElevation = 3f.toPx()
-            card.setUseCompatPadding(false)
             card.updateLayoutParams<MarginLayoutParams> {
                 topMargin = keyline2
                 bottomMargin = keyline2
             }
-            widget.setPaddingRelative(keyline1, keyline2, keyline1, keyline2)
             buttons.updateLayoutParams<LinearLayout.LayoutParams> {
                 gravity = Gravity.BOTTOM
                 marginStart = (-8f).toPx().toInt()
@@ -903,14 +861,9 @@ class RealNativeInputManager @Inject constructor(
             }
         } else {
             row.setPaddingRelative(0, 0, 0, 0)
-            card.setCardBackgroundColor(card.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
-            card.cardElevation = 6f.toPx()
-            card.setUseCompatPadding(true)
             card.updateLayoutParams<MarginLayoutParams> {
                 topMargin = (-9f).toPx().toInt()
             }
-            val vertical = 4f.toPx().toInt()
-            widget.setPaddingRelative(keyline1, vertical, keyline1, vertical)
             buttons.updateLayoutParams<LinearLayout.LayoutParams> {
                 gravity = Gravity.TOP
                 marginStart = (-12f).toPx().toInt()
@@ -947,9 +900,9 @@ class RealNativeInputManager @Inject constructor(
     }
 
     /**
-     * Mirrors [NativeInputWidget.bindTabCount]: the fragment's viewLifecycleOwner is reused across
-     * show/hide cycles, so the previous observer is removed before re-observing — otherwise each cycle
-     * stacks an observer that keeps updating a detached button. Shared by the nav-bar strip and the
+     * The fragment's viewLifecycleOwner is reused across show/hide cycles, so the previous observer is
+     * removed before re-observing — otherwise each cycle stacks an observer that keeps updating a
+     * detached button. Shared by the nav-bar strip and the
      * search-only inline buttons.
      */
     private fun bindNavBarTabCount(
@@ -980,8 +933,6 @@ class RealNativeInputManager @Inject constructor(
             onInputFocusChanged = callbacks.onInputFocusChanged
             onFireButtonTapped = callbacks.onFireButtonPressed
             onCustomizeResponsesClicked = callbacks.onCustomizeResponsesClicked
-            bindTabCount(lifecycleOwner, tabs.map { it.size })
-            hideMainButtons()
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
             bindAttachmentCallbacks(
                 onCameraCaptureRequested = callbacks.onCameraCaptureRequested,
@@ -1171,7 +1122,7 @@ class RealNativeInputManager @Inject constructor(
     /** The toggle-row back arrow is the inverse of the nav bar: it fills in as the back affordance only
      *  while the nav bar is hidden, so exactly one back arrow shows at a time. */
     private fun syncBackArrowToNavBar() {
-        widgetFrom(rootView)?.setNavBarVisible(navBarShown == true)
+        omnibarWidget()?.setNavBarVisible(navBarShown == true)
     }
 
     /** On the user's first keystroke (empty to non-empty), latches the nav bar off for the rest of this input session and slide it out. */

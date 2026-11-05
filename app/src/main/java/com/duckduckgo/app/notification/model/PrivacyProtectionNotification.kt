@@ -31,7 +31,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -92,7 +92,7 @@ class PrivacyProtectionNotificationSpecification(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PrivacyProtectionNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: PrivacyProtectionNotification,

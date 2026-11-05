@@ -47,8 +47,8 @@ import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Key
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_VOICE_SEARCH
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_PREFERENCES
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -153,6 +153,8 @@ interface DuckChatDataStore {
 
     suspend fun setLastUsedTogglePosition(position: String)
 
+    suspend fun getLastUsedTogglePosition(): String?
+
     fun observeLastUsedTogglePosition(): StateFlow<String?>
 
     suspend fun getSelectedModel(): SelectedModel?
@@ -184,7 +186,7 @@ data class SelectedModel(
 )
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SharedPreferencesDuckChatDataStore @Inject constructor(
     @DuckChat private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
@@ -475,6 +477,9 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun setLastUsedTogglePosition(position: String) {
         store.edit { prefs -> prefs[DUCK_AI_LAST_USED_TOGGLE_POSITION] = position }
     }
+
+    override suspend fun getLastUsedTogglePosition(): String? =
+        store.data.firstOrNull()?.let { it[DUCK_AI_LAST_USED_TOGGLE_POSITION] }
 
     override fun observeLastUsedTogglePosition(): StateFlow<String?> = lastUsedTogglePositionFlow
 

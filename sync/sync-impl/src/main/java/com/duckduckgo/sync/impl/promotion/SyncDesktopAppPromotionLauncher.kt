@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.sync.impl.R
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR

@@ -20,24 +20,26 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.nextsteps.impl.R
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsCardBinding
 import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsStackedCardsBinding
-import com.duckduckgo.nextsteps.impl.ui.NextStepsItemsViewModel.ViewState
+import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsViewModel.Command
+import com.duckduckgo.nextsteps.impl.ui.NextStepsStackedCardsViewModel.ViewState
 import com.duckduckgo.remote.messaging.api.CardItem
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -52,13 +54,18 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
+    @Inject
+    lateinit var actionLauncher: NextStepsActionLauncher
+
     private val binding: ViewNextStepsStackedCardsBinding by viewBinding()
 
-    private val viewModel: NextStepsItemsViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NextStepsItemsViewModel::class.java]
+    private val viewModel: NextStepsStackedCardsViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NextStepsStackedCardsViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()
+    private val conflatedCommandJob = ConflatedJob()
+    private var lifecycleOwner: LifecycleOwner? = null
     private var dismissAnimationRunning = false
 
     private val backCardOffset = resources.getDimension(R.dimen.nextStepsBackCardOffset)
@@ -67,6 +74,7 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
 
     init {
         binding.frontCard.closeButton.setOnClickListener { dismissFrontCard() }
+        binding.frontCard.primaryAction.setOnClickListener { viewModel.onPrimaryActionClicked() }
         binding.backCard.closeButton.isEnabled = false
         binding.backCard.primaryAction.isEnabled = false
         binding.backCard.root.isClickable = false
@@ -76,15 +84,43 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        val lifecycleOwner = findViewTreeLifecycleOwner()!!
+        actionLauncher.register(context)
+
+        val lifecycleOwner = findViewTreeLifecycleOwner()!!.also { this.lifecycleOwner = it }
+        lifecycleOwner.lifecycle.addObserver(viewModel)
+        viewModel.onViewAttached()
         conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
+            .launchIn(lifecycleOwner.lifecycleScope)
+
+        conflatedCommandJob += viewModel.commands()
+            .onEach { processCommand(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
     override fun onDetachedFromWindow() {
+        binding.frontCard.root.animate().cancel()
+        binding.backCard.root.animate().cancel()
+        dismissAnimationRunning = false
         conflatedStateJob.cancel()
+        conflatedCommandJob.cancel()
+        viewModel.onViewDetached()
+        actionLauncher.unregister()
+        lifecycleOwner?.lifecycle?.removeObserver(viewModel)
+        lifecycleOwner = null
         super.onDetachedFromWindow()
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Command.LaunchAddWidget -> actionLauncher.launchAddWidget(context, command.widgetType)
+            is Command.LaunchDefaultBrowserDialog -> {
+                if (actionLauncher.launchDefaultBrowserDialog(context)) viewModel.onDefaultBrowserDialogShown()
+            }
+            is Command.LaunchDefaultBrowserSettings -> actionLauncher.launchDefaultBrowserSettings(context)
+            is Command.LaunchScreen -> actionLauncher.launchScreen(context, command.screen, command.payload)
+            is Command.AnimateFrontCardCompletion -> animateFrontCardOut { viewModel.onFrontCardCompletionAnimated() }
+        }
     }
 
     private fun render(viewState: ViewState) {
@@ -109,6 +145,10 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     }
 
     private fun dismissFrontCard() {
+        animateFrontCardOut { viewModel.onFrontCardDismissed() }
+    }
+
+    private fun animateFrontCardOut(onEnd: () -> Unit) {
         if (dismissAnimationRunning) return
         dismissAnimationRunning = true
 
@@ -121,7 +161,7 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
             .alpha(0f)
             .setDuration(FRONT_EXIT_DURATION_MS)
             .withEndAction {
-                if (!hasBackCard) finishDismiss()
+                if (!hasBackCard) finishDismiss(onEnd)
             }
             .start()
 
@@ -131,14 +171,14 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
                 .scaleY(1f)
                 .translationY(0f)
                 .setDuration(BACK_PROMOTE_DURATION_MS)
-                .withEndAction { finishDismiss() }
+                .withEndAction { finishDismiss(onEnd) }
                 .start()
         }
     }
 
-    private fun finishDismiss() {
+    private fun finishDismiss(onEnd: () -> Unit) {
         dismissAnimationRunning = false
-        viewModel.onFrontCardDismissed()
+        onEnd()
     }
 
     private fun resetStackTransforms() {

@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeContract.Input
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeContract.Output
@@ -50,7 +51,7 @@ class DisplayQrCodeContract : ActivityResultContract<Input, Output>() {
 
     data class Input(
         val syncEntryPoint: SyncEntryPoint,
-        val launchSource: String?,
+        val launchSource: SyncLaunchSource,
     )
 
     sealed interface Output {

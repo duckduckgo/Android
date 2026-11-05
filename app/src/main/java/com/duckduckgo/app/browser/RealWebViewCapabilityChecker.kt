@@ -34,17 +34,18 @@ import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class, MainProcessLifecycleObserver::class)
-@ContributesBinding(AppScope::class, WebViewCapabilityChecker::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
+@ContributesBinding(AppScope::class, binding = binding<WebViewCapabilityChecker>())
+@SingleIn(AppScope::class)
 class RealWebViewCapabilityChecker @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
@@ -102,7 +103,7 @@ enum class WebViewCapabilityPixelName(override val pixelName: String) : Pixel.Pi
     WEBVIEW_CAPABILITIES("webview_capabilities"),
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WebViewCapabilityPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(

@@ -25,7 +25,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,7 +35,7 @@ import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RoomWebViewSessionStorage @Inject constructor(
     private val dao: WebViewSessionDao,
     @AppCoroutineScope private val appScope: CoroutineScope,

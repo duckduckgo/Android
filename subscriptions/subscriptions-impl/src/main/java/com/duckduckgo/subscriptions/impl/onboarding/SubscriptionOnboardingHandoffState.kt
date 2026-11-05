@@ -17,10 +17,10 @@
 package com.duckduckgo.subscriptions.impl.onboarding
 
 import com.duckduckgo.di.scopes.ActivityScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class SubscriptionOnboardingHandoffState @Inject constructor() {
     var isHandoff: Boolean = false
 }

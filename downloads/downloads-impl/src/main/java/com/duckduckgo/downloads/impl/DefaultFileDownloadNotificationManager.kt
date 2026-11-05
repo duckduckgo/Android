@@ -27,9 +27,10 @@ import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloadNotificationManager
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -46,13 +47,13 @@ private const val DOWNLOAD_SEEN_REQUEST_CODE_MASK = Int.MIN_VALUE
 @AnyThread
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = FileDownloadNotificationManager::class,
+    binding = binding<FileDownloadNotificationManager>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = BrowserLifecycleObserver::class,
+    binding = binding<BrowserLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DefaultFileDownloadNotificationManager @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val applicationContext: Context,

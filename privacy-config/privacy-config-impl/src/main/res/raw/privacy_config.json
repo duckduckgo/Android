@@ -31,17 +31,7 @@
                 }
             },
             "state": "enabled",
-            "features": {
-                "enabledByDefault": {
-                    "state": "enabled"
-                },
-                "adBlockingUXImprovements": {
-                    "state": "enabled"
-                },
-                "showAdBlockingOmnibarAnimation": {
-                    "state": "enabled"
-                }
-            }
+            "features": {}
         },
         "ampLinks": {
             "exceptions": [

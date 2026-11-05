@@ -27,8 +27,8 @@ import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -152,7 +152,7 @@ interface ExchangeV2Runner {
     fun localTrigger(trigger: LocalTrigger): Job
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealExchangeV2Runner @Inject constructor(
     private val smFactory: ExchangeV2StateMachineFactory,

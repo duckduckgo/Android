@@ -17,8 +17,9 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -30,8 +31,8 @@ interface ChatSuggestionsStore {
     val hasChatSuggestions: Flow<Boolean>
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = ChatSuggestionsStore::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<ChatSuggestionsStore>())
 class RealChatSuggestionsStore @Inject constructor() : ChatSuggestionsStore {
     private val _hasChatSuggestions = MutableSharedFlow<Boolean>(
         replay = 1,

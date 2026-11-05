@@ -19,12 +19,12 @@ package com.duckduckgo.app.tabs.db
 import com.duckduckgo.app.tabs.model.CachedPageContext
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealTabPageContextRepository @Inject constructor(
     private val dao: TabPageContextDao,
 ) : TabPageContextRepository {

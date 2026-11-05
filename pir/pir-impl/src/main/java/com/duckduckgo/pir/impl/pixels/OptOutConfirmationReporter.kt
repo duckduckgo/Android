@@ -25,7 +25,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOu
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus.REQUESTED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.util.concurrent.TimeUnit

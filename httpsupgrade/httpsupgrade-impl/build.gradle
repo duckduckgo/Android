@@ -16,15 +16,15 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
     implementation project(':app-build-config-api')
     implementation project(':library-loader-api')
     implementation project(':privacy-config-api')
@@ -37,7 +37,6 @@ dependencies {
     implementation project(path: ':data-store-api')
 
     implementation AndroidX.room.runtime
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation KotlinX.coroutines.core
@@ -61,11 +60,8 @@ dependencies {
 }
 
 android {
-    ndkVersion '28.2.13676358'
+    ndkVersion '30.0.16248370'
     namespace 'com.duckduckgo.httpsupgrade.impl'
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"

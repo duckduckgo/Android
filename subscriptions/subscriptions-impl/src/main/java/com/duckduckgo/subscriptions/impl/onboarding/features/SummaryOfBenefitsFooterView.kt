@@ -29,12 +29,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -47,7 +48,6 @@ import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_SUMMARY_OF_BENEFITS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ViewSummaryOfBenefitsFooterBinding
 import com.google.android.material.snackbar.Snackbar
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.io.File

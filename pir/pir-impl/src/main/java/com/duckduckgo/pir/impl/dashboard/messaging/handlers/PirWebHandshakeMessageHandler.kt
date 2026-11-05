@@ -26,7 +26,8 @@ import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -35,9 +36,9 @@ import javax.inject.Inject
 /**
  * Handles the initial handshake message from Web which is used to establish communication.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = ActivityScope::class,
-    boundType = PirWebJsMessageHandler::class,
+    binding = binding<PirWebJsMessageHandler>(),
 )
 class PirWebHandshakeMessageHandler @Inject constructor(
     private val subscriptions: Subscriptions,

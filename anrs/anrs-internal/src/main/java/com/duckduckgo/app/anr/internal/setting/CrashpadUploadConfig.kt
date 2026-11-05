@@ -18,10 +18,10 @@ package com.duckduckgo.app.anr.internal.setting
 
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class CrashpadUploadConfig @Inject constructor(sharedPreferencesProvider: SharedPreferencesProvider) {
 
     private val prefs by lazy { sharedPreferencesProvider.getSharedPreferences(CRASHPAD_UPLOAD_CONFIG) }

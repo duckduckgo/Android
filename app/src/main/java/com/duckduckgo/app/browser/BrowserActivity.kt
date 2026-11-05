@@ -55,7 +55,6 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
@@ -110,6 +109,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithParams
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -386,7 +386,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.daggerInject()
+        super.injectDependencies()
 
         val savedMode = savedInstanceState?.getString(KEY_SAVED_BROWSER_MODE)
         val modeChangedSinceSave = savedMode != null && savedMode != currentBrowserMode.name
@@ -405,7 +405,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
         pendingModeSwitch = newInstanceState?.getBundle(KEY_PENDING_MODE_SWITCH)?.toPendingModeSwitch()
 
-        super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+        super.onCreate(savedInstanceState = newInstanceState, injectDependencies = false)
 
         if (modeChangedSinceSave) {
             // remove restored VM and fragments
@@ -433,6 +433,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         observeBrowserModeChanges()
 
         viewModel.awaitClearDataFinishedNotification()
+        if (savedInstanceState == null && !intent.launchedFromRecents && dataClearer.dataClearerState.value != ApplicationClearDataState.FINISHED) {
+            dataClearer.deferredQuery = intent.intentText
+        }
         initializeServiceWorker()
 
         intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
@@ -674,6 +677,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         } else {
             logcat(INFO) { "Automatic data clearer not yet finished, so deferring processing of intent" }
             lastIntent = intent
+            dataClearer.deferredQuery = intent.intentText
         }
     }
 

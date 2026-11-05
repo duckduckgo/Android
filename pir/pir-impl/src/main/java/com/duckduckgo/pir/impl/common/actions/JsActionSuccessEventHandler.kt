@@ -49,14 +49,16 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedRespon
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ScrollResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class JsActionSuccessEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -138,7 +140,7 @@ class JsActionSuccessEventHandler @Inject constructor(
                 )
             }
 
-            is FillFormResponse, is ClickResponse, is ExpectationResponse, is ExtractedResponse, is ExecuteScriptResponse -> {
+            is FillFormResponse, is ClickResponse, is ExpectationResponse, is ExtractedResponse, is ExecuteScriptResponse, is ScrollResponse -> {
                 Next(
                     nextState = baseSuccessState.copy(
                         currentActionIndex = baseSuccessState.currentActionIndex + 1,

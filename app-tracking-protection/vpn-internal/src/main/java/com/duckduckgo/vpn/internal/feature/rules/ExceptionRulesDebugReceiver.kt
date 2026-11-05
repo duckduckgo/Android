@@ -26,7 +26,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -75,7 +75,7 @@ class ExceptionRulesDebugReceiver(
     }
 }
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val exclusionRulesRepository: ExclusionRulesRepository,

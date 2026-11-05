@@ -61,7 +61,7 @@
             android:name="asset_statements"
             android:resource="@string/asset_statements" />
 
-        <!-- Disable WorkManager's default initialization so we can use Dagger with it -->
+        <!-- Disable WorkManager's default initialization so we can use DI with it -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

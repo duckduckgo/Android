@@ -32,9 +32,10 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import fi.iki.elonen.NanoHTTPD
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ interface DuckAiDebugServer {
     fun stop()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiDebugServer @Inject constructor(
     // The debug server inspects the Regular-mode store only; it does not surface Fire-mode data.
@@ -833,9 +834,9 @@ class RealDuckAiDebugServer @Inject constructor(
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class DuckAiDebugServerLifecycleObserver @Inject constructor(
     private val server: RealDuckAiDebugServer,

@@ -24,7 +24,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.WgProtocol
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore.DataVolume
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -33,7 +33,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class NetpDataVolumeMonitor @Inject constructor(
     private val wgProtocol: WgProtocol,
     private val dispatcherProvider: DispatcherProvider,

@@ -21,7 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.traces.api.StartupTraces
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

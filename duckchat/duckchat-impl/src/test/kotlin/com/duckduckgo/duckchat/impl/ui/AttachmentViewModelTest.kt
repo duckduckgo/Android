@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
@@ -124,15 +125,16 @@ class AttachmentViewModelTest {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
     private val nativeInputStateStore = RealNativeInputStateStore(
-        dagger.Lazy { tabRepositoryProvider },
+        lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
+        RealTextSelectionRepository(lazy { mock() }, mock()),
+        ChatStateStore(),
     )
 
     private lateinit var viewModel: AttachmentViewModel
 
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
-    private val textSelectionRepository = RealTextSelectionRepository(dagger.Lazy { duckChatPixels }, selectionJourney)
+    private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
     @Before

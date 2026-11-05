@@ -18,8 +18,8 @@ package com.duckduckgo.sync.impl.promotion.passwords
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters

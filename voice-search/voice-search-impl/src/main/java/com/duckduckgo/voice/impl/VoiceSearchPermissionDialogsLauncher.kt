@@ -29,7 +29,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 

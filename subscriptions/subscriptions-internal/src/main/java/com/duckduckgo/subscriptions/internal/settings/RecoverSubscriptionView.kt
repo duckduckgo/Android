@@ -20,16 +20,16 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
 import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -57,7 +57,7 @@ class RecoverSubscriptionView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class RecoverSubscriptionViewPlugin @Inject constructor() : SubsSettingPlugin {
     override fun getView(context: Context): View {
         return RecoverSubscriptionView(context)

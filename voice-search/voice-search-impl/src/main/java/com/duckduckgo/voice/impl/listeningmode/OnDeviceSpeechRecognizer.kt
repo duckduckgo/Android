@@ -29,7 +29,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

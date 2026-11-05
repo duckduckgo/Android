@@ -29,7 +29,8 @@ import com.duckduckgo.sync.api.SyncState.READY
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
@@ -40,9 +41,9 @@ import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.*
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class SettingsSyncDataObserver @Inject constructor(
     private val syncEngine: SyncEngine,

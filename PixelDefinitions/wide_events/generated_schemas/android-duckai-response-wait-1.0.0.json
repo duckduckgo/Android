@@ -1,0 +1,158 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Captures how long a user waits on a Duck.ai response in the full Duck.ai tab, whether they leave while it is pending, and whether they come back to it. Not sampled: every flow is recorded.",
+    "$comment": "{\"owners\":[\"LukasPaczos\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-duckai-response-wait" }, "version": { "const": "1.0.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app when the event's flow started. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["duckai-response-wait"] },
+                "status": { "type": "string", "description": "The terminal status of the flow", "enum": ["SUCCESS", "FAILURE"] },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "reasoning_effort": {
+                                    "type": "string",
+                                    "description": "Reasoning effort selected for the prompt. Present only when an effort was selected",
+                                    "enum": ["none", "minimal", "low", "medium", "high"]
+                                },
+                                "used_reasoning": {
+                                    "type": "string",
+                                    "description": "Whether the prompt used reasoning (low, medium or high effort). Present from the start of the flow",
+                                    "enum": ["true", "false"]
+                                },
+                                "used_extended_reasoning": {
+                                    "type": "string",
+                                    "description": "Whether the prompt used extended reasoning (medium or high effort). Present from the start of the flow",
+                                    "enum": ["true", "false"]
+                                },
+                                "user_requested_image_generation": {
+                                    "type": "string",
+                                    "description": "Whether the user selected the image generation tool for the prompt. Present from the start of the flow",
+                                    "enum": ["true", "false"]
+                                },
+                                "user_requested_web_search": {
+                                    "type": "string",
+                                    "description": "Whether the user selected the web search tool for the prompt. Present from the start of the flow",
+                                    "enum": ["true", "false"]
+                                },
+                                "status_reason": {
+                                    "type": "string",
+                                    "description": "Reason the flow ended. The flow follows the chat, not the tab it was sent from. watched when the user stayed on the chat until the response finished, returned when the user came back to the chat after leaving, not_returned when the user never came back before the flow expired, stopped when the user tapped stop while the response was generating. Present on every event",
+                                    "enum": ["watched", "returned", "not_returned", "stopped"]
+                                },
+                                "failure_reason": {
+                                    "type": "string",
+                                    "description": "Reason the flow failed. not_returned when the user never came back to the chat before the flow expired. Only present on FAILURE events",
+                                    "enum": ["not_returned"]
+                                },
+                                "step.left": {
+                                    "type": "string",
+                                    "description": "Parameter present when the user left the chat while the response was still loading",
+                                    "enum": ["true"]
+                                },
+                                "left_via": {
+                                    "type": "string",
+                                    "description": "How the user left the chat. Present only when step.left is present",
+                                    "enum": [
+                                        "app_backgrounded",
+                                        "tab_switched",
+                                        "new_tab_opened",
+                                        "back_or_close",
+                                        "fire_tab_opened",
+                                        "other_navigation"
+                                    ]
+                                },
+                                "step.response_ready_while_away": {
+                                    "type": "string",
+                                    "description": "Parameter present when the response finished while the user was away from the tab. Best effort: absent when the page only reports the finished response after the user is back, for example while the app was in the background",
+                                    "enum": ["true"]
+                                },
+                                "step.returned": {
+                                    "type": "string",
+                                    "description": "Parameter present when the user came back to the chat after leaving, in the same tab or another one",
+                                    "enum": ["true"]
+                                },
+                                "step.prompt_after_return": {
+                                    "type": "string",
+                                    "description": "Parameter present when the user submitted another prompt in the same chat after returning",
+                                    "enum": ["true"]
+                                },
+                                "prompt_to_leave_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Time from prompt submission to the user leaving the tab, bucketed (lower end of bucket, in ms). -1 when the measured duration was negative. Present only when step.left is present",
+                                    "enum": ["-1", "0", "2000", "5000", "10000", "20000", "30000"]
+                                },
+                                "leave_to_return_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Time from the user leaving the tab to coming back, bucketed (lower end of bucket, in ms). -1 when the measured duration was negative. Present only when step.returned is present",
+                                    "enum": ["-1", "0", "5000", "10000", "30000", "60000", "300000", "900000", "3600000"]
+                                },
+                                "ready_to_return_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Time from the response finishing while the user was away to the user coming back, bucketed (lower end of bucket, in ms). -1 when the measured duration was negative. Present only when the response finished while away and the user returned",
+                                    "enum": ["-1", "0", "5000", "10000", "30000", "60000", "300000", "900000", "3600000"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

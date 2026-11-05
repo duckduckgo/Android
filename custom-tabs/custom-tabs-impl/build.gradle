@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -25,15 +25,14 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 	implementation project(":custom-tabs-api")
 
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     implementation project(path: ':statistics-api')
     ksp AndroidX.room.compiler
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 
     // Browser
@@ -56,9 +55,6 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.customtabs.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
