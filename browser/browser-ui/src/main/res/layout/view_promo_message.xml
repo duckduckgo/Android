@@ -27,53 +27,40 @@
         android:orientation="vertical"
         android:padding="@dimen/keyline_5">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/headerImage"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/keyline_4"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/titleText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginHorizontal="@dimen/keyline_1"
+            android:breakStrategy="balanced"
+            android:gravity="center"
+            app:typography="h3"
+            tools:text="Placeholder Title" />
 
-            <ImageView
-                android:id="@+id/headerImage"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginEnd="@dimen/keyline_4"
-                android:importantForAccessibility="no"
-                android:scaleType="fitCenter"
-                android:visibility="gone"
-                tools:visibility="visible" />
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/messageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_1"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:breakStrategy="balanced"
+            android:gravity="center"
+            app:textType="secondary"
+            app:typography="body2"
+            tools:text="Body text goes here. This component can be used with one or two buttons." />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="56dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/titleText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:breakStrategy="balanced"
-                    app:typography="h3"
-                    tools:text="Placeholder Title" />
-
-                <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/messageText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    android:breakStrategy="balanced"
-                    android:visibility="gone"
-                    app:textType="secondary"
-                    app:typography="body2"
-                    tools:text="Body text goes here. This component can be used with one or two buttons." />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <com.duckduckgo.sync.impl.promotion.widget.AdaptiveButtonsLayout
+        <com.duckduckgo.browser.ui.promo.AdaptiveButtonsLayout
             android:id="@+id/buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -98,7 +85,24 @@
                 tools:text="Primary"
                 tools:visibility="visible" />
 
-        </com.duckduckgo.sync.impl.promotion.widget.AdaptiveButtonsLayout>
+        </com.duckduckgo.browser.ui.promo.AdaptiveButtonsLayout>
+
+        <FrameLayout
+            android:id="@+id/toggleContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:background="@drawable/background_promo_message_toggle"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/toggleItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:showSwitch="true" />
+
+        </FrameLayout>
 
     </LinearLayout>
 

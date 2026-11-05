@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.promotion.widget
+package com.duckduckgo.browser.ui.promo
 
 import android.content.Context
 import android.util.AttributeSet

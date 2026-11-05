@@ -27,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Callback
+import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -44,7 +45,6 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.P
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsSetUpPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsSetUpPromotionViewModel.Command.DismissPromotion
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsSetUpPromotionViewModel.Command.LaunchSyncSetup
-import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView.ActionStyle
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import kotlinx.coroutines.Job
