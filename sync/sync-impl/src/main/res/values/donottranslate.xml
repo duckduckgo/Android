@@ -22,8 +22,9 @@
     <string name="sync_bookmarks_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_title">Sync with your Desktop&#160;App</string>
-    <string name="sync_bookmarks_multi_device_promo_primary_button">Sync Bookmarks</string>
+    <string name="sync_bookmarks_multi_device_promo_title">Sync bookmarks with your desktop app&#160;too?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">Sync&#160;&amp;&#160;Backup is enabled on this&#160;device.</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button">Connect</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button">Get App</string>
 
     <!-- Sync promo in bookmark added dialog -->
@@ -49,8 +50,9 @@
     <string name="sync_passwords_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Sync with your Desktop&#160;App</string>
-    <string name="sync_passwords_multi_device_promo_primary_button">Sync Passwords</string>
+    <string name="sync_passwords_multi_device_promo_title">Sync passwords with your desktop app&#160;too?</string>
+    <string name="sync_passwords_multi_device_promo_message">Sync&#160;&amp;&#160;Backup is enabled on this&#160;device.</string>
+    <string name="sync_passwords_multi_device_promo_primary_button">Connect</string>
     <string name="sync_passwords_multi_device_promo_secondary_button">Get App</string>
 
     <!-- Sync promo after bookmarks import -->

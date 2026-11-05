@@ -50,14 +50,14 @@ class PromoMiniMessageView @JvmOverloads constructor(
         get() = binding.titleText.text
         set(value) {
             binding.titleText.text = value
-            binding.titleText.isVisible = value != null
+            binding.titleText.isVisible = !value.isNullOrEmpty()
         }
 
     var message: CharSequence?
         get() = binding.messageText.text
         set(value) {
             binding.messageText.text = value
-            binding.messageText.isVisible = value != null
+            binding.messageText.isVisible = !value.isNullOrEmpty()
         }
 
     var primaryButtonText: CharSequence?
@@ -66,6 +66,13 @@ class PromoMiniMessageView @JvmOverloads constructor(
             binding.primaryButton.text = value
             binding.primaryButton.isVisible = value != null
             updateButtonsVisibility()
+        }
+
+    @DrawableRes
+    var primaryButtonIcon: Int? = null
+        set(value) {
+            field = value
+            binding.primaryButton.setIconResource(value ?: 0)
         }
 
     var secondaryButtonText: CharSequence?
@@ -104,6 +111,7 @@ class PromoMiniMessageView @JvmOverloads constructor(
             title = getText(R.styleable.PromoMiniMessageView_promoTitleText)
             message = getText(R.styleable.PromoMiniMessageView_promoMessageText)
             primaryButtonText = getText(R.styleable.PromoMiniMessageView_promoPrimaryButtonText)
+            primaryButtonIcon = getResourceId(R.styleable.PromoMiniMessageView_promoPrimaryButtonIcon, 0).takeIf { it != 0 }
             secondaryButtonText = getText(R.styleable.PromoMiniMessageView_promoSecondaryButtonText)
             showCloseButton = getBoolean(R.styleable.PromoMiniMessageView_promoShowCloseButton, true)
             showElevation = getBoolean(R.styleable.PromoMiniMessageView_promoShowElevation, true)

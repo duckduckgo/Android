@@ -21,6 +21,7 @@
         <attr name="promoTitleText" />
         <attr name="promoMessageText" />
         <attr name="promoPrimaryButtonText" />
+        <attr name="promoPrimaryButtonIcon" format="reference" />
         <attr name="promoSecondaryButtonText" />
         <attr name="promoShowCloseButton" />
         <attr name="promoShowElevation" />
