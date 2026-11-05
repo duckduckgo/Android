@@ -27,9 +27,8 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 )
 interface AnrSupervisorFeature {
     /**
-     * When enabled, the ANR watcher's stop grace period never holds the lock the main thread takes on app foreground,
-     * and returning during it re-arms the running watcher instead of queueing a second one.
-     * When disabled, the watcher behaves as before (legacy behavior). Read once per process.
+     * When enabled, returning to the app never waits on the ANR watcher, and the watcher never keeps running in the background.
+     * When disabled, the legacy watcher lifecycle applies. Read once per process.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle

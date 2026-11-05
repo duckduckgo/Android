@@ -66,7 +66,7 @@ class AnrSupervisorRunnable @Inject constructor(
     private val customTabDetector: CustomTabDetector,
     private val appBuildConfig: AppBuildConfig,
     anrsDatabase: AnrsDatabase,
-    private val anrSupervisorFeature: AnrSupervisorFeature,
+    anrSupervisorFeature: AnrSupervisorFeature,
 ) : Runnable {
 
     private val anrDao = anrsDatabase.arnDao()
@@ -102,25 +102,19 @@ class AnrSupervisorRunnable @Inject constructor(
     private fun runNonBlocking() {
         var exitDecided = false
         try {
-            exitDecided = superviseUntilStopped()
+            while (!Thread.interrupted()) {
+                checkForAnr()
+                exitDecided = exitAfterStopGracePeriod()
+                if (exitDecided) break
+                Thread.sleep(ANR_CHALLENGE_PERIOD_MILLIS)
+            }
+        } catch (e: InterruptedException) {
+            logcat { "AnrSupervisor interrupted" }
         } finally {
+            // A decided exit already cleared running under the lock; clearing it again could undo a run onOpen has since started.
             if (!exitDecided) synchronized(this) { running = false }
         }
         logcat { "AnrSupervisor stopped" }
-    }
-
-    /** Returns true when it exited because the app stayed in the background, having already cleared [running]. */
-    private fun superviseUntilStopped(): Boolean {
-        while (!Thread.interrupted()) {
-            try {
-                checkForAnr()
-                if (exitAfterStopGracePeriod()) return true
-                Thread.sleep(ANR_CHALLENGE_PERIOD_MILLIS)
-            } catch (e: InterruptedException) {
-                return false
-            }
-        }
-        return false
     }
 
     // Sleeps without holding the lock, which AnrSupervisor.onOpen takes on the main thread.
