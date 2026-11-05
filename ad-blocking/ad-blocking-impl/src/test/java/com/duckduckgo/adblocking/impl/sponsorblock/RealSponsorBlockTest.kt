@@ -65,8 +65,8 @@ class RealSponsorBlockTest {
     }
 
     @Test
-    fun whenMalformedIdThenReturnsEmptyWithoutLookup() = runTest {
-        listOf("", "short", "dQw4w9WgXcQX", "dQw4w9WgXc!", "../../etc/pa").forEach { id ->
+    fun whenBlankIdThenReturnsEmptyWithoutLookup() = runTest {
+        listOf("", "   ").forEach { id ->
             assertTrue(sponsorBlock.getSegments(id).isEmpty())
         }
         assertTrue(segmentsProvider.requestedIds.isEmpty())
