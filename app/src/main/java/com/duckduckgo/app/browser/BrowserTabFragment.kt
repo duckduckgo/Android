@@ -5154,7 +5154,7 @@ class BrowserTabFragment :
      */
     override fun onSaveInstanceState(bundle: Bundle) {
         viewModel.saveWebViewState(webView, tabId)
-        if (isPdfVisible() && viewModel.isPdfPageContextEnabled()) {
+        if (isPdfVisible()) {
             bundle.putString("pdfContextUrl", viewModel.url)
             bundle.putString("pdfContextTitle", viewModel.browserViewState.value?.currentPdfFileName)
             bundle.putString("pdfContextUri", viewModel.browserViewState.value?.currentPdfCachedUri?.toString())
@@ -5166,7 +5166,7 @@ class BrowserTabFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.restoreWebViewState(webView, omnibar.getText())
             val pdfUrl = bundle?.getString("pdfContextUrl")
-            if (pdfUrl != null && viewModel.isPdfPageContextEnabled()) {
+            if (pdfUrl != null) {
                 val uri = bundle.getString("pdfContextUri")?.let { Uri.parse(it) }
                 val title = bundle.getString("pdfContextTitle").orEmpty()
                 if (viewModel.restorePdfPageContext(uri, title, pdfUrl) && uri != null) {

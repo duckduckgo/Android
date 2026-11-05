@@ -2826,7 +2826,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onPageLoadTimeout() {
         val state = currentBrowserViewState()
-        if (pdfPageContextResolver.isEnabled() && state.currentPdfCachedUri != null) return
+        if (state.currentPdfCachedUri != null) return
         val canShowError = state.browserShowing &&
             state.sslError == NONE &&
             !state.maliciousSiteBlocked &&
@@ -4613,7 +4613,11 @@ class BrowserTabViewModel @Inject constructor(
                     pageContextJSHelper.cancelCollection(tabId)
                     pdfPageContextRegistry.show(tabId, result.uri, pdfTitle, url)
                     command.value = ShowPdfInTab(url, result.uri)
-                    if (pdfPageContextResolver.isEnabled()) collectPageContext()
+                    pdfPageContextResolver.getMetadata(tabId)?.let { metadata ->
+                        if (metadata.availability != DuckAiPdfMetadata.Availability.STALE) {
+                            command.value = Command.PdfPageContextReceived(tabId, metadata)
+                        }
+                    }
                     if (customTab == null && pdfDownloadTooltipDataStore.canShow()) {
                         pdfDownloadTooltipDataStore.incrementShownCount()
                         command.value = Command.ShowPdfDownloadTooltip
@@ -5472,7 +5476,7 @@ class BrowserTabViewModel @Inject constructor(
 
             PAGE_CONTEXT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
-                    if (pdfPageContextResolver.isEnabled() && pdfPageContextProvider.getMetadata(tabId) != null) return@launch
+                    if (pdfPageContextResolver.getMetadata(tabId) != null) return@launch
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
                         val enrichedContext = duckChatJSHelper.enrichPageContextIfPossible(tabId, pageContext)
@@ -6194,8 +6198,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun isPdfPageContextEnabled(): Boolean = pdfPageContextResolver.isEnabled()
-
     suspend fun restorePdfPageContext(uri: Uri?, title: String, url: String): Boolean {
         pageContextJSHelper.cancelCollection(tabId)
         pdfPageContextRegistry.show(tabId, uri, title, url)
@@ -6225,14 +6227,12 @@ class BrowserTabViewModel @Inject constructor(
         isDuckAiVisible: Boolean,
     ) {
         viewModelScope.launch {
-            if (pdfPageContextResolver.isEnabled()) {
-                val context = pdfPageContextResolver.getMetadata(tabId)
-                if (context != null) {
-                    if (context.availability != DuckAiPdfMetadata.Availability.STALE) {
-                        command.value = Command.PdfPageContextReceived(tabId, context)
-                    }
-                    return@launch
+            val context = pdfPageContextResolver.getMetadata(tabId)
+            if (context != null) {
+                if (context.availability != DuckAiPdfMetadata.Availability.STALE) {
+                    command.value = Command.PdfPageContextReceived(tabId, context)
                 }
+                return@launch
             }
             val subscriptionEvent = pageContextJSHelper.collectPageContext(tabId, trigger, navigationId, isDuckAiVisible)
             _subscriptionEventDataChannel.send(subscriptionEvent)

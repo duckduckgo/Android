@@ -77,6 +77,31 @@ class PdfPageContextResolverTest {
         verifyNoInteractions(provider, pixels)
     }
 
+    @Test fun `metadata API returns null without a PDF`() = runTest {
+        whenever(provider.getMetadata("tab")).thenReturn(null)
+
+        assertNull(testee.getMetadata("tab"))
+
+        verify(provider, never()).read(any())
+        verifyNoInteractions(pixels)
+    }
+
+    @Test fun `metadata API preserves unavailable and stale PDF states`() = runTest {
+        val statuses = mapOf(
+            PdfPageContext.Status.TOO_LARGE to DuckAiPdfMetadata.Availability.TOO_LARGE,
+            PdfPageContext.Status.UNAVAILABLE to DuckAiPdfMetadata.Availability.UNAVAILABLE,
+            PdfPageContext.Status.STALE to DuckAiPdfMetadata.Availability.STALE,
+        )
+        statuses.forEach { (status, availability) ->
+            whenever(provider.getMetadata("tab")).thenReturn(document.copy(status = status))
+
+            assertEquals(availability, testee.getMetadata("tab")?.availability)
+        }
+
+        verify(provider, never()).read(any())
+        verifyNoInteractions(pixels)
+    }
+
     @Test fun `explicit attach sends base64 PDF`() = runTest {
         whenever(provider.getMetadata("tab")).thenReturn(document)
         whenever(provider.read(document.snapshot)).thenReturn(PdfContentResult.Success("%PDF-".toByteArray()))

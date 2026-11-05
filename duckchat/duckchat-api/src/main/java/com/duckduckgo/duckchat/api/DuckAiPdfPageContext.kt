@@ -18,8 +18,6 @@ package com.duckduckgo.duckchat.api
 
 /** PDF page-context metadata for the browser's contextual chat entry point. */
 interface DuckAiPdfPageContext {
-    fun isEnabled(): Boolean
-
     /** Null means disabled or no PDF. Stale and unavailable PDFs must not trigger extraction of the hidden page. */
     suspend fun getMetadata(tabId: String): DuckAiPdfMetadata?
 }

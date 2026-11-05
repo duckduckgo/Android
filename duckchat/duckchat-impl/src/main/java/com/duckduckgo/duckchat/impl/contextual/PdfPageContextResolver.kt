@@ -118,7 +118,7 @@ class PdfPageContextResolver @Inject constructor(
         }
     }
 
-    override fun isEnabled(): Boolean = feature.pdfPageContext().isEnabled()
+    internal fun isEnabled(): Boolean = feature.pdfPageContext().isEnabled()
 
     override suspend fun getMetadata(tabId: String): DuckAiPdfMetadata? {
         if (!isEnabled()) return null

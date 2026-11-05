@@ -10856,10 +10856,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHiddenWebViewTimesOutWhilePdfContextIsVisibleThenPdfRemainsAvailable() = runTest {
+    fun whenHiddenWebViewTimesOutWhilePdfIsVisibleAndDuckAiPdfContextDisabledThenPdfRemainsAvailable() = runTest {
         loadUrl("https://example.com/document.pdf")
         testee.browserViewState.value = browserViewState().copy(currentPdfCachedUri = Uri.parse("file:///cache/document.pdf"))
-        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
         clearInvocations(mockCommandObserver)
 
         testee.onPageLoadTimeout()
@@ -14504,7 +14503,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCollectPageContextHasPdfMetadataThenEmitMetadataWithoutCollectingWebPage() = runTest {
         val metadata = DuckAiPdfMetadata("document.pdf", "https://example.com/document.pdf", DuckAiPdfMetadata.Availability.AVAILABLE)
-        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
         whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(metadata)
 
         testee.collectPageContext()
@@ -14517,7 +14515,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCollectPageContextHasNoPdfMetadataThenCollectWebPage() = runTest {
-        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
         whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(null)
         whenever(mockPageContextJSHelper.collectPageContext(any(), any(), anyOrNull(), any())).thenReturn(
             SubscriptionEventData(PAGE_CONTEXT_FEATURE_NAME, "collect", JSONObject()),
@@ -14895,7 +14892,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRestoredPdfCacheExistsThenCachedDocumentCanBeShown() = runTest {
+    fun whenRestoredPdfCacheExistsAndDuckAiPdfContextDisabledThenCachedDocumentCanBeShown() = runTest {
         val uri = Uri.parse("file:///cache/restored.pdf")
         val url = "https://example.com/restored.pdf"
         whenever(pdfPageContextProvider.getMetadata(any())).thenReturn(
@@ -16126,7 +16123,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPdfMetadataStaleThenDoNotCollectHiddenPage() = runTest {
-        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
         whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(
             DuckAiPdfMetadata("private.pdf", "https://private.example", DuckAiPdfMetadata.Availability.STALE),
         )
@@ -16134,5 +16130,60 @@ class BrowserTabViewModelTest {
         verify(mockPageContextJSHelper, never()).collectPageContext(any(), any(), anyOrNull(), any())
         assertCommandNotIssued<Command.PdfPageContextReceived>()
         assertCommandNotIssued<Command.PageContextReceived>()
+    }
+
+    @Test
+    fun whenPdfLoadsAndDuckAiPdfContextDisabledThenDoNotCollectHiddenPage() = runTest {
+        whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(null)
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        val uri = Uri.parse("file:///cache/document.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/document.pdf", browserMode = BrowserMode.REGULAR))
+            .thenReturn(PdfDownloadResult.Success(uri))
+
+        testee.requestFileDownload(mock(), "https://example.com/document.pdf", null, "application/pdf", true, false)
+
+        assertEquals(uri, browserViewState().currentPdfCachedUri)
+        assertCommandIssued<Command.ShowPdfInTab>()
+        assertCommandNotIssued<Command.PdfPageContextReceived>()
+        verify(mockPageContextJSHelper, never()).collectPageContext(any(), any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenPdfLoadsWithDuckAiMetadataThenEmitPdfContext() = runTest {
+        val metadata = DuckAiPdfMetadata("document.pdf", "https://example.com/document.pdf", DuckAiPdfMetadata.Availability.AVAILABLE)
+        whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(metadata)
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/document.pdf", browserMode = BrowserMode.REGULAR))
+            .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/document.pdf")))
+
+        testee.requestFileDownload(mock(), "https://example.com/document.pdf", null, "application/pdf", true, false)
+
+        assertCommandIssued<Command.PdfPageContextReceived> { assertEquals(metadata, this.metadata) }
+        verify(mockPageContextJSHelper, never()).collectPageContext(any(), any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenMarkdownCallbackArrivesWithStalePdfMetadataThenIgnoreHiddenPage() = runTest {
+        whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(
+            DuckAiPdfMetadata("document.pdf", "https://example.com/document.pdf", DuckAiPdfMetadata.Availability.STALE),
+        )
+
+        testee.processJsCallbackMessage(PAGE_CONTEXT_FEATURE_NAME, "collectionResult", "contextId", JSONObject(), false) { "someUrl" }
+
+        verify(mockPageContextJSHelper, never()).processPageContext(any(), any(), anyOrNull(), any())
+        assertCommandNotIssued<Command.PageContextReceived>()
+    }
+
+    @Test
+    fun whenMarkdownCallbackArrivesAndDuckAiPdfContextDisabledThenProcessMarkdown() = runTest {
+        whenever(pdfPageContextResolver.getMetadata(any())).thenReturn(null)
+        whenever(pdfPageContextProvider.getMetadata(any())).thenReturn(
+            PdfPageContext("document.pdf", "https://example.com/document.pdf", PdfPageContext.Status.AVAILABLE, mock()),
+        )
+        whenever(mockPageContextJSHelper.processPageContext(any(), any(), anyOrNull(), any())).thenReturn("markdown")
+
+        testee.processJsCallbackMessage(PAGE_CONTEXT_FEATURE_NAME, "collectionResult", "contextId", JSONObject(), false) { "someUrl" }
+
+        assertCommandIssued<Command.PageContextReceived> { assertEquals("markdown", pageContext) }
     }
 }
