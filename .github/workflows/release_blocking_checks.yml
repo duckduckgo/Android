@@ -12,6 +12,11 @@ on:
         required: false
         type: boolean
         default: true
+      fail_fast:
+        description: 'Cancel the remaining end-to-end suites as soon as one fails'
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       commit:
@@ -35,16 +40,26 @@ jobs:
       commit: ${{ inputs.commit }}
     secrets: inherit
 
-  end-to-end:
-    needs: nightly
-    uses: ./.github/workflows/e2e-nightly-full-suite.yml
+  end-to-end-build:
+    uses: ./.github/workflows/e2e-build-and-upload.yml
     with:
       commit: ${{ inputs.commit }}
       create_asana_tasks: ${{ inputs.create_asana_tasks }}
     secrets: inherit
 
+  end-to-end:
+    needs: [nightly, end-to-end-build]
+    uses: ./.github/workflows/e2e-nightly-full-suite.yml
+    with:
+      commit: ${{ inputs.commit }}
+      create_asana_tasks: ${{ inputs.create_asana_tasks }}
+      internal_binary_id: ${{ needs.end-to-end-build.outputs.internal_binary_id }}
+      release_binary_id: ${{ needs.end-to-end-build.outputs.release_binary_id }}
+      fail_fast: ${{ inputs.fail_fast == true }}
+    secrets: inherit
+
   privacy:
-    needs: end-to-end
+    needs: nightly
     uses: ./.github/workflows/privacy.yml
     with:
       commit: ${{ inputs.commit }}
