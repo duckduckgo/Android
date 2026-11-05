@@ -85,6 +85,7 @@ class AttachmentView(
     private var nativeInputStateJob: Job? = null
     private var attachmentStateJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
+    private var hasAttachmentsOrError: Boolean = false
     private var popupWindow: PopupWindow? = null
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
@@ -111,10 +112,13 @@ class AttachmentView(
         attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
         }
-        nativeInputStateJob = nativeInputStateProvider.state
+        val editTabId = host?.takeIf { it.isEditSurface() }?.tabId()
+        val nativeInputState = editTabId?.let { nativeInputStateProvider.stateForTab(it) } ?: nativeInputStateProvider.state
+        nativeInputStateJob = nativeInputState
             .onEach { state ->
                 lastNativeInputState = state
                 updateButtonVisibility()
+                updateContainerVisibility(container)
             }
             .launchIn(scope)
     }
@@ -225,10 +229,15 @@ class AttachmentView(
                 ?: state.textSelectionLimitError,
             isEditMode = isEditMode,
         )
-        val notStreaming = lastNativeInputState?.isChatStreaming != true
-        container.isVisible = (state.hasAttachments || errorMessage != null) && notStreaming
+        hasAttachmentsOrError = state.hasAttachments || errorMessage != null
+        updateContainerVisibility(container)
         updateLimitError(errorMessage)
         notifyStateChanged(state)
+    }
+
+    private fun updateContainerVisibility(container: FrameLayout) {
+        val isDuckAi = isEditMode || isContextual || lastNativeInputState?.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI
+        container.isVisible = hasAttachmentsOrError && isDuckAi && lastNativeInputState?.isChatStreaming != true
     }
 
     private fun syncImages(imagesView: ImageAttachmentsContainerView, state: AttachmentViewModel.AttachmentState) {

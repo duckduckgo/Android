@@ -2162,6 +2162,7 @@ class BrowserTabFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.CollectPageContext -> {
+                        if (isHidden) return@onEach
                         viewModel.collectPageContext()
                     }
 
@@ -3126,6 +3127,10 @@ class BrowserTabFragment :
             is Command.StartAdBlockingAnimation -> {
                 omnibar.cancelTrackersAnimation()
                 omnibar.createAdBlockingAnimation(it.icon, it.text)
+            }
+
+            is Command.PdfPageContextReceived -> {
+                sharedContextualViewModel.onPdfPageContextReceived(it.tabId, it.metadata)
             }
 
             is Command.PageContextReceived -> {
@@ -5149,12 +5154,25 @@ class BrowserTabFragment :
      */
     override fun onSaveInstanceState(bundle: Bundle) {
         viewModel.saveWebViewState(webView, tabId)
+        if (isPdfVisible()) {
+            bundle.putString("pdfContextUrl", viewModel.url)
+            bundle.putString("pdfContextTitle", viewModel.browserViewState.value?.currentPdfFileName)
+            bundle.putString("pdfContextUri", viewModel.browserViewState.value?.currentPdfCachedUri?.toString())
+        }
         super.onSaveInstanceState(bundle)
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.restoreWebViewState(webView, omnibar.getText())
+            val pdfUrl = bundle?.getString("pdfContextUrl")
+            if (pdfUrl != null) {
+                val uri = bundle.getString("pdfContextUri")?.let { Uri.parse(it) }
+                val title = bundle.getString("pdfContextTitle").orEmpty()
+                if (viewModel.restorePdfPageContext(uri, title, pdfUrl) && uri != null) {
+                    showPdf(pdfUrl, uri)
+                }
+            }
         }
         viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)
