@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.android.support.AndroidSupportInjection
@@ -78,7 +79,7 @@ class SyncBookmarkAddedSetUpPromotionView @JvmOverloads constructor(
 
     // We never show the switch as on: turning it on only starts the setup, and Sync being enabled removes the promotion.
     private val switchListener: OnCheckedChangeListener = OnCheckedChangeListener { _, _ ->
-        binding.promoItem.quietlySetIsChecked(false, switchListener)
+        binding.promoSwitch.quietlySetIsChecked(false, switchListener)
         interactor?.setUpSync()
     }
 
@@ -88,10 +89,8 @@ class SyncBookmarkAddedSetUpPromotionView @JvmOverloads constructor(
 
     init {
         binding.promoCard.clipToOutline = true
-        binding.promoItem.apply {
-            setClickListener { interactor?.setUpSync() }
-            setOnCheckedChangeListener(switchListener)
-        }
+        binding.promoCard.setOnClickListener { interactor?.setUpSync() }
+        binding.promoSwitch.setOnCheckedChangeListener(switchListener)
         binding.overflowIcon.setOnClickListener { showOverflowMenu(it) }
     }
 

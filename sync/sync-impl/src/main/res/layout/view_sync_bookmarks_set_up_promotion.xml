@@ -27,12 +27,12 @@
         android:id="@+id/promoMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:promoActionStyle="toggle"
         app:promoHeaderImage="@drawable/sync_pending_96"
-        app:promoMessageText="@string/syncPromoSubtitleBookmarks"
+        app:promoMessageText="@string/sync_bookmarks_promo_message"
+        app:promoPrimaryButtonText="@string/sync_bookmarks_promo_primary_button"
         app:promoShowCloseButton="true"
         app:promoShowElevation="true"
-        app:promoTitleText="@string/syncPromoTitleBookmarks"
+        app:promoTitleText="@string/sync_bookmarks_promo_title"
         app:promoToggleText="@string/sync_bookmarks_promo_toggle" />
 
 </FrameLayout>

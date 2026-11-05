@@ -23,7 +23,6 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.setMargins
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.codegen.annotations.PriorityKey
@@ -78,7 +77,8 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
         }
 
         val root = LayoutInflater.from(activity).inflate(R.layout.view_sync_setup_bookmark_added_promo, null) as OneLineListItem
-        root.layoutParams = MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { setMargins(16.toPx(activity)) }
+        val margin = 16.toPx(activity)
+        root.layoutParams = MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { setMargins(margin, 8.toPx(activity), margin, margin) }
         if (appBrandDesignUpdateToggles.radius().isEnabled()) {
             root.setBackgroundResource(R.drawable.sync_bookmark_added_promo_background)
         }

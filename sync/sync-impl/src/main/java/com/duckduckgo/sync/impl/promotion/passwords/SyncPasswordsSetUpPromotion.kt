@@ -34,6 +34,8 @@ import kotlin.time.Duration.Companion.days
 
 interface SyncPasswordsSetUpPromotion {
     suspend fun canShowPromotion(savedPasswords: Int): Boolean
+
+    suspend fun shouldUseToggle(): Boolean
 }
 
 @ContributesBinding(AppScope::class, binding = binding<SyncPasswordsSetUpPromotion>())
@@ -57,6 +59,10 @@ class RealSyncPasswordsSetUpPromotion @Inject constructor(
             ).awaitAll()
             preconditions.all { it }
         }
+    }
+
+    override suspend fun shouldUseToggle(): Boolean = withContext(dispatchers.io()) {
+        syncPromotionFeature.shouldShowToggleInPromos().isEnabled()
     }
 
     private suspend fun isPromotionEnabled(): Boolean = withContext(dispatchers.io()) {

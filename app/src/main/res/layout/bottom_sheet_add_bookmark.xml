@@ -67,8 +67,6 @@
         android:id="@+id/promotionContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:background="?attr/daxColorBackground"
         android:orientation="vertical" />
 
 </com.duckduckgo.app.bookmarks.dialog.TouchObservingLinearLayout>

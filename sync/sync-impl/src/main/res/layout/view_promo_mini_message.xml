@@ -54,6 +54,7 @@
                     android:id="@+id/titleText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:breakStrategy="balanced"
                     app:typography="h3"
                     tools:text="Placeholder Title" />
 
@@ -62,6 +63,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_2"
+                    android:breakStrategy="balanced"
                     android:visibility="gone"
                     app:textType="secondary"
                     app:typography="body2"
@@ -77,27 +79,31 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginBottom="-4dp"
+            android:baselineAligned="false"
             android:divider="@drawable/divider_promo_message_buttons"
             android:orientation="horizontal"
             android:showDividers="middle"
             android:visibility="gone"
             tools:visibility="visible">
 
+            <!-- We ignore InvalidDaxButtonProperty: match_parent keeps both buttons the same height. -->
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/secondaryButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:visibility="gone"
+                tools:ignore="InvalidDaxButtonProperty"
                 tools:text="Secondary"
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonBrand
                 android:id="@+id/primaryButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:visibility="gone"
+                tools:ignore="InvalidDaxButtonProperty"
                 tools:text="Primary"
                 tools:visibility="visible" />
 
