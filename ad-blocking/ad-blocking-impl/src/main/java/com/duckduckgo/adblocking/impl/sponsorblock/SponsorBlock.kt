@@ -36,8 +36,8 @@ interface SponsorBlock {
     fun config(): SponsorBlockConfig
 
     /**
-     * Segments for [videoId], sorted by start. Empty when SponsorBlock is disabled, [videoId] isn't a valid YouTube video ID,
-     * or the lookup fails.
+     * Segments for [videoId], sorted by start. Empty when SponsorBlock is disabled, [videoId] is blank, or the lookup
+     * fails.
      */
     suspend fun getSegments(videoId: String): List<SponsorBlockSegment>
 }
@@ -52,7 +52,7 @@ class RealSponsorBlock @Inject constructor(
     override fun config(): SponsorBlockConfig = SponsorBlockConfig(enabled = isEnabled(), skipMode = SponsorBlockSkipMode.MANUAL)
 
     override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
-        if (!VIDEO_ID_REGEX.matches(videoId) || !isEnabled()) return emptyList()
+        if (videoId.isBlank() || !isEnabled()) return emptyList()
         return try {
             segmentsProvider.getSegments(videoId).sortedBy { it.start }
         } catch (e: CancellationException) {
@@ -64,8 +64,4 @@ class RealSponsorBlock @Inject constructor(
     }
 
     private fun isEnabled(): Boolean = sponsorBlockFeature.mvpEnabled().isEnabled()
-
-    private companion object {
-        val VIDEO_ID_REGEX = Regex("^[A-Za-z0-9_-]{11}$")
-    }
 }
