@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -58,11 +57,12 @@ class RealSponsorBlockSegmentsProvider @Inject constructor(
 
     private val mutex = Mutex()
 
-    // Holds every valid segment of a video, so a remote config change applies without refetching.
-    private val cache = object : LinkedHashMap<String, List<SponsorBlockSegment>>(CACHE_SIZE, LOAD_FACTOR, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<SponsorBlockSegment>>): Boolean = size > CACHE_SIZE
+    // A finished lookup is a cache hit and a running one is shared by concurrent callers. Lookups hold every valid segment of a
+    // video, so a remote config change applies without refetching.
+    private val lookups = object : LinkedHashMap<String, Deferred<List<SponsorBlockSegment>?>>(CACHE_SIZE, LOAD_FACTOR, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Deferred<List<SponsorBlockSegment>?>>): Boolean =
+            size > CACHE_SIZE
     }
-    private val inFlight = mutableMapOf<String, Deferred<List<SponsorBlockSegment>?>>()
 
     override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
         val segments = lookup(videoId).await() ?: return emptyList()
@@ -72,15 +72,11 @@ class RealSponsorBlockSegmentsProvider @Inject constructor(
 
     // Runs in appScope so one caller being cancelled doesn't cancel the lookup for others waiting on the same video.
     private suspend fun lookup(videoId: String): Deferred<List<SponsorBlockSegment>?> = mutex.withLock {
-        cache[videoId]?.let { return@withLock CompletableDeferred(it) }
-        inFlight.getOrPut(videoId) {
+        lookups.getOrPut(videoId) {
             appScope.async(dispatchers.io()) {
-                val segments = fetch(videoId)
-                mutex.withLock {
-                    inFlight.remove(videoId)
-                    if (segments != null) cache[videoId] = segments
+                fetch(videoId).also { segments ->
+                    if (segments == null) mutex.withLock { lookups.remove(videoId) }
                 }
-                segments
             }
         }
     }
