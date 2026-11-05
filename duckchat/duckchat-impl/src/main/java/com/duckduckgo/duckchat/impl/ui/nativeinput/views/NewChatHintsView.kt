@@ -19,9 +19,12 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -29,6 +32,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
@@ -86,17 +90,40 @@ class NewChatHintsView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         stateJob?.cancel()
         stateJob = null
-        content.animate().cancel()
-        content.alpha = if (isVisible) 1f else 0f
+        settleChips()
         super.onDetachedFromWindow()
     }
 
     private fun show(visible: Boolean) {
         if (isVisible == visible) return
-        content.animate().cancel()
         isVisible = visible
-        content.alpha = 0f
-        if (visible) content.animate().alpha(1f).setDuration(FADE_IN_DURATION_MS).start()
+        if (visible) animateChipsIn() else settleChips()
+    }
+
+    // The overshoot stands in for a damping 0.6 / stiffness 800 spring to avoid a dynamicanimation dependency; alpha reaches 1 early on the same curve.
+    private fun animateChipsIn() {
+        settleChips()
+        val offset = CHIP_SLIDE_OFFSET_DP.toPx().toFloat() * if (layoutDirection == View.LAYOUT_DIRECTION_RTL) -1 else 1
+        row.children.forEachIndexed { index, chip ->
+            val delay = index * CHIP_STAGGER_MS
+            chip.translationX = offset
+            chip.alpha = 0f
+            chip.animate()
+                .translationX(0f)
+                .alpha(1f)
+                .setStartDelay(delay)
+                .setDuration(CHIP_SLIDE_MS)
+                .setInterpolator(OvershootInterpolator(CHIP_OVERSHOOT_TENSION))
+                .start()
+        }
+    }
+
+    private fun settleChips() {
+        row.children.forEach { chip ->
+            chip.animate().cancel()
+            chip.translationX = 0f
+            chip.alpha = 1f
+        }
     }
 
     private fun render(hints: List<NewChatHint>, tabId: String) {
@@ -118,6 +145,9 @@ class NewChatHintsView @JvmOverloads constructor(
     }
 
     private companion object {
-        const val FADE_IN_DURATION_MS = 150L
+        const val CHIP_SLIDE_OFFSET_DP = 96
+        const val CHIP_STAGGER_MS = 40L
+        const val CHIP_SLIDE_MS = 300L
+        const val CHIP_OVERSHOOT_TENSION = 1.6f
     }
 }
