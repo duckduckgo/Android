@@ -53,6 +53,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -125,33 +126,40 @@ class NewChatHintsViewModelTest {
     }
 
     @Test
-    fun whenAHintIsTappedThenHintsStayDismissedUntilAPromptIsSent() = runTest {
+    fun whenAFilesHintIsTappedWithoutAttachingThenHintsStayVisible() = runTest {
+        val testee = viewModel()
+        testee.viewState("tab").test {
+            awaitItem()
+            testee.onHintTapped(NewChatHint.DOCUMENTS, "tab")
+            runCurrent()
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCreateImageIsTappedThenHintsHideUntilImageGenerationIsRemoved() = runTest {
         val testee = viewModel()
         testee.viewState("tab").test {
             val initial = awaitItem()
-            testee.onHintTapped(NewChatHint.DOCUMENTS, "tab")
+            testee.onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            stateStore.update("tab") { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
             assertTrue(awaitItem().isEmpty())
-            stateStore.update("tab") { it.copy(hasText = true) }
-            stateStore.update("tab") { it.copy(hasText = false) }
-            runCurrent()
-            expectNoEvents()
-            stateStore.update("tab") { it.copy(chatId = "chat") }
-            stateStore.update("tab") { it.copy(chatId = null) }
+            stateStore.update("tab") { it.copy(selectedTool = null) }
             assertEquals(initial, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenATapSendsNoCommandThenHintsAreStillDismissed() = runTest {
+    fun whenATapIsStillBeingHandledThenASecondTapIsIgnored() = runTest {
+        val selection = CompletableDeferred<Unit>()
+        whenever(modelManager.selectModel(any())).doSuspendableAnswer { selection.await() }
         val testee = viewModel()
-        testee.viewState("tab").test {
-            awaitItem()
-            eligible.value = false
-            assertTrue(awaitItem().isEmpty())
-            testee.onHintTapped(NewChatHint.DOCUMENTS, "tab")
-            eligible.value = true
+        commands.commandsFor { "tab" }.test {
+            backgroundScope.launch { testee.onHintTapped(NewChatHint.DOCUMENTS, "tab") }
             runCurrent()
+            testee.onHintTapped(NewChatHint.PHOTO, "tab")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }

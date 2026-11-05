@@ -33,12 +33,9 @@ import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsEligibility
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -54,27 +51,32 @@ class NewChatHintsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val eligible = eligibility.observeEligible(browserMode)
-    private val dismissedTabs = MutableStateFlow(emptySet<String>())
+    private var isHandlingTap = false
 
     fun viewState(tabId: String): Flow<List<NewChatHint>> {
         val order = hintOrder(tabId)
-        val inputState = provider.stateForTab(tabId).onEach { state ->
-            if (state.chatId != null) dismissedTabs.update { it - tabId }
-        }
         return combine(
             tabRepository.flowSelectedTab,
-            inputState,
+            provider.stateForTab(tabId),
             modelManager.modelState,
             eligible,
-            dismissedTabs,
-        ) { selectedTab, input, models, isEligible, dismissed ->
-            val showHints = selectedTab?.tabId == tabId && isEligible && input.isNewChat() && input.isDraftEmpty() && tabId !in dismissed
+        ) { selectedTab, input, models, isEligible ->
+            val showHints = selectedTab?.tabId == tabId && isEligible && input.isNewChat() && input.isDraftEmpty()
             if (showHints) order.filter { capableModel(it, models) != null } else emptyList()
         }.distinctUntilChanged()
     }
 
     suspend fun onHintTapped(hint: NewChatHint, tabId: String) {
-        dismissedTabs.update { it + tabId }
+        if (isHandlingTap) return
+        isHandlingTap = true
+        try {
+            sendCommand(hint, tabId)
+        } finally {
+            isHandlingTap = false
+        }
+    }
+
+    private suspend fun sendCommand(hint: NewChatHint, tabId: String) {
         if (!canAct(tabId)) return
         val models = modelManager.modelState.value
         val model = capableModel(hint, models) ?: return
