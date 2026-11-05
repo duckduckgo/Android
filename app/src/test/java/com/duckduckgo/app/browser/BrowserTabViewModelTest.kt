@@ -1153,6 +1153,7 @@ class BrowserTabViewModelTest {
         testee.onCleared()
 
         verify(mockPageContextJSHelper, never()).cancelCollection(any())
+        verify(pdfPageContextRegistry, never()).hide(any())
     }
 
     @Test
@@ -1160,6 +1161,7 @@ class BrowserTabViewModelTest {
         testee.onCleared()
 
         verify(mockPageContextJSHelper).cancelCollection("abc")
+        verify(pdfPageContextRegistry).hide("abc")
     }
 
     private fun resetChannels() {
