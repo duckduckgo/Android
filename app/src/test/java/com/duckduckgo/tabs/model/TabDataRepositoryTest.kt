@@ -544,8 +544,6 @@ class TabDataRepositoryTest {
         val addedTabId = testee.add()
         val siteData = testee.retrieveSiteData(addedTabId)
 
-        whenever(mockDao.tabs()).thenReturn(listOf(TabEntity(tabId = addedTabId, position = 0), TabEntity(tabId = "other", position = 1)))
-
         testee.deleteAll()
 
         verify(mockDao).deleteAllTabs()
@@ -556,8 +554,8 @@ class TabDataRepositoryTest {
         verify(mockDuckChatContextualDataStore).clearAll()
         verify(mockTabVisitedSitesRepository).clearAll()
         verify(mockNativeInputStatePublisher).clearAll()
-        verify(pageContextJSHelper).clearTab(addedTabId)
-        verify(pageContextJSHelper).clearTab("other")
+        verify(pageContextJSHelper).clearAll()
+        verify(mockDao, never()).tabs()
         org.mockito.kotlin.verifyNoMoreInteractions(pageContextJSHelper)
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }

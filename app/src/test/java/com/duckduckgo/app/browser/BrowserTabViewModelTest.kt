@@ -960,7 +960,10 @@ class BrowserTabViewModelTest {
             whenever(mockStack.getItemAtIndex(any())).thenReturn(mockWebHistoryItem)
         }
 
-    private fun initialiseViewModel(viewModelDispatchers: DispatcherProvider = coroutineRule.testDispatcherProvider) {
+    private fun initialiseViewModel(
+        viewModelDispatchers: DispatcherProvider = coroutineRule.testDispatcherProvider,
+        loadData: Boolean = true,
+    ) {
         // Detach the previous instance's command observer before creating a new VM, so tests that
         // call initialiseViewModel() more than once (e.g. to swap browserMode mid-test) don't leave
         // a stale VM attached to mockCommandObserver and emitting unexpected commands.
@@ -1120,8 +1123,27 @@ class BrowserTabViewModelTest {
                 currentTimeProvider = fakeCurrentTimeProvider,
             )
 
-        testee.loadData("abc", null, false, false)
+        if (loadData) {
+            testee.loadData("abc", null, false, false)
+        }
         testee.command.observeForever(mockCommandObserver)
+    }
+
+    @Test
+    fun whenClearedBeforeLoadDataThenNoCollectionIsCancelled() {
+        resetChannels()
+        initialiseViewModel(loadData = false)
+
+        testee.onCleared()
+
+        verify(mockPageContextJSHelper, never()).cancelCollection(any())
+    }
+
+    @Test
+    fun whenClearedAfterLoadDataThenCollectionIsCancelled() {
+        testee.onCleared()
+
+        verify(mockPageContextJSHelper).cancelCollection("abc")
     }
 
     private fun resetChannels() {

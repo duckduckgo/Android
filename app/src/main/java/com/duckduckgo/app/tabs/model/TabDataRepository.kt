@@ -506,7 +506,7 @@ class TabDataRepository(
 
     override suspend fun deleteAll() = withContext(dispatchers.io()) {
         logcat(INFO) { "Deleting tabs right now" }
-        tabsDao.tabs().forEach { pageContextJSHelper.clearTab(it.tabId) }
+        pageContextJSHelper.clearAll()
         tabsDao.deleteAllTabs()
         webViewPreviewPersister.deleteAll()
         faviconManager.deleteAllTemp()

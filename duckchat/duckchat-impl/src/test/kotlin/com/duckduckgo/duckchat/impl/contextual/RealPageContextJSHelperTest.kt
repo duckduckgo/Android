@@ -164,6 +164,56 @@ class RealPageContextJSHelperTest {
         verifyNoInteractions(pixels)
     }
 
+    @Test
+    fun `blank tab identifiers preserve subscription without measuring results or timeouts`() = runTest {
+        val pixels = mock<PageContextExtractionPixels>()
+        val helper = reportingHelper(pixels, backgroundScope, testScheduler)
+
+        listOf("", " ").forEach { tabId ->
+            val subscription = helper.collectPageContext(tabId)
+            assertEquals("pageContext", subscription.featureName)
+            assertEquals("collect", subscription.subscriptionName)
+            helper.deliverMarkdown(tabId)
+            helper.collectPageContext(tabId)
+        }
+        advanceTimeBy(31_000)
+
+        verifyNoInteractions(pixels)
+    }
+
+    @Test
+    fun `clear all discards pending results and timeouts for every tab`() = runTest {
+        val pixels = mock<PageContextExtractionPixels>()
+        val helper = reportingHelper(pixels, backgroundScope, testScheduler)
+        helper.collectPageContext("result", navigationId = 1L)
+        helper.collectPageContext("timeout", navigationId = 1L)
+
+        helper.clearAll()
+        helper.deliverMarkdown("result")
+        advanceTimeBy(31_000)
+
+        verifyNoInteractions(pixels)
+    }
+
+    @Test
+    fun `clear all resets navigation deduplication for every tab`() = runTest {
+        val pixels = mock<PageContextExtractionPixels>()
+        val helper = reportingHelper(pixels, backgroundScope, testScheduler)
+        listOf("first", "second").forEach {
+            helper.collectPageContext(it, navigationId = 1L)
+            helper.deliverMarkdown(it)
+        }
+
+        helper.clearAll()
+        listOf("first", "second").forEach {
+            helper.collectPageContext(it, navigationId = 1L)
+            helper.deliverMarkdown(it)
+        }
+
+        verify(pixels, times(4)).success(ContextType.MARKDOWN)
+        verifyNoMoreInteractions(pixels)
+    }
+
     private fun reportingHelper(
         pixels: PageContextExtractionPixels,
         scope: CoroutineScope,
@@ -227,7 +277,7 @@ class RealPageContextJSHelperTest {
 
     @Test
     fun whenCollectPageContextThenReturnsCollectSubscription() {
-        val result = testee.collectPageContext()
+        val result = testee.collectPageContext("tab")
 
         assertEquals(RealPageContextJSHelper.PAGE_CONTEXT_FEATURE_NAME, result.featureName)
         assertEquals("collect", result.subscriptionName)

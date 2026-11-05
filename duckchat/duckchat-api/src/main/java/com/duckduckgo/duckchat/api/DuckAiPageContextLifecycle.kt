@@ -16,7 +16,8 @@
 
 package com.duckduckgo.duckchat.api
 
-/** Releases page-context collection state when a browser tab is deleted. */
+/** Releases page-context collection state when browser tabs are deleted. */
 interface DuckAiPageContextLifecycle {
     fun clearTab(tabId: String)
+    fun clearAll()
 }

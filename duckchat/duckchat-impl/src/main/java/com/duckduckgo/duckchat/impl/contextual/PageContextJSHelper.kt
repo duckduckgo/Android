@@ -53,7 +53,7 @@ interface PageContextJSHelper : DuckAiPageContextLifecycle {
      * when one is given.
      */
     fun collectPageContext(
-        tabId: String = "",
+        tabId: String,
         trigger: Trigger = Trigger.TAB_CONTENT,
         navigationId: Long? = null,
         isDuckAiVisible: Boolean = true,
@@ -107,6 +107,13 @@ class RealPageContextJSHelper @Inject constructor(
         return null
     }
 
+    override fun clearAll() {
+        synchronized(requests) {
+            requests.clear()
+            reportedNavigations.clear()
+        }
+    }
+
     override fun clearTab(tabId: String) {
         synchronized(requests) {
             requests.remove(tabId)
@@ -126,7 +133,7 @@ class RealPageContextJSHelper @Inject constructor(
         navigationId: Long?,
         isDuckAiVisible: Boolean,
     ): SubscriptionEventData {
-        if (isDuckAiVisible && feature.pdfPageContext().isEnabled()) {
+        if (tabId.isNotBlank() && isDuckAiVisible && feature.pdfPageContext().isEnabled()) {
             val request = Request(SystemClock.elapsedRealtime(), trigger, navigationId)
             synchronized(requests) { requests[tabId] = request }
             scope.launch(dispatchers.io()) {

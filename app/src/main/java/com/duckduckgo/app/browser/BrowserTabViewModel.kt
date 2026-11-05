@@ -1310,7 +1310,9 @@ class BrowserTabViewModel @Inject constructor(
 
     @VisibleForTesting
     public override fun onCleared() {
-        pageContextJSHelper.cancelCollection(tabId)
+        if (::tabId.isInitialized) {
+            pageContextJSHelper.cancelCollection(tabId)
+        }
         newTabPageModalPresenterRegistry.unregister(this)
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
