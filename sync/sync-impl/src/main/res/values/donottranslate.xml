@@ -22,7 +22,7 @@
     <string name="sync_bookmarks_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_title">Sync bookmarks with your desktop app&#160;too?</string>
+    <string name="sync_bookmarks_multi_device_promo_title">Sync bookmarks with your desktop&#160;app&#160;too?</string>
     <string name="sync_bookmarks_multi_device_promo_message">Sync&#160;&amp;&#160;Backup is enabled on this&#160;device.</string>
     <string name="sync_bookmarks_multi_device_promo_primary_button">Connect</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button">Get App</string>
@@ -50,19 +50,19 @@
     <string name="sync_passwords_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Sync passwords with your desktop app&#160;too?</string>
+    <string name="sync_passwords_multi_device_promo_title">Sync passwords with your desktop&#160;app&#160;too?</string>
     <string name="sync_passwords_multi_device_promo_message">Sync&#160;&amp;&#160;Backup is enabled on this&#160;device.</string>
     <string name="sync_passwords_multi_device_promo_primary_button">Connect</string>
     <string name="sync_passwords_multi_device_promo_secondary_button">Get App</string>
 
     <!-- Sync promo after bookmarks import -->
-    <string name="sync_bookmarks_import_promo_title_label">Access your bookmarks across mobile&#160;and&#160;desktop</string>
-    <string name="sync_bookmarks_import_promo_title_toggle">Sync&#160;&amp;&#160;back&#160;up your&#160;bookmarks across mobile&#160;and&#160;desktop</string>
+    <string name="sync_bookmarks_import_promo_title_label">Access your bookmarks across mobile&#160;and&#160;desktop.</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sync&#160;&amp;&#160;back&#160;up your&#160;bookmarks across mobile&#160;and&#160;desktop.</string>
     <string name="sync_bookmarks_import_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Sync promo after passwords import -->
-    <string name="sync_passwords_import_promo_title_label">Access your passwords across mobile&#160;and&#160;desktop</string>
-    <string name="sync_passwords_import_promo_title_toggle">Sync&#160;&amp;&#160;back&#160;up your&#160;passwords across mobile&#160;and&#160;desktop</string>
+    <string name="sync_passwords_import_promo_title_label">Access your passwords across mobile&#160;and&#160;desktop.</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sync&#160;&amp;&#160;back&#160;up your&#160;passwords across mobile&#160;and&#160;desktop.</string>
     <string name="sync_passwords_import_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Scanner screen: manual entry tab -->
