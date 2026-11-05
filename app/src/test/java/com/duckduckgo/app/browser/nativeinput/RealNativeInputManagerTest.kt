@@ -436,6 +436,44 @@ class RealNativeInputManagerTest {
     }
 
     @Test
+    fun whenVisibleNewChatNavigatesToExistingChatThenKeyboardIsHidden() = runTest {
+        whenever(duckAiChatStore.hasMigrated()).thenReturn(false)
+        val url = MutableStateFlow<String?>("https://duck.ai/chat")
+        val (widget, inputMethodManager) = givenVisibleWidgetWithKeyboardUp(url)
+
+        url.value = "https://duck.ai/chat?chatID=a"
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertFalse(shadowOf(inputMethodManager).isSoftInputVisible)
+        verify(widget).clearInputFocus()
+    }
+
+    @Test
+    fun whenVisibleExistingChatNavigatesToAnotherChatThenKeyboardIsHidden() = runTest {
+        whenever(duckAiChatStore.hasMigrated()).thenReturn(false)
+        val url = MutableStateFlow<String?>("https://duck.ai/chat?chatID=a")
+        val (widget, inputMethodManager) = givenVisibleWidgetWithKeyboardUp(url)
+
+        url.value = "https://duck.ai/chat?chatID=b"
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertFalse(shadowOf(inputMethodManager).isSoftInputVisible)
+        verify(widget).clearInputFocus()
+    }
+
+    @Test
+    fun whenVisibleNewChatNavigatesToPromptThenKeyboardIsHidden() {
+        val url = MutableStateFlow<String?>("https://duck.ai/chat")
+        val (widget, inputMethodManager) = givenVisibleWidgetWithKeyboardUp(url)
+
+        url.value = "https://duck.ai/chat?prompt=1"
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertFalse(shadowOf(inputMethodManager).isSoftInputVisible)
+        verify(widget).clearInputFocus()
+    }
+
+    @Test
     fun whenViewAttachesToNewWindowThenShownChangesStillTriggerFocus() {
         val widget = givenAutoFocusWidget()
         val wrapper = requireNotNull(autoFocusWidgetRoot)
@@ -498,16 +536,29 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenPickerIsCancelledThenLaterFocusRequestsStillWork() {
+    fun whenPickerIsCancelledThenLaterTabHideReleasesFocus() {
         val widget = givenAutoFocusWidget()
         testee.setPickingImage(true)
         testee.onTabVisibilityChanged(true)
         shadowOf(Looper.getMainLooper()).idle()
+        whenever(widget.hasInputFocus()).thenReturn(true)
 
-        testee.requestTabInputFocus()
+        testee.onTabVisibilityChanged(false)
+
+        verify(widget).clearInputFocus()
+    }
+
+    private fun givenVisibleWidgetWithKeyboardUp(url: MutableStateFlow<String?>): Pair<NativeInputWidget, InputMethodManager> {
+        val widget = givenAutoFocusWidget(hasOtherFocus = true, url = url)
+        whenever(widget.hasInputFocus()).thenReturn(true)
+        testee.onTabVisibilityChanged(true)
         shadowOf(Looper.getMainLooper()).idle()
-
-        verify(widget).focusInput(any())
+        clearInvocations(widget)
+        val root = requireNotNull(autoFocusWidgetRoot).parent as ViewGroup
+        val inputMethodManager = root.context.getSystemService(InputMethodManager::class.java)
+        inputMethodManager.showSoftInput(root.findFocus(), InputMethodManager.SHOW_IMPLICIT)
+        assertTrue(shadowOf(inputMethodManager).isSoftInputVisible)
+        return widget to inputMethodManager
     }
 
     private fun givenAutoFocusWidget(

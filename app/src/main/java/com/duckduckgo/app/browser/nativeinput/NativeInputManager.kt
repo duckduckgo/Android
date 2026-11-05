@@ -719,7 +719,7 @@ class RealNativeInputManager @Inject constructor(
             bindTabInputFocus(widgetView, lifecycleOwner, currentTabUrl, armOnAttach = !forceImageGeneration && textSelection == null)
         }
         lifecycleOwner.lifecycleScope.launch {
-            if (isDuckAiSettingsUrl(currentTabUrl.firstOrNull())) widgetView.gone()
+            if (currentTabUrl.firstOrNull()?.toUri()?.isDuckAiSettingsUrl(duckChat) == true) widgetView.gone()
         }
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
         applyInitialTabSelection(widgetView, isNewTab, initialInputMode)
@@ -810,7 +810,7 @@ class RealNativeInputManager @Inject constructor(
 
     // canAutoFocus is part of the state so a request that bailed (keyboard up, other input focused) is
     // retried once that clears, while unchanged layout passes stay deduplicated. It is only computed while a
-    // request is pending, since it walks the view tree on every layout pass.
+    // request is pending, since it would otherwise run on every layout pass.
     private data class InputViewState(val isReady: Boolean, val canAutoFocus: Boolean)
 
     private fun inputViewReady(view: View): Flow<InputViewState> = callbackFlow {
@@ -1823,11 +1823,6 @@ class RealNativeInputManager @Inject constructor(
         return uri.toChatIdOrNull(duckChat)
     }
 
-    private fun isDuckAiSettingsUrl(url: String?): Boolean {
-        val uri = url?.toUri() ?: return false
-        return duckChat.isDuckChatUrl(uri) && uri.getQueryParameter("settings") == "open"
-    }
-
     companion object {
         private const val WIDGET_ELEVATION_DP = 8f
         private const val FADE_OUT_DURATION_MS = 150L
@@ -1930,6 +1925,9 @@ internal fun shouldShowNavBar(isBrowserContext: Boolean, interactionLatched: Boo
 internal fun shouldAnimateNavBar(currentShown: Boolean?, targetShown: Boolean): Boolean =
     currentShown != targetShown
 
+internal fun Uri.isDuckAiSettingsUrl(duckChat: DuckChat): Boolean =
+    duckChat.isDuckChatUrl(this) && getQueryParameter("settings") == "open"
+
 internal enum class DuckAiChatUrlType { NewChat, ExistingChat, PromptInProgress, OtherDuckAiPage, NotDuckAi }
 
 internal fun classifyDuckAiChatUrl(rawUrl: String?, duckChat: DuckChat): DuckAiChatUrlType {
@@ -1941,7 +1939,7 @@ internal fun classifyDuckAiChatUrl(rawUrl: String?, duckChat: DuckChat): DuckAiC
         uri.toChatIdOrNull(duckChat) != null -> DuckAiChatUrlType.ExistingChat
         uri.getQueryParameter("prompt") == "1" -> DuckAiChatUrlType.PromptInProgress
         (path.isEmpty() || path == "/chat") && uri.getQueryParameter("mode") != "voice-mode" &&
-            uri.getQueryParameter("settings") != "open" -> DuckAiChatUrlType.NewChat
+            !uri.isDuckAiSettingsUrl(duckChat) -> DuckAiChatUrlType.NewChat
         else -> DuckAiChatUrlType.OtherDuckAiPage
     }
 }

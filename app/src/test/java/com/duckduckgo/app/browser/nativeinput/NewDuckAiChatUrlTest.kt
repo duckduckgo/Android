@@ -18,9 +18,13 @@ package com.duckduckgo.app.browser.nativeinput
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.nativeinput.DuckAiChatUrlType.ExistingChat
+import com.duckduckgo.app.browser.nativeinput.DuckAiChatUrlType.NewChat
+import com.duckduckgo.app.browser.nativeinput.DuckAiChatUrlType.NotDuckAi
+import com.duckduckgo.app.browser.nativeinput.DuckAiChatUrlType.OtherDuckAiPage
+import com.duckduckgo.app.browser.nativeinput.DuckAiChatUrlType.PromptInProgress
 import com.duckduckgo.duckchat.api.DuckChat
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,52 +42,53 @@ class NewDuckAiChatUrlTest {
     }
 
     @Test
-    fun whenNewChatThenEligible() {
-        assertTrue(isNewDuckAiChat("https://duck.ai/chat?native-input=true", duckChat))
-        assertTrue(isNewDuckAiChat("https://duck.ai/", duckChat))
+    fun whenNewChatThenNewChat() {
+        assertUrlType(NewChat, "https://duck.ai/chat?native-input=true")
+        assertUrlType(NewChat, "https://duck.ai/")
+        assertUrlType(NewChat, "https://duck.ai/chat/")
     }
 
     @Test
-    fun whenChatIdIsPresentThenIneligible() {
-        assertFalse(isNewDuckAiChat("https://duck.ai/chat?chatID=existing", duckChat))
+    fun whenChatIdIsPresentThenExistingChat() {
+        assertUrlType(ExistingChat, "https://duck.ai/chat?chatID=existing")
     }
 
     @Test
-    fun whenChatIdIsBlankThenEligible() {
-        assertTrue(isNewDuckAiChat("https://duck.ai/chat?chatID=", duckChat))
+    fun whenChatIdIsBlankThenNewChat() {
+        assertUrlType(NewChat, "https://duck.ai/chat?chatID=")
     }
 
     @Test
-    fun whenPromptIsInProgressThenIneligible() {
-        assertFalse(isNewDuckAiChat("https://duck.ai/chat?prompt=1", duckChat))
-        assertTrue(isNewDuckAiChat("https://duck.ai/chat?prompt=0", duckChat))
+    fun whenPromptIsInProgressThenPromptInProgress() {
+        assertUrlType(PromptInProgress, "https://duck.ai/chat?prompt=1")
+        assertUrlType(NewChat, "https://duck.ai/chat?prompt=0")
     }
 
     @Test
-    fun whenVoiceModeThenIneligible() {
-        assertFalse(isNewDuckAiChat("https://duck.ai/chat?mode=voice-mode", duckChat))
+    fun whenVoiceModeThenOtherDuckAiPage() {
+        assertUrlType(OtherDuckAiPage, "https://duck.ai/chat?mode=voice-mode")
     }
 
     @Test
-    fun whenSettingsOpenThenIneligible() {
-        assertFalse(isNewDuckAiChat("https://duck.ai/chat?settings=open", duckChat))
+    fun whenSettingsOpenThenOtherDuckAiPage() {
+        assertUrlType(OtherDuckAiPage, "https://duck.ai/chat?settings=open")
     }
 
     @Test
-    fun whenOtherDuckAiPageThenIneligible() {
-        assertFalse(isNewDuckAiChat("https://duck.ai/settings", duckChat))
-        assertFalse(isNewDuckAiChat("https://duck.ai/about", duckChat))
-        assertTrue(isNewDuckAiChat("https://duck.ai/chat/", duckChat))
+    fun whenOtherDuckAiPageThenOtherDuckAiPage() {
+        assertUrlType(OtherDuckAiPage, "https://duck.ai/settings")
+        assertUrlType(OtherDuckAiPage, "https://duck.ai/about")
     }
 
     @Test
-    fun whenNotDuckAiUrlThenIneligible() {
-        assertFalse(isNewDuckAiChat("https://example.com/", duckChat))
-        assertFalse(isNewDuckAiChat(null, duckChat))
-        assertFalse(isNewDuckAiChat("", duckChat))
-        assertFalse(isNewDuckAiChat("invalid", duckChat))
+    fun whenNotDuckAiUrlThenNotDuckAi() {
+        assertUrlType(NotDuckAi, "https://example.com/")
+        assertUrlType(NotDuckAi, null)
+        assertUrlType(NotDuckAi, "")
+        assertUrlType(NotDuckAi, "invalid")
     }
 
-    private fun isNewDuckAiChat(rawUrl: String?, duckChat: DuckChat): Boolean =
-        classifyDuckAiChatUrl(rawUrl, duckChat) == DuckAiChatUrlType.NewChat
+    private fun assertUrlType(expected: DuckAiChatUrlType, rawUrl: String?) {
+        assertEquals(rawUrl, expected, classifyDuckAiChatUrl(rawUrl, duckChat))
+    }
 }

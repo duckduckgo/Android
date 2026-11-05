@@ -513,10 +513,6 @@ class NativeInputLayoutCoordinator(
             return
         }
         fun applyOffset() {
-            if (omnibarState.isOmnibarBottom()) {
-                widgetView.translationY = 0f
-                return
-            }
             // Before the first layout there is no bottom to measure, and translating by the full root
             // height would throw the host off screen.
             if (widgetView.bottom == 0) return
