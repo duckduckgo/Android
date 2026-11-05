@@ -35,7 +35,6 @@ import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.RippleConfiguration
 import androidx.compose.material3.Surface
@@ -102,11 +101,7 @@ internal fun DaxButton(
         },
     )
 
-    CompositionLocalProvider(
-        LocalRippleConfiguration provides null,
-        // Lays out at the visible height; Compose still extends touch input to the 48dp minimum target.
-        LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
-    ) {
+    CompositionLocalProvider(LocalRippleConfiguration provides null) {
         Surface(
             onClick = onClick,
             modifier = modifier.semantics { role = Role.Button },

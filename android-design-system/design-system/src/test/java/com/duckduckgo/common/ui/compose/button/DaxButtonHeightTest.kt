@@ -56,28 +56,42 @@ class DaxButtonHeightTest(
     fun aShortLabelKeepsTheVisibleTokenHeight() {
         show(text = "Continue", width = 360.dp)
 
-        assertEquals(case.minHeight, buttonHeight())
+        assertEquals(case.minHeight, pillHeight("Continue"))
     }
 
     @Test
-    fun aWrappedLabelGrowsTheButtonByTheViewPaddingAndStaysCentred() {
+    fun aShortLabelReservesAtLeastTheMinimumTouchTargetAroundTheCentredPill() {
+        show(text = "Continue", width = 360.dp)
+
+        val footprint = compose.onNodeWithTag(ButtonTag).getUnclippedBoundsInRoot()
+        val pill = pill("Continue")
+        assertEquals(maxOf(case.minHeight, MinTouchTarget), footprint.bottom - footprint.top)
+        assertEquals(pill.top - footprint.top, footprint.bottom - pill.bottom)
+    }
+
+    @Test
+    fun aWrappedLabelGrowsTheButtonByItsVerticalPaddingAndStaysCentred() {
         show(text = LongLabel, width = 120.dp)
 
         val label = compose.onNodeWithText(LongLabel, useUnmergedTree = true).getUnclippedBoundsInRoot()
-        val button = compose.onNodeWithTag(ButtonTag).getUnclippedBoundsInRoot()
+        val pill = pill(LongLabel)
+        val footprint = compose.onNodeWithTag(ButtonTag).getUnclippedBoundsInRoot()
         val labelHeight = label.bottom - label.top
-        assertTrue("The label must wrap for this fixture: $labelHeight", labelHeight + case.verticalPadding * 2 > case.minHeight)
-        assertEquals(maxOf(case.minHeight, labelHeight + case.verticalPadding * 2).value, buttonHeight().value, 0.5f)
-        assertEquals(((button.top + button.bottom) / 2).value, ((label.top + label.bottom) / 2).value, 0.5f)
+        assertTrue("The label must wrap for this fixture: $labelHeight", labelHeight + case.verticalPadding * 2 > MinTouchTarget)
+        assertEquals((labelHeight + case.verticalPadding * 2).value, pillHeight(LongLabel).value, 0.5f)
+        assertEquals((pill.bottom - pill.top).value, (footprint.bottom - footprint.top).value, 0.5f)
+        assertEquals(((pill.top + pill.bottom) / 2).value, ((label.top + label.bottom) / 2).value, 0.5f)
     }
 
     @Test
-    fun aTouchJustOutsideAButtonShorterThanTheMinimumTouchTargetStillClicksIt() {
-        assumeTrue("Compose only extends touch input for buttons under 48dp", case.minHeight < 48.dp)
+    fun aTouchJustOutsideAPillShorterThanTheMinimumTouchTargetStillClicksIt() {
+        assumeTrue("Only buttons under 48dp have space around the pill", case.minHeight < MinTouchTarget)
         var clicks = 0
         show(text = "Continue", width = 360.dp, onClick = { clicks++ })
 
-        compose.onNodeWithTag(ButtonTag).performTouchInput { click(Offset(centerX, -3.dp.toPx())) }
+        val aboveThePill = pill("Continue").top - compose.onNodeWithTag(ButtonTag).getUnclippedBoundsInRoot().top - 1.dp
+        assertTrue("The touch must land outside the pill: $aboveThePill", aboveThePill >= 0.dp)
+        compose.onNodeWithTag(ButtonTag).performTouchInput { click(Offset(centerX, aboveThePill.toPx())) }
 
         assertEquals(1, clicks)
     }
@@ -96,7 +110,9 @@ class DaxButtonHeightTest(
         }
     }
 
-    private fun buttonHeight(): Dp = compose.onNodeWithTag(ButtonTag).getUnclippedBoundsInRoot().let { it.bottom - it.top }
+    private fun pill(text: String) = compose.onNodeWithText(text).getUnclippedBoundsInRoot()
+
+    private fun pillHeight(text: String): Dp = pill(text).let { it.bottom - it.top }
 
     class Case(
         private val name: String,
@@ -109,6 +125,7 @@ class DaxButtonHeightTest(
 
     companion object {
         private const val ButtonTag = "button"
+        private val MinTouchTarget = 48.dp
         private const val LongLabel = "Let's do it, show me how this works"
 
         // buttonSmallHeight 48 / buttonSmallTopPadding 8 and buttonLargeHeight 60 / buttonLargeTopPadding 14, less the 6dp MaterialButton inset.

@@ -143,15 +143,14 @@ internal fun dialogActionLayout(
     hasContent: Boolean,
     hasPrimaryCta: Boolean,
     headerToActionsSpacing: Dp = DaxOnboardingDialogDefaults.HeaderContentSpacing,
-    contentToPrimarySpacing: Dp = DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing,
 ): DialogActionLayout = DialogActionLayout(
-    headerToActions = if (hasContent || hasPrimaryCta) {
-        headerToActionsSpacing
-    } else {
-        0.dp
+    headerToActions = when {
+        hasContent -> headerToActionsSpacing
+        hasPrimaryCta -> (headerToActionsSpacing - DaxOnboardingDialogDefaults.PrimaryCtaTouchInset).coerceAtLeast(0.dp)
+        else -> 0.dp
     },
     contentToPrimary = if (hasContent && hasPrimaryCta) {
-        contentToPrimarySpacing
+        DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing
     } else {
         0.dp
     },
@@ -186,7 +185,6 @@ internal fun DaxOnboardingDialogCore(
     bottomPadding: Dp = DaxOnboardingDialogDefaults.BottomPadding,
     titleBodySpacing: Dp = DaxOnboardingDialogDefaults.TitleBodySpacing,
     elevation: Dp = DaxOnboardingDialogDefaults.Elevation,
-    useNativeCtaInsets: Boolean = false,
     showScrollbar: Boolean = false,
 ) {
     val inInspectionMode = LocalInspectionMode.current
@@ -432,7 +430,6 @@ internal fun DaxOnboardingDialogCore(
                                         headerToActionsSpacing = headerToActionsSpacing,
                                         contentHorizontalPadding = contentPadding,
                                         primaryCtaHorizontalPadding = primaryCtaHorizontalPadding,
-                                        useNativeCtaInsets = useNativeCtaInsets,
                                         contentGate = contentGate,
                                     )
                                 }
@@ -639,21 +636,13 @@ private fun DialogActions(
     headerToActionsSpacing: Dp,
     contentHorizontalPadding: Dp,
     primaryCtaHorizontalPadding: Dp,
-    useNativeCtaInsets: Boolean,
     contentGate: Modifier = Modifier,
 ) {
     val hasActions = content != null || primaryCta != null
-    val density = LocalDensity.current
-    val contentToPrimarySpacing = if (useNativeCtaInsets) {
-        with(density) { (20.dp.roundToPx() + 4.dp.roundToPx()).toDp() }
-    } else {
-        DaxOnboardingDialogDefaults.ContentToPrimaryCtaSpacing
-    }
     val actionLayout = dialogActionLayout(
         hasContent = content != null,
         hasPrimaryCta = primaryCta != null,
         headerToActionsSpacing = headerToActionsSpacing,
-        contentToPrimarySpacing = contentToPrimarySpacing,
     )
     if (!landscape && hasActions) {
         Spacer(Modifier.size(actionLayout.headerToActions))
@@ -683,10 +672,6 @@ private fun DialogActions(
             enabled = primaryCta.enabled,
             typography = DaxBrandButtonTypography.DuckSans,
         )
-    }
-
-    if (primaryCta != null) {
-        Spacer(Modifier.height(4.dp))
     }
 }
 
