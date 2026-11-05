@@ -85,6 +85,12 @@
             android:text="Brand DuckSans"
             app:daxButtonBrandTypography="duckSans" />
 
+        <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+            android:id="@+id/dax_button_brand_wrapped"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:text="Brand with a label that wraps" />
+
         <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -139,6 +145,12 @@
             android:layout_height="wrap_content"
             android:enabled="false"
             android:text="Primary Disabled" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/dax_button_primary_wrapped"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:text="Primary with a label that wraps" />
 
         <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
             android:layout_width="match_parent"
