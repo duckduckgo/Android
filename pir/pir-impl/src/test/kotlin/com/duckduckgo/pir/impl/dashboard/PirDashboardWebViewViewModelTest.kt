@@ -420,21 +420,14 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
-    fun `test prompts to request the permission whenever it is not granted, whatever PIR requested before`() = runTest {
+    fun `test prompts to open settings when the system gives no rationale`() = runTest {
         advanceUntilIdle()
         givenNotifications(permissionGranted = false, canShow = false)
 
         testee.commands().test {
             testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
-            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
-            testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
-            assertEquals(Command.RequestNotificationPermission, awaitItem())
-            testee.onNotificationPermissionResult(granted = false, shouldShowRationale = false)
+
             assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS), awaitItem())
-
-            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
-
-            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -453,49 +446,17 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
-    fun `test offers settings when the request is refused with no rationale before or after`() = runTest {
-        advanceUntilIdle()
-        givenNotifications(permissionGranted = false, canShow = false)
-
-        testee.commands().test {
-            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
-            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
-            testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
-            assertEquals(Command.RequestNotificationPermission, awaitItem())
-
-            testee.onNotificationPermissionResult(granted = false, shouldShowRationale = false)
-
-            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS), awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test does not offer settings after the first denial`() = runTest {
-        advanceUntilIdle()
-        givenNotifications(permissionGranted = false, canShow = false)
-
-        testee.commands().test {
-            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
-            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
-
-            testee.onNotificationPermissionResult(granted = false, shouldShowRationale = true)
-
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test does not offer settings after the user denies the request again`() = runTest {
+    fun `test does not prompt again when the user denies the request`() = runTest {
         advanceUntilIdle()
         givenNotifications(permissionGranted = false, canShow = false)
 
         testee.commands().test {
             testee.onNotificationPermissionStateComputed(shouldShowRationale = true)
             assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
+            testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
 
-            testee.onNotificationPermissionResult(granted = false, shouldShowRationale = false)
+            testee.onNotificationPermissionResult(granted = false)
 
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -550,10 +511,10 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test reports the granted pixel only when the permission is granted`() {
-        testee.onNotificationPermissionResult(granted = false, shouldShowRationale = true)
+        testee.onNotificationPermissionResult(granted = false)
         verify(pirPixelSender, never()).reportNotificationPermissionGranted(any())
 
-        testee.onNotificationPermissionResult(granted = true, shouldShowRationale = false)
+        testee.onNotificationPermissionResult(granted = true)
         verify(pirPixelSender).reportNotificationPermissionGranted(PirNotificationPromptType.REQUEST_PERMISSION)
     }
 
@@ -581,7 +542,7 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test granting the permission shows the notification of the running scan`() = runTest {
-        testee.onNotificationPermissionResult(granted = true, shouldShowRationale = false)
+        testee.onNotificationPermissionResult(granted = true)
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter).showScanNotificationIfRunning()
@@ -589,7 +550,7 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test denying the permission does not show the scan notification`() = runTest {
-        testee.onNotificationPermissionResult(granted = false, shouldShowRationale = true)
+        testee.onNotificationPermissionResult(granted = false)
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()

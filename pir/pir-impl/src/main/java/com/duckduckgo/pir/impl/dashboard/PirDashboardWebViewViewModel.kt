@@ -83,7 +83,6 @@ class PirDashboardWebViewViewModel @Inject constructor(
 
     private var purchaseFlowOutstanding = false
     private var awaitingReturnFromNotificationSettings = false
-    private var shouldShowRationaleBeforeRequest = false
 
     private val command = Channel<Command>(Channel.BUFFERED)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -127,9 +126,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
     fun onNotificationPermissionStateComputed(shouldShowRationale: Boolean) {
         if (pirNotificationManager.canShowNotifications()) return
 
-        shouldShowRationaleBeforeRequest = shouldShowRationale
-        // with the permission granted, notifications are off for the app or the PIR channel, which only settings can change
-        val promptType = if (pirNotificationManager.hasNotificationPermission()) {
+        // without a rationale the permission is either locked or never asked, which Android doesn't let apps tell apart;
+        // browser onboarding already asks, so it's most likely locked, and settings turns notifications on in both cases
+        val promptType = if (pirNotificationManager.hasNotificationPermission() || !shouldShowRationale) {
             PirNotificationPromptType.OPEN_SETTINGS
         } else {
             PirNotificationPromptType.REQUEST_PERMISSION
@@ -165,21 +164,11 @@ class PirDashboardWebViewViewModel @Inject constructor(
         pirPixelSender.reportNotificationPermissionPromptDismissed(promptType)
     }
 
-    fun onNotificationPermissionResult(
-        granted: Boolean,
-        shouldShowRationale: Boolean,
-    ) {
-        if (granted) {
-            pirPixelSender.reportNotificationPermissionGranted(PirNotificationPromptType.REQUEST_PERMISSION)
-            showScanNotificationIfRunning()
-            return
-        }
+    fun onNotificationPermissionResult(granted: Boolean) {
+        if (!granted) return
 
-        // no rationale before or after means the system denied without showing its dialog, or its first dialog was dismissed unanswered;
-        // the two can't be told apart, and settings turns notifications on in both
-        if (!shouldShowRationaleBeforeRequest && !shouldShowRationale) {
-            showNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS)
-        }
+        pirPixelSender.reportNotificationPermissionGranted(PirNotificationPromptType.REQUEST_PERMISSION)
+        showScanNotificationIfRunning()
     }
 
     fun onResumed() {

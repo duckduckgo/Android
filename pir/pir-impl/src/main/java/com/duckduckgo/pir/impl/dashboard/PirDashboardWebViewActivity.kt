@@ -99,7 +99,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
 
     private val notificationPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
-        viewModel.onNotificationPermissionResult(granted = granted, shouldShowRationale = shouldShowNotificationPermissionRationale())
+        viewModel.onNotificationPermissionResult(granted = granted)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
