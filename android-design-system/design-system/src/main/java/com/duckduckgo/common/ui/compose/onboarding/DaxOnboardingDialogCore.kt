@@ -531,7 +531,7 @@ private fun DialogText(
     titleBodySpacing: Dp,
     textHorizontalPadding: Dp,
     contentColor: Color,
-    contentGate: Modifier,
+    contentGate: Modifier = Modifier,
 ) {
     val titleMeasurer = rememberTextMeasurer()
     val naturalTitleStyle = titleStyle.asTextStyle.copy(lineHeight = TextUnit.Unspecified)
@@ -638,7 +638,7 @@ private fun DialogActions(
     contentHorizontalPadding: Dp,
     primaryCtaHorizontalPadding: Dp,
     useNativeCtaInsets: Boolean,
-    contentGate: Modifier,
+    contentGate: Modifier = Modifier,
 ) {
     val hasActions = content != null || primaryCta != null
     val density = LocalDensity.current
