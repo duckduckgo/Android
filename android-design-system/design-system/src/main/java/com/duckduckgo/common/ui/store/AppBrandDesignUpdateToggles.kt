@@ -75,4 +75,7 @@ interface AppBrandDesignUpdateToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun bottomSheets(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun rmfCards(): Toggle
 }
