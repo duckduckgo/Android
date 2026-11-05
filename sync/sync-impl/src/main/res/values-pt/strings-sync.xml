@@ -479,10 +479,10 @@
     <string name="sync_simplified_deep_link_auth_prompt_message">Desbloqueia o dispositivo para configurar o Sync &amp; Backup</string>
 
     <!-- Sync promo on passwords import success screen -->
-    <string name="sync_passwords_import_promo_title">Acede às tuas palavras-passe no telemóvel e no computador.</string>
+    <string name="sync_passwords_import_promo_title_label">Acede às tuas palavras-passe no telemóvel e no computador</string>
     <string name="sync_passwords_import_promo_primary_button">Ativar Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
-    <string name="sync_bookmarks_import_promo_title">Acede aos teus marcadores no telemóvel e no computador.</string>
+    <string name="sync_bookmarks_import_promo_title_label">Acede aos teus marcadores no telemóvel e no computador</string>
     <string name="sync_bookmarks_import_promo_primary_button">Ativar Sync &amp; Backup</string>
 </resources>
