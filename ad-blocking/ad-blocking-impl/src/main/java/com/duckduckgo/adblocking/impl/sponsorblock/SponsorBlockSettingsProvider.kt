@@ -18,7 +18,6 @@ package com.duckduckgo.adblocking.impl.sponsorblock
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -52,24 +51,15 @@ class RealSponsorBlockSettingsProvider @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : SponsorBlockSettingsProvider {
 
-    private val settingsAdapter: JsonAdapter<SettingsJson> by lazy {
-        Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(SettingsJson::class.java)
+    private val settingsAdapter: JsonAdapter<SponsorBlockSettings> by lazy {
+        Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(SponsorBlockSettings::class.java)
     }
 
     override suspend fun settings(): SponsorBlockSettings = withContext(dispatchers.io()) {
         val json = feature.self().getSettings() ?: return@withContext SponsorBlockSettings()
-        val parsed = runCatching { settingsAdapter.fromJson(json) }
+        runCatching { settingsAdapter.fromJson(json) }
             .onFailure { logcat(WARN) { "SponsorBlock: failed to parse settings: ${it.asLog()}" } }
             .getOrNull()
-            ?: return@withContext SponsorBlockSettings()
-        SponsorBlockSettings(
-            categories = parsed.categories ?: SponsorBlockSettings.DEFAULT_CATEGORIES,
-            actionTypes = parsed.actionTypes ?: SponsorBlockSettings.DEFAULT_ACTION_TYPES,
-        )
+            ?: SponsorBlockSettings()
     }
-
-    private data class SettingsJson(
-        @field:Json(name = "categories") val categories: List<String>?,
-        @field:Json(name = "actionTypes") val actionTypes: List<String>?,
-    )
 }
