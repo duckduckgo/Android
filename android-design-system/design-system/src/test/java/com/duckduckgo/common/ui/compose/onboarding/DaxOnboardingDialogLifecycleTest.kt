@@ -464,15 +464,15 @@ class DaxOnboardingDialogLifecycleTest {
         rotate(Configuration.ORIENTATION_LANDSCAPE)
         val ltrBody = bounds("body")
         val ltrSlot = bounds("slot")
-        assertEquals(160f * density, ltrSlot.width, 1f)
-        assertEquals(60f * density, ltrSlot.left - ltrBody.right, 1f)
+        assertEquals(200f * density, ltrSlot.width, 1f)
+        assertEquals(16f * density, ltrSlot.left - ltrBody.right, 1f)
 
         compose.runOnIdle { layoutDirection.value = LayoutDirection.Rtl }
         frames()
         val rtlBody = bounds("body")
         val rtlSlot = bounds("slot")
         assertEquals(ltrSlot.width, rtlSlot.width, 1f)
-        assertEquals(60f * density, rtlBody.left - rtlSlot.right, 1f)
+        assertEquals(16f * density, rtlBody.left - rtlSlot.right, 1f)
     }
 
     @Test
@@ -488,7 +488,7 @@ class DaxOnboardingDialogLifecycleTest {
         assertTrue(slot.left >= dialog.left)
         assertTrue(slot.right <= dialog.right)
         assertTrue(slot.width > 0f)
-        assertEquals(28f * density, slot.left - dialog.left, 1f)
+        assertEquals(40f * density, slot.left - dialog.left, 1f)
 
         compose.runOnIdle { layoutDirection.value = LayoutDirection.Rtl }
         frames()
@@ -496,7 +496,7 @@ class DaxOnboardingDialogLifecycleTest {
         assertEquals(slot.width, rtlSlot.width, 1f)
         assertTrue(rtlSlot.left >= dialog.left)
         assertTrue(rtlSlot.right <= dialog.right)
-        assertEquals(28f * density, dialog.right - rtlSlot.right, 1f)
+        assertEquals(40f * density, dialog.right - rtlSlot.right, 1f)
     }
 
     @Test
