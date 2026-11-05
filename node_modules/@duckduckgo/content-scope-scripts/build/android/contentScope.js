@@ -992,7 +992,8 @@
       "tabSuspension",
       "autofillPasskeys",
       "textSelection",
-      "chromeWebstorePatching"
+      "chromeWebstorePatching",
+      "selectionTools"
     ]
   );
   var featureConfigDependencies = {
@@ -1075,7 +1076,8 @@
       "performanceMetrics",
       "duckAiChatHistory",
       "autofillPasskeys",
-      "chromeWebstorePatching"
+      "chromeWebstorePatching",
+      "selectionTools"
     ],
     firefox: ["cookie", "webDetection", ...baseFeatures, "clickToLoad", "webEvents", "webInterferenceDetection", "breakageReporting"],
     chrome: ["cookie", "webDetection", ...baseFeatures, "clickToLoad", "webEvents", "webInterferenceDetection", "breakageReporting"],
@@ -1610,7 +1612,8 @@
     // only enabled on apple platforms
     "textSelection",
     "uaChBrands",
-    "chromeWebstorePatching"
+    "chromeWebstorePatching",
+    "selectionTools"
   ];
   var selfGatingFeatures = ["trackerProtection", "uaChBrands"];
   function isPlatformSpecificFeature(featureName) {
