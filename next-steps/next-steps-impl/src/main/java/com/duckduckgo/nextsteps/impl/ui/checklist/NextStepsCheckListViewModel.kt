@@ -175,12 +175,14 @@ class NextStepsCheckListViewModel @Inject constructor(
         val state = _viewState.value
         val message = state.message ?: return
         val allItemsDone = state.listItems.all { it.completed || it.item.id == animatingCompletionItemId }
-        viewModelScope.launch {
-            val firstDismissal = withContext(dispatchers.io()) { itemsStore.markMessageDismissed(message.id) }
-            if (firstDismissal) {
-                if (allItemsDone) telemetry.onAllItemsDone() else telemetry.onSectionDismissed()
-                remoteMessageModel.onMessageDismissed(message)
-            }
+        viewModelScope.launch { dismiss(message, allItemsDone) }
+    }
+
+    private suspend fun dismiss(message: RemoteMessage, allItemsDone: Boolean) {
+        val firstDismissal = withContext(dispatchers.io()) { itemsStore.markMessageDismissed(message.id) }
+        if (firstDismissal) {
+            if (allItemsDone) telemetry.onAllItemsDone() else telemetry.onSectionDismissed()
+            remoteMessageModel.onMessageDismissed(message)
         }
     }
 
@@ -190,6 +192,11 @@ class NextStepsCheckListViewModel @Inject constructor(
         val completedIds = completionChecker.refresh(supportedItems) { telemetry.onItemsCompleted(Variant.CHECK_LIST, it) }
         completionOrder = completedIds.toList()
         val settledListItems = supportedItems.map { ViewState.ListItem(item = it, completed = it.id in completedIds) }.sortedItems()
+        val firstRenderOnThisPage = shownMessageId != id
+        if (firstRenderOnThisPage && settledListItems.isNotEmpty() && settledListItems.all { it.completed }) {
+            dismiss(this, allItemsDone = true)
+            return ViewState()
+        }
         startCompletionAnimationIfDue(settledListItems)
         val listItems = supportedItems
             .map { ViewState.ListItem(item = it, completed = it.id in completedIds && it.id != animatingCompletionItemId) }

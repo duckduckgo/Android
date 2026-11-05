@@ -164,6 +164,7 @@ import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegra
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarPickerManager
+import com.duckduckgo.app.browser.newtab.TabNextStepsState
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
@@ -773,6 +774,8 @@ class BrowserTabFragment :
     }
 
     private val sharedContextualViewModel: DuckChatContextualSharedViewModel by viewModels()
+
+    private val tabNextStepsState: TabNextStepsState by viewModels()
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
@@ -6268,6 +6271,7 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideIfDaxBubble(previousCta)
+                        tabNextStepsState.onNewTabPageShownAfterOnboarding()
                         showNewTab()
                     }
                 }
@@ -6343,6 +6347,7 @@ class BrowserTabFragment :
             setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
             configureBrandDesignFitListener()
             brandDesignDialogScrollView.post { configuration.applyFit() }
+            tabNextStepsState.onOnboardingBubbleShown()
             viewModel.onCtaShown()
         }
 

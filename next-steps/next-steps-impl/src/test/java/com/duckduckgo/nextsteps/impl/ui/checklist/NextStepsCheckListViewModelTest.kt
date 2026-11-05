@@ -522,15 +522,61 @@ class NextStepsCheckListViewModelTest {
     }
 
     @Test
-    fun `when every item is already completed then the section stays visible`() = runTest {
+    fun `when every item is already completed when the page renders then the section is dismissed without being shown`() = runTest {
         defaultBrowserCheck.completed = true
         addWidgetCheck.completed = true
         syncCheck.completed = true
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        advanceUntilIdle()
+
+        assertNull(testee.viewState.value.message)
+        assertTrue(testee.viewState.value.listItems.isEmpty())
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
+        verify(remoteMessageModel, never()).onMessageShown(any())
+    }
+
+    @Test
+    fun `when the section was completed on a page then the next page dismisses it as all items done`() = runTest {
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        advanceUntilIdle()
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+        syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        testee.onViewDetached()
+        testee.onViewAttached()
+        advanceUntilIdle()
+
+        assertNull(testee.viewState.value.message)
+        verify(remoteMessageModel, times(1)).onMessageShown(any())
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "all_items_done",
+            completed = 0,
+            dismissed = null,
+            finishedElsewhere = 3,
+            alreadyComplete = 0,
+        )
+    }
+
+    @Test
+    fun `when the section still has open items then the next page shows it again`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+
+        testee.onViewDetached()
+        testee.onViewAttached()
         advanceUntilIdle()
 
         assertEquals(3, testee.viewState.value.listItems.size)
-        assertTrue(testee.viewState.value.listItems.all { it.completed })
         verify(remoteMessageModel, never()).onMessageDismissed(any())
     }
 
