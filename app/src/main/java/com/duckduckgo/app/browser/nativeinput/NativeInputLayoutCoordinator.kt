@@ -86,11 +86,8 @@ class NativeInputLayoutCoordinator(
 
     fun configureNewChatHints(widgetView: View, hintsView: View) {
         val spacing = rootView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-        val horizontalMargin = rootView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
         hintsView.layoutParams = CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             gravity = Gravity.BOTTOM
-            marginStart = horizontalMargin
-            marginEnd = horizontalMargin
         }
         val card = widgetView.findViewById<View>(R.id.inputModeWidgetCard)
         val preDrawListener = ViewTreeObserver.OnPreDrawListener {

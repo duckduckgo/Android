@@ -128,7 +128,6 @@ class RealNativeInputManagerTest {
     @Before
     fun setUp() {
         doReturn(8).whenever(layoutResources).getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-        doReturn(16).whenever(layoutResources).getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
         whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(MutableStateFlow(false))

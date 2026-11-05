@@ -185,7 +185,6 @@ class NativeInputLayoutCoordinatorTest {
         val hints = View(activity)
         val resources: Resources = spy(activity.resources)
         doReturn(HINTS_SPACING_PX).whenever(resources).getDimensionPixelSize(CommonR.dimen.keyline_2)
-        doReturn(HINTS_MARGIN_PX).whenever(resources).getDimensionPixelSize(CommonR.dimen.keyline_4)
         val root = object : CoordinatorLayout(activity) {
             override fun getResources(): Resources = resources
         }.apply {
@@ -207,6 +206,5 @@ class NativeInputLayoutCoordinatorTest {
         private const val CARD_TOP_MARGIN_PX = 20
         private const val CARD_HEIGHT_PX = 60
         private const val HINTS_SPACING_PX = 8
-        private const val HINTS_MARGIN_PX = 16
     }
 }

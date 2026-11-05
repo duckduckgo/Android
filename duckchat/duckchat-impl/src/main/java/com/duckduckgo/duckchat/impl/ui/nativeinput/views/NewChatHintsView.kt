@@ -58,6 +58,9 @@ class NewChatHintsView @JvmOverloads constructor(
     private val row = LinearLayout(context)
     private val content = HorizontalScrollView(context).apply {
         isHorizontalScrollBarEnabled = false
+        clipToPadding = false
+        val inset = resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+        setPaddingRelative(inset, 0, inset, 0)
         addView(row)
     }
 
