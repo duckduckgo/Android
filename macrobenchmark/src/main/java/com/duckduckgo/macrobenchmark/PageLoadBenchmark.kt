@@ -168,10 +168,12 @@ class PageLoadBenchmark {
             ?.putExtra(TestSeederKey.USER_ALLOW_LIST.key, userAllowListValue)
         instrumentation.context.startActivity(launch)
         val skipButton = By.res(TARGET_PACKAGE, "skipOnboardingButton")
-        if (device.wait(Until.hasObject(skipButton), 20_000L)) {
-            device.findObject(skipButton)?.click()
-            device.waitForIdle()
+        // The skip button only appears once the live privacy config is downloaded, so this also gates on that download.
+        check(device.wait(Until.hasObject(skipButton), SKIP_ONBOARDING_TIMEOUT_MS)) {
+            "Onboarding skip button not shown within ${SKIP_ONBOARDING_TIMEOUT_MS}ms: the privacy config download was too slow or failed"
         }
+        device.findObject(skipButton).click()
+        device.waitForIdle()
         val seedingPid = if (fixturePort != null) awaitMockEnvironmentState("seeded", excludePid = null) else null
         verifyProtectionState(userAllowListValue)
         return seedingPid
@@ -215,6 +217,7 @@ class PageLoadBenchmark {
         private const val NAV_COUNT = 10
         private const val READY_TIMEOUT_MS = 60_000L
         private const val READY_POLL_MS = 500L
+        private const val SKIP_ONBOARDING_TIMEOUT_MS = 60_000L
         private val MOCK_ENVIRONMENT_LINE = Regex("mockEnvironment=(seeded|ready|failed) (.*) pid=(\\d+)\\s*$")
         private const val PAGE_SETTLE_MS_PROTECTED = 8_000L
 
