@@ -128,7 +128,7 @@ class AnrSupervisorRunnable @Inject constructor(
         stopped.set(false)
     }
 
-    @Synchronized
+    // Not synchronized: AnrSupervisor.onOpen locks this runnable on the main thread, so sleeping under that lock blocks app start.
     @Throws(InterruptedException::class)
     private fun checkStopped() {
         if (stopped.get()) {
