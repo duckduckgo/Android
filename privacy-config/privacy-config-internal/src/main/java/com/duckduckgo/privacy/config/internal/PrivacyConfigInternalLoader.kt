@@ -41,6 +41,7 @@ class PrivacyConfigInternalLoader @Inject constructor(
     private val store: DevPrivacyConfigSettingsDataStore,
     private val repository: PrivacyConfigRepository,
     private val marker: PrivacyConfigOverrideMarker,
+    private val versionCheckOverride: InternalPrivacyConfigVersionCheckOverride,
 ) {
     // Keeps a command's settings change and its download together when Developer Settings loads at the same time.
     private val mutex = Mutex()
@@ -85,7 +86,9 @@ class PrivacyConfigInternalLoader @Inject constructor(
         return "$RESET ${storedConfig()}"
     }
 
-    private suspend fun forceLoad(): ConfigDownloadResult = downloader.download(force = true)
+    private suspend fun forceLoad(): ConfigDownloadResult = versionCheckOverride.skippingVersionCheck {
+        downloader.download()
+    }
 
     private fun storedConfig(): String {
         val stored = repository.get()

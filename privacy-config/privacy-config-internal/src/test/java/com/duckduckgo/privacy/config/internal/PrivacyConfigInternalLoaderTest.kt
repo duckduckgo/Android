@@ -40,12 +40,13 @@ class PrivacyConfigInternalLoaderTest {
         override var useCustomPrivacyConfigUrl = false
         override var canUrlBeChanged = false
     }
+    private val versionCheckOverride = InternalPrivacyConfigVersionCheckOverride()
     private var downloads = 0
     private var downloadResult: ConfigDownloadResult = Success
     private var downloadException: Exception? = null
     private val downloader = object : PrivacyConfigDownloader {
-        override suspend fun download(force: Boolean): ConfigDownloadResult {
-            assertTrue(force)
+        override suspend fun download(): ConfigDownloadResult {
+            assertTrue(versionCheckOverride.skipVersionCheck())
             downloads++
             downloadException?.let { throw it }
             return downloadResult
@@ -60,11 +61,12 @@ class PrivacyConfigInternalLoaderTest {
             lines.add(line)
         }
     }
-    private val testee = PrivacyConfigInternalLoader(downloader, store, repository, marker)
+    private val testee = PrivacyConfigInternalLoader(downloader, store, repository, marker, versionCheckOverride)
 
     @Test
     fun whenSetUrlThenEnableOverrideForceLoadAndEmitAppliedLine() = runTest {
         testee.handleCommand(SetUrl(URL))
+        assertFalse(versionCheckOverride.skipVersionCheck())
         assertEquals(URL, store.remotePrivacyConfigUrl)
         assertTrue(store.useCustomPrivacyConfigUrl)
         assertEquals(1, downloads)
@@ -97,6 +99,7 @@ class PrivacyConfigInternalLoaderTest {
         store.remotePrivacyConfigUrl = URL
         store.useCustomPrivacyConfigUrl = true
         testee.handleCommand(Reset)
+        assertFalse(versionCheckOverride.skipVersionCheck())
         assertNull(store.remotePrivacyConfigUrl)
         assertFalse(store.useCustomPrivacyConfigUrl)
         assertEquals(1, downloads)
@@ -107,7 +110,9 @@ class PrivacyConfigInternalLoaderTest {
     fun whenDownloadFailsThenEmitFailedLineWithTheUrlTried() = runTest {
         downloadResult = ConfigDownloadResult.Error("offline")
         testee.handleCommand(SetUrl(URL))
+        assertFalse(versionCheckOverride.skipVersionCheck())
         testee.handleCommand(Reset)
+        assertFalse(versionCheckOverride.skipVersionCheck())
         val expected = listOf(
             "CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed source=$URL",
             "CONFIG_OVERRIDE_FAILED action=reset reason=download_failed source=$PRIVACY_REMOTE_CONFIG_URL",
@@ -120,6 +125,7 @@ class PrivacyConfigInternalLoaderTest {
         downloadException = IllegalStateException("database failure")
 
         testee.handleCommand(SetUrl(URL))
+        assertFalse(versionCheckOverride.skipVersionCheck())
 
         assertEquals(listOf("CONFIG_OVERRIDE_FAILED action=set_url reason=download_failed source=$URL"), lines)
     }
@@ -127,8 +133,20 @@ class PrivacyConfigInternalLoaderTest {
     @Test
     fun whenManualLoadThenForceDownloadWithoutResultLine() = runTest {
         assertEquals(Success, testee.load())
+        assertFalse(versionCheckOverride.skipVersionCheck())
         assertEquals(1, downloads)
         assertEquals(emptyList<String>(), lines)
+    }
+
+    @Test
+    fun whenManualLoadThrowsThenRestoreContext() = runTest {
+        downloadException = IllegalStateException("failure")
+        try {
+            testee.load()
+            org.junit.Assert.fail("Expected failure")
+        } catch (_: IllegalStateException) {
+            assertFalse(versionCheckOverride.skipVersionCheck())
+        }
     }
 
     private companion object {

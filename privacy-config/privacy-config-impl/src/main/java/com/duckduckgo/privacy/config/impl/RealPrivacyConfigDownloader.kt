@@ -28,8 +28,6 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadEr
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadError.EMPTY_CONFIG_ERROR
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadError.STORE_ERROR
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
-import com.duckduckgo.privacy.config.store.PrivacyConfig
-import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
@@ -46,7 +44,7 @@ interface PrivacyConfigDownloader {
      * @return [ConfigDownloadResult.Success] if remote config has been downloaded correctly or
      * [ConfigDownloadResult.Error] otherwise.
      */
-    suspend fun download(force: Boolean = false): ConfigDownloadResult
+    suspend fun download(): ConfigDownloadResult
 
     sealed class ConfigDownloadResult {
         data object Success : ConfigDownloadResult()
@@ -63,23 +61,12 @@ class RealPrivacyConfigDownloader @Inject constructor(
     private val privacyConfigCallbacks: PluginPoint<PrivacyConfigCallbackPlugin>,
     private val pixel: Pixel,
     private val telemetry: PrivacyConfigDownloadTelemetry,
-    private val repository: PrivacyConfigRepository,
 ) : PrivacyConfigDownloader {
 
     private val downloadMutex = Mutex()
 
-    override suspend fun download(force: Boolean): PrivacyConfigDownloader.ConfigDownloadResult = downloadMutex.withLock {
-        val previousConfig = if (force) repository.get() else null
-        if (force) {
-            repository.insert(PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = ""))
-        }
-        try {
-            downloadConfig()
-        } finally {
-            if (force && repository.get()?.version == -1L) {
-                if (previousConfig == null) repository.delete() else repository.insert(previousConfig)
-            }
-        }
+    override suspend fun download(): PrivacyConfigDownloader.ConfigDownloadResult = downloadMutex.withLock {
+        downloadConfig()
     }
 
     private suspend fun downloadConfig(): PrivacyConfigDownloader.ConfigDownloadResult {

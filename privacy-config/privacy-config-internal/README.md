@@ -52,10 +52,14 @@ leaves settings unchanged.
 
 The receiver handles the command itself, in the background (`goAsync`), so the process
 stays alive until the command finishes. Commands are serialized. A valid
-SET_URL enables the developer override, then resets the stored version and ETag before
-downloading. There is no command retry, polling, or new periodic work; the existing
-hourly worker is unchanged. The override is persistent: it remains until a RESET or a
-manual Developer Settings change, including across app restarts.
+SET_URL enables the developer URL override, then downloads. Developer Settings loads,
+SET_URL, and RESET bypass the version/signature gate only for that operation, allowing
+an equal or older config to replace stored config. Independent refreshes keep normal
+version checks. Failed downloads do not pre-clear stored metadata or feature data.
+There is no command retry, polling, or new periodic work; the existing hourly worker
+is unchanged. The selected URL settings are persistent: they remain until a RESET or
+a manual Developer Settings change, including across app restarts. This version policy
+does not bypass HTTP caches.
 
 Serve `generated/v6/android-config.json` from `duckduckgo/privacy-configuration`
 (after running `node index.js`) with `Cache-Control: no-store` so subsequent commands
@@ -95,15 +99,12 @@ Loads from the hourly refresh or from Developer Settings log no line. The ETag i
 if the server omits it. A failed SET_URL download keeps the selected override for the
 next command or manual load.
 
-### Known issue: no network in the background on Android 17
+### Observed background download failures on some Android 17 images
 
-Android 17 (SDK 37) enables the UID background firewall chain. An app that the
-broadcast starts in the background, and that has not been in the foreground since
-boot, has no network at all: `localhost` and raw IP addresses included, not only DNS.
-Both commands then log `CONFIG_OVERRIDE_FAILED ... reason=download_failed`, and RESET
-fails against the production URL too. Open the app once (it can be closed or
-force-stopped again afterwards), then send the command. Android 15 and earlier
-deliver the command to a cold-started app without this restriction.
+On some Android 17 images, background commands before the app's first foreground
+launch may fail with `reason=download_failed`, including RESET against production.
+Opening the app once before sending the command is a workaround. Treat this as an
+image-specific observation; a universal firewall cause has not been verified.
 
 ## Local remote config patches
 
