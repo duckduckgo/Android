@@ -27,6 +27,11 @@ on:
         required: false
         type: boolean
         default: false
+      maestro_priority:
+        description: 'Maestro Cloud queue priority (high, normal or low)'
+        required: false
+        type: string
+        default: normal
   workflow_dispatch:
     inputs:
       commit:
@@ -38,6 +43,15 @@ on:
         required: false
         type: boolean
         default: true
+      maestro_priority:
+        description: 'Maestro Cloud queue priority'
+        required: false
+        type: choice
+        options:
+          - high
+          - normal
+          - low
+        default: normal
 
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}
@@ -158,6 +172,7 @@ jobs:
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: ${{ matrix.suite-name }}
+          maestro_priority: ${{ inputs.maestro_priority }}
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
           is_release_blocker: true
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
