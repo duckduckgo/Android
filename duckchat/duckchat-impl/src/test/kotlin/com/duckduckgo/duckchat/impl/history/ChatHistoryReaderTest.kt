@@ -101,7 +101,7 @@ class ChatHistoryReaderTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verifyBlocking(duckChatJSHelper) {
-            processJsCallbackMessage(eq(FEATURE), eq(METHOD), eq(ID), anyOrNull(), any(), any(), any(), eq(mode), isNull())
+            processJsCallbackMessage(eq(FEATURE), eq(METHOD), eq(ID), anyOrNull(), any(), any(), any(), eq(mode), isNull(), eq(true))
         }
     }
 

@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
@@ -66,9 +67,10 @@ class FileAttachmentsContainerView @JvmOverloads constructor(
             itemView.setBackgroundResource(
                 if (oversized) R.drawable.background_file_attachment_chip_error else R.drawable.background_image_attachment_chip,
             )
-            itemView.findViewById<DaxTextView>(R.id.fileSize).setTextColor(
-                context.getColorFromAttr(if (oversized) CommonR.attr.daxColorDestructive else CommonR.attr.daxColorSecondaryText),
-            )
+            itemView.findViewById<DaxTextView>(R.id.fileSize).apply {
+                isVisible = oversized
+                setTextColor(context.getColorFromAttr(CommonR.attr.daxColorDestructive))
+            }
         }
     }
 
