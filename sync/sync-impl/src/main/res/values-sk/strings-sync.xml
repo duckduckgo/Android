@@ -486,7 +486,7 @@
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Maj prístup k svojim záložkám na mobile aj v počítači.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Zapni Sync &amp; Backup</string>
-    <string name="sync_bookmarks_import_promo_title_toggle">Synchronizuj a zálohuj svoje záložky na mobile a počítači pomocou Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Synchronizuj a zálohuj svoje záložky na mobile a počítači pomocou Sync &amp; Backup</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
@@ -496,8 +496,8 @@
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_title">Synchronizuj s aplikáciou pre počítač</string>
-    <string name="sync_bookmarks_multi_device_promo_primary_button">Synchronizuj záložky</string>
+    <string name="sync_bookmarks_multi_device_promo_title">Chceš synchronizovať záložky aj s aplikáciou pre počítač?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Pripojiť</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Získaj aplikáciu</string>
 
     <!-- Sync promo in bookmark added dialog -->
@@ -523,8 +523,8 @@
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Synchronizuj s aplikáciou pre počítač</string>
-    <string name="sync_passwords_multi_device_promo_primary_button">Synchronizuj heslá</string>
+    <string name="sync_passwords_multi_device_promo_title">Chceš synchronizovať heslá aj s aplikáciou pre počítač?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Pripojiť</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Ziskaj aplikáciu</string>
 
 </resources>
