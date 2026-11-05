@@ -447,6 +447,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.time.Duration.Companion.seconds
+import com.duckduckgo.duckchat.api.PageContextTrigger as Trigger
 import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("DenyListedApi")
@@ -964,7 +965,10 @@ class BrowserTabViewModelTest {
             whenever(mockStack.getItemAtIndex(any())).thenReturn(mockWebHistoryItem)
         }
 
-    private fun initialiseViewModel(viewModelDispatchers: DispatcherProvider = coroutineRule.testDispatcherProvider) {
+    private fun initialiseViewModel(
+        viewModelDispatchers: DispatcherProvider = coroutineRule.testDispatcherProvider,
+        loadData: Boolean = true,
+    ) {
         // Detach the previous instance's command observer before creating a new VM, so tests that
         // call initialiseViewModel() more than once (e.g. to swap browserMode mid-test) don't leave
         // a stale VM attached to mockCommandObserver and emitting unexpected commands.
@@ -1125,8 +1129,27 @@ class BrowserTabViewModelTest {
                 currentTimeProvider = fakeCurrentTimeProvider,
             )
 
-        testee.loadData("abc", null, false, false)
+        if (loadData) {
+            testee.loadData("abc", null, false, false)
+        }
         testee.command.observeForever(mockCommandObserver)
+    }
+
+    @Test
+    fun whenClearedBeforeLoadDataThenNoCollectionIsCancelled() {
+        resetChannels()
+        initialiseViewModel(loadData = false)
+
+        testee.onCleared()
+
+        verify(mockPageContextJSHelper, never()).cancelCollection(any())
+    }
+
+    @Test
+    fun whenClearedAfterLoadDataThenCollectionIsCancelled() {
+        testee.onCleared()
+
+        verify(mockPageContextJSHelper).cancelCollection("abc")
     }
 
     private fun resetChannels() {
@@ -9205,7 +9228,32 @@ class BrowserTabViewModelTest {
 
             testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
 
-            verify(mockPageContextJSHelper).collectPageContext()
+            verify(mockPageContextJSHelper).collectPageContext(any(), any(), anyOrNull(), any())
+        }
+
+    @Test
+    fun whenPageFinishedWithContextualSheetHiddenThenCollectWithoutReportingOutcome() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = true))
+            givenCurrentSite("https://example.com")
+            testee.onMainFrameLoadStarted(navigationId = 7L)
+
+            testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "https://example.com")
+
+            verify(mockPageContextJSHelper).collectPageContext(any(), eq(Trigger.NAVIGATION), eq(7L), eq(false))
+        }
+
+    @Test
+    fun whenPageFinishedWithContextualSheetVisibleThenCollectReportingNavigationOutcome() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = true))
+            givenCurrentSite("https://example.com")
+            testee.onMainFrameLoadStarted(navigationId = 7L)
+            testee.onDuckAiContextualSheetVisibilityChanged(true)
+
+            testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "https://example.com")
+
+            verify(mockPageContextJSHelper).collectPageContext(any(), eq(Trigger.NAVIGATION), eq(7L), eq(true))
         }
 
     @Test
@@ -9216,7 +9264,7 @@ class BrowserTabViewModelTest {
 
             testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
 
-            verify(mockPageContextJSHelper, never()).collectPageContext()
+            verify(mockPageContextJSHelper, never()).collectPageContext(any(), any(), anyOrNull(), any())
         }
 
     @Test
@@ -14431,7 +14479,7 @@ class BrowserTabViewModelTest {
             subscriptionName = "collect",
             params = JSONObject(),
         )
-        whenever(mockPageContextJSHelper.collectPageContext()).thenReturn(expectedEvent)
+        whenever(mockPageContextJSHelper.collectPageContext(any(), any(), anyOrNull(), any())).thenReturn(expectedEvent)
 
         testee.collectPageContext()
 

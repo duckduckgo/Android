@@ -495,6 +495,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
+import com.duckduckgo.duckchat.api.PageContextTrigger as Trigger
 import com.duckduckgo.mobile.android.R as CommonR
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
@@ -815,6 +816,7 @@ class BrowserTabViewModel @Inject constructor(
 
     // Needed for PageLoadWideEvent: it identifies which page load the progress events belong to.
     private var pageLoadNavigationId: Long? = null
+    private var isDuckAiContextualSheetVisible = false
     private var hasExitedFixedProgress = false
     private var navigationState = NavigationProgressState()
 
@@ -1322,6 +1324,9 @@ class BrowserTabViewModel @Inject constructor(
 
     @VisibleForTesting
     public override fun onCleared() {
+        if (::tabId.isInitialized) {
+            pageContextJSHelper.cancelCollection(tabId)
+        }
         newTabPageModalPresenterRegistry.unregister(this)
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
@@ -2779,6 +2784,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun pageCleared() {
+        pageContextJSHelper.cancelCollection(tabId)
         logcat(VERBOSE) { "Page cleared: $url" }
         site = null
         onSiteChanged()
@@ -2800,6 +2806,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onMainFrameLoadStarted(navigationId: Long) {
+        pageContextJSHelper.cancelCollection(tabId)
         pageLoadNavigationId = navigationId
         hasExitedFixedProgress = false
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
@@ -2922,7 +2929,7 @@ class BrowserTabViewModel @Inject constructor(
             onDuckAiOnboardingPageFinishedIfApplicable()
 
             if (androidBrowserConfig.storePageContext().isEnabled()) {
-                collectPageContext()
+                collectPageContext(Trigger.NAVIGATION, pageLoadNavigationId, isDuckAiContextualSheetVisible)
             }
         }
     }
@@ -6169,10 +6176,22 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun collectPageContext() {
+        collectPageContext(Trigger.TAB_CONTENT, navigationId = null, isDuckAiVisible = true)
+    }
+
+    private fun collectPageContext(
+        trigger: Trigger,
+        navigationId: Long?,
+        isDuckAiVisible: Boolean,
+    ) {
         viewModelScope.launch {
-            val subscriptionEvent = pageContextJSHelper.collectPageContext()
+            val subscriptionEvent = pageContextJSHelper.collectPageContext(tabId, trigger, navigationId, isDuckAiVisible)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
+    }
+
+    fun onDuckAiContextualSheetVisibilityChanged(visible: Boolean) {
+        isDuckAiContextualSheetVisible = visible
     }
 
     fun onDuckChatOmnibarButtonClicked(
