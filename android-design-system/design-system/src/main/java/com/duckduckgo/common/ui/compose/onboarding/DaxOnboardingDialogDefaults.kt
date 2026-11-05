@@ -95,7 +95,8 @@ object DaxOnboardingDialogDefaults {
     internal val TypingSettle: Duration = 20.milliseconds
 
     internal val LandscapeCtaWidth = 200.dp
-    internal val LandscapeTextCtaSpacing = 8.dp
+    internal val LandscapeTextCtaSpacing = 16.dp
+    internal val LandscapeHorizontalPadding = 24.dp
     internal val LandscapeTitleBodySpacing = 8.dp
     internal val ContextualTopPadding = 32.dp
     internal val ContextualTitleBodySpacing = 16.dp
