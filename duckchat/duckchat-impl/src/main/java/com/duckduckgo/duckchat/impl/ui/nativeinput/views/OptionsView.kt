@@ -111,6 +111,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         hintCommandsJob?.cancel()
         hintCommandsJob = newChatHintCommands.commandsFor { host.tabId() }.onEach { command ->
             if (command is NewChatHintCommand.CreateImage && !isEditMode && !host.isContextualSurface()) {
+                viewModel.onToolSelectedByUser(Tool.IMAGE_GENERATION)
                 host.toolSelected(Tool.IMAGE_GENERATION.rawValue)
                 host.focusInput()
             }

@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
@@ -86,6 +87,9 @@ class NewChatHintsView @JvmOverloads constructor(
                 show(hints.isNotEmpty())
             }.launchIn(scope)
     }
+
+    // The host fades the hints out with the input while they stay VISIBLE; invisible chips must not take taps.
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean = alpha > 0f && super.dispatchTouchEvent(event)
 
     override fun onDetachedFromWindow() {
         stateJob?.cancel()

@@ -187,6 +187,17 @@ class NewChatHintsViewModelTest {
     }
 
     @Test
+    fun whenAModelChangeWindowIsOpenThenHintsAreHiddenAndTapsSendNothing() = runTest {
+        stateStore.update("tab") { it.copy(modelChangeMode = true) }
+        assertTrue(viewModel().viewState("tab").first().isEmpty())
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenViewModelIsRecreatedThenTheTabKeepsItsOrder() = runTest {
         val initial = viewModel().viewState("tab").first()
         assertEquals(initial, viewModel().viewState("tab").first())
