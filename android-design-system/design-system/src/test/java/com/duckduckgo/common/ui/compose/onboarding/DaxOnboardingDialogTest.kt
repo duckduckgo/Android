@@ -90,7 +90,7 @@ class DaxOnboardingDialogTest {
     @get:Rule
     val compose = createComposeRule(effectContext = motionScale)
 
-    private val state = DaxOnboardingDialogState()
+    private val state = DaxOnboardingDialogHostState()
     private val contentKey = mutableStateOf("first")
     private val title = mutableStateOf("A title long enough to keep typing while a pointer gesture is in progress")
     private val animate = mutableStateOf(true)
