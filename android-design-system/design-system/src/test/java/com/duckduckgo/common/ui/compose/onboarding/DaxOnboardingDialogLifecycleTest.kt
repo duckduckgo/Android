@@ -285,14 +285,14 @@ class DaxOnboardingDialogLifecycleTest {
     }
 
     @Test
-    fun replacingNonNullSlotUsesLatestReadinessCallbackWithoutRepeatingDelivery() {
+    fun replacingNonNullSlotDuringIntroLetsOnlyTheReplacementObserveTheSettle() {
         val useReplacement = mutableStateOf(false)
         val deliveries = mutableListOf<String>()
         val original: @Composable DaxOnboardingDialogContentScope.() -> Unit = {
-            onContentReady { deliveries.add("original") }
+            OnIntroSettled { deliveries.add("original") }
         }
         val replacement: @Composable DaxOnboardingDialogContentScope.() -> Unit = {
-            onContentReady { deliveries.add("replacement") }
+            OnIntroSettled { deliveries.add("replacement") }
         }
         compose.setContent {
             DuckDuckGoTheme {
@@ -311,11 +311,6 @@ class DaxOnboardingDialogLifecycleTest {
         assertTrue(deliveries.isEmpty())
 
         compose.runOnIdle { useReplacement.value = true }
-        frames()
-        advance(5_000)
-        assertEquals(listOf("replacement"), deliveries)
-
-        compose.runOnIdle { useReplacement.value = false }
         frames()
         advance(5_000)
         assertEquals(listOf("replacement"), deliveries)
@@ -412,7 +407,7 @@ class DaxOnboardingDialogLifecycleTest {
     }
 
     @Test
-    fun slotReinsertedAfterDeliveredReadinessDoesNotReceiveItAgain() {
+    fun slotReinsertedAfterSettleSeesTheSameSettledIntroWithoutReplaying() {
         showDialog()
         val original = identities.getValue("slot")
         assertEquals(listOf(original to false), ready)
@@ -421,8 +416,9 @@ class DaxOnboardingDialogLifecycleTest {
         compose.runOnIdle { showSlot.value = true }
         frames()
 
-        assertNotSame(original, identities.getValue("slot"))
-        assertEquals(listOf(original to false), ready)
+        val reinserted = identities.getValue("slot")
+        assertNotSame(original, reinserted)
+        assertEquals(listOf(original to false, reinserted to false), ready)
         assertEquals(listOf("first"), finished)
         assertEquals(2, effectStarts["slot"])
         assertEquals(1, disposals["slot"])
@@ -552,7 +548,7 @@ class DaxOnboardingDialogLifecycleTest {
                 {
                     val token = remember { Any() }
                     probeContent("slot", currentSlotHeight, token)
-                    onContentReady { animated -> ready.add(token to animated) }
+                    OnIntroSettled { animated -> ready.add(token to animated) }
                     if (includeFocusAndView) {
                         Box(
                             Modifier.size(24.dp).focusRequester(focusRequester)
