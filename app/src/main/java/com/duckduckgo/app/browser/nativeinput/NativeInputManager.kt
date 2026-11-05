@@ -725,9 +725,9 @@ class RealNativeInputManager @Inject constructor(
             if (currentTabUrl.firstOrNull()?.toUri()?.isDuckAiSettingsUrl(duckChat) == true) {
                 widgetView.gone()
             } else if (widgetRoot === widgetView && omnibarController.isDuckAiMode()) {
-                val cardContext = widgetView.findViewById<View>(R.id.inputModeWidgetCard).context
+                val cardContext = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)?.context ?: return@launch
                 val hints = newChatHintsRenderer.create(cardContext, tabId)
-                if (hints != null && widgetRoot === widgetView) {
+                if (hints != null && widgetRoot === widgetView && !isExiting) {
                     layoutCoordinator.configureNewChatHints(widgetView, hints)
                     rootView.addView(hints)
                     newChatHintsView = hints

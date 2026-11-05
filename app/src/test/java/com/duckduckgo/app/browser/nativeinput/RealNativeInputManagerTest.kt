@@ -581,7 +581,9 @@ class RealNativeInputManagerTest {
         visibleBeforeShow: Boolean = false,
     ): NativeInputWidget {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
-        val root = FrameLayout(activity)
+        val root = object : FrameLayout(activity) {
+            override fun getResources(): Resources = layoutResources
+        }
         activity.setContentView(root)
         root.addView(FrameLayout(activity).apply { id = R.id.includeNewBrowserTab })
         if (hasOtherFocus) {
@@ -613,7 +615,12 @@ class RealNativeInputManagerTest {
             override fun hasWindowFocus(): Boolean = true
         }.apply {
             id = R.id.inputModeRoot
-            addView(widget)
+            addView(
+                FrameLayout(activity).apply {
+                    id = R.id.inputModeWidgetCard
+                    addView(widget)
+                },
+            )
         }
         autoFocusWidgetRoot = widgetView
         val inflater: LayoutInflater = mock()
@@ -650,7 +657,12 @@ class RealNativeInputManagerTest {
         val widget = TestNativeInputWidget(context, widgetDelegate).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget }
         val widgetView = FrameLayout(context).apply {
             id = R.id.inputModeRoot
-            addView(widget)
+            addView(
+                FrameLayout(context).apply {
+                    id = R.id.inputModeWidgetCard
+                    addView(widget)
+                },
+            )
         }
         val inflater: LayoutInflater = mock()
         whenever(inflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)

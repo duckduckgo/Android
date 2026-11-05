@@ -24,7 +24,6 @@
     android:layout_height="wrap_content"
     android:layout_marginEnd="@dimen/keyline_2"
     android:focusable="true"
-    android:clickable="true"
     android:gravity="center"
     android:background="@drawable/new_chat_hint_background"
     android:drawableTint="?attr/daxColorPrimaryIcon"

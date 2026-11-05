@@ -89,6 +89,9 @@ class NativeInputLayoutCoordinator(
         hintsView.layoutParams = CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             gravity = Gravity.BOTTOM
         }
+        // The input root is raised and opaque; matching its Z keeps the chips (added later) drawn on top of it.
+        hintsView.elevation = widgetView.elevation
+        hintsView.translationZ = widgetView.translationZ
         val card = widgetView.findViewById<View>(R.id.inputModeWidgetCard)
         val preDrawListener = ViewTreeObserver.OnPreDrawListener {
             if (!hintsView.isVisible) return@OnPreDrawListener true
