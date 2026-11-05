@@ -27,15 +27,13 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.WindowManager
 import android.widget.LinearLayout
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetAddBookmarkBinding
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -74,11 +72,9 @@ class BookmarkAddedConfirmationDialog(
 
     private val autoDismissDialogJob = ConflatedJob()
 
-    private var bottomSystemBarInset = 0
-
     override fun show() {
         setContentView(binding.root)
-        applyBottomSystemBarInset()
+        binding.root.applyBottomSystemBarInsetPadding()
 
         addInteractionListeners()
 
@@ -135,25 +131,8 @@ class BookmarkAddedConfirmationDialog(
                 } else {
                     binding.promotionContainer.gone()
                 }
-                updateBottomSystemBarInset()
             }
         }
-    }
-
-    private fun applyBottomSystemBarInset() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            bottomSystemBarInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-            updateBottomSystemBarInset()
-            insets
-        }
-        ViewCompat.requestApplyInsets(binding.root)
-    }
-
-    // We pad whichever view sits at the bottom, so the area under the navigation bar matches the promotions when they're shown.
-    private fun updateBottomSystemBarInset() {
-        val isPromotionVisible = binding.promotionContainer.isVisible
-        binding.root.updatePadding(bottom = if (isPromotionVisible) 0 else bottomSystemBarInset)
-        binding.promotionContainer.updatePadding(bottom = if (isPromotionVisible) bottomSystemBarInset else 0)
     }
 
     private fun startAutoDismissTimer() {
