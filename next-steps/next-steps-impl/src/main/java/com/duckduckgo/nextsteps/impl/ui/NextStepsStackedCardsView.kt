@@ -73,6 +73,8 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     private val backElevation = resources.getDimension(R.dimen.nextStepsBackCardElevation)
 
     init {
+        binding.frontCard.applyRmfStyle()
+        binding.backCard.applyRmfStyle()
         binding.frontCard.closeButton.setOnClickListener { dismissFrontCard() }
         binding.frontCard.primaryAction.setOnClickListener { viewModel.onPrimaryActionClicked() }
         binding.backCard.closeButton.isEnabled = false

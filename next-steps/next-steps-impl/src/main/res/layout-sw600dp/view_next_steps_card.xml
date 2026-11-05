@@ -90,6 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
+            android:theme="?attr/daxRmfCardButtonTheme"
             app:daxButtonSize="small"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"

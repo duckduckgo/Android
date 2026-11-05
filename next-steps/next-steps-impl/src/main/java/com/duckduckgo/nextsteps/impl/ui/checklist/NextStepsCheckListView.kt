@@ -19,9 +19,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -36,6 +39,9 @@ import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
+import com.duckduckgo.common.ui.view.applyRmfCardStyle
+import com.duckduckgo.common.ui.view.getDimensionFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -54,6 +60,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ViewScope::class)
 class NextStepsCheckListView @JvmOverloads constructor(
@@ -79,11 +86,16 @@ class NextStepsCheckListView @JvmOverloads constructor(
     private var completionAnimationRunning = false
 
     init {
-        val horizontalPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        val horizontalPadding = resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
         val bottomPadding = resources.getDimensionPixelSize(R.dimen.nextStepsStackPaddingBottom)
         setPadding(horizontalPadding, horizontalPadding, horizontalPadding, bottomPadding)
         clipToPadding = false
         clipChildren = false
+        binding.checkListCard.applyRmfCardStyle(binding.closeButton)
+        if (context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)) {
+            binding.checkListCard.radius = context.getDimensionFromAttr(CommonR.attr.daxContainerRadius, CommonR.dimen.extraLargeShapeCornerRadius)
+            binding.sectionTitle.updateLayoutParams<LayoutParams> { marginStart = 0 }
+        }
         binding.closeButton.setOnClickListener { viewModel.onSectionDismissed() }
     }
 
@@ -166,6 +178,15 @@ class NextStepsCheckListView @JvmOverloads constructor(
     }
 
     private fun ViewNextStepsCheckListItemBinding.bind(listItem: ViewState.ListItem) {
+        if (context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)) {
+            itemRow.updatePadding(left = 0, right = 0)
+            divider.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = 0
+                rightMargin = 0
+                marginStart = 0
+                marginEnd = 0
+            }
+        }
         itemTitle.text = listItem.item.titleText
         actionButton.alpha = 1f
         completedIcon.alpha = 1f

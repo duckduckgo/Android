@@ -98,6 +98,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/nextStepsPrimaryActionSpacing"
+            android:theme="?attr/daxRmfCardButtonTheme"
             app:daxButtonSize="small"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

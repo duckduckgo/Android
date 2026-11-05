@@ -381,6 +381,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
         override fun bind(component: Component) {
+            val rebrandEnabled = view.context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
                 topIllustration = CommonR.drawable.announcement_96,
@@ -452,6 +453,16 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<MessageCta>(R.id.big_two_actions_update_remote_message).apply {
                 setMessage(bigTwoActionsUpdateMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.long_primary_remote_message).apply {
+                isVisible = rebrandEnabled
+                if (rebrandEnabled) setMessage(bigTwoActionsMessage.copy(action = "Subscribe to DuckDuckGo Pro", action2 = "No"))
+            }
+
+            view.findViewById<MessageCta>(R.id.long_secondary_remote_message).apply {
+                isVisible = rebrandEnabled
+                if (rebrandEnabled) setMessage(bigTwoActionsMessage.copy(action = "Subscribe to DuckDuckGo Pro", action2 = "Remind me next week"))
             }
 
             view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
