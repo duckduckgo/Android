@@ -134,6 +134,7 @@ class RealPromoCampaignJSHelper @Inject constructor(
                     if (requestId == null) {
                         return null
                     }
+                    promoCampaignRepository.endPromo(checkExpiry = true)
                     val record = promoCampaignRepository.getPromoRecord()
                     JsCallbackData(createPayload(record), featureName, method, requestId)
                 }
