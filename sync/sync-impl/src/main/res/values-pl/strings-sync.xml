@@ -492,6 +492,7 @@
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Synchronizuj i twórz kopie zapasowe zakładek</string>
     <string name="sync_bookmarks_promo_message">Szyfrowane kompleksowo. Nikt nie może zobaczyć Twoich zakładek, nawet my.</string>
+    <string name="sync_bookmarks_promo_primary_button">Włącz Sync &amp; Backup</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -506,7 +507,7 @@
     <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Włącz Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
-    <string name="sync_bookmark_added_multi_device_promo_title">Synchronizuj z moją aplikacją komputerową</string>
+    <string name="sync_bookmark_added_multi_device_promo_title">Synchronizuj z aplikacją komputerową</string>
     <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Więcej opcji</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Ukryj</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Synchronizuj z komputerem</string>
@@ -518,6 +519,7 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Synchronizuj i twórz kopie zapasowe haseł</string>
     <string name="sync_passwords_promo_message">Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my.</string>
+    <string name="sync_passwords_promo_primary_button">Włącz Sync &amp; Backup</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
