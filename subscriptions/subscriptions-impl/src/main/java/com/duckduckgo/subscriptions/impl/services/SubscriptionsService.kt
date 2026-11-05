@@ -142,4 +142,5 @@ data class WithdrawalEligibilityResponse(
 data class WithdrawResponse(
     val refundedAmount: String?,
     val currency: String?,
+    val requestedAt: Long?,
 )
