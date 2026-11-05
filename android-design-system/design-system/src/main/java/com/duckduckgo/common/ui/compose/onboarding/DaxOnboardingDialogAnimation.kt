@@ -82,6 +82,8 @@ internal class DaxOnboardingDialogIntro(
         private set
     var finished by mutableStateOf(false)
         private set
+    var animationSkipped by mutableStateOf(!animate)
+        private set
     val settled: Boolean get() = phase == IntroPhase.Settled
 
     val headerAlpha = Animatable(if (animate) 0f else 1f)
@@ -143,6 +145,7 @@ internal class DaxOnboardingDialogIntro(
         settleShell()
         headerAlpha.snapTo(1f)
         contentAlpha.snapTo(1f)
+        animationSkipped = !animated
         phase = IntroPhase.Settled
         if (!finished) {
             finished = true

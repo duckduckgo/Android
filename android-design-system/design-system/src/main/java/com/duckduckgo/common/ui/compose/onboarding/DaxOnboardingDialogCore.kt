@@ -198,7 +198,6 @@ internal fun DaxOnboardingDialogCore(
     val latestTail by rememberUpdatedState(tail)
     val latestTailExtended by rememberUpdatedState(tailExtended)
     val latestHeaderImage by rememberUpdatedState(headerImage)
-    val contentScope = remember(contentKey) { DaxOnboardingDialogContentScope { intro.settled } }
     val requestSkip = intro.requestSkip
     val latestAnimating by rememberUpdatedState(!settled)
     val latestRequestSkip by rememberUpdatedState(requestSkip)
@@ -246,10 +245,8 @@ internal fun DaxOnboardingDialogCore(
             },
             settleShell = { shell.settle(latestTail, latestTailExtended, cardSizeTracker.lastSize) },
             hasTitle = { latestTitle.text.isNotEmpty() },
-            onFinished = { animated ->
+            onFinished = {
                 state.updateAnimating(requestSkip, false)
-                contentScope.notifyContentReady(animated)
-                contentScope.deliverContentReady()
                 latestOnIntroFinished(contentKey)
             },
         )
@@ -304,14 +301,12 @@ internal fun DaxOnboardingDialogCore(
             shell.tailDepth.snapTo(target)
         }
     }
-    LaunchedEffect(contentScope, contentScope.readyVersion) { contentScope.deliverContentReady() }
 
-    val contentSlot = remember(contentScope) {
+    val contentSlot = remember(intro) {
         movableContentOf<@Composable DaxOnboardingDialogContentScope.() -> Unit> { slot ->
-            DisposableEffect(Unit) { onDispose { contentScope.clearReadyCallback() } }
             Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                contentScope.installColumnScope(this)
-                with(contentScope) { slot() }
+                val contentScope = remember(this, intro) { DaxOnboardingDialogContentScopeImpl(this, intro) }
+                contentScope.slot()
             }
         }
     }
@@ -348,7 +343,7 @@ internal fun DaxOnboardingDialogCore(
     val textPadding = if (landscapeLayout) 0.dp else textHorizontalPadding
     val contentPadding = if (landscapeLayout) 0.dp else contentHorizontalPadding
     val onboardingIconsPrimary = LocalOnboardingColors.current.iconsPrimary
-    // Not `settled`: onContentReady requests focus before recomposition updates it.
+    // Reads the phase at focus time, not `settled`: content may request focus as the intro settles, before recomposition.
     val contentGate = Modifier
         .focusProperties { if (intro.phase != IntroPhase.Settled) onEnter = { cancelFocusChange() } }
         .focusGroup()

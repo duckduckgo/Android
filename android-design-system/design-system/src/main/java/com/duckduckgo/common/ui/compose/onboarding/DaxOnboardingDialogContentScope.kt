@@ -18,89 +18,29 @@ package com.duckduckgo.common.ui.compose.onboarding
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Measured
-import androidx.compose.ui.layout.VerticalAlignmentLine
 
 /**
  * Receiver scope for arbitrary dialog content.
  *
- * The dialog enforces pointer, focus and semantics gating for the whole slot. [enabled] is a
- * reporting value that lets content choose its own visual state; it is not the enforcement
- * boundary. Register long-lived work with [onContentReady] and cancel it from a `DisposableEffect`.
- * The slot is keyed by content key, so its remembered state and effects are disposed when the
- * content key changes.
+ * The dialog gates pointer, focus and semantics for the whole slot until the intro settles. The slot is keyed by
+ * content key, so its remembered state and effects reset when the content key changes.
  */
 @Stable
-class DaxOnboardingDialogContentScope internal constructor(
-    private val isEnabled: () -> Boolean,
-) : ColumnScope {
-    private var columnScope: ColumnScope? = null
-    private var pendingReady: Boolean? = null
-    private var readyCallback: ((Boolean) -> Unit)? = null
-    private var delivered = false
-    internal var readyVersion by mutableIntStateOf(0)
-        private set
-
-    /** Whether the shared intro has settled and content may be presented as ready. */
-    val enabled: Boolean
-        get() = isEnabled()
+interface DaxOnboardingDialogContentScope : ColumnScope {
+    /** True once the intro animation has finished and the content can be interacted with. */
+    val isIntroSettled: Boolean
 
     /**
-     * Registers a callback invoked once after this content key's shared content fade (or snap).
-     * `animated` is false when the intro was snapped or skipped.
-     * The registration is dropped if the slot leaves composition before then.
+     * Whether the intro animation was skipped rather than played: tapped through, or never run because animations were off.
+     * Only meaningful once [isIntroSettled] is true.
      */
-    fun onContentReady(callback: (animated: Boolean) -> Unit) {
-        val firstRegistration = readyCallback == null
-        readyCallback = callback
-        if (firstRegistration && pendingReady != null && !delivered) readyVersion++
-    }
+    val wasIntroAnimationSkipped: Boolean
+}
 
-    internal fun notifyContentReady(animated: Boolean) {
-        if (delivered) return
-        pendingReady = animated
-        readyVersion++
-    }
-
-    internal fun clearReadyCallback() {
-        readyCallback = null
-    }
-
-    internal fun deliverContentReady() {
-        if (delivered) return
-        val animated = pendingReady ?: return
-        val callback = readyCallback ?: return
-        delivered = true
-        pendingReady = null
-        callback(animated)
-    }
-
-    internal fun installColumnScope(scope: ColumnScope) {
-        columnScope = scope
-    }
-
-    override fun Modifier.weight(weight: Float, fill: Boolean): Modifier {
-        val base = this
-        return columnScope?.let { with(it) { base.weight(weight, fill) } } ?: base
-    }
-
-    override fun Modifier.align(alignment: Alignment.Horizontal): Modifier {
-        val base = this
-        return columnScope?.let { with(it) { base.align(alignment) } } ?: base
-    }
-
-    override fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine): Modifier {
-        val base = this
-        return columnScope?.let { with(it) { base.alignBy(alignmentLine) } } ?: base
-    }
-
-    override fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int): Modifier {
-        val base = this
-        return columnScope?.let { with(it) { base.alignBy(alignmentLineBlock) } } ?: base
-    }
+internal class DaxOnboardingDialogContentScopeImpl(
+    columnScope: ColumnScope,
+    private val intro: DaxOnboardingDialogIntro,
+) : DaxOnboardingDialogContentScope, ColumnScope by columnScope {
+    override val isIntroSettled: Boolean get() = intro.settled
+    override val wasIntroAnimationSkipped: Boolean get() = intro.animationSkipped
 }
