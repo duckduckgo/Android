@@ -50,6 +50,7 @@ dependencies {
 
     testImplementation project(':common-test')
     testImplementation project(':data-store-test')
+    testImplementation project(":feature-toggles-test")
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.test.ext.junit

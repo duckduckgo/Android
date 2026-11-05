@@ -23,7 +23,11 @@ import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +38,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.robolectric.Shadows.shadowOf
-import kotlin.system.measureTimeMillis
 
 @RunWith(AndroidJUnit4::class)
 class AnrSupervisorTest {
@@ -45,8 +48,8 @@ class AnrSupervisorTest {
     private val customTabDetector: CustomTabDetector = mock()
     private val appBuildConfig: AppBuildConfig = mock { on { versionName } doReturn "5.0.0" }
 
-    private val runnable = AnrSupervisorRunnable(webViewVersionProvider, customTabDetector, appBuildConfig, anrsDatabase)
-    private val testee = AnrSupervisor(runnable)
+    private lateinit var runnable: AnrSupervisorRunnable
+    private lateinit var testee: AnrSupervisor
 
     @After
     fun tearDown() {
@@ -63,25 +66,42 @@ class AnrSupervisorTest {
     }
 
     @Test
-    fun whenReturningDuringStopGracePeriodThenOnOpenDoesNotBlock() {
-        backgroundUntilStopGracePeriod()
-
-        val took = measureTimeMillis { testee.onOpen(isFreshLaunch = false) }
-
-        assertTrue("onOpen blocked for ${took}ms", took < 500)
-    }
-
-    @Test
-    fun whenReturningDuringStopGracePeriodThenWatcherKeepsRunning() {
+    fun whenReturningDuringStopGracePeriodThenOnOpenReturnsWhileWatcherIsStillInIt() {
+        setUp(nonBlockingLifecycle = true)
         backgroundUntilStopGracePeriod()
 
         testee.onOpen(isFreshLaunch = false)
 
-        awaitUntil(respondToChecks = true) { !runnable.isStopped && watcherThread() != null }
+        assertTrue(watcherIsIn(NON_BLOCKING_GRACE_PERIOD))
+    }
+
+    @Test
+    fun whenReturningDuringStopGracePeriodThenWatcherKeepsRunning() {
+        setUp(nonBlockingLifecycle = true)
+        backgroundUntilStopGracePeriod()
+
+        testee.onOpen(isFreshLaunch = false)
+
+        awaitUntil(respondToChecks = true) { watcherIsSleepingBetweenChecks() }
+        assertFalse(runnable.isStopped)
+    }
+
+    @Test
+    fun whenReturningAndLeavingAgainDuringStopGracePeriodThenWatcherStops() {
+        setUp(nonBlockingLifecycle = true)
+        backgroundUntilStopGracePeriod()
+
+        testee.onOpen(isFreshLaunch = false)
+        testee.onClose()
+
+        awaitUntil(respondToChecks = true) { watcherThread() == null }
+        assertNoWatcherStartsWithin(STOP_GRACE_PERIOD_MILLIS + 500)
+        assertTrue(runnable.isStopped)
     }
 
     @Test
     fun whenAppStaysInBackgroundThenWatcherStops() {
+        setUp(nonBlockingLifecycle = true)
         backgroundUntilStopGracePeriod()
 
         awaitUntil(respondToChecks = true) { watcherThread() == null }
@@ -90,7 +110,20 @@ class AnrSupervisorTest {
     }
 
     @Test
+    fun whenReturningAfterWatcherStoppedThenWatcherRestarts() {
+        setUp(nonBlockingLifecycle = true)
+        backgroundUntilStopGracePeriod()
+        awaitUntil(respondToChecks = true) { watcherThread() == null }
+
+        testee.onOpen(isFreshLaunch = false)
+
+        awaitUntil(respondToChecks = true) { watcherIsSleepingBetweenChecks() }
+        assertFalse(runnable.isStopped)
+    }
+
+    @Test
     fun whenMainThreadRespondsThenNoAnrIsRecorded() {
+        setUp(nonBlockingLifecycle = true)
         testee.onOpen(isFreshLaunch = false)
 
         awaitUntil(respondToChecks = true) { watcherIsSleepingBetweenChecks() }
@@ -100,6 +133,7 @@ class AnrSupervisorTest {
 
     @Test
     fun whenMainThreadDoesNotRespondThenAnrIsRecorded() {
+        setUp(nonBlockingLifecycle = true)
         testee.onOpen(isFreshLaunch = false)
 
         awaitUntil(respondToChecks = false) { mockingDetails(anrDao).invocations.isNotEmpty() }
@@ -107,11 +141,68 @@ class AnrSupervisorTest {
         verify(anrDao).insert(any())
     }
 
+    @Test
+    fun whenFlagDisabledAndReturningDuringStopGracePeriodThenOnOpenWaitsForIt() {
+        setUp(nonBlockingLifecycle = false)
+        backgroundUntilStopGracePeriod()
+
+        testee.onOpen(isFreshLaunch = false)
+
+        assertFalse(watcherIsIn(LEGACY_GRACE_PERIOD))
+    }
+
+    @Test
+    fun whenFlagDisabledAndReturningDuringStopGracePeriodThenWatcherRestarts() {
+        setUp(nonBlockingLifecycle = false)
+        backgroundUntilStopGracePeriod()
+
+        testee.onOpen(isFreshLaunch = false)
+
+        awaitUntil(respondToChecks = true) { !runnable.isStopped && watcherIsSleepingBetweenChecks() }
+    }
+
+    @Test
+    fun whenFlagDisabledAndAppStaysInBackgroundThenWatcherStops() {
+        setUp(nonBlockingLifecycle = false)
+        backgroundUntilStopGracePeriod()
+
+        awaitUntil(respondToChecks = true) { watcherThread() == null }
+
+        assertTrue(runnable.isStopped)
+    }
+
+    @Test
+    fun whenFlagDisabledAndMainThreadDoesNotRespondThenAnrIsRecorded() {
+        setUp(nonBlockingLifecycle = false)
+        testee.onOpen(isFreshLaunch = false)
+
+        awaitUntil(respondToChecks = false) { mockingDetails(anrDao).invocations.isNotEmpty() }
+
+        verify(anrDao).insert(any())
+    }
+
+    private fun setUp(nonBlockingLifecycle: Boolean) {
+        val feature = FakeFeatureToggleFactory.create(AnrSupervisorFeature::class.java).apply {
+            self().setRawStoredState(State(enable = nonBlockingLifecycle))
+        }
+        runnable = AnrSupervisorRunnable(webViewVersionProvider, customTabDetector, appBuildConfig, anrsDatabase, feature)
+        testee = AnrSupervisor(runnable)
+    }
+
     private fun backgroundUntilStopGracePeriod() {
         testee.onOpen(isFreshLaunch = false)
         awaitUntil(respondToChecks = false) { !runnable.isStopped }
         testee.onClose()
-        awaitUntil(respondToChecks = true) { watcherIsIn("checkStopped") }
+        awaitUntil(respondToChecks = true) { watcherIsIn(NON_BLOCKING_GRACE_PERIOD) || watcherIsIn(LEGACY_GRACE_PERIOD) }
+    }
+
+    private fun assertNoWatcherStartsWithin(millis: Long) {
+        val deadline = System.currentTimeMillis() + millis
+        while (System.currentTimeMillis() < deadline) {
+            assertNull(watcherThread())
+            shadowOf(Looper.getMainLooper()).idle()
+            Thread.sleep(10)
+        }
     }
 
     private fun awaitUntil(respondToChecks: Boolean, timeoutMs: Long = 5_000, condition: () -> Boolean) {
@@ -132,6 +223,12 @@ class AnrSupervisorTest {
 
     private fun watcherIsSleepingBetweenChecks(): Boolean {
         val stack = watcherThread()?.stackTrace ?: return false
-        return stack.any { it.methodName == "sleep" } && !watcherIsIn("checkStopped")
+        return stack.any { it.methodName == "sleep" } && !watcherIsIn(NON_BLOCKING_GRACE_PERIOD) && !watcherIsIn(LEGACY_GRACE_PERIOD)
+    }
+
+    private companion object {
+        const val NON_BLOCKING_GRACE_PERIOD = "exitAfterStopGracePeriod"
+        const val LEGACY_GRACE_PERIOD = "checkStopped"
+        const val STOP_GRACE_PERIOD_MILLIS = 2_000L
     }
 }
