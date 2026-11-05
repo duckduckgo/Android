@@ -33,6 +33,7 @@
     <string name="undo">Atsaukt</string>
     <string name="cancel">Atcelt</string>
     <string name="done">Gatavs</string>
+    <string name="search">Meklēt</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Vienmēr ieslēgts</string>

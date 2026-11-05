@@ -25,7 +25,6 @@
     <string name="no">Ne</string>
     <string name="open">Otevřít</string>
     <string name="cancel">Zrušit</string>
-    <string name="search">Vyhledávání</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat smazán</string>

@@ -33,6 +33,7 @@
     <string name="undo">Annuler</string>
     <string name="cancel">Annuler</string>
     <string name="done">Terminé</string>
+    <string name="search">Rechercher</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Toujours activé</string>
