@@ -28,7 +28,7 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -67,7 +67,7 @@ class RealNextSteps @Inject constructor(
             // The stack is gone once no card is left, even before a New Tab Page render dismisses the message.
             Cohorts.STACKED_CARDS -> {
                 val items = (message.content as? Content.ActionableItems)?.listItems.orEmpty()
-                completionChecker.hasRemainingItems(items, itemsStore.dismissedItemIds().first())
+                completionChecker.hasRemainingItems(items, itemsStore.dismissedItemIds().firstOrNull().orEmpty())
             }
             else -> false
         }
