@@ -18,6 +18,8 @@ package com.duckduckgo.autofill.impl.importing.promo
 
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.ImportFromGoogleAvailability
+import com.duckduckgo.autofill.impl.importing.BookmarkImportTimestamp
+import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -28,6 +30,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 interface BookmarksInPasswordsImportPromotion {
     suspend fun canShowPromotion(importedPasswordsCount: Int): Boolean
@@ -38,11 +41,14 @@ class RealBookmarksInPasswordsImportPromotion @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val autofillFeature: AutofillFeature,
     private val importFromGoogleAvailability: ImportFromGoogleAvailability,
+    private val bookmarkImportTimestamp: BookmarkImportTimestamp,
+    private val timeProvider: TimeProvider,
     private val dispatchers: DispatcherProvider,
 ) : BookmarksInPasswordsImportPromotion {
 
     override suspend fun canShowPromotion(importedPasswordsCount: Int): Boolean {
         if (importedPasswordsCount == 0) return false
+        if (hasRecentlyImportedBookmarks()) return false
 
         return coroutineScope {
             val preconditions = listOf(
@@ -62,7 +68,13 @@ class RealBookmarksInPasswordsImportPromotion @Inject constructor(
         savedSitesRepository.bookmarksCount() < MAX_SAVED_BOOKMARKS
     }
 
+    private fun hasRecentlyImportedBookmarks(): Boolean {
+        val lastBookmarksImport = bookmarkImportTimestamp.lastBookmarksImportMillis() ?: return false
+        return timeProvider.currentTimeMillis() - lastBookmarksImport < RECENT_IMPORT_WINDOW.inWholeMilliseconds
+    }
+
     private companion object {
         const val MAX_SAVED_BOOKMARKS = 9
+        val RECENT_IMPORT_WINDOW = 15.minutes
     }
 }

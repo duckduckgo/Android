@@ -2,6 +2,7 @@ package com.duckduckgo.autofill.impl.importing.takeout.processor
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.impl.importing.BookmarkImportTimestamp
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -18,6 +19,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -28,6 +30,7 @@ class TakeoutBookmarkImporterTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockSavedSitesImporter = mock<SavedSitesImporter>()
+    private val mockBookmarkImportTimestamp = mock<BookmarkImportTimestamp>()
 
     private val successfulResultNoneImported = ImportSavedSitesResult.Success(emptyList())
     private val successfulResultWithImports =
@@ -45,6 +48,7 @@ class TakeoutBookmarkImporterTest {
         RealTakeoutBookmarkImporter(
             savedSitesImporter = mockSavedSitesImporter,
             dispatchers = coroutineTestRule.testDispatcherProvider,
+            bookmarkImportTimestamp = mockBookmarkImportTimestamp,
         )
 
     @Test
@@ -171,6 +175,39 @@ class TakeoutBookmarkImporterTest {
             assertTrue("Temp file should exist before import", tempFile.exists())
             testee.importBookmarks(tempFileUri, ImportFolder.Root)
             assertFalse("Temp file should be deleted even when exception is thrown", tempFile.exists())
+        }
+
+    @Test
+    fun whenImportSucceedsWithImportsThenImportTimestampIsRecorded() =
+        runTest {
+            configureResult(successfulResultWithImports)
+            val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+
+            testee.importBookmarks(tempFileUri, ImportFolder.Root)
+
+            verify(mockBookmarkImportTimestamp).onBookmarksImported()
+        }
+
+    @Test
+    fun whenImportSucceedsWithNoImportsThenImportTimestampIsNotRecorded() =
+        runTest {
+            configureResult(successfulResultNoneImported)
+            val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+
+            testee.importBookmarks(tempFileUri, ImportFolder.Root)
+
+            verify(mockBookmarkImportTimestamp, never()).onBookmarksImported()
+        }
+
+    @Test
+    fun whenImportFailsThenImportTimestampIsNotRecorded() =
+        runTest {
+            configureResult(failedResult)
+            val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+
+            testee.importBookmarks(tempFileUri, ImportFolder.Root)
+
+            verify(mockBookmarkImportTimestamp, never()).onBookmarksImported()
         }
 
     private suspend fun configureResult(result: ImportSavedSitesResult) {

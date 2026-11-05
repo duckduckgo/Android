@@ -19,6 +19,8 @@ package com.duckduckgo.autofill.impl.importing.promo
 import android.annotation.SuppressLint
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.ImportFromGoogleAvailability
+import com.duckduckgo.autofill.impl.importing.BookmarkImportTimestamp
+import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -31,6 +33,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.minutes
 
 @SuppressLint("DenyListedApi")
 class RealBookmarksInPasswordsImportPromotionTest {
@@ -38,6 +41,11 @@ class RealBookmarksInPasswordsImportPromotionTest {
     private val importFromGoogleAvailability: ImportFromGoogleAvailability = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val savedSitesRepository: SavedSitesRepository = mock()
+    private val bookmarkImportTimestamp: BookmarkImportTimestamp = mock()
+    private var currentTimeMillis = 30.minutes.inWholeMilliseconds
+    private val timeProvider = object : TimeProvider {
+        override fun currentTimeMillis() = currentTimeMillis
+    }
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -51,6 +59,8 @@ class RealBookmarksInPasswordsImportPromotionTest {
         savedSitesRepository = savedSitesRepository,
         autofillFeature = autofillFeature,
         importFromGoogleAvailability = importFromGoogleAvailability,
+        bookmarkImportTimestamp = bookmarkImportTimestamp,
+        timeProvider = timeProvider,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -91,6 +101,18 @@ class RealBookmarksInPasswordsImportPromotionTest {
     @Test
     fun whenSavedBookmarksCountBelowLimitThenPromoCanShow() = runTest {
         whenever(savedSitesRepository.bookmarksCount()).thenReturn(8)
+        assertTrue(testee.canShowPromotion(importedPasswordsCount = 1))
+    }
+
+    @Test
+    fun whenBookmarksImportFinishedWithinLast15MinutesThenPromoCannotShow() = runTest {
+        whenever(bookmarkImportTimestamp.lastBookmarksImportMillis()).thenReturn(currentTimeMillis - 15.minutes.inWholeMilliseconds + 1)
+        assertFalse(testee.canShowPromotion(importedPasswordsCount = 1))
+    }
+
+    @Test
+    fun whenBookmarksImportFinished15MinutesAgoThenPromoCanShow() = runTest {
+        whenever(bookmarkImportTimestamp.lastBookmarksImportMillis()).thenReturn(currentTimeMillis - 15.minutes.inWholeMilliseconds)
         assertTrue(testee.canShowPromotion(importedPasswordsCount = 1))
     }
 
