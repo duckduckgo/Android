@@ -23,8 +23,6 @@ import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Shared by a tab and its New Tab Page, so the tab decides once whether its New Tab Page may show Next Steps.
- * Onboarding bubbles record themselves as completed as soon as they render, so persisted onboarding state can't
- * tell the page that showed one apart from a page opened after onboarding.
  */
 class TabNextStepsState : ViewModel() {
 
