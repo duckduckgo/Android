@@ -28,7 +28,7 @@
         app:promoPrimaryButtonText="@string/sync_bookmarks_import_promo_primary_button"
         app:promoShowCloseButton="false"
         app:promoShowElevation="false"
-        app:promoTitleText="@string/sync_bookmarks_import_promo_title"
+        app:promoTitleText="@string/sync_bookmarks_import_promo_title_label"
         app:promoToggleText="@string/sync_bookmarks_import_promo_toggle" />
 
 </FrameLayout>
