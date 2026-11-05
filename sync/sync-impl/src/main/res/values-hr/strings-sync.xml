@@ -480,13 +480,13 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Pristupi svojim lozinkama na mobitelu i računalu.</string>
     <string name="sync_passwords_import_promo_primary_button">Uključi Sync &amp; Backup</string>
-    <string name="sync_passwords_import_promo_title_toggle">Sinkroniziraj i sigurnosno kopiraj svoje lozinke na mobilnim uređajima i računalu</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sinkroniziraj i sigurnosno kopiraj svoje lozinke na mobilnim uređajima i računalu.</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Pristupi svojim oznakama na mobilnim uređajima i računalima.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Uključi Sync &amp; Backup</string>
-    <string name="sync_bookmarks_import_promo_title_toggle">Sinkroniziraj &amp; sigurnosno kopiraj svoje knjižne oznake na mobilnim uređajima i računalu</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sinkroniziraj &amp; sigurnosno kopiraj svoje knjižne oznake na mobilnim uređajima i računalu.</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
@@ -496,8 +496,8 @@
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_title">Sinkroniziraj sa svojom aplikacijom za  računala</string>
-    <string name="sync_bookmarks_multi_device_promo_primary_button">Sinkroniziraj knjižne oznake</string>
+    <string name="sync_bookmarks_multi_device_promo_title">Želiš li sinkronizirati i knjižne oznake sa svojom aplikacijom za računala?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Poveži se</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Dohvati aplikaciju</string>
 
     <!-- Sync promo in bookmark added dialog -->
@@ -523,8 +523,8 @@
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Sinkroniziraj sa svojom aplikacijom za  računala</string>
-    <string name="sync_passwords_multi_device_promo_primary_button">Sinkroniziraj lozinke</string>
+    <string name="sync_passwords_multi_device_promo_title">Želiš li također sinkronizirati lozinke sa svojom aplikacijom za računala?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Poveži se</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Dohvati aplikaciju</string>
 
 </resources>
