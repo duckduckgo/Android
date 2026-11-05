@@ -64,6 +64,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         val serialized: String,
         val title: String,
         val url: String,
+        val mimeType: String = "",
     )
 
     sealed class Command {
@@ -182,6 +183,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
                     serialized = serializedPageContext,
                     title = json.optString("title"),
                     url = json.optString("url"),
+                    mimeType = json.optString("mimeType"),
                 ),
             )
         }

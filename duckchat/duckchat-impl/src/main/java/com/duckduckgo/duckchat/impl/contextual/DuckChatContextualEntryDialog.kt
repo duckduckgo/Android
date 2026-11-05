@@ -46,6 +46,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.DialogContextualDuckAiEntryBinding
@@ -217,7 +218,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun renderViewState(state: DuckChatContextualEntryViewModel.ViewState) {
         val context = state.attachedContext
         if (context != null) {
-            binding.entryNativeInputCard.widget.setPageContext(context.title, context.url)
+            binding.entryNativeInputCard.widget.setPageContext(context.title, context.url, context.mimeType)
         } else {
             binding.entryNativeInputCard.widget.clearPageContext()
         }
@@ -272,7 +273,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureQuickAction() {
         binding.entryPromptQuickAction.setOnClickListener {
             if (viewModel.viewState.value.attachedContext == null) return@setOnClickListener
-            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(R.string.duckAIContextualPromptSummarize), null, null, null, null, null))
+            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(summarizePromptResource()), null, null, null, null, null))
         }
     }
 
@@ -373,7 +374,15 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         }
     }
 
+    private fun summarizePromptResource(): Int =
+        if (duckChatFeature.pdfPageContext().isEnabled() && viewModel.viewState.value.attachedContext?.mimeType == PDF_MIME_TYPE) {
+            R.string.duckAIContextualPromptSummarizeDocument
+        } else {
+            R.string.duckAIContextualPromptSummarize
+        }
+
     private fun updateQuickActionVisibility() {
+        binding.entryPromptQuickAction.setText(summarizePromptResource())
         // Summarize acts on the attached page, and suggestions take its place when present.
         val show = viewModel.viewState.value.attachedContext != null && !binding.entrySuggestionsView.hasContent()
         binding.entryPromptQuickAction.visibility = if (show) View.VISIBLE else View.GONE
