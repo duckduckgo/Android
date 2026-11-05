@@ -116,6 +116,8 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
+import com.duckduckgo.common.ui.compose.button.DaxBrandButton
+import com.duckduckgo.common.ui.compose.button.DaxBrandButtonTypography
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButtonColors
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -670,7 +672,7 @@ private fun DialogActions(
 
     if (primaryCta != null) {
         Spacer(Modifier.height(actionLayout.contentToPrimary))
-        DaxOnboardingPrimaryButton(
+        DaxBrandButton(
             text = primaryCta.text,
             onClick = { if (intro.settled) primaryCta.onClick() },
             modifier = Modifier
@@ -679,6 +681,7 @@ private fun DialogActions(
                 .introCtaGate(intro.settled, primaryCta.text)
                 .drawAlpha { intro.contentAlpha.value },
             enabled = primaryCta.enabled,
+            typography = DaxBrandButtonTypography.DuckSans,
         )
     }
 
