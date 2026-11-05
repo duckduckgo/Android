@@ -178,7 +178,7 @@ class BookmarksInPasswordsImportPromotionView @JvmOverloads constructor(
 
     private companion object {
         const val IMPORT_RESULT_KEY = "BookmarksInPasswordsImportPromotion"
-        val IMPORT_PARAMS = BookmarksImportParams(launchSource = "promotion_passwords_import", offerPasswordsImport = false)
+        val IMPORT_PARAMS = BookmarksImportParams(launchSource = "promotion_passwords_import")
     }
 }
 

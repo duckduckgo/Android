@@ -235,6 +235,6 @@ class SavedSitesInternalSettingsActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent = Intent(context, SavedSitesInternalSettingsActivity::class.java)
 
         private const val TAG_PRE_IMPORT_BOOKMARKS = "ImportBookmarksPreImportDialog"
-        private val GOOGLE_IMPORT_PARAMS = BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true)
+        private val GOOGLE_IMPORT_PARAMS = BookmarksImportParams(launchSource = "bookmarks_screen")
     }
 }

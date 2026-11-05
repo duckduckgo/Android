@@ -5,7 +5,6 @@ import android.view.View
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.AutofillImportLaunchSource.BookmarksImportPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
@@ -17,8 +16,6 @@ import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCa
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
-import com.duckduckgo.autofill.impl.importing.promo.BookmarksInPasswordsImportPromotion
-import com.duckduckgo.autofill.impl.importing.promo.BookmarksInPasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.wideevents.CredentialImportWideEvent
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
@@ -382,36 +379,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     }
 
     @Test
-    fun whenImportStartedFromBookmarksImportPromoThenBookmarksImportPromoNotOffered() = runTest {
-        val fallback = FakePromotionPlugin { true }
-        promotionPlugins += listOf(eligibleBookmarksImportPromo(), fallback)
-        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
-        importRedesignFeature.self().setRawStoredState(State(enable = true))
-        testee.determineInitialUi(BookmarksImportPromo, canShowPreImportDialog = false)
-        advanceUntilIdle()
-
-        testee.onImportFlowFinishedSuccessfully()
-        runCurrent()
-
-        assertEquals(ImportSuccess(finished(savedCredentials = 10, numberSkipped = 0), promo = fallback), testee.viewState.value.viewMode)
-    }
-
-    @Test
-    fun whenImportNotStartedFromBookmarksImportPromoThenBookmarksImportPromoOffered() = runTest {
-        val bookmarksImportPromo = eligibleBookmarksImportPromo()
-        promotionPlugins += listOf(bookmarksImportPromo, FakePromotionPlugin { true })
-        configureImportFinished(savedCredentials = 10, numberSkipped = 0)
-        importRedesignFeature.self().setRawStoredState(State(enable = true))
-        testee.determineInitialUi(TEST_SOURCE, canShowPreImportDialog = false)
-        advanceUntilIdle()
-
-        testee.onImportFlowFinishedSuccessfully()
-        runCurrent()
-
-        assertEquals(ImportSuccess(finished(savedCredentials = 10, numberSkipped = 0), promo = bookmarksImportPromo), testee.viewState.value.viewMode)
-    }
-
-    @Test
     fun whenInitialUiDeterminedAndRedesignEnabledThenViewStateHasRedesignEnabled() = runTest {
         importRedesignFeature.self().setRawStoredState(State(enable = true))
 
@@ -672,12 +639,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         testee.determineInitialUi(TEST_SOURCE, canShowPreImportDialog = true)
         advanceUntilIdle()
     }
-
-    private fun eligibleBookmarksImportPromo() = BookmarksInPasswordsImportScreenPromotionPlugin(
-        promotion = object : BookmarksInPasswordsImportPromotion {
-            override suspend fun canShowPromotion(importedPasswordsCount: Int) = true
-        },
-    )
 
     private fun configureImportInProgress() {
         whenever(credentialImporter.getImportStatus()).thenReturn(listOf(InProgress).asFlow())

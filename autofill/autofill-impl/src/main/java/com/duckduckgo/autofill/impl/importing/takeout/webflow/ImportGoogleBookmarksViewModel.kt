@@ -21,10 +21,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
-import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.Companion.PRIORITY_KEY_IMPORT_PASSWORDS_PROMO
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command.Exit
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoogleBookmarksJourney
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -43,7 +43,7 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
     @Assisted private val params: BookmarksImportParams,
     @Assisted private val isRedesignEnabled: Boolean,
     private val importJourney: ImportGoogleBookmarksJourney,
-    private val promotionPlugins: Map<Int, BookmarksImportScreenPromotionPlugin>,
+    private val promotionPlugins: PluginPoint<BookmarksImportScreenPromotionPlugin>,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -113,11 +113,7 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
         val data = BookmarksImportScreenPromotionPlugin.ImportResult(successCount = importedCount)
         // we don't let a broken promo plugin keep the user on the importing screen
         return withTimeoutOrNull(PROMO_TIMEOUT) {
-            promotionPlugins.entries
-                .sortedBy { it.key }
-                .filterNot { !params.offerPasswordsImport && it.key == PRIORITY_KEY_IMPORT_PASSWORDS_PROMO }
-                .firstOrNull { it.value.isEligible(data) }
-                ?.value
+            promotionPlugins.getPlugins().firstOrNull { it.isEligible(data) }
         }
     }
 

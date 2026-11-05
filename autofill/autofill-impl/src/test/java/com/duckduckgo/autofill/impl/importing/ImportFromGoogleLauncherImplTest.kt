@@ -86,7 +86,7 @@ class ImportFromGoogleLauncherImplTest {
     @Test
     fun `Synchronous result is Unavailable when request was not created by the launcher`() {
         val request = object : BookmarksImportRequest {
-            override val params = BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true)
+            override val params = BookmarksImportParams(launchSource = "bookmarks_screen")
         }
         val result = contract.getSynchronousResult(context, request)
         assertEquals(PublicResult.Unavailable, result?.value)
@@ -107,14 +107,14 @@ class ImportFromGoogleLauncherImplTest {
         whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(true)
         val launcher = FakeActivityResultLauncher()
 
-        testee.launchBookmarksImport(BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true), launcher)
+        testee.launchBookmarksImport(BookmarksImportParams(launchSource = "bookmarks_screen"), launcher)
 
         assertEquals(1, launcher.launchedInputs.size)
     }
 
     @Test
     fun `createIntent opens the import screen with the launch source`() = runTest {
-        val params = BookmarksImportParams(launchSource = "promotion_passwords_import", offerPasswordsImport = false)
+        val params = BookmarksImportParams(launchSource = "promotion_passwords_import")
         val request = launchedRequest(isAvailable = true, params = params)
 
         contract.createIntent(context, request)
@@ -166,7 +166,7 @@ class ImportFromGoogleLauncherImplTest {
 
     private suspend fun launchedRequest(
         isAvailable: Boolean,
-        params: BookmarksImportParams = BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true),
+        params: BookmarksImportParams = BookmarksImportParams(launchSource = "bookmarks_screen"),
     ): BookmarksImportRequest {
         whenever(importFromGoogleAvailability.isBookmarksImportAvailable()).thenReturn(isAvailable)
         val launcher = FakeActivityResultLauncher()

@@ -943,6 +943,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         }
 
         private const val DIALOG_TAG_IMPORT_BOOKMARKS = "ImportBookmarksPreImportDialog"
-        private val GOOGLE_IMPORT_PARAMS = BookmarksImportParams(launchSource = "bookmarks_screen", offerPasswordsImport = true)
+        private val GOOGLE_IMPORT_PARAMS = BookmarksImportParams(launchSource = "bookmarks_screen")
     }
 }

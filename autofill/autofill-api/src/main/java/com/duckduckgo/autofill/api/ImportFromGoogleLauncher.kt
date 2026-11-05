@@ -49,11 +49,9 @@ interface ImportFromGoogleLauncher {
      * How the bookmark import flow is started.
      *
      * @param launchSource A Pixel tag for where the flow is started from.
-     * @param offerPasswordsImport Whether the success screen may offer importing passwords.
      */
     data class BookmarksImportParams(
         val launchSource: String,
-        val offerPasswordsImport: Boolean,
     ) : Serializable
 
     /**

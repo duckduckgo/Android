@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.AutofillImportLaunchSource.BookmarksImportPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
@@ -30,7 +29,6 @@ import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExcha
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult.Failure
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
-import com.duckduckgo.autofill.impl.importing.promo.BookmarksInPasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.wideevents.CredentialImportWideEvent
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
@@ -125,10 +123,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         )
         // we don't let a broken promo plugin keep the user on the importing screen
         return withTimeoutOrNull(PROMO_TIMEOUT) {
-            importScreenPromotionPlugins.getPlugins()
-                // we don't send the user back to importing bookmarks when they came here from the bookmarks import promo
-                .filterNot { startedImportSource == BookmarksImportPromo && it is BookmarksInPasswordsImportScreenPromotionPlugin }
-                .firstOrNull { it.isEligible(data) }
+            importScreenPromotionPlugins.getPlugins().firstOrNull { it.isEligible(data) }
         }
     }
 
@@ -162,7 +157,6 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
             if (credentialExchangeInProgress) return
             credentialExchangeInProgress = true
         }
-        startedImportSource = importSource
         credentialImportWideEvent.onImportStarted(importSource, useCredentialExchange)
         command.trySend(if (useCredentialExchange) StartCredentialExchange else StartWebFlow)
     }
@@ -247,7 +241,6 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private var credentialExchangeInProgress = false
-    private var startedImportSource: AutofillImportLaunchSource? = null
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(

@@ -266,7 +266,7 @@ class ImportGoogleBookmarksWebFlowActivity :
 
     private fun getImportParams(): BookmarksImportParams {
         return intent.getActivityParams(ImportBookmarksViaGoogleTakeoutScreen::class.java)?.params
-            ?: BookmarksImportParams(launchSource = UNKNOWN_LAUNCH_SOURCE, offerPasswordsImport = true)
+            ?: BookmarksImportParams(launchSource = UNKNOWN_LAUNCH_SOURCE)
     }
 
     companion object {
