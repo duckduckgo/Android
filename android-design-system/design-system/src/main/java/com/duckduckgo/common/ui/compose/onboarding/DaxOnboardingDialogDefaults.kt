@@ -63,7 +63,6 @@ object DaxOnboardingDialogDefaults {
     val TitleBodySpacing: Dp = 20.dp
     val HeaderContentSpacing: Dp = 20.dp
 
-    // The View CTA's 20dp margin plus the 4dp vertical inset of a small rebrand button.
     val ContentToPrimaryCtaSpacing: Dp = 24.dp
     val DismissSize: Dp = 32.dp
     val DismissOffset: Dp = 4.dp
