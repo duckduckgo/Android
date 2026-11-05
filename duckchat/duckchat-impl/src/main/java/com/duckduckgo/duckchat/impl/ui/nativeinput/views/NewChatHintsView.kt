@@ -37,6 +37,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -77,7 +78,7 @@ class NewChatHintsView @JvmOverloads constructor(
         stateJob?.cancel()
         stateJob = viewModel.viewState(tabId)
             .onEach { hints ->
-                render(hints)
+                render(hints, tabId)
                 show(hints.isNotEmpty())
             }.launchIn(scope)
     }
@@ -98,7 +99,7 @@ class NewChatHintsView @JvmOverloads constructor(
         if (visible) content.animate().alpha(1f).setDuration(FADE_IN_DURATION_MS).start()
     }
 
-    private fun render(hints: List<NewChatHint>) {
+    private fun render(hints: List<NewChatHint>, tabId: String) {
         row.removeAllViews()
         hints.forEach { hint ->
             val label = LayoutInflater.from(context).inflate(R.layout.item_new_chat_hint, row, false) as DaxTextView
@@ -109,6 +110,9 @@ class NewChatHintsView @JvmOverloads constructor(
             }
             label.setText(text)
             label.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
+            label.setOnClickListener {
+                findViewTreeLifecycleOwner()?.lifecycleScope?.launch { viewModel.onHintTapped(hint, tabId) }
+            }
             row.addView(label)
         }
     }

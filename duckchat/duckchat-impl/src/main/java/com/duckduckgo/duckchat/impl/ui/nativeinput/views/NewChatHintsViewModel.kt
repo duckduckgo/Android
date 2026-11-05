@@ -29,10 +29,16 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsEligibility
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -41,24 +47,48 @@ class NewChatHintsViewModel @Inject constructor(
     private val provider: NativeInputStateProvider,
     private val modelManager: DuckAiModelManager,
     private val duckChat: DuckChatInternal,
+    private val commands: NewChatHintCommands,
     private val tabRepository: TabRepository,
     eligibility: NewChatHintsEligibility,
     browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val eligible = eligibility.observeEligible(browserMode)
+    private val dismissedTabs = MutableStateFlow(emptySet<String>())
 
     fun viewState(tabId: String): Flow<List<NewChatHint>> {
         val order = hintOrder(tabId)
+        val inputState = provider.stateForTab(tabId).onEach { state ->
+            if (state.chatId != null) dismissedTabs.update { it - tabId }
+        }
         return combine(
             tabRepository.flowSelectedTab,
-            provider.stateForTab(tabId),
+            inputState,
             modelManager.modelState,
             eligible,
-        ) { selectedTab, input, models, eligible ->
-            val showHints = selectedTab?.tabId == tabId && eligible && input.isNewChat()
+            dismissedTabs,
+        ) { selectedTab, input, models, isEligible, dismissed ->
+            val showHints = selectedTab?.tabId == tabId && isEligible && input.isNewChat() && input.isDraftEmpty() && tabId !in dismissed
             if (showHints) order.filter { capableModel(it, models) != null } else emptyList()
         }.distinctUntilChanged()
+    }
+
+    suspend fun onHintTapped(hint: NewChatHint, tabId: String) {
+        dismissedTabs.update { it + tabId }
+        if (!canAct(tabId)) return
+        val models = modelManager.modelState.value
+        val model = capableModel(hint, models) ?: return
+        if (model.id != models.selectedModelId) {
+            modelManager.selectModel(model)
+            // Selecting a model suspends; the tab, chat or eligibility may have changed meanwhile.
+            if (!canAct(tabId)) return
+        }
+        val command = when (hint) {
+            NewChatHint.DOCUMENTS -> NewChatHintCommand.OpenDocuments(tabId, model.supportedFileTypes)
+            NewChatHint.PHOTO -> NewChatHintCommand.OpenPhoto(tabId)
+            NewChatHint.IMAGE_GENERATION -> NewChatHintCommand.CreateImage(tabId)
+        }
+        commands.send(command)
     }
 
     private fun capableModel(hint: NewChatHint, models: ModelState): AIChatModel? {
@@ -67,7 +97,14 @@ class NewChatHintsViewModel @Inject constructor(
         return capable.firstOrNull { it.id == models.selectedModelId } ?: capable.firstOrNull()
     }
 
+    private suspend fun canAct(tabId: String): Boolean =
+        eligible.firstOrNull() == true &&
+            tabRepository.flowSelectedTab.firstOrNull()?.tabId == tabId &&
+            provider.stateForTab(tabId).value.isNewChat()
+
     private fun hintOrder(tabId: String): List<NewChatHint> = NewChatHint.entries.shuffled(Random(tabId.hashCode()))
 
     private fun NativeInputState.isNewChat() = inputContext == InputContext.DUCK_AI && chatId == null
+
+    private fun NativeInputState.isDraftEmpty() = !hasText && !hasAttachments && selectedTool == null
 }
