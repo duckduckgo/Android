@@ -171,6 +171,7 @@
     <!-- Message CTA -->
     <dimen name="messageCtaCloseButtonSize">40dp</dimen>
     <dimen name="messageCtaIllustrationSize">64dp</dimen>
+    <dimen name="rebrandMessageCtaIllustrationSize">96dp</dimen>
 
     <!-- Text Input -->
     <dimen name="outlinedTextPasswordIconSize">54dp</dimen>

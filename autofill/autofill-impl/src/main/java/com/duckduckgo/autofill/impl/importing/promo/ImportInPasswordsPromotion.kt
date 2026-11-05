@@ -35,6 +35,7 @@ import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionVi
 import com.duckduckgo.autofill.impl.importing.resolvePasswordsKeychainAnimationAsset
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.codegen.annotations.PriorityKey
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
@@ -52,6 +53,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_IMPORT_PROMO)
@@ -151,7 +153,13 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
             onTopAnimationConfigured { view ->
                 animationAsset.staticRes?.let { staticRes ->
                     view.cancelAnimation()
-                    view.setImageResource(staticRes)
+                    view.setImageResource(
+                        if (context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)) {
+                            R.drawable.passwords_keychain_feature_96
+                        } else {
+                            staticRes
+                        },
+                    )
                 } ?: run {
                     view.repeatCount = 1
                     view.playAnimation()

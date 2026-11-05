@@ -30,6 +30,7 @@ import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Comp
 import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.codegen.annotations.PriorityKey
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -52,6 +53,7 @@ import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
@@ -135,7 +137,11 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
         with(binding.syncPromotion) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.sync_check_56,
+                    topIllustration = if (context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)) {
+                        R.drawable.sync_start_96
+                    } else {
+                        R.drawable.sync_check_56
+                    },
                     title = context.getString(R.string.syncPromoTitlePasswords),
                     subtitle = context.getString(R.string.syncPromoSubtitlePasswords),
                     action = context.getString(R.string.syncPromoPrimaryButton),

@@ -23,4 +23,6 @@
         <item name="daxRebrandRmfCards">true</item>
     </style>
 
+    <dimen name="rmfMessageCloseButtonSize">36dp</dimen>
+
 </resources>
