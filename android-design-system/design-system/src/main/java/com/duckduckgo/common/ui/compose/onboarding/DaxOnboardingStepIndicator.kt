@@ -124,7 +124,6 @@ internal fun DaxOnboardingStepIndicator(
     val textMeasurer = rememberTextMeasurer()
     val metrics = LocalContext.current.resources.displayMetrics
     val labelStyle = DaxOnboardingDialogDefaults.StepIndicatorLabelStyle
-    // The View sizes this label through TypedValue, which applies non-linear font scaling.
     val labelSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, labelStyle.fontSize.value, metrics)
     val style = labelStyle.copy(fontSize = with(density) { labelSize.toSp() })
     val labelWidth = remember(step.labels, style, density.density, density.fontScale, textMeasurer, layoutDirection) {

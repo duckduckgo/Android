@@ -289,7 +289,7 @@ internal fun DaxOnboardingDialogCore(
             shell.tailMirror.snapTo(target.mirrorFraction)
         }
     }
-    // Like the View dialogs, the tail is already at depth when content introduces itself; only a settled change animates.
+    // The tail is already at depth when content introduces itself; only a settled change animates.
     LaunchedEffect(contentKey, tailExtended, animate, settled) {
         val target = if (tailExtended) 1f else 0f
         if (settled && animate && motionScale != 0f) {
@@ -735,7 +735,6 @@ private fun tailPositionFor(tail: DaxOnboardingDialogTail, placement: Offset): D
     -> DaxSpeechBubbleTailPosition.Interpolated(placement.x, placement.y)
 }
 
-// Match the default ChangeBounds interpolator used by the View onboarding dialog.
 private val BoundsAnimationEasing = Easing(AccelerateDecelerateInterpolator()::getInterpolation)
 
 private fun boundsTween(duration: Duration) = tween<IntSize>(duration.inWholeMilliseconds.toInt(), easing = BoundsAnimationEasing)
@@ -798,7 +797,7 @@ private fun Modifier.bubbleFill(shape: () -> Shape, fill: Color): Modifier = dra
     onDrawBehind { drawOutline(outline, fill) }
 }
 
-// Outside the card clip: like the View card's Material stroke, it overhangs the fill along the tail's slopes.
+// Outside the card clip, so it overhangs the fill along the tail's slopes.
 private fun Modifier.bubbleStroke(shape: () -> Shape, stroke: Color, strokeWidth: Dp): Modifier = drawWithCache {
     val strokePx = minOf(ceil(strokeWidth.toPx()), ceil(size.minDimension / 2))
     val path = (shape() as DaxSpeechBubbleShape).strokePath(size, layoutDirection, this, strokePx)
@@ -850,7 +849,7 @@ private class PlatformScrollbar(val thumb: Drawable, val thickness: Int) {
     }
 }
 
-// Mirrors ScrollBarDrawable's thumb geometry so the card matches the View ScrollView with fadeScrollbars="false".
+// Mirrors the platform ScrollBarDrawable thumb geometry, with the thumb always shown.
 private fun Modifier.platformScrollbar(scrollState: ScrollState, scrollbar: PlatformScrollbar): Modifier = drawWithContent {
     drawContent()
     val extent = size.height.roundToInt()
