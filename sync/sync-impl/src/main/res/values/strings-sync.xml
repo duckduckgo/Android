@@ -480,13 +480,13 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Access your passwords across Mobile&#160;and&#160;Desktop.</string>
     <string name="sync_passwords_import_promo_primary_button">Turn on Sync&#160;&amp;&#160;Backup</string>
-    <string name="sync_passwords_import_promo_title_toggle">Sync&#160;&amp;&#160;back&#160;up your&#160;passwords across mobile&#160;and&#160;desktop</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sync&#160;&amp;&#160;back&#160;up your&#160;passwords across mobile&#160;and&#160;desktop.</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Access your bookmarks across Mobile&#160;and&#160;Desktop.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Turn on Sync&#160;&amp;&#160;Backup</string>
-    <string name="sync_bookmarks_import_promo_title_toggle">Sync&#160;&amp;&#160;back&#160;up your&#160;bookmarks across mobile&#160;and&#160;desktop</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sync&#160;&amp;&#160;back&#160;up your&#160;bookmarks across mobile&#160;and&#160;desktop.</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
@@ -496,8 +496,8 @@
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_title">Sync with your desktop&#160;app</string>
-    <string name="sync_bookmarks_multi_device_promo_primary_button">Sync Bookmarks</string>
+    <string name="sync_bookmarks_multi_device_promo_title">Sync bookmarks with your desktop&#160;app&#160;too?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Connect</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Get App</string>
 
     <!-- Sync promo in bookmark added dialog -->
@@ -523,8 +523,8 @@
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Sync with your desktop&#160;app</string>
-    <string name="sync_passwords_multi_device_promo_primary_button">Sync Passwords</string>
+    <string name="sync_passwords_multi_device_promo_title">Sync passwords with your desktop&#160;app&#160;too?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Connect</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Get App</string>
 
 </resources>
