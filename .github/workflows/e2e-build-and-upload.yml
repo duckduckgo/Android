@@ -22,7 +22,7 @@ on:
 
 jobs:
   build_and_upload:
-    runs-on: ubuntu-latest
+    runs-on: android-large-runner
     name: Build and upload binaries
     outputs:
       internal_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}

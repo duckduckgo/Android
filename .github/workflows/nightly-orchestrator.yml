@@ -12,7 +12,7 @@ concurrency:
 jobs:
   resolve-commit:
     name: Resolve commit SHA
-    runs-on: android-large-runner
+    runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.resolve.outputs.commit_sha }}
     steps:
