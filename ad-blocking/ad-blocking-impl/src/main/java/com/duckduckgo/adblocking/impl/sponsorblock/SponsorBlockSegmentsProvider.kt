@@ -16,8 +16,21 @@
 
 package com.duckduckgo.adblocking.impl.sponsorblock
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.sha256
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import logcat.LogPriority.WARN
+import logcat.logcat
 import javax.inject.Inject
 
 data class SponsorBlockSegment(
@@ -33,8 +46,89 @@ interface SponsorBlockSegmentsProvider {
     suspend fun getSegments(videoId: String): List<SponsorBlockSegment>
 }
 
-// TODO: replace with the real segments provider; this one never returns segments.
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class EmptySponsorBlockSegmentsProvider @Inject constructor() : SponsorBlockSegmentsProvider {
-    override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> = emptyList()
+class RealSponsorBlockSegmentsProvider @Inject constructor(
+    private val service: SponsorBlockService,
+    private val hashPrefixGate: SponsorBlockHashPrefixGate,
+    private val settingsProvider: SponsorBlockSettingsProvider,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appScope: CoroutineScope,
+) : SponsorBlockSegmentsProvider {
+
+    private val mutex = Mutex()
+
+    // Holds every valid segment of a video, so a remote config change applies without refetching.
+    private val cache = object : LinkedHashMap<String, List<SponsorBlockSegment>>(CACHE_SIZE, LOAD_FACTOR, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<SponsorBlockSegment>>): Boolean = size > CACHE_SIZE
+    }
+    private val inFlight = mutableMapOf<String, Deferred<List<SponsorBlockSegment>?>>()
+
+    override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
+        val segments = lookup(videoId).await() ?: return emptyList()
+        val settings = settingsProvider.settings()
+        return segments.filter { it.category in settings.categories && it.actionType in settings.actionTypes }
+    }
+
+    // Runs in appScope so one caller being cancelled doesn't cancel the lookup for others waiting on the same video.
+    private suspend fun lookup(videoId: String): Deferred<List<SponsorBlockSegment>?> = mutex.withLock {
+        cache[videoId]?.let { return@withLock CompletableDeferred(it) }
+        inFlight.getOrPut(videoId) {
+            appScope.async(dispatchers.io()) {
+                val segments = fetch(videoId)
+                mutex.withLock {
+                    inFlight.remove(videoId)
+                    if (segments != null) cache[videoId] = segments
+                }
+                segments
+            }
+        }
+    }
+
+    /** Null when the lookup failed, so the failure isn't cached. */
+    private suspend fun fetch(videoId: String): List<SponsorBlockSegment>? {
+        val hashPrefix = videoId.sha256.take(HASH_PREFIX_LENGTH)
+        return try {
+            if (!hashPrefixGate.hasSegments(hashPrefix)) return emptyList()
+            val response = service.getSegments(hashPrefix)
+            when {
+                response.code() == HTTP_NOT_FOUND -> emptyList()
+                response.isSuccessful -> response.body().orEmpty()
+                    .firstOrNull { it.videoID == videoId }
+                    ?.segments.orEmpty()
+                    .mapNotNull { it.toSegmentOrNull() }
+                else -> {
+                    logcat(WARN) { "SponsorBlock: segments lookup failed: HTTP ${response.code()}" }
+                    null
+                }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(WARN) { "SponsorBlock: segments lookup failed: ${e.javaClass.simpleName}" }
+            null
+        }
+    }
+
+    private fun SegmentResponse.toSegmentOrNull(): SponsorBlockSegment? {
+        val range = segment?.takeIf { it.size == 2 } ?: return null
+        val start = range[0] ?: return null
+        val end = range[1] ?: return null
+        if (!start.isFinite() || !end.isFinite() || start < 0 || end <= start) return null
+        if (category.isNullOrBlank() || actionType.isNullOrBlank()) return null
+        return SponsorBlockSegment(
+            start = start,
+            end = end,
+            category = category,
+            actionType = actionType,
+            videoDuration = videoDuration?.takeIf { it.isFinite() && it > 0 },
+        )
+    }
+
+    private companion object {
+        const val HASH_PREFIX_LENGTH = 4
+        const val HTTP_NOT_FOUND = 404
+        const val CACHE_SIZE = 50
+        const val LOAD_FACTOR = 0.75f
+    }
 }
