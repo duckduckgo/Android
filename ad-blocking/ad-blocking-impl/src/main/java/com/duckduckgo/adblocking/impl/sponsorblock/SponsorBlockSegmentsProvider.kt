@@ -57,8 +57,6 @@ class RealSponsorBlockSegmentsProvider @Inject constructor(
 
     private val mutex = Mutex()
 
-    // A finished lookup is a cache hit and a running one is shared by concurrent callers. Lookups hold every valid segment of a
-    // video, so a remote config change applies without refetching.
     private val lookups = object : LinkedHashMap<String, Deferred<List<SponsorBlockSegment>?>>(CACHE_SIZE, LOAD_FACTOR, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Deferred<List<SponsorBlockSegment>?>>): Boolean =
             size > CACHE_SIZE
@@ -70,7 +68,6 @@ class RealSponsorBlockSegmentsProvider @Inject constructor(
         return segments.filter { it.category in settings.categories && it.actionType in settings.actionTypes }
     }
 
-    // Runs in appScope so one caller being cancelled doesn't cancel the lookup for others waiting on the same video.
     private suspend fun lookup(videoId: String): Deferred<List<SponsorBlockSegment>?> = mutex.withLock {
         lookups.getOrPut(videoId) {
             appScope.async(dispatchers.io()) {
