@@ -343,6 +343,10 @@ internal fun DaxOnboardingDialogCore(
     }
     val shellAlpha = { if (tailAtRest()) 1f else shell.cardAlpha.value }
     val colors = DaxOnboardingDialogDefaults.colors
+    val rowHorizontalPadding = if (landscapeLayout) DaxOnboardingDialogDefaults.LandscapeHorizontalPadding else 0.dp
+    val primaryCtaHorizontalPadding = if (landscapeLayout) 0.dp else DaxOnboardingDialogDefaults.ContentHorizontalPadding
+    val textPadding = if (landscapeLayout) 0.dp else textHorizontalPadding
+    val contentPadding = if (landscapeLayout) 0.dp else contentHorizontalPadding
     val onboardingIconsPrimary = LocalOnboardingColors.current.iconsPrimary
     // Not `settled`: onContentReady requests focus before recomposition updates it.
     val contentGate = Modifier
@@ -416,7 +420,7 @@ internal fun DaxOnboardingDialogCore(
                                         } else {
                                             titleBodySpacing
                                         },
-                                        textHorizontalPadding = textHorizontalPadding,
+                                        textHorizontalPadding = textPadding,
                                         contentColor = colors.content,
                                         contentGate = contentGate,
                                     )
@@ -429,13 +433,16 @@ internal fun DaxOnboardingDialogCore(
                                         primaryCta = primaryCta,
                                         landscape = landscapeLayout,
                                         headerToActionsSpacing = headerToActionsSpacing,
-                                        contentHorizontalPadding = contentHorizontalPadding,
+                                        contentHorizontalPadding = contentPadding,
+                                        primaryCtaHorizontalPadding = primaryCtaHorizontalPadding,
                                         useNativeCtaInsets = useNativeCtaInsets,
                                         contentGate = contentGate,
                                     )
                                 }
                             },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = rowHorizontalPadding),
                         ) { measurables, constraints ->
                             val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
                             if (landscapeLayout) {
@@ -634,6 +641,7 @@ private fun DialogActions(
     landscape: Boolean,
     headerToActionsSpacing: Dp,
     contentHorizontalPadding: Dp,
+    primaryCtaHorizontalPadding: Dp,
     useNativeCtaInsets: Boolean,
     contentGate: Modifier,
 ) {
@@ -672,7 +680,7 @@ private fun DialogActions(
             onClick = { if (intro.settled) primaryCta.onClick() },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = DaxOnboardingDialogDefaults.ContentHorizontalPadding)
+                .padding(horizontal = primaryCtaHorizontalPadding)
                 .introCtaGate(intro.settled, primaryCta.text)
                 .drawAlpha { intro.contentAlpha.value },
             enabled = primaryCta.enabled,
