@@ -480,13 +480,13 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Осигурете си достъп до паролите от мобилно устройство и настолен компютър.</string>
     <string name="sync_passwords_import_promo_primary_button">Включване на Sync &amp; Backup</string>
-    <string name="sync_passwords_import_promo_title_toggle">Синхронизирайте и архивирайте Вашите пароли на мобилни устройства и настолен компютър</string>
+    <string name="sync_passwords_import_promo_title_toggle">Синхронизирайте и архивирайте Вашите пароли на мобилни устройства и настолен компютър.</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Осигурете си достъп до отметките от мобилно устройство и настолен компютър.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Включване на Sync &amp; Backup</string>
-    <string name="sync_bookmarks_import_promo_title_toggle">Синхронизирайте и архивирайте Вашите отметки на мобилни устройства и настолен компютър</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Синхронизирайте и архивирайте Вашите отметки на мобилни устройства и настолен компютър.</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
@@ -496,8 +496,8 @@
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_title">Синхронизиране с приложение за компютър</string>
-    <string name="sync_bookmarks_multi_device_promo_primary_button">Синхронизиране на отметките</string>
+    <string name="sync_bookmarks_multi_device_promo_title">Синхронизиране на отметките и с приложението за компютър?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Свързване</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Вземете приложението</string>
 
     <!-- Sync promo in bookmark added dialog -->
@@ -523,8 +523,8 @@
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Синхронизиране с приложение за компютър</string>
-    <string name="sync_passwords_multi_device_promo_primary_button">Синхронизиране на паролите</string>
+    <string name="sync_passwords_multi_device_promo_title">Синхронизиране на паролите и с приложението за компютър?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Свързване</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Вземете приложението</string>
 
 </resources>
