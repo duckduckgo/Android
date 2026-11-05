@@ -103,7 +103,6 @@ class DaxOnboardingDialogTest {
     private val disposedContent = mutableListOf<String>()
     private var clicks = 0
     private var dismissals = 0
-    private var composingContent = false
     private var onFinishedAction: (String) -> Unit = {}
     private var onReadyAction: () -> Unit = {}
     private var slotContent: (@Composable () -> Unit)? = null
@@ -355,36 +354,26 @@ class DaxOnboardingDialogTest {
     }
 
     @Test
-    fun completionRemovingDialogDeliversContentReadyBeforeDisposal() {
-        onFinishedAction = {
-            assertEquals(listOf("first" to true), ready)
-            mounted.value = false
-        }
+    fun completionRemovingDialogDisposesContentWithoutReplaying() {
+        onFinishedAction = { mounted.value = false }
         showDialog()
 
         finishAnimation()
 
         assertEquals(listOf("first"), finished)
-        assertEquals(listOf("first" to true), ready)
         assertEquals(listOf("first"), disposedContent)
         assertFalse(state.isAnimating)
     }
 
     @Test
-    fun completionReplacingDialogDeliversOldContentReadyBeforeDisposal() {
-        onFinishedAction = { key ->
-            if (key == "first") {
-                assertEquals(listOf("first" to false), ready)
-                contentKey.value = "second"
-            }
-        }
+    fun completionReplacingDialogDisposesOldContentAndStartsTheNextIntro() {
+        onFinishedAction = { key -> if (key == "first") contentKey.value = "second" }
         showDialog()
 
         compose.runOnIdle { state.skip() }
         advanceRecompositionFrames()
 
         assertEquals(listOf("first"), finished)
-        assertEquals(listOf("first" to false), ready)
         assertEquals(listOf("first"), disposedContent)
         assertTrue(state.isAnimating)
     }
@@ -565,7 +554,7 @@ class DaxOnboardingDialogTest {
                     CompositionLocalProvider(LocalConfiguration provides configuration) {
                         DaxContextualOnboardingDialog(contentKey = "first", title = title.value, state = state) {
                             var ready by remember { mutableStateOf(false) }
-                            onContentReady { ready = true }
+                            OnIntroSettled { ready = true }
                             slotReady = ready
                         }
                     }
@@ -617,7 +606,7 @@ class DaxOnboardingDialogTest {
     fun removingSlotBeforeIntroCompletesDropsItsContentReadyCallback() {
         val showSlot = mutableStateOf(true)
         val slotReady = mutableListOf<Boolean>()
-        showSlotDialog(showSlot) { onContentReady { slotReady.add(it) } }
+        showSlotDialog(showSlot) { OnIntroSettled { slotReady.add(it) } }
         advance(1_000)
         assertTrue(state.isAnimating)
 
@@ -633,7 +622,7 @@ class DaxOnboardingDialogTest {
     fun reAddingSlotBeforeIntroCompletesDeliversOnce() {
         val showSlot = mutableStateOf(true)
         val slotReady = mutableListOf<Boolean>()
-        showSlotDialog(showSlot) { onContentReady { slotReady.add(it) } }
+        showSlotDialog(showSlot) { OnIntroSettled { slotReady.add(it) } }
         advance(1_000)
 
         compose.runOnIdle { showSlot.value = false }
@@ -652,7 +641,7 @@ class DaxOnboardingDialogTest {
         var instances = 0
         showSlotDialog(showSlot) {
             val instance = remember { ++instances }
-            onContentReady { slotReady.add(instance to it) }
+            OnIntroSettled { slotReady.add(instance to it) }
         }
         advance(1_000)
 
@@ -696,7 +685,7 @@ class DaxOnboardingDialogTest {
                         ) {
                             slotInstances.add(remember { Any() })
                             DisposableEffect(Unit) { onDispose { slotDisposals++ } }
-                            onContentReady { slotReady.add(it) }
+                            OnIntroSettled { slotReady.add(it) }
                         }
                     }
                 }
@@ -783,19 +772,16 @@ class DaxOnboardingDialogTest {
             },
         ) {
             val key = contentKey.value
-            enabledObservations.add(key to enabled)
+            enabledObservations.add(key to isIntroSettled)
             DisposableEffect(key) {
                 onDispose { disposedContent.add(key) }
             }
-            composingContent = true
             if (registerReady.value) {
-                onContentReady { animated ->
-                    assertFalse("Content ready must run after composition", composingContent)
+                OnIntroSettled { animated ->
                     ready.add(key to animated)
                     onReadyAction()
                 }
             }
-            composingContent = false
             slotContent?.invoke()
         }
     }
