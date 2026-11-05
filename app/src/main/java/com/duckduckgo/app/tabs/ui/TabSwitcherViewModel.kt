@@ -238,6 +238,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     sealed class Command {
         data object Close : Command()
+        data class CloseAndSelectTab(val tabId: String) : Command()
         data class CloseAndShowUndoMessage(val deletedTabIds: List<String>) : Command()
         data class CloseTabsRequest(
             val tabIds: List<String>,
@@ -335,7 +336,7 @@ class TabSwitcherViewModel @Inject constructor(
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY, type = Daily())
             }
             tabRepository.select(tabId)
-            command.value = Command.Close
+            command.value = Command.CloseAndSelectTab(tabId)
             pixel.fire(
                 AppPixelName.TAB_MANAGER_SWITCH_TABS,
                 mapOf(Pixel.PixelParameter.BROWSER_MODE to currentMode.value.name.lowercase()),

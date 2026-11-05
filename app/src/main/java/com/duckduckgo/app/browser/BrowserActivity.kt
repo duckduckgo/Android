@@ -1214,6 +1214,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         }
 
+    fun onTabSelectedFromSwitcher(tabId: String) {
+        supportFragmentManager.fragments
+            .filterIsInstance<BrowserTabFragment>()
+            .firstOrNull { it.tabId == tabId }
+            ?.requestNativeInputFocus()
+    }
+
     private fun observeDuckChatSharedCommands() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

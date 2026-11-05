@@ -53,6 +53,7 @@ class NativeInputLayoutCoordinator(
     /** Restores content targets to the padding snapshotted in [configureContentOffset]. */
     private var resetContentOffset: (() -> Unit)? = null
     private var reapplyAutocompleteOffset: (() -> Unit)? = null
+    private var clearForcedBottomTranslationListeners: (() -> Unit)? = null
 
     // The content-reflow LayoutTransition is suspended while a per-frame content-offset drive is running
     // (nav bar slide or widget exit) so that drive is the only thing moving the content. Captured on suspend.
@@ -500,6 +501,8 @@ class NativeInputLayoutCoordinator(
     }
 
     fun applyForcedBottomTranslation(widgetView: View, isBottom: Boolean) {
+        clearForcedBottomTranslationListeners?.invoke()
+        clearForcedBottomTranslationListeners = null
         val shouldForce = isBottom && !omnibarState.isOmnibarBottom()
         if (!shouldForce) {
             // Only reset bottom-anchored widgets. A top-anchored widget's translationY is owned by the
@@ -526,19 +529,28 @@ class NativeInputLayoutCoordinator(
         // Both views matter: the root resizes when the keyboard hides, and the host is re-laid out a
         // frame later. Listening to the root alone measured the gap against the host's pre-resize
         // bottom and left the input parked below the screen.
-        rootView.addOnLayoutChangeListener(layoutListener)
-        widgetView.addOnLayoutChangeListener(layoutListener)
-        widgetView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = Unit
+        if (widgetView.isAttachedToWindow) {
+            rootView.addOnLayoutChangeListener(layoutListener)
+            widgetView.addOnLayoutChangeListener(layoutListener)
+        }
+        val attachListener = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                rootView.addOnLayoutChangeListener(layoutListener)
+                v.addOnLayoutChangeListener(layoutListener)
+                applyOffset()
+            }
 
-                override fun onViewDetachedFromWindow(v: View) {
-                    rootView.removeOnLayoutChangeListener(layoutListener)
-                    v.removeOnLayoutChangeListener(layoutListener)
-                    v.removeOnAttachStateChangeListener(this)
-                }
-            },
-        )
+            override fun onViewDetachedFromWindow(v: View) {
+                rootView.removeOnLayoutChangeListener(layoutListener)
+                v.removeOnLayoutChangeListener(layoutListener)
+            }
+        }
+        widgetView.addOnAttachStateChangeListener(attachListener)
+        clearForcedBottomTranslationListeners = {
+            rootView.removeOnLayoutChangeListener(layoutListener)
+            widgetView.removeOnLayoutChangeListener(layoutListener)
+            widgetView.removeOnAttachStateChangeListener(attachListener)
+        }
     }
 }
 

@@ -910,6 +910,10 @@ class TabSwitcherActivity :
             Close -> {
                 finishAfterTransition()
             }
+            is Command.CloseAndSelectTab -> {
+                setResult(RESULT_OK, Intent().putExtra(EXTRA_KEY_SELECTED_TAB_ID, command.tabId))
+                finishAfterTransition()
+            }
             is CloseAndShowUndoMessage -> {
                 skipTabPurge = true
                 setResult(
@@ -1316,6 +1320,7 @@ class TabSwitcherActivity :
         fun intent(context: Context): Intent = Intent(context, TabSwitcherActivity::class.java)
 
         const val EXTRA_KEY_DELETED_TAB_IDS = "deletedTabIds"
+        const val EXTRA_KEY_SELECTED_TAB_ID = "selectedTabId"
         const val EXTRA_KEY_DUCK_AI_URL = "duckAIUrl"
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
