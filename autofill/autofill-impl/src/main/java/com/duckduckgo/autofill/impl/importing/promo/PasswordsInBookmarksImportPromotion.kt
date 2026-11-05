@@ -17,8 +17,10 @@
 package com.duckduckgo.autofill.impl.importing.promo
 
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.importing.CredentialImportTimestamp
 import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -29,6 +31,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 interface PasswordsInBookmarksImportPromotion {
     suspend fun canShowPromotion(importedBookmarksCount: Int): Boolean
@@ -39,11 +42,14 @@ class RealPasswordsInBookmarksImportPromotion @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val autofillFeature: AutofillFeature,
     private val passwordImportAvailability: PasswordImportAvailability,
+    private val credentialImportTimestamp: CredentialImportTimestamp,
+    private val timeProvider: TimeProvider,
     private val dispatchers: DispatcherProvider,
 ) : PasswordsInBookmarksImportPromotion {
 
     override suspend fun canShowPromotion(importedBookmarksCount: Int): Boolean {
         if (importedBookmarksCount == 0) return false
+        if (hasRecentlyImportedPasswords()) return false
 
         return coroutineScope {
             val preconditions = listOf(
@@ -66,7 +72,13 @@ class RealPasswordsInBookmarksImportPromotion @Inject constructor(
         return savedPasswordsCount < MAX_SAVED_PASSWORDS
     }
 
+    private fun hasRecentlyImportedPasswords(): Boolean {
+        val lastPasswordsImport = credentialImportTimestamp.lastPasswordsImportMillis() ?: return false
+        return timeProvider.currentTimeMillis() - lastPasswordsImport < RECENT_IMPORT_WINDOW.inWholeMilliseconds
+    }
+
     private companion object {
         const val MAX_SAVED_PASSWORDS = 9
+        val RECENT_IMPORT_WINDOW = 15.minutes
     }
 }

@@ -14,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -23,6 +24,7 @@ class CredentialImporterImplTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val autofillStore: InternalAutofillStore = mock()
+    private val credentialImportTimestamp: CredentialImportTimestamp = mock()
     private val dispatchers = coroutinesTestRule.testDispatcherProvider
     private val appCoroutineScope: CoroutineScope = coroutinesTestRule.testScope
 
@@ -32,6 +34,7 @@ class CredentialImporterImplTest {
         autofillStore = autofillStore,
         dispatchers = dispatchers,
         appCoroutineScope = appCoroutineScope,
+        credentialImportTimestamp = credentialImportTimestamp,
     )
 
     @Before
@@ -130,6 +133,26 @@ class CredentialImporterImplTest {
         duplicatedLogin.treatAsDuplicate()
         listOf(duplicatedLogin).import()
         verify(autofillStore).hasEverImportedPasswords = true
+    }
+
+    @Test
+    fun whenImportingCredentialsSuccessfullyThenImportTimestampIsRecorded() = runTest {
+        listOf(creds()).import()
+        verify(credentialImportTimestamp).onPasswordsImported()
+    }
+
+    @Test
+    fun whenImportingNoCredentialsThenImportTimestampIsNotRecorded() = runTest {
+        listOf<LoginCredentials>().import()
+        verify(credentialImportTimestamp, never()).onPasswordsImported()
+    }
+
+    @Test
+    fun whenImportingOnlyDuplicatesThenImportTimestampIsNotRecorded() = runTest {
+        val duplicatedLogin = creds(username = "username")
+        duplicatedLogin.treatAsDuplicate()
+        listOf(duplicatedLogin).import()
+        verify(credentialImportTimestamp, never()).onPasswordsImported()
     }
 
     private suspend fun List<LoginCredentials>.import(originalListSize: Int = this.size) {

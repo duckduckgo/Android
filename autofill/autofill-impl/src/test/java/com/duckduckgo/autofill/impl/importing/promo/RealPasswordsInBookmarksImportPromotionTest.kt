@@ -18,8 +18,10 @@ package com.duckduckgo.autofill.impl.importing.promo
 
 import android.annotation.SuppressLint
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.importing.CredentialImportTimestamp
 import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -32,6 +34,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.minutes
 
 @SuppressLint("DenyListedApi")
 class RealPasswordsInBookmarksImportPromotionTest {
@@ -39,6 +42,11 @@ class RealPasswordsInBookmarksImportPromotionTest {
     private val passwordImportAvailability: PasswordImportAvailability = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val autofillStore: InternalAutofillStore = mock()
+    private val credentialImportTimestamp: CredentialImportTimestamp = mock()
+    private var currentTimeMillis = 30.minutes.inWholeMilliseconds
+    private val timeProvider = object : TimeProvider {
+        override fun currentTimeMillis() = currentTimeMillis
+    }
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -52,6 +60,8 @@ class RealPasswordsInBookmarksImportPromotionTest {
         autofillStore = autofillStore,
         autofillFeature = autofillFeature,
         passwordImportAvailability = passwordImportAvailability,
+        credentialImportTimestamp = credentialImportTimestamp,
+        timeProvider = timeProvider,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -111,6 +121,18 @@ class RealPasswordsInBookmarksImportPromotionTest {
     fun whenCredentialsCountFailsThenPromoCannotShow() = runTest {
         whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.failure(Exception("test"))))
         assertFalse(testee.canShowPromotion(importedBookmarksCount = 1))
+    }
+
+    @Test
+    fun whenPasswordsImportFinishedWithinLast15MinutesThenPromoCannotShow() = runTest {
+        whenever(credentialImportTimestamp.lastPasswordsImportMillis()).thenReturn(currentTimeMillis - 15.minutes.inWholeMilliseconds + 1)
+        assertFalse(testee.canShowPromotion(importedBookmarksCount = 1))
+    }
+
+    @Test
+    fun whenPasswordsImportFinished15MinutesAgoThenPromoCanShow() = runTest {
+        whenever(credentialImportTimestamp.lastPasswordsImportMillis()).thenReturn(currentTimeMillis - 15.minutes.inWholeMilliseconds)
+        assertTrue(testee.canShowPromotion(importedBookmarksCount = 1))
     }
 
     private suspend fun configurePasswordImportAvailability(isAvailable: Boolean) {
