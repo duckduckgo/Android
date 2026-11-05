@@ -55,8 +55,6 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -66,9 +64,6 @@ android {
     }
 
     namespace 'com.duckduckgo.app.anr'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 
     packagingOptions {
         jniLibs {

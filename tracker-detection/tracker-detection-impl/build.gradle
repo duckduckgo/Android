@@ -43,8 +43,6 @@ dependencies {
     testImplementation AndroidX.room.testing
     testImplementation AndroidX.archCore.testing
     testImplementation project(':common-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -56,9 +54,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     room {
         schemaDirectory("$projectDir/schemas")
