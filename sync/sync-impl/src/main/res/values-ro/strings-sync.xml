@@ -68,7 +68,6 @@
     <string name="login_screen_cant_scan_label">Nu poți scana?</string>
     <string name="login_screen_cant_scan_button_text">Copiază codul textului</string>
 
-
     <!-- Connect screen -->
     <string name="connect_screen_title">Scanează codul QR</string>
     <string name="connect_screen_scan_qr_hint">Deschide aplicația DuckDuckGo pe celălalt dispozitiv și mergi la <b>Setări &gt; Sincronizare și backup &gt; Sincronizează cu un alt dispozitiv</b>.</string>
@@ -481,8 +480,51 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Accesează-ți parolele pe mobil și desktop.</string>
     <string name="sync_passwords_import_promo_primary_button">Activează Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sincronizează și efectuează o copie de rezervă pentru parolele tale pe mobil și desktop.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Accesează marcajele pe mobil și desktop.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Activează Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sincronizează și efectuează o copie de rezervă pentru marcajele tale pe mobil și desktop.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Sync &amp; Back Up pentru marcajele tale</string>
+    <string name="sync_bookmarks_promo_message">Criptat de la un capăt la altul. Nimeni nu poate vedea marcajele tale, nici măcar noi.</string>
+    <string name="sync_bookmarks_promo_primary_button">Activează Sync &amp; Backup</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Vrei să sincronizezi și marcajele cu aplicația pentru desktop?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Conectează</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Obține aplicația</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Sincronizează și creează copii de rezervă pentru marcaje</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Mai multe opțiuni</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Ascunde</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Activează Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Sincronizează cu aplicația pentru desktop</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Mai multe opțiuni</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Ascunde</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Sincronizează cu computerul desktop</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Obține aplicația pentru desktop</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Haide să-ți sincronizăm aplicația pentru desktop!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Sincronizează cu computerul desktop</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Nu am aplicația pentru desktop</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Sync &amp; Back Up pentru parolele tale</string>
+    <string name="sync_passwords_promo_message">Criptarea de la un capăt la altul înseamnă că nimeni în afară de tine nu îți poate vedea parolele, nici măcar noi.</string>
+    <string name="sync_passwords_promo_primary_button">Activează Sync &amp; Backup</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Sincronizezi parolele și cu aplicația pentru desktop?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Conectează</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Obține aplicația</string>
+
 </resources>
