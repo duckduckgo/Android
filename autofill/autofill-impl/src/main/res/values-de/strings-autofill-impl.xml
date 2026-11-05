@@ -325,11 +325,11 @@
     <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Lesezeichen importiert: <b>%1$d</b>]]></string>
 
     <!-- Passwords import promo on the bookmarks import result screen -->
-    <string name="passwords_import_promo_in_bookmarks_import_title">Übertrage deine Passwörter von Google zu DuckDuckGo.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_title">Übertrage deine Passwörter von Google zu DuckDuckGo.</string>
     <string name="passwords_import_promo_in_bookmarks_import_button">Passwörter von Google importieren</string>
 
     <!-- Bookmarks import promo on the passwords import result screen -->
-    <string name="bookmarks_import_promo_in_passwords_import_title">Übertrage deine Lesezeichen von Google zu DuckDuckGo.</string>
+    <string name="bookmarks_import_promo_in_passwords_import_title">Übertrage deine Lesezeichen von Google zu DuckDuckGo.</string>
     <string name="bookmarks_import_promo_in_passwords_import_button">Lesezeichen von Google importieren</string>
 
 </resources>
