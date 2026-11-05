@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.promo
+package com.duckduckgo.duckchat.impl.promo.data
 
 import app.cash.turbine.test
+import com.duckduckgo.duckchat.impl.promo.FakeCurrentTimeProvider
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
 import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.promo.messaging.PromoCampaignJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
@@ -42,6 +43,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -89,6 +91,8 @@ class DuckChatContextualWebViewViewModelTest {
     private val contextualEntryPromptStore: ContextualEntryPromptStore = mock()
     private val textSelectionRepository: TextSelectionRepository = mock()
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
+    private val promoRecordEvents = MutableSharedFlow<SubscriptionEventData>()
+    private val promoCampaignJSHelper: PromoCampaignJSHelper = mock()
 
     private val serializedPageData =
         """
@@ -106,6 +110,7 @@ class DuckChatContextualWebViewViewModelTest {
         whenever(duckChatFeature.contextualFireButton()).thenReturn(contextualFireButtonToggle)
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
+        whenever(promoCampaignJSHelper.promoRecordEvents).thenReturn(promoRecordEvents)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(textSelectionRepository.selections(any())).thenReturn(MutableStateFlow(emptyList()))
         whenever(duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(
@@ -832,6 +837,17 @@ class DuckChatContextualWebViewViewModelTest {
         verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
     }
 
+    @Test
+    fun `when the promo record changes then its event is sent to the web app`() = runTest {
+        val event = SubscriptionEventData(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, "submitAIChatBonusRecord", JSONObject())
+
+        testee.subscriptionEventDataFlow.test {
+            promoRecordEvents.emit(event)
+
+            assertEquals(event, awaitItem())
+        }
+    }
+
     private fun buildViewModel() = DuckChatContextualWebViewViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
@@ -850,6 +866,7 @@ class DuckChatContextualWebViewViewModelTest {
         termsConsent = termsConsent,
         browserMode = BrowserMode.REGULAR,
         entryWideEvent = entryWideEvent,
+        promoCampaignJSHelper = promoCampaignJSHelper,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {

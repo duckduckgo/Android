@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.promo
+package com.duckduckgo.duckchat.impl.promo.data
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope

@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
 import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.promo.messaging.PromoCampaignJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
@@ -88,6 +89,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val termsConsent: DuckAiTermsConsent,
     private val browserMode: BrowserMode,
     private val entryWideEvent: DuckAiEntryWideEvent,
+    promoCampaignJSHelper: PromoCampaignJSHelper,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -169,6 +171,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             }
             observeRecentChats()
         }
+        promoCampaignJSHelper.promoRecordEvents
+            .onEach { event -> _subscriptionEventDataChannel.trySend(event) }
+            .launchIn(viewModelScope)
     }
 
     data class ViewState(

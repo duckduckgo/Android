@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.rmf
 
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.promo.PromoCampaignRepository
+import com.duckduckgo.duckchat.impl.promo.data.PromoCampaignRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
