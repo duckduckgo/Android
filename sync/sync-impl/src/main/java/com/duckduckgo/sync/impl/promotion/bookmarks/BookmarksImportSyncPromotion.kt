@@ -31,6 +31,8 @@ interface BookmarksImportSyncPromotion {
     suspend fun canShowPromotion(importedBookmarks: Int): Boolean
 
     suspend fun shouldUseToggle(): Boolean
+
+    suspend fun shouldUseUpdatedCopy(): Boolean
 }
 
 @ContributesBinding(AppScope::class, binding = binding<BookmarksImportSyncPromotion>())
@@ -51,6 +53,10 @@ class RealBookmarksImportSyncPromotion @Inject constructor(
 
     override suspend fun shouldUseToggle(): Boolean = withContext(dispatchers.io()) {
         syncPromotionFeature.shouldShowToggleInPromos().isEnabled()
+    }
+
+    override suspend fun shouldUseUpdatedCopy(): Boolean = withContext(dispatchers.io()) {
+        syncPromotionFeature.leveragePromosRedesign().isEnabled()
     }
 
     private suspend fun isPromotionEnabled(): Boolean = withContext(dispatchers.io()) {
