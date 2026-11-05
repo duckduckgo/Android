@@ -38,6 +38,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.robolectric.Shadows.shadowOf
+import java.util.concurrent.TimeUnit
+import kotlin.system.measureTimeMillis
 
 @RunWith(AndroidJUnit4::class)
 class AnrSupervisorTest {
@@ -53,16 +55,9 @@ class AnrSupervisorTest {
 
     @After
     fun tearDown() {
-        // A run queued by onOpen starts only after the current one exits, so keep interrupting until none is left.
         testee.onClose()
-        var quietSince = System.currentTimeMillis()
-        while (System.currentTimeMillis() - quietSince < 200) {
-            watcherThread()?.let {
-                it.interrupt()
-                quietSince = System.currentTimeMillis()
-            }
-            Thread.sleep(10)
-        }
+        testee.executor.shutdownNow()
+        assertTrue(testee.executor.awaitTermination(5, TimeUnit.SECONDS))
     }
 
     @Test
@@ -146,8 +141,9 @@ class AnrSupervisorTest {
         setUp(nonBlockingLifecycle = false)
         backgroundUntilStopGracePeriod()
 
-        testee.onOpen(isFreshLaunch = false)
+        val took = measureTimeMillis { testee.onOpen(isFreshLaunch = false) }
 
+        assertTrue("onOpen took ${took}ms", took >= 500)
         assertFalse(watcherIsIn(LEGACY_GRACE_PERIOD))
     }
 

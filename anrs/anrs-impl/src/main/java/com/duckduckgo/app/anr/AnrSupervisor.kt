@@ -19,6 +19,7 @@ package com.duckduckgo.app.anr
 import android.os.Debug
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
@@ -38,7 +39,8 @@ class AnrSupervisor @Inject constructor(
     private val anrSupervisorRunnable: AnrSupervisorRunnable,
 ) : BrowserLifecycleObserver {
 
-    private val executor = Executors.newSingleThreadExecutor()
+    @VisibleForTesting
+    internal val executor = Executors.newSingleThreadExecutor()
 
     override fun onOpen(isFreshLaunch: Boolean) {
         synchronized(anrSupervisorRunnable) {
