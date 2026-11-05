@@ -75,8 +75,8 @@ class PirFreemiumSettingViewModel @Inject constructor(
     fun onEntryPointClicked() {
         val (ctaState, entryPoint) = when (_viewState.value.freemiumState) {
             PirFreemiumState.NOT_ELIGIBLE -> return
-            PirFreemiumState.ELIGIBLE -> PirFreemiumCtaState.START_FREE_SCAN to PirFreeScanEntryPoint.APP_MENU_PRE_SCAN
-            PirFreemiumState.USED -> PirFreemiumCtaState.VIEW_SCAN_RESULTS to PirFreeScanEntryPoint.APP_MENU_POST_SCAN
+            PirFreemiumState.ELIGIBLE -> PirFreemiumCtaState.START_FREE_SCAN to PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN
+            PirFreemiumState.USED -> PirFreemiumCtaState.VIEW_SCAN_RESULTS to PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN
         }
 
         pixelSender.reportFreemiumSettingsEntryPointClicked(ctaState)

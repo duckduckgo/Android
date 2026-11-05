@@ -156,11 +156,11 @@ class PirWebHandshakeMessageHandlerTest {
     fun whenDashboardHasAFreeScanEntryPointThenResponseCarriesItsToken() = runTest {
         givenFreeUserNotEligibleForTrial()
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
-        freeScanEntryPointHolder.freeScanEntryPoint = CompletableDeferred(value = PirFreeScanEntryPoint.APP_MENU_POST_SCAN)
+        freeScanEntryPointHolder.freeScanEntryPoint = CompletableDeferred(value = PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN)
 
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
-        verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false, freeScanEntryPoint = "appmenupostscan")
+        verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false, freeScanEntryPoint = "appsettingspostscan")
     }
 
     @Test

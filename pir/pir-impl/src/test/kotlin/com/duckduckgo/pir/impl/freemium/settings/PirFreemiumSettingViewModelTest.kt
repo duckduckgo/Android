@@ -97,7 +97,7 @@ class PirFreemiumSettingViewModelTest {
         testee.commands().test {
             testee.onEntryPointClicked()
 
-            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_MENU_PRE_SCAN), awaitItem())
+            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN), awaitItem())
         }
         verify(pixelSender).reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.START_FREE_SCAN)
     }
@@ -110,7 +110,7 @@ class PirFreemiumSettingViewModelTest {
         testee.commands().test {
             testee.onEntryPointClicked()
 
-            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_MENU_POST_SCAN), awaitItem())
+            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN), awaitItem())
         }
     }
 

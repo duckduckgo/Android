@@ -91,8 +91,9 @@ class SubscriptionUrlExtensionsTest {
         listOf(
             "funnel_freescan_android__freescanbanner",
             "funnel_freescan_android__viewresultsbanner",
-            "funnel_freescan_android__appmenuprescan",
-            "funnel_freescan_android__appmenupostscan",
+            "funnel_freescan_android__appsettingsprescan",
+            "funnel_freescan_android__appsettingspostscan",
+            "funnel_freescan_android__scancompletenotification",
         ).forEach { origin ->
             val result = BUY_URL.appendFunnelOriginParam(origin).toUri()
 

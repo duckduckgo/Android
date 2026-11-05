@@ -22,8 +22,9 @@ package com.duckduckgo.pir.impl.dashboard.entrypoint
 enum class PirFreeScanEntryPoint(val token: String) {
     FREE_SCAN_BANNER("freescanbanner"),
     VIEW_RESULTS_BANNER("viewresultsbanner"),
-    APP_MENU_PRE_SCAN("appmenuprescan"),
-    APP_MENU_POST_SCAN("appmenupostscan"),
+    APP_SETTINGS_PRE_SCAN("appsettingsprescan"),
+    APP_SETTINGS_POST_SCAN("appsettingspostscan"),
+    SCAN_COMPLETE_NOTIFICATION("scancompletenotification"),
 }
 
 /**

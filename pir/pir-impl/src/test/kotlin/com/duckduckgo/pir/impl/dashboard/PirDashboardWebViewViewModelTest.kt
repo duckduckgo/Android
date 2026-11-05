@@ -199,10 +199,10 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test a launch from a known entry point keeps that entry point`() = runTest {
-        openDashboard(FromEntryPoint(PirFreeScanEntryPoint.APP_MENU_PRE_SCAN))
+        openDashboard(FromEntryPoint(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN))
 
-        assertEquals(PirFreeScanEntryPoint.APP_MENU_PRE_SCAN, testee.freeScanEntryPoint.await())
-        assertEquals(PirFreeScanEntryPoint.APP_MENU_PRE_SCAN, testee.resolvedFreeScanEntryPoint)
+        assertEquals(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN, testee.freeScanEntryPoint.await())
+        assertEquals(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN, testee.resolvedFreeScanEntryPoint)
     }
 
     @Test
@@ -233,6 +233,40 @@ class PirDashboardWebViewViewModelTest {
     }
 
     @Test
+    fun `test a launch from the scan complete notification is the notification entry point`() = runTest {
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = true, freemiumLaunch = null)
+
+        assertEquals(PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION, testee.freeScanEntryPoint.await())
+        assertEquals(PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION, testee.resolvedFreeScanEntryPoint)
+    }
+
+    @Test
+    fun `test a notification launch restored after process death keeps the notification entry point`() = runTest {
+        testee.onLaunched(
+            isRestored = true,
+            fromFreemiumScanCompleteNotification = true,
+            freemiumLaunch = FromEntryPoint(PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION),
+        )
+
+        assertEquals(PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION, testee.freeScanEntryPoint.await())
+    }
+
+    @Test
+    fun `test a purchase from the scan complete notification carries it in the origin`() = runTest {
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = true, freemiumLaunch = null)
+
+        testee.commands().test {
+            testee.onSubscriptionPurchaseRequested(route)
+
+            assertEquals(
+                LaunchSubscriptionPurchase(origin = "funnel_freescan_android__scancompletenotification", featurePage = "pir"),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test the entry point stays the one the dashboard was opened with after it is recreated`() = runTest {
         whenever(pirFreemiumDataStore.firstScanResult).thenReturn(null)
         openDashboard(FromRemoteMessage)
@@ -246,13 +280,13 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test a purchase from a known entry point carries it in the origin`() = runTest {
-        openDashboard(FromEntryPoint(PirFreeScanEntryPoint.APP_MENU_POST_SCAN))
+        openDashboard(FromEntryPoint(PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN))
 
         testee.commands().test {
             testee.onSubscriptionPurchaseRequested(route)
 
             assertEquals(
-                LaunchSubscriptionPurchase(origin = "funnel_freescan_android__appmenupostscan", featurePage = "pir"),
+                LaunchSubscriptionPurchase(origin = "funnel_freescan_android__appsettingspostscan", featurePage = "pir"),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()

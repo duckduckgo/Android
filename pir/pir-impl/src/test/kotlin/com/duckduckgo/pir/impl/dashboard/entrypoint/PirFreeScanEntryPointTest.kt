@@ -16,9 +16,10 @@
 
 package com.duckduckgo.pir.impl.dashboard.entrypoint
 
-import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.APP_MENU_POST_SCAN
-import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.APP_MENU_PRE_SCAN
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.FREE_SCAN_BANNER
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.VIEW_RESULTS_BANNER
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -29,8 +30,9 @@ class PirFreeScanEntryPointTest {
     fun whenEntryPointIsKnownThenOriginCarriesItsToken() {
         assertEquals("funnel_freescan_android__freescanbanner", freeScanOrigin(BASE_ORIGIN, FREE_SCAN_BANNER))
         assertEquals("funnel_freescan_android__viewresultsbanner", freeScanOrigin(BASE_ORIGIN, VIEW_RESULTS_BANNER))
-        assertEquals("funnel_freescan_android__appmenuprescan", freeScanOrigin(BASE_ORIGIN, APP_MENU_PRE_SCAN))
-        assertEquals("funnel_freescan_android__appmenupostscan", freeScanOrigin(BASE_ORIGIN, APP_MENU_POST_SCAN))
+        assertEquals("funnel_freescan_android__appsettingsprescan", freeScanOrigin(BASE_ORIGIN, APP_SETTINGS_PRE_SCAN))
+        assertEquals("funnel_freescan_android__appsettingspostscan", freeScanOrigin(BASE_ORIGIN, APP_SETTINGS_POST_SCAN))
+        assertEquals("funnel_freescan_android__scancompletenotification", freeScanOrigin(BASE_ORIGIN, SCAN_COMPLETE_NOTIFICATION))
     }
 
     @Test
@@ -41,7 +43,7 @@ class PirFreeScanEntryPointTest {
     @Test
     fun whenTokensAreListedThenTheyMatchTheValuesTheWebUiAccepts() {
         assertEquals(
-            listOf("freescanbanner", "viewresultsbanner", "appmenuprescan", "appmenupostscan"),
+            listOf("freescanbanner", "viewresultsbanner", "appsettingsprescan", "appsettingspostscan", "scancompletenotification"),
             PirFreeScanEntryPoint.entries.map { it.token },
         )
     }

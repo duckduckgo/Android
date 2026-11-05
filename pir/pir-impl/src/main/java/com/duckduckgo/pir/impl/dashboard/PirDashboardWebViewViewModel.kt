@@ -32,6 +32,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.FREE_SCAN_BANNER
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.VIEW_RESULTS_BANNER
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromEntryPoint
@@ -132,7 +133,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
         fromFreemiumScanCompleteNotification: Boolean,
         freemiumLaunch: PirFreemiumDashboardScreens?,
     ) {
-        resolveFreeScanEntryPoint(freemiumLaunch)
+        resolveFreeScanEntryPoint(freemiumLaunch, fromFreemiumScanCompleteNotification)
 
         // a restored dashboard keeps its launch intent, and the tap was already counted when it was first created
         if (isRestored || !fromFreemiumScanCompleteNotification) {
@@ -167,7 +168,10 @@ class PirDashboardWebViewViewModel @Inject constructor(
         }
     }
 
-    private fun resolveFreeScanEntryPoint(freemiumLaunch: PirFreemiumDashboardScreens?) {
+    private fun resolveFreeScanEntryPoint(
+        freemiumLaunch: PirFreemiumDashboardScreens?,
+        fromFreemiumScanCompleteNotification: Boolean,
+    ) {
         // the ViewModel survives a configuration change, and the visit keeps the entry point it was opened with
         if (isFreeScanEntryPointRequested) return
         isFreeScanEntryPointRequested = true
@@ -176,7 +180,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
             val entryPoint = when (freemiumLaunch) {
                 is FromEntryPoint -> freemiumLaunch.entryPoint
                 FromRemoteMessage -> withContext(dispatcherProvider.io()) { remoteMessageBannerEntryPoint() }
-                null -> null
+                null -> if (fromFreemiumScanCompleteNotification) SCAN_COMPLETE_NOTIFICATION else null
             }
             resolvedFreeScanEntryPoint = entryPoint
             freeScanEntryPointResult.complete(entryPoint)

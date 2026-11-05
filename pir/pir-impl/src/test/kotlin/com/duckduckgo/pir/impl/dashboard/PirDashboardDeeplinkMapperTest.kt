@@ -60,7 +60,7 @@ class PirDashboardDeeplinkMapperTest {
         assertEquals(PirDashboardWebViewActivity::class.java, dashboardScreenMapper.map(PirDashboardWebViewScreen))
         assertEquals(
             PirDashboardWebViewActivity::class.java,
-            fromEntryPointMapper.map(FromEntryPoint(PirFreeScanEntryPoint.APP_MENU_PRE_SCAN)),
+            fromEntryPointMapper.map(FromEntryPoint(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN)),
         )
         assertEquals(PirDashboardWebViewActivity::class.java, fromRemoteMessageMapper.map(FromRemoteMessage))
     }
