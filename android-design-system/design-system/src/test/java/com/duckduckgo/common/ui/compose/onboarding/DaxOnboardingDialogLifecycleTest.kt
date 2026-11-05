@@ -75,7 +75,7 @@ class DaxOnboardingDialogLifecycleTest {
     @get:Rule
     val compose = createComposeRule()
 
-    private val state = DaxOnboardingDialogState()
+    private val state = DaxOnboardingDialogHostState()
     private val orientation = mutableStateOf(Configuration.ORIENTATION_PORTRAIT)
     private val layoutDirection = mutableStateOf(LayoutDirection.Ltr)
     private val contentKey = mutableStateOf("first")

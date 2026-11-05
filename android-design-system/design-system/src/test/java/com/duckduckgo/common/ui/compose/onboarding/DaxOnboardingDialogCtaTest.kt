@@ -57,7 +57,7 @@ class DaxOnboardingDialogCtaTest {
     @Test
     fun primaryCtaFinishesItsFadeWithoutJumpingFromDisabledToEnabledColors() {
         compose.mainClock.autoAdvance = false
-        val state = DaxOnboardingDialogState()
+        val state = DaxOnboardingDialogHostState()
         lateinit var view: View
         var reference = Rect.Zero
         compose.setContent {

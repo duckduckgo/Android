@@ -57,7 +57,7 @@ class DaxOnboardingDialogHostTest {
     private val title = mutableStateOf("First title")
     private val animate = mutableStateOf(false)
     private val contentHeight = mutableStateOf(48.dp)
-    private val state = DaxOnboardingDialogState()
+    private val state = DaxOnboardingDialogHostState()
     private val finished = mutableListOf<String>()
 
     @Test
