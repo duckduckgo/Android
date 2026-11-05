@@ -32,18 +32,14 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dev.zacsweers.metro.ContributesIntoSet
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority.WARN
-import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesIntoSet(AppScope::class)
 class SponsorBlockContentScopeJsMessageHandler @Inject constructor(
-    private val sponsorBlockFeature: SponsorBlockFeature,
-    private val segmentsProvider: SponsorBlockSegmentsProvider,
+    private val sponsorBlock: SponsorBlock,
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
@@ -54,7 +50,7 @@ class SponsorBlockContentScopeJsMessageHandler @Inject constructor(
             val id = jsMessage.id ?: return
             appScope.launch(dispatcherProvider.io()) {
                 val result = when (jsMessage.method) {
-                    METHOD_GET_SEGMENTS -> getSegments(jsMessage.params)
+                    METHOD_GET_SEGMENTS -> getSegments(jsMessage.params.optString(PARAM_VIDEO_ID))
                     METHOD_GET_CONFIG -> getConfig()
                     else -> return@launch
                 }
@@ -77,28 +73,16 @@ class SponsorBlockContentScopeJsMessageHandler @Inject constructor(
     private val segmentsAdapter: JsonAdapter<SegmentsResponse> by lazy { moshi.adapter(SegmentsResponse::class.java) }
     private val configAdapter: JsonAdapter<ConfigResponse> by lazy { moshi.adapter(ConfigResponse::class.java) }
 
-    private suspend fun getSegments(params: JSONObject): JSONObject {
-        val videoId = params.optString(PARAM_VIDEO_ID).takeIf { VIDEO_ID_REGEX.matches(it) }
-        val segments = if (videoId == null || !isEnabled()) {
-            emptyList()
-        } else {
-            try {
-                segmentsProvider.getSegments(videoId)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logcat(WARN) { "SponsorBlock: segments lookup failed: ${e.javaClass.simpleName}" }
-                emptyList()
-            }
+    private suspend fun getSegments(videoId: String): JSONObject =
+        JSONObject(segmentsAdapter.toJson(SegmentsResponse(sponsorBlock.getSegments(videoId))))
+
+    private fun getConfig(): JSONObject {
+        val config = sponsorBlock.config()
+        val skipMode = when (config.skipMode) {
+            SponsorBlockSkipMode.MANUAL -> SKIP_MODE_MANUAL
         }
-        return JSONObject(segmentsAdapter.toJson(SegmentsResponse(segments.sortedBy { it.start })))
+        return JSONObject(configAdapter.toJson(ConfigResponse(enabled = config.enabled, skipMode = skipMode, version = CONTRACT_VERSION)))
     }
-
-    // TODO: send the user's SponsorBlock settings (on/off, skip mode) once they exist; skipMode is fixed to manual for now.
-    private fun getConfig(): JSONObject =
-        JSONObject(configAdapter.toJson(ConfigResponse(enabled = isEnabled(), skipMode = SKIP_MODE_MANUAL, version = CONTRACT_VERSION)))
-
-    private fun isEnabled(): Boolean = sponsorBlockFeature.mvpEnabled().isEnabled()
 
     private data class SegmentsResponse(
         val segments: List<SponsorBlockSegment>,
@@ -117,6 +101,5 @@ class SponsorBlockContentScopeJsMessageHandler @Inject constructor(
         private const val PARAM_VIDEO_ID = "videoID"
         private const val SKIP_MODE_MANUAL = "manual"
         private const val CONTRACT_VERSION = 1
-        private val VIDEO_ID_REGEX = Regex("^[A-Za-z0-9_-]{11}$")
     }
 }
