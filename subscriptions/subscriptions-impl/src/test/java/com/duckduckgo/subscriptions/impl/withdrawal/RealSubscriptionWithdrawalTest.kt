@@ -108,38 +108,45 @@ class RealSubscriptionWithdrawalTest {
 
     @Test
     fun whenWithdrawSucceedsThenReturnRefund() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
+        whenever(subscriptionsService.withdraw()).thenReturn(withdrawResponse())
 
         val result = withdrawal.withdraw()
 
-        assertEquals(Success(REFUND), result)
+        assertEquals(Success(refund = REFUND, requestedAtMillis = REQUESTED_AT_MILLIS), result)
     }
 
     @Test
     fun whenWithdrawSucceedsWithMalformedAmountThenReturnSuccessWithoutRefund() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9,99", currency = "gbp"))
+        whenever(subscriptionsService.withdraw()).thenReturn(withdrawResponse(refundedAmount = "9,99"))
 
-        assertEquals(Success(refund = null), withdrawal.withdraw())
+        assertEquals(Success(refund = null, requestedAtMillis = REQUESTED_AT_MILLIS), withdrawal.withdraw())
     }
 
     @Test
     fun whenWithdrawSucceedsWithoutCurrencyThenReturnSuccessWithoutRefund() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = null))
+        whenever(subscriptionsService.withdraw()).thenReturn(withdrawResponse(currency = null))
 
-        assertEquals(Success(refund = null), withdrawal.withdraw())
+        assertEquals(Success(refund = null, requestedAtMillis = REQUESTED_AT_MILLIS), withdrawal.withdraw())
     }
 
     @Test
     fun whenWithdrawResponseCannotBeDecodedThenReturnSuccessWithoutRefund() = runTest {
         whenever(subscriptionsService.withdraw()).thenAnswer { throw JsonDataException("Expected a string but was BEGIN_OBJECT") }
 
-        assertEquals(Success(refund = null), withdrawal.withdraw())
+        assertEquals(Success(refund = null, requestedAtMillis = null), withdrawal.withdraw())
         verify(subscriptionsManager).signOut()
     }
 
     @Test
+    fun whenWithdrawSucceedsWithoutRequestedAtThenReturnSuccessWithoutRequestedAt() = runTest {
+        whenever(subscriptionsService.withdraw()).thenReturn(withdrawResponse(requestedAt = null))
+
+        assertEquals(Success(refund = REFUND, requestedAtMillis = null), withdrawal.withdraw())
+    }
+
+    @Test
     fun whenWithdrawSucceedsThenSignOut() = runTest {
-        whenever(subscriptionsService.withdraw()).thenReturn(WithdrawResponse(refundedAmount = "9.99", currency = "gbp"))
+        whenever(subscriptionsService.withdraw()).thenReturn(withdrawResponse())
 
         withdrawal.withdraw()
 
@@ -209,7 +216,15 @@ class RealSubscriptionWithdrawalTest {
 
     private companion object {
         private val REFUND = Refund(amount = BigDecimal("9.99"), currency = "GBP")
+        private const val REQUESTED_AT_SECONDS = 1791288000L
+        private const val REQUESTED_AT_MILLIS = 1791288000000L
     }
+
+    private fun withdrawResponse(
+        refundedAmount: String? = "9.99",
+        currency: String? = "gbp",
+        requestedAt: Long? = REQUESTED_AT_SECONDS,
+    ) = WithdrawResponse(refundedAmount = refundedAmount, currency = currency, requestedAt = requestedAt)
 
     private fun eligibleResponse() = WithdrawalEligibilityResponse(
         eligible = true,
