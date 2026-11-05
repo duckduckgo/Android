@@ -480,49 +480,51 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Kom åt dina lösenord på mobil och dator.</string>
     <string name="sync_passwords_import_promo_primary_button">Aktivera Sync &amp; Backup</string>
-    <string name="sync_passwords_import_promo_title_toggle">Synka dina lösenord mellan mobil och dator med Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_title_toggle">Synka &amp; säkerhetskopiera dina lösenord mellan mobil och dator.</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Kom åt dina bokmärken på mobilen och datorn.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Aktivera Sync &amp; Backup</string>
-    <string name="sync_bookmarks_import_promo_title_toggle">Sync &amp; Backup för dina bokmärken på mobilen och datorn</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Synka &amp; säkerhetskopiera dina bokmärken på mobilen och datorn.</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Synka och säkerhetskopiera dina bokmärken</string>
     <string name="sync_bookmarks_promo_message">End-to-end-krypterat. Ingen kan se dina bokmärken, inte ens vi.</string>
+    <string name="sync_bookmarks_promo_primary_button">Aktivera Sync &amp; Backup</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_title">Synkronisera med din datorapp</string>
-    <string name="sync_bookmarks_multi_device_promo_primary_button">Synka bokmärken</string>
+    <string name="sync_bookmarks_multi_device_promo_title">Vill du även synkronisera bokmärken med din datorapp?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Anslut</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Hämta app</string>
 
     <!-- Sync promo in bookmark added dialog -->
-    <string name="sync_bookmark_added_set_up_promo_title">Sync &amp; Backup för bokmärken</string>
+    <string name="sync_bookmark_added_set_up_promo_title">Synka &amp; säkerhetskopiera bokmärken</string>
     <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Fler alternativ</string>
     <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Dölj</string>
     <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Aktivera Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
-    <string name="sync_bookmark_added_multi_device_promo_title">Synkronisera med min datorapp</string>
+    <string name="sync_bookmark_added_multi_device_promo_title">Synkronisera med datorappen</string>
     <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Fler alternativ</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Dölj</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Synkronisera med datorn</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Hämta app för dator</string>
     <string name="sync_bookmark_added_multi_device_sheet_title">Vi synkroniserar din datorapp!</string>
     <string name="sync_bookmark_added_multi_device_sheet_primary_button">Synkronisera med datorn</string>
-    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Jag har ingen datorapp</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Jag har inte datorappen</string>
 
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Synka och säkerhetskopiera dina lösenord</string>
     <string name="sync_passwords_promo_message">End-to-end-kryptering innebär att ingen annan än du kan se dina lösenord, inte ens vi.</string>
+    <string name="sync_passwords_promo_primary_button">Aktivera Sync &amp; Backup</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Synkronisera med din datorapp</string>
-    <string name="sync_passwords_multi_device_promo_primary_button">Synkronisera lösenord</string>
+    <string name="sync_passwords_multi_device_promo_title">Vill du även synkronisera lösenord med din datorapp?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Anslut</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Hämta app</string>
 
 </resources>
