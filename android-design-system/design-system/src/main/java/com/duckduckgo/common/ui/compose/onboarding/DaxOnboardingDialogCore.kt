@@ -161,7 +161,7 @@ internal fun DaxOnboardingDialogCore(
     contentKey: String,
     title: AnnotatedString,
     titleStyle: DuckDuckGoTextStyle,
-    state: DaxOnboardingDialogState,
+    state: DaxOnboardingDialogStateImpl,
     animate: Boolean,
     entryDelay: Duration,
     textAlign: DaxOnboardingDialogTextAlign,
