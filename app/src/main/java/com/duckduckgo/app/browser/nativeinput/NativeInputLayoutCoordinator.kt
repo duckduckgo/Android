@@ -84,6 +84,45 @@ class NativeInputLayoutCoordinator(
         }
     }
 
+    fun configureNewChatHints(widgetView: View, hintsView: View) {
+        val spacing = rootView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        val horizontalMargin = rootView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        hintsView.layoutParams = CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            gravity = Gravity.BOTTOM
+            marginStart = horizontalMargin
+            marginEnd = horizontalMargin
+        }
+        val card = widgetView.findViewById<View>(R.id.inputModeWidgetCard)
+        val preDrawListener = ViewTreeObserver.OnPreDrawListener {
+            if (!hintsView.isVisible) return@OnPreDrawListener true
+            val targetBottom = widgetView.top + widgetView.translationY + card.topWithin(widgetView) - spacing
+            hintsView.translationY = targetBottom - hintsView.bottom
+            hintsView.alpha = if (card.isShown) widgetView.alpha * card.alpha else 0f
+            true
+        }
+        var observer: ViewTreeObserver? = null
+        hintsView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                observer = v.viewTreeObserver.also { it.addOnPreDrawListener(preDrawListener) }
+            }
+
+            override fun onViewDetachedFromWindow(v: View) {
+                observer?.takeIf { it.isAlive }?.removeOnPreDrawListener(preDrawListener)
+                observer = null
+            }
+        })
+    }
+
+    private fun View.topWithin(ancestor: View): Float {
+        var offset = 0f
+        var view: View = this
+        while (view !== ancestor) {
+            offset += view.top + view.translationY
+            view = view.parent as? View ?: break
+        }
+        return offset
+    }
+
     fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
         val autoCompleteList = rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)

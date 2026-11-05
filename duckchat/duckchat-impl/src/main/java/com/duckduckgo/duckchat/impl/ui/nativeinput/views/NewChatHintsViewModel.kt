@@ -25,7 +25,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
@@ -41,7 +40,6 @@ import kotlin.random.Random
 class NewChatHintsViewModel @Inject constructor(
     private val provider: NativeInputStateProvider,
     private val modelManager: DuckAiModelManager,
-    private val feature: DuckChatFeature,
     private val duckChat: DuckChatInternal,
     private val tabRepository: TabRepository,
     eligibility: NewChatHintsEligibility,
@@ -50,15 +48,18 @@ class NewChatHintsViewModel @Inject constructor(
 
     private val eligible = eligibility.observeEligible(browserMode)
 
-    fun viewState(tabId: String): Flow<List<NewChatHint>> = combine(
-        tabRepository.flowSelectedTab,
-        provider.stateForTab(tabId),
-        modelManager.modelState,
-        eligible,
-    ) { selectedTab, input, models, eligible ->
-        val showHints = feature.newChatHints().isEnabled() && selectedTab?.tabId == tabId && eligible && input.isNewChat()
-        if (showHints) hintOrder(tabId).filter { capableModel(it, models) != null } else emptyList()
-    }.distinctUntilChanged()
+    fun viewState(tabId: String): Flow<List<NewChatHint>> {
+        val order = hintOrder(tabId)
+        return combine(
+            tabRepository.flowSelectedTab,
+            provider.stateForTab(tabId),
+            modelManager.modelState,
+            eligible,
+        ) { selectedTab, input, models, eligible ->
+            val showHints = selectedTab?.tabId == tabId && eligible && input.isNewChat()
+            if (showHints) order.filter { capableModel(it, models) != null } else emptyList()
+        }.distinctUntilChanged()
+    }
 
     private fun capableModel(hint: NewChatHint, models: ModelState): AIChatModel? {
         if (hint == NewChatHint.PHOTO && !duckChat.isImageUploadEnabled()) return null

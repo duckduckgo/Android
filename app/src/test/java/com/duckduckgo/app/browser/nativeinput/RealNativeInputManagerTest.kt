@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.nativeinput
 import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Looper
 import android.view.LayoutInflater
@@ -51,6 +52,7 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NewChatHintsRenderer
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -76,8 +78,10 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -103,11 +107,17 @@ class RealNativeInputManagerTest {
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
     private val duckAiChatStore: DuckAiChatStore = mock()
     private var autoFocusWidgetRoot: View? = null
+    private val newChatHintsRenderer = object : NewChatHintsRenderer {
+        override suspend fun create(context: Context, tabId: String): View = View(context)
+    }
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
-    private val rootView: ViewGroup = FrameLayout(context)
+    private val layoutResources: Resources = spy(context.resources)
+    private val rootView: ViewGroup = object : FrameLayout(context) {
+        override fun getResources(): Resources = layoutResources
+    }
     private val omnibar: Omnibar = mock()
     private val lifecycleOwner = FakeLifecycleOwner()
 
@@ -117,6 +127,8 @@ class RealNativeInputManagerTest {
 
     @Before
     fun setUp() {
+        doReturn(8).whenever(layoutResources).getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        doReturn(16).whenever(layoutResources).getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
         whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(MutableStateFlow(false))
@@ -135,6 +147,7 @@ class RealNativeInputManagerTest {
             nativeInputEventListener,
             edgeToEdgeHandler,
             duckAiChatStore,
+            newChatHintsRenderer,
         )
     }
 
