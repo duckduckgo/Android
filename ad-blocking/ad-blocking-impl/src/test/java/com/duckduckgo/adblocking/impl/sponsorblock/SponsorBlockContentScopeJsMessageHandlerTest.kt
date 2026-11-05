@@ -16,12 +16,9 @@
 
 package com.duckduckgo.adblocking.impl.sponsorblock
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerFeatureRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -41,21 +38,18 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi") // setRawStoredState
 @RunWith(AndroidJUnit4::class)
 class SponsorBlockContentScopeJsMessageHandlerTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val feature = FakeFeatureToggleFactory.create(SponsorBlockFeature::class.java)
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository = mock()
     private val jsMessaging: JsMessaging = mock()
-    private val segmentsProvider = FakeSegmentsProvider()
+    private val sponsorBlock = FakeSponsorBlock()
 
     private val handler = SponsorBlockContentScopeJsMessageHandler(
-        sponsorBlockFeature = feature,
-        segmentsProvider = segmentsProvider,
+        sponsorBlock = sponsorBlock,
         duckPlayerFeatureRepository = duckPlayerFeatureRepository,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         appScope = coroutineRule.testScope,
@@ -64,7 +58,6 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
     @Before
     fun setup() {
         whenever(duckPlayerFeatureRepository.getYouTubeEmbedUrl()).thenReturn("youtube-nocookie.com")
-        setEnabled(true)
     }
 
     @Test
@@ -73,7 +66,7 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
     }
 
     @Test
-    fun whenGetConfigThenReturnsEnabledManualModeAndVersion() {
+    fun whenGetConfigThenReturnsConfigAndVersion() {
         val response = send("getConfig")
 
         assertTrue(response.getBoolean("enabled"))
@@ -82,22 +75,22 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
     }
 
     @Test
-    fun whenFeatureDisabledThenGetConfigReturnsNotEnabled() {
-        setEnabled(false)
+    fun whenNotEnabledThenGetConfigReturnsNotEnabled() {
+        sponsorBlock.config = sponsorBlock.config.copy(enabled = false)
 
         assertFalse(send("getConfig").getBoolean("enabled"))
     }
 
     @Test
-    fun whenGetSegmentsWithValidIdThenReturnsSegmentsSortedByStart() {
-        segmentsProvider.segments = listOf(
-            SponsorBlockSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", videoDuration = 300.5),
+    fun whenGetSegmentsThenPassesVideoIdAndSerializesSegments() {
+        sponsorBlock.segments = listOf(
             SponsorBlockSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip"),
+            SponsorBlockSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", videoDuration = 300.5),
         )
 
-        val segments = send("getSegments", JSONObject().put("videoID", VALID_ID)).getJSONArray("segments")
+        val segments = send("getSegments", JSONObject().put("videoID", VIDEO_ID)).getJSONArray("segments")
 
-        assertEquals(VALID_ID, segmentsProvider.requestedIds.single())
+        assertEquals(VIDEO_ID, sponsorBlock.requestedIds.single())
         assertEquals(2, segments.length())
         with(segments.getJSONObject(0)) {
             assertEquals(5.0, getDouble("start"), 0.0)
@@ -110,33 +103,9 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
     }
 
     @Test
-    fun whenGetSegmentsWithMalformedIdThenReturnsEmptyWithoutLookup() {
-        listOf("", "short", "dQw4w9WgXcQX", "dQw4w9WgXc!", "../../etc/pa").forEach { id ->
-            val segments = send("getSegments", JSONObject().put("videoID", id)).getJSONArray("segments")
-            assertEquals(0, segments.length())
-        }
-        assertTrue(segmentsProvider.requestedIds.isEmpty())
-    }
-
-    @Test
-    fun whenGetSegmentsWithoutVideoIdThenReturnsEmptyWithoutLookup() {
+    fun whenGetSegmentsWithoutVideoIdThenPassesEmptyId() {
         assertEquals(0, send("getSegments").getJSONArray("segments").length())
-        assertTrue(segmentsProvider.requestedIds.isEmpty())
-    }
-
-    @Test
-    fun whenFeatureDisabledThenGetSegmentsReturnsEmptyWithoutLookup() {
-        setEnabled(false)
-
-        assertEquals(0, send("getSegments", JSONObject().put("videoID", VALID_ID)).getJSONArray("segments").length())
-        assertTrue(segmentsProvider.requestedIds.isEmpty())
-    }
-
-    @Test
-    fun whenProviderThrowsThenGetSegmentsReturnsEmpty() {
-        segmentsProvider.error = RuntimeException("boom")
-
-        assertEquals(0, send("getSegments", JSONObject().put("videoID", VALID_ID)).getJSONArray("segments").length())
+        assertEquals("", sponsorBlock.requestedIds.single())
     }
 
     @Test
@@ -157,24 +126,20 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
         }.params
     }
 
-    private fun setEnabled(enabled: Boolean) {
-        feature.self().setRawStoredState(State(enable = true))
-        feature.mvpEnabled().setRawStoredState(State(enable = enabled))
-    }
-
-    private class FakeSegmentsProvider : SponsorBlockSegmentsProvider {
+    private class FakeSponsorBlock : SponsorBlock {
+        var config = SponsorBlockConfig(enabled = true, skipMode = SponsorBlockSkipMode.MANUAL)
         var segments: List<SponsorBlockSegment> = emptyList()
-        var error: Exception? = null
         val requestedIds = mutableListOf<String>()
+
+        override fun config(): SponsorBlockConfig = config
 
         override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
             requestedIds += videoId
-            error?.let { throw it }
             return segments
         }
     }
 
     private companion object {
-        const val VALID_ID = "dQw4w9WgXcQ"
+        const val VIDEO_ID = "dQw4w9WgXcQ"
     }
 }
