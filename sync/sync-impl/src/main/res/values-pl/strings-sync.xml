@@ -480,9 +480,18 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Uzyskaj dostęp do swoich haseł na urządzeniach mobilnych i komputerach stacjonarnych.</string>
-    <string name="sync_passwords_import_promo_primary_button">Włącz Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Rozpocznij synchronizację</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Korzystaj z zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Włącz Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Rozpocznij synchronizację</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_primary_button_label">Rozpocznij synchronizację</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_primary_button_label">Rozpocznij synchronizację</string>
+
+    <!-- Sync promo menu in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Rozpocznij synchronizację</string>
 </resources>

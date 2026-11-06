@@ -480,9 +480,18 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Greife auf Mobilgeräten und Desktop auf deine Passwörter zu.</string>
-    <string name="sync_passwords_import_promo_primary_button">Sync &amp; Backup aktivieren</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Synchronisierung starten</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Greife auf deine Lesezeichen auf dem Handy und auf dem Desktop zu.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Sync &amp; Backup aktivieren</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Synchronisierung starten</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_primary_button_label">Synchronisierung starten</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_primary_button_label">Synchronisierung starten</string>
+
+    <!-- Sync promo menu in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Synchronisierung starten</string>
 </resources>

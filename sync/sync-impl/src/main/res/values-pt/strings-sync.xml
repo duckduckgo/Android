@@ -480,9 +480,18 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Acede às tuas palavras-passe no telemóvel e no computador.</string>
-    <string name="sync_passwords_import_promo_primary_button">Ativar Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Iniciar sincronização</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Acede aos teus marcadores no telemóvel e no computador.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Ativar Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Iniciar sincronização</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_primary_button_label">Iniciar sincronização</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_primary_button_label">Iniciar sincronização</string>
+
+    <!-- Sync promo menu in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Iniciar sincronização</string>
 </resources>

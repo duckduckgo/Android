@@ -480,9 +480,18 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Получай доступ к своим паролям на мобильных устройствах и настольном компьютере.</string>
-    <string name="sync_passwords_import_promo_primary_button">Включить Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Начать синхронизацию</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Получай доступ к закладкам на мобильных устройствах и компьютере.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Включить Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Начать синхронизацию</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_primary_button_label">Начать синхронизацию</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_primary_button_label">Начать синхронизацию</string>
+
+    <!-- Sync promo menu in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Начать синхронизацию</string>
 </resources>
