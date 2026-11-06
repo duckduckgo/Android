@@ -6,12 +6,18 @@ tags:
 - retry:
     maxRetries: 3
     commands:
-      - launchApp:
-          clearState: true
-          stopApp: true
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      # Maestro Cloud requires launchApp first; clearState then drops the onboarding it starts.
+      - launchApp
+      - clearState
       - openLink:
           link: duck://https://duckduckgo.com?q=why%20use%20duckduckgo
+
+      # On a cold start the omnibar shows the full URL until the SERP loads and replaces it with the query.
+      - extendedWaitUntil:
+          visible:
+            id: "omnibarTextInput|inputField"
+            text: "why use duckduckgo"
+          timeout: 10000
 
       - copyTextFrom:
           id: "omnibarTextInput|inputField"

@@ -6,14 +6,12 @@ name: "Autofill: Prompted to save and update credentials on web form"
 - retry:
       maxRetries: 3
       commands:
-        - launchApp:
-              clearState: true
-        - runFlow: ../shared/skip_all_onboarding.yaml
+        # Maestro Cloud requires launchApp first; clearState then drops the onboarding it starts.
+        - launchApp
+        - clearState
 
-        - tapOn:
-            id: "omnibarTextInput|inputField"
-        - inputText: "fill.dev/form/login-simple"
-        - pressKey: enter
+        - openLink:
+            link: "duck://https://fill.dev/form/login-simple"
 
         - tapOn:
             text: "Got it"

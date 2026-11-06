@@ -1,5 +1,12 @@
 appId: com.duckduckgo.mobile.android
 ---
+# The checks below don't wait, so right after a page opens they can miss the icon and hide a keyboard that isn't there.
+- extendedWaitUntil:
+    visible:
+      id: 'com.duckduckgo.mobile.android:id/fireIconImageView|com.duckduckgo.mobile.android:id/inputFieldFireIconImageview'
+    timeout: 5000
+    optional: true
+
 - runFlow:
     when:
       notVisible:
