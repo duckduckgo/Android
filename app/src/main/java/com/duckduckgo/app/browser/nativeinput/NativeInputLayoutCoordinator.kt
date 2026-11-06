@@ -413,13 +413,18 @@ class NativeInputLayoutCoordinator(
 
         // In order to avoid leaking the globalLayoutListener, keep a reference to the observer
         // that we used to register the listener on and unregister from it on detach.
+        // With the fix enabled, it's only registered while the NTP content is attached. A detached
+        // view returns a temporary observer, so registering then and again when the widget
+        // re-attaches would leave a copy that's never removed from the temporary observer.
         var ntpObserver: ViewTreeObserver? = null
 
         fun addListeners() {
             widgetView.addOnLayoutChangeListener(layoutListener)
             rootView.addOnLayoutChangeListener(layoutListener)
-            ntpObserver = newTabContent.viewTreeObserver?.also {
-                it.addOnGlobalLayoutListener(globalLayoutListener)
+            if (!inputWidgetFixEnabled || newTabContent.isAttachedToWindow) {
+                ntpObserver = newTabContent.viewTreeObserver.also {
+                    it.addOnGlobalLayoutListener(globalLayoutListener)
+                }
             }
         }
         fun removeListeners() {
