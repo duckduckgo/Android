@@ -76,6 +76,13 @@ interface PirRemoteFeatures {
      */
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun freemium(): Toggle
+
+    /**
+     * When enabled, completing onboarding on the dashboard asks for the notification permission
+     * (after explaining why) so the user can be told when the initial scan completes.
+     */
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun notificationPermissionPrompt(): Toggle
 }
 
 @SingleIn(AppScope::class)

@@ -55,6 +55,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -87,6 +88,7 @@ class PirWebSaveProfileMessageHandlerTest {
     private val mockPirScanCompleteNotifier: PirScanCompleteNotifier = mock()
     private val mockBrokerJsonUpdater: BrokerJsonUpdater = mock()
     private val mockUseBundledBrokerJsonsToggle: Toggle = mock()
+    private val mockNotificationPermissionPromptToggle: Toggle = mock()
     private val testScope = TestScope()
 
     @Before
@@ -95,6 +97,8 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirRemoteFeatures.freemium()).thenReturn(mockFreemiumToggle)
         whenever(mockPirRemoteFeatures.useBundledBrokerJsons()).thenReturn(mockUseBundledBrokerJsonsToggle)
         whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirRemoteFeatures.notificationPermissionPrompt()).thenReturn(mockNotificationPermissionPromptToggle)
+        whenever(mockNotificationPermissionPromptToggle.isEnabled()).thenReturn(true)
         whenever(mockRepository.getAllActiveBrokers()).thenReturn(listOf("broker"))
         whenever(mockPirWorkHandler.canRunPir()).thenReturn(
             flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)),
@@ -1042,6 +1046,77 @@ class PirWebSaveProfileMessageHandlerTest {
         // Then
         verify(mockBrokerJsonUpdater, never()).update()
         verifyResponse(jsMessage, false, mockJsMessaging)
+    }
+
+    @Test
+    fun whenOnboardingSavesProfileThenSaveIsForwardedToTheDashboardToPromptForNotifications() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockJsMessageCallback).process(jsMessage.featureName, SAVE_PROFILE.messageName, jsMessage.id, null)
+    }
+
+    @Test
+    fun whenOnboardingSavesProfileAndPromptIsDisabledThenSaveIsNotForwardedToTheDashboard() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockNotificationPermissionPromptToggle.isEnabled()).thenReturn(false)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockJsMessageCallback, never()).process(any(), any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenEditingExistingProfileThenSaveIsNotForwardedToTheDashboard() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(listOf(createProfileQuery()))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockJsMessageCallback, never()).process(any(), any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenOnboardingSavesProfileAndRunModeCannotBeResolvedThenSaveIsNotForwardedToTheDashboard() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)),
+        )
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockJsMessageCallback, never()).process(any(), any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenOnboardingSaveFailsThenSaveIsNotForwardedToTheDashboard() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(false)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockJsMessageCallback, never()).process(any(), any(), anyOrNull(), anyOrNull())
     }
 
     private suspend fun givenSuccessfulProfileSave() {

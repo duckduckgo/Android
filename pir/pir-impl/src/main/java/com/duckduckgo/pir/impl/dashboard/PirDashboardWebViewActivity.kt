@@ -16,12 +16,17 @@
 
 package com.duckduckgo.pir.impl.dashboard
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -29,6 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -40,6 +46,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendResponseToJs
@@ -51,6 +58,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
+import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -89,6 +97,10 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
 
     private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
+
+    private val notificationPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
+        viewModel.onNotificationPermissionResult(granted = granted)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -244,7 +256,67 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
                 this,
                 SubscriptionPurchase(origin = command.origin, featurePage = command.featurePage),
             )
+
+            Command.CheckNotificationPermission -> checkNotificationPermission()
+            is Command.ShowNotificationPermissionPrompt -> showNotificationPermissionPrompt(command.promptType)
+            Command.RequestNotificationPermission -> requestNotificationPermission()
+            Command.OpenNotificationSettings -> openNotificationSettings()
         }
+    }
+
+    private fun checkNotificationPermission() {
+        viewModel.onNotificationPermissionStateComputed(shouldShowRationale = shouldShowNotificationPermissionRationale())
+    }
+
+    private fun shouldShowNotificationPermissionRationale(): Boolean = Build.VERSION.SDK_INT >= 33 &&
+        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
+
+    private fun showNotificationPermissionPrompt(promptType: PirNotificationPromptType) {
+        val (messageRes, positiveButtonRes) = when (promptType) {
+            PirNotificationPromptType.REQUEST_PERMISSION ->
+                R.string.pirNotificationPermissionPromptMessage to R.string.pirNotificationPermissionPromptAllow
+            PirNotificationPromptType.OPEN_SETTINGS ->
+                R.string.pirNotificationPermissionPromptSettingsMessage to R.string.pirNotificationPermissionPromptOpenSettings
+        }
+
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.pirNotificationPermissionPromptTitle)
+            .setMessage(messageRes)
+            .setPositiveButton(positiveButtonRes)
+            .setNegativeButton(R.string.pirNotificationPermissionPromptNotNow)
+            .setCancellable(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onDialogShown() {
+                        viewModel.onNotificationPermissionPromptShown(promptType)
+                    }
+
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onNotificationPermissionPromptAccepted(promptType)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onNotificationPermissionPromptDismissed(promptType)
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onNotificationPermissionPromptDismissed(promptType)
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun openNotificationSettings() {
+        val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        startActivity(settingsIntent)
     }
 
     private fun sendJsEvent(event: SubscriptionEventData) {
