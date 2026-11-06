@@ -35,4 +35,7 @@ interface NewTabReturnHatchFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun afterInactivityEntry(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun idleReturnFirstFrameHold(): Toggle
 }
