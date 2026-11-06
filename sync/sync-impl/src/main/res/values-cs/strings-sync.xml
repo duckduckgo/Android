@@ -480,9 +480,18 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Měj přístup ke svým heslům na mobilu i počítači.</string>
-    <string name="sync_passwords_import_promo_primary_button">Zapni Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Spustit synchronizaci</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Přístup k záložkám na mobilních zařízeních i počítačích.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Zapni Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Spustit synchronizaci</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_primary_button_label">Spustit synchronizaci</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_primary_button_label">Spustit synchronizaci</string>
+
+    <!-- Sync promo menu in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Spustit synchronizaci</string>
 </resources>
