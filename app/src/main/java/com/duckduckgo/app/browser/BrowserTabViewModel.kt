@@ -403,6 +403,7 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -6136,12 +6137,22 @@ class BrowserTabViewModel @Inject constructor(
         entryPoint: DuckChatEntryPoint,
         fromDuckAiChat: Boolean,
     ) {
-        if (fromDuckAiChat) {
-            duckAiSessionCallback.onNewChatCreated(tabId)
-            recordPendingNewTabOpenedExit()
+        viewModelScope.launch {
+            val emptyChats = tabRepository.getTabs().filter { tab ->
+                tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && it.toChatIdOrNull(duckChat) == null } == true
+            }
+            val emptyChat = emptyChats.firstOrNull { it.tabId == tabId } ?: emptyChats.firstOrNull()
+            if (emptyChat != null) {
+                if (emptyChat.tabId != tabId) command.value = Command.SwitchToTab(emptyChat.tabId)
+                return@launch
+            }
+            if (fromDuckAiChat) {
+                duckAiSessionCallback.onNewChatCreated(tabId)
+                recordPendingNewTabOpenedExit()
+            }
+            duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
+            command.value = OpenInNewTab(duckChat.getDuckChatUrl("", false), tabId)
         }
-        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-        command.value = OpenInNewTab(duckChat.getDuckChatUrl("", false), tabId)
     }
 
     fun onCustomizeResponsesClicked() {
