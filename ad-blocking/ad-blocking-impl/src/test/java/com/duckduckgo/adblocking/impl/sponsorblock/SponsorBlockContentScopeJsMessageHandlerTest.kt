@@ -22,9 +22,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -118,39 +115,6 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
         verify(jsMessaging, never()).onResponse(any())
     }
 
-    @Test
-    fun whenConfigChangesAfterGetConfigThenPushesOnConfigChanged() {
-        send("getConfig")
-
-        sponsorBlock.config = sponsorBlock.config.copy(enabled = false)
-
-        val captor = argumentCaptor<SubscriptionEventData>()
-        verify(jsMessaging).sendSubscriptionEvent(captor.capture())
-        with(captor.firstValue) {
-            assertEquals("sponsorBlock", featureName)
-            assertEquals("onConfigChanged", subscriptionName)
-            assertFalse(params.getBoolean("enabled"))
-            assertEquals("manual", params.getString("skipMode"))
-            assertEquals(1, params.getInt("version"))
-        }
-    }
-
-    @Test
-    fun whenConfigIsUnchangedThenNothingIsPushed() {
-        send("getConfig")
-
-        verify(jsMessaging, never()).sendSubscriptionEvent(any())
-    }
-
-    @Test
-    fun whenNoPageAskedForConfigThenChangesAreNotPushed() {
-        send("getSegments")
-
-        sponsorBlock.config = sponsorBlock.config.copy(enabled = false)
-
-        verify(jsMessaging, never()).sendSubscriptionEvent(any())
-    }
-
     private fun send(method: String, params: JSONObject = JSONObject()): JSONObject {
         handler.process(JsMessage("contentScopeScripts", "sponsorBlock", method, params, "id"), jsMessaging, null)
         val captor = argumentCaptor<JsCallbackData>()
@@ -163,18 +127,11 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
     }
 
     private class FakeSponsorBlock : SponsorBlock {
-        private val configFlow = MutableStateFlow(SponsorBlockConfig(enabled = true, skipMode = SponsorBlockSkipMode.MANUAL))
-        var config: SponsorBlockConfig
-            get() = configFlow.value
-            set(value) {
-                configFlow.value = value
-            }
+        var config = SponsorBlockConfig(enabled = true, skipMode = SponsorBlockSkipMode.MANUAL)
         var segments: List<SponsorBlockSegment> = emptyList()
         val requestedIds = mutableListOf<String>()
 
         override fun config(): SponsorBlockConfig = config
-
-        override fun observeConfig(): Flow<SponsorBlockConfig> = configFlow
 
         override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
             requestedIds += videoId
