@@ -55,6 +55,7 @@ class RMFExperimentMatchingAttributeTest {
         testFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "rmfExperimentTestFeature",
+            daxDomainResolver = { null },
         ).build().create(TestFeature::class.java)
 
         inventory = RealFeatureTogglesInventory(

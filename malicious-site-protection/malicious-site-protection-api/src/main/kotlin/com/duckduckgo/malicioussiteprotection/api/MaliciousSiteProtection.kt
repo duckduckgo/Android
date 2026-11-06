@@ -16,11 +16,11 @@
 
 package com.duckduckgo.malicioussiteprotection.api
 
-import android.net.Uri
+import com.duckduckgo.url.DaxUrl
 
 interface MaliciousSiteProtection {
 
-    suspend fun isMalicious(url: Uri, confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit): IsMaliciousResult
+    suspend fun isMalicious(url: DaxUrl, confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit): IsMaliciousResult
 
     fun isFeatureEnabled(): Boolean
 

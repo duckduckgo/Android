@@ -59,7 +59,7 @@ class FeatureTogglesTest {
         provider = FakeProvider()
         toggleStore = CachedToggleStore(FakeToggleStore())
         callback = FakeFeatureTogglesCallback()
-        feature = FeatureToggles.Builder()
+        feature = FeatureToggles.Builder { null }
             .store(toggleStore)
             .appVariantProvider { provider.variantKey }
             .appVersionProvider { provider.version }
@@ -355,7 +355,7 @@ class FeatureTogglesTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun whenValidFeatureAndMissingFeatureNameBuilderParameterThenThrow() {
-        FeatureToggles.Builder()
+        FeatureToggles.Builder { null }
             .store(FakeToggleStore())
             .appVersionProvider { provider.version }
             .build()
@@ -365,7 +365,7 @@ class FeatureTogglesTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun whenValidFeatureAndMissingStoreBuilderParameterThenThrow() {
-        FeatureToggles.Builder()
+        FeatureToggles.Builder { null }
             .featureName("test")
             .appVersionProvider { provider.version }
             .build()

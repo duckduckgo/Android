@@ -17,12 +17,9 @@
 package com.duckduckgo.url.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.url.DaxDomainType
 import com.duckduckgo.url.DaxScheme
-import com.duckduckgo.url.DaxUrlResolver
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotSame
@@ -45,12 +42,7 @@ class RealDaxUrlProviderTest {
     @Before
     fun setup() {
         whenever(feature.useUnifiedUrl()).thenReturn(toggle)
-        provider = RealDaxUrlProvider(feature)
-    }
-
-    @After
-    fun tearDown() {
-        DaxUrlResolver.reset()
+        provider = RealDaxUrlProvider(lazy { feature })
     }
 
     @Test
@@ -79,23 +71,6 @@ class RealDaxUrlProviderTest {
         assertTrue(provider.getUrl("https://sub.example.com").matches(exception))
         assertFalse(provider.getUrl("https://other.com").matches(exception))
         assertFalse(provider.getUrl("https://notexample.com").matches(exception))
-    }
-
-    @Test
-    fun whenProviderInstalledThenFeatureExceptionResolvesDaxDomain() {
-        whenever(toggle.isEnabled()).thenReturn(false)
-        DaxUrlResolver.install(provider)
-
-        val exception = FeatureException(domain = "example.com", reason = null)
-        val child = provider.getUrl("https://sub.example.com").domain!!
-
-        assertTrue(exception.daxDomain!!.sameOrSubdomain(child))
-    }
-
-    @Test
-    fun whenProviderNotInstalledThenFeatureExceptionDaxDomainIsNull() {
-        DaxUrlResolver.reset()
-        assertNull(FeatureException(domain = "example.com", reason = null).daxDomain)
     }
 
     @Test
@@ -297,5 +272,79 @@ class RealDaxUrlProviderTest {
         val domain = provider.getDomain("sub.example.com")!!
         assertNotSame(domain.toTldPlusOne(), domain.toTldPlusOne())
         assertEquals(domain.toTldPlusOne(), domain.toTldPlusOne())
+    }
+
+    @Test
+    fun whenBuildingThenComponentsAreAssembledInOrder() {
+        whenever(toggle.isEnabled()).thenReturn(true)
+        val url = provider.builder()
+            .scheme(DaxScheme.HTTPS)
+            .encodedHost("example.com")
+            .encodedPath("/a/b")
+            .encodedQuery("q=1")
+            .build()
+
+        assertEquals("https://example.com/a/b?q=1", url.serialized)
+    }
+
+    @Test
+    fun whenBuildingThenUnsetComponentsAreOmitted() {
+        whenever(toggle.isEnabled()).thenReturn(true)
+        val url = provider.builder()
+            .scheme(DaxScheme.HTTP)
+            .encodedHost("example.com")
+            .encodedPath("/")
+            .encodedQuery(null)
+            .build()
+
+        assertEquals("http://example.com/", url.serialized)
+    }
+
+    @Test
+    fun whenSchemeIsOtherThenNoSchemeIsWritten() {
+        whenever(toggle.isEnabled()).thenReturn(true)
+        val url = provider.builder()
+            .scheme(DaxScheme.OTHER)
+            .encodedHost("example.com")
+            .encodedPath("/a")
+            .build()
+
+        assertEquals("//example.com/a", url.serialized)
+    }
+
+    // The verbatim contract: a component the caller already percent-encoded must survive the round
+    // trip unchanged, because consumers hash and regex-match the result (see
+    // :malicious-site-protection-impl). Re-encoding here would silently shift those bytes.
+    @Test
+    fun whenComponentsArePercentEncodedThenTheyAreNotEncodedAgain() {
+        whenever(toggle.isEnabled()).thenReturn(true)
+        val url = provider.builder()
+            .scheme(DaxScheme.HTTPS)
+            .encodedHost("example.com")
+            .encodedPath("/a%20b%23c")
+            .encodedQuery("q=%2F")
+            .build()
+
+        assertEquals("https://example.com/a%20b%23c?q=%2F", url.serialized)
+    }
+
+    @Test
+    fun whenBuildingThenHostIsNotNormalizedButDomainStillIs() {
+        whenever(toggle.isEnabled()).thenReturn(true)
+        val url = provider.builder()
+            .scheme(DaxScheme.HTTPS)
+            .encodedHost("www.example.com")
+            .encodedPath("/a")
+            .build()
+
+        assertEquals("https://www.example.com/a", url.serialized)
+        assertEquals("example.com", url.domain?.toString())
+    }
+
+    @Test
+    fun whenBuildingThenMemoizationFollowsTheFlag() {
+        whenever(toggle.isEnabled()).thenReturn(false)
+        val url = provider.builder().scheme(DaxScheme.HTTPS).encodedHost("example.com").build()
+        assertFalse((url as RealDaxUrl).memoize)
     }
 }

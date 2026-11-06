@@ -39,6 +39,7 @@ dependencies {
     implementation project(':data-store-api')
     implementation project(':navigation-api')
     implementation project(':settings-api')
+    implementation project(':unified-url-model-api')
 
     ksp project(':codegen-ksp')
     implementation project(path: ':codegen-annotations')
@@ -66,6 +67,7 @@ dependencies {
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':unified-url-model-test')
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy

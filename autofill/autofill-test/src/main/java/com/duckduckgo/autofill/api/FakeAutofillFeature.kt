@@ -18,12 +18,13 @@ package com.duckduckgo.autofill.api
 
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.url.DaxDomain
 
 class FakeAutofillFeature private constructor() {
 
     companion object {
-        fun create(): AutofillFeature {
-            return FeatureToggles.Builder()
+        fun create(daxDomainResolver: (String) -> DaxDomain? = { null }): AutofillFeature {
+            return FeatureToggles.Builder(daxDomainResolver = daxDomainResolver)
                 .store(
                     object : Toggle.Store {
                         private val map = mutableMapOf<String, Toggle.State>()

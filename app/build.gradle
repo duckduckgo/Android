@@ -360,6 +360,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':feature-toggles-internal-api')
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':unified-url-model-test')
     implementation project(':feature-toggles-impl')
     internalImplementation project(":feature-toggles-internal")
     implementation project(':privacy-config-api')

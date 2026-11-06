@@ -28,7 +28,6 @@ import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.url.DaxDomain
 import com.duckduckgo.url.DaxScheme
 import com.duckduckgo.url.DaxUrl
-import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 /**
@@ -52,10 +51,14 @@ internal class RealDaxUrl(
     private val uri: Uri by held(memoize) { raw.toUri() }
 
     override val domain: DaxDomain? by held(memoize) {
-        uri.baseHost?.takeIf { it.isNotBlank() }?.let { RealDaxDomain(it, memoize) }.also {
-            logcat("Cris") { "${it?.value} memoize: ${it?.memoize}" }
-        }
+        uri.baseHost?.takeIf { it.isNotBlank() }?.let { RealDaxDomain(it, memoize) }
     }
+
+    override val host: String?
+        get() = uri.host
+
+    override val serialized: String
+        get() = raw
 
     override val scheme: DaxScheme by held(memoize) { DaxScheme.fromValue(uri.scheme) }
 

@@ -56,6 +56,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
             forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
+            daxDomainResolver = { null },
         ).build().create(TestTriggerFeature::class.java)
     }
 

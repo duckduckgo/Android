@@ -38,12 +38,12 @@ import org.junit.Test
 class RealExperimentMetricsHandlerTest {
 
     private val metricsExtension = FakeMetricsPixelExtension()
-    private val cssExperiments = FeatureToggles.Builder()
+    private val cssExperiments = FeatureToggles.Builder { null }
         .store(FakeToggleStore())
         .featureName("contentScopeExperiments")
         .build()
         .create(TestContentScopeExperiments::class.java)
-    private val blockList = FeatureToggles.Builder()
+    private val blockList = FeatureToggles.Builder { null }
         .store(FakeToggleStore())
         .featureName("blockList")
         .build()

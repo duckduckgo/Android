@@ -40,6 +40,7 @@ class MetricsPixelDefinitionsTest {
         testFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "testFeature",
+            daxDomainResolver = { null },
         ).build().create(TestTriggerFeature::class.java)
 
         val enrollmentDate = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()

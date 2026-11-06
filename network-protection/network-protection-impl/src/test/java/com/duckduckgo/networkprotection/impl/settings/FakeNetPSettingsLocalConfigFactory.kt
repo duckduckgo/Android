@@ -22,7 +22,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 class FakeNetPSettingsLocalConfigFactory private constructor() {
     companion object {
         fun create(): NetPSettingsLocalConfig {
-            return FeatureToggles.Builder()
+            return FeatureToggles.Builder { null }
                 .store(
                     object : Toggle.Store {
                         private val map = mutableMapOf<String, Toggle.State>()

@@ -22,29 +22,34 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.url.DaxDomain
 import com.duckduckgo.url.DaxScheme
 import com.duckduckgo.url.DaxUrl
+import com.duckduckgo.url.DaxUrlBuilder
 import com.duckduckgo.url.DaxUrlProvider
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
+// Lazy: every generated feature-toggle module injects this provider, so eager injection of a feature
+// here would close a dependency cycle. Breaking it once at this end keeps `Lazy` out of generated code.
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, binding = binding<DaxUrlProvider>())
 class RealDaxUrlProvider @Inject constructor(
-    private val unifiedUrlModelFeature: UnifiedUrlModelFeature,
+    private val unifiedUrlModelFeature: Lazy<UnifiedUrlModelFeature>,
 ) : DaxUrlProvider {
 
     // Read once (not per call): keeps the hot path off the toggle store and makes resolution
     // single-variant for the process lifetime, so which path a URL takes can't change mid-session.
     // A flag flip therefore takes effect on next process start — the right granularity for an
     // implementation switch (no swapping the URL model mid-session).
-    private val useUnifiedUrl by lazy { unifiedUrlModelFeature.useUnifiedUrl().isEnabled() }
+    private val useUnifiedUrl by lazy { unifiedUrlModelFeature.value.useUnifiedUrl().isEnabled() }
 
     // No dedup cache: each call builds a fresh model. Reuse is the caller's job — resolve once at the
     // entry boundary and hold the DaxUrl/DaxDomain, rather than re-resolving the same String downstream.
     override fun getUrl(url: String): DaxUrl = RealDaxUrl(url, memoize = useUnifiedUrl)
 
     override fun getDomain(host: String): DaxDomain? = getUrl(host).domain
+
+    override fun builder(): DaxUrlBuilder = RealDaxUrlBuilder(memoize = useUnifiedUrl)
 
     // Every DaxUrl is produced by this provider (no public constructor), so it is always a
     // RealDaxUrl — the cast is intentional.

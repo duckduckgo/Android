@@ -43,6 +43,7 @@ class RealAddressBarTrackersAnimationManagerTest {
         fakeFeatureToggle = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "addressBarTrackersAnimation",
+            daxDomainResolver = { null },
         ).build().create(AddressBarTrackersAnimationFeatureToggle::class.java)
 
         testee = RealAddressBarTrackersAnimationManager(

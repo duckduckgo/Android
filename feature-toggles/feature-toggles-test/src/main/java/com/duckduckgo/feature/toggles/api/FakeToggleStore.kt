@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.api
 
+import com.duckduckgo.url.DaxDomain
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
@@ -38,8 +39,9 @@ class FakeFeatureToggleFactory {
             store: Toggle.Store = FakeToggleStore(),
             ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
             appVersionProvider: () -> Int = { Int.MAX_VALUE },
+            daxDomainResolver: (String) -> DaxDomain? = { null },
         ): T {
-            return FeatureToggles.Builder()
+            return FeatureToggles.Builder(daxDomainResolver = daxDomainResolver)
                 .store(store)
                 .appVersionProvider(appVersionProvider)
                 .featureName("fakeFeature")

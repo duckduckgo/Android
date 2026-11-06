@@ -40,6 +40,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Malici
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.url.DaxUrlProvider
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.binding
@@ -104,6 +105,7 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     private val exemptedUrlsHolder: ExemptedUrlsHolder,
     @IsMainProcess private val isMainProcess: Boolean,
     private val pixel: Pixel,
+    private val daxUrlProvider: DaxUrlProvider,
 ) : MaliciousSiteBlockerWebViewIntegration, PrivacyConfigCallbackPlugin {
 
     data class ProcessedUrlStatus(val status: MaliciousStatus, val clientSideHit: Boolean)
@@ -268,7 +270,9 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         confirmationCallback: (maliciousStatus: MaliciousStatus) -> Unit,
     ): IsMaliciousResult {
         val checkId = currentCheckId.incrementAndGet()
-        return maliciousSiteProtection.isMalicious(url) {
+        // The WebView hands us a Uri, so the model is entered here, at the last Uri-shaped boundary.
+        // Everything past this point speaks DaxUrl.
+        return maliciousSiteProtection.isMalicious(daxUrlProvider.getUrl(url.toString())) {
             // if another load has started, we should ignore the result
             val isMalicious = if (checkId == currentCheckId.get()) {
                 it

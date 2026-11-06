@@ -33,8 +33,6 @@ import com.duckduckgo.di.android.AndroidInjector
 import com.duckduckgo.di.android.HasInjector
 import com.duckduckgo.di.android.getFactory
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
-import com.duckduckgo.url.DaxUrlProvider
-import com.duckduckgo.url.DaxUrlResolver
 import dev.zacsweers.metro.HasMemberInjections
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
@@ -81,9 +79,6 @@ open class DuckDuckGoApplication : HasInjector, MultiProcessApplication() {
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    @Inject
-    lateinit var daxUrlProvider: DaxUrlProvider
-
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
     open lateinit var appComponent: AppComponent
@@ -94,14 +89,6 @@ open class DuckDuckGoApplication : HasInjector, MultiProcessApplication() {
 
         configureStrictMode()
         configureDependencyInjection()
-
-        // Install the DaxUrl provider as early as the graph allows (it can't precede graph creation
-        // above, since the provider comes from it). This shrinks the pre-install window in which
-        // FeatureException.daxDomain resolves to null. It is defence-in-depth only: correctness is
-        // guaranteed by the getter caching non-null results and retrying on null, so a read that races
-        // this install self-heals on the next access. DaxUrlResolverInitializer (a
-        // MainProcessLifecycleObserver) re-installs the same singleton as a fallback; install is idempotent.
-        DaxUrlResolver.install(daxUrlProvider)
 
         setupActivityLifecycleCallbacks()
         configureUncaughtExceptionHandler()

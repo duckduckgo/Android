@@ -65,6 +65,7 @@ class BlockListInterceptorApiPluginTest {
         testBlockListFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "blockList",
+            daxDomainResolver = { null },
         ).build().create(TestBlockListFeature::class.java)
 
         inventory = RealFeatureTogglesInventory(

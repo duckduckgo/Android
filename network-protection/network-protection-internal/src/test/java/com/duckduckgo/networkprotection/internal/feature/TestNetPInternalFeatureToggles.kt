@@ -29,7 +29,7 @@ class TestNetPInternalFeatureToggles {
 
     @Before
     fun setup() {
-        toggles = FeatureToggles.Builder()
+        toggles = FeatureToggles.Builder { null }
             .store(FakeToggleStore())
             .appVersionProvider { Int.MAX_VALUE }
             .featureName("test")

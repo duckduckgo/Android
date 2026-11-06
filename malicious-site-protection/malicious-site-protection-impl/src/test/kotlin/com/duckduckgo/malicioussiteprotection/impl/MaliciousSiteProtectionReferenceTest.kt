@@ -16,7 +16,6 @@
 
 package com.duckduckgo.malicioussiteprotection.impl
 
-import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -37,6 +36,7 @@ import com.duckduckgo.malicioussiteprotection.impl.domain.RealMaliciousSiteProte
 import com.duckduckgo.malicioussiteprotection.impl.domain.RealUrlCanonicalization
 import com.duckduckgo.malicioussiteprotection.impl.domain.UrlCanonicalization
 import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
+import com.duckduckgo.url.test.FakeDaxUrlProvider
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -91,8 +91,10 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
     private val moshi = Moshi.Builder().build()
     private val mockMaliciousSiteProtectionRCRepository: MaliciousSiteProtectionRCRepository = mock()
     private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
+    private val daxUrlProvider = FakeDaxUrlProvider()
     private val urlCanonicalization: UrlCanonicalization = RealUrlCanonicalization(
         mockMaliciousSiteProtectionRCFeature,
+        daxUrlProvider,
     )
     private val messageDigest: MessageDigest = MessageDigest.getInstance("SHA-256")
     private val repository = RealMaliciousSiteRepository(
@@ -167,7 +169,7 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         testCase.exceptPlatforms
-        val maliciousResult = testee.isMalicious(testCase.siteURL.toUri()) { it: MaliciousStatus ->
+        val maliciousResult = testee.isMalicious(daxUrlProvider.getUrl(testCase.siteURL)) { it: MaliciousStatus ->
             if (it is MaliciousStatus.Malicious) {
                 assertEquals(testCase.expectBlock, true)
             } else {

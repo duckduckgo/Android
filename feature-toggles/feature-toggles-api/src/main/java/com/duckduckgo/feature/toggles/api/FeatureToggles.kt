@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore
 import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore.Listener
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
+import com.duckduckgo.url.DaxDomain
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -49,6 +50,7 @@ class FeatureToggles private constructor(
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
     private val ioDispatcher: CoroutineDispatcher,
+    private val daxDomainResolver: (String) -> DaxDomain?,
 ) {
 
     private val featureToggleCache = ConcurrentHashMap<Method, Toggle>()
@@ -62,6 +64,7 @@ class FeatureToggles private constructor(
         private var forceDefaultVariant: () -> Unit = { /** noop **/ },
         private var callback: FeatureTogglesCallback? = null,
         private var ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+        private val daxDomainResolver: (String) -> DaxDomain?,
     ) {
 
         fun store(store: Toggle.Store) = apply { this.store = store }
@@ -94,6 +97,7 @@ class FeatureToggles private constructor(
                 forceDefaultVariant = forceDefaultVariant,
                 callback = this.callback,
                 ioDispatcher = this.ioDispatcher,
+                daxDomainResolver = this.daxDomainResolver,
             )
         }
     }
@@ -146,6 +150,7 @@ class FeatureToggles private constructor(
                 forceDefaultVariant = forceDefaultVariant,
                 callback = callback,
                 ioDispatcher = ioDispatcher,
+                daxDomainResolver = daxDomainResolver,
             )
         }
     }
@@ -274,7 +279,17 @@ interface Toggle {
     /**
      * @return the list of domain exceptions`exceptions` of the feature or empty list if not present in the remote config
      */
+    @Deprecated(
+        message = "FeatureException is the remote-config DTO. Match against exception domains instead.",
+        replaceWith = ReplaceWith("getExceptionDomains()"),
+    )
     fun getExceptions(): List<FeatureException>
+
+    /**
+     * @return the `exceptions` domains of the feature as normalized [DaxDomain]s, or empty list if not
+     * present in the remote config. Entries whose `domain` has no resolvable host are dropped.
+     */
+    fun getExceptionDomains(): List<DaxDomain>
 
     /**
      * WARNING: This method always returns the cohort assigned regardless it the experiment is still enabled or not.
@@ -438,6 +453,7 @@ internal class ToggleImpl constructor(
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
     private val ioDispatcher: CoroutineDispatcher,
+    private val daxDomainResolver: (String) -> DaxDomain?,
 ) : Toggle {
 
     override fun equals(other: Any?): Boolean {
@@ -661,8 +677,29 @@ internal class ToggleImpl constructor(
 
     override fun getSettings(): String? = store.get(key)?.settings
 
+    @Deprecated(
+        message = "FeatureException is the remote-config DTO. Match against exception domains instead.",
+        replaceWith = ReplaceWith("getExceptionDomains()"),
+    )
     override fun getExceptions(): List<FeatureException> {
         return store.get(key)?.exceptions.orEmpty()
+    }
+
+    // Memoized against the State instance rather than recomputed per call: [store] is a
+    // CachedToggleStore, so the same State is returned until a config write invalidates it — which
+    // makes reference identity a self-invalidating cache key. Held as one reference so a reader can
+    // never observe a State paired with another State's domains. The write is unguarded: a race
+    // costs a duplicate resolve, never a wrong value.
+    @Volatile
+    private var exceptionDomains: Pair<State, List<DaxDomain>>? = null
+
+    override fun getExceptionDomains(): List<DaxDomain> {
+        val state = store.get(key) ?: return emptyList()
+        exceptionDomains?.let { (cached, domains) -> if (cached === state) return domains }
+
+        return state.exceptions.mapNotNull { daxDomainResolver(it.domain) }.also {
+            exceptionDomains = state to it
+        }
     }
 
     override suspend fun getCohort(): Cohort? {

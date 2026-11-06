@@ -55,6 +55,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
         testFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "testFeature",
+            daxDomainResolver = { null },
         ).build().create(TestTriggerFeature::class.java)
 
         inventory = RealFeatureTogglesInventory(

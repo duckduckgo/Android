@@ -35,7 +35,7 @@ class RealBlockListExperimentTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val feature = FeatureToggles.Builder(FakeToggleStore(), featureName = "blockList").build()
+    private val feature = FeatureToggles.Builder(FakeToggleStore(), featureName = "blockList", daxDomainResolver = { null }).build()
         .create(TestBlockListFeature::class.java)
     private val featureInventory = CountingInventory(
         listOf(feature.nonMatchingFeatureName(), feature.tdsNextExperimentTest(), feature.tdsNextExperimentAnotherTest()),

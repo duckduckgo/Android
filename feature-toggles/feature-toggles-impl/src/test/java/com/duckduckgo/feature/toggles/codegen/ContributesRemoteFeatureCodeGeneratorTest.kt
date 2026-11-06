@@ -81,6 +81,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             appVariantProvider = { variantManager.getVariantKey() },
             forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
             callback = featureTogglesCallback,
+            daxDomainResolver = { null },
         ).build().create(TestTriggerFeature::class.java)
         anotherTestFeature = FeatureToggles.Builder(
             toggleStore,
@@ -89,6 +90,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
             forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
+            daxDomainResolver = { null },
         ).build().create(AnotherTestTriggerFeature::class.java)
     }
 

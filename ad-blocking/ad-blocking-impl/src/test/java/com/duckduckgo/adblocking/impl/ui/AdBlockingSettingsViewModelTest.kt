@@ -56,7 +56,7 @@ class AdBlockingSettingsViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val statusChecker: AdBlockingStatusChecker = mock()
-    private val feature = FeatureToggles.Builder()
+    private val feature = FeatureToggles.Builder { null }
         .store(FakeToggleStore())
         .appVersionProvider { Int.MAX_VALUE }
         .featureName("adBlockingExtension")

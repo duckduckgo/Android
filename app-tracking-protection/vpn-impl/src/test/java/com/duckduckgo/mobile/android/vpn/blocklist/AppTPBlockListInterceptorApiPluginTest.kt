@@ -85,6 +85,7 @@ class AppTPBlockListInterceptorApiPluginTest {
         testBlockListFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "appTrackerProtection",
+            daxDomainResolver = { null },
         ).build().create(TestBlockListFeature::class.java)
 
         vpnFeaturesRegistry = VpnFeaturesRegistryImpl(

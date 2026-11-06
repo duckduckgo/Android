@@ -1,12 +1,12 @@
 package com.duckduckgo.malicioussiteprotection.impl.remoteconfig
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
+import com.duckduckgo.url.test.FakeDaxUrlProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -19,7 +19,11 @@ class RealMaliciousSiteProtectionRCRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val feature = FakeFeatureToggleFactory.create(MaliciousSiteProtectionFeature::class.java)
+    private val daxUrlProvider = FakeDaxUrlProvider()
+    private val feature = FakeFeatureToggleFactory.create(
+        MaliciousSiteProtectionFeature::class.java,
+        daxDomainResolver = daxUrlProvider::getDomain,
+    )
 
     @Before
     fun setup() {
@@ -30,30 +34,30 @@ class RealMaliciousSiteProtectionRCRepositoryTest {
     fun whenHostMatchesExceptionDomainExactlyThenIsExempted() = runTest {
         val repository = createRepository()
 
-        assertTrue(repository.isExempted(Domain("example.com")))
+        assertTrue(repository.isExempted(domain("example.com")))
     }
 
     @Test
     fun whenHostIsSubdomainOfExceptionDomainThenIsExempted() = runTest {
         val repository = createRepository()
 
-        assertTrue(repository.isExempted(Domain("sub.example.com")))
-        assertTrue(repository.isExempted(Domain("a.b.example.com")))
+        assertTrue(repository.isExempted(domain("sub.example.com")))
+        assertTrue(repository.isExempted(domain("a.b.example.com")))
     }
 
     @Test
     fun whenHostIsUnrelatedDomainThenIsNotExempted() = runTest {
         val repository = createRepository()
 
-        assertFalse(repository.isExempted(Domain("other.com")))
+        assertFalse(repository.isExempted(domain("other.com")))
     }
 
     @Test
     fun whenHostSharesSuffixButIsNotSubdomainThenIsNotExempted() = runTest {
         val repository = createRepository()
 
-        assertFalse(repository.isExempted(Domain("notexample.com")))
-        assertFalse(repository.isExempted(Domain("fakeexample.com")))
+        assertFalse(repository.isExempted(domain("notexample.com")))
+        assertFalse(repository.isExempted(domain("fakeexample.com")))
     }
 
     @Test
@@ -61,7 +65,7 @@ class RealMaliciousSiteProtectionRCRepositoryTest {
         feature.self().setRawStoredState(Toggle.State(exceptions = emptyList()))
         val repository = createRepository()
 
-        assertFalse(repository.isExempted(Domain("example.com")))
+        assertFalse(repository.isExempted(domain("example.com")))
     }
 
     @Test
@@ -77,23 +81,25 @@ class RealMaliciousSiteProtectionRCRepositoryTest {
         )
         val repository = createRepository()
 
-        assertTrue(repository.isExempted(Domain("sub.example.com")))
+        assertTrue(repository.isExempted(domain("sub.example.com")))
     }
 
     @Test
     fun whenRemoteConfigUpdateThenIsExemptedReflectsNewExceptions() = runTest {
         val repository = createRepository()
 
-        assertTrue(repository.isExempted(Domain("example.com")))
+        assertTrue(repository.isExempted(domain("example.com")))
 
         feature.self().setRawStoredState(
             Toggle.State(exceptions = listOf(FeatureException("other.com", "reason"))),
         )
         repository.onPrivacyConfigDownloaded()
 
-        assertFalse(repository.isExempted(Domain("example.com")))
-        assertTrue(repository.isExempted(Domain("other.com")))
+        assertFalse(repository.isExempted(domain("example.com")))
+        assertTrue(repository.isExempted(domain("other.com")))
     }
+
+    private fun domain(host: String) = daxUrlProvider.getDomain(host)!!
 
     private fun createRepository() = RealMaliciousSiteProtectionRCRepository(
         feature,

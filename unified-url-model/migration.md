@@ -15,16 +15,20 @@ the construction boundary (`getUrl`/`getDomain`).
 Shipped behind the `unifiedUrlModel` feature flag (`UnifiedUrlModelFeature`):
 
 - **`:unified-url-model-api`** (pure-JVM): `DaxUrl`, `DaxDomain`, `DaxScheme`, `DaxDomainType`,
-  `DaxUrlProvider`, `DaxUrlResolver`.
+  `DaxUrlProvider`.
 - **`:unified-url-model-impl`**: `RealDaxUrl`, `RealDaxDomain` (each a single class taking a
-  `memoize` flag — see below), the `held` property helper, `RealDaxUrlProvider`,
-  `DaxUrlResolverInitializer`.
-- **End-to-end proof**: `FeatureException.daxDomain` resolves through the process-wide
-  `DaxUrlResolver`. It is a **computed property with a getter** (Moshi-ignored), and it *must* be — a
-  stored/eager `val` initializes once during Moshi deserialization, before the provider installs, so
-  it would pin `null` forever (and the `resolved ?:` retry would be dead code). The getter self-heals:
-  it caches only non-null results into a `@Transient resolved` field and retries on null, so the
-  first read after install resolves and memoizes.
+  `memoize` flag — see below), the `held` property helper, `RealDaxUrlProvider`.
+- **End-to-end proof**: `Toggle.getExceptionDomains()` returns the remote-config `exceptions` as
+  resolved `DaxDomain`s. Resolution happens in `ToggleImpl` via a `daxDomainResolver` lambda passed
+  through `FeatureToggles.Builder`, which the codegen'd `*_ProxyModule` supplies from an injected
+  `Lazy<DaxUrlProvider>` — `Lazy` because `RealDaxUrlProvider` reads its own feature flag and eager
+  injection would close a Dagger cycle back through that module.
+
+  **`FeatureException` stays an untouched DTO.** It is the Moshi/Room shape for remote config and is
+  what content-scope-scripts serializes back out to the JS layer; it carries no `DaxDomain`. Keeping
+  the DTO and the domain model separate is what removes the need for a process-wide service-locator
+  holder: resolution moved to `ToggleImpl`, which is constructed from the Dagger graph, so there is
+  no install point, no startup-ordering window, and no null-until-installed state.
 
 Key properties already established:
 - **Memoization A/B** gated by `useUnifiedUrl()`: a single `RealDaxUrl`/`RealDaxDomain` takes a
@@ -44,7 +48,7 @@ Key properties already established:
 | Today | Model equivalent | Status |
 |---|---|---|
 | `uri.host` / `baseHost` / `UriString.host()` | `daxUrl.domain` (`DaxDomain?`) | ✅ done |
-| `UriString.sameOrSubdomain(url, exc.domain)` (hot path, ~54 sites) | `daxUrl.matches(exc.daxDomain)` / `parentDomain.sameOrSubdomain(child)` | ✅ done |
+| `UriString.sameOrSubdomain(url, exc.domain)` (hot path, ~54 sites) | `daxUrl.matches(exceptionDomain)` / `parentDomain.sameOrSubdomain(child)` | ✅ done |
 | `uri.isHttps` / `uri.scheme` (~69 sites) | `daxUrl.isHttps` / `daxUrl.scheme` (`DaxScheme`) | ✅ done |
 | `toTldPlusOne()` / `toTldPlusOneOrSelf()` | `DaxDomain.toTldPlusOne()` / `toTldPlusOneOrSelf()` | ✅ done |
 | `UriString.isWebUrl(x)` (default) | `daxUrl.isWebUrl` | ✅ done (ported) |
@@ -135,30 +139,27 @@ stay distinct. They do **not** map to `DaxDomain`. Triaged:
 - **Flag-gated, per-feature rollout.** Migrate one feature at a time; `useUnifiedUrl()` selects
   recompute mode (`memoize = false`, parity) vs memoize mode (`memoize = true`). Both modes must
   produce identical results — only performance differs.
-- **Persisted String domains stay String.** `FeatureException.domain` and every `*Repository`
-  exception DTO are Moshi-persisted. Do not change the stored type — expose a **computed**
-  `daxDomain: DaxDomain?` alongside (Moshi ignores computed properties; see `FeatureException`).
-- **Injectable consumers** take `DaxUrlProvider` via DI. **Non-injectable** spots (data-class
-  computed properties like `FeatureException`, built by Moshi and never by Dagger) read through the
-  process-wide `DaxUrlResolver`. The service-locator holder is **unavoidable here**: a Moshi-built
-  object can't have `DaxUrlProvider` injected, and the pure-DI alternative — moving resolution off the
-  data class into DI-constructed repositories — was rejected because it forces every consumer to
-  remember to resolve instead of reading a plain property. `resolve*` returns null before install.
-- **Install point.** The app calls `DaxUrlResolver.install(daxUrlProvider)` in
-  `DuckDuckGoApplication.onMainProcessCreate`, immediately after `configureDependencyInjection()` —
-  the earliest sound point, and one that guarantees install before **any**
-  `MainProcessLifecycleObserver.onCreate` fires. `DaxUrlResolverInitializer` (a lifecycle observer)
-  stays as an idempotent fallback. This makes observer-based loads safe but by construction **cannot**
-  beat a load started from an `init{}` block; it is defense-in-depth, not the correctness mechanism
-  (see the resolve-at-match-time rule below).
-- **Resolve at match time; never cache a pre-resolved `DaxDomain`.** When `DaxDomain` eventually
-  replaces the stored String/`Domain` property, consumers must cache the **`FeatureException`** (or the
-  raw String) and resolve at the point of use — e.g. `it.daxDomain` inside `isExempted` — not snapshot
-  the resolved domain into a field or collection at load time. The self-heal lives in the getter, so
-  the live seam only survives if the cached thing is the object that *has* the getter.
-  `exceptionDomains = getExceptions().mapNotNull { it.daxDomain }` at load time is an actual bug: it
-  pins whatever the resolver returned then (null before install). Cost is amortized — `daxDomain`
-  memoizes into its `resolved` field on the first non-null read — and it self-heals.
+- **DTO and domain model stay separate.** `FeatureException` (and every `*Repository` exception
+  entity) is the Moshi/Room persistence shape and keeps its `domain: String`. It gains nothing — no
+  `DaxDomain` field, computed or stored. Content-scope-scripts serializes `List<FeatureException>`
+  straight back out to the JS layer, so the DTO must stay exactly the wire shape.
+- **Resolution happens in the producer, which is always injectable.** Every place that builds
+  exceptions is either a Dagger `@Provides` or an `@Inject` class, so it can take `DaxUrlProvider`
+  directly. For remote-config toggles that producer is `ToggleImpl`, fed by a `daxDomainResolver`
+  lambda on `FeatureToggles.Builder` that the codegen'd `*_ProxyModule` supplies. For the legacy
+  per-feature Room repositories it is the repository's own `@Provides`. There is no service-locator
+  holder, no install point, and therefore no window in which a domain resolves to null because
+  startup hadn't got far enough.
+- **Consumers read `DaxDomain`, never a String.** `Toggle.getExceptionDomains(): List<DaxDomain>`
+  replaces `getExceptions()` for matching; `getExceptions()` is `@Deprecated` and goes away once the
+  last matcher is migrated. Legacy repositories expose their exceptions as `List<DaxDomain>` when
+  their feature migrates. Entries whose `domain` has no resolvable host are dropped at the boundary
+  (`mapNotNull`), so consumers never null-check a domain.
+- **Caching a resolved `DaxDomain` is fine and expected.** Because resolution is eager at the
+  producer, a resolved list is a stable snapshot of a config version — repositories should hold
+  `List<DaxDomain>` in memory and re-resolve only when config changes. `ToggleImpl` memoizes its
+  resolved list against the `CachedToggleStore` `State` instance, so a config write invalidates it
+  automatically.
 - **Dependency direction.** The url-model is low-level. Higher-level code (`browser-api`'s
   `UriString`, `app`'s `QueryUrlConverter`) migrates to depend on / delegate to it — never the
   reverse. Do not add a `browser-api` dependency to `:unified-url-model-impl`.
@@ -166,7 +167,7 @@ stay distinct. They do **not** map to `DaxDomain`. Triaged:
 ## Risks / watch-items
 
 - **Hot-path performance.** The `matches(DaxDomain)` overload is load-bearing: exception domains
-  must be pre-parsed `DaxDomain`s (via the computed `daxDomain`) so `exceptions.any { … }` doesn't
+  must be pre-parsed `DaxDomain`s (resolved once at the producer) so `exceptions.any { … }` doesn't
   re-parse per iteration. Keep the memoizing mode (`memoize = true`) on the hot path.
 - **Migration boundary: String-based sites vs `Uri`-based sites.** The model is a *String*
   abstraction (pure-JVM api → `getUrl(String)`), so "recompute mode == today" only holds where the
@@ -187,37 +188,33 @@ stay distinct. They do **not** map to `DaxDomain`. Triaged:
   **Recommendation:** migrate String-holding sites first (the bulk of the value; recompute = today). For
   `Uri`-holding sites, either leave them on the `Uri` path, or — only if enough of them justify it —
   add a `Uri` entry point: a second, Android-level provider interface that accepts `Uri` (the
-  String-based `DaxUrlProvider` stays in the pure-JVM api for `DaxUrlResolver`/`feature-toggles-api`).
+  String-based `DaxUrlProvider` stays in the pure-JVM api for `feature-toggles-api`).
   That's the only thing that truly removes the round-trip parse.
 - **`RealDaxUrlProvider` no longer caches.** The bounded LRU was removed: the provider builds a fresh
   model per `getUrl`/`getDomain` call, and reuse is the caller's job. The hot-path caching layer is now
-  **per-`FeatureException` memoization** (`daxDomain` caches its non-null result into `resolved`) plus
+  **the producer-side resolved list** (exceptions resolved once per config version and held) plus
   resolving the incoming (child) URL once at the match boundary rather than per exception. If profiling
   later shows churn on true String-entry points you don't own (e.g. resource URLs handed over by the
   WebView), reintroduce a small dedup cache *there*, not as a blanket provider LRU.
-- **The self-heal only protects re-readers.** `daxDomain`'s retry-on-null lives in the getter, so it
-  helps only code that re-reads *through the getter*. A consumer that snapshots the resolved
-  `DaxDomain` into its own field gets zero protection — if it read before install, it caches null
-  forever. `RealMaliciousSiteProtectionRCRepository` is the cautionary case: it loads exceptions in an
-  `init{}` IO coroutine that can race/precede install, caching into a `@Volatile` field refreshed only
-  on `onPrivacyConfigDownloaded()`. Today it's safe *only* because it caches `Domain(raw)` strings (and
-  `daxDomain` there is merely a debug log); its log showing null-then-resolved was
-  `onPrivacyConfigDownloaded` firing a **second** load, not the getter guarantee — if that callback
-  doesn't fire this session (config already on disk), the first value is all it gets. This is exactly
-  why the migration rule is resolve-at-match-time.
+- **Early-load repositories are now safe by construction.** `RealMaliciousSiteProtectionRCRepository`
+  loads exceptions in an `init{}` IO coroutine and caches into a `@Volatile` field refreshed only on
+  `onPrivacyConfigDownloaded()`. Under the previous locator design that was a live hazard (it could
+  read before install and pin null forever). With resolution injected into the producer, the provider
+  is a constructor dependency — it cannot be absent when the load runs — so an `init{}`-block load
+  resolves correctly on the first pass.
 - **`UriString`'s LRU keys on `(child+parent).hashCode()`** — a hash used as the key, collision-prone
   (pre-existing latent bug). Fix when consolidating caching into the model.
 - **Behavior parity.** `getDomain` intentionally allows `localhost`/IPs; strict `isValidDomain`
   (rejects them) is opt-in via `type`. Don't silently tighten during migration.
-- **Provider install timing.** `DaxUrlResolver.resolve*` returns null until install (in
-  `onMainProcessCreate`, before any lifecycle observer). Safe for observer-based / post-`onCreate` URL
-  matching; **not** guaranteed to beat an `init{}`-block load. Correctness for such loads comes from
-  the resolve-at-match-time rule, not install ordering. Keep the `reset()` test hook in mind.
+- **Dagger cycle.** `RealDaxUrlProvider` injects `UnifiedUrlModelFeature` to read its own flag, and
+  every codegen'd `*_ProxyModule` now injects `DaxUrlProvider`. That is a cycle unless the generated
+  module takes `Lazy<DaxUrlProvider>` — it does. Anything else that injects `DaxUrlProvider` into a
+  feature-toggle provision point must do the same.
 
 ## Suggested order
 
 1. Add phase-2 `DaxUrl` members (path/query/type helpers). (The provider LRU has been removed;
-   caching is now per-`FeatureException` memoization + resolve-at-the-boundary — see risks.)
+   caching is now producer-side: exceptions resolved once per config version — see risks.)
 2. Migrate the hot-path exception matchers (privacy-config: https, contentblocking, trackingparameters,
    amplinks, gpc; request-filterer; TDS; cookies; autofill) to `daxUrl.matches(daxDomain)`.
 3. Migrate user-input validation (allowlist, fireproofing, auth-cookies) to `type`/`getValidDomain`.

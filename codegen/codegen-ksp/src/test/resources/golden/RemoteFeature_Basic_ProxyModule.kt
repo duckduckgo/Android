@@ -10,6 +10,7 @@ import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.url.DaxUrlProvider
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.IntoSet
@@ -27,7 +28,8 @@ public object TestFeature_ProxyModule {
     callback: FeatureTogglesCallback,
     appBuildConfig: AppBuildConfig,
     variantManager: VariantManager,
-  ): TestFeature = FeatureToggles.Builder()
+    daxUrlProvider: DaxUrlProvider,
+  ): TestFeature = FeatureToggles.Builder(daxDomainResolver = daxUrlProvider::getDomain)
       .store(toggleStore)
       .appVersionProvider({ appBuildConfig.versionCode })
       .flavorNameProvider({ appBuildConfig.flavor.name })

@@ -16,22 +16,33 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.domain
 
-import android.net.Uri
 import android.util.Patterns.IP_ADDRESS
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
+import com.duckduckgo.url.DaxUrl
+import com.duckduckgo.url.DaxUrlProvider
 import dev.zacsweers.metro.ContributesBinding
 import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
 
 interface UrlCanonicalization {
-    fun canonicalizeUrl(uri: Uri): Uri
+
+    /**
+     * The threat-feed canonical form of [url]: the shape whose host is hashed into a prefix lookup
+     * and whose String is matched against feed filter regexes.
+     *
+     * This normalization is the feed's, not the URL model's: it reads [DaxUrl.host] verbatim and
+     * strips `www.` only when `stripWWWPrefix` is enabled, so the remote flag stays authoritative over
+     * what gets hashed. [DaxUrl.domain] always strips it and must not feed the hash.
+     */
+    fun canonicalize(url: DaxUrl): DaxUrl
 }
 
 @ContributesBinding(AppScope::class)
 class RealUrlCanonicalization @Inject constructor(
     private val maliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature,
+    private val daxUrlProvider: DaxUrlProvider,
 ) : UrlCanonicalization {
 
     private val multipleDotsRegex = Regex("\\.{2,}")
@@ -57,15 +68,15 @@ class RealUrlCanonicalization @Inject constructor(
             .joinToString(".")
     }
 
-    override fun canonicalizeUrl(uri: Uri): Uri {
+    override fun canonicalize(url: DaxUrl): DaxUrl {
         return runCatching {
-            Uri.Builder()
-                .scheme(uri.scheme?.clean())
-                .encodedAuthority(uri.host?.clean()?.canonicalizeDomain())
-                .encodedPath(uri.path?.clean().canonicalizePath())
-                .encodedQuery(uri.query?.clean())
+            daxUrlProvider.builder()
+                .scheme(url.scheme)
+                .encodedHost(url.host?.clean()?.canonicalizeDomain())
+                .encodedPath(url.path?.clean().canonicalizePath())
+                .encodedQuery(url.query?.clean())
                 .build()
-        }.getOrDefault(uri)
+        }.getOrDefault(url)
     }
 
     private fun String.percentEncodePath(): String {

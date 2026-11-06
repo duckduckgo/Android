@@ -16,10 +16,9 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.domain
 
-import androidx.core.net.toUri
 import com.duckduckgo.common.test.FileUtilities
-import com.duckduckgo.common.utils.domain
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
+import com.duckduckgo.url.test.FakeDaxUrlProvider
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import junit.framework.TestCase.assertEquals
@@ -54,18 +53,19 @@ class DomainCanonicalizationReferenceTest(private val testCase: TestCase) {
     @get:org.junit.Rule
     var coroutineRule = com.duckduckgo.common.test.CoroutineTestRule()
     private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
+    private val daxUrlProvider = FakeDaxUrlProvider()
 
     private lateinit var testee: RealUrlCanonicalization
 
     @Before
     fun setup() {
         whenever(mockMaliciousSiteProtectionRCFeature.stripWWWPrefix()).thenReturn(true)
-        testee = RealUrlCanonicalization(mockMaliciousSiteProtectionRCFeature)
+        testee = RealUrlCanonicalization(mockMaliciousSiteProtectionRCFeature, daxUrlProvider)
     }
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
-        assertEquals(testCase.expectDomain, testee.canonicalizeUrl(testCase.siteURL.toUri()).domain())
+        assertEquals(testCase.expectDomain, testee.canonicalize(daxUrlProvider.getUrl(testCase.siteURL)).domain.toString())
     }
 
     data class TestCase(

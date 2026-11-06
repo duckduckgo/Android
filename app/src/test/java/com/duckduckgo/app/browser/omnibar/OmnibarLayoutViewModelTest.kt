@@ -154,11 +154,13 @@ class OmnibarLayoutViewModelTest {
         fakeStandardizedLeadingIconToggle = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "standardizedLeadingIcon",
+            daxDomainResolver = { null },
         ).build().create(StandardizedLeadingIconFeatureToggle::class.java)
 
         fakeOmnibarPreFillKillSwitch = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "omnibarPreFillKillSwitch",
+            daxDomainResolver = { null },
         ).build().create(OmnibarPreFillKillSwitch::class.java)
         fakeOmnibarPreFillKillSwitch.self().setRawStoredState(State(enable = true))
 

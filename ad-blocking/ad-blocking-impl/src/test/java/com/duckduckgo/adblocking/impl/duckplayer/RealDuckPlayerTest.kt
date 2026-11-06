@@ -93,7 +93,7 @@ class RealDuckPlayerTest {
     private val mockDuckPlayerLocalFilesPath: DuckPlayerLocalFilesPath = mock()
     private val mimeType: MimeTypeMap = mock()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
-    private val adBlockingExtensionFeature = FeatureToggles.Builder()
+    private val adBlockingExtensionFeature = FeatureToggles.Builder { null }
         .store(FakeToggleStore())
         .appVersionProvider { Int.MAX_VALUE }
         .featureName("adBlockingExtension")

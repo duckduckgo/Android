@@ -28,6 +28,12 @@ interface DaxUrlProvider {
     /** Parses [host] into a normalized [DaxDomain], or null when it has no resolvable host. */
     fun getDomain(host: String): DaxDomain?
 
+    /**
+     * A builder for assembling a [DaxUrl] from its parts. See [DaxUrlBuilder] for the encoding
+     * contract; [withScheme] is the single-component special case of it.
+     */
+    fun builder(): DaxUrlBuilder
+
     /** Returns a new [DaxUrl] with [url]'s scheme rewritten to [scheme] (was `Uri.toHttps`). */
     fun withScheme(url: DaxUrl, scheme: DaxScheme): DaxUrl
 

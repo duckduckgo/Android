@@ -30,6 +30,18 @@ interface DaxUrl {
     /** The normalized [DaxDomain] of this URL, or null when it has no resolvable host. */
     val domain: DaxDomain?
 
+    /**
+     * The host exactly as written (decoded, `www.` kept, case preserved), or null when there is none.
+     * For matching use [domain]; this is for byte-exact work such as hashing or re-serializing a URL.
+     */
+    val host: String?
+
+    /**
+     * The URL serialized exactly as it was built or parsed, for byte-exact work only: regex matching,
+     * hashing, cache keys. For comparison use [domain] or [matches], never this.
+     */
+    val serialized: String
+
     /** This URL's scheme. */
     val scheme: DaxScheme
 

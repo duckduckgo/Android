@@ -54,6 +54,7 @@ class RealMetricsPixelSenderTest {
         testFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "testFeature",
+            daxDomainResolver = { null },
         ).build().create(TestTriggerFeature::class.java)
 
         sender = RealMetricsPixelSender(fakePixel, store, coroutineRule.testDispatcherProvider)

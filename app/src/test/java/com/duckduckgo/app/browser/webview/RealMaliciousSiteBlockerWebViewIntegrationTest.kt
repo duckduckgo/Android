@@ -22,6 +22,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMali
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.WaitForConfirmation
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
+import com.duckduckgo.url.test.FakeDaxUrlProvider
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -36,7 +37,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -65,6 +66,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
         isMainProcess = true,
         exemptedUrlsHolder = mockExemptedUrlsHolder,
         pixel = mockPixel,
+        daxUrlProvider = FakeDaxUrlProvider(),
     )
 
     @Before
@@ -203,6 +205,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
             isMainProcess = true,
             exemptedUrlsHolder = mockExemptedUrlsHolder,
             pixel = mockPixel,
+            daxUrlProvider = FakeDaxUrlProvider(),
         )
         whenever(maliciousSiteProtection.isMalicious(any(), any())).thenReturn(ConfirmedResult(Malicious(MALWARE)))
         val subresource = mock(WebResourceRequest::class.java)
@@ -397,7 +400,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
         val result2 = testee.shouldIntercept(request, maliciousUri) {}
         verify(mockPixel, times(1)).fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to MALWARE.name.lowercase()))
-        verify(maliciousSiteProtection, times(1)).isMalicious(eq(maliciousUri), any())
+        verify(maliciousSiteProtection, times(1)).isMalicious(argThat { toString() == maliciousUri.toString() }, any())
 
         assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = true), result2)
     }

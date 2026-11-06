@@ -63,9 +63,9 @@ class EventHubMetricsSpecTest {
 
     private val metricsExtension = FakeMetricsPixelExtension()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
-    private val css = FeatureToggles.Builder().store(FakeToggleStore()).featureName("contentScopeExperiments").build()
+    private val css = FeatureToggles.Builder { null }.store(FakeToggleStore()).featureName("contentScopeExperiments").build()
         .create(CssExperiments::class.java)
-    private val blockList = FeatureToggles.Builder().store(FakeToggleStore()).featureName("blockList").build()
+    private val blockList = FeatureToggles.Builder { null }.store(FakeToggleStore()).featureName("blockList").build()
         .create(BlockList::class.java)
     private val contentScopeExperiments = object : ContentScopeExperiments {
         override suspend fun getActiveExperiments(): List<Toggle> = listOf(
