@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -31,7 +33,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -49,7 +53,18 @@ class RealNativeInputOmnibarControllerTest {
     private val tabsMenu = View(context).apply { id = R.id.tabsMenu }
     private val browserMenu = View(context).apply { id = R.id.browserMenu }
 
-    private val aiTitle = TextView(context).apply { id = R.id.aiTitle }
+    // :app unit tests run without Android resources, so the title's context serves the one string it reads.
+    private val aiTitleContext = object : ContextWrapper(context) {
+        private val resources = spy(context.resources).also {
+            doReturn("Duck.ai").whenever(it).getString(R.string.duckAiHeaderPaidTitle)
+        }
+
+        override fun getResources(): Resources = resources
+    }
+    private val aiTitle = TextView(aiTitleContext).apply {
+        id = R.id.aiTitle
+        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
     private val duckAIFreePill = View(context).apply { id = R.id.duckAIFreePill }
     private val duckAIFreePillUpgrade = View(context).apply { id = R.id.duckAIFreePillUpgrade }
     private val duckAIFreePillChevron = View(context).apply { id = R.id.duckAIFreePillChevron }
@@ -174,5 +189,25 @@ class RealNativeInputOmnibarControllerTest {
         testee.setTierVisible(true) // re-apply while still visible -> no re-fire
 
         assertEquals(1, impressions)
+    }
+
+    @Test
+    fun whenOverlayActiveAndTierPaidThenOmnibarLayoutDoesNotRequestAnotherLayout() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        whenever(rootView.findViewById<View?>(R.id.inputModeRoot)).thenReturn(View(context))
+        testee.updateTierTitle(DuckAiTier.Paid, {}) {}
+        testee.hideBackground()
+
+        layOut(omnibarView)
+
+        assertFalse(aiTitle.isLayoutRequested)
+    }
+
+    private fun layOut(view: View) {
+        view.measure(
+            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(200, View.MeasureSpec.EXACTLY),
+        )
+        view.layout(0, 0, 1000, 200)
     }
 }
