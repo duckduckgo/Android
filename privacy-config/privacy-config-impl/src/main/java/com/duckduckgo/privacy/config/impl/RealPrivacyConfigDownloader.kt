@@ -29,6 +29,9 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadEr
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadError.STORE_ERROR
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.WARN
 import logcat.logcat
 import retrofit2.HttpException
@@ -50,6 +53,7 @@ interface PrivacyConfigDownloader {
 }
 
 @WorkerThread
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPrivacyConfigDownloader @Inject constructor(
     private val privacyConfigService: PrivacyConfigService,
@@ -59,7 +63,13 @@ class RealPrivacyConfigDownloader @Inject constructor(
     private val telemetry: PrivacyConfigDownloadTelemetry,
 ) : PrivacyConfigDownloader {
 
-    override suspend fun download(): PrivacyConfigDownloader.ConfigDownloadResult {
+    private val downloadMutex = Mutex()
+
+    override suspend fun download(): PrivacyConfigDownloader.ConfigDownloadResult = downloadMutex.withLock {
+        downloadConfig()
+    }
+
+    private suspend fun downloadConfig(): PrivacyConfigDownloader.ConfigDownloadResult {
         logcat { "Downloading privacy config" }
 
         telemetry.onDownloadStarted()
