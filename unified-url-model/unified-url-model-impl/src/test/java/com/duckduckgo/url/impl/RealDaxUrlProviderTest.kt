@@ -22,6 +22,7 @@ import com.duckduckgo.url.DaxDomainType
 import com.duckduckgo.url.DaxScheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -284,7 +285,7 @@ class RealDaxUrlProviderTest {
             .encodedQuery("q=1")
             .build()
 
-        assertEquals("https://example.com/a/b?q=1", url.serialized)
+        assertEquals("https://example.com/a/b?q=1", (url as RealDaxUrl).raw)
     }
 
     @Test
@@ -297,7 +298,7 @@ class RealDaxUrlProviderTest {
             .encodedQuery(null)
             .build()
 
-        assertEquals("http://example.com/", url.serialized)
+        assertEquals("http://example.com/", (url as RealDaxUrl).raw)
     }
 
     @Test
@@ -309,7 +310,7 @@ class RealDaxUrlProviderTest {
             .encodedPath("/a")
             .build()
 
-        assertEquals("//example.com/a", url.serialized)
+        assertEquals("//example.com/a", (url as RealDaxUrl).raw)
     }
 
     // The verbatim contract: a component the caller already percent-encoded must survive the round
@@ -325,7 +326,7 @@ class RealDaxUrlProviderTest {
             .encodedQuery("q=%2F")
             .build()
 
-        assertEquals("https://example.com/a%20b%23c?q=%2F", url.serialized)
+        assertEquals("https://example.com/a%20b%23c?q=%2F", (url as RealDaxUrl).raw)
     }
 
     @Test
@@ -337,8 +338,29 @@ class RealDaxUrlProviderTest {
             .encodedPath("/a")
             .build()
 
-        assertEquals("https://www.example.com/a", url.serialized)
+        assertEquals("https://www.example.com/a", (url as RealDaxUrl).raw)
         assertEquals("example.com", url.domain?.toString())
+    }
+
+    @Test
+    fun whenRegexFoundAnywhereThenContainsMatch() {
+        whenever(toggle.isEnabled()).thenReturn(true)
+        val url = provider.getUrl("https://example.com/login?next=/account")
+
+        assertTrue(url.containsMatch(Regex("/login")))
+        assertTrue(url.containsMatch(Regex("^https://example\\.com/")))
+        assertFalse(url.containsMatch(Regex("^/login")))
+    }
+
+    @Test
+    fun whenBuiltFromSameStringThenUrlsAreEqualRegardlessOfMode() {
+        whenever(toggle.isEnabled()).thenReturn(true)
+        val memoized = provider.getUrl("https://example.com/a")
+        val recomputing = RealDaxUrl("https://example.com/a", memoize = false)
+
+        assertEquals(memoized, recomputing)
+        assertEquals(memoized.hashCode(), recomputing.hashCode())
+        assertNotEquals(memoized, provider.getUrl("https://example.com/b"))
     }
 
     @Test

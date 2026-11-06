@@ -24,6 +24,9 @@ package com.duckduckgo.url
  * than re-parsing a String. It lives in a pure-JVM `java-library` module (`:unified-url-model-api`)
  * so that `feature-toggles-api` can depend on it; concrete implementations that wrap
  * `android.net.Uri` / `okhttp3.HttpUrl` live in `:unified-url-model-impl`.
+ *
+ * Implementations provide value-based `equals`/`hashCode` over the URL as built or parsed, so a
+ * [DaxUrl] is usable as a cache key.
  */
 interface DaxUrl {
 
@@ -35,12 +38,6 @@ interface DaxUrl {
      * For matching use [domain]; this is for byte-exact work such as hashing or re-serializing a URL.
      */
     val host: String?
-
-    /**
-     * The URL serialized exactly as it was built or parsed, for byte-exact work only: regex matching,
-     * hashing, cache keys. For comparison use [domain] or [matches], never this.
-     */
-    val serialized: String
 
     /** This URL's scheme. */
     val scheme: DaxScheme
@@ -90,4 +87,11 @@ interface DaxUrl {
      * and so aren't re-parsed per iteration.
      */
     fun matches(other: DaxDomain): Boolean
+
+    /**
+     * True if [regex] matches anywhere in this URL exactly as it was built or parsed (`find`
+     * semantics, not a full match), which is how threat-feed and tracker filter rules are written.
+     * The serialized form never leaves the model; this is the one operation that reads it.
+     */
+    fun containsMatch(regex: Regex): Boolean
 }

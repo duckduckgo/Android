@@ -21,7 +21,7 @@ import com.duckduckgo.malicioussiteprotection.impl.domain.RealUrlCanonicalizatio
 import com.duckduckgo.url.test.FakeDaxUrlProvider
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -65,8 +65,11 @@ class URLCanonicalizationReferenceTest(private val testCase: TestCase) {
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
-        assertEquals(testCase.expectURL, testee.canonicalize(daxUrlProvider.getUrl(testCase.siteURL)).serialized)
+        assertTrue(testee.canonicalize(daxUrlProvider.getUrl(testCase.siteURL)).containsMatch(exactly(testCase.expectURL)))
     }
+
+    // The model never hands out its serialized form; an anchored literal regex is the byte-exact check.
+    private fun exactly(expected: String) = Regex("^${Regex.escape(expected)}$")
 
     data class TestCase(
         val name: String,

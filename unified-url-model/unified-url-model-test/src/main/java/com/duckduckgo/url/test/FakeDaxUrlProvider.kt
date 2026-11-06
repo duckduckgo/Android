@@ -141,7 +141,11 @@ internal class FakeDaxUrl(private val raw: String) : DaxUrl {
 
     override fun matches(other: DaxDomain): Boolean = other.sameOrSubdomain(domain ?: return false)
 
-    override val serialized: String get() = raw
+    override fun containsMatch(regex: Regex): Boolean = regex.containsMatchIn(raw)
+
+    override fun equals(other: Any?): Boolean = other is FakeDaxUrl && other.raw == raw
+
+    override fun hashCode(): Int = raw.hashCode()
 }
 
 /**

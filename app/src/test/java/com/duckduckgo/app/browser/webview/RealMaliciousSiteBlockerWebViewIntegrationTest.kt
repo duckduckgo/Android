@@ -37,7 +37,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -400,7 +400,7 @@ class RealMaliciousSiteBlockerWebViewIntegrationTest {
 
         val result2 = testee.shouldIntercept(request, maliciousUri) {}
         verify(mockPixel, times(1)).fire(AppPixelName.MALICIOUS_SITE_DETECTED_IN_IFRAME, mapOf("category" to MALWARE.name.lowercase()))
-        verify(maliciousSiteProtection, times(1)).isMalicious(argThat { toString() == maliciousUri.toString() }, any())
+        verify(maliciousSiteProtection, times(1)).isMalicious(eq(FakeDaxUrlProvider().getUrl(maliciousUri.toString())), any())
 
         assertEquals(MaliciousSite(maliciousUri, MALWARE, exempted = false, clientSideHit = true), result2)
     }

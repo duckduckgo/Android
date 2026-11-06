@@ -57,9 +57,6 @@ internal class RealDaxUrl(
     override val host: String?
         get() = uri.host
 
-    override val serialized: String
-        get() = raw
-
     override val scheme: DaxScheme by held(memoize) { DaxScheme.fromValue(uri.scheme) }
 
     override val isWebUrl: Boolean by held(memoize) { webUrlFrom(uri) }
@@ -99,6 +96,14 @@ internal class RealDaxUrl(
     override fun matches(other: DaxUrl): Boolean = matches(other.domain ?: return false)
 
     override fun matches(other: DaxDomain): Boolean = other.sameOrSubdomain(domain ?: return false)
+
+    override fun containsMatch(regex: Regex): Boolean = regex.containsMatchIn(raw)
+
+    // By [raw], not by mode: a memoized and a recomputing URL built from the same String are equal,
+    // mirroring RealDaxDomain, so the flag never changes what a cache keyed by DaxUrl sees.
+    override fun equals(other: Any?): Boolean = other is RealDaxUrl && other.raw == raw
+
+    override fun hashCode(): Int = raw.hashCode()
 
     // Mirrors UriString.isWebUrl (default, no search-query disambiguation — a DaxUrl is already a
     // URL). The two should converge, with UriString eventually delegating here. Takes the parsed

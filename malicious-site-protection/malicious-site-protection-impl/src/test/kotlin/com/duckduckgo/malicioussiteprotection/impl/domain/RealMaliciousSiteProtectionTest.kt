@@ -184,7 +184,7 @@ class RealMaliciousSiteProtectionTest {
         whenever(mockMaliciousSiteRepository.getFeedForHashPrefix(hashPrefix)).thenReturn(PHISHING)
         whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(FilterSet(filter, PHISHING))
         whenever(mockMaliciousSiteRepository.matches(hashPrefix.substring(0, 4)))
-            .thenReturn(Result(listOf(Match(hostname, url.serialized, ".*malicious.*", hash, PHISHING))))
+            .thenReturn(Result(listOf(Match(hostname, "https://malicious.com", ".*malicious.*", hash, PHISHING))))
 
         realMaliciousSiteProtection.isMalicious(url) {
             onSiteBlockedAsyncCalled = true
@@ -207,7 +207,7 @@ class RealMaliciousSiteProtectionTest {
         whenever(mockMaliciousSiteRepository.getFeedForHashPrefix(hashPrefix)).thenReturn(PHISHING)
         whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(FilterSet(filter, PHISHING))
         whenever(mockMaliciousSiteRepository.matches(hashPrefix.substring(0, 4)))
-            .thenReturn(Result(listOf(Match(hostname, url.serialized, ".*malicious.*", hash, SCAM))))
+            .thenReturn(Result(listOf(Match(hostname, "https://malicious.com", ".*malicious.*", hash, SCAM))))
 
         realMaliciousSiteProtection.isMalicious(url) { status: MaliciousStatus ->
             onSiteBlockedAsyncCalled = true

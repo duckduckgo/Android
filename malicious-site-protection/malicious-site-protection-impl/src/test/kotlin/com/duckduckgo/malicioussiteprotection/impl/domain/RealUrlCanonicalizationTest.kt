@@ -19,6 +19,7 @@ package com.duckduckgo.malicioussiteprotection.impl.domain
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.duckduckgo.url.test.FakeDaxUrlProvider
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -32,6 +33,8 @@ class RealUrlCanonicalizationTest {
     private val daxUrlProvider = FakeDaxUrlProvider()
     private val testee = RealUrlCanonicalization(rcFeature, daxUrlProvider)
 
+    private fun exactly(expected: String) = Regex("^${Regex.escape(expected)}$")
+
     @Test
     fun whenStripWWWPrefixDisabledThenCanonicalHostKeepsWWW() {
         whenever(rcFeature.stripWWWPrefix()).thenReturn(false)
@@ -39,7 +42,7 @@ class RealUrlCanonicalizationTest {
         val canonical = testee.canonicalize(daxUrlProvider.getUrl("https://www.example.com/path"))
 
         assertEquals("www.example.com", canonical.host)
-        assertEquals("https://www.example.com/path", canonical.serialized)
+        assertTrue(canonical.containsMatch(exactly("https://www.example.com/path")))
     }
 
     @Test
@@ -49,6 +52,6 @@ class RealUrlCanonicalizationTest {
         val canonical = testee.canonicalize(daxUrlProvider.getUrl("https://www.example.com/path"))
 
         assertEquals("example.com", canonical.host)
-        assertEquals("https://example.com/path", canonical.serialized)
+        assertTrue(canonical.containsMatch(exactly("https://example.com/path")))
     }
 }
