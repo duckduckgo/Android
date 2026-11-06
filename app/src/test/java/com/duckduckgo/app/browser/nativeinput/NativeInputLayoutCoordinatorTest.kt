@@ -193,7 +193,7 @@ class NativeInputLayoutCoordinatorTest {
             addView(widget, CoordinatorLayout.LayoutParams(MATCH_PARENT, CARD_TOP_MARGIN_PX + CARD_HEIGHT_PX).apply { gravity = Gravity.BOTTOM })
         }
         activity.setContentView(root)
-        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
 
         coordinator.configureNewChatHints(widget, hints)
         root.addView(hints)
