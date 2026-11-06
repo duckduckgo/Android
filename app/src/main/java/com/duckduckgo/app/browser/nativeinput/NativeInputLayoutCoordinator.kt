@@ -186,28 +186,27 @@ class NativeInputLayoutCoordinator(
             focusedView?.removeOnLayoutChangeListener(layoutListener)
         }
         addListeners()
-        widgetView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) {
-                    if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
-                        addListeners()
-                        v.post { applyForWidgetPosition() }
-                    }
+        val attachListener = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+                    addListeners()
+                    v.post { applyForWidgetPosition() }
                 }
+            }
 
-                override fun onViewDetachedFromWindow(v: View) {
-                    if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
-                        removeListeners()
-                    } else {
-                        applyPadding(deltaTop = 0, deltaBottom = 0)
-                        reapplyAutocompleteOffset = null
-                        restoreFloats.forEach { it() }
-                        removeListeners()
-                        v.removeOnAttachStateChangeListener(this)
-                    }
+            override fun onViewDetachedFromWindow(v: View) {
+                if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+                    removeListeners()
+                } else {
+                    applyPadding(deltaTop = 0, deltaBottom = 0)
+                    reapplyAutocompleteOffset = null
+                    restoreFloats.forEach { it() }
+                    removeListeners()
+                    v.removeOnAttachStateChangeListener(this)
                 }
-            },
-        )
+            }
+        }
+        widgetView.addOnAttachStateChangeListener(attachListener)
     }
 
     // Clears the CoordinatorLayout behavior and raises elevation so the view floats over
@@ -421,39 +420,38 @@ class NativeInputLayoutCoordinator(
             ntpObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
         }
         addListeners()
-        widgetView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) {
-                    if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
-                        addListeners()
-                        v.post { applyOffset() }
-                    }
+        val attachListener = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+                    addListeners()
+                    v.post { applyOffset() }
                 }
+            }
 
-                override fun onViewDetachedFromWindow(v: View) {
-                    if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
-                        removeListeners()
-                    } else {
-                        ntpGroup?.layoutTransition = previousNtpTransition
-                        pendingContentLayoutTransition = null
-                        widgetAnimationFrameHandler = null
-                        reapplyContentOffset = null
-                        resetContentOffset = null
-                        isWidgetAnimating = false
-                        contentTransitionGroup = null
-                        suspendedContentTransition = null
-                        isContentReflowSuspended = false
-                        isReflowSuspendRequested = false
-                        targets.forEach { target ->
-                            applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
-                        }
-                        clearNtpScrollArtifacts()
-                        removeListeners()
-                        v.removeOnAttachStateChangeListener(this)
+            override fun onViewDetachedFromWindow(v: View) {
+                if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+                    removeListeners()
+                } else {
+                    ntpGroup?.layoutTransition = previousNtpTransition
+                    pendingContentLayoutTransition = null
+                    widgetAnimationFrameHandler = null
+                    reapplyContentOffset = null
+                    resetContentOffset = null
+                    isWidgetAnimating = false
+                    contentTransitionGroup = null
+                    suspendedContentTransition = null
+                    isContentReflowSuspended = false
+                    isReflowSuspendRequested = false
+                    targets.forEach { target ->
+                        applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
+                    clearNtpScrollArtifacts()
+                    removeListeners()
+                    v.removeOnAttachStateChangeListener(this)
                 }
-            },
-        )
+            }
+        }
+        widgetView.addOnAttachStateChangeListener(attachListener)
     }
 
     /**
