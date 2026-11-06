@@ -44,7 +44,7 @@ class AnrSupervisor @Inject constructor(
 
     override fun onOpen(isFreshLaunch: Boolean) {
         synchronized(anrSupervisorRunnable) {
-            if (!Debug.isDebuggerConnected() && anrSupervisorRunnable.shouldStartOnOpen()) {
+            if (!Debug.isDebuggerConnected() && anrSupervisorRunnable.claimRunOnOpen()) {
                 executor.execute(anrSupervisorRunnable)
             }
         }
@@ -84,8 +84,8 @@ class AnrSupervisorRunnable @Inject constructor(
     val isStopped
         get() = stopped.get()
 
-    /** Called under this runnable's lock; true when the caller must start a new run. */
-    fun shouldStartOnOpen(): Boolean {
+    /** Called under this runnable's lock; re-arms a live run, or claims a new one and returns true so the caller starts it. */
+    fun claimRunOnOpen(): Boolean {
         if (!nonBlockingLifecycle) return isStopped
         // Re-arm a run that is still alive (e.g. in its stop grace period) instead of queueing a second one.
         unstop()
