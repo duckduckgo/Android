@@ -403,24 +403,27 @@ class NativeInputLayoutCoordinator(
         // every global layout pass — broad by design; kept cheap via the isWidgetAnimating skip and
         // no-op applyPadding. Needed in both modes: bottom mode's nav bar top inset also flips with
         // logo-only transitions (hatch/RMF/AppTP banner appearing).
-        val ntpContentView = newTabContent
         val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
             if (isWidgetAnimating) return@OnGlobalLayoutListener
             applyOffset()
         }
-        // Keep the observer we registered on. When the fragment view detaches, the NTP content is
-        // gone before the widget, so `ntpContentView.viewTreeObserver` at cleanup time is a new
-        // object and removing from it would be no-op and leak this listener.
-        val ntpObserver = ntpContentView?.viewTreeObserver
+
+        // In order to avoid leaking the globalLayoutListener, keep a reference to the observer
+        // that we used to register the listener on and unregister from it on detach.
+        var ntpObserver: ViewTreeObserver? = null
+
         fun addListeners() {
             widgetView.addOnLayoutChangeListener(layoutListener)
             rootView.addOnLayoutChangeListener(layoutListener)
-            ntpObserver?.addOnGlobalLayoutListener(globalLayoutListener)
+            ntpObserver = newTabContent.viewTreeObserver?.also {
+                it.addOnGlobalLayoutListener(globalLayoutListener)
+            }
         }
         fun removeListeners() {
             widgetView.removeOnLayoutChangeListener(layoutListener)
             rootView.removeOnLayoutChangeListener(layoutListener)
             ntpObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
+            ntpObserver = null
         }
         addListeners()
         val attachListener = object : View.OnAttachStateChangeListener {
