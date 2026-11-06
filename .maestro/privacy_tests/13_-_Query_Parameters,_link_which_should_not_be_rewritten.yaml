@@ -6,11 +6,9 @@ tags:
 - retry:
       maxRetries: 3
       commands:
-            - launchApp:
-                clearState: true
-            - runFlow: ../shared/skip_all_onboarding.yaml
-            - inputText: "https://privacy-test-pages.site/privacy-protections/query-parameters/"
-            - pressKey: Enter
+            - clearState
+            - openLink:
+                link: "duck://https://privacy-test-pages.site/privacy-protections/query-parameters/"
             - assertVisible:
                 text: "Link which should not be rewritten"
             - tapOn:

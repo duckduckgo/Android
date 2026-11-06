@@ -6,14 +6,10 @@ tags:
 - retry:
       maxRetries: 3
       commands:
-            - launchApp:
-                clearState: true
-            - runFlow: ../shared/skip_all_onboarding.yaml
-            - tapOn:
-                id: "omnibarTextInput|inputField"
+            - clearState
             # Test 1 - using line-separator (U+2028) character
-            - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2028.html"
-            - pressKey: Enter
+            - openLink:
+                link: "duck://https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2028.html"
 
             - tapOn: "run"
             - assertVisible: "Example Domain"

@@ -9,17 +9,11 @@ tags:
 - retry:
     maxRetries: 3
     commands:
-      - launchApp:
-          clearState: true
-
-      - runFlow: ../../shared/skip_all_onboarding.yaml
-      - hideKeyboard
+      - clearState
 
       # get to autofill form
-      - tapOn:
-          id: "omnibarTextInput|inputField"
-      - inputText: "https://autofill.me/form/login-simple"
-      - pressKey: Enter
+      - openLink:
+          link: "duck://https://autofill.me/form/login-simple"
 
       # simulate a partial login form by first submitting just the username
       - tapOn: "Username"

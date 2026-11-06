@@ -7,16 +7,10 @@ tags:
 - retry:
       maxRetries: 3
       commands:
-            - launchApp:
-                  clearState: true
-                  stopApp: true
+            - clearState
 
-            - runFlow: ../shared/skip_all_onboarding.yaml
-
-            - tapOn:
-                id: "omnibarTextInput|inputField"
-            - inputText: "https://privacy-test-pages.site"
-            - pressKey: Enter
+            - openLink:
+                link: "duck://https://privacy-test-pages.site"
             - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
             - assertVisible:
                 text: "0 trackers blocked in the last 7 days"
