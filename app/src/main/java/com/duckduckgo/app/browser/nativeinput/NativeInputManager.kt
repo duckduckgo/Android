@@ -217,6 +217,7 @@ class RealNativeInputManager @Inject constructor(
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
     private val newChatHintsRenderer: NewChatHintsRenderer,
+    private val nativeInputLayoutFixKillSwitch: NativeInputLayoutFixKillSwitch,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -306,7 +307,7 @@ class RealNativeInputManager @Inject constructor(
     ) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
-        this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
+        this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController, nativeInputLayoutFixKillSwitch)
         duckChat.observeNativeChatInputEnabled()
             .onEach { isEnabled ->
                 val wasEnabled = isNativeChatInputEnabled

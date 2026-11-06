@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.R
 class NativeInputLayoutCoordinator(
     private val rootView: ViewGroup,
     private val omnibarState: OmnibarState,
+    private val nativeInputLayoutFixKillSwitch: NativeInputLayoutFixKillSwitch,
 ) {
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
 
