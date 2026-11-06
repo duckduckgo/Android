@@ -4028,7 +4028,11 @@ class BrowserTabFragment :
                     )
                     setChatMenuItemText(
                         com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab,
-                        if (plusMenuUpdateEnabled) R.string.search else com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab,
+                        if (plusMenuUpdateEnabled) {
+                            com.duckduckgo.mobile.android.R.string.search
+                        } else {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab
+                        },
                     )
                     chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }

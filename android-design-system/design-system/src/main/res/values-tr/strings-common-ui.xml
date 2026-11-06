@@ -33,6 +33,7 @@
     <string name="undo">Geri al</string>
     <string name="cancel">Vazgeç</string>
     <string name="done">Bitti</string>
+    <string name="search">Arama yap</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Her Zaman Açık</string>
