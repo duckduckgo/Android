@@ -216,6 +216,38 @@ class NewTabTransitionCoordinatorTest {
     }
 
     @Test
+    fun relistingATabWhosePictureArrivedLeavesTheDecisionToItsRegistration() {
+        testee.onTabShowing("source", container)
+        val picture = CompletableDeferred<Bitmap?>()
+        register("added", picture)
+        testee.onTabsChanged(listOf("source", "added"), container)
+        picture.complete(Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888))
+
+        testee.onTabsChanged(listOf("source", "added"), container)
+        assertNotPlaying()
+        assertTrue(runningChanges.isEmpty())
+
+        testee.onTabRegistered("added", listedTabIds = listOf("source", "added"), visibleTabId = "added", container)
+        assertNotPlaying()
+        assertTrue(runningChanges.isEmpty())
+        assertEquals(null, pendingTransitions.peek("added"))
+    }
+
+    @Test
+    fun relistedTabStillHiddenAtItsRegistrationIsCovered() {
+        testee.onTabShowing("source", container)
+        val picture = CompletableDeferred<Bitmap?>()
+        register("added", picture)
+        testee.onTabsChanged(listOf("source", "added"), container)
+        picture.complete(Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888))
+        testee.onTabsChanged(listOf("source", "added"), container)
+
+        testee.onTabRegistered("added", listedTabIds = listOf("source", "added"), visibleTabId = "source", container)
+
+        assertCovered()
+    }
+
+    @Test
     fun anotherSelectionWhileAwaitingPictureDropsTheTransition() {
         testee.onTabShowing("source", container)
         val picture = CompletableDeferred<Bitmap?>()

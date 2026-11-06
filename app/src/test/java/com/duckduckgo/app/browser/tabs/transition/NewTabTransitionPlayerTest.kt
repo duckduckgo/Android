@@ -22,10 +22,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Looper
 import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewOverlay
 import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -194,6 +196,24 @@ class NewTabTransitionPlayerTest {
     }
 
     @Test
+    fun cancelMidTransitionResetsThePictureAndRemovesTheDim() {
+        testee.play(container, picture(), motion)
+        // The cover was hidden at the last layout, so it has no width to slide by until it's laid out again.
+        root.layoutAt(WIDTH, HEIGHT)
+        repeat(5) { tick(animator(), deltaMs = 20) }
+
+        assertTrue(cover.scaleX < 1f)
+        assertTrue(cover.scaleY < 1f)
+        assertTrue(cover.translationX < 0f)
+        assertTrue(dim().alpha > 0)
+        assertTrue(dimInOverlay())
+
+        testee.cancel()
+
+        assertRestored()
+    }
+
+    @Test
     fun playWhileRunningCleansUpFirst() {
         var firstEnded = 0
         testee.play(container, picture(), motion) { firstEnded++ }
@@ -214,6 +234,50 @@ class NewTabTransitionPlayerTest {
 
         assertRestored()
         assertEquals(1, ended)
+    }
+
+    @Test
+    fun coverWithMismatchedPictureEndsAtOnce() {
+        var ended = 0
+
+        testee.cover(container, Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)) { ended++ }
+
+        assertRestored()
+        assertEquals(1, ended)
+    }
+
+    @Test
+    fun coverWithMismatchedPictureReplacingACoverEndsBoth() {
+        var firstEnded = 0
+        var secondEnded = 0
+        testee.cover(container, picture()) { firstEnded++ }
+
+        testee.cover(container, Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)) { secondEnded++ }
+        assertRestored()
+
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(1_500))
+        assertEquals(1, firstEnded)
+        assertEquals(1, secondEnded)
+    }
+
+    @Test
+    fun replacedCoversTimeoutDoesNotEndTheNextCover() {
+        var firstEnded = 0
+        var secondEnded = 0
+        testee.cover(container, picture()) { firstEnded++ }
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(400))
+
+        testee.cover(container, picture()) { secondEnded++ }
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(600))
+        assertEquals(0f, container.alpha, DELTA)
+        assertEquals(View.VISIBLE, cover.visibility)
+        assertTrue(state.isRunning.value)
+        assertEquals(1, firstEnded)
+        assertEquals(0, secondEnded)
+
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(400))
+        assertRestored()
+        assertEquals(1, secondEnded)
     }
 
     @Test
@@ -362,7 +426,29 @@ class NewTabTransitionPlayerTest {
         assertSame(containerBackground, container.background)
         assertEquals(View.GONE, cover.visibility)
         assertNull(cover.drawable)
+        assertEquals(1f, cover.scaleX, DELTA)
+        assertEquals(1f, cover.scaleY, DELTA)
+        assertEquals(0f, cover.translationX, DELTA)
+        assertFalse(dimInOverlay())
         assertFalse(state.isRunning.value)
+    }
+
+    private fun dim(): Drawable = NewTabTransitionPlayer::class.java.getDeclaredField("dim").run {
+        isAccessible = true
+        get(testee) as Drawable
+    }
+
+    // ViewOverlay has no public way to list what it holds.
+    private fun dimInOverlay(): Boolean {
+        val group = ViewOverlay::class.java.getDeclaredField("mOverlayViewGroup").run {
+            isAccessible = true
+            get(cover.overlay)
+        }
+        val drawables = group.javaClass.getDeclaredField("mDrawables").run {
+            isAccessible = true
+            get(group) as List<*>?
+        }.orEmpty()
+        return dim() in drawables
     }
 
     // "Remove animations": the animator's own scale (read from API 33) and the system setting it mirrors (read below that).
