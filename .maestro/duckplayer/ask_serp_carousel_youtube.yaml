@@ -7,6 +7,8 @@ name: "DuckPlayer: Ask > SERP > Carousel > YouTube"
 - retry:
     maxRetries: 3
     commands:
+      # Maestro Cloud requires launchApp first; clearState then drops the onboarding it starts.
+      - launchApp
       - clearState
       - runFlow: common/load_serp_video_carousel.yaml
       - runFlow: common/serp_dialog_youtube.yaml

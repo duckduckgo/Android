@@ -7,6 +7,8 @@ tags:
 - retry:
     maxRetries: 3
     commands:
+      # Maestro Cloud requires launchApp first; clearState then drops the onboarding it starts.
+      - launchApp
       - clearState
       - runFlow: common/enable_duck_player_always.yaml
       - runFlow: common/load_youtube_video.yaml
