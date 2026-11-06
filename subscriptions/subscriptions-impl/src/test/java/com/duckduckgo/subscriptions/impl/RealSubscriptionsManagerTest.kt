@@ -3013,6 +3013,27 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenRefreshSubscriptionDataWithPlanCountryThenStoresPlanCountry() = runTest {
+        givenUserIsSignedIn()
+        whenever(subscriptionsService.subscription()).thenReturn(
+            SubscriptionResponse(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1234,
+                platform = "stripe",
+                status = "Auto-Renewable",
+                activeOffers = listOf(),
+                planCountry = "DE",
+            ),
+        )
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        assertEquals("DE", subscriptionsManager.getSubscription()!!.planCountry)
+    }
+
+    @Test
     fun whenRefreshSubscriptionDataWithNoPendingPlansThenStoresEmptyList() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionSucceedsWithNoPendingPlans()

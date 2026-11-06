@@ -67,6 +67,7 @@ class RealAuthRepositoryTest {
         authStore.startedAt = 1000L
         authStore.expiresOrRenewsAt = 1000L
         authStore.platform = "google"
+        authStore.planCountry = "US"
         authStore.productId = "productId"
         authStore.entitlements = "[]"
 
@@ -77,6 +78,7 @@ class RealAuthRepositoryTest {
         assertNull(authStore.startedAt)
         assertNull(authStore.expiresOrRenewsAt)
         assertNull(authStore.platform)
+        assertNull(authStore.planCountry)
         assertNull(authStore.productId)
         assertEquals("[]", authStore.entitlements)
     }
@@ -501,5 +503,52 @@ class RealAuthRepositoryTest {
         assertEquals(1, subscription!!.pendingPlans.size)
         assertEquals("ddg-privacy-pro-yearly-renews-us", subscription.pendingPlans[0].productId)
         assertTrue(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenSetSubscriptionWithPlanCountryThenStorePlanCountry() = runTest {
+        authRepository.setSubscription(
+            Subscription(
+                productId = "ddg-subscription-pro-monthly-renews-us",
+                billingPeriod = "monthly",
+                startedAt = 1234L,
+                expiresOrRenewsAt = 5678L,
+                status = AUTO_RENEWABLE,
+                platform = "stripe",
+                activeOffers = emptyList(),
+                planCountry = "DE",
+            ),
+        )
+
+        assertEquals("DE", authStore.planCountry)
+    }
+
+    @Test
+    fun whenGetSubscriptionWithPlanCountryThenPlanCountryReturned() = runTest {
+        authStore.productId = "ddg-subscription-pro-monthly-renews-us"
+        authStore.billingPeriod = "monthly"
+        authStore.startedAt = 1234L
+        authStore.expiresOrRenewsAt = 5678L
+        authStore.status = AUTO_RENEWABLE.statusName
+        authStore.platform = "stripe"
+        authStore.planCountry = "DE"
+
+        val subscription = authRepository.getSubscription()
+
+        assertEquals("DE", subscription!!.planCountry)
+    }
+
+    @Test
+    fun whenGetSubscriptionWithoutPlanCountryThenPlanCountryIsNull() = runTest {
+        authStore.productId = "ddg-subscription-pro-monthly-renews-us"
+        authStore.billingPeriod = "monthly"
+        authStore.startedAt = 1234L
+        authStore.expiresOrRenewsAt = 5678L
+        authStore.status = AUTO_RENEWABLE.statusName
+        authStore.platform = "google"
+
+        val subscription = authRepository.getSubscription()
+
+        assertNull(subscription!!.planCountry)
     }
 }

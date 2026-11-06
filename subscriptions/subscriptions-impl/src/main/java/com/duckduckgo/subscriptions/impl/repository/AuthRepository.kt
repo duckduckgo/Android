@@ -203,6 +203,7 @@ internal class RealAuthRepository constructor(
             expiresOrRenewsAt = subscription?.expiresOrRenewsAt
             status = subscription?.status?.statusName
             platform = subscription?.platform
+            planCountry = subscription?.planCountry
             freeTrialActive = subscription?.activeOffers?.contains(ActiveOfferType.TRIAL) ?: false
             pendingPlans = subscription?.pendingPlans?.let { plans ->
                 if (plans.isEmpty()) {
@@ -256,6 +257,7 @@ internal class RealAuthRepository constructor(
             platform = platform,
             activeOffers = activeOffers,
             pendingPlans = pendingPlans,
+            planCountry = subscriptionsDataStore.planCountry,
         )
     }
 
@@ -413,6 +415,7 @@ data class Subscription(
     val platform: String,
     val activeOffers: List<ActiveOfferType>,
     val pendingPlans: List<PendingPlan> = emptyList(),
+    val planCountry: String? = null,
 ) {
     fun isActive(): Boolean = status.isActive()
 

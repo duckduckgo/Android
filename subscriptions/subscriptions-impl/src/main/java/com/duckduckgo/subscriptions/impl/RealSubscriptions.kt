@@ -421,6 +421,12 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun stripeTierOptions(): Toggle
 
+    /**
+     * When enabled, Stripe products are fetched for the subscription's country
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun stripeTierOptionsByCountry(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),

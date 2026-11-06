@@ -37,6 +37,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -88,7 +91,7 @@ class RealStripePlansHandlerTest {
 
     @Test
     fun whenGetTierOptionsThenMapStripeProductsToJson() = runTest {
-        whenever(stripeTierOptionsProvider.getTierProducts(any())).thenReturn(
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(
             listOf(
                 StripeTierProduct(
                     tier = "plus",
@@ -116,11 +119,44 @@ class RealStripePlansHandlerTest {
     @Test
     fun whenGetTierOptionsThenProTierFollowsProFlag() = runTest {
         subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
-        whenever(stripeTierOptionsProvider.getTierProducts(any())).thenReturn(emptyList())
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(emptyList())
 
         handler.getTierOptions()
 
-        verify(stripeTierOptionsProvider).getTierProducts(includeProTier = false)
+        verify(stripeTierOptionsProvider).getTierProducts(includeProTier = false, country = null)
+    }
+
+    @Test
+    fun whenByCountryFlagEnabledThenRequestProductsForPlanCountry() = runTest {
+        givenStripeTierOptionsByCountryEnabled(true)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(platform = "stripe", planCountry = "DE"))
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(emptyList())
+
+        handler.getTierOptions()
+
+        verify(stripeTierOptionsProvider).getTierProducts(any(), eq("DE"))
+    }
+
+    @Test
+    fun whenByCountryFlagEnabledAndNoPlanCountryThenRequestProductsWithoutCountry() = runTest {
+        givenStripeTierOptionsByCountryEnabled(true)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(platform = "stripe"))
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(emptyList())
+
+        handler.getTierOptions()
+
+        verify(stripeTierOptionsProvider).getTierProducts(any(), isNull())
+    }
+
+    @Test
+    fun whenByCountryFlagDisabledThenRequestProductsWithoutCountry() = runTest {
+        givenStripeTierOptionsByCountryEnabled(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(platform = "stripe", planCountry = "DE"))
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(emptyList())
+
+        handler.getTierOptions()
+
+        verify(stripeTierOptionsProvider).getTierProducts(any(), isNull())
     }
 
     @Test
@@ -163,7 +199,15 @@ class RealStripePlansHandlerTest {
         subscriptionsFeature.stripeTierOptions().setRawStoredState(Toggle.State(enable = enabled))
     }
 
-    private fun subscription(platform: String, status: SubscriptionStatus = AUTO_RENEWABLE) = Subscription(
+    private fun givenStripeTierOptionsByCountryEnabled(enabled: Boolean) {
+        subscriptionsFeature.stripeTierOptionsByCountry().setRawStoredState(Toggle.State(enable = enabled))
+    }
+
+    private fun subscription(
+        platform: String,
+        status: SubscriptionStatus = AUTO_RENEWABLE,
+        planCountry: String? = null,
+    ) = Subscription(
         productId = "productId",
         billingPeriod = "Monthly",
         startedAt = 1234,
@@ -171,5 +215,6 @@ class RealStripePlansHandlerTest {
         status = status,
         platform = platform,
         activeOffers = listOf(),
+        planCountry = planCountry,
     )
 }

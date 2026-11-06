@@ -68,7 +68,12 @@ class RealStripePlansHandler @Inject constructor(
 
     override suspend fun getTierOptions(): SubscriptionTierOptionsJson {
         val includeProTier = subscriptionsFeature.allowProTierPurchase().isEnabled()
-        val products = stripeTierOptionsProvider.getTierProducts(includeProTier).map { product ->
+        val country = if (subscriptionsFeature.stripeTierOptionsByCountry().isEnabled()) {
+            subscriptionsManager.getSubscription()?.planCountry
+        } else {
+            null
+        }
+        val products = stripeTierOptionsProvider.getTierProducts(includeProTier, country).map { product ->
             ProductJson(
                 tier = product.tier,
                 features = product.features.map { TierFeatureJson(product = it.product, name = it.name) },
