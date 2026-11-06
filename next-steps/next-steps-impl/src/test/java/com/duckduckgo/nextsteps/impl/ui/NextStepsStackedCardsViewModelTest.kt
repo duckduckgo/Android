@@ -80,7 +80,7 @@ class NextStepsStackedCardsViewModelTest {
     private val clock: CurrentTimeProvider = mock {
         whenever(it.localDateTimeNow()).thenReturn(LocalDateTime.of(2026, 10, 21, 12, 0))
     }
-    private val telemetry = RealNextStepsTelemetry(telemetryStore, pixels, clock, coroutineRule.testDispatcherProvider)
+    private val telemetry = RealNextStepsTelemetry(telemetryStore, pixels, mock(), clock, coroutineRule.testDispatcherProvider)
     private val defaultBrowserCheck = FakeCompletionCheck("setup_default_browser")
     private val addWidgetCheck = FakeCompletionCheck("setup_add_widget")
     private val syncCheck = FakeCompletionCheck("setup_sync")
