@@ -53,6 +53,8 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.Job
@@ -73,6 +75,8 @@ class AttachmentView(
 
     @Inject lateinit var faviconManager: FaviconManager
 
+    @Inject lateinit var newChatHintCommands: NewChatHintCommands
+
     var host: NativeInputHost? = null
     var isEditMode: Boolean = false
 
@@ -84,6 +88,7 @@ class AttachmentView(
     private var supportsUpload: Boolean = false
     private var nativeInputStateJob: Job? = null
     private var attachmentStateJob: Job? = null
+    private var attachmentRequestJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
     private var hasAttachmentsOrError: Boolean = false
     private var popupWindow: PopupWindow? = null
@@ -108,6 +113,11 @@ class AttachmentView(
         viewModel = vm
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
+        attachmentRequestJob?.cancel()
+        attachmentRequestJob = newChatHintCommands.commandsFor { host?.tabId() }
+            .onEach { command ->
+                if (!isEditMode && !isContextual) openAttachment(command)
+            }.launchIn(scope)
         attachmentStateJob?.cancel()
         attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
@@ -324,8 +334,24 @@ class AttachmentView(
         nativeInputStateJob = null
         attachmentStateJob?.cancel()
         attachmentStateJob = null
+        attachmentRequestJob?.cancel()
+        attachmentRequestJob = null
         lastNativeInputState = null
         dismissPopup()
+    }
+
+    private fun openAttachment(request: NewChatHintCommand) {
+        when (request) {
+            is NewChatHintCommand.OpenDocuments -> {
+                host?.showAttachmentChooser(true)
+                host?.requestFilePicker(buildFilePickerCallback(), request.mimeTypes)
+            }
+            is NewChatHintCommand.OpenPhoto -> {
+                host?.showAttachmentChooser(true)
+                host?.requestFilePicker(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
+            }
+            is NewChatHintCommand.CreateImage -> Unit
+        }
     }
 
     private fun showPopupMenu() {

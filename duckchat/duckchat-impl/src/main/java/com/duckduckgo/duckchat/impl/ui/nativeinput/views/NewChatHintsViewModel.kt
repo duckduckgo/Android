@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesViewModel
@@ -29,10 +30,17 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsEligibility
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -41,12 +49,14 @@ class NewChatHintsViewModel @Inject constructor(
     private val provider: NativeInputStateProvider,
     private val modelManager: DuckAiModelManager,
     private val duckChat: DuckChatInternal,
+    private val commands: NewChatHintCommands,
     private val tabRepository: TabRepository,
     eligibility: NewChatHintsEligibility,
     browserMode: BrowserMode,
 ) : ViewModel() {
 
-    private val eligible = eligibility.observeEligible(browserMode)
+    private val eligible: StateFlow<Boolean?> = eligibility.observeEligible(browserMode).stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    private var isHandlingTap = false
 
     fun viewState(tabId: String): Flow<List<NewChatHint>> {
         val order = hintOrder(tabId)
@@ -54,11 +64,38 @@ class NewChatHintsViewModel @Inject constructor(
             tabRepository.flowSelectedTab,
             provider.stateForTab(tabId),
             modelManager.modelState,
-            eligible,
-        ) { selectedTab, input, models, eligible ->
-            val showHints = selectedTab?.tabId == tabId && eligible && input.isNewChat()
+            eligible.filterNotNull(),
+        ) { selectedTab, input, models, isEligible ->
+            val showHints = selectedTab?.tabId == tabId && isEligible && input.isNewChat() && input.isDraftEmpty()
             if (showHints) order.filter { capableModel(it, models) != null } else emptyList()
         }.distinctUntilChanged()
+    }
+
+    suspend fun onHintTapped(hint: NewChatHint, tabId: String) {
+        if (isHandlingTap) return
+        isHandlingTap = true
+        try {
+            sendCommand(hint, tabId)
+        } finally {
+            isHandlingTap = false
+        }
+    }
+
+    private suspend fun sendCommand(hint: NewChatHint, tabId: String) {
+        if (!canAct(tabId)) return
+        val models = modelManager.modelState.value
+        val model = capableModel(hint, models) ?: return
+        if (model.id != models.selectedModelId) {
+            modelManager.selectModel(model)
+            // Selecting a model suspends; the tab, chat or eligibility may have changed meanwhile.
+            if (!canAct(tabId)) return
+        }
+        val command = when (hint) {
+            NewChatHint.DOCUMENTS -> NewChatHintCommand.OpenDocuments(tabId, model.supportedFileTypes)
+            NewChatHint.PHOTO -> NewChatHintCommand.OpenPhoto(tabId)
+            NewChatHint.IMAGE_GENERATION -> NewChatHintCommand.CreateImage(tabId)
+        }
+        commands.send(command)
     }
 
     private fun capableModel(hint: NewChatHint, models: ModelState): AIChatModel? {
@@ -67,7 +104,15 @@ class NewChatHintsViewModel @Inject constructor(
         return capable.firstOrNull { it.id == models.selectedModelId } ?: capable.firstOrNull()
     }
 
+    private suspend fun canAct(tabId: String): Boolean =
+        eligible.value == true &&
+            tabRepository.flowSelectedTab.firstOrNull()?.tabId == tabId &&
+            provider.stateForTab(tabId).value.isNewChat()
+
     private fun hintOrder(tabId: String): List<NewChatHint> = NewChatHint.entries.shuffled(Random(tabId.hashCode()))
 
-    private fun NativeInputState.isNewChat() = inputContext == InputContext.DUCK_AI && chatId == null
+    // A model-change window lets the input use a recovery model instead of the selected one, which a hint can't switch away from.
+    private fun NativeInputState.isNewChat() = inputContext == InputContext.DUCK_AI && chatId == null && !modelChangeMode
+
+    private fun NativeInputState.isDraftEmpty() = !hasText && !hasAttachments && selectedTool == null
 }

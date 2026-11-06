@@ -34,6 +34,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel.AttachmentState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
@@ -183,6 +184,7 @@ class AttachmentViewTest {
             viewModelFactory = factory
             nativeInputStateProvider = provider
             faviconManager = mock()
+            newChatHintCommands = NewChatHintCommands()
         }
         root.addView(FrameLayout(activity).apply { addView(view) })
         shadowOf(view).callOnAttachedToWindow()

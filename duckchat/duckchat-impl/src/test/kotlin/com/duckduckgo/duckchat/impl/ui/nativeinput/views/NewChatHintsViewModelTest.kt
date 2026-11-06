@@ -33,10 +33,17 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsEligibility
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -44,14 +51,18 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class NewChatHintsViewModelTest {
     @get:Rule val coroutineRule = CoroutineTestRule()
 
     private val eligible = MutableStateFlow(true)
+    private val commands = NewChatHintCommands()
     private val selectedTab = MutableStateFlow<TabEntity?>(TabEntity("tab"))
     private val tabRepository: TabRepository = mock { on { flowSelectedTab } doReturn selectedTab }
     private val repositories: BrowserModeDataProvider<TabRepository> = mock {
@@ -70,7 +81,7 @@ class NewChatHintsViewModelTest {
         eligibility: NewChatHintsEligibility = object : NewChatHintsEligibility {
             override fun observeEligible(browserMode: BrowserMode) = eligible
         },
-    ) = NewChatHintsViewModel(provider, modelManager, duckChat, tabRepository, eligibility, BrowserMode.REGULAR)
+    ) = NewChatHintsViewModel(provider, modelManager, duckChat, commands, tabRepository, eligibility, BrowserMode.REGULAR)
 
     @Before
     fun setUp() {
@@ -78,14 +89,78 @@ class NewChatHintsViewModelTest {
     }
 
     @Test
-    fun whenTypingOnNewChatThenAllAvailableHintsStayInTheSameOrder() = runTest {
+    fun whenTypingThenHintsHideAndReturnInTheSameOrderOnceTheInputIsEmpty() = runTest {
         viewModel().viewState("tab").test {
             val initial = awaitItem()
             assertEquals(setOf(NewChatHint.DOCUMENTS, NewChatHint.PHOTO, NewChatHint.IMAGE_GENERATION), initial.toSet())
-            stateStore.update("tab") { it.copy(hasText = true, hasAttachments = true) }
+            stateStore.update("tab") { it.copy(hasText = true) }
+            assertTrue(awaitItem().isEmpty())
+            stateStore.update("tab") { it.copy(hasText = false) }
+            assertEquals(initial, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAnAttachmentIsAddedThenHintsHideUntilItIsRemoved() = runTest {
+        viewModel().viewState("tab").test {
+            val initial = awaitItem()
+            stateStore.update("tab") { it.copy(hasAttachments = true) }
+            assertTrue(awaitItem().isEmpty())
+            stateStore.update("tab") { it.copy(hasAttachments = false) }
+            assertEquals(initial, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAToolIsSelectedThenHintsHideUntilItIsDeselected() = runTest {
+        viewModel().viewState("tab").test {
+            val initial = awaitItem()
+            stateStore.update("tab") { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+            assertTrue(awaitItem().isEmpty())
+            stateStore.update("tab") { it.copy(selectedTool = null) }
+            assertEquals(initial, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAFilesHintIsTappedWithoutAttachingThenHintsStayVisible() = runTest {
+        val testee = viewModel()
+        testee.viewState("tab").test {
+            awaitItem()
+            testee.onHintTapped(NewChatHint.DOCUMENTS, "tab")
             runCurrent()
             expectNoEvents()
-            assertEquals(initial, viewModel().viewState("tab").first())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCreateImageIsTappedThenHintsHideUntilImageGenerationIsRemoved() = runTest {
+        val testee = viewModel()
+        testee.viewState("tab").test {
+            val initial = awaitItem()
+            testee.onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            stateStore.update("tab") { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+            assertTrue(awaitItem().isEmpty())
+            stateStore.update("tab") { it.copy(selectedTool = null) }
+            assertEquals(initial, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenATapIsStillBeingHandledThenASecondTapIsIgnored() = runTest {
+        val selection = CompletableDeferred<Unit>()
+        whenever(modelManager.selectModel(any())).doSuspendableAnswer { selection.await() }
+        val testee = viewModel()
+        commands.commandsFor { "tab" }.test {
+            backgroundScope.launch { testee.onHintTapped(NewChatHint.DOCUMENTS, "tab") }
+            runCurrent()
+            testee.onHintTapped(NewChatHint.PHOTO, "tab")
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -109,6 +184,17 @@ class NewChatHintsViewModelTest {
         }
         stateStore.update("tab") { it.copy(inputContext = InputContext.DUCK_AI, chatId = "chat") }
         assertTrue(viewModel().viewState("tab").first().isEmpty())
+    }
+
+    @Test
+    fun whenAModelChangeWindowIsOpenThenHintsAreHiddenAndTapsSendNothing() = runTest {
+        stateStore.update("tab") { it.copy(modelChangeMode = true) }
+        assertTrue(viewModel().viewState("tab").first().isEmpty())
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -136,6 +222,75 @@ class NewChatHintsViewModelTest {
             assertTrue(awaitItem().isEmpty())
             stateStore.update("tab") { it.copy(chatId = null) }
             assertEquals(initial, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDocumentsHintIsTappedThenFirstAccessibleFileModelIsSelectedBeforeOpeningPicker() = runTest {
+        val unsupported = model().copy(id = "text", supportedFileTypes = emptyList())
+        val inaccessible = model().copy(id = "gated", isAccessible = false)
+        val capable = model().copy(id = "files")
+        models.value = ModelState(models = listOf(unsupported, inaccessible, capable), selectedModelId = "text")
+        whenever(modelManager.selectModel(any())).thenAnswer { invocation ->
+            models.value = models.value.copy(selectedModelId = invocation.getArgument<AIChatModel>(0).id)
+            Unit
+        }
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.DOCUMENTS, "tab")
+            assertEquals("files", models.value.selectedModelId)
+            assertEquals(NewChatHintCommand.OpenDocuments("tab", listOf("application/pdf")), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPhotoHintIsTappedThenGalleryCommandIsSentAndTheDraftIsKept() = runTest {
+        models.value = models.value.copy(selectedModelId = "model")
+        stateStore.update("tab") { it.copy(hasText = true) }
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.PHOTO, "tab")
+            assertEquals(NewChatHintCommand.OpenPhoto("tab"), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertTrue(input.value.hasText)
+    }
+
+    @Test
+    fun whenImageHintIsTappedThenOnlyItsTabReceivesTheCommand() = runTest {
+        commands.commandsFor { "other" }.test {
+            val otherTab = this
+            commands.commandsFor { "tab" }.test {
+                viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+                assertEquals(NewChatHintCommand.CreateImage("tab"), awaitItem())
+                otherTab.expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCapabilityDisappearsBeforeTheTapThenNoCommandIsSent() = runTest {
+        models.value = ModelState()
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.DOCUMENTS, "tab")
+            viewModel().onHintTapped(NewChatHint.PHOTO, "tab")
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTabSwitchesDuringModelSelectionThenNoCommandIsSentToThePreviousTab() = runTest {
+        whenever(modelManager.selectModel(any())).thenAnswer {
+            selectedTab.value = TabEntity("other")
+            Unit
+        }
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -176,6 +331,51 @@ class NewChatHintsViewModelTest {
             assertTrue(awaitItem().isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenNotEligibleThenTapsDoNotSendCommands() = runTest {
+        eligible.value = false
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            viewModel().onHintTapped(NewChatHint.PHOTO, "tab")
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertTrue(viewModel().viewState("tab").first().isEmpty())
+    }
+
+    @Test
+    fun whenEligibilityResetsDuringModelSelectionThenNoCommandIsSent() = runTest {
+        whenever(modelManager.selectModel(any())).thenAnswer {
+            eligible.value = false
+            Unit
+        }
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSelectionChangesDuringStateReadThenCommandsNeverTargetANonSelectedTab() = runTest {
+        val selectedInput = CompletableDeferred<NativeInputState>()
+        val provider = object : NativeInputStateProvider by stateStore {
+            override val state = flow { emit(selectedInput.await()) }
+        }
+        val deliveries = mutableListOf<Pair<String, String?>>()
+        commands.commandsFor { "tab" }
+            .onEach { deliveries += it.tabId to selectedTab.value?.tabId }
+            .launchIn(backgroundScope)
+        backgroundScope.launch { viewModel(provider = provider).onHintTapped(NewChatHint.IMAGE_GENERATION, "tab") }
+        runCurrent()
+
+        selectedTab.value = TabEntity("other")
+        selectedInput.complete(NativeInputState.zero().copy(inputContext = InputContext.DUCK_AI))
+        runCurrent()
+
+        assertTrue(deliveries.all { (target, selected) -> target == selected })
     }
 
     private fun model() = AIChatModel(
