@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -52,6 +53,13 @@ class RealSponsorBlockTest {
         setEnabled(false)
 
         assertFalse(sponsorBlock.config().enabled)
+    }
+
+    @Test
+    fun observeConfigEmitsTheCurrentConfigFirst() = runTest {
+        setEnabled(false)
+
+        assertEquals(SponsorBlockConfig(enabled = false, skipMode = SponsorBlockSkipMode.MANUAL), sponsorBlock.observeConfig().first())
     }
 
     @Test
