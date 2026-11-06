@@ -19,6 +19,9 @@ package com.duckduckgo.adblocking.impl.sponsorblock
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -35,6 +38,9 @@ data class SponsorBlockConfig(
 interface SponsorBlock {
     fun config(): SponsorBlockConfig
 
+    /** Emits the current [config] and then every change to it. */
+    fun observeConfig(): Flow<SponsorBlockConfig>
+
     /**
      * Segments for [videoId], sorted by start. Empty when SponsorBlock is disabled, [videoId] is blank, or the lookup
      * fails.
@@ -50,6 +56,9 @@ class RealSponsorBlock @Inject constructor(
 
     // TODO: send the user's SponsorBlock settings (on/off, skip mode) once they exist; skipMode is fixed to manual for now.
     override fun config(): SponsorBlockConfig = SponsorBlockConfig(enabled = isEnabled(), skipMode = SponsorBlockSkipMode.MANUAL)
+
+    override fun observeConfig(): Flow<SponsorBlockConfig> =
+        sponsorBlockFeature.mvpEnabled().enabled().map { config() }.distinctUntilChanged()
 
     override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
         if (videoId.isBlank() || !isEnabled()) return emptyList()
