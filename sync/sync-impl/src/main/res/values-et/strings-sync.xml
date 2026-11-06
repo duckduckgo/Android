@@ -480,9 +480,18 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Pääse ligi oma paroolidele mobiilis ja arvutis.</string>
-    <string name="sync_passwords_import_promo_primary_button">Lülita Sync &amp; Backup sisse</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Alusta sünkroonimist</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Pääse oma järjehoidjatele ligi nii mobiilis kui ka arvutis.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Lülita Sync &amp; Backup sisse</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Alusta sünkroonimist</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_primary_button_label">Alusta sünkroonimist</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_primary_button_label">Alusta sünkroonimist</string>
+
+    <!-- Sync promo menu in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Alusta sünkroonimist</string>
 </resources>
