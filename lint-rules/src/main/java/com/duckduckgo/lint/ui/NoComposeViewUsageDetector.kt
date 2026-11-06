@@ -37,7 +37,7 @@ class NoComposeViewUsageDetector : LayoutDetector(), SourceCodeScanner {
     override fun getApplicableElements() = listOf("androidx.compose.ui.platform.ComposeView")
 
     override fun visitElement(context: XmlContext, element: Element) {
-        if (isInDesignSystemModule(context.project.name)) return
+        if (ComposeHostingPolicy.isComposeHostAllowed(context.project.name, context.file)) return
         reportComposeViewUsageInXml(context, element)
     }
 
@@ -49,7 +49,7 @@ class NoComposeViewUsageDetector : LayoutDetector(), SourceCodeScanner {
         node: UCallExpression,
         constructor: PsiMethod
     ) {
-        if (isInDesignSystemModule(context.project.name)) return
+        if (ComposeHostingPolicy.isComposeHostAllowed(context.project.name, context.file)) return
         reportComposeViewUsageInCode(context, node)
     }
 
@@ -69,18 +69,14 @@ class NoComposeViewUsageDetector : LayoutDetector(), SourceCodeScanner {
         )
     }
 
-    private fun isInDesignSystemModule(projectName: String): Boolean {
-        return projectName in DESIGN_SYSTEM_MODULES
-    }
 
     companion object {
-        private val DESIGN_SYSTEM_MODULES = setOf("design-system", "design-system-internal")
         val NO_COMPOSE_VIEW_USAGE = Issue
             .create(
                 id = "NoComposeViewUsage",
                 briefDescription = "ComposeView should not be used in XML layouts or custom views",
-                explanation = "Compose is not yet approved to be used in production. ComposeView should not be used in XML layouts or custom views until Compose usage is officially approved for the codebase.",
-                moreInfo = "https://app.asana.com/0/1202857801505092/list",
+                explanation = "Compose hosts are limited to the Compose integration Phase 2 scenarios. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml.",
+                moreInfo = "https://app.asana.com/1/137249556945/task/1219547140965597",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,
                 severity = Severity.ERROR,
