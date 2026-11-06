@@ -70,6 +70,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
+import com.duckduckgo.duckchat.api.nativeinput.NewChatHintsRenderer
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -215,6 +216,7 @@ class RealNativeInputManager @Inject constructor(
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
+    private val newChatHintsRenderer: NewChatHintsRenderer,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -228,6 +230,7 @@ class RealNativeInputManager @Inject constructor(
     private var duckAiToolbarHidden: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
+    private var newChatHintsView: View? = null
     private var navBarRoot: View? = null
     private var navBarShown: Boolean? = null
 
@@ -719,7 +722,17 @@ class RealNativeInputManager @Inject constructor(
             bindTabInputFocus(widgetView, lifecycleOwner, currentTabUrl, armOnAttach = !forceImageGeneration && textSelection == null)
         }
         lifecycleOwner.lifecycleScope.launch {
-            if (currentTabUrl.firstOrNull()?.toUri()?.isDuckAiSettingsUrl(duckChat) == true) widgetView.gone()
+            if (currentTabUrl.firstOrNull()?.toUri()?.isDuckAiSettingsUrl(duckChat) == true) {
+                widgetView.gone()
+            } else if (widgetRoot === widgetView && omnibarController.isDuckAiMode()) {
+                val cardContext = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)?.context ?: return@launch
+                val hints = newChatHintsRenderer.create(cardContext, tabId)
+                if (hints != null && widgetRoot === widgetView && !isExiting) {
+                    layoutCoordinator.configureNewChatHints(widgetView, hints)
+                    rootView.addView(hints)
+                    newChatHintsView = hints
+                }
+            }
         }
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
         applyInitialTabSelection(widgetView, isNewTab, initialInputMode)
@@ -995,6 +1008,8 @@ class RealNativeInputManager @Inject constructor(
         inputFocusJob.cancel()
         consumeInputFocusRequest()
         inputFocusUrlType = DuckAiChatUrlType.NotDuckAi
+        newChatHintsView?.let(rootView::removeView)
+        newChatHintsView = null
         animator.cancelAnimation()
         var removed = false
         rootView.findViewById<View?>(R.id.inputModeRoot)?.let {
