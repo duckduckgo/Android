@@ -55,6 +55,8 @@ class NativeInputLayoutCoordinator(
     private var resetContentOffset: (() -> Unit)? = null
     private var reapplyAutocompleteOffset: (() -> Unit)? = null
     private var clearForcedBottomTranslationListeners: (() -> Unit)? = null
+    private var clearAutocompleteLayoutResources: (() -> Unit)? = null
+    private var clearContentOffsetResources: (() -> Unit)? = null
 
     // The content-reflow LayoutTransition is suspended while a per-frame content-offset drive is running
     // (nav bar slide or widget exit) so that drive is the only thing moving the content. Captured on suspend.
@@ -197,12 +199,15 @@ class NativeInputLayoutCoordinator(
             override fun onViewDetachedFromWindow(v: View) {
                 removeListeners()
                 if (!nativeInputLayoutFixKillSwitch.self().isEnabled()) {
-                    applyPadding(deltaTop = 0, deltaBottom = 0)
-                    reapplyAutocompleteOffset = null
-                    restoreFloats.forEach { it() }
-                    v.removeOnAttachStateChangeListener(this)
+                    clearAutocompleteLayoutResources?.invoke()
                 }
             }
+        }
+        clearAutocompleteLayoutResources = {
+            applyPadding(deltaTop = 0, deltaBottom = 0)
+            reapplyAutocompleteOffset = null
+            restoreFloats.forEach { it() }
+            widgetView.removeOnAttachStateChangeListener(attachListener)
         }
         widgetView.addOnAttachStateChangeListener(attachListener)
     }
@@ -429,23 +434,26 @@ class NativeInputLayoutCoordinator(
             override fun onViewDetachedFromWindow(v: View) {
                 removeListeners()
                 if (!nativeInputLayoutFixKillSwitch.self().isEnabled()) {
-                    ntpGroup?.layoutTransition = previousNtpTransition
-                    pendingContentLayoutTransition = null
-                    widgetAnimationFrameHandler = null
-                    reapplyContentOffset = null
-                    resetContentOffset = null
-                    isWidgetAnimating = false
-                    contentTransitionGroup = null
-                    suspendedContentTransition = null
-                    isContentReflowSuspended = false
-                    isReflowSuspendRequested = false
-                    targets.forEach { target ->
-                        applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
-                    }
-                    clearNtpScrollArtifacts()
-                    v.removeOnAttachStateChangeListener(this)
+                    clearContentOffsetResources?.invoke()
                 }
             }
+        }
+        clearContentOffsetResources = {
+            ntpGroup?.layoutTransition = previousNtpTransition
+            pendingContentLayoutTransition = null
+            widgetAnimationFrameHandler = null
+            reapplyContentOffset = null
+            resetContentOffset = null
+            isWidgetAnimating = false
+            contentTransitionGroup = null
+            suspendedContentTransition = null
+            isContentReflowSuspended = false
+            isReflowSuspendRequested = false
+            targets.forEach { target ->
+                applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
+            }
+            clearNtpScrollArtifacts()
+            widgetView.removeOnAttachStateChangeListener(attachListener)
         }
         widgetView.addOnAttachStateChangeListener(attachListener)
     }
