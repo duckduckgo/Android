@@ -479,10 +479,10 @@
     <string name="sync_simplified_deep_link_auth_prompt_message">Odblokuj urządzenie, aby skonfigurować funkcję Sync &amp; Backup</string>
 
     <!-- Sync promo on passwords import success screen -->
-    <string name="sync_passwords_import_promo_title">Uzyskaj dostęp do swoich haseł na urządzeniach mobilnych i komputerach stacjonarnych.</string>
+    <string name="sync_passwords_import_promo_title_label">Uzyskaj dostęp do swoich haseł na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="sync_passwords_import_promo_primary_button">Włącz Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
-    <string name="sync_bookmarks_import_promo_title">Korzystaj z zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
+    <string name="sync_bookmarks_import_promo_title_label">Uzyskaj dostęp do swoich zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Włącz Sync &amp; Backup</string>
 </resources>
