@@ -66,6 +66,15 @@ class RealSystemSettingsLauncherTest {
     }
 
     @Test
+    fun whenScreenIsSamsungHomeScreenThenIntentHighlightsShowSearchOnHomeScreenPreference() {
+        testee.launch(context, SAMSUNG_HOME_SCREEN)
+
+        val captor = argumentCaptor<Intent>()
+        verify(context).startActivity(captor.capture())
+        assertEquals("pref_search_on_home_screen", captor.firstValue.getStringExtra(":settings:fragment_args_key"))
+    }
+
+    @Test
     fun whenSamsungActivityIsNotFoundThenOpensSystemSettings() {
         doThrow(ActivityNotFoundException()).doNothing().whenever(context).startActivity(any())
 

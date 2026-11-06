@@ -54,6 +54,7 @@ class RealSystemSettingsLauncher @Inject constructor() : SystemSettingsLauncher 
         SAMSUNG_HOME_SCREEN -> Intent(SAMSUNG_APPLICATION_SETTINGS_ACTION).apply {
             addCategory(SAMSUNG_APPLICATION_SETTINGS_CATEGORY)
             component = ComponentName(SAMSUNG_LAUNCHER_PACKAGE, SAMSUNG_HOME_SCREEN_SETTINGS_ACTIVITY)
+            putExtra(SETTINGS_HIGHLIGHT_KEY, SAMSUNG_SHOW_SEARCH_ON_HOME_SCREEN_PREFERENCE)
         }
     }
 
@@ -62,5 +63,7 @@ class RealSystemSettingsLauncher @Inject constructor() : SystemSettingsLauncher 
         const val SAMSUNG_HOME_SCREEN_SETTINGS_ACTIVITY = "com.android.homescreen.settings.HomeScreenSettingsActivity"
         const val SAMSUNG_APPLICATION_SETTINGS_ACTION = "com.sec.android.intent.action.SEC_APPLICATION_SETTINGS"
         const val SAMSUNG_APPLICATION_SETTINGS_CATEGORY = "com.sec.android.intent.category.SEC_APPLICATION_SETTINGS"
+        const val SAMSUNG_SHOW_SEARCH_ON_HOME_SCREEN_PREFERENCE = "pref_search_on_home_screen"
+        const val SETTINGS_HIGHLIGHT_KEY = ":settings:fragment_args_key"
     }
 }
