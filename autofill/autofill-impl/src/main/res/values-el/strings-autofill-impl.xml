@@ -325,11 +325,11 @@
     <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Σελιδοδείκτες που εισήχθησαν: <b>%1$d</b>]]></string>
 
     <!-- Passwords import promo on the bookmarks import result screen -->
-    <string name="passwords_import_promo_in_bookmarks_import_title">Φέρε τους κωδικούς πρόσβασής σου από τη Google στο DuckDuckGo.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_title">Μεταφέρετε τους κωδικούς πρόσβασής σας από τη Google στο DuckDuckGo.</string>
     <string name="passwords_import_promo_in_bookmarks_import_button">Εισαγωγή κωδικών πρόσβασης από τη Google</string>
 
     <!-- Bookmarks import promo on the passwords import result screen -->
-    <string name="bookmarks_import_promo_in_passwords_import_title">Φέρε τους σελιδοδείκτες σου από τη Google στο DuckDuckGo.</string>
+    <string name="bookmarks_import_promo_in_passwords_import_title">Μεταφέρετε τους σελιδοδείκτες σας από τη Google στο DuckDuckGo.</string>
     <string name="bookmarks_import_promo_in_passwords_import_button">Εισαγωγή σελιδοδεικτών από τη Google</string>
 
 </resources>
