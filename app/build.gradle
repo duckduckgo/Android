@@ -10,6 +10,7 @@ plugins {
     id 'dev.zacsweers.metro'
     id 'androidx.room'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'androidx.baselineprofile'
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
@@ -211,6 +212,13 @@ android {
             useLegacyPackaging = true
         }
     }
+}
+
+baselineProfile {
+    automaticGenerationDuringBuild = false
+    saveInSrc = true
+    dexLayoutOptimization = true
+    mergeIntoMain = true
 }
 
 base {
@@ -596,6 +604,7 @@ dependencies {
     // Android KTX
     implementation AndroidX.core.ktx
     implementation AndroidX.core.splashscreen
+    baselineProfile project(':macrobenchmark')
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData
