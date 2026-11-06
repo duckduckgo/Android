@@ -48,6 +48,7 @@ import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
@@ -227,6 +228,9 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
+            if (cta is SyncAfterDeviceTransferBubbleCta) {
+                pixel.fire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
+            }
             if (cta is DaxSubscriptionBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
@@ -284,6 +288,9 @@ class CtaViewModel @Inject constructor(
         }
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
+        }
+        if (cta is SyncAfterDeviceTransferBubbleCta) {
+            pixel.fire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
         }
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.userAcceptedPrompt()

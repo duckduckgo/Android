@@ -18,6 +18,9 @@ package com.duckduckgo.app.onboarding.orchestrator
 
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.pixels.AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
@@ -33,12 +36,14 @@ import javax.inject.Inject
  * Composes the plan shown once on an install whose data arrived from another phone.
  *
  * It never fires onboarding pixels, enrols in experiments or touches the user's app stage: the user may have
- * finished onboarding years ago on the previous phone, and nothing here may treat them as a new user.
+ * finished onboarding years ago on the previous phone, and nothing here may treat them as a new user. Its only
+ * pixels are the device migration ones.
  */
 class DeviceMigrationPlanProvider @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val appBuildConfig: AppBuildConfig,
     private val notificationManager: NotificationManagerCompat,
+    private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
 ) {
 
@@ -97,7 +102,12 @@ class DeviceMigrationPlanProvider @Inject constructor(
         id = NewUserOnboardingStepIds.MIGRATION_ALL_SET,
         dialog = NewUserOnboardingActivityDialog.MigrationAllSet,
     ) { event ->
-        if (event is NewUserOnboardingEvent.ContinueClicked) Advance else Stay
+        if (event is NewUserOnboardingEvent.ContinueClicked) {
+            pixel.fire(DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
+            Advance
+        } else {
+            Stay
+        }
     }
 
     private fun migrationStep(

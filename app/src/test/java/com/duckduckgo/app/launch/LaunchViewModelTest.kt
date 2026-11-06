@@ -95,6 +95,7 @@ class LaunchViewModelTest {
                 defaultBrowserDetector = defaultBrowserDetector,
                 appBuildConfig = appBuildConfig,
                 notificationManager = notificationManager,
+                pixel = pixel,
                 dispatchers = coroutineRule.testDispatcherProvider,
             ),
             userStageStore = userStageStore,

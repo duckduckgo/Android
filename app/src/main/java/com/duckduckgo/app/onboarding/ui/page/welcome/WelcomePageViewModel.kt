@@ -40,6 +40,7 @@ import com.duckduckgo.app.onboarding.orchestrator.stepIndicatorProgress
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
@@ -553,7 +554,11 @@ class WelcomePageViewModel @Inject constructor(
 
         val config = dialogConfigResolver.resolve(dialog, customAiOnboardingStore.isEnabled())
         if (config != null) {
-            if (state.rootPlanId != MIGRATION_PLAN_ID) shownPixels.fireFor(dialog)
+            if (state.rootPlanId != MIGRATION_PLAN_ID) {
+                shownPixels.fireFor(dialog)
+            } else if (dialog == NewUserOnboardingActivityDialog.MigrationAllSet) {
+                pixel.fire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_SHOWN, type = Unique())
+            }
             _viewState.update {
                 it.copy(
                     screen = Screen.Dialog(

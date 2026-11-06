@@ -18,12 +18,14 @@ package com.duckduckgo.devicemigration.impl
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_DEFAULT_BROWSER
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_FLOW_PENDING
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
@@ -32,6 +34,7 @@ import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_DEFAULT_BROWSER
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_SIGNED_IN_TO_SYNC
 import com.duckduckgo.di.scopes.AppScope
@@ -75,6 +78,7 @@ class RealDeviceMigration @Inject constructor(
     private val deviceMigrationFeature: DeviceMigrationFeature,
     private val statisticsDataStore: StatisticsDataStore,
     private val deviceSyncState: Lazy<DeviceSyncState>, // break any possible DI dependency cycle
+    private val defaultBrowserDetector: Lazy<DefaultBrowserDetector>, // break any possible DI dependency cycle
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DeviceMigration, MainProcessLifecycleObserver, AtbInitializerListener {
@@ -134,7 +138,23 @@ class RealDeviceMigration @Inject constructor(
             } catch (e: Exception) {
                 logcat(ERROR) { "Could not record Sync state for a future device transfer: ${e.javaClass.simpleName}" }
             }
+            stampDefaultBrowser()
         }
+    }
+
+    // The default browser is changed in system settings, so the user comes back to the app through a resume, not a new process.
+    override fun onResume(owner: LifecycleOwner) {
+        appCoroutineScope.launch(dispatchers.io()) {
+            detection
+            stampDefaultBrowser()
+        }
+    }
+
+    private fun stampDefaultBrowser() {
+        val transferred = markerStore.transferred
+        val isDefaultBrowser = defaultBrowserDetector.value.isDefaultBrowser()
+        if (transferred.contains(KEY_DEFAULT_BROWSER) && transferred.getBoolean(KEY_DEFAULT_BROWSER, false) == isDefaultBrowser) return
+        transferred.edit().putBoolean(KEY_DEFAULT_BROWSER, isDefaultBrowser).commit()
     }
 
     // Detection treats an ATB on a fresh package as transferred data, so it must run before this install's first ATB is saved.
@@ -179,9 +199,12 @@ class RealDeviceMigration @Inject constructor(
         val transferred = markerStore.transferred
         markerStore.local.edit()
             .apply {
-                // Copied now because this phone overwrites the transferred stamp with its own state on every start.
+                // Copied now because this phone overwrites the transferred stamps with its own state on every start.
                 if (transferred.contains(KEY_SIGNED_IN_TO_SYNC)) {
                     putBoolean(KEY_SOURCE_SIGNED_IN_TO_SYNC, transferred.getBoolean(KEY_SIGNED_IN_TO_SYNC, true))
+                }
+                if (transferred.contains(KEY_DEFAULT_BROWSER)) {
+                    putBoolean(KEY_SOURCE_DEFAULT_BROWSER, transferred.getBoolean(KEY_DEFAULT_BROWSER, false))
                 }
             }
             .putBoolean(KEY_MIGRATED, true)

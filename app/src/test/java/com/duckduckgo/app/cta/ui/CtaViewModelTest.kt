@@ -61,6 +61,7 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -1546,7 +1547,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenSyncSuggestionShownThenNoPixelIsSentAndItStaysDue() = runTest {
+    fun whenSyncSuggestionShownThenOnlyItsOnceEverShownPixelIsSentAndItStaysDue() = runTest {
         givenDaxOnboardingCompleted()
         fakeSyncAfterDeviceTransferPrompt.due = true
         val cta = refreshHomeCta()!!
@@ -1554,7 +1555,8 @@ class CtaViewModelTest {
         testee.onCtaShown(cta)
 
         verify(mockDismissedCtaDao, never()).insert(any())
-        verifyNoInteractions(mockPixel)
+        verify(mockPixel).fire(DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
+        verifyNoMoreInteractions(mockPixel)
         verifyNoInteractions(mockOnboardingPixelSender)
         assertTrue(refreshHomeCta() is SyncAfterDeviceTransferBubbleCta)
     }
@@ -1568,7 +1570,19 @@ class CtaViewModelTest {
         testee.onUserClickCtaOkButton(cta)
 
         assertFalse(fakeSyncAfterDeviceTransferPrompt.dismissed)
-        verifyNoInteractions(mockPixel)
+    }
+
+    @Test
+    fun whenSyncSuggestionAcceptedThenOnlyItsOnceEverClickPixelIsSent() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockPixel).fire(DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
+        verifyNoMoreInteractions(mockPixel)
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     private suspend fun refreshHomeCta(): Cta? = testee.refreshCta(

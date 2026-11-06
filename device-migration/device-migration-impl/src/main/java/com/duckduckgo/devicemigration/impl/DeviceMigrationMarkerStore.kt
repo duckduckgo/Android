@@ -36,6 +36,7 @@ class DeviceMigrationMarkerStore(
         const val KEY_SEEN = "seen"
         const val KEY_IS_NEW_INSTALL = "isNewInstall"
         const val KEY_SIGNED_IN_TO_SYNC = "signedInToSync"
+        const val KEY_DEFAULT_BROWSER = "defaultBrowser"
 
         const val LOCAL_FILE = "com.duckduckgo.devicemigration.local"
         const val KEY_LAUNCHED = "launched"
@@ -45,6 +46,7 @@ class DeviceMigrationMarkerStore(
         const val KEY_SYNC_RESTORE_DONE = "syncRestoreDone"
         const val KEY_PREVIOUS_DEVICE_HAD_SYNC = "previousDeviceHadSync"
         const val KEY_SOURCE_SIGNED_IN_TO_SYNC = "sourceSignedInToSync"
+        const val KEY_SOURCE_DEFAULT_BROWSER = "sourceDefaultBrowser"
         const val KEY_RESTORED_FROM_BACKUP = "restoredFromBackup"
         const val KEY_TRANSFER_ALLOWED = "transferAllowed"
     }

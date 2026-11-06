@@ -18,6 +18,9 @@ package com.duckduckgo.app.onboarding.orchestrator
 
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
@@ -32,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -43,6 +47,7 @@ class DeviceMigrationPlanProviderTest {
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val notificationManager: NotificationManagerCompat = mock()
+    private val pixel: Pixel = mock()
 
     private val orchestrator = LinearOnboardingOrchestratorImpl()
     private lateinit var provider: DeviceMigrationPlanProvider
@@ -56,6 +61,7 @@ class DeviceMigrationPlanProviderTest {
             defaultBrowserDetector = defaultBrowserDetector,
             appBuildConfig = appBuildConfig,
             notificationManager = notificationManager,
+            pixel = pixel,
             dispatchers = coroutineRule.testDispatcherProvider,
         )
     }
@@ -88,7 +94,7 @@ class DeviceMigrationPlanProviderTest {
     fun `when built then building has no side effects`() {
         provider.buildPlan(onCompleted = {})
 
-        verifyNoInteractions(defaultBrowserDetector, appBuildConfig, notificationManager)
+        verifyNoInteractions(defaultBrowserDetector, appBuildConfig, notificationManager, pixel)
     }
 
     @Test
@@ -114,6 +120,26 @@ class DeviceMigrationPlanProviderTest {
 
         assertEquals(Completed(rootPlanId = DeviceMigrationPlanProvider.MIGRATION_PLAN_ID), orchestrator.state.value)
         assertEquals(1, completedCalls)
+    }
+
+    @Test
+    fun `when the all set button is clicked then the click pixel fires once ever`() = runTest {
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        startAndReachDefaultBrowserStepPosition()
+        assertStep(NewUserOnboardingStepIds.MIGRATION_ALL_SET)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        verify(pixel).fire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
+    }
+
+    @Test
+    fun `when the plan is walked through to the all set screen then no click pixel fires before the button is clicked`() = runTest {
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        startAndReachDefaultBrowserStepPosition()
+
+        assertStep(NewUserOnboardingStepIds.MIGRATION_ALL_SET)
+        verifyNoInteractions(pixel)
     }
 
     @Test

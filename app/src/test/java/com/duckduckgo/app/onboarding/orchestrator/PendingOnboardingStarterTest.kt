@@ -274,6 +274,7 @@ class PendingOnboardingStarterTest {
             defaultBrowserDetector = defaultBrowserDetector,
             appBuildConfig = appBuildConfig,
             notificationManager = notificationManager,
+            pixel = mock(),
             dispatchers = coroutineRule.testDispatcherProvider,
         ),
         userStageStore = userStageStore,

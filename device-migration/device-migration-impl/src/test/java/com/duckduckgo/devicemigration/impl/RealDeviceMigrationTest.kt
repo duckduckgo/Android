@@ -18,17 +18,20 @@ package com.duckduckgo.devicemigration.impl
 
 import android.content.SharedPreferences
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_DEFAULT_BROWSER
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_DEFAULT_BROWSER
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.LOCAL_FILE
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.TRANSFERRED_FILE
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -61,6 +64,10 @@ class RealDeviceMigrationTest {
     private val deviceSyncState: DeviceSyncState = mock {
         on { isUserSignedInOnDevice() } doAnswer { signedInToSync }
     }
+    private var isDefaultBrowser = false
+    private val defaultBrowserDetector: DefaultBrowserDetector = mock {
+        on { isDefaultBrowser() } doAnswer { isDefaultBrowser }
+    }
     private val statisticsDataStore: StatisticsDataStore = mock {
         on { hasInstallationStatistics } doAnswer { hasAtb }
     }
@@ -78,11 +85,14 @@ class RealDeviceMigrationTest {
         deviceMigrationFeature = feature,
         statisticsDataStore = statisticsDataStore,
         deviceSyncState = lazyOf(deviceSyncState),
+        defaultBrowserDetector = lazyOf(defaultBrowserDetector),
         dispatchers = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
     )
 
     private fun onCreate() = testee.onCreate(mock<LifecycleOwner>())
+
+    private fun onResume() = testee.onResume(mock<LifecycleOwner>())
 
     @Test
     fun whenKeyNotMarkedThenNotDoneOnThisInstall() {
@@ -370,6 +380,47 @@ class RealDeviceMigrationTest {
         onCreate()
 
         assertTrue(newInstance().previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenDuckDuckGoIsDefaultThenOnCreateStampsItForTheNextPhone() = runTest {
+        isDefaultBrowser = true
+
+        onCreate()
+
+        assertTrue(transferred.getBoolean(KEY_DEFAULT_BROWSER, false))
+    }
+
+    @Test
+    fun whenDefaultBrowserChangedWhileAppRunningThenOnResumeRefreshesStamp() = runTest {
+        onCreate()
+
+        isDefaultBrowser = true
+        onResume()
+
+        assertTrue(transferred.getBoolean(KEY_DEFAULT_BROWSER, false))
+    }
+
+    @Test
+    fun whenPreviousPhoneStampedDefaultBrowserThenKeptAfterThisPhoneStampsItsOwn() = runTest {
+        transferFromPhone(signedInToSync = false)
+        transferred.edit().putBoolean(KEY_DEFAULT_BROWSER, true).commit()
+        assertTrue(testee.isMigratedInstall())
+
+        isDefaultBrowser = false
+        onCreate()
+
+        assertTrue(local.getBoolean(KEY_SOURCE_DEFAULT_BROWSER, false))
+        assertFalse(transferred.getBoolean(KEY_DEFAULT_BROWSER, true))
+    }
+
+    @Test
+    fun whenPreviousPhoneLeftNoDefaultBrowserStampThenNoSourceValue() = runTest {
+        transferFromPhone(signedInToSync = false)
+
+        assertTrue(testee.isMigratedInstall())
+
+        assertFalse(local.contains(KEY_SOURCE_DEFAULT_BROWSER))
     }
 
     private fun transferFromPhone(signedInToSync: Boolean) {

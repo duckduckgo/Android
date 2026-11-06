@@ -48,7 +48,9 @@ import com.duckduckgo.app.onboarding.ui.OnboardingSkipper
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.welcome.WelcomePageViewModel.Command
 import com.duckduckgo.app.onboarding.ui.page.welcome.WelcomePageViewModel.Screen
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
@@ -84,6 +86,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -1016,7 +1019,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun `fires no onboarding pixels and records no default browser dialog on the migration screens`() = runTest {
+    fun `fires only the device migration pixels and records no default browser dialog on the migration screens`() = runTest {
         whenever(mockDefaultRoleBrowserDialog.createIntent(any())).thenReturn(Intent())
         givenMigrationPending(AppStage.ESTABLISHED, notificationsEnabled = false)
         val testee = createMigrationViewModel()
@@ -1035,7 +1038,9 @@ class WelcomePageViewModelTest {
         testee.onEvent(NewUserOnboardingEvent.ContinueClicked)
         advanceUntilIdle()
 
-        verifyNoInteractions(pixel)
+        verify(pixel).fire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_SHOWN, type = Unique())
+        verify(pixel).fire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
+        verifyNoMoreInteractions(pixel)
         verifyNoInteractions(mockShownPixels)
         verifyNoInteractions(mockAppInstallStore)
         verify(mockDefaultRoleBrowserDialog, never()).dialogShown()
@@ -1070,6 +1075,7 @@ class WelcomePageViewModelTest {
                 defaultBrowserDetector = mockDefaultBrowserDetector,
                 appBuildConfig = mockAppBuildConfig,
                 notificationManager = mockNotificationManager,
+                pixel = pixel,
                 dispatchers = coroutineRule.testDispatcherProvider,
             ),
             userStageStore = mockUserStageStore,
