@@ -18,7 +18,7 @@ tags:
       # get to autofill form
       - tapOn:
           id: "omnibarTextInput|inputField"
-      - inputText: "https://autofill.me/form/login-simple"
+      - inputText: "https://privacy-test-pages.site/autofill/e2e/login.html"
       - pressKey: Enter
 
       # simulate a partial login form by first submitting just the username
