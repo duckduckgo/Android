@@ -131,7 +131,7 @@ class NativeInputLayoutCoordinator(
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)
 
         // In duck.ai mode the legacy AppBar stays visible; float overlays over it so AppBar
-        // behavior/elevation doesn't push or cover them. Restored on widget detach.
+        // behavior/elevation doesn't push or cover them. Restored when the widget is removed.
         val restoreFloats: List<() -> Unit> = if (omnibarState.isDuckAiMode()) {
             listOfNotNull(autoCompleteList, focusedView).map { it.floatOverLegacyOmnibar() }
         } else {
@@ -490,7 +490,7 @@ class NativeInputLayoutCoordinator(
      * Around a nav bar show/hide slide (widget stays open): silence the layout listeners and suspend the
      * content-reflow transition so the per-frame [updateNavBarInset] drive moves the content in lock-step
      * with the bar. Paired with [endNavBarSlide]; both idempotent, so a rapid re-toggle that cancels the
-     * previous slide stays suspended until the last slide ends. [configureContentOffset]/detach reset it.
+     * previous slide stays suspended until the last slide ends. [configureContentOffset]/[onWidgetRemoved] reset it.
      */
     fun beginNavBarSlide() {
         isWidgetAnimating = true
