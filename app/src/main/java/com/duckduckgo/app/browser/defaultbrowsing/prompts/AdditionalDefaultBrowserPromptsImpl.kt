@@ -220,7 +220,10 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             return@withLock ModalEvaluator.EvaluationResult.Skipped
         }
 
-        defaultBrowserPromptsAppUsageRepository.recordAppUsedNow()
+        val isNextStepsSectionActive = nextSteps.isSectionActive()
+        if (!isNextStepsSectionActive) {
+            defaultBrowserPromptsAppUsageRepository.recordAppUsedNow()
+        }
 
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
         logcat { "evaluate: is default browser = $isDefaultBrowser" }
@@ -240,7 +243,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         } else {
             logcat { "evaluate: current stage is other than NOT_STARTED and DuckDuckGo is NOT default browser." }
 
-            if (nextSteps.isSectionActive()) {
+            if (isNextStepsSectionActive) {
                 logcat { "evaluate: Next Steps section is active, holding the prompts back" }
                 return@withLock ModalEvaluator.EvaluationResult.Skipped
             }

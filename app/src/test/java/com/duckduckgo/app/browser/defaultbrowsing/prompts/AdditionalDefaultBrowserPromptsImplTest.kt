@@ -418,7 +418,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `evaluate - if enough active days until stage 1 but the next steps section is active, then hold the stage`() = runTest {
+    fun `evaluate - if enough active days until stage 1 but the next steps section is active, then hold the stage and do not count the day`() = runTest {
         val dataStoreMock = createDataStoreFake(
             initialStage = Stage.STARTED,
         )
@@ -435,7 +435,25 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
         verify(dataStoreMock, never()).storeStage(Stage.STAGE_1)
-        verify(defaultBrowserPromptsAppUsageRepositoryMock).recordAppUsedNow()
+        verify(defaultBrowserPromptsAppUsageRepositoryMock, never()).recordAppUsedNow()
+    }
+
+    @Test
+    fun `evaluate - if default browser while the next steps section is active, then stop the flow`() = runTest {
+        val dataStoreMock = createDataStoreFake(
+            initialStage = Stage.STARTED,
+        )
+        val testee = createTestee(
+            defaultBrowserPromptsDataStore = dataStoreMock,
+        )
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
+        whenever(nextStepsMock.isSectionActive()).thenReturn(true)
+        whenever(stageEvaluatorMock.evaluate(Stage.STOPPED)).thenReturn(DefaultBrowserPromptsFlowStageAction.disableAll)
+
+        testee.evaluate()
+
+        verify(dataStoreMock).storeStage(Stage.STOPPED)
     }
 
     @Test
