@@ -22,13 +22,21 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.nextsteps.impl.NextStepsItemsExperimentToggles.Cohorts
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
+import com.duckduckgo.remote.messaging.api.Surface
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -39,10 +47,18 @@ class RealNextStepsTest {
 
     private val toggles: NextStepsItemsExperimentToggles = FakeFeatureToggleFactory.create(NextStepsItemsExperimentToggles::class.java)
     private val appBuildConfig: AppBuildConfig = mock()
+    private val remoteMessageModel: RemoteMessageModel = mock()
+    private val completionChecker: NextStepsCompletionChecker = mock()
+    private val itemsStore: NextStepsItemsStore = mock {
+        whenever(it.dismissedItemIds()).thenReturn(flowOf(emptySet()))
+    }
 
     private val testee = RealNextSteps(
         nextStepsItemsFeatureToggles = toggles,
         appBuildConfig = appBuildConfig,
+        remoteMessageModel = remoteMessageModel,
+        completionChecker = completionChecker,
+        itemsStore = itemsStore,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
@@ -132,6 +148,88 @@ class RealNextStepsTest {
 
         assertNull(testee.provideSectionView(mock()))
     }
+
+    @Test
+    fun `section is active for a treatment user while a next steps message holds the slot`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.CHECK_LIST)
+        toggles.nextStepsItemsExperiment().enroll()
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(aMessage(Content.ActionableItems("Setup", emptyList())))
+
+        assertTrue(testee.isSectionActive())
+    }
+
+    @Test
+    fun `section is not active once no next steps message holds the slot`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
+        toggles.nextStepsItemsExperiment().enroll()
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(null)
+
+        assertFalse(testee.isSectionActive())
+    }
+
+    @Test
+    fun `section is not active when another message holds the slot`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
+        toggles.nextStepsItemsExperiment().enroll()
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(aMessage(Content.Small("title", "description")))
+
+        assertFalse(testee.isSectionActive())
+    }
+
+    @Test
+    fun `section is not active for a control user even with a next steps message`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.CONTROL)
+        toggles.nextStepsItemsExperiment().enroll()
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(aMessage(Content.ActionableItems("Setup", emptyList())))
+
+        assertFalse(testee.isSectionActive())
+    }
+
+    @Test
+    fun `stacked cards section is active while a card is left`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
+        toggles.nextStepsItemsExperiment().enroll()
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(aMessage(Content.ActionableItems("Setup", emptyList())))
+        whenever(completionChecker.hasRemainingItems(any(), any())).thenReturn(true)
+
+        assertTrue(testee.isSectionActive())
+    }
+
+    @Test
+    fun `stacked cards section is not active once every card is done or dismissed, even before the message is dismissed`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
+        toggles.nextStepsItemsExperiment().enroll()
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(aMessage(Content.ActionableItems("Setup", emptyList())))
+        whenever(completionChecker.hasRemainingItems(any(), any())).thenReturn(false)
+
+        assertFalse(testee.isSectionActive())
+    }
+
+    @Test
+    fun `check list section stays active while its message holds the slot, even with every item done`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.CHECK_LIST)
+        toggles.nextStepsItemsExperiment().enroll()
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(aMessage(Content.ActionableItems("Setup", emptyList())))
+        whenever(completionChecker.hasRemainingItems(any(), any())).thenReturn(false)
+
+        assertTrue(testee.isSectionActive())
+        verify(completionChecker, never()).hasRemainingItems(any(), any())
+    }
+
+    private fun aMessage(content: Content) = RemoteMessage(
+        id = "message",
+        content = content,
+        matchingRules = emptyList(),
+        exclusionRules = emptyList(),
+        surfaces = listOf(Surface.NEW_TAB_PAGE),
+    )
 
     private suspend fun givenKillSwitch(enabled: Boolean) {
         toggles.self().setRawStoredState(Toggle.State(enable = enabled))

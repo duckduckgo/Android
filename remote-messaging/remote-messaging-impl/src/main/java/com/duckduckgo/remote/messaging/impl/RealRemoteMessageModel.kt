@@ -93,6 +93,13 @@ class RealRemoteMessageModel @Inject constructor(
         remoteMessagingRepository.clearMessageImage(surface)
     }
 
+    override suspend fun getItemImageFile(
+        remoteMessage: RemoteMessage,
+        itemId: String,
+    ): String? {
+        return remoteMessagingRepository.getItemImageFilePath(remoteMessage, itemId)
+    }
+
     override suspend fun isMessageDismissed(id: String): Boolean = withContext(dispatchers.io()) {
         remoteMessagingRepository.dismissedMessages().contains(id)
     }

@@ -51,6 +51,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -79,7 +80,7 @@ class NextStepsStackedCardsViewModelTest {
     private val clock: CurrentTimeProvider = mock {
         whenever(it.localDateTimeNow()).thenReturn(LocalDateTime.of(2026, 10, 21, 12, 0))
     }
-    private val telemetry = RealNextStepsTelemetry(telemetryStore, pixels, clock, coroutineRule.testDispatcherProvider)
+    private val telemetry = RealNextStepsTelemetry(telemetryStore, pixels, mock(), clock, coroutineRule.testDispatcherProvider)
     private val defaultBrowserCheck = FakeCompletionCheck("setup_default_browser")
     private val addWidgetCheck = FakeCompletionCheck("setup_add_widget")
     private val syncCheck = FakeCompletionCheck("setup_sync")
@@ -1256,6 +1257,27 @@ class NextStepsStackedCardsViewModelTest {
     )
 
     private val syncItem = defaultBrowserItem.copy(id = "setup_sync", titleText = "Sync your data")
+
+    @Test
+    fun `when an item image was downloaded with the message then its local path is in the state`() = runTest {
+        val itemsWithImages = listOf(defaultBrowserItem.copy(imageUrl = "https://img/1.png"), addWidgetItem.copy(imageUrl = "https://img/2.png"))
+        val message = aMessage(content = Content.ActionableItems(titleText = "Complete your setup", listItems = itemsWithImages))
+        whenever(remoteMessageModel.getItemImageFile(message, defaultBrowserItem.id)).thenReturn("/images/1.png")
+        whenever(remoteMessageModel.getItemImageFile(message, addWidgetItem.id)).thenReturn(null)
+        activeMessage.value = message
+        advanceUntilIdle()
+
+        assertEquals(mapOf(defaultBrowserItem.id to "/images/1.png"), testee.viewState.value.imageFilePaths)
+    }
+
+    @Test
+    fun `when an item has no image url then no local image is looked up`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.imageFilePaths.isEmpty())
+        verify(remoteMessageModel, never()).getItemImageFile(any(), any())
+    }
 
     private fun nextStepsContent() = Content.ActionableItems(
         titleText = "Complete your setup",

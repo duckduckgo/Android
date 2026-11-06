@@ -121,6 +121,55 @@ class NativeInputLayoutCoordinatorTest {
         assertEquals(CARD_TOP_MARGIN_PX + CARD_HEIGHT_PX, browserLayout.paddingBottom)
     }
 
+    @Test
+    fun whenWidgetReattachesThenForcedBottomTranslationFollowsRootSize() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val widget = View(activity)
+        val params = FrameLayout.LayoutParams(MATCH_PARENT, 400, Gravity.TOP)
+        val root = FrameLayout(activity).apply { addView(widget, params) }
+        activity.setContentView(root)
+        root.measure(
+            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+        )
+        root.layout(0, 0, 1000, 1000)
+        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        coordinator.applyForcedBottomTranslation(widget, isBottom = true)
+        assertEquals(600f, widget.translationY)
+
+        root.removeView(widget)
+        root.addView(widget, params)
+        root.measure(
+            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(600, View.MeasureSpec.EXACTLY),
+        )
+        root.layout(0, 0, 1000, 600)
+
+        assertEquals(200f, widget.translationY)
+    }
+
+    @Test
+    fun whenForcedBottomIsDisabledThenReattachingDoesNotOverrideTopTranslation() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val widget = View(activity)
+        val root = FrameLayout(activity).apply { addView(widget) }
+        activity.setContentView(root)
+        root.layout(0, 0, 1000, 1000)
+        widget.layout(0, 0, 1000, 400)
+        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        coordinator.applyForcedBottomTranslation(widget, isBottom = true)
+        assertEquals(600f, widget.translationY)
+
+        root.removeView(widget)
+        coordinator.applyForcedBottomTranslation(widget, isBottom = false)
+        widget.translationY = -NAV_BAR_HEIGHT_PX.toFloat()
+        root.addView(widget)
+        root.layout(0, 0, 1000, 600)
+        widget.layout(0, 0, 1000, 300)
+
+        assertEquals(-NAV_BAR_HEIGHT_PX.toFloat(), widget.translationY)
+    }
+
     private companion object {
         private const val NAV_BAR_HEIGHT_PX = 56
         private const val CARD_TOP_MARGIN_PX = 20

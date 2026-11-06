@@ -294,6 +294,14 @@
         "exceptPlatforms": []
       },
       {
+        "name": "correct rule that only misses reason property",
+        "requestUrl": "https://request-blocklist.example/missing-reason",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
         "name": "incorrect rule that has extra property",
         "requestUrl": "https://request-blocklist.example/extra-prop",
         "requestType": "image",

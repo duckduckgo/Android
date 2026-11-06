@@ -223,6 +223,7 @@ import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
 import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
+import com.duckduckgo.app.browser.pdf.PdfPageContextRegistry
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.progressbar.NavigationProgressState
@@ -351,6 +352,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
+import com.duckduckgo.browser.api.pdf.PdfPageContext
+import com.duckduckgo.browser.api.pdf.PdfPageContextProvider
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -389,6 +392,8 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
+import com.duckduckgo.duckchat.api.DuckAiPdfPageContext
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
@@ -396,6 +401,7 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -494,6 +500,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
+import com.duckduckgo.duckchat.api.PageContextTrigger as Trigger
 import com.duckduckgo.mobile.android.R as CommonR
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
@@ -586,6 +593,7 @@ class BrowserTabViewModel @Inject constructor(
     private val pageContextJSHelper: PageContextJSHelper,
     private val tabPageContextRepository: TabPageContextRepository,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
+    private val promoRecordObserver: PromoRecordObserver,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val pageLoadWideEvent: PageLoadWideEvent,
@@ -600,6 +608,9 @@ class BrowserTabViewModel @Inject constructor(
     private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
     private val brokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
+    private val pdfPageContextProvider: PdfPageContextProvider,
+    private val pdfPageContextRegistry: PdfPageContextRegistry,
+    private val pdfPageContextResolver: DuckAiPdfPageContext,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
     private val newDownloadState: NewDownloadState,
@@ -813,6 +824,7 @@ class BrowserTabViewModel @Inject constructor(
 
     // Needed for PageLoadWideEvent: it identifies which page load the progress events belong to.
     private var pageLoadNavigationId: Long? = null
+    private var isDuckAiContextualSheetVisible = false
     private var hasExitedFixedProgress = false
     private var navigationState = NavigationProgressState()
 
@@ -927,6 +939,7 @@ class BrowserTabViewModel @Inject constructor(
 
         observeSyncStatusChangesForDuckChat()
         observeSubscriptionChangesForDuckChat()
+        observePromoRecordChangesForDuckChat()
 
         tabRepository.childClosedTabs
             .onEach { closedTab ->
@@ -1164,6 +1177,17 @@ class BrowserTabViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    private fun observePromoRecordChangesForDuckChat() {
+        promoRecordObserver.promoRecordChangedEvents
+            .onEach { event ->
+                val currentUrl = url
+                if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) {
+                    _subscriptionEventDataChannel.trySend(event)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
     private fun sendDuckChatAuthUpdate() {
         val authUpdateEvent = SubscriptionEventData(
             featureName = SUBSCRIPTIONS_FEATURE_NAME,
@@ -1308,6 +1332,10 @@ class BrowserTabViewModel @Inject constructor(
 
     @VisibleForTesting
     public override fun onCleared() {
+        if (::tabId.isInitialized) {
+            pageContextJSHelper.cancelCollection(tabId)
+            pdfPageContextRegistry.hide(tabId)
+        }
         newTabPageModalPresenterRegistry.unregister(this)
         buildingSiteFactoryJob?.cancel()
         autoCompleteJob.cancel()
@@ -2097,6 +2125,8 @@ class BrowserTabViewModel @Inject constructor(
         if (duckChat.isVoiceChatSessionActive(tabId)) {
             duckChat.endVoiceChatSession(tabId)
         }
+        pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextRegistry.hide(tabId)
         pdfDownloadJob.cancel()
         suggestRedirectJob.cancel()
         badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
@@ -2765,6 +2795,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun pageCleared() {
+        pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextRegistry.hide(tabId)
         logcat(VERBOSE) { "Page cleared: $url" }
         site = null
         onSiteChanged()
@@ -2786,6 +2818,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onMainFrameLoadStarted(navigationId: Long) {
+        pageContextJSHelper.cancelCollection(tabId)
         pageLoadNavigationId = navigationId
         hasExitedFixedProgress = false
         errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
@@ -2793,6 +2826,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onPageLoadTimeout() {
         val state = currentBrowserViewState()
+        if (state.currentPdfCachedUri != null) return
         val canShowError = state.browserShowing &&
             state.sslError == NONE &&
             !state.maliciousSiteBlocked &&
@@ -2908,7 +2942,7 @@ class BrowserTabViewModel @Inject constructor(
             onDuckAiOnboardingPageFinishedIfApplicable()
 
             if (androidBrowserConfig.storePageContext().isEnabled()) {
-                collectPageContext()
+                collectPageContext(Trigger.NAVIGATION, pageLoadNavigationId, isDuckAiContextualSheetVisible)
             }
         }
     }
@@ -4576,7 +4610,14 @@ class BrowserTabViewModel @Inject constructor(
                         currentPdfCachedUri = result.uri,
                         currentPdfFileName = pdfTitle,
                     )
+                    pageContextJSHelper.cancelCollection(tabId)
+                    pdfPageContextRegistry.show(tabId, result.uri, pdfTitle, url)
                     command.value = ShowPdfInTab(url, result.uri)
+                    pdfPageContextResolver.getMetadata(tabId)?.let { metadata ->
+                        if (metadata.availability != DuckAiPdfMetadata.Availability.STALE) {
+                            command.value = Command.PdfPageContextReceived(tabId, metadata)
+                        }
+                    }
                     if (customTab == null && pdfDownloadTooltipDataStore.canShow()) {
                         pdfDownloadTooltipDataStore.incrementShownCount()
                         command.value = Command.ShowPdfDownloadTooltip
@@ -4626,6 +4667,8 @@ class BrowserTabViewModel @Inject constructor(
         currentWebViewTitle: String?,
         currentWebViewCertificate: SslCertificate? = null,
     ) {
+        pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextRegistry.hide(tabId)
         if (currentBrowserViewState().currentPdfCachedUri == null) return
         browserViewState.value = currentBrowserViewState().copy(
             currentPdfCachedUri = null,
@@ -5314,7 +5357,7 @@ class BrowserTabViewModel @Inject constructor(
         context: Context? = null,
         getWebViewUrl: () -> String?,
     ) {
-        logcat { "jsCallback $featureName $method $data" }
+        logcat { "jsCallback $featureName $method" }
 
         when (method) {
             "webShare" ->
@@ -5433,6 +5476,7 @@ class BrowserTabViewModel @Inject constructor(
 
             PAGE_CONTEXT_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
+                    if (pdfPageContextResolver.getMetadata(tabId) != null) return@launch
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
                         val enrichedContext = duckChatJSHelper.enrichPageContextIfPossible(tabId, pageContext)
@@ -6154,11 +6198,49 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    suspend fun restorePdfPageContext(uri: Uri?, title: String, url: String): Boolean {
+        pageContextJSHelper.cancelCollection(tabId)
+        pdfPageContextRegistry.show(tabId, uri, title, url)
+        return when (pdfPageContextProvider.getMetadata(tabId)?.status) {
+            PdfPageContext.Status.AVAILABLE, PdfPageContext.Status.TOO_LARGE -> {
+                browserViewState.value = currentBrowserViewState().copy(currentPdfCachedUri = uri, currentPdfFileName = title)
+                true
+            }
+            PdfPageContext.Status.UNAVAILABLE -> {
+                browserViewState.value = currentBrowserViewState().copy(currentPdfCachedUri = null, currentPdfFileName = null)
+                if (Uri.parse(url).scheme?.lowercase() in listOf("http", "https")) {
+                    handlePdfUrl(url, null, "application/pdf", requestUserConfirmation = false, forceRefresh = true)
+                }
+                false
+            }
+            PdfPageContext.Status.STALE, null -> false
+        }
+    }
+
     fun collectPageContext() {
+        collectPageContext(Trigger.TAB_CONTENT, navigationId = null, isDuckAiVisible = true)
+    }
+
+    private fun collectPageContext(
+        trigger: Trigger,
+        navigationId: Long?,
+        isDuckAiVisible: Boolean,
+    ) {
         viewModelScope.launch {
-            val subscriptionEvent = pageContextJSHelper.collectPageContext()
+            val context = pdfPageContextResolver.getMetadata(tabId)
+            if (context != null) {
+                if (context.availability != DuckAiPdfMetadata.Availability.STALE) {
+                    command.value = Command.PdfPageContextReceived(tabId, context)
+                }
+                return@launch
+            }
+            val subscriptionEvent = pageContextJSHelper.collectPageContext(tabId, trigger, navigationId, isDuckAiVisible)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
+    }
+
+    fun onDuckAiContextualSheetVisibilityChanged(visible: Boolean) {
+        isDuckAiContextualSheetVisible = visible
     }
 
     fun onDuckChatOmnibarButtonClicked(

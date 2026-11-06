@@ -44,6 +44,7 @@ import okhttp3.Response
 import java.io.File
 import java.io.IOException
 import java.security.cert.X509Certificate
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
@@ -157,26 +158,27 @@ class RealInlinePdfHandler @Inject constructor(
     private val cacheDir: File
         get() = File(context.cacheDir, PDF_CACHE_DIR).also { it.mkdirs() }
 
+    private val abandonedDownloadsCleaned: Unit by lazy {
+        cacheDir.listFiles().orEmpty().filter { it.name.endsWith(".part") }.forEach { it.delete() }
+    }
+
     override suspend fun downloadToCache(
         url: String,
         forceRefresh: Boolean,
         browserMode: BrowserMode,
     ): PdfDownloadResult = withContext(dispatcherProvider.io()) {
         val fileName = extractFileName(url)
-        // Prefix the cache filename with the URL hash so two URLs sharing a last path segment
-        // (e.g. report.pdf at site A and site B) don't collide and serve stale content.
-        val targetFile = File(cacheDir, "${url.hashCode()}-$fileName")
+        val prefix = "${url.hashCode()}-"
+        val targetFile = File(cacheDir, "$prefix${UUID.randomUUID()}-$fileName.part")
         try {
-            if (!forceRefresh && targetFile.exists() && hasPdfMagicBytes(targetFile)) {
-                // Bump mtime so LRU eviction treats this file as recently *used*,
-                // not just recently *written*.
-                targetFile.setLastModified(System.currentTimeMillis())
-                return@withContext PdfDownloadResult.Success(
-                    uri = Uri.fromFile(targetFile),
-                    certificate = readCertSidecar(targetFile),
-                )
+            abandonedDownloadsCleaned
+            val cached = cacheDir.listFiles()?.filter {
+                (it.name.startsWith(prefix) && it.name.endsWith("-$fileName")) || it.name == "$prefix$fileName"
+            }?.maxByOrNull { it.lastModified() }
+            if (!forceRefresh && cached != null && hasPdfMagicBytes(cached)) {
+                cached.setLastModified(System.currentTimeMillis())
+                return@withContext PdfDownloadResult.Success(Uri.fromFile(cached), readCertSidecar(cached))
             }
-
             val requestBuilder = Request.Builder().url(url)
 
             // The Fire manager (ProfileStore-backed, @UiThread) resolves to null off-main until warmed,
@@ -224,21 +226,22 @@ class RealInlinePdfHandler @Inject constructor(
                 return@withContext PdfDownloadResult.Failure(PdfErrorType.UNKNOWN)
             }
 
-            certificate?.let { saveCertSidecar(targetFile, it) }
-
-            enforceCacheBudget(keepFile = targetFile, maxFiles = MAX_CACHED_FILES)
-
-            PdfDownloadResult.Success(Uri.fromFile(targetFile), certificate)
+            val completedFile = File(cacheDir, targetFile.name.removeSuffix(".part"))
+            if (!targetFile.renameTo(completedFile)) throw IOException("Unable to publish cached PDF")
+            certificate?.let { saveCertSidecar(completedFile, it) }
+            enforceCacheBudget(keepFile = completedFile, maxFiles = MAX_CACHED_FILES)
+            PdfDownloadResult.Success(Uri.fromFile(completedFile), certificate)
         } catch (e: CancellationException) {
             logcat { "PDF download cancelled, cleaning up partial file" }
             targetFile.delete()
             throw e
         } catch (e: IOException) {
-            logcat { "PDF download failed: ${e.message}" }
+            logcat { "PDF download failed" }
             targetFile.delete()
             PdfDownloadResult.Failure(PdfErrorType.IO_ERROR)
         } catch (e: SecurityException) {
-            logcat { "PDF download denied: ${e.message}" }
+            targetFile.delete()
+            logcat { "PDF download denied" }
             PdfDownloadResult.Failure(PdfErrorType.SECURITY_ERROR)
         }
     }
@@ -291,7 +294,7 @@ class RealInlinePdfHandler @Inject constructor(
         val dir = cacheDir
         val keepName = keepFile.name
         val candidates = dir.listFiles()
-            ?.filter { it.isFile && !it.name.endsWith(CERT_SIDECAR_SUFFIX) && it.name != keepName }
+            ?.filter { it.isFile && !it.name.endsWith(".part") && !it.name.endsWith(CERT_SIDECAR_SUFFIX) && it.name != keepName }
             ?: return
         val totalFiles = candidates.size + 1
         if (totalFiles <= maxFiles) return
@@ -317,11 +320,11 @@ class RealInlinePdfHandler @Inject constructor(
             parcel.writeBundle(bundle)
             certSidecarFile(targetFile).writeBytes(parcel.marshall())
         } catch (e: IOException) {
-            logcat { "PDF cert sidecar write failed: ${e.message}" }
+            logcat { "PDF cert sidecar write failed" }
         } catch (e: BadParcelableException) {
-            logcat { "PDF cert parcelable not conform: ${e.message}" }
+            logcat { "PDF cert parcelable not conform" }
         } catch (e: Throwable) {
-            logcat { "PDF cert unexpected error: ${e.message}" }
+            logcat { "PDF cert unexpected error" }
         } finally {
             parcel.recycle()
         }
@@ -345,7 +348,7 @@ class RealInlinePdfHandler @Inject constructor(
                 parcel.recycle()
             }
         } catch (t: Throwable) {
-            logcat { "PDF cert sidecar read failed: ${t.message}" }
+            logcat { "PDF cert sidecar read failed" }
             sidecar.delete()
             null
         }
@@ -355,9 +358,9 @@ class RealInlinePdfHandler @Inject constructor(
 
     override suspend fun cacheLocalPdf(uri: Uri): LocalPdfResult = withContext(dispatcherProvider.io()) {
         val displayName = resolveDisplayName(uri)
-        // Prefix with the source URI hash so two sources sharing a display name don't collide.
-        val targetFile = File(cacheDir, "${uri.toString().hashCode()}-$displayName")
+        val targetFile = File(cacheDir, "${uri.toString().hashCode()}-${UUID.randomUUID()}-$displayName.part")
         try {
+            abandonedDownloadsCleaned
             context.contentResolver.openInputStream(uri)?.use { input ->
                 targetFile.outputStream().use { output -> input.copyTo(output) }
             } ?: run {
@@ -372,18 +375,20 @@ class RealInlinePdfHandler @Inject constructor(
                 return@withContext LocalPdfResult.Failure(PdfErrorType.UNKNOWN)
             }
 
-            enforceCacheBudget(keepFile = targetFile, maxFiles = MAX_CACHED_FILES)
-            LocalPdfResult.Success(Uri.fromFile(targetFile), displayName)
+            val completedFile = File(cacheDir, targetFile.name.removeSuffix(".part"))
+            if (!targetFile.renameTo(completedFile)) throw IOException("Unable to publish cached PDF")
+            enforceCacheBudget(keepFile = completedFile, maxFiles = MAX_CACHED_FILES)
+            LocalPdfResult.Success(Uri.fromFile(completedFile), displayName)
         } catch (e: CancellationException) {
             logcat { "Local PDF copy cancelled, cleaning up partial file" }
             targetFile.delete()
             throw e
         } catch (e: IOException) {
-            logcat { "Local PDF copy failed: ${e.message}" }
+            logcat { "Local PDF copy failed" }
             targetFile.delete()
             LocalPdfResult.Failure(PdfErrorType.IO_ERROR)
         } catch (e: SecurityException) {
-            logcat { "Local PDF copy denied: ${e.message}" }
+            logcat { "Local PDF copy denied" }
             targetFile.delete()
             LocalPdfResult.Failure(PdfErrorType.SECURITY_ERROR)
         }
@@ -413,7 +418,7 @@ class RealInlinePdfHandler @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            logcat { "Local PDF display name lookup failed: ${e.message}" }
+            logcat { "Local PDF display name lookup failed" }
             null
         }
     }

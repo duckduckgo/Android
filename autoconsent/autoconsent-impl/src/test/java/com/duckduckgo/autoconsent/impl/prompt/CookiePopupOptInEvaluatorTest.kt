@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.AppInstallTimeProvider
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -66,6 +67,9 @@ class CookiePopupOptInEvaluatorTest {
     private val appInstallTimeProvider: AppInstallTimeProvider = mock {
         on { firstInstallTimeMillis() } doReturn now - TimeUnit.DAYS.toMillis(30)
     }
+    private val nextSteps: NextSteps = mock {
+        onBlocking { isSectionActive() } doReturn false
+    }
 
     private val testee by lazy {
         CookiePopupOptInEvaluator(
@@ -78,6 +82,7 @@ class CookiePopupOptInEvaluatorTest {
             onboardingFlowChecker = onboardingFlowChecker,
             currentTimeProvider = currentTimeProvider,
             appInstallTimeProvider = appInstallTimeProvider,
+            nextSteps = nextSteps,
         )
     }
 
@@ -116,6 +121,15 @@ class CookiePopupOptInEvaluatorTest {
     @Test
     fun whenPromptToggleDisabledThenSkippedAndNothingLaunched() = runTest {
         feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = false))
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenNextStepsSectionIsActiveThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        whenever(nextSteps.isSectionActive()).thenReturn(true)
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
         assertNull(shadowOf(application).nextStartedActivity)

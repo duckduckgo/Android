@@ -551,6 +551,34 @@ class AttachmentViewModelTest {
     }
 
     @Test
+    fun whenFilesHaveDifferentSizesThenOnlyFilesAboveLimitAreMarkedOversized() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = FileLimits(maxFileSizeBytes = maxBytes)))
+        addFiles(
+            aFileAttachment(id = "small", sizeBytes = maxBytes - 1),
+            aFileAttachment(id = "exact", sizeBytes = maxBytes),
+            aFileAttachment(id = "large", sizeBytes = maxBytes + 1),
+        )
+
+        assertEquals(setOf("large"), viewModel.attachmentState.value.oversizedFileIds)
+    }
+
+    @Test
+    fun whenFileSizeLimitChangesThenExistingFileOversizeStateUpdates() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        addFiles(aFileAttachment(id = "file", sizeBytes = maxBytes + 1))
+        assertEquals(setOf("file"), viewModel.attachmentState.value.oversizedFileIds)
+
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = FileLimits(maxFileSizeBytes = maxBytes * 2)))
+        advanceUntilIdle()
+        assertTrue(viewModel.attachmentState.value.oversizedFileIds.isEmpty())
+
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = FileLimits(maxFileSizeBytes = maxBytes)))
+        advanceUntilIdle()
+        assertEquals(setOf("file"), viewModel.attachmentState.value.oversizedFileIds)
+    }
+
+    @Test
     fun whenOversizedFileRemovedThenFileSizeErrorClears() = runTest {
         val maxBytes = 5L * 1024 * 1024
         val limits = FileLimits(maxFileSizeBytes = maxBytes)

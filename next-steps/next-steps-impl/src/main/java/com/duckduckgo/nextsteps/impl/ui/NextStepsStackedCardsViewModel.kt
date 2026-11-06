@@ -67,6 +67,8 @@ class NextStepsStackedCardsViewModel @Inject constructor(
         val message: RemoteMessage? = null,
         val title: String = "",
         val items: List<CardItem.ListItem> = emptyList(),
+        /** Local image file path by item id, for the items whose image was downloaded with the message. */
+        val imageFilePaths: Map<String, String> = emptyMap(),
     )
 
     sealed class Command {
@@ -115,6 +117,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
                     message = message,
                     title = content?.titleText.orEmpty(),
                     items = items,
+                    imageFilePaths = if (message == null) emptyMap() else imageFilePaths(message, items),
                 )
                 if (message != null && items.isEmpty()) {
                     dismissMessage(message)
@@ -215,6 +218,14 @@ class NextStepsStackedCardsViewModel @Inject constructor(
             refreshOnScreenItems(message, onScreen, remaining, completedIds)
         }
     }
+
+    private suspend fun imageFilePaths(
+        message: RemoteMessage,
+        items: List<CardItem.ListItem>,
+    ): Map<String, String> = items
+        .filter { !it.imageUrl.isNullOrEmpty() }
+        .mapNotNull { item -> remoteMessageModel.getItemImageFile(message, item.id)?.let { item.id to it } }
+        .toMap()
 
     private suspend fun refreshCompletedItemIds(items: List<CardItem.ListItem>): Set<String> =
         completionChecker.refresh(items) { telemetry.onItemsCompleted(Variant.STACKED_CARDS, it) }

@@ -27,6 +27,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
@@ -43,6 +44,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -80,6 +82,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -146,7 +149,10 @@ class RealDuckChatJSHelperTest {
     private val entryWideEvent: DuckAiEntryWideEvent = mock()
     private val tabSessions: DuckAiTabSessionRepository = mock()
 
+    private val pdfPageContextResolver: PdfPageContextResolver = mock()
+
     private val testee = RealDuckChatJSHelper(
+        pdfPageContextResolver = pdfPageContextResolver,
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
@@ -668,6 +674,92 @@ class RealDuckChatJSHelperTest {
         assertTrue(result!!.params.has("pageContext"))
         assertTrue(result.params.isNull("pageContext"))
     }
+
+    @Test
+    fun `manual PDF attachment reports frontend attachment pixel`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(true), any())).thenReturn(pdfContextResult("JVBERi0="))
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "userAction"),
+            tabId = "tab-1",
+        )!!
+
+        val context = response.params.getJSONObject("pageContext")
+        assertEquals("JVBERi0=", context.getString("data"))
+        assertTrue(context.getBoolean("attached"))
+        verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
+    }
+
+    @Test
+    fun `manual PDF response without bytes does not report attached`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(true), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "userAction"),
+            tabId = "tab-1",
+        )!!
+
+        assertFalse(response.params.getJSONObject("pageContext").getBoolean("attached"))
+        verify(mockDuckChatPixels, never()).reportContextualPageContextManuallyAttachedFrontend()
+    }
+
+    @Test
+    fun `PDF initialization with auto attachment off sends unattached metadata`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(false), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "init"),
+            tabId = "tab-1",
+        )!!
+
+        val context = response.params.getJSONObject("pageContext")
+        assertTrue(context.getBoolean("attachable"))
+        assertFalse(context.getBoolean("attached"))
+        assertFalse(context.has("data"))
+        verify(pdfPageContextResolver).resolve(eq("tab-1"), anyOrNull(), eq(false), any())
+    }
+
+    @Test
+    fun `PDF initialization after removal does not read bytes when auto attachment is on`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(false), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "init"),
+            tabId = "tab-1",
+            allowAutomaticPageContextAttachment = false,
+        )!!
+
+        assertFalse(response.params.getJSONObject("pageContext").getBoolean("attached"))
+        verify(pdfPageContextResolver).resolve(eq("tab-1"), anyOrNull(), eq(false), any())
+        verify(pdfPageContextResolver, never()).resolve(eq("tab-1"), anyOrNull(), eq(true), any())
+    }
+
+    private fun pdfContextResult(data: String? = null) = PdfPageContextResolver.Result.Pdf(
+        DuckAiPdfMetadata(
+            "document.pdf",
+            "https://example.com/document.pdf",
+            DuckAiPdfMetadata.Availability.AVAILABLE,
+        ),
+        data,
+    )
 
     @Test
     fun whenGetPageContextUserActionThenReturnsContextRegardlessOfAutoFlag() = runTest {
