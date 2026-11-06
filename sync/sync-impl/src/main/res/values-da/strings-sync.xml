@@ -480,13 +480,13 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Få adgang til dine adgangskoder på mobil og computer.</string>
     <string name="sync_passwords_import_promo_primary_button">Slå Sync &amp; Backup til</string>
-    <string name="sync_passwords_import_promo_title_toggle">Synkroniser og sikkerhedskopier dine adgangskoder på tværs af mobil og computer</string>
+    <string name="sync_passwords_import_promo_title_toggle">Synkroniser og sikkerhedskopier dine adgangskoder på tværs af mobil og computer.</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Få adgang til dine bogmærker på mobil og computer.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Slå Sync &amp; Backup til</string>
-    <string name="sync_bookmarks_import_promo_title_toggle">Synkroniser og sikkerhedskopier dine bogmærker på mobil og computer</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Synkroniser og sikkerhedskopier dine bogmærker på mobil og computer.</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
@@ -496,8 +496,8 @@
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_title">Synkroniser med din computer-app</string>
-    <string name="sync_bookmarks_multi_device_promo_primary_button">Synkroniser bogmærker</string>
+    <string name="sync_bookmarks_multi_device_promo_title">Synkroniser bogmærker med din computer-app også?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Opret forbindelse</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Hent App</string>
 
     <!-- Sync promo in bookmark added dialog -->
@@ -523,8 +523,8 @@
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Synkroniser med din computer-app</string>
-    <string name="sync_passwords_multi_device_promo_primary_button">Synkroniser adgangskoder</string>
+    <string name="sync_passwords_multi_device_promo_title">Synkroniser adgangskoder med din computer-app også?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Opret forbindelse</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Hent App</string>
 
 </resources>
