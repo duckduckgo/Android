@@ -19,10 +19,10 @@ package com.duckduckgo.eventhub.impl.metrics
 import android.annotation.SuppressLint
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListExperiment
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.eventhub.impl.pixels.EventHubRepository
+import com.duckduckgo.eventhub.impl.pixels.FakeCurrentTimeProvider
 import com.duckduckgo.eventhub.impl.pixels.RealEventHubPixelManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
@@ -420,12 +420,6 @@ class EventHubMetricsSpecTest {
             val state = experiment.getRawStoredState()!!
             experiment.setRawStoredState(state.copy(assignedCohort = COHORT.copy(enrollmentDateET = enrollmentDate)))
         }
-    }
-
-    private class FakeCurrentTimeProvider : CurrentTimeProvider {
-        override fun currentTimeMillis(): Long = 0L
-        override fun elapsedRealtime(): Long = 0L
-        override fun localDateTimeNow(): java.time.LocalDateTime = java.time.LocalDateTime.now()
     }
 
     interface CssExperiments {
