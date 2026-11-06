@@ -7,10 +7,7 @@ name: "DuckPlayer: Ask > SERP > Carousel > YouTube"
 - retry:
     maxRetries: 3
     commands:
-      - launchApp:
-          clearState: true
-
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - clearState
       - runFlow: common/load_serp_video_carousel.yaml
       - runFlow: common/serp_dialog_youtube.yaml
       - runFlow: common/handle_youtube_cookies.yaml
