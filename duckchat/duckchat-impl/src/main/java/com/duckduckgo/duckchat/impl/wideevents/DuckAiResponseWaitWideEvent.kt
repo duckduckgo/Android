@@ -33,6 +33,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.responseready.DuckAiResponseMonitor
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -78,6 +79,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private val duckChatFeature: Lazy<DuckChatFeature>,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val flowStore: DuckAiResponseWaitFlowStore,
+    private val responseMonitor: DuckAiResponseMonitor,
     dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
 ) : DuckAiResponseWaitWideEvent, DuckAiSessionCallback, BrowserLifecycleObserver, DataClearingPlugin {
@@ -250,11 +252,14 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
                 if (flow.chatId == null) flow.chatId = screen.chatId
                 if (!flow.onScreen) {
                     flow.onScreen = true
+                    flow.chatId?.let(responseMonitor::onReturned)
                     if (flow.left) recordReturn(flow)
                 }
             } else {
                 if (flow.onScreen) {
                     flow.onScreen = false
+                    // POC: the page can't report 'ready' once backgrounded, so 'done' here means it finished while watched.
+                    flow.chatId?.takeIf { !flow.done }?.let { responseMonitor.onLeft(flow.tabId, it) }
                     recordLeave(flow, resolveLeftVia(flow, appClosed))
                 }
                 // The tab now shows another chat, so its response states no longer describe this flow.

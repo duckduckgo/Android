@@ -66,5 +66,18 @@
             android:name=".ui.DuckChatVoiceMicrophoneService"
             android:exported="false"
             android:foregroundServiceType="microphone" />
+
+        <service
+            android:name=".responseready.DuckAiRespondingService"
+            android:exported="false"
+            android:foregroundServiceType="shortService" />
+
+        <activity
+            android:name=".responseready.ResponseReadyTapActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 </manifest>

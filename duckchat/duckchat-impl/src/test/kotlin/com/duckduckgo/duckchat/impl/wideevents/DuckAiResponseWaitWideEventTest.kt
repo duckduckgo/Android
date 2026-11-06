@@ -100,6 +100,7 @@ class DuckAiResponseWaitWideEventTest {
         duckChatFeature = lazy { duckChatFeature },
         duckChatFeatureRepository = duckChatFeatureRepository,
         flowStore = flowStore,
+        responseMonitor = mock(),
         dispatchers = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
     )
