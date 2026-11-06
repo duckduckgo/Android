@@ -55,6 +55,17 @@ class RealSystemSettingsLauncherTest {
     }
 
     @Test
+    fun whenScreenIsSamsungHomeScreenThenIntentMatchesSamsungSettingsFilter() {
+        testee.launch(context, SAMSUNG_HOME_SCREEN)
+
+        val captor = argumentCaptor<Intent>()
+        verify(context).startActivity(captor.capture())
+        val intent = captor.firstValue
+        assertEquals("com.sec.android.intent.action.SEC_APPLICATION_SETTINGS", intent.action)
+        assertTrue(intent.hasCategory("com.sec.android.intent.category.SEC_APPLICATION_SETTINGS"))
+    }
+
+    @Test
     fun whenSamsungActivityIsNotFoundThenOpensSystemSettings() {
         doThrow(ActivityNotFoundException()).doNothing().whenever(context).startActivity(any())
 

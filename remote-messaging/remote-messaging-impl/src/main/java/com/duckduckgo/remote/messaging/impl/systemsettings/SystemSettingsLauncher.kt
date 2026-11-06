@@ -51,7 +51,8 @@ class RealSystemSettingsLauncher @Inject constructor() : SystemSettingsLauncher 
     }
 
     private fun SystemSettingsScreen.intent(): Intent = when (this) {
-        SAMSUNG_HOME_SCREEN -> Intent().apply {
+        SAMSUNG_HOME_SCREEN -> Intent(SAMSUNG_APPLICATION_SETTINGS_ACTION).apply {
+            addCategory(SAMSUNG_APPLICATION_SETTINGS_CATEGORY)
             component = ComponentName(SAMSUNG_LAUNCHER_PACKAGE, SAMSUNG_HOME_SCREEN_SETTINGS_ACTIVITY)
         }
     }
@@ -59,5 +60,7 @@ class RealSystemSettingsLauncher @Inject constructor() : SystemSettingsLauncher 
     private companion object {
         const val SAMSUNG_LAUNCHER_PACKAGE = "com.sec.android.app.launcher"
         const val SAMSUNG_HOME_SCREEN_SETTINGS_ACTIVITY = "com.android.homescreen.settings.HomeScreenSettingsActivity"
+        const val SAMSUNG_APPLICATION_SETTINGS_ACTION = "com.sec.android.intent.action.SEC_APPLICATION_SETTINGS"
+        const val SAMSUNG_APPLICATION_SETTINGS_CATEGORY = "com.sec.android.intent.category.SEC_APPLICATION_SETTINGS"
     }
 }
