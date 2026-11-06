@@ -418,7 +418,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `evaluate - if enough active days until stage 1 but the next steps section is active, then hold the stage and do not count the day`() = runTest {
+    fun `evaluate - if the next steps section is active, then hold the stage and do not count the day`() = runTest {
         val dataStoreMock = createDataStoreFake(
             initialStage = Stage.STARTED,
         )
