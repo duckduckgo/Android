@@ -105,7 +105,7 @@ def test_reformatting_a_type_keeps_the_same_finding(tmp_path):
     assert one_line == spread
 
 
-def test_sealed_cases_need_no_kdoc_but_still_count_toward_size(tmp_path):
+def test_sealed_cases_need_no_kdoc_but_still_count_as_declarations(tmp_path):
     out = score_run(tmp_path, (
         "/** Doc. */\nsealed interface Result {\n"
         "    data object Loading : Result\n"
@@ -186,3 +186,12 @@ def test_flavor_source_sets_are_scored_and_test_source_sets_are_not(tmp_path):
     with open(out / "api-quality-declarations-t.csv", newline="") as f:
         declarations = {row["declaration"] for row in csv.DictReader(f)}
     assert {"Main", "PlayOnly"} <= declarations and "Fixture" not in declarations
+
+
+def test_one_undocumented_member_fails_m4_and_coverage_is_counted(tmp_path):
+    out = score_run(tmp_path, "/** Doc. */\ninterface A {\n    /** Doc. */\n    fun f()\n    fun g()\n}\n")
+
+    with open(out / "api-quality-scores-t.csv", newline="") as f:
+        row = next(csv.DictReader(f))
+    assert (row["failing"], row["kdoc_documented"], row["kdoc_total"]) == ("M4", "2", "3")
+    assert "| KDoc coverage | 66.7% |" in (out / "api-quality-scorecard-t.md").read_text()

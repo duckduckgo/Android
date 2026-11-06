@@ -62,8 +62,6 @@ public class Scorer {
 
     static final String TOGGLE_OWNER = "feature-toggles-api";
     static final String SIZE_EXCLUDED_FROM_FLOOR = "browser-api";
-    static final double KDOC_THRESHOLD = 0.80;
-    static final int SIZE_CEILING = 80;
     static final List<String> IMPL_SUFFIXES = List.of("Repository", "Dao", "Entity", "ViewModel", "Impl");
     /** `Real` is this repo's prefix for implementations (`RealFoo` implements `Foo`). */
     static final List<String> IMPL_PREFIXES = List.of("Real");
@@ -80,10 +78,10 @@ public class Scorer {
     static final Map<String, String> MUTABLE_IMPORTED_TYPES = Map.of(
         "Channel", "kotlinx.coroutines.channels.Channel",
         "SendChannel", "kotlinx.coroutines.channels.SendChannel");
-    static final String[] RULES = {"M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"};
+    static final String[] RULES = {"M1", "M2", "M3", "M4", "M5", "M7", "M8"};
     static final int MAX_SCORE = RULES.length;
 
-    /** SEALED_CASE: a subtype nested in its sealed parent. Counts for M6 but needs no KDoc, like an enum entry. */
+    /** SEALED_CASE: a subtype nested in its sealed parent. Counts as a declaration but needs no KDoc, like an enum entry. */
     enum Kind { TYPE, SEALED_CASE, TOP_FUNCTION, TOP_PROPERTY, MEMBER_FUNCTION, MEMBER_PROPERTY }
 
     record Decl(String module, String file, int line, String name, Kind kind, boolean documented) {
@@ -108,8 +106,8 @@ public class Scorer {
         final List<Finding> findings = new ArrayList<>();
         final List<Ctor> constructors = new ArrayList<>();
         final Set<String> failing = new TreeSet<>();
-        double topKdoc;
-        double memberKdoc;
+        int kdocTotal;
+        int kdocDocumented;
 
         Module(String name, Path dir) {
             this.name = name;
@@ -504,22 +502,16 @@ public class Scorer {
     }
 
     static void evaluate(Module module) {
-        List<Decl> top = module.decls.stream().filter(d -> d.needsKdoc() && d.countsForM3()).toList();
-        List<Decl> members = module.decls.stream().filter(d -> d.needsKdoc() && !d.countsForM3()).toList();
-        module.topKdoc = ratio(top);
-        module.memberKdoc = ratio(members);
         for (Decl d : module.decls) {
-            if (d.needsKdoc() && !d.documented()) {
+            if (!d.needsKdoc()) continue;
+            module.kdocTotal++;
+            if (d.documented()) {
+                module.kdocDocumented++;
+            } else {
                 module.findings.add(new Finding(module.name, d.countsForM3() ? "M3" : "M4", d.file(), d.line(), d.name(), "no KDoc"));
             }
         }
-        if (module.decls.size() > SIZE_CEILING) {
-            module.findings.add(new Finding(module.name, "M6", "", 0, module.name,
-                module.decls.size() + " public declarations (ceiling " + SIZE_CEILING + ")"));
-        }
         for (Finding f : module.findings) {
-            if (f.rule().equals("M3") && module.topKdoc >= KDOC_THRESHOLD) continue;
-            if (f.rule().equals("M4") && module.memberKdoc >= KDOC_THRESHOLD) continue;
             module.failing.add(f.rule());
         }
         module.findings.sort(FINDING_ORDER);
@@ -529,21 +521,12 @@ public class Scorer {
         .thenComparing(Finding::file).thenComparingInt(Finding::line).thenComparing(Finding::declaration)
         .thenComparing(Finding::detail);
 
-    static double ratio(List<Decl> decls) {
-        if (decls.isEmpty()) return 1.0;
-        return decls.stream().filter(Decl::documented).count() / (double) decls.size();
-    }
-
     // ---- output ----
 
     static List<Module> ranked(List<Module> modules) {
         return modules.stream()
             .sorted(Comparator.comparingInt(Module::score).thenComparing(m -> -m.decls.size()).thenComparing(m -> m.name))
             .toList();
-    }
-
-    static String pct(double value) {
-        return Math.round(value * 100) + "%";
     }
 
     static String pct1(double value) {
@@ -557,10 +540,10 @@ public class Scorer {
 
     static void writeScoresCsv(List<Module> modules, Path out) throws IOException {
         try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(out, StandardCharsets.UTF_8))) {
-            w.println("module,score,declarations,top_kdoc,member_kdoc,failing");
+            w.println("module,score,declarations,kdoc_documented,kdoc_total,failing");
             for (Module m : ranked(modules)) {
                 w.println(String.join(",", m.name, String.valueOf(m.score()), String.valueOf(m.decls.size()),
-                    pct(m.topKdoc), pct(m.memberKdoc), csv(String.join(" ", m.failing))));
+                    String.valueOf(m.kdocDocumented), String.valueOf(m.kdocTotal), csv(String.join(" ", m.failing))));
             }
         }
     }
@@ -636,6 +619,10 @@ public class Scorer {
         md.append("| **Minimum score, excluding `browser-api`** | **").append(floor).append(outOf).append("** (")
             .append(floorModules).append(") |\n");
         md.append("| Public declarations | ").append(String.format("%,d", totalDecls)).append(" |\n");
+        int kdocTotal = modules.stream().mapToInt(m -> m.kdocTotal).sum();
+        int kdocDocumented = modules.stream().mapToInt(m -> m.kdocDocumented).sum();
+        md.append("| Open findings | ").append(String.format("%,d", modules.stream().mapToInt(m -> m.findings.size()).sum())).append(" |\n");
+        md.append("| KDoc coverage | ").append(pct1(kdocTotal == 0 ? 1.0 : kdocDocumented / (double) kdocTotal)).append(" |\n");
         long perfect = modules.stream().filter(m -> m.score() == MAX_SCORE).count();
         md.append("| Modules at ").append(MAX_SCORE).append(outOf).append(" | ").append(perfect).append(" |\n\n");
 

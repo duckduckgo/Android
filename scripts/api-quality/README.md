@@ -45,9 +45,9 @@ python3 scripts/api-quality/compare.py --before /tmp/old-score --after scripts/a
 | File | Contents |
 |---|---|
 | `api-quality-scorecard-<date>.md` | Summary and per-module scores |
-| `api-quality-scores-<date>.csv` | One row per module, with its failing rules |
-| `api-quality-findings-<date>.csv` | One row per finding, including undocumented declarations in modules that still clear the 80% KDoc threshold |
-| `api-quality-declarations-<date>.csv` | Every counted public declaration, to audit M3, M4 and M6 |
+| `api-quality-scores-<date>.csv` | One row per module, with its KDoc counts and failing rules |
+| `api-quality-findings-<date>.csv` | One row per finding |
+| `api-quality-declarations-<date>.csv` | Every counted public declaration, to audit M3 and M4 |
 | `api-quality-constructors-<date>.csv` | Every constructor of a public class, any visibility; not counted, only lets `compare.py` tell a constructor still exists |
 
 ## Asana configuration
@@ -73,14 +73,16 @@ names the missing ones. Posting uses the existing `ASANA_ACCESS_TOKEN` secret.
 - **Source:** the `.kt` files of every non-test source set of a module: `src/main` and any flavor folder such as `src/play`.
 - **Public:** no `private`, `internal` or `protected` modifier, inside a public parent. `override` members are left out, because
   the contract and KDoc belong to the declaration they override.
-- **Declaration (M6):** each public type (top-level or nested, including type aliases; not companion objects or enum entries),
+- **Declaration:** each public type (top-level or nested, including type aliases; not companion objects or enum entries),
   top-level function or property, and member function or property. Primary-constructor `val`/`var` parameters count as properties.
+  The declaration count weights the fleet score.
 - **Sealed cases:** a class or object declared inside its `sealed` parent and extending it (`Result.Success`) needs no
-  KDoc, like an enum entry: it counts for M6 but not for M3. Its own members still count for M4. A subtype declared outside
+  KDoc, like an enum entry: it counts as a declaration but not for M3. Its own members still count for M4. A subtype declared outside
   its parent isn't recognised, since there's no symbol resolution.
-- **M3** covers types and top-level functions. **M4** covers member functions and properties, and top-level properties. A
-  property is also documented when its class KDoc describes it with an `@property`/`@param` tag or a `[name]` link. A module with
-  nothing to document for a check scores 100% on it.
+- **M3** covers types and top-level functions. **M4** covers member functions and properties, and top-level properties. Each
+  fails on any declaration in its group without KDoc. A property is also documented when its class KDoc describes it with an
+  `@property`/`@param` tag or a `[name]` link. **KDoc coverage**, the share of declarations with KDoc, is reported next to the
+  scores to show progress while a module still fails the checks.
 - **Constructors:** a `val`/`var` parameter is a property, public even behind a private constructor. Other parameters of a
   public constructor are checked by M2, M7 and M8 as `Type.constructor(...)`; enum and sealed class constructors aren't.
 - **M1:** a type name ending in `Repository`, `Dao`, `Entity`, `ViewModel` or `Impl`, or starting with `Real` followed by an

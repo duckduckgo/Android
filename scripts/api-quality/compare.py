@@ -41,15 +41,14 @@ class Finding:
     detail: str
 
     def key(self):
-        # M6 detail carries the declaration count, which changes whenever the module grows; the finding itself doesn't.
         # The file stands in for the package: declarations are simple names, so two packages can both have an `A.f()`.
-        return (self.module, self.rule, self.file, self.declaration, "" if self.rule == "M6" else self.detail)
+        return (self.module, self.rule, self.file, self.declaration, self.detail)
 
     def location(self):
         return (self.module, self.file, self.declaration)
 
     def moved_key(self):
-        return (self.rule, self.declaration, "" if self.rule == "M6" else self.detail)
+        return (self.rule, self.declaration, self.detail)
 
 
 @dataclass
@@ -57,6 +56,8 @@ class ModuleScore:
     module: str
     score: int
     declarations: int
+    kdoc_documented: int = 0
+    kdoc_total: int = 0
     failing: set = field(default_factory=set)
 
 
@@ -72,6 +73,7 @@ class Run:
         total_decls = sum(m.declarations for m in modules)
         floor_candidates = [m for m in modules if m.module != FLOOR_EXCLUDED_MODULE]
         floor = min((m.score for m in floor_candidates), default=0)
+        kdoc_total = sum(m.kdoc_total for m in modules)
         return {
             "modules": len(modules),
             "points": sum(m.score for m in modules),
@@ -81,6 +83,8 @@ class Run:
             "floor": floor,
             "floor_modules": sorted(m.module for m in floor_candidates if m.score == floor),
             "declarations": total_decls,
+            "open_findings": len(self.findings),
+            "kdoc_coverage": sum(m.kdoc_documented for m in modules) / kdoc_total if kdoc_total else 1.0,
         }
 
 
@@ -99,6 +103,8 @@ def load_run(directory):
                 module=row["module"],
                 score=int(row["score"]),
                 declarations=int(row["declarations"]),
+                kdoc_documented=int(row["kdoc_documented"]),
+                kdoc_total=int(row["kdoc_total"]),
                 failing=set(row["failing"].split()) if row["failing"] else set(),
             )
     with open(_single(directory, "api-quality-findings-*.csv"), newline="") as f:
@@ -282,6 +288,8 @@ def summary_table(before: Run, after: Run, diff: Diff, baseline: Run = None, wee
         ["Score, average per module"] + [pct(f["unweighted"]) for f in fleets] + [GOALS["unweighted"]],
         [f"Lowest module score, excluding `{FLOOR_EXCLUDED_MODULE}`"] + [f"{f['floor']}/{MAX_SCORE}" for f in fleets]
         + [f"{GOALS['floor']}/{MAX_SCORE}"],
+        ["Open findings"] + [f"{f['open_findings']:,}" for f in fleets] + [""],
+        ["KDoc coverage of public declarations"] + [pct(f["kdoc_coverage"]) for f in fleets] + [""],
         ["New findings"] + blanks + [str(len(diff.new)), ""],
         ["Resolved findings"] + blanks + [str(len(diff.resolved)), ""],
     ]
