@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jetbrains.kotlin.cli.FrontendConfigurationKeys;
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector;
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles;
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment;
@@ -20,6 +21,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.Disposable;
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer;
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement;
 import org.jetbrains.kotlin.com.intellij.psi.util.PsiTreeUtil;
+import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar;
 import org.jetbrains.kotlin.config.CommonConfigurationKeys;
 import org.jetbrains.kotlin.config.CompilerConfiguration;
 import org.jetbrains.kotlin.kdoc.psi.api.KDoc;
@@ -137,6 +139,9 @@ public class Scorer {
         // The compiler reports diagnostics to the message collector. Files are only parsed, never compiled, so its parse
         // warnings are discarded rather than printed for every file.
         configuration.put(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.Companion.getNONE());
+        // Since Kotlin 2.4 the environment reads compiler plugin extensions from this storage instead of creating it. No
+        // plugins are loaded, so an empty one is enough.
+        configuration.put(FrontendConfigurationKeys.EXTENSIONS_STORAGE, new CompilerPluginRegistrar.ExtensionStorage());
         KotlinCoreEnvironment environment = KotlinCoreEnvironment.createForProduction(
             disposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES);
         psiFactory = new KtPsiFactory(environment.getProject(), false);
