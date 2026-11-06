@@ -1037,7 +1037,7 @@ class TabSwitcherViewModelTest {
 
         verify(mockTabRepository).select("empty")
         verify(mockTabRepository, never()).add(any(), any())
-        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any())
+        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any(), any())
         verify(mockCommandObserver).onChanged(Command.Close)
     }
 

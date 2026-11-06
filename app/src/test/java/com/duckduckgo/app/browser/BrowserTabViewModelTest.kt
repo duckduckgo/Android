@@ -13993,7 +13993,7 @@ class BrowserTabViewModelTest {
         testee.openNewDuckChatFromChatMenu()
 
         assertCommandIssued<Command.SwitchToTab> { assertEquals("empty", tabId) }
-        verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any())
+        verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any(), any())
         verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
         verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
     }
@@ -14019,7 +14019,7 @@ class BrowserTabViewModelTest {
         testee.openNewDuckChatFromChatMenu()
 
         verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
-        verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any())
+        verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any(), any())
         assertCommandNotIssued<Command.OpenInNewTab>()
         assertCommandNotIssued<Command.SwitchToTab>()
     }
