@@ -65,4 +65,10 @@ interface TabManagerFeatureFlags {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun richDuckAiGridTabItem(): Toggle
+
+    /**
+     * Whether to animate the new tabs opened from the browser or the tab manager with the new transitions.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun newTabTransitions(): Toggle
 }
