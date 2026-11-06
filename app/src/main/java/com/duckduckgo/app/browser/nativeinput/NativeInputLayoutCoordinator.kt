@@ -197,17 +197,20 @@ class NativeInputLayoutCoordinator(
             }
 
             override fun onViewDetachedFromWindow(v: View) {
-                removeListeners()
-                if (!inputWidgetFixEnabled) {
+                if (inputWidgetFixEnabled) {
+                    removeListeners()
+                } else {
                     clearAutocompleteLayoutResources?.invoke()
                 }
             }
         }
         clearAutocompleteLayoutResources = {
+            removeListeners()
             applyPadding(deltaTop = 0, deltaBottom = 0)
             reapplyAutocompleteOffset = null
             restoreFloats.forEach { it() }
             widgetView.removeOnAttachStateChangeListener(attachListener)
+            clearAutocompleteLayoutResources = null
         }
         widgetView.addOnAttachStateChangeListener(attachListener)
     }
@@ -435,13 +438,15 @@ class NativeInputLayoutCoordinator(
             }
 
             override fun onViewDetachedFromWindow(v: View) {
-                removeListeners()
-                if (!inputWidgetFixEnabled) {
+                if (inputWidgetFixEnabled) {
+                    removeListeners()
+                } else {
                     clearContentOffsetResources?.invoke()
                 }
             }
         }
         clearContentOffsetResources = {
+            removeListeners()
             ntpGroup?.layoutTransition = previousNtpTransition
             pendingContentLayoutTransition = null
             widgetAnimationFrameHandler = null
@@ -457,6 +462,7 @@ class NativeInputLayoutCoordinator(
             }
             clearNtpScrollArtifacts()
             widgetView.removeOnAttachStateChangeListener(attachListener)
+            clearContentOffsetResources = null
         }
         widgetView.addOnAttachStateChangeListener(attachListener)
     }
