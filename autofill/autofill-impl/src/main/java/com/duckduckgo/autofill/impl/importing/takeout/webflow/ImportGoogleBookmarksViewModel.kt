@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command.Exit
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
@@ -39,7 +40,7 @@ import logcat.logcat
 import kotlin.time.Duration.Companion.seconds
 
 class ImportGoogleBookmarksViewModel @AssistedInject constructor(
-    @Assisted private val launchSource: String,
+    @Assisted private val params: BookmarksImportParams,
     @Assisted private val isRedesignEnabled: Boolean,
     private val importJourney: ImportGoogleBookmarksJourney,
     private val promotionPlugins: PluginPoint<BookmarksImportScreenPromotionPlugin>,
@@ -52,7 +53,7 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     init {
-        importJourney.started(launchSource)
+        importJourney.started(params.launchSource)
     }
 
     fun onWaitingForExportStarted() {
@@ -161,19 +162,19 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            launchSource: String,
+            params: BookmarksImportParams,
             isRedesignEnabled: Boolean,
         ): ImportGoogleBookmarksViewModel
 
         class Provider(
             private val assistedFactory: Factory,
-            private val launchSource: String,
+            private val params: BookmarksImportParams,
             private val isRedesignEnabled: Boolean,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(launchSource, isRedesignEnabled) as T
+                return assistedFactory.create(params, isRedesignEnabled) as T
             }
         }
     }

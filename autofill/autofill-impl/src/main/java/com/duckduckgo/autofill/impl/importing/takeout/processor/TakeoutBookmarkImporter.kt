@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.importing.takeout.processor
 
 import android.net.Uri
+import com.duckduckgo.autofill.impl.importing.BookmarkImportTimestamp
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
@@ -48,6 +49,7 @@ interface TakeoutBookmarkImporter {
 class RealTakeoutBookmarkImporter @Inject constructor(
     private val savedSitesImporter: SavedSitesImporter,
     private val dispatchers: DispatcherProvider,
+    private val bookmarkImportTimestamp: BookmarkImportTimestamp,
 ) : TakeoutBookmarkImporter {
     override suspend fun importBookmarks(
         tempFileUri: Uri,
@@ -55,7 +57,11 @@ class RealTakeoutBookmarkImporter @Inject constructor(
     ): ImportSavedSitesResult =
         withContext(dispatchers.io()) {
             try {
-                savedSitesImporter.import(tempFileUri, destination)
+                val result = savedSitesImporter.import(tempFileUri, destination)
+                if (result is ImportSavedSitesResult.Success && result.savedSites.isNotEmpty()) {
+                    bookmarkImportTimestamp.onBookmarksImported()
+                }
+                result
             } catch (exception: Exception) {
                 ImportSavedSitesResult.Error(exception)
             } finally {
