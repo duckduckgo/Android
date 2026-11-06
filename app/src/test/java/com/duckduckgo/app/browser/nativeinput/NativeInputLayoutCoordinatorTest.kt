@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.app.Activity
+import android.content.Context
 import android.content.res.Resources
 import android.os.Looper
 import android.view.Gravity
@@ -202,10 +203,179 @@ class NativeInputLayoutCoordinatorTest {
         assertEquals(widget.top + card.top - HINTS_SPACING_PX, (hints.bottom + hints.translationY).toInt())
     }
 
+    @Test
+    fun whenTabViewIsReattachedThenBrowserContentKeepsClearingWidget() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        coordinator.configureContentOffset(tab.widget, isBottom = true)
+        idle()
+
+        switchAwayAndBack(pager, tab)
+
+        assertEquals(WIDGET_HEIGHT_PX, tab.browserLayout.paddingBottom)
+    }
+
+    @Test
+    fun whenWidgetIsRemovedThenBrowserContentReturnsToBasePadding() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        coordinator.configureContentOffset(tab.widget, isBottom = true)
+        idle()
+
+        tab.root.removeView(tab.widget)
+        coordinator.onWidgetRemoved()
+        idle()
+
+        assertEquals(0, tab.browserLayout.paddingBottom)
+    }
+
+    @Test
+    fun whenWidgetConfiguredWhileTabWasDetachedIsRemovedThenItNoLongerDrivesBrowserContent() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        coordinator.configureContentOffset(tab.widget, isBottom = true)
+        pager.addView(tab.root)
+        idle()
+        switchAwayAndBack(pager, tab)
+
+        tab.root.removeView(tab.widget)
+        coordinator.onWidgetRemoved()
+        tab.browserLayout.setPadding(0, 0, 0, OTHER_SESSION_PADDING_PX)
+        pager.viewTreeObserver.dispatchOnGlobalLayout()
+
+        assertEquals(OTHER_SESSION_PADDING_PX, tab.browserLayout.paddingBottom)
+    }
+
+    @Test
+    fun whenWidgetIsRemovedThenItNoLongerDrivesBrowserContent() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        coordinator.configureContentOffset(tab.widget, isBottom = true)
+        idle()
+
+        tab.root.removeView(tab.widget)
+        coordinator.onWidgetRemoved()
+        tab.browserLayout.setPadding(0, 0, 0, OTHER_SESSION_PADDING_PX)
+        pager.viewTreeObserver.dispatchOnGlobalLayout()
+
+        assertEquals(OTHER_SESSION_PADDING_PX, tab.browserLayout.paddingBottom)
+    }
+
+    @Test
+    fun whenTabViewIsReattachedThenAutocompleteKeepsClearingWidget() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
+        idle()
+
+        switchAwayAndBack(pager, tab)
+
+        assertEquals(WIDGET_HEIGHT_PX, tab.autoCompleteList.paddingBottom)
+    }
+
+    @Test
+    fun whenWidgetIsRemovedThenAutocompleteReturnsToBasePadding() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
+        idle()
+
+        tab.root.removeView(tab.widget)
+        coordinator.onWidgetRemoved()
+        idle()
+
+        assertEquals(0, tab.autoCompleteList.paddingBottom)
+    }
+
+    @Test
+    fun whenLayoutFixDisabledThenSwitchingTabsReturnsBrowserContentToBasePadding() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = false)
+        coordinator.configureContentOffset(tab.widget, isBottom = true)
+        idle()
+
+        switchAwayAndBack(pager, tab)
+
+        assertEquals(0, tab.browserLayout.paddingBottom)
+    }
+
+    @Test
+    fun whenLayoutFixDisabledThenSwitchingTabsReturnsAutocompleteToBasePadding() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = false)
+        coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
+        idle()
+
+        switchAwayAndBack(pager, tab)
+
+        assertEquals(0, tab.autoCompleteList.paddingBottom)
+    }
+
+    @Test
+    fun whenLayoutFixDisabledThenOnWidgetRemovedLeavesLayoutToDetach() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = false)
+        coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
+        coordinator.configureContentOffset(tab.widget, isBottom = true)
+        idle()
+
+        coordinator.onWidgetRemoved()
+
+        assertEquals(WIDGET_HEIGHT_PX, tab.browserLayout.paddingBottom)
+        assertEquals(WIDGET_HEIGHT_PX, tab.autoCompleteList.paddingBottom)
+    }
+
+    private class BottomWidgetTab(context: Context) {
+        val browserLayout = FrameLayout(context).apply { id = R.id.browserLayout }
+        val autoCompleteList = FrameLayout(context).apply { id = R.id.autoCompleteSuggestionsList }
+        val widget = FrameLayout(context)
+        val root = FrameLayout(context).apply {
+            addView(FrameLayout(context).apply { id = R.id.newTabPage })
+            addView(browserLayout, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+            addView(autoCompleteList, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+            addView(widget, FrameLayout.LayoutParams(MATCH_PARENT, WIDGET_HEIGHT_PX, Gravity.BOTTOM))
+        }
+    }
+
+    private fun givenTabPager(): FrameLayout {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        return FrameLayout(activity).also { activity.setContentView(it) }
+    }
+
+    // Mirrors the tab pager paging a tab out: it removes the tab view from its container and re-adds the same view
+    // when the tab is selected again.
+    private fun switchAwayAndBack(pager: FrameLayout, tab: BottomWidgetTab) {
+        pager.removeAllViews()
+        idle()
+        pager.addView(tab.root)
+        idle()
+    }
+
+    private fun idle() = shadowOf(Looper.getMainLooper()).idle()
+
     private companion object {
         private const val NAV_BAR_HEIGHT_PX = 56
         private const val CARD_TOP_MARGIN_PX = 20
         private const val CARD_HEIGHT_PX = 60
         private const val HINTS_SPACING_PX = 8
+        private const val WIDGET_HEIGHT_PX = 80
+        private const val OTHER_SESSION_PADDING_PX = 123
     }
 }
