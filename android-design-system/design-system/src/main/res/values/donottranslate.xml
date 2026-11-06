@@ -74,4 +74,6 @@
     <string name="dax_top_app_bar_clear_search_content_description">Clear search</string>
     <string name="dax_top_app_bar_exit_search_content_description">Exit search</string>
 
+    <string name="onboardingDialogFinishAnimation" translatable="false">Finish animation</string>
+
 </resources>
