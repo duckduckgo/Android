@@ -1,0 +1,151 @@
+name: API quality weekly report
+
+on:
+  schedule:
+    # Mondays 06:00 UTC, so the report is ready for the week's first triage.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      post_to_asana:
+        description: 'Post the report and finding tasks to Asana'
+        type: boolean
+        default: false
+
+env:
+  # TODO: the launch baseline commit (full SHA). Every report also compares develop with it; empty skips that section.
+  API_QUALITY_BASELINE_SHA: ''
+  # Asana IDs for the posting script; see scripts/api-quality/README.md.
+  GH_API_QUALITY_PROJECT_ID: ${{ vars.GH_API_QUALITY_PROJECT_ID }}
+  GH_API_QUALITY_TRIAGE_SECTION_ID: ${{ vars.GH_API_QUALITY_TRIAGE_SECTION_ID }}
+  GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID: ${{ vars.GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID }}
+  GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID }}
+  GH_API_QUALITY_STATUS_FIELD_KEY_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_KEY_ID }}
+  GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID: ${{ vars.GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID }}
+  GH_API_QUALITY_RULES_URL: ${{ vars.GH_API_QUALITY_RULES_URL }}
+
+concurrency:
+  group: api-quality-weekly
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  weekly_report:
+    name: API quality weekly report
+    runs-on: ubuntu-latest
+    steps:
+      # A scheduled run scores exactly the commit it was triggered on, so next week's run can find and re-score it.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'schedule' && github.sha || 'develop' }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install -r scripts/api-quality/requirements.txt
+
+      # The scorer is deterministic, so the previous report and the baseline are re-scored from their commits instead of
+      # stored. The previous report is the last successful scheduled run created before this one; manual runs are previews
+      # and never count. A missed week widens the comparison rather than skipping findings, and a re-run keeps its
+      # original creation time, so it still compares with the report before it. Before the first scheduled report,
+      # develop a week earlier stands in; --first-parent keeps to develop's own history, since commits from merged release
+      # branches carry older dates.
+      - name: Find the previous report's commit
+        id: score
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          created="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .created_at)"
+          today="${created:0:10}"
+          previous="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow api-quality-weekly.yml --event schedule \
+            --status success --limit 50 --json headSha,createdAt \
+            | jq -r --arg created "$created" 'map(select(.createdAt < $created)) | .[0] // empty | "\(.headSha) \(.createdAt[:10])"')"
+          if [[ -n "$previous" ]]; then
+            read -r previous_sha last_week <<< "$previous"
+          else
+            last_week="$(date -u -d "$today -7 days" +%F)"
+            previous_sha="$(git rev-list -1 --first-parent --before="$last_week 06:00" origin/develop)"
+          fi
+          {
+            echo "today=$today"
+            echo "last_week=$last_week"
+            echo "previous_sha=$previous_sha"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Score last week
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: ${{ steps.score.outputs.previous_sha }}
+          out-dir: ${{ runner.temp }}/score-previous
+          label: ${{ steps.score.outputs.last_week }}
+
+      - name: Score this week
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: HEAD
+          out-dir: ${{ runner.temp }}/score-current
+          label: ${{ steps.score.outputs.today }}
+          previous-scores: ${{ runner.temp }}/score-previous/api-quality-scores-${{ steps.score.outputs.last_week }}.csv
+
+      - name: Score the baseline
+        if: env.API_QUALITY_BASELINE_SHA != ''
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: ${{ env.API_QUALITY_BASELINE_SHA }}
+          out-dir: ${{ runner.temp }}/score-baseline
+          label: baseline
+
+      - name: Build report
+        env:
+          TODAY: ${{ steps.score.outputs.today }}
+          LAST_WEEK: ${{ steps.score.outputs.last_week }}
+          PREVIOUS_SHA: ${{ steps.score.outputs.previous_sha }}
+        run: |
+          baseline_args=()
+          if [[ -n "$API_QUALITY_BASELINE_SHA" ]]; then
+            baseline_args=(--baseline "$RUNNER_TEMP/score-baseline")
+          fi
+          python3 scripts/api-quality/compare.py \
+            --before "$RUNNER_TEMP/score-previous" --after "$RUNNER_TEMP/score-current" --mode weekly --weekly-report \
+            "${baseline_args[@]}" --out-md "$RUNNER_TEMP/body.md" --out-json "$RUNNER_TEMP/new-findings.json" \
+            --rules-url "$GH_API_QUALITY_RULES_URL" --link-base "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$(git rev-parse HEAD)"
+          {
+            echo "# API Weekly Report, $TODAY"
+            echo
+            echo "- **This week:** \`develop\` at \`$(git rev-parse --short=10 HEAD)\`, $TODAY"
+            echo "- **Last week:** \`develop\` at \`${PREVIOUS_SHA:0:10}\`, $LAST_WEEK"
+            if [[ -n "$API_QUALITY_BASELINE_SHA" ]]; then
+              echo "- **Baseline:** \`${API_QUALITY_BASELINE_SHA:0:10}\`"
+            fi
+            echo
+            cat "$RUNNER_TEMP/body.md"
+          } > "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p "$RUNNER_TEMP/artifact"
+          cp "$RUNNER_TEMP/report.md" "$RUNNER_TEMP/new-findings.json" "$RUNNER_TEMP"/score-current/* "$RUNNER_TEMP/artifact/"
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-quality-${{ steps.score.outputs.today }}
+          path: ${{ runner.temp }}/artifact
+          retention-days: 90
+
+      # Posting is the last step. Scheduled runs post once the Asana project variable is set; until then they only report
+      # on the run page. A re-run posts again, like the original was meant to: it updates the report task its first
+      # attempt created, found by the run ID, and comments on finding tasks that already exist.
+      - name: Post to Asana
+        if: (github.event_name == 'schedule' && vars.GH_API_QUALITY_PROJECT_ID != '') || inputs.post_to_asana
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          TODAY: ${{ steps.score.outputs.today }}
+        run: |
+          python3 scripts/api-quality/asana_sync.py \
+            --report-md "$RUNNER_TEMP/report.md" --new-json "$RUNNER_TEMP/new-findings.json" --date "$TODAY"
