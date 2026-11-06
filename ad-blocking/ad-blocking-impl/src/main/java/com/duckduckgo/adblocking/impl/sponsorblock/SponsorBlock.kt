@@ -55,10 +55,10 @@ class RealSponsorBlock @Inject constructor(
 ) : SponsorBlock {
 
     // TODO: send the user's SponsorBlock settings (on/off, skip mode) once they exist; skipMode is fixed to manual for now.
-    override fun config(): SponsorBlockConfig = SponsorBlockConfig(enabled = isEnabled(), skipMode = SponsorBlockSkipMode.MANUAL)
+    override fun config(): SponsorBlockConfig = config(enabled = isEnabled())
 
     override fun observeConfig(): Flow<SponsorBlockConfig> =
-        sponsorBlockFeature.mvpEnabled().enabled().map { config() }.distinctUntilChanged()
+        sponsorBlockFeature.mvpEnabled().enabled().map { config(enabled = it) }.distinctUntilChanged()
 
     override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
         if (videoId.isBlank() || !isEnabled()) return emptyList()
@@ -71,6 +71,8 @@ class RealSponsorBlock @Inject constructor(
             emptyList()
         }
     }
+
+    private fun config(enabled: Boolean) = SponsorBlockConfig(enabled = enabled, skipMode = SponsorBlockSkipMode.MANUAL)
 
     private fun isEnabled(): Boolean = sponsorBlockFeature.mvpEnabled().isEnabled()
 }
