@@ -56,7 +56,7 @@ class RealUrlToTypeMapperTest {
 
     @Test
     fun whenUrlHasScriptExtensionThenReturnScriptType() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= 30) {
             assertEquals("script", testee.map("example.com/test.js", requestHeaders))
         }
     }
