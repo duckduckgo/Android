@@ -252,6 +252,7 @@ interface SubscriptionsManager {
      * @param offerId The offer ID for the new plan (optional)
      * @param replacementMode The replacement mode for the subscription switch
      * @param origin The entry point where the switch was initiated (e.g., "subscription_settings", "dev_settings")
+     * @param change The change type sent by the plans page (upgrade, downgrade or crossgrade)
      *
      */
     suspend fun switchSubscriptionPlan(
@@ -260,6 +261,7 @@ interface SubscriptionsManager {
         offerId: String? = null,
         replacementMode: SubscriptionReplacementMode,
         origin: String? = null,
+        change: String? = null,
     )
 
     /**
@@ -430,6 +432,7 @@ class RealSubscriptionsManager @Inject constructor(
         offerId: String?,
         replacementMode: SubscriptionReplacementMode,
         origin: String?,
+        change: String?,
     ) = withContext(dispatcherProvider.io()) {
         try {
             pendingOnboardingEnrollmentIsFreeTrial = null
@@ -445,6 +448,7 @@ class RealSubscriptionsManager @Inject constructor(
                 context = origin,
                 fromPlan = currentSubscription.productId,
                 toPlan = planId,
+                change = change,
             )
 
             if (!isSignedIn()) {

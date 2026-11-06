@@ -570,7 +570,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experiments)
-            is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode)
+            is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode, command.change)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
@@ -734,6 +734,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         planId: String,
         offerId: String?,
         replacementMode: com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode,
+        change: String?,
     ) {
         viewModel.switchSubscriptionPlan(
             activity = this,
@@ -741,6 +742,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             offerId = offerId,
             replacementMode = replacementMode,
             origin = params.origin,
+            change = change,
         )
     }
 
