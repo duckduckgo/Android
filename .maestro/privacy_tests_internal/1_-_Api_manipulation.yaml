@@ -12,12 +12,7 @@ tags:
             isMaestro: "true"
             privacyConfigUrl: "https://privacy-test-pages.site/content-scope-scripts/infra/config/conditional-matching-experiments.json"
       - runFlow: ../shared/skip_all_onboarding.yaml
-      # Tap whichever field is live: the legacy omnibar (native input search-only off)
-      # or the native input widget's field (native input search-only on).
-      - tapOn:
-          id: "omnibarTextInput|inputField"
-      - inputText: "https://privacy-test-pages.site/content-scope-scripts/infra/pages/conditional-matching-experiments.html?automation=1"
-      - pressKey: Enter
+      - openLink: "duck://https://privacy-test-pages.site/content-scope-scripts/infra/pages/conditional-matching-experiments.html?automation=1"
       - tapOn:
           id: "run-tests"
       - assertVisible:
