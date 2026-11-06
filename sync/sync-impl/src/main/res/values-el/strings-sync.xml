@@ -68,7 +68,6 @@
     <string name="login_screen_cant_scan_label">Δεν μπορείτε να πραγματοποιήσετε σάρωση;</string>
     <string name="login_screen_cant_scan_button_text">Αντιγραφή κωδικού κειμένου</string>
 
-
     <!-- Connect screen -->
     <string name="connect_screen_title">Σάρωση κώδικα QR</string>
     <string name="connect_screen_scan_qr_hint">Ανοίξτε την εφαρμογή DuckDuckGo στην άλλη συσκευή σας και μεταβείτε στις <b>Ρυθμίσεις &gt; Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας &gt; Συγχρονισμός με άλλη συσκευή</b>.</string>
@@ -481,8 +480,51 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Αποκτήστε πρόσβαση στους κωδικούς πρόσβασής σας από κινητό και υπολογιστή.</string>
     <string name="sync_passwords_import_promo_primary_button">Ενεργοποίηση Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_title_toggle">Κάντε Sync &amp; Backup στους κωδικούς πρόσβασής σας σε κινητό και υπολογιστή.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Απόκτησε πρόσβαση στους σελιδοδείκτες σας από κινητό και υπολογιστή.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Ενεργοποίηση Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Κάντε Sync &amp; Backup στους σελιδοδείκτες σας σε κινητό και υπολογιστή.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Κάνε Sync &amp; Back Up στους σελιδοδείκτες σου</string>
+    <string name="sync_bookmarks_promo_message">Κρυπτογράφηση από άκρο σε άκρο. Κανείς δεν μπορεί να δει τους σελιδοδείκτες σου, ούτε καν εμείς.</string>
+    <string name="sync_bookmarks_promo_primary_button">Ενεργοποίηση Sync &amp; Backup</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Να συγχρονιστούν και οι σελιδοδείκτες με την εφαρμογή για υπολογιστή ;</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Σύνδεση</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Λήψη εφαρμογής</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Σελιδοδείκτες Sync &amp; Backup </string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Περισσότερες επιλογές</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Απόκρυψη</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Ενεργοποίηση Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Συγχρονισμός με την εφαρμογή για υπολογιστή</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Περισσότερες επιλογές</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Απόκρυψη</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Συγχρονισμός με υπολογιστή</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Λήψη εφαρμογής για υπολογιστές</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Ας συγχρονίσουμε την εφαρμογή σας για υπολογιστή!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Συγχρονισμός με υπολογιστή</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Δεν έχω την εφαρμογή για υπολογιστή</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Κάνε Sync &amp; Back Up στους κωδικούς πρόσβασής σου</string>
+    <string name="sync_passwords_promo_message">Η κρυπτογράφηση από άκρο σε άκρο σημαίνει ότι κανείς άλλος εκτός από εσένα δεν μπορεί να δει τους κωδικούς πρόσβασής σου, ούτε καν εμείς.</string>
+    <string name="sync_passwords_promo_primary_button">Ενεργοποίηση Sync &amp; Backup</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Να συγχρονιστούν και οι κωδικοί πρόσβασης με την εφαρμογή για υπολογιστή;</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Σύνδεση</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Λήψη εφαρμογής</string>
+
 </resources>
