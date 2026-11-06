@@ -171,13 +171,20 @@ class NativeInputLayoutCoordinator(
 
         reapplyAutocompleteOffset = { applyForWidgetPosition() }
         widgetView.post { applyForWidgetPosition() }
-        val layoutListener =
-            View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-                applyForWidgetPosition()
-            }
-        widgetView.addOnLayoutChangeListener(layoutListener)
-        autoCompleteList.addOnLayoutChangeListener(layoutListener)
-        focusedView?.addOnLayoutChangeListener(layoutListener)
+        val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            applyForWidgetPosition()
+        }
+        fun addListeners() {
+            widgetView.addOnLayoutChangeListener(layoutListener)
+            autoCompleteList.addOnLayoutChangeListener(layoutListener)
+            focusedView?.addOnLayoutChangeListener(layoutListener)
+        }
+        fun removeListeners() {
+            widgetView.removeOnLayoutChangeListener(layoutListener)
+            autoCompleteList.removeOnLayoutChangeListener(layoutListener)
+            focusedView?.removeOnLayoutChangeListener(layoutListener)
+        }
+        addListeners()
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
@@ -186,9 +193,7 @@ class NativeInputLayoutCoordinator(
                     applyPadding(deltaTop = 0, deltaBottom = 0)
                     reapplyAutocompleteOffset = null
                     restoreFloats.forEach { it() }
-                    v.removeOnLayoutChangeListener(layoutListener)
-                    autoCompleteList.removeOnLayoutChangeListener(layoutListener)
-                    focusedView?.removeOnLayoutChangeListener(layoutListener)
+                    removeListeners()
                     v.removeOnAttachStateChangeListener(this)
                 }
             },
@@ -376,13 +381,10 @@ class NativeInputLayoutCoordinator(
             clearNtpScrollArtifacts()
         }
         widgetView.post { applyOffset() }
-        val layoutListener =
-            View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-                if (isWidgetAnimating) return@OnLayoutChangeListener
-                applyOffset()
-            }
-        widgetView.addOnLayoutChangeListener(layoutListener)
-        rootView.addOnLayoutChangeListener(layoutListener)
+        val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            if (isWidgetAnimating) return@OnLayoutChangeListener
+            applyOffset()
+        }
 
         // Some offset inputs change without moving rootView/widgetView (hatch height, logo visibility,
         // NTP reflow), which the per-view listeners miss. The window-shared viewTreeObserver fires on
@@ -390,16 +392,25 @@ class NativeInputLayoutCoordinator(
         // no-op applyPadding. Needed in both modes: bottom mode's nav bar top inset also flips with
         // logo-only transitions (hatch/RMF/AppTP banner appearing).
         val ntpContentView = newTabContent
-        val globalLayoutListener =
-            ViewTreeObserver.OnGlobalLayoutListener {
-                if (isWidgetAnimating) return@OnGlobalLayoutListener
-                applyOffset()
-            }
+        val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+            if (isWidgetAnimating) return@OnGlobalLayoutListener
+            applyOffset()
+        }
         // Keep the observer we registered on. When the fragment view detaches, the NTP content is
         // gone before the widget, so `ntpContentView.viewTreeObserver` at cleanup time is a new
         // object and removing from it would be no-op and leak this listener.
         val ntpObserver = ntpContentView?.viewTreeObserver
-        ntpObserver?.addOnGlobalLayoutListener(globalLayoutListener)
+        fun addListeners() {
+            widgetView.addOnLayoutChangeListener(layoutListener)
+            rootView.addOnLayoutChangeListener(layoutListener)
+            ntpObserver?.addOnGlobalLayoutListener(globalLayoutListener)
+        }
+        fun removeListeners() {
+            widgetView.removeOnLayoutChangeListener(layoutListener)
+            rootView.removeOnLayoutChangeListener(layoutListener)
+            ntpObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
+        }
+        addListeners()
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
@@ -419,9 +430,7 @@ class NativeInputLayoutCoordinator(
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
                     clearNtpScrollArtifacts()
-                    v.removeOnLayoutChangeListener(layoutListener)
-                    rootView.removeOnLayoutChangeListener(layoutListener)
-                    ntpObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
+                    removeListeners()
                     v.removeOnAttachStateChangeListener(this)
                 }
             },
