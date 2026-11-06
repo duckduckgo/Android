@@ -1,6 +1,8 @@
 appId: com.duckduckgo.mobile.android
 androidWebViewHierarchy: devtools
 name: "Autofill: Prompted to save and update credentials on web form"
+tags:
+    - autofillNoAuthTests
 ---
 # Pre-requisite: on an autofill-eligible device, including having a modern WebView
 - retry:
@@ -12,7 +14,7 @@ name: "Autofill: Prompted to save and update credentials on web form"
 
         - tapOn:
             id: "omnibarTextInput|inputField"
-        - inputText: "fill.dev/form/login-simple"
+        - inputText: "https://privacy-test-pages.site/autofill/e2e/login.html"
         - pressKey: enter
 
         - tapOn:
@@ -36,19 +38,24 @@ name: "Autofill: Prompted to save and update credentials on web form"
 
         - tapOn:
             text: "Login"
+            index: 1
         - assertVisible: "Save Password"
         - tapOn: "Save Password"
 
-        - pressKey: back
-        - tapOn: "Close Autofill Dialog"
-
         - tapOn:
             id: "password"
+        - tapOn:
+            text: "Close Autofill Dialog"
+            optional: true
+        - tapOn:
+            id: "password"
+        - eraseText
         - inputText: "password2"
         - pressKey: Back
 
         - tapOn:
             text: "Login"
+            index: 1
         - assertVisible: "Update Password"
         - tapOn: "Update Password"
 
