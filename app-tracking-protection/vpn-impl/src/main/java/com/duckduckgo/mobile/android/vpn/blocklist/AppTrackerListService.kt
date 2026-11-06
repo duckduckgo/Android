@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.blocklist
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import retrofit2.Call

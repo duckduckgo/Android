@@ -47,64 +47,7 @@ class RealAddressBarTrackersAnimationManagerTest {
 
         testee = RealAddressBarTrackersAnimationManager(
             addressBarTrackersAnimationFeatureToggle = fakeFeatureToggle,
-            dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
         )
-    }
-
-    @Test
-    fun whenFeatureEnabledThenIsFeatureEnabledReturnsTrue() = runTest {
-        fakeFeatureToggle.feature().setRawStoredState(State(enable = true))
-
-        val result = testee.isFeatureEnabled()
-
-        assertTrue(result)
-    }
-
-    @Test
-    fun whenFeatureDisabledThenIsFeatureEnabledReturnsFalse() = runTest {
-        fakeFeatureToggle.feature().setRawStoredState(State(enable = false))
-
-        val result = testee.isFeatureEnabled()
-
-        assertFalse(result)
-    }
-
-    @Test
-    fun whenFetchFeatureStateCalledThenCachesFeatureState() = runTest {
-        fakeFeatureToggle.feature().setRawStoredState(State(enable = true))
-
-        testee.fetchFeatureState()
-
-        // Change the toggle state after fetching
-        fakeFeatureToggle.feature().setRawStoredState(State(enable = false))
-
-        // Should return cached value (true), not the new value (false)
-        val result = testee.isFeatureEnabled()
-        assertTrue(result)
-    }
-
-    @Test
-    fun whenIsFeatureEnabledCalledMultipleTimesThenUseCachedValue() = runTest {
-        fakeFeatureToggle.feature().setRawStoredState(State(enable = true))
-
-        // First call caches the value
-        assertTrue(testee.isFeatureEnabled())
-
-        // Change the toggle state
-        fakeFeatureToggle.feature().setRawStoredState(State(enable = false))
-
-        // Subsequent calls should return cached value
-        assertTrue(testee.isFeatureEnabled())
-        assertTrue(testee.isFeatureEnabled())
-    }
-
-    @Test
-    fun whenIsFeatureEnabledCalledWithoutFetchThenFetchesAndCaches() = runTest {
-        fakeFeatureToggle.feature().setRawStoredState(State(enable = false))
-
-        val result = testee.isFeatureEnabled()
-
-        assertFalse(result)
     }
 
     @Test

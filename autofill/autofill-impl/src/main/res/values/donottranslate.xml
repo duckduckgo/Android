@@ -15,5 +15,7 @@
   -->
 
 <resources>
-
+    <!-- Passwords import promo on the bookmarks import result screen -->
+    <string name="passwords_import_promo_in_bookmarks_import_title">Bring your passwords from Google to DuckDuckGo.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_button">Import Passwords from Google</string>
 </resources>

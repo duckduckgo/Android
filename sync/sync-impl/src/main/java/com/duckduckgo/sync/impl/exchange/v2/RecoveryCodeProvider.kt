@@ -22,8 +22,9 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ThirdPartyRecoveryCode
 import com.duckduckgo.sync.impl.ThirdPartyRecoveryCodeWrapper
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import org.json.JSONObject
 import java.util.Base64
 import javax.inject.Inject
@@ -62,7 +63,7 @@ interface RecoveryCodeProvider {
 @ContributesBinding(AppScope::class)
 class RealRecoveryCodeProvider @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
-    private val syncStore: com.duckduckgo.sync.store.SyncStore,
+    private val syncStore: SyncStore,
 ) : RecoveryCodeProvider {
 
     override fun createDdgAccountIfNeeded(): Result<Unit> {

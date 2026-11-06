@@ -25,6 +25,7 @@ dependencies {
 
     testImplementation Testing.junit4
     testImplementation 'org.junit.vintage:junit-vintage-engine:_'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
     testImplementation "com.android.tools.lint:lint-api:$lint_version"
     testImplementation "com.android.tools.lint:lint-tests:$lint_version"
 }
@@ -49,5 +50,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
 }
 
 tasks.register('jvm_checks') {
+    dependsOn 'test'
+}
+
+tasks.register('jvm_tests') {
     dependsOn 'test'
 }

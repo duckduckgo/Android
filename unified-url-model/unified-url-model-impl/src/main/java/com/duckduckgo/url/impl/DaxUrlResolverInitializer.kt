@@ -21,7 +21,8 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.url.DaxUrlProvider
 import com.duckduckgo.url.DaxUrlResolver
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 /**
@@ -29,16 +30,16 @@ import javax.inject.Inject
  * that `FeatureException.daxDomain` (a non-injectable data-class property) can resolve through it.
  *
  * The primary install happens earlier, in `DuckDuckGoApplication.onMainProcessCreate` right after the
- * Dagger graph is built. This observer re-installs the same app-scoped singleton at `ON_CREATE` as a
+ * DI graph is built. This observer re-installs the same app-scoped singleton at `ON_CREATE` as a
  * safety net; [DaxUrlResolver.install] is idempotent, so running twice is harmless.
  *
  * Neither install point is load-bearing for correctness: `FeatureException.daxDomain` caches only
  * non-null results and retries on null, so any read that races installation self-heals on the next
  * access. Early install merely shrinks the window in which that read returns null.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class DaxUrlResolverInitializer @Inject constructor(
     private val daxUrlProvider: DaxUrlProvider,

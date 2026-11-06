@@ -28,7 +28,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
@@ -40,12 +39,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.airbnb.lottie.RenderMode
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SheetFireSingleTabBinding
 import com.duckduckgo.app.global.view.SingleTabFireDialogViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
@@ -54,11 +53,11 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -114,7 +113,6 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private var animationEnabled = false
     private var canFinish = false
     private var pendingFragmentResultEvent: String? = null
-    private var isFireAnimationUpdateEnabled = false
 
     override fun show(fragmentManager: FragmentManager, tag: String?) {
         // FragmentManager.commit() inside DialogFragment.show() throws after onSaveInstanceState.
@@ -150,9 +148,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         configureBottomSheet()
         observeViewModel()
 
-        if (appBuildConfig.sdkInt == 26) {
-            dialog?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), CommonR.color.translucentDark)
-        } else if (appBuildConfig.sdkInt in 27..<30) {
+        if (appBuildConfig.sdkInt < 30) {
             dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }
 
@@ -278,15 +274,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState.Loaded) {
-        isFireAnimationUpdateEnabled = state.stateData.isFireAnimationUpdateEnabled
-
         if (state.stateData.isFirePictogramVisible) {
-            val animationRes = if (isFireAnimationUpdateEnabled) {
-                R.raw.fire_dialog_animation_brand_design
-            } else {
-                R.raw.fire_dialog_animation
-            }
-            binding.fireIcon.setAnimation(animationRes)
+            binding.fireIcon.setAnimation(R.raw.fire_dialog_animation_brand_design)
             binding.fireIcon.playAnimation()
         } else {
             binding.fireIcon.gone()
@@ -389,6 +378,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 isAppearanceLightStatusBars = false
                 isAppearanceLightNavigationBars = false
             }
+            setDimAmount(0f)
         }
         isCancelable = false
         binding.fireAnimationView.show()

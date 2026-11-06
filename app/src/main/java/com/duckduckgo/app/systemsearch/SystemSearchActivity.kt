@@ -19,7 +19,6 @@ package com.duckduckgo.app.systemsearch
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.Spanned
@@ -41,7 +40,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
@@ -52,8 +50,11 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener
+import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppReturnPixelSender
+import com.duckduckgo.app.pixels.LaunchSourceValues
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.AutocompleteItemRemoved
@@ -73,6 +74,7 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveS
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -81,14 +83,13 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -113,6 +114,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
     @Inject
+    lateinit var appReturnPixelSender: AppReturnPixelSender
+
+    @Inject
     lateinit var faviconManager: FaviconManager
 
     @Inject
@@ -128,9 +132,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
@@ -142,6 +143,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private var nestedScrollViewPosition: Int = 0
     private var nestedScrollViewRestorePosition: Int = 0
 
+    /**
+     * The launch source resolved from a genuinely new [Intent] delivery (fresh launch or [onNewIntent]),
+     * consumed by the next [onResume]. Not re-derived from [getIntent] on every resume, since the widget
+     * extras it carries are sticky and would otherwise be misread as a fresh widget open on a plain
+     * Recents return.
+     */
+    private var pendingLaunchSource: String? = null
+
     private val systemSearchOnboarding
         get() = binding.includeSystemSearchOnboarding
 
@@ -149,6 +158,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var voiceSearch: ImageView
     private lateinit var clearTextButton: ImageView
     private lateinit var shadowContainer: MaterialCardView
+    private lateinit var inputContainer: MaterialCardView
     private lateinit var logo: ImageView
     private lateinit var duckAi: ImageView
     private lateinit var omnibarDivider: View
@@ -171,6 +181,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         voiceSearch = if (isOmnibarAtTop) binding.voiceSearchButton else binding.voiceSearchButtonBottom
         clearTextButton = if (isOmnibarAtTop) binding.clearTextButton else binding.clearTextButtonBottom
         shadowContainer = if (isOmnibarAtTop) binding.omniBarContainerShadow else binding.omniBarContainerShadowBottom
+        inputContainer = if (isOmnibarAtTop) binding.omniBarContainer else binding.omniBarContainerBottom
+        applyAddressBarRebrandRadius(
+            isEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled(),
+            rebrandRadius = resources.getDimension(CommonR.dimen.rebrandInputRadius),
+            legacyRadius = resources.getDimension(CommonR.dimen.largeShapeCornerRadius),
+            shadowContainer,
+            inputContainer,
+        )
         logo = if (isOmnibarAtTop) binding.logo else binding.logoBottom
         duckAi = if (isOmnibarAtTop) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
         omnibarDivider = if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
@@ -200,17 +218,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
 
         configureViewReferences(viewModel.isOmnibarAtTop)
         configureOmnibar(viewModel.isOmnibarAtTop)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets(viewModel.isOmnibarAtTop)
-        }
+        configureEdgeToEdgeInsets(viewModel.isOmnibarAtTop)
         configureObservers()
         configureFlowCollectors()
         configureOnboarding()
@@ -223,6 +236,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         if (savedInstanceState == null) {
             intent?.let {
+                pendingLaunchSource = resolveLaunchSource(it)
                 sendLaunchPixels(it)
                 if (launchedFromAssist(it)) {
                     handleDigitalAssistIntent()
@@ -232,16 +246,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= 28) {
-            shadowContainer.addBottomShadow(
-                shadowSizeDp = 12f,
-                offsetYDp = 3f,
-                insetDp = 3f,
-                shadowColor = ContextCompat.getColor(this, CommonR.color.background_omnibar_shadow),
-            )
-        }
+        shadowContainer.addBottomShadow(
+            shadowSizeDp = 12f,
+            offsetYDp = 3f,
+            insetDp = 3f,
+            shadowColor = ContextCompat.getColor(this, CommonR.color.background_omnibar_shadow),
+        )
 
-        viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
 
         showKeyboard(omnibarTextInput)
@@ -250,17 +261,24 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
 
+        appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.OTHER)
+        pendingLaunchSource = null
+
         if (viewModel.hasOmnibarTypeChanged) {
             recreate()
         }
     }
 
+    private fun resolveLaunchSource(intent: Intent): String =
+        if (launchedFromAnyWidget(intent)) LaunchSourceValues.WIDGET else LaunchSourceValues.OTHER
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
+        pendingLaunchSource = resolveLaunchSource(intent)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         viewModel.resetViewState()
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
-        viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         sendLaunchPixels(intent)
         if (launchedFromAssist(intent)) {
             handleDigitalAssistIntent()
@@ -417,7 +435,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     }
 
                     is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                        viewModel.onDuckAiRequested(result.query)
+                        viewModel.onDuckAiRequested(result.query, DuckChatEntryPoint.SYSTEM_SEARCH, voice = true)
                     }
                 }
             } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
@@ -432,7 +450,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     fun configureDuckAi() {
         duckAi.setOnClickListener {
-            viewModel.onDuckAiRequested(omnibarTextInput.text.toString())
+            viewModel.onDuckAiRequested(omnibarTextInput.text.toString(), DuckChatEntryPoint.SYSTEM_SEARCH)
         }
     }
 
@@ -553,7 +571,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             SystemSearchViewModel.Command.ExitSearch -> finish()
 
             LaunchDuckAiVoiceChat -> {
-                duckChat.openVoiceDuckChat()
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.DIGITAL_ASSISTANT)
                 finish()
             }
         }

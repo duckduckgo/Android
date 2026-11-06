@@ -24,6 +24,10 @@ package com.duckduckgo.pir.impl.models
  * Majority of the attributes here came from the [PirSuccessResponse.ExtractedResponse]'s
  * [ScriptExtractedProfile]. Note that all attributes from the script can be null so we don't use
  * any as the local db id.
+ *
+ * [extras] holds fields the broker config asked the script to scrape that we have no schema for.
+ * We store and forward them verbatim so that a new field can be added in the broker config alone,
+ * without a native release.
  */
 data class ExtractedProfile(
     val dbId: Long = 0L,
@@ -42,10 +46,12 @@ data class ExtractedProfile(
     val identifier: String = "",
     val dateAddedInMillis: Long = 0L,
     val deprecated: Boolean = false,
+    val extras: Map<String, String> = emptyMap(),
 )
 
 data class AddressCityState(
     val city: String,
     val state: String,
     val fullAddress: String? = null,
+    val extras: Map<String, String> = emptyMap(),
 )

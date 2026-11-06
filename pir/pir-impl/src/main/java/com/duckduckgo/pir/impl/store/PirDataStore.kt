@@ -52,6 +52,12 @@ interface PirDataStore {
     /** Number of scheduled worker runs that have contributed to the open completion flow. */
     var initialScanCompletionScheduledRunCount: Int
 
+    /** Marked before every initial scan starts; the next run that finishes normally takes it. */
+    fun markScanCompleteNotificationPending()
+
+    /** Returns whether a scan-complete notification was pending, and clears it. */
+    fun takePendingScanCompleteNotification(): Boolean
+
     fun reset()
     fun resetUserData()
 }
@@ -194,6 +200,24 @@ internal class RealPirDataStore(
             }
         }
 
+    override fun markScanCompleteNotificationPending() {
+        // committed synchronously as the dashboard (:main) marks it and the run (:pir) takes it
+        preferences.edit(commit = true) {
+            putBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, true)
+        }
+    }
+
+    override fun takePendingScanCompleteNotification(): Boolean {
+        if (!preferences.getBoolean(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING, false)) {
+            return false
+        }
+
+        preferences.edit(commit = true) {
+            remove(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING)
+        }
+        return true
+    }
+
     override fun reset() {
         mainConfigEtag = null
         hasBrokerConfigBeenManuallyUpdated = false
@@ -215,6 +239,9 @@ internal class RealPirDataStore(
         initialScanCompletionFlowId = 0L
         initialScanCompletionForegroundRunCount = 0
         initialScanCompletionScheduledRunCount = 0
+        preferences.edit(commit = true) {
+            remove(KEY_SCAN_COMPLETE_NOTIFICATION_PENDING)
+        }
     }
 
     companion object {
@@ -235,5 +262,6 @@ internal class RealPirDataStore(
         private const val KEY_INITIAL_SCAN_COMPLETION_FLOW_ID = "KEY_INITIAL_SCAN_COMPLETION_FLOW_ID"
         private const val KEY_INITIAL_SCAN_COMPLETION_FOREGROUND_RUN_COUNT = "KEY_INITIAL_SCAN_COMPLETION_FOREGROUND_RUN_COUNT"
         private const val KEY_INITIAL_SCAN_COMPLETION_SCHEDULED_RUN_COUNT = "KEY_INITIAL_SCAN_COMPLETION_SCHEDULED_RUN_COUNT"
+        private const val KEY_SCAN_COMPLETE_NOTIFICATION_PENDING = "KEY_SCAN_COMPLETE_NOTIFICATION_PENDING"
     }
 }

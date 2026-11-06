@@ -1,0 +1,70 @@
+{
+    "m_browser_feature_daily_active_user_d": {
+        "description": "Sent once per day for an active user, carrying the current state of each browser feature that contributes a BrowserFeatureStateReporterPlugin. Fired from FeatureRetentionPixelSender when the search or app retention ATB refreshes.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["scheduled"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            {
+                "key": "address_bar",
+                "type": "string",
+                "description": "Address bar layout the user has selected",
+                "enum": ["TOP", "BOTTOM", "SPLIT_TOP"]
+            },
+            {
+                "key": "launch_screen",
+                "type": "string",
+                "description": "Screen the user has chosen to see when the app launches after inactivity",
+                "enum": ["new_tab_page", "last_opened_tab", "specific_page"]
+            },
+            {
+                "key": "default_browser",
+                "type": "string",
+                "description": "Whether DuckDuckGo is the device's default browser",
+                "enum": ["0", "1"]
+            },
+            {
+                "key": "email",
+                "type": "string",
+                "description": "Whether the user is signed in to Email Protection",
+                "enum": ["0", "1"]
+            },
+            {
+                "key": "voice_search",
+                "type": "string",
+                "description": "Whether voice search is available to the user",
+                "enum": ["0", "1"]
+            },
+            {
+                "key": "locale",
+                "type": "string",
+                "description": "Device locale as a sanitized language tag",
+                "examples": ["en-US", "de-DE"]
+            },
+            {
+                "key": "duck_ai_input_mode",
+                "type": "string",
+                "description": "Whether the current configuration offers the Search/Duck.ai toggle in the address bar, or is search-only. Independent of which input surface renders it.",
+                "enum": ["search_and_duck_ai", "search_only"]
+            },
+            {
+                "key": "duck_ai_native_input",
+                "type": "string",
+                "description": "Whether the Duck.ai native input field is the active input surface for this user",
+                "enum": ["0", "1"]
+            },
+            {
+                "key": "duck_ai_contextual",
+                "type": "string",
+                "description": "Whether Duck.ai contextual mode is enabled for this user",
+                "enum": ["0", "1"]
+            },
+            {
+                "key": "app_links",
+                "type": "string",
+                "description": "How the user has configured opening links in native apps",
+                "enum": ["ask_everytime", "always", "never"]
+            }
+        ]
+    }
+}

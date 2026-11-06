@@ -23,5 +23,11 @@
             android:exported="false"
             android:label="@string/downloadsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.browser.BrowserActivity" />
+        <activity
+            android:name="com.duckduckgo.downloads.impl.OpenDownloadedFileActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 </manifest>

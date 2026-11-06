@@ -26,6 +26,7 @@ import com.duckduckgo.common.ui.internal.ui.component.buttons.ComponentInteracti
 import com.duckduckgo.common.ui.internal.ui.component.cards.ComponentLayoutsFragment
 import com.duckduckgo.common.ui.internal.ui.component.listitems.ComponentListItemsElementsFragment
 import com.duckduckgo.common.ui.internal.ui.component.navigation.ComponentMessagingFragment
+import com.duckduckgo.common.ui.internal.ui.component.navigation.ComponentNavigationFragment
 import com.duckduckgo.common.ui.internal.ui.component.templates.TemplatesFragment
 import com.duckduckgo.common.ui.internal.ui.component.textinput.ComponentTextInputFragment
 import com.duckduckgo.common.ui.internal.ui.dialogs.DialogsFragment
@@ -47,6 +48,7 @@ class AppComponentsPagerAdapter(
         TEXT_INPUT(R.string.tab_title_text_input),
         DIALOGS(R.string.tab_title_dialogs),
         LAYOUTS(R.string.tab_title_layouts),
+        NAVIGATION(R.string.tab_title_component_navigation),
         TEMPLATES(R.string.tab_title_templates),
         INTERACTIVE_ELEMENTS(R.string.tab_title_component_interactive),
         MESSAGING(R.string.tab_title_component_messaging),
@@ -72,6 +74,7 @@ class AppComponentsPagerAdapter(
             MainFragments.TEXT_INPUT -> ComponentTextInputFragment()
             MainFragments.DIALOGS -> DialogsFragment()
             MainFragments.LAYOUTS -> ComponentLayoutsFragment()
+            MainFragments.NAVIGATION -> ComponentNavigationFragment()
             MainFragments.TEMPLATES -> TemplatesFragment()
             MainFragments.INTERACTIVE_ELEMENTS -> ComponentInteractiveElementsFragment()
             MainFragments.MESSAGING -> ComponentMessagingFragment()

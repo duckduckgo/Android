@@ -34,12 +34,12 @@ class AppUrl {
         const val SOURCE = "t"
         const val ATB = "atb"
         const val RETENTION_ATB = "set_atb"
+        const val IS_TABLET = "is_tablet"
         const val DEV_MODE = "test"
         const val LANGUAGE = "lg"
         const val EMAIL = "email"
         const val COUNTRY = "co"
         const val HIDE_SERP = "ko"
-        const val HIDE_DUCK_AI = "kbg"
         const val VERTICAL = "ia"
         const val VERTICAL_REWRITE = "iar"
     }
@@ -47,8 +47,8 @@ class AppUrl {
     object ParamValue {
         const val SOURCE = "ddg_android"
         const val SOURCE_EU_AUCTION = "ddg_androideu"
+        const val SOURCE_TABLET = "ddg_android_tablet"
         const val HIDE_SERP = "-1"
-        const val HIDE_DUCK_AI = "-1"
         const val CHAT_VERTICAL = "chat"
     }
 

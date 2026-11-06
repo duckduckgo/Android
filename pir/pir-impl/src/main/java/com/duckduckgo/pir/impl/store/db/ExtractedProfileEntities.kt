@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.store.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -52,4 +53,5 @@ data class StoredExtractedProfile(
     val fullName: String = "",
     val dateAddedInMillis: Long = 0L, // Tells us when the extracted profile has been found
     val deprecated: Boolean = false, // This should tell us if the profile is irrelevant for PIR (this is not me, profile edits)
+    @ColumnInfo(defaultValue = "{}") val extras: Map<String, String> = emptyMap(), // Scraped fields we have no schema for
 )

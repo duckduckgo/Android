@@ -20,8 +20,9 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.WidgetType
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.remote.messaging.api.Action
@@ -86,7 +87,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
             val cardsList = message?.content as? Content.CardsList
             val imageFile = remoteMessagingModel.getRemoteMessageImageFile(Surface.MODAL)
             if (cardsList != null) {
-                _viewState.value = buildViewState(cardsList, imageFile)
+                _viewState.value = buildViewState(message, cardsList, imageFile)
             } else {
                 _command.send(Command.DismissMessage)
             }
@@ -130,7 +131,11 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun buildViewState(cardsList: Content.CardsList, imageFilePath: String?): ViewState {
+    private suspend fun buildViewState(
+        message: RemoteMessage,
+        cardsList: Content.CardsList,
+        imageFilePath: String?,
+    ): ViewState {
         val items = mutableListOf<ModalListItem>()
 
         items.add(
@@ -145,7 +150,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         items.addAll(
             cardsList.listItems.map { cardItem ->
                 val itemImagePath = if (cardItem is CardItem.ListItem && !cardItem.imageUrl.isNullOrEmpty()) {
-                    remoteMessagingRepository.getCardItemImageFilePath(cardItem.id)
+                    remoteMessagingRepository.getItemImageFilePath(message, cardItem.id)
                 } else {
                     null
                 }
@@ -225,5 +230,6 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         ) : Command()
 
         data object LaunchDefaultCredentialProvider : Command()
+        data class LaunchAddWidget(val widgetType: WidgetType) : Command()
     }
 }

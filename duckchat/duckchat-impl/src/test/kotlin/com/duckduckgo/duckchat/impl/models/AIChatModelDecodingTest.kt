@@ -29,6 +29,20 @@ class AIChatModelDecodingTest {
     private val adapter: JsonAdapter<RemoteAIChatModel> = moshi.adapter(RemoteAIChatModel::class.java)
 
     @Test
+    fun whenLabelMissingThenFieldIsNull() {
+        val json = """{"id":"m","name":"n"}"""
+        val parsed = adapter.fromJson(json)!!
+        assertNull(parsed.label)
+    }
+
+    @Test
+    fun whenLabelPopulatedThenFieldDecoded() {
+        val json = """{"id":"m","name":"n","label":"EVERYDAY_USE"}"""
+        val parsed = adapter.fromJson(json)!!
+        assertEquals("EVERYDAY_USE", parsed.label)
+    }
+
+    @Test
     fun whenSupportedReasoningEffortMissingThenFieldIsNull() {
         val json = """{"id":"m","name":"n"}"""
         val parsed = adapter.fromJson(json)!!

@@ -22,6 +22,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -31,8 +34,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -65,6 +68,27 @@ sealed interface OnboardingPixelAction {
         val addressBarPosition: OmnibarType,
         val inputScreenSelected: Boolean,
     ) : OnboardingPixelAction
+
+    data class PasswordImportErrorShown(val transient: Boolean) : OnboardingPixelAction
+
+    data class PasswordImportErrorClicked(val action: PasswordImportErrorAction) : OnboardingPixelAction
+
+    data class DownloadReasonClicked(val reason: DownloadReasonSelection) : OnboardingPixelAction
+
+    data class PreferencesClicked(val selections: Map<OnboardingPreference, Boolean>) : OnboardingPixelAction
+
+    data class SingleChoiceClicked(val optionId: String) : OnboardingPixelAction
+
+    data class TimeLimitReached(val byAppOpens: Boolean) : OnboardingPixelAction
+}
+
+/**
+ * What the user did on an import-error surface
+ */
+enum class PasswordImportErrorAction {
+    CONTINUE,
+    RETRY,
+    CANCEL,
 }
 
 interface OnboardingPixelSender {
@@ -90,10 +114,23 @@ interface OnboardingPixelSender {
      * attached as the `variant` param to every subsequent onboarding pixel.
      * */
     fun chatBranchSelected()
+
+    /**
+     * Records that this run is the download-reason segmented flow, so every pixel it fires carries
+     * `flow=tailored_by_download_reason` instead of the default.
+     */
+    fun segmentedFlowStarted()
+
+    /**
+     * Clears the persisted flow and variant attribution. Called when a new linear onboarding run
+     * starts: a run restarted after an app kill replays from before the branching step, so
+     * attribution persisted by a previous run must not label this run's pre-branch pixels.
+     */
+    fun clearFlowAttribution()
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealOnboardingPixelSender @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
@@ -105,6 +142,7 @@ class RealOnboardingPixelSender @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val deviceInfo: DeviceInfo,
     private val appBuildConfig: AppBuildConfig,
+    private val onboardingStore: OnboardingStore,
 ) : OnboardingPixelSender {
 
     private val variantPrefs by lazy { sharedPreferencesProvider.getSharedPreferences(PREFS_VARIANT_FILENAME) }
@@ -119,6 +157,17 @@ class RealOnboardingPixelSender @Inject constructor(
 
     override fun chatBranchSelected() {
         variantPrefs.edit().putString(PREFS_KEY_VARIANT, PREFS_VARIANT_CHAT).apply()
+    }
+
+    override fun segmentedFlowStarted() {
+        variantPrefs.edit().putBoolean(PREFS_KEY_SEGMENTED_FLOW, true).apply()
+    }
+
+    override fun clearFlowAttribution() {
+        variantPrefs.edit()
+            .remove(PREFS_KEY_VARIANT)
+            .remove(PREFS_KEY_SEGMENTED_FLOW)
+            .apply()
     }
 
     override fun fire(pixelName: OnboardingPixelName, action: OnboardingPixelAction) {
@@ -152,6 +201,24 @@ class RealOnboardingPixelSender @Inject constructor(
 
             is OnboardingPixelAction.QuickSetupClicked ->
                 fireQuickSetupClicked(pixelName, action.addressBarPosition, action.inputScreenSelected)
+
+            is OnboardingPixelAction.PasswordImportErrorShown ->
+                fireStep(pixelName, PIXEL_EVENT_SHOWN, if (action.transient) VALUE_TRANSIENT else VALUE_PERMANENT)
+
+            is OnboardingPixelAction.PasswordImportErrorClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, importErrorValue(action.action))
+
+            is OnboardingPixelAction.DownloadReasonClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, action.reason.pixelToken)
+
+            is OnboardingPixelAction.PreferencesClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, extraParams = preferenceParams(action.selections))
+
+            is OnboardingPixelAction.SingleChoiceClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, action.optionId)
+
+            is OnboardingPixelAction.TimeLimitReached ->
+                fireStep(pixelName, PIXEL_EVENT_REACHED, if (action.byAppOpens) VALUE_APP_OPENS else VALUE_DAYS, includeValueInTag = false)
         }
     }
 
@@ -200,11 +267,13 @@ class RealOnboardingPixelSender @Inject constructor(
         event: String,
         value: String? = null,
         includeValueInTag: Boolean = true,
+        extraParams: Map<String, String> = emptyMap(),
     ) {
         appCoroutineScope.launch {
             val params = buildStandardParams().toMutableMap()
             params[PIXEL_PARAM_EVENT] = event
             value?.let { params[PIXEL_PARAM_VALUE] = it }
+            params.putAll(extraParams)
             val tag = buildString {
                 append(pixelName.pixelName).append("_").append(event)
                 if (includeValueInTag) {
@@ -219,31 +288,84 @@ class RealOnboardingPixelSender @Inject constructor(
         // source/flow are install-level facts: CustomAiOnboardingStore is the canonical source (a
         // side-effect-free read of the decision persisted at plan build time).
         val reinstall = isReinstallUser.await()
-        val (days, isCustomAiFlow, variant) = withContext(dispatchers.io()) {
+        val (days, isCustomAiFlow, attribution) = withContext(dispatchers.io()) {
             Triple(
                 appInstallStore.daysInstalled(),
                 customAiOnboardingStore.isEnabled(),
-                when (variantPrefs.getString(PREFS_KEY_VARIANT, null)) {
-                    PREFS_VARIANT_SEARCH -> VARIANT_SEARCH
-                    PREFS_VARIANT_CHAT -> VARIANT_CHAT
-                    else -> null
-                },
+                resolveFlowAttribution(),
             )
         }
         val params = mutableMapOf(
             PIXEL_PARAM_INSTALL_TYPE to if (reinstall) INSTALL_TYPE_REINSTALL else INSTALL_TYPE_NEW,
             // PIXEL_PARAM_SOURCE to null, - this will be added in a follow-up PR
-            PIXEL_PARAM_FLOW to if (isCustomAiFlow) FLOW_DUCKAI else ONBOARDING_DEFAULT,
+            PIXEL_PARAM_FLOW to when {
+                attribution.isSegmentedFlow -> FLOW_TAILORED_BY_DOWNLOAD_REASON
+                isCustomAiFlow -> FLOW_DUCKAI
+                else -> ONBOARDING_DEFAULT
+            },
             PIXEL_PARAM_PIXEL_SOURCE to deviceInfo.formFactor().description,
         )
-        variant?.let { params[PIXEL_PARAM_VARIANT] = it }
-        if (days in 0..MAX_DAYS_SINCE_INSTALL_REPORTED) {
-            params[PIXEL_PARAM_DAYS_SINCE_INSTALL] = days.toString()
-        }
+        attribution.branchVariant?.let { params[PIXEL_PARAM_VARIANT] = it }
+        attribution.downloadReasonVariant?.let { params[PIXEL_PARAM_VARIANT_DOWNLOAD_REASON] = it }
+        params[PIXEL_PARAM_DAYS_SINCE_INSTALL] = daysSinceInstallBucket(days)
         return params
     }
 
+    private fun daysSinceInstallBucket(days: Long): String = when {
+        days <= 0L -> DAYS_SINCE_INSTALL_0
+        days <= 3L -> DAYS_SINCE_INSTALL_1_3
+        days <= 10L -> DAYS_SINCE_INSTALL_4_10
+        days <= 28L -> DAYS_SINCE_INSTALL_11_28
+        else -> DAYS_SINCE_INSTALL_OVER_28
+    }
+
+    private fun resolveFlowAttribution() = FlowAttribution(
+        isSegmentedFlow = variantPrefs.getBoolean(PREFS_KEY_SEGMENTED_FLOW, false),
+        branchVariant = when (variantPrefs.getString(PREFS_KEY_VARIANT, null)) {
+            PREFS_VARIANT_SEARCH -> VARIANT_SEARCH
+            PREFS_VARIANT_CHAT -> VARIANT_CHAT
+            else -> null
+        },
+        downloadReasonVariant = onboardingStore.getDownloadReason()
+            ?.let { "$VARIANT_DOWNLOAD_REASON_PREFIX${it.pixelToken}" },
+    )
+
+    /**
+     * The download reason and the search/chat branch are independent choices a segmented run can make
+     * both of, so each gets its own param: a single one would have to encode the pairs, and its enum
+     * would be the cross-product of the two.
+     */
+    private data class FlowAttribution(
+        val isSegmentedFlow: Boolean,
+        val branchVariant: String?,
+        val downloadReasonVariant: String?,
+    )
+
+    private fun preferenceParams(selections: Map<OnboardingPreference, Boolean>): Map<String, String> =
+        selections.entries.associate { (preference, enabled) ->
+            // Duck.ai's row is worded as hiding AI images, but the param reports whether they're shown
+            val reported = if (preference == OnboardingPreference.HIDE_AI_GENERATED_IMAGES) !enabled else enabled
+            preference.pixelParamKey to reported.toString()
+        }
+
+    private val OnboardingPreference.pixelParamKey: String
+        get() = when (this) {
+            OnboardingPreference.SEARCH_HISTORY -> PARAM_RECENTLY_VISITED_SITES_ENABLED
+            OnboardingPreference.SAFE_SEARCH -> PARAM_SAFE_SEARCH_ENABLED
+            OnboardingPreference.SEARCH_ASSIST -> PARAM_SEARCH_ASSIST_ENABLED
+            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> PARAM_AI_GENERATED_IMAGES_ENABLED
+            OnboardingPreference.BLOCK_ADS -> PARAM_YOUTUBE_AD_BLOCKING_ENABLED
+            OnboardingPreference.REJECT_OPTIONAL_COOKIES -> PARAM_COOKIE_POPUP_PROTECTION_ENABLED
+            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES -> PARAM_POPUPS_WITHOUT_OPTOUTS_ENABLED
+        }
+
     private fun engageOrDismiss(engaged: Boolean): String = if (engaged) VALUE_ENGAGE else VALUE_DISMISS
+
+    private fun importErrorValue(action: PasswordImportErrorAction): String = when (action) {
+        PasswordImportErrorAction.CONTINUE -> VALUE_ENGAGE
+        PasswordImportErrorAction.RETRY -> VALUE_RETRY
+        PasswordImportErrorAction.CANCEL -> VALUE_DISMISS
+    }
 
     private fun tryInputValue(fromSuggestion: Boolean, isChat: Boolean): String {
         val source = if (fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM
@@ -260,41 +382,58 @@ class RealOnboardingPixelSender @Inject constructor(
     private fun onOff(value: Boolean): String = if (value) "on" else "off"
 
     private companion object {
-        private const val PIXEL_PARAM_EVENT = "e"
+        private const val PIXEL_PARAM_EVENT = "event"
         private const val PIXEL_PARAM_VALUE = "value"
-        private const val PIXEL_PARAM_INSTALL_TYPE = "it"
-        private const val PIXEL_PARAM_DAYS_SINCE_INSTALL = "d"
-        private const val PIXEL_PARAM_SOURCE = "source"
+        private const val PIXEL_PARAM_INSTALL_TYPE = "installType"
+        private const val PIXEL_PARAM_DAYS_SINCE_INSTALL = "daysSinceInstall"
         private const val PIXEL_PARAM_FLOW = "flow"
         private const val PIXEL_PARAM_VARIANT = "variant"
+        private const val PIXEL_PARAM_VARIANT_DOWNLOAD_REASON = "variant_download_reason"
         private const val PIXEL_PARAM_PIXEL_SOURCE = "pixelSource"
 
         private const val PIXEL_EVENT_SHOWN = "shown"
         private const val PIXEL_EVENT_CLICKED = "clicked"
         private const val PIXEL_EVENT_CONFIRMED = "confirmed"
+        private const val PIXEL_EVENT_REACHED = "reached"
 
         private const val INSTALL_TYPE_NEW = "new"
         private const val INSTALL_TYPE_REINSTALL = "reinstall"
 
         private const val ONBOARDING_DEFAULT = "default"
         private const val FLOW_DUCKAI = "duckai"
+        private const val FLOW_TAILORED_BY_DOWNLOAD_REASON = "tailored_by_download_reason"
 
         private const val VARIANT_SEARCH = "search_plus_duckai-search"
         private const val VARIANT_CHAT = "search_plus_duckai-chat"
+        private const val VARIANT_DOWNLOAD_REASON_PREFIX = "download_reason_"
 
         private const val PREFS_VARIANT_FILENAME = "com.duckduckgo.app.onboarding.variant"
         private const val PREFS_KEY_VARIANT = "variant"
+        private const val PREFS_KEY_SEGMENTED_FLOW = "segmentedFlow"
         private const val PREFS_VARIANT_SEARCH = "search"
         private const val PREFS_VARIANT_CHAT = "chat"
 
+        private const val PARAM_RECENTLY_VISITED_SITES_ENABLED = "recently_visited_sites_enabled"
+        private const val PARAM_SAFE_SEARCH_ENABLED = "safe_search_enabled"
+        private const val PARAM_SEARCH_ASSIST_ENABLED = "search_assist_enabled"
+        private const val PARAM_AI_GENERATED_IMAGES_ENABLED = "ai_generated_images_enabled"
+        private const val PARAM_YOUTUBE_AD_BLOCKING_ENABLED = "youtube_ad_blocking_enabled"
+        private const val PARAM_COOKIE_POPUP_PROTECTION_ENABLED = "cookie_popup_protection_enabled"
+        private const val PARAM_POPUPS_WITHOUT_OPTOUTS_ENABLED = "popups_without_optouts_enabled"
+
         private const val VALUE_ENGAGE = "engage"
         private const val VALUE_DISMISS = "dismiss"
+        private const val VALUE_RETRY = "retry"
+        private const val VALUE_TRANSIENT = "transient"
+        private const val VALUE_PERMANENT = "permanent"
         private const val VALUE_DDG = "ddg"
         private const val VALUE_OTHER = "other"
         private const val VALUE_ADDED = "added"
         private const val VALUE_NOT_ADDED = "not_added"
         private const val VALUE_GRANTED = "granted"
         private const val VALUE_DENIED = "denied"
+        private const val VALUE_DAYS = "days"
+        private const val VALUE_APP_OPENS = "app-opens"
         private const val SEARCH_ONLY = "search_only"
         private const val SEARCH_PLUS_DUCKAI = "search_plus_duckai"
 
@@ -316,6 +455,10 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val INPUT_TYPE_SEARCH = "search"
         private const val INPUT_TYPE_SEARCH_AND_DUCKAI = "search_and_duckai"
 
-        private const val MAX_DAYS_SINCE_INSTALL_REPORTED = 28L
+        private const val DAYS_SINCE_INSTALL_0 = "0"
+        private const val DAYS_SINCE_INSTALL_1_3 = "1-3"
+        private const val DAYS_SINCE_INSTALL_4_10 = "4-10"
+        private const val DAYS_SINCE_INSTALL_11_28 = "11-28"
+        private const val DAYS_SINCE_INSTALL_OVER_28 = "28+"
     }
 }

@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.repository
 
 import android.content.Context
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -214,12 +215,6 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
-    fun `when isFullScreenModeUserSettingEnabled called, then get from data store`() = runTest {
-        whenever(mockDataStore.isFullScreenUserSettingEnabled()).thenReturn(true)
-        assertTrue(testee.isFullScreenModeUserSettingEnabled())
-    }
-
-    @Test
     fun whenRegisterDuckChatOpenedThenDataStoreCalled() = runTest {
         whenever(mockDataStore.wasOpenedBefore()).thenReturn(false)
         testee.registerOpened()
@@ -258,6 +253,26 @@ class DuckChatFeatureRepositoryTest {
         val result = testee.wasOpenedBefore()
 
         assertTrue(result)
+    }
+
+    @Test
+    fun whenIsFirstPromptSubmissionCalledForTheFirstTimeThenReturnTrueAndMarkSubmitted() = runTest {
+        whenever(mockDataStore.hasSubmittedPromptBefore()).thenReturn(false)
+
+        val result = testee.checkAndMarkFirstPromptSubmission()
+
+        assertTrue(result)
+        verify(mockDataStore).setPromptSubmitted()
+    }
+
+    @Test
+    fun whenIsFirstPromptSubmissionCalledAfterAPriorSubmissionThenReturnFalseAndDoNotMarkAgain() = runTest {
+        whenever(mockDataStore.hasSubmittedPromptBefore()).thenReturn(true)
+
+        val result = testee.checkAndMarkFirstPromptSubmission()
+
+        assertFalse(result)
+        verify(mockDataStore, never()).setPromptSubmitted()
     }
 
     @Test
@@ -347,12 +362,16 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
-    fun `when observeDefaultTogglePosition then observe data store`() = runTest {
-        whenever(mockDataStore.observeDefaultTogglePosition()).thenReturn(flowOf(null, "DUCK_AI"))
+    fun `when getLastUsedTogglePosition then get from data store`() = runTest {
+        whenever(mockDataStore.getLastUsedTogglePosition()).thenReturn("DUCK_AI")
+        assertEquals("DUCK_AI", testee.getLastUsedTogglePosition())
+    }
 
-        val results = testee.observeDefaultTogglePosition().take(2).toList()
-        assertNull(results[0])
-        assertEquals("DUCK_AI", results[1])
+    @Test
+    fun `when observeDefaultTogglePosition then observe data store`() = runTest {
+        whenever(mockDataStore.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
+
+        assertEquals("DUCK_AI", testee.observeDefaultTogglePosition().value)
     }
 
     @Test
@@ -364,10 +383,8 @@ class DuckChatFeatureRepositoryTest {
 
     @Test
     fun `when observeLastUsedTogglePosition then observe data store`() = runTest {
-        whenever(mockDataStore.observeLastUsedTogglePosition()).thenReturn(flowOf(null, "DUCK_AI"))
+        whenever(mockDataStore.observeLastUsedTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
 
-        val results = testee.observeLastUsedTogglePosition().take(2).toList()
-        assertNull(results[0])
-        assertEquals("DUCK_AI", results[1])
+        assertEquals("DUCK_AI", testee.observeLastUsedTogglePosition().value)
     }
 }

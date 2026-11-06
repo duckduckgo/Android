@@ -17,8 +17,7 @@
 package com.duckduckgo.browser.api.pdf
 
 /**
- * Tells other modules whether DuckDuckGo's native PDF viewer can be launched right now
- * (SDK floor + pdfViewer remote flag), without exposing the feature flag itself outside :app.
+ * Tells other modules whether DuckDuckGo's native PDF viewer can be launched right now (SDK floor).
  */
 interface PdfViewerAvailability {
     fun isAvailable(): Boolean

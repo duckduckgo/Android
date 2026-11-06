@@ -20,8 +20,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardOpenedPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -30,14 +31,14 @@ import javax.inject.Inject
  * [com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore] is the dumb storage layer; this class is the single entry
  * point for the PixelSender, the scheduler, and the workers.
  */
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(
+@SingleIn(AppScope::class)
+@ContributesIntoSet(
     AppScope::class,
-    boundType = PrivacyDashboardOpenedPlugin::class,
+    binding = binding<PrivacyDashboardOpenedPlugin>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
-    boundType = SubscriptionPromoCtaShownPlugin::class,
+    binding = binding<SubscriptionPromoCtaShownPlugin>(),
 )
 class PaywallMetricsManager @Inject constructor(
     private val paywallMetricsStore: PaywallMetricsDataStore,

@@ -16,33 +16,21 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateDefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePageFragment
+import com.duckduckgo.app.onboarding.ui.page.welcome.WelcomePageFragment
 
 interface OnboardingPageBuilder {
-    fun buildWelcomePage(): WelcomePage
-    fun buildBrandDesignUpdateWelcomePage(): BrandDesignUpdateWelcomePage
-    fun buildConfigDrivenWelcomePage(): ConfigDrivenWelcomePageFragment
+    fun buildWelcomePage(): WelcomePageFragment
     fun buildDefaultBrowserPage(): DefaultBrowserPage
-    fun buildBrandDesignUpdateDefaultBrowserPage(): BrandDesignUpdateDefaultBrowserPage
 
     sealed class OnboardingPageBlueprint {
-        data object DefaultBrowserBlueprint : OnboardingPageBlueprint()
         data object WelcomePageBlueprint : OnboardingPageBlueprint()
-        data object BrandDesignUpdateWelcomePageBlueprint : OnboardingPageBlueprint()
-        data object ConfigDrivenWelcomePageBlueprint : OnboardingPageBlueprint()
-        data object BrandDesignUpdateDefaultBrowserPageBlueprint : OnboardingPageBlueprint()
+        data object DefaultBrowserBlueprint : OnboardingPageBlueprint()
     }
 }
 
 class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
 
-    override fun buildWelcomePage() = WelcomePage()
-    override fun buildBrandDesignUpdateWelcomePage() = BrandDesignUpdateWelcomePage()
-    override fun buildConfigDrivenWelcomePage() = ConfigDrivenWelcomePageFragment()
+    override fun buildWelcomePage() = WelcomePageFragment()
     override fun buildDefaultBrowserPage() = DefaultBrowserPage()
-    override fun buildBrandDesignUpdateDefaultBrowserPage() = BrandDesignUpdateDefaultBrowserPage()
 }

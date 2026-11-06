@@ -28,13 +28,14 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class ConditionExpectationSucceededEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -47,10 +48,9 @@ class ConditionExpectationSucceededEventHandler @Inject constructor(
         event: Event,
     ): Next {
         val actionsToAppend = (event as ConditionExpectationSucceeded).conditionActions
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         attemptFireOptOutStagePixel(currentBrokerStep, state)
 
-        val updatedBrokerSteps = state.brokerStepsToExecute.toMutableList()
         val updatedBrokerActions = currentBrokerStep.step.actions.toMutableList().apply {
             this.addAll(
                 state.currentActionIndex + 1,
@@ -78,12 +78,10 @@ class ConditionExpectationSucceededEventHandler @Inject constructor(
             )
         }
 
-        updatedBrokerSteps[state.currentBrokerStepIndex] = updatedBrokerStep
-
         return Next(
             nextState = state.copy(
                 currentActionIndex = state.currentActionIndex + 1,
-                brokerStepsToExecute = updatedBrokerSteps,
+                brokerStep = updatedBrokerStep,
             ),
             nextEvent = ExecuteBrokerStepAction(
                 UserProfile(

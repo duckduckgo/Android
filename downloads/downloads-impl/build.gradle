@@ -16,17 +16,13 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.downloads.impl'
     compileOptions {
         coreLibraryDesugaringEnabled = true
@@ -37,8 +33,8 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':downloads-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':di')
@@ -65,10 +61,6 @@ dependencies {
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.work.runtimeKtx
-
-    // Dagger
-    compileOnly "org.glassfish:javax.annotation:10.0-b28"
-    implementation Google.dagger
 
     implementation KotlinX.coroutines.core
     testImplementation (KotlinX.coroutines.test) {

@@ -20,10 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChat
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeJsMessaging
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -39,7 +36,6 @@ class IsNativeDuckAiEnabledHandlerTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val fakeDuckChat = FakeDuckChat(enabled = true)
-    private val serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private lateinit var handler: IsNativeDuckAiEnabledHandler
 
     @Before
@@ -70,8 +66,6 @@ class IsNativeDuckAiEnabledHandlerTest {
 
     @Test
     fun `when id is null then no response is sent`() = runTest {
-        @Suppress("DenyListedApi")
-        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDuckChat.setEnabled(true)
 
         val fakeJsMessaging = FakeJsMessaging()
@@ -92,8 +86,6 @@ class IsNativeDuckAiEnabledHandlerTest {
 
     @Test
     fun `when id is not null then response is sent`() = runTest {
-        @Suppress("DenyListedApi")
-        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDuckChat.setEnabled(true)
 
         val fakeJsMessaging = FakeJsMessaging()

@@ -30,7 +30,7 @@ import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request.Permission
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface ActivityResultLauncherWrapper {

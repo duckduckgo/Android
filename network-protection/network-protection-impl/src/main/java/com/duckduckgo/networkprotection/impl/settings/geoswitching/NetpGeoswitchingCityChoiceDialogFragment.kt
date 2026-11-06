@@ -25,22 +25,20 @@ import android.widget.FrameLayout
 import android.widget.RadioGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.button.RadioButton
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.H4
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.databinding.DialogGeoswitchingCityBinding
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -56,15 +54,8 @@ class NetpGeoswitchingCityChoiceDialogFragment : BottomSheetDialogFragment() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
     private var preferredCity: String? = null
-    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed_EdgeToEdge
-    } else {
-        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed
-    }
+    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed_EdgeToEdge
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -78,9 +69,7 @@ class NetpGeoswitchingCityChoiceDialogFragment : BottomSheetDialogFragment() {
         preferredCity = runBlocking { netPGeoswitchingRepository.getUserPreferredLocation().cityName }
         return DialogGeoswitchingCityBinding.inflate(inflater, container, false).apply {
             configureViews(this)
-            if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-                root.applyBottomSystemBarInsetPadding()
-            }
+            root.applyBottomSystemBarInsetPadding()
         }.root
     }
 

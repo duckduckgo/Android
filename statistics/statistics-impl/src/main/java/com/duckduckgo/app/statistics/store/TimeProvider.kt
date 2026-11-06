@@ -17,7 +17,7 @@
 package com.duckduckgo.app.statistics.store
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.Instant
 import javax.inject.Inject
 

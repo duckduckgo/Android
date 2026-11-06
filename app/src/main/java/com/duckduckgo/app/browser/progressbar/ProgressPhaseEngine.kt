@@ -40,8 +40,6 @@ class ProgressPhaseEngine(
     var displayProgress: Float = 0f
         private set
 
-    var stallDetectionEnabled: Boolean = false
-
     private var realProgress: Float = 0f
     private var velocity: Float = 0f
     private var phaseStartTime: Long = 0L
@@ -61,7 +59,7 @@ class ProgressPhaseEngine(
 
     fun start() {
         phase = Phase.FAST_START
-        displayProgress = 0f
+        displayProgress = config.initialProgress
         realProgress = 0f
         velocity = 0f
         creepProgress = 0f
@@ -133,7 +131,7 @@ class ProgressPhaseEngine(
             Phase.IDLE -> {} // no-op
             Phase.FAST_START -> tickFastStart()
             Phase.TRACKING -> tickTracking(dt)
-            Phase.INDETERMINATE -> if (!stallDetectionEnabled) onSweepFinished() // otherwise hold frozen; the view renders the sweep
+            Phase.INDETERMINATE -> {} // held frozen; the view renders the sweep and calls onSweepFinished()
             Phase.RESUMING -> tickResuming()
             Phase.COMPLETING -> tickCompleting()
             Phase.DONE -> {} // no-op
@@ -146,7 +144,7 @@ class ProgressPhaseEngine(
         val t = (elapsed.toFloat() / config.fastStartDurationMs).coerceIn(0f, 1f)
         // cubic ease-in
         val eased = t * t * t
-        displayProgress = eased * config.fastStartTarget
+        displayProgress = config.initialProgress + eased * (config.fastStartTarget - config.initialProgress)
 
         if (t >= 1f) {
             displayProgress = config.fastStartTarget
@@ -157,9 +155,7 @@ class ProgressPhaseEngine(
     }
 
     private fun tickTracking(dt: Float) {
-        if (stallDetectionEnabled &&
-            timeProvider.elapsedRealtime() - lastForwardProgressTime >= config.stallTimeoutMs
-        ) {
+        if (timeProvider.elapsedRealtime() - lastForwardProgressTime >= config.stallTimeoutMs) {
             phase = Phase.INDETERMINATE
             velocity = 0f
             return

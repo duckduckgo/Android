@@ -16,8 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.effectiveLimitError
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowAttachButton
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowInputControls
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -41,5 +45,25 @@ class NativeInputControlsVisibilityTest {
     @Test
     fun `controls hidden off chat tab while streaming`() {
         assertFalse(shouldShowInputControls(onChatTab = false, isStreaming = true))
+    }
+
+    @Test
+    fun `attach button hidden in edit mode even when uploads are supported`() {
+        assertFalse(shouldShowAttachButton(supportsUpload = true, isContextual = false, isEditMode = true, pluginControlsVisible = true))
+    }
+
+    @Test
+    fun `attach button shown outside edit mode when uploads are supported`() {
+        assertTrue(shouldShowAttachButton(supportsUpload = true, isContextual = false, isEditMode = false, pluginControlsVisible = true))
+    }
+
+    @Test
+    fun `limit errors suppressed in edit mode`() {
+        assertNull(effectiveLimitError(imageLimitError = "too many images", isEditMode = true))
+    }
+
+    @Test
+    fun `limit errors surfaced outside edit mode`() {
+        assertEquals("too many images", effectiveLimitError(imageLimitError = "too many images", isEditMode = false))
     }
 }

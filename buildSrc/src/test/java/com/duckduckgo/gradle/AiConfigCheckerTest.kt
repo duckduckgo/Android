@@ -34,7 +34,7 @@ class AiConfigCheckerTest {
     }
 
     /**
-     * A consistent repo: an always-loaded rule, a path-scoped rule, a doc reachable from CLAUDE.md and
+     * A consistent repo: an always-loaded rule, a path-scoped rule, a doc reachable from AGENTS.md and
      * another reachable from a rule, a well-formed skill, and no dangling references.
      */
     private fun validRepo() {
@@ -42,9 +42,9 @@ class AiConfigCheckerTest {
         write("di/build.gradle", "// module\n")
 
         write(
-            "CLAUDE.md",
+            "AGENTS.md",
             """
-            |# CLAUDE.md — Project
+            |# AGENTS.md — Project
             |
             |Versions live in the build files.
             |
@@ -53,6 +53,7 @@ class AiConfigCheckerTest {
             || `.claude/docs/contributions.md` | opening a PR |
             """.trimMargin(),
         )
+        write("CLAUDE.md", "@AGENTS.md\n")
 
         write(".claude/rules/architecture.md", "# Architecture\n\nSee module `:di`.\nCrashes: `.claude/docs/dagger-scopes.md`.\n")
         write(".claude/rules/maestro-ui-tests.md", "---\npaths:\n  - \".maestro/**\"\n---\n# Maestro\n")
@@ -70,15 +71,29 @@ class AiConfigCheckerTest {
     }
 
     @Test
-    fun `missing CLAUDE_md is reported`() {
+    fun `missing AGENTS_md is reported`() {
         val violations = check()
-        assertTrue(violations.any { it.message.contains("CLAUDE.md not found") }, "got: $violations")
+        assertTrue(violations.any { it.message.contains("AGENTS.md not found") }, "got: $violations")
+    }
+
+    @Test
+    fun `instructions written into CLAUDE_md are reported`() {
+        validRepo()
+        write("CLAUDE.md", "@AGENTS.md\n\nAlways use Compose.\n")
+        assertTrue(check().any { it.message.contains("CLAUDE.md must contain only") }, "got: ${check()}")
+    }
+
+    @Test
+    fun `missing CLAUDE_md is reported`() {
+        validRepo()
+        File(repo, "CLAUDE.md").delete()
+        assertTrue(check().any { it.message.contains("CLAUDE.md must contain only") }, "got: ${check()}")
     }
 
     // --- docs reachability ---------------------------------------------------------------------
 
     @Test
-    fun `doc referenced from neither CLAUDE_md nor a rule is unreachable`() {
+    fun `doc referenced from neither AGENTS_md nor a rule is unreachable`() {
         validRepo()
         write(".claude/docs/orphan.md", "# Orphan\n")
         val violations = check()
@@ -99,10 +114,10 @@ class AiConfigCheckerTest {
     // --- dangling config references -----------------------------------------------------------
 
     @Test
-    fun `CLAUDE_md pointing at a missing doc is reported`() {
+    fun `AGENTS_md pointing at a missing doc is reported`() {
         validRepo()
-        val claude = File(repo, "CLAUDE.md")
-        claude.writeText(claude.readText() + "\n| `.claude/docs/ghost.md` | never |\n")
+        val agents = File(repo, "AGENTS.md")
+        agents.writeText(agents.readText() + "\n| `.claude/docs/ghost.md` | never |\n")
         val violations = check()
         assertTrue(
             violations.any { it.message.contains("Dangling AI config reference") && it.message.contains("ghost.md") },
@@ -247,10 +262,10 @@ class AiConfigCheckerTest {
     // --- volatile facts -----------------------------------------------------------------------
 
     @Test
-    fun `restated tool version in CLAUDE_md is reported`() {
+    fun `restated tool version in AGENTS_md is reported`() {
         validRepo()
-        val claude = File(repo, "CLAUDE.md")
-        claude.writeText(claude.readText() + "\nBuild: Gradle 7.6, Kotlin 1.9.24.\n")
+        val agents = File(repo, "AGENTS.md")
+        agents.writeText(agents.readText() + "\nBuild: Gradle 7.6, Kotlin 1.9.24.\n")
         val violations = check()
         assertTrue(violations.any { it.message.contains("Restated tool version") }, "got: $violations")
     }
@@ -258,8 +273,8 @@ class AiConfigCheckerTest {
     @Test
     fun `tool version inside a code fence is allowed`() {
         validRepo()
-        val claude = File(repo, "CLAUDE.md")
-        claude.writeText(claude.readText() + "\n```\nexample: Gradle 7.6\n```\n")
+        val agents = File(repo, "AGENTS.md")
+        agents.writeText(agents.readText() + "\n```\nexample: Gradle 7.6\n```\n")
         assertTrue(check().none { it.message.contains("Restated tool version") }, "fenced examples are not restatements")
     }
 
@@ -267,14 +282,14 @@ class AiConfigCheckerTest {
     fun `tool version in a rule is allowed`() {
         validRepo()
         write(".claude/rules/architecture.md", "# Architecture\n\nA library requires Kotlin 2.3.0.\n")
-        assertTrue(check().none { it.message.contains("Restated tool version") }, "the guard is CLAUDE.md-only")
+        assertTrue(check().none { it.message.contains("Restated tool version") }, "the guard is AGENTS.md-only")
     }
 
     @Test
     fun `single integer version is not flagged`() {
         validRepo()
-        val claude = File(repo, "CLAUDE.md")
-        claude.writeText(claude.readText() + "\nBuilding requires JDK 21 and JVM target 17.\n")
+        val agents = File(repo, "AGENTS.md")
+        agents.writeText(agents.readText() + "\nBuilding requires JDK 21 and JVM target 17.\n")
         assertTrue(check().none { it.message.contains("Restated tool version") }, "single integers are not semvers")
     }
 }

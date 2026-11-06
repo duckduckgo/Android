@@ -1,7 +1,7 @@
 {
   "name": "Cyber Background Checks",
   "url": "cyberbackgroundchecks.com",
-  "version": "0.8.0",
+  "version": "0.10.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705644000000,
   "optOutUrl": "https://cyberbackgroundchecks.com/donotsellmyinfo",

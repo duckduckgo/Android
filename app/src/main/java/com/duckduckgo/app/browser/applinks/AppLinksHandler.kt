@@ -16,15 +16,22 @@
 
 package com.duckduckgo.app.browser.applinks
 
+import android.content.Intent
+import android.content.pm.ResolveInfo
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.UriString
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AppLinksHandler {
+    /**
+     * @param trustedCallerOverridesDisabledAppLinks true when [appLink] goes back to the app that opened the custom tab
+     * and may be handled even though [appLinksEnabled] is false. That app may only be known from its referrer, so the
+     * no-gesture launch carve-out still requires [clientPackage].
+     */
     fun handleAppLink(
         isForMainFrame: Boolean,
         appLink: AppLink,
@@ -32,13 +39,47 @@ interface AppLinksHandler {
         clientPackage: String?,
         appLinksEnabled: Boolean,
         shouldHaltWebNavigation: Boolean,
+        trustedCallerOverridesDisabledAppLinks: Boolean = false,
         launchAppLink: () -> Unit,
     ): Boolean
 
     fun updatePreviousUrl(urlString: String?)
     fun setUserQueryState(state: Boolean)
     fun isUserQuery(): Boolean
+
+    /**
+     * True when the app link resolves back to the app that opened the custom tab
+     *
+     * @param appLink the app link being evaluated.
+     * @param callerPackage package that launched the custom tab (if any).
+     */
+    fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean
+
+    /**
+     * The intent to launch, without a confirmation prompt, when a non-HTTP app link can only open the app that opened the
+     * custom tab; null otherwise. As with HTTP app links, the intent is made browsable and any explicit component is
+     * dropped, so the target is reached through a browsable intent filter, and every activity the resulting intent
+     * resolves to must belong to [callerPackage].
+     *
+     * @param intent the non-HTTP app link intent; left unmodified.
+     * @param callerPackage package that launched the custom tab (if any).
+     * @param queryActivities resolves an intent to the activities that can handle it.
+     */
+    fun trustedCallerIntent(
+        intent: Intent,
+        callerPackage: String?,
+        queryActivities: (Intent) -> List<ResolveInfo>,
+    ): TrustedCallerIntent?
+
+    /**
+     * True when the app link's domain always launches its app, bypassing the usual user-gesture and prompt requirements.
+     *
+     * @param appLink the app link being evaluated.
+     */
+    fun isAlwaysTriggerDomain(appLink: AppLink): Boolean
 }
+
+data class TrustedCallerIntent(val intent: Intent, val activities: List<ResolveInfo>)
 
 @ContributesBinding(AppScope::class)
 class DuckDuckGoAppLinksHandler @Inject constructor(
@@ -48,6 +89,9 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
     var previousUrl: String? = null
     var isAUserQuery = false
     var hasTriggeredForDomain = false
+
+    // Domains exempt from every suppression rule below  as they launch on repeat navigations to the same
+    // domain, and without a user gesture.
     private val alwaysTriggerList = listOf("app.digid.nl")
 
     override fun handleAppLink(
@@ -57,32 +101,37 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         clientPackage: String?,
         appLinksEnabled: Boolean,
         shouldHaltWebNavigation: Boolean,
+        trustedCallerOverridesDisabledAppLinks: Boolean,
         launchAppLink: () -> Unit,
     ): Boolean {
-        if (!appLinksEnabled || !isForMainFrame) {
+        if (!isForMainFrame) {
             return false
         }
+
+        val isTrustedCaller = isTrustedCaller(appLink, clientPackage)
+        if (!appLinksEnabled && !trustedCallerOverridesDisabledAppLinks) {
+            return false
+        }
+
+        val urlString = appLink.uriString
+        val isAlwaysTriggerDomain = isAlwaysTriggerDomain(appLink)
 
         // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
-        if (androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
-            val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
-            val isTrustedCaller = targetPackage != null && clientPackage == targetPackage
+        if (!isAlwaysTriggerDomain && androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
             if (!hasGesture && !isTrustedCaller) {
                 return false
             }
         }
 
-        val urlString = appLink.uriString
         previousUrl?.let {
             if (isSameOrSubdomain(it, urlString)) {
-                val shouldTrigger = alwaysTriggerList.contains(urlString.extractDomain())
-                if (isAUserQuery || !hasTriggeredForDomain || shouldTrigger) {
+                if (isAUserQuery || !hasTriggeredForDomain || isAlwaysTriggerDomain) {
                     previousUrl = urlString
                     launchAppLink()
                     hasTriggeredForDomain = true
-                    if (shouldTrigger) return true
+                    if (isAlwaysTriggerDomain) return true
                 }
                 return false
             }
@@ -112,5 +161,31 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
 
     override fun isUserQuery(): Boolean {
         return isAUserQuery
+    }
+
+    override fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean {
+        val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
+        return targetPackage != null && callerPackage == targetPackage
+    }
+
+    override fun trustedCallerIntent(
+        intent: Intent,
+        callerPackage: String?,
+        queryActivities: (Intent) -> List<ResolveInfo>,
+    ): TrustedCallerIntent? {
+        if (callerPackage == null) return null
+        val sanitizedIntent = Intent(intent).apply {
+            addCategory(Intent.CATEGORY_BROWSABLE)
+            component = null
+            selector?.component = null
+            selector?.addCategory(Intent.CATEGORY_BROWSABLE)
+        }
+        val activities = queryActivities(sanitizedIntent)
+        if (activities.isEmpty() || activities.any { it.activityInfo?.packageName != callerPackage }) return null
+        return TrustedCallerIntent(sanitizedIntent, activities)
+    }
+
+    override fun isAlwaysTriggerDomain(appLink: AppLink): Boolean {
+        return alwaysTriggerList.contains(appLink.uriString.extractDomain())
     }
 }

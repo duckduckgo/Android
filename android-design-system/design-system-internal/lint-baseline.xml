@@ -24,6 +24,17 @@
     </issue>
 
     <issue
+        id="TooManyViews"
+        message="`component_buttons.xml` has more than 80 views, bad for performance"
+        errorLine1="        &lt;com.duckduckgo.common.ui.internal.ui.PlatformLabelView"
+        errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/component_buttons.xml"
+            line="509"
+            column="10"/>
+    </issue>
+
+    <issue
         id="HardcodedText"
         message="Hardcoded string &quot;Primary Small&quot;, should use `@string` resource"
         errorLine1="            android:text=&quot;Primary Small&quot; />"

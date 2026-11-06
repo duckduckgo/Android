@@ -25,14 +25,14 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.referral.impl.InstallOriginBridgeFeature
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONObject
 import javax.inject.Inject
 
 /**
  * Handles the `handshake` message from SERP, advertising whether the install-origin bridge is available.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SerpHandshakeHandler @Inject constructor(
     private val installOriginBridgeFeature: InstallOriginBridgeFeature,
 ) : ContentScopeJsMessageHandlersPlugin {

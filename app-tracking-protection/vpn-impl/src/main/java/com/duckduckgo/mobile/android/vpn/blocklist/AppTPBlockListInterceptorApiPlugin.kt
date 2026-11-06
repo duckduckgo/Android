@@ -27,10 +27,11 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures.Cohorts.TRE
 import com.duckduckgo.mobile.android.vpn.feature.activeAppTpTdsFlag
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import okhttp3.Interceptor
@@ -39,9 +40,9 @@ import okhttp3.Response
 import retrofit2.Invocation
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class AppTPBlockListInterceptorApiPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
@@ -112,9 +113,9 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
+    binding = binding<PixelParamRemovalPlugin>(),
 )
 object MetricPixelRemovalInterceptor : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

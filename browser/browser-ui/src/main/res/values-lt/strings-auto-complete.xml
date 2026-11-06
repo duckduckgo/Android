@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Atšaukti</string>
     <string name="autocompleteRemoveItemRemove">Pašalinti</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Perjungti į skirtuką · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai“</string>
 </resources>

@@ -25,9 +25,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
@@ -50,9 +51,9 @@ interface AdClickCollector {
  * Report: 7d rolling average of ad clicks (bucketed value). Not sent if count is 0.
  * Specs: https://app.asana.com/1/137249556945/project/1206716555947156/task/1211301604929610?focus=true
  */
-@ContributesMultibinding(AppScope::class, AttributedMetric::class)
-@ContributesBinding(AppScope::class, AdClickCollector::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<AttributedMetric>())
+@ContributesBinding(AppScope::class, binding = binding<AdClickCollector>())
+@SingleIn(AppScope::class)
 class RealAdClickAttributedMetric @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,

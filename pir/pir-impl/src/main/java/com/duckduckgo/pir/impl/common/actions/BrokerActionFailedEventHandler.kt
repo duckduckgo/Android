@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
@@ -32,19 +33,19 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
-import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.asActionType
 import com.duckduckgo.pir.impl.scripts.models.getDetails
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class BrokerActionFailedEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -60,13 +61,9 @@ class BrokerActionFailedEventHandler @Inject constructor(
          * This means we have received an error from the JS layer for the last action we pushed.
          * We end the run for the broker.
          */
-        if (!isEventValid(state)) {
+        if (!isEventValid(state, event as BrokerActionFailed)) {
             // Stale event: arrived after the broker step / action was already considered completed.
-            val broker = if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) {
-                Broker.unknown()
-            } else {
-                state.brokerStepsToExecute[state.currentBrokerStepIndex].broker
-            }
+            val broker = state.brokerStep.broker
 
             pirRunStateHandler.handleState(
                 BrokerStepInvalidEvent(
@@ -77,15 +74,27 @@ class BrokerActionFailedEventHandler @Inject constructor(
             return Next(nextState = state)
         }
 
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
-        val error = (event as BrokerActionFailed).error
+        val error = event.error
 
         // A condition action reports a failure (JsActionFailed, or a local timeout) when its expectation
         // is not met. For a condition that is expected rather than fatal: treat it as "condition not met"
         // and skip to the next action, instead of retrying and then failing the whole broker step.
         if (currentAction is BrokerAction.Condition) {
             return handleConditionNotMet(state)
+        }
+
+        // Silenced script failures still need diagnostics, but must not stop the broker step.
+        if (currentAction is BrokerAction.ExecuteScript && currentAction.failSilently && error is PirError.ActionError.JsActionFailed) {
+            emitBrokerActionFailedPixel(state, error)
+            return Next(
+                nextState = state.copy(
+                    currentActionIndex = state.currentActionIndex + 1,
+                    actionRetryCount = 0,
+                ),
+                nextEvent = ExecuteBrokerStepAction(UserProfile(userProfile = state.profileQuery)),
+            )
         }
 
         // If failure is on Any captcha action, we proceed to next action
@@ -119,7 +128,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
     }
 
     private suspend fun handleConditionNotMet(state: State): Next {
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
                 BrokerOptOutConditionNotFound(
@@ -145,14 +154,18 @@ class BrokerActionFailedEventHandler @Inject constructor(
         )
     }
 
-    private fun isEventValid(state: State): Boolean {
-        // Broker steps has probably been considered completed before the js error arrived
-        if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) return false
-
+    private fun isEventValid(
+        state: State,
+        event: BrokerActionFailed,
+    ): Boolean {
         // Broker step actions has probably been considered completed before the js error arrived
-        if (state.brokerStepsToExecute[state.currentBrokerStepIndex].step.actions.size <= state.currentActionIndex) return false
+        if (state.brokerStep.step.actions.size <= state.currentActionIndex) return false
 
-        return true
+        val currentBrokerStepAction =
+            state.brokerStep.step.actions[state.currentActionIndex]
+
+        // The action IDs don't match, the error is probably for an outdated / old action
+        return !(event.error is PirError.ActionError && event.error.actionID != currentBrokerStepAction.id)
     }
 
     private fun shouldRetryFailedAction(
@@ -160,7 +173,8 @@ class BrokerActionFailedEventHandler @Inject constructor(
         event: BrokerActionFailed,
         currentAction: BrokerAction,
     ): Boolean {
-        if (!event.allowRetry) {
+        // Scripts can have non-idempotent side effects, so never retry them.
+        if (!event.allowRetry || currentAction is BrokerAction.ExecuteScript) {
             return false
         }
 
@@ -177,7 +191,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
         state: State,
         error: PirError,
     ) {
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
         val extractedProfile = when (currentBrokerStep) {
             is OptOutStep -> {
@@ -202,6 +216,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
                 stepType = currentBrokerStep.step.stepType,
                 completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 actionType = currentAction.asActionType(),
+                isFreeScan = (currentBrokerStep as? ScanStep)?.isFreeScan == true,
             ),
         )
     }

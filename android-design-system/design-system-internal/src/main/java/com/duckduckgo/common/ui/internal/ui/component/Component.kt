@@ -20,6 +20,7 @@ enum class Component {
     BUTTON,
     FAB,
     CARD,
+    SCAFFOLD,
     TOP_APP_BAR,
     CHIP,
     DRAWER,
@@ -46,4 +47,7 @@ enum class Component {
     SETTINGS_LIST_ITEM,
     SECTION_DIVIDER,
     PROGRESS_SPINNER,
+    SKELETON,
+    APP_TRACKING_PROTECTION_BANNER,
+    CONTEXT_MENU,
 }

@@ -18,11 +18,11 @@ package com.duckduckgo.adblocking.impl.duckplayer
 
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerPageSettingsPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class CustomErrorPagePlugin @Inject constructor(
     private val duckPlayerFeature: DuckPlayerFeature,
 ) : DuckPlayerPageSettingsPlugin {

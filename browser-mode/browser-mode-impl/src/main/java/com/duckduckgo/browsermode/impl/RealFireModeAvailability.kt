@@ -23,9 +23,10 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
@@ -33,11 +34,10 @@ import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = FireModeAvailability::class)
-@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<FireModeAvailability>())
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealFireModeAvailability @Inject constructor(
-    private val fireModeFeature: FireModeFeature,
     private val dispatchers: DispatcherProvider,
     @param:AppCoroutineScope private val appScope: CoroutineScope,
 ) : FireModeAvailability, MainProcessLifecycleObserver {
@@ -53,7 +53,7 @@ class RealFireModeAvailability @Inject constructor(
 
     private fun computeAndCache(): Boolean {
         cachedAvailability?.let { return it }
-        val value = isMultiProfileSupported() && isDeleteBrowsingDataSupported() && fireModeFeature.fireTabs().isEnabled()
+        val value = isMultiProfileSupported() && isDeleteBrowsingDataSupported()
         cachedAvailability = value
         return value
     }

@@ -27,6 +27,8 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
@@ -54,6 +56,9 @@ class AccountInfoKeyManagerTest {
     private val syncApi: SyncApi = mock()
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val nativeLib: SyncLib = mock()
+    private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
+    private val syncPixels: SyncPixels = mock()
+    private val accountInfoDdgWrapRepairer: AccountInfoDdgWrapRepairer = mock()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -68,12 +73,17 @@ class AccountInfoKeyManagerTest {
             syncJweCrypto = syncJweCrypto,
             nativeLib = nativeLib,
             thirdPartyKeyWrapper = RealThirdPartyKeyWrapper(syncJweCrypto),
+            thirdPartyCredentialManager = thirdPartyCredentialManager,
             dispatchers = coroutineTestRule.testDispatcherProvider,
+            syncPixels = syncPixels,
+            accountInfoDdgWrapRepairer = accountInfoDdgWrapRepairer,
         )
         configureForSuccessfulKeypairMint()
+        whenever(accountInfoDdgWrapRepairer.repair(any(), anyOrNull())).thenReturn(Success(Unit))
     }
 
     private fun configureForSuccessfulKeypairMint() {
+        whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(false))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.secretKey).thenReturn(secretKey)
         whenever(syncJweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair("pubKey", "cHJpdktleQ"))
@@ -124,6 +134,7 @@ class AccountInfoKeyManagerTest {
         val result = manager.ensureKeyRegistered() as Success
 
         assertEquals(RsaJwk(n = "modulus", e = "AQAB"), result.data.publicKey)
+        verify(syncPixels).fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyCreateSuccess)
         assertTrue(result.data.created)
         assertEquals(1, result.data.wrapsSent)
         verify(syncJweCrypto).generateRsaKeyPair(3072)
@@ -139,6 +150,50 @@ class AccountInfoKeyManagerTest {
     }
 
     @Test
+    fun whenNoScopedPasswordCachedThenAsksServerWhetherAccountHasThirdPartyCredential() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any())).thenReturn(Success(SetKeysIfAbsentResult.Created))
+
+        manager.ensureKeyRegistered()
+
+        verify(thirdPartyCredentialManager).refresh()
+    }
+
+    @Test
+    fun whenScopedPasswordRecoveredFromServerThenBothWrapsAreSent() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(syncStore.userId).thenReturn(userId)
+        // a successful refresh stores the recovered scoped password
+        whenever(thirdPartyCredentialManager.refresh()).thenAnswer {
+            whenever(syncStore.scopedPassword).thenReturn(ScopedPassword("c3BSYXc="))
+            Success(true)
+        }
+        whenever(syncJweCrypto.hkdfSha256SingleBlock(any(), any(), any(), any())).thenReturn(ByteArray(32))
+        whenever(syncJweCrypto.jweEncryptSymmetric(any(), any(), anyOrNull())).thenReturn("3party_wrapped")
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any())).thenReturn(Success(SetKeysIfAbsentResult.Created))
+
+        val result = manager.ensureKeyRegistered() as Success
+
+        assertEquals(2, result.data.wrapsSent)
+        verify(syncApi).setKeysIfAbsent(
+            eq(token),
+            eq("account_info"),
+            check { keys -> assertEquals(setOf("ddg", "3party"), keys.map { it.encryptedWith }.toSet()) },
+        )
+    }
+
+    @Test
+    fun whenScopedPasswordRecoveryFailsThenKeyIsStillRegisteredForDdgOnly() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(thirdPartyCredentialManager.refresh()).thenReturn(Error(reason = "no network"))
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any())).thenReturn(Success(SetKeysIfAbsentResult.Created))
+
+        val result = manager.ensureKeyRegistered() as Success
+
+        assertEquals(1, result.data.wrapsSent)
+    }
+
+    @Test
     fun whenScopedPasswordPresentThenBothWrapsAreSentSharingOneKid() = runTest {
         whenever(syncStore.scopedPassword).thenReturn(ScopedPassword("c3BSYXc="))
         whenever(syncStore.userId).thenReturn(userId)
@@ -150,6 +205,7 @@ class AccountInfoKeyManagerTest {
 
         assertTrue(result is Success)
         assertEquals(2, (result as Success).data.wrapsSent)
+        verify(thirdPartyCredentialManager, never()).refresh()
         verify(syncApi).setKeysIfAbsent(
             eq(token),
             eq("account_info"),
@@ -185,33 +241,53 @@ class AccountInfoKeyManagerTest {
         assertEquals("other-kid", result.data.kid)
         assertEquals(RsaJwk(n = "other-mod", e = "AQAB"), result.data.publicKey)
         assertTrue(!result.data.created)
+        verify(syncPixels).fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyAdoptSuccess)
         verify(syncStore).accountInfoPublicKey = AccountInfoPublicKey(keyId = "other-kid", modulus = "other-mod", exponent = "AQAB")
+        verify(accountInfoDdgWrapRepairer).repair("other-kid")
     }
 
     @Test
     fun whenSetIfAbsentRequiresFetchThenFetchesKeysAndAdopts() = runTest {
+        val serverEntry = accountInfoEntry(kid = "server-kid", encryptedWith = "ddg", modulus = "server-mod")
         whenever(syncStore.scopedPassword).thenReturn(null)
         whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any())).thenReturn(Success(SetKeysIfAbsentResult.ExistsFetchRequired))
-        whenever(syncApi.getProtectedKeys(token)).thenReturn(
-            Success(
-                listOf(
-                    ProtectedKeyEntry(
-                        kid = "server-kid",
-                        purpose = "account_info",
-                        encryptedWith = "ddg",
-                        encryptedPrivateKey = "AAAA",
-                        publicKey = RsaJwk(n = "server-mod", e = "AQAB"),
-                    ),
-                ),
-            ),
-        )
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(listOf(serverEntry)))
 
         val result = manager.ensureKeyRegistered() as Success
 
         assertEquals("server-kid", result.data.kid)
         assertEquals(RsaJwk(n = "server-mod", e = "AQAB"), result.data.publicKey)
         assertTrue(!result.data.created)
+        verify(syncPixels).fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyAdoptSuccess)
         verify(syncStore).accountInfoPublicKey = AccountInfoPublicKey(keyId = "server-kid", modulus = "server-mod", exponent = "AQAB")
+        verify(accountInfoDdgWrapRepairer).repair("server-kid", listOf(serverEntry))
+    }
+
+    @Test
+    fun whenRepairingAdoptedKeyFailsThenStillAdoptsAndCachesPublicKey() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any()))
+            .thenReturn(Success(SetKeysIfAbsentResult.Existing(kid = "other-kid", publicKey = RsaJwk(n = "other-mod", e = "AQAB"))))
+        whenever(accountInfoDdgWrapRepairer.repair("other-kid")).thenReturn(Error(reason = "repair failed"))
+
+        val result = manager.ensureKeyRegistered()
+
+        assertTrue(result is Success)
+        verify(syncStore).accountInfoPublicKey = AccountInfoPublicKey(keyId = "other-kid", modulus = "other-mod", exponent = "AQAB")
+    }
+
+    @Test
+    fun whenExistingResponseHasNoPublicKeyThenFetchesAndAdoptsFullKey() = runTest {
+        val serverEntry = accountInfoEntry(kid = "server-kid", encryptedWith = "3party", modulus = "server-mod")
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any()))
+            .thenReturn(Success(SetKeysIfAbsentResult.Existing(kid = "server-kid", publicKey = null)))
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(listOf(serverEntry)))
+
+        val result = manager.ensureKeyRegistered() as Success
+
+        assertEquals(RsaJwk(n = "server-mod", e = "AQAB"), result.data.publicKey)
+        verify(accountInfoDdgWrapRepairer).repair("server-kid", listOf(serverEntry))
     }
 
     @Test
@@ -224,6 +300,9 @@ class AccountInfoKeyManagerTest {
         val result = manager.ensureKeyRegistered()
 
         assertTrue(result is Error)
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.AccountInfoKeyAdoptFailed(UnifiedDeviceListPixel.AccountInfoKeyAdoptFailureReason.KEYS_FETCH_FAILED),
+        )
     }
 
     @Test
@@ -233,6 +312,9 @@ class AccountInfoKeyManagerTest {
         val result = manager.ensureKeyRegistered()
 
         assertTrue(result is Error)
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.AccountInfoKeyCreateFailed(UnifiedDeviceListPixel.AccountInfoKeyCreateFailureReason.REQUEST_FAILED),
+        )
         verify(syncStore, org.mockito.kotlin.times(0)).accountInfoPublicKey = anyOrNull()
     }
 
@@ -243,6 +325,9 @@ class AccountInfoKeyManagerTest {
         val result = manager.ensureKeyRegistered()
 
         assertTrue(result is Error)
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.AccountInfoKeyCreateFailed(UnifiedDeviceListPixel.AccountInfoKeyCreateFailureReason.MINT_FAILED),
+        )
         verify(syncApi, never()).setKeysIfAbsent(anyString(), anyString(), any())
     }
 
@@ -257,4 +342,16 @@ class AccountInfoKeyManagerTest {
 
         assertEquals(1, result.data.wrapsSent)
     }
+
+    private fun accountInfoEntry(
+        kid: String,
+        encryptedWith: String,
+        modulus: String,
+    ) = ProtectedKeyEntry(
+        kid = kid,
+        purpose = "account_info",
+        encryptedWith = encryptedWith,
+        encryptedPrivateKey = "AAAA",
+        publicKey = RsaJwk(n = modulus, e = "AQAB"),
+    )
 }

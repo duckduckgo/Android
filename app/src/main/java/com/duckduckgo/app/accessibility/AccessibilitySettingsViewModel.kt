@@ -18,9 +18,9 @@ package com.duckduckgo.app.accessibility
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -110,7 +110,6 @@ class AccessibilitySettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             voiceSearchRepository.setVoiceSearchUserEnabled(checked)
             if (checked) {
-                voiceSearchRepository.resetVoiceSearchDismissed()
                 pixel.fire(VOICE_SEARCH_ON)
             } else {
                 pixel.fire(VOICE_SEARCH_OFF)

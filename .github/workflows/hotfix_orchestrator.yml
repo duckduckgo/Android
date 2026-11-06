@@ -17,6 +17,9 @@ on:
         default: 'Bug fixes and other improvements'
         type: string
 
+env:
+  HOTFIX_CONFLICT_PLAYBOOK_URL: https://app.asana.com/1/137249556945/task/1219472906247295
+
 jobs:
   prepare:
     uses: ./.github/workflows/hotfix_prepare.yml
@@ -24,6 +27,7 @@ jobs:
       app-version: ${{ inputs.app-version }}
       commit-hashes: ${{ inputs.commit-hashes }}
       release-notes: ${{ inputs.release-notes }}
+      create_asana_task: false
     secrets: inherit
 
   # Create the Asana hotfix tracking task up-front; mirrors the manual "task first, then tag" order
@@ -33,6 +37,7 @@ jobs:
     with:
       app-version: ${{ inputs.app-version }}
       commit-hashes: ${{ inputs.commit-hashes }}
+      create_asana_task: false
     secrets: inherit
 
   resolve-hotfix-sha:
@@ -58,6 +63,8 @@ jobs:
     with:
       commit: ${{ needs.resolve-hotfix-sha.outputs.commit_sha }}
       create_asana_tasks: false
+      fail_fast: true
+      maestro_priority: high
     secrets: inherit
 
   finish:
@@ -65,4 +72,23 @@ jobs:
     uses: ./.github/workflows/hotfix_finish.yml
     with:
       app-version: ${{ inputs.app-version }}
+      create_asana_task: false
     secrets: inherit
+
+  notify-failure:
+    needs: [prepare, create-hotfix-task, resolve-hotfix-sha, release-blocking-checks, finish]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Asana task when any orchestrator step failed
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+          asana-task-name: GH Workflow Failure - Hotfix Orchestrator ${{ inputs.app-version }}
+          asana-task-description: |
+            The Hotfix Orchestrator workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+            ${{ needs.prepare.outputs.cherry-pick-conflict == 'true' && format('A fix commit did not cherry-pick cleanly. Follow Where to start > Prepare failed, keeping version {0}: {1}', inputs.app-version, env.HOTFIX_CONFLICT_PLAYBOOK_URL) || '' }}
+            ${{ needs.finish.outputs.merge-conflict == 'true' && format('Merging the hotfix back stopped on a conflict. Follow Where to start > Finish failed, keeping version {0}: {1}', inputs.app-version, env.HOTFIX_CONFLICT_PLAYBOOK_URL) || '' }}
+          action: 'create-asana-task'

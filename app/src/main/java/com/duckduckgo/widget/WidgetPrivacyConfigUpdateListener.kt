@@ -17,21 +17,44 @@
 package com.duckduckgo.widget
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
+)
+@ContributesIntoSet(
+    scope = AppScope::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class WidgetPrivacyConfigUpdateListener @Inject constructor(
     private val context: Context,
     private val widgetUpdater: WidgetUpdater,
-) : PrivacyConfigCallbackPlugin {
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
+) : PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
+
+    private var lastAppliedAddressBarEnabled: Boolean? = null
+
+    override fun onStart(owner: LifecycleOwner) {
+        val isAddressBarEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        if (isAddressBarEnabled == lastAppliedAddressBarEnabled) return
+
+        refreshWidgets(isAddressBarEnabled)
+    }
 
     override fun onPrivacyConfigDownloaded() {
+        refreshWidgets(appBrandDesignUpdateToggles.addressBar().isEnabled())
+    }
+
+    private fun refreshWidgets(isAddressBarEnabled: Boolean) {
         widgetUpdater.updateWidgets(context)
+        lastAppliedAddressBarEnabled = isAddressBarEnabled
     }
 }

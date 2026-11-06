@@ -18,14 +18,15 @@ package com.duckduckgo.app.appearance
 
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.appearance.AppearanceScreen.Default
 import com.duckduckgo.app.appearance.AppearanceScreen.HighlightedItem
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
@@ -37,6 +38,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -50,9 +53,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.launchIn
@@ -67,9 +68,6 @@ import com.duckduckgo.mobile.android.R as CommonR
 class AppearanceActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appTheme: AppTheme
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -124,17 +122,12 @@ class AppearanceActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureUiEventHandlers()
         observeViewModel()
@@ -194,6 +187,9 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 viewState.let {
                     updateSelectedTheme(it.theme)
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
+                    if (it.showAppIconSettingFirst) {
+                        moveAppIconSettingFirst()
+                    }
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode && viewState.canForceDarkMode
                     binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
@@ -201,7 +197,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
                         viewState.isTrackersCountInTabSwitcherEnabled,
                         showTrackersCountInTabSwitcher,
                     )
-                    binding.showTrackersCountInAddressBar.isVisible = viewState.shouldShowAddressBarTrackersAnimationItem
                     binding.showTrackersCountInAddressBar.quietlySetIsChecked(
                         viewState.isAddressBarTrackersAnimationEnabled,
                         showTrackersCountInAddressBar,
@@ -251,6 +246,19 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private fun launchAppIconChange() {
         changeIconFlow.launch(null)
+    }
+
+    /** Reordered here rather than in the layout so the screen is untouched when the flag is off. */
+    private fun moveAppIconSettingFirst() {
+        val container = binding.changeAppIconSetting.parent as ViewGroup
+        if (container.indexOfChild(binding.changeAppIconSetting) == 0) return
+
+        container.removeView(binding.changeAppIconSetting)
+        container.addView(binding.changeAppIconSetting, 0)
+        binding.changeAppIconSetting.updateLayoutParams<MarginLayoutParams> {
+            topMargin = resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+        }
+        binding.selectedThemeSetting.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
     }
 
     private fun launchThemeSelector(theme: DuckDuckGoTheme) {

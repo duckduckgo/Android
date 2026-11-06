@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -32,8 +32,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * One-time, per-device backfill that brings an already signed-in user into the unified device list:
- * ensures the account's `account_info` key exists and writes this device's `device_info`.
+ * One-time, per-device backfill that brings an already signed-in user into the unified device list by writing this device's `device_info`.
  */
 @WorkerThread
 interface DeviceInfoMigrator {
@@ -47,15 +46,15 @@ interface DeviceInfoMigrator {
     suspend fun ensureMigrated(): Result<Unit>
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDeviceInfoMigrator @Inject constructor(
     private val syncStore: SyncStore,
     private val syncApi: SyncApi,
     private val syncFeature: SyncFeature,
     private val syncDeviceIds: SyncDeviceIds,
-    private val accountInfoKeyManager: AccountInfoKeyManager,
     private val deviceInfoUpdater: DeviceInfoUpdater,
+    private val deviceInfoPublishWatcher: DeviceInfoPublishWatcher,
     private val dispatchers: DispatcherProvider,
 ) : DeviceInfoMigrator {
 
@@ -83,13 +82,7 @@ class RealDeviceInfoMigrator @Inject constructor(
             is Error -> return serverHasDeviceInfoResult
         }
 
-        logcat { "Sync-UnifiedDevices: no device_info on server for this device; ensuring account_info key" }
-        when (val keyResult = ensureAccountInfoKey()) {
-            is Success -> Unit
-            is Error -> return keyResult
-        }
-
-        logcat { "Sync-UnifiedDevices: writing device_info for this device" }
+        logcat { "Sync-UnifiedDevices: no device_info on server for this device; writing device_info" }
         return writeDeviceInfo(inputs.userId)
     }
 
@@ -100,8 +93,8 @@ class RealDeviceInfoMigrator @Inject constructor(
                 return Precheck.Stop(Error(reason = "DeviceInfoMigration: not signed in"))
             }
 
-        if (!syncFeature.canWriteUnifiedDeviceList().isEnabled()) {
-            logcat { "Sync-UnifiedDevices: migration skipped — canWriteUnifiedDeviceList disabled" }
+        if (!syncFeature.canWriteDeviceInfo()) {
+            logcat { "Sync-UnifiedDevices: migration skipped — writing device_info is disabled" }
             return Precheck.Stop(Success(Unit))
         }
 
@@ -133,29 +126,23 @@ class RealDeviceInfoMigrator @Inject constructor(
         }
     }
 
-    private suspend fun ensureAccountInfoKey(): Result<Unit> {
-        return when (val keyResult = accountInfoKeyManager.ensureKeyRegistered()) {
+    private suspend fun writeDeviceInfo(userId: String): Result<Unit> {
+        return when (
+            val updateResult = deviceInfoUpdater.setThisDeviceName(
+                name = syncDeviceIds.deviceName(),
+                source = DeviceInfoUpdateSource.FIRST_WRITE,
+            )
+        ) {
             is Success -> {
-                logcat { "Sync-UnifiedDevices: account_info key ready (kid=${keyResult.data.kid})" }
-                Success(Unit)
-            }
-            is Error -> {
-                logcat(ERROR) { "Sync-UnifiedDevices: migration ensureKeyRegistered failed, will retry later: ${keyResult.reason}" }
-                keyResult
-            }
-        }
-    }
-
-    private fun writeDeviceInfo(userId: String): Result<Unit> {
-        return when (val patch = deviceInfoUpdater.updateThisDevice(syncDeviceIds.deviceName())) {
-            is Success -> {
+                // record before the migration marker so a concurrent read seeing the marker also sees this publish
+                deviceInfoPublishWatcher.markPublished()
                 markMigrated(userId)
-                logcat { "Sync-UnifiedDevices: migration complete for this device (${patch.data.size} devices_v2 returned)" }
+                logcat { "Sync-UnifiedDevices: migration complete for this device (${updateResult.data.size} devices_v2 returned)" }
                 Success(Unit)
             }
             is Error -> {
-                logcat(ERROR) { "Sync-UnifiedDevices: migration PATCH failed, will retry later: ${patch.reason}" }
-                patch
+                logcat(ERROR) { "Sync-UnifiedDevices: migration PATCH failed, will retry later: ${updateResult.reason}" }
+                updateResult
             }
         }
     }

@@ -19,9 +19,10 @@ package com.duckduckgo.autoconsent.impl.cache
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.AutoconsentSettings
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
 interface AutoconsentSettingsCache {
@@ -32,9 +33,9 @@ interface AutoconsentSettingsCache {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AutoconsentSettingsCache::class,
+    binding = binding<AutoconsentSettingsCache>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAutoconsentSettingsCache @Inject constructor() : AutoconsentSettingsCache {
 
     private var hash = 0

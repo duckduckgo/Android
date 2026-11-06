@@ -27,7 +27,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -42,7 +43,7 @@ interface ChatSyncPromotion {
     suspend fun recordPromotionDismissed()
 }
 
-@ContributesBinding(AppScope::class, boundType = ChatSyncPromotion::class)
+@ContributesBinding(AppScope::class, binding = binding<ChatSyncPromotion>())
 class RealChatSyncPromotion @Inject constructor(
     private val promotionDataStore: SyncPromotionDataStore,
     private val syncState: DeviceSyncState,

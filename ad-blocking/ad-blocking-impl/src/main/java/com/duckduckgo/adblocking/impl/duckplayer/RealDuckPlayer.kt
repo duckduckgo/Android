@@ -68,9 +68,10 @@ import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -111,11 +112,11 @@ interface DuckPlayerInternal : DuckPlayer {
     fun setOpenInNewTab(enabled: Boolean)
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = DuckPlayer::class)
-@ContributesBinding(AppScope::class, boundType = DuckPlayerInternal::class)
-@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
-@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<DuckPlayer>())
+@ContributesBinding(AppScope::class, binding = binding<DuckPlayerInternal>())
+@ContributesIntoSet(AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealDuckPlayer @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val duckPlayerFeature: DuckPlayerFeature,
@@ -147,10 +148,9 @@ class RealDuckPlayer @Inject constructor(
             combine(
                 duckPlayerFeatureRepository.observeUserPreferences(),
                 adBlockingExtensionFeature.self().enabled(),
-                adBlockingExtensionFeature.enabledByDefault().enabled(),
-                ::Triple,
-            ).collect { (stored, selfEnabled, enabledByDefault) ->
-                applyAdBlockingRolloutDefaultIfEligible(stored, selfEnabled, enabledByDefault)
+                ::Pair,
+            ).collect { (stored, selfEnabled) ->
+                applyNewInstallDuckPlayerDefaultIfEligible(stored, selfEnabled)
             }
         }
     }
@@ -159,15 +159,13 @@ class RealDuckPlayer @Inject constructor(
         loadToMemory()
     }
 
-    private suspend fun applyAdBlockingRolloutDefaultIfEligible(
+    private suspend fun applyNewInstallDuckPlayerDefaultIfEligible(
         stored: StoredUserPreferences,
         selfEnabled: Boolean,
-        enabledByDefault: Boolean,
     ) {
         if (!appBuildConfig.isNewInstall()) return
         if (stored.privatePlayerMode != null) return
         if (!selfEnabled) return
-        if (!enabledByDefault) return
         duckPlayerFeatureRepository.setUserPreferences(
             UserPreferences(
                 overlayInteracted = stored.overlayInteracted,
@@ -384,14 +382,16 @@ class RealDuckPlayer @Inject constructor(
             return processDuckPlayerUri(url, webView)
         } else {
             if (!isFeatureEnabled) return null
-            val webViewUrl = withContext(dispatchers.main()) { webView.url }
             if (isYoutubeWatchUrl(url)) {
                 return processYouTubeWatchUri(request, url, webView)
             } else if (isSimulatedYoutubeNoCookie(url)) {
                 return processSimulatedYouTubeNoCookieUri(url, webView)
-            } else if (duckPlayerFeature.addCustomEmbedReferer().isEnabled() && isYouTubeNoCookieEmbedUri(url, webViewUrl)) {
-                return getEmbedWithReferer(request)?.let { inputStream ->
-                    WebResourceResponse("text/html", "UTF-8", inputStream)
+            } else if (isYouTubeNoCookieUri(url) && duckPlayerFeature.addCustomEmbedReferer().isEnabled()) {
+                val webViewUrl = withContext(dispatchers.main()) { webView.url }
+                if (isYouTubeNoCookieEmbedUri(url, webViewUrl)) {
+                    return getEmbedWithReferer(request)?.let { inputStream ->
+                        WebResourceResponse("text/html", "UTF-8", inputStream)
+                    }
                 }
             }
         }

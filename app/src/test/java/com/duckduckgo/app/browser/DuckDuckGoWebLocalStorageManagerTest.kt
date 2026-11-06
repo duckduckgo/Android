@@ -22,10 +22,9 @@ import com.duckduckgo.app.browser.weblocalstorage.MatchingRegex
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettingsJsonParser
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
-import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.DBIterator
@@ -55,7 +54,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
 
     @Before
     fun setup() = runTest {
-        whenever(mockDatabaseProvider.get()).thenReturn(mockDB)
+        whenever(mockDatabaseProvider.value).thenReturn(mockDB)
         whenever(mockAndroidBrowserConfigFeature.webLocalStorage()).thenReturn(mockWebLocalStorageToggle)
         whenever(mockWebLocalStorageToggle.getSettings()).thenReturn("settings")
 

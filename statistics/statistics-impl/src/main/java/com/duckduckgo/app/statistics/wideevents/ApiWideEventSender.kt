@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.wideevents.api.ContextSection
 import com.duckduckgo.app.statistics.wideevents.api.FeatureData
 import com.duckduckgo.app.statistics.wideevents.api.FeatureSection
 import com.duckduckgo.app.statistics.wideevents.api.GlobalSection
+import com.duckduckgo.app.statistics.wideevents.api.MetaSection
 import com.duckduckgo.app.statistics.wideevents.api.WideEventRequest
 import com.duckduckgo.app.statistics.wideevents.api.WideEventService
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
@@ -31,7 +32,7 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEvent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -49,14 +50,19 @@ class ApiWideEventSender @Inject constructor(
         requireNotNull(event.status) { "Attempting to send wide event with null status" }
 
         val request = WideEventRequest(
+            meta = MetaSection(
+                type = event.metaType,
+                version = event.metaVersion,
+            ),
             global = GlobalSection(
                 platform = PLATFORM,
                 type = TYPE,
                 sampleRate = event.samplingProbability,
+                isFirstDailyOccurrence = event.isFirstDailyOccurrence,
             ),
             app = AppSection(
                 name = APP_NAME,
-                version = appBuildConfig.versionName,
+                version = event.appVersion,
                 formFactor = deviceInfo.formFactor().description,
                 devMode = appBuildConfig.isDebug,
             ),

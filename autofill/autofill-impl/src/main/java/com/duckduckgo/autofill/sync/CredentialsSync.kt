@@ -29,14 +29,14 @@ import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
 import javax.inject.*
 
 typealias Iso8601String = String
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class CredentialsSync @Inject constructor(
     private val secureStorage: SecureStorage,
     private val credentialsSyncStore: CredentialsSyncStore,

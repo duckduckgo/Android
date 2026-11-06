@@ -1,0 +1,225 @@
+{
+  "name": "National Public Data",
+  "url": "nationalpublicdata.com",
+  "version": "0.9.0",
+  "addedDatetime": 1791273600000,
+  "optOutUrl": "https://nationalpublicdata.com/optout.html",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://nationalpublicdata.com/search/?name=${firstName}%20${lastName}&city=${city}&state=${state}",
+          "id": "a4d59ac0-295a-4635-ae1c-de9b48d86303"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-db1e7fef-0d8e-4fda-b54f-469719cd1acc"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#header-search"
+            }
+          ],
+          "id": "8753eb41-9d16-4d38-b39a-560be00e615f"
+        },
+        {
+          "_comment": "Optional: results render 25 cards and load more by infinite scroll. Scroll the spinner into view and wait up to 10s for card 26; always resolves, so it never fails the scan.",
+          "actionType": "executeScript",
+          "script": "return new Promise(function (resolve) { try { var list = root.getElementById('persons-list-container'); var spinner = list && list.dataset.hasMore === '1' && list.querySelector('.js-infinity-scroll-spinner'); if (!spinner) return resolve(); spinner.scrollIntoView(); var start = Date.now(); var timer = setInterval(function () { if (root.querySelectorAll('.name-cards-block').length > 25 || Date.now() - start > 10000) { clearInterval(timer); resolve(); } }, 500); } catch (e) { resolve(); } });",
+          "id": "429c0a45-732c-4535-ac0c-62ab2d79c21c"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".name-cards-block",
+          "noResultsSelector": "//div[contains(@class, 'error-content') and contains(., 'We could not find people')]",
+          "profile": {
+            "name": {
+              "selector": ".name-cards-head h2 a",
+              "beforeText": ","
+            },
+            "age": {
+              "selector": ".name-cards-head h2 a",
+              "afterText": ","
+            },
+            "addressFullList": {
+              "selector": ".//div[contains(@class, 'home-icon')]/following-sibling::div[contains(@class, 'name-cards-block__text')]//div[contains(@class, 'flex-line')]/span[1]",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[contains(@class, 'rel-icon')]/following-sibling::div[contains(@class, 'name-cards-block__text')]//a",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//a[contains(@class, 'like-button')]"
+            }
+          },
+          "id": "67b67d1a-99dc-4975-bc45-33475420f410"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://nationalpublicdata.com/optout.html",
+          "id": "ab46cdc3-d214-48f6-b022-71a73ea1da9e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-4cf9f0c6-eb95-45d5-a15a-8d074f27bf38"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#removebylink-link"
+            }
+          ],
+          "id": "56570c3f-c3ab-46ea-9fbc-d9407f6589f6"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".opt-out-form form",
+          "dataSource": "extractedProfile",
+          "elements": [
+            {
+              "type": "profileUrl",
+              "selector": "#removebylink-link"
+            }
+          ],
+          "id": "cd9fd8dc-ea82-4f79-8e9e-a2e2166aa357"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".opt-out-form input[type='submit']"
+            }
+          ],
+          "id": "69450588-4daf-45f1-8268-78a0f813ebf1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#removebylink-email"
+            }
+          ],
+          "id": "6c55f005-8bc4-45be-b527-f6ad27941dfc"
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "0ee23e17-7517-4ea7-9709-db1d4b6217c3"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".opt-out-form form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#removebylink-email"
+            }
+          ],
+          "id": "8cda9dd2-83b7-482c-b6fe-546a7981719d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".cf-turnstile"
+            }
+          ],
+          "id": "cft-ed95eb4b-b68a-4348-a92b-d5f1c7e12aa7"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".opt-out-form button[type='submit']"
+            }
+          ],
+          "id": "34d90660-4221-4538-a01a-4dc87037c687"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "a[href*='/optout/confirmation/']"
+            },
+            {
+              "type": "text",
+              "selector": ".opt-out-text",
+              "expect": "We've sent an email with the final steps"
+            }
+          ],
+          "id": "2c7dfa94-afc5-419b-86d5-fdf87304ef94"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "794b75b7-5fd3-4b84-8f6e-0933986e4dc3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-279c947c-c119-4d24-8bc1-d77be233c711"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".opt-out-text .like-h3"
+            },
+            {
+              "type": "text",
+              "selector": ".opt-out-text",
+              "expect": "Request received. Your data is now being removed"
+            }
+          ],
+          "id": "45ec97cb-e3a8-4826-8a07-ddb29c0fe8f8"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

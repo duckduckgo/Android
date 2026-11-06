@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl.crypto
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import io.jsonwebtoken.Jwts
 import logcat.logcat
 import org.json.JSONObject
@@ -49,6 +49,11 @@ interface SyncJweCrypto {
      * Generate an RSA keypair of [keySizeBits] bits.
      */
     fun generateRsaKeyPair(keySizeBits: Int): RsaKeyPair
+
+    /**
+     * Generate [byteCount] cryptographically random bytes.
+     */
+    fun generateSecureBytes(byteCount: Int): ByteArray
 
     /**
      * JWE-encrypt content with a symmetric AES-256 key using direct encryption (alg=dir, enc=A256GCM).
@@ -116,6 +121,10 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
             publicKeyBase64 = b64UrlEncode(keyPair.public.encoded),
             privateKeyBase64 = b64UrlEncode(keyPair.private.encoded),
         )
+    }
+
+    override fun generateSecureBytes(byteCount: Int): ByteArray {
+        return ByteArray(byteCount).also { secureRandom.nextBytes(it) }
     }
 
     override fun jweEncryptSymmetric(plaintext: ByteArray, symmetricKey: ByteArray, kid: String?): String {

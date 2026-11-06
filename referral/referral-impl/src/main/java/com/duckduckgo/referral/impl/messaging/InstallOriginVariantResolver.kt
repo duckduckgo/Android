@@ -19,8 +19,8 @@ package com.duckduckgo.referral.impl.messaging
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppReferrer
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -32,7 +32,7 @@ interface InstallOriginVariantResolver {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealInstallOriginVariantResolver @Inject constructor(
     private val context: Context,
     private val appReferrer: AppReferrer,

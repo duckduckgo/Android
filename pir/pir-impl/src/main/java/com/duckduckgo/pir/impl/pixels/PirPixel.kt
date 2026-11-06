@@ -171,6 +171,11 @@ enum class PirPixel(
         type = Count,
     ),
 
+    PIR_BROKER_CUSTOM_STATS_OPTOUT_REMOVED_IDENTIFIER_FOUND(
+        baseName = "m_dbp_optoutjob_removed-identifier-found",
+        type = Count,
+    ),
+
     PIR_ENGAGEMENT_DAU(
         baseName = "m_dbp_engagement_dau",
         type = Count,
@@ -203,6 +208,11 @@ enum class PirPixel(
 
     PIR_FIRST_SCAN_STARTED(
         baseName = "m_dbp_first_scan",
+        type = Unique(),
+    ),
+
+    PIR_FREEMIUM_UPSELL(
+        baseName = "m_dbp_freemium_upsell",
         type = Unique(),
     ),
 
@@ -349,6 +359,34 @@ enum class PirPixel(
     PIR_SCAN_RENDERER_GONE(
         baseName = "m_dbp_scan_renderer-gone",
         types = setOf(Count, Daily()),
+    ),
+    PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION(
+        baseName = "m_dbp_freemium_settings_entry_point_impression",
+        type = Count,
+    ),
+    PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED(
+        baseName = "m_dbp_freemium_settings_entry_point_clicked",
+        type = Count,
+    ),
+    PIR_FREEMIUM_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE(
+        baseName = "m_dbp_freemium_notification_sent_first_scan_complete",
+        type = Count,
+    ),
+    PIR_FREEMIUM_NOTIFICATION_OPENED_FIRST_SCAN_COMPLETE(
+        baseName = "m_dbp_freemium_notification_opened_first_scan_complete",
+        type = Count,
+    ),
+    PIR_FREEMIUM_MAINTENANCE_SCAN_SKIPPED(
+        baseName = "m_dbp_freemium_pir_maintenance_scan_skipped",
+        types = setOf(Count, Daily()),
+    ),
+    PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE(
+        baseName = "m_dbp_notification_sent_first_scan_complete",
+        type = Count,
+    ),
+    PIR_APP_SETTINGS_CLICK(
+        baseName = "m_privacy-pro_app-settings_personal-information-removal_click",
+        type = Count,
     ),
     ;
 

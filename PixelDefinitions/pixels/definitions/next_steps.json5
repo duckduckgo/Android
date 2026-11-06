@@ -1,0 +1,197 @@
+{
+    "next_steps_section_shown_unique": {
+        "description": "Fires once per RMF message ID per install, the first time its Next Steps section is rendered on the new tab page, in either design. The message ID is used only for local deduplication and is not sent.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["impression"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Section design the user saw, matching the experiment cohort.",
+                "enum": ["stacked_cards", "check_list"]
+            }
+        ]
+    },
+    "next_steps_item_cta_clicked": {
+        "description": "Fires when a setup item's CTA is tapped and resolves to a launch command: the front card's button in the stacked design, or an open row in the check list. Carries how often the item had been on screen, so a per-impression pixel is not needed.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Section design the user saw, matching the experiment cohort.",
+                "enum": ["stacked_cards", "check_list"]
+            },
+            {
+                "key": "item",
+                "type": "string",
+                "description": "Setup item identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day within the current section, bucketed: calendar days on which it was shown, starting at 0 for each new section. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the current section was first shown, bucketed; resets to 0 for each new section. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "impressionsSoFar",
+                "type": "string",
+                "description": "Times this item was on screen on this install, bucketed: as the front card in the stacked design, or in a rendered check list. Zero means the item was never shown.",
+                "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
+            }
+        ]
+    },
+    "next_steps_item_removed": {
+        "description": "Fires once per setup item when it leaves the section or is found already done: completed after its CTA was tapped, dismissed with the close button (stacked design only), finished elsewhere while on screen, or already complete before the current section first rendered, with completion reporting deduplicated across sections.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Section design the user saw, matching the experiment cohort.",
+                "enum": ["stacked_cards", "check_list"]
+            },
+            {
+                "key": "item",
+                "type": "string",
+                "description": "Setup item identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day within the current section, bucketed: calendar days on which it was shown, starting at 0 for each new section. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the current section was first shown, bucketed; resets to 0 for each new section. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the item is gone: completed after its CTA was the last one tapped, dismissed with the close button, finished elsewhere while on screen without a CTA tap, or already complete before the current section first rendered.",
+                "enum": ["completed", "dismissed", "finished_elsewhere", "already_complete"]
+            },
+            {
+                "key": "impressionsSoFar",
+                "type": "string",
+                "description": "Times this item was on screen on this install, bucketed: as the front card in the stacked design, or in a rendered check list. Zero means the item was never shown.",
+                "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
+            }
+        ]
+    },
+    "next_steps_item_daily_impressions": {
+        "description": "Reports bucketed front-card impressions for one eligible stacked setup card and local day. Finalized on card retirement, a later impression day, or section end; classified by the recorded impressions. The check list shows every item at once and sends no daily counts.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["impression", "user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Section design the user saw, matching the experiment cohort.",
+                "enum": ["stacked_cards"]
+            },
+            {
+                "key": "item",
+                "type": "string",
+                "description": "Setup item identified by its code-supported item id.",
+                "enum": ["setup_default_browser", "setup_add_widget", "setup_sync"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day within the current section, bucketed: calendar days on which it was shown, starting at 0 for each new section. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the current section was first shown, bucketed; resets to 0 for each new section. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "impressions",
+                "type": "string",
+                "description": "Number of front-card impressions for this card on the recorded local day, bucketed. Zero denotes an eligible card that never reached the front.",
+                "enum": ["0", "1", "2", "3-4", "5-7", "8+"]
+            }
+        ]
+    },
+    "next_steps_section_ended": {
+        "description": "Fires when the Next Steps section ends: the user completed or dismissed every stacked card, the user closed the check list, or RMF took the message out of the active slot (auto-dismiss, replacement by another message, config removal) while it was still showing.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Section design the user saw, matching the experiment cohort.",
+                "enum": ["stacked_cards", "check_list"]
+            },
+            {
+                "key": "activeDay",
+                "type": "string",
+                "description": "Active day within the current section, bucketed: calendar days on which it was shown, starting at 0 for each new section. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "calendarDay",
+                "type": "string",
+                "description": "Local calendar days since the current section was first shown, bucketed; resets to 0 for each new section. Rollups carry the day they were counted on.",
+                "enum": ["0", "1", "2", "3", "4-7", "8-14", "15+"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the section ended: every stacked card completed or dismissed by the user, the user closed the check list with every item complete (all_items_done) or with items still open (user_dismissed), or RMF removed the message.",
+                "enum": ["all_items_done", "user_dismissed", "auto"]
+            },
+            {
+                "key": "completed",
+                "type": "string",
+                "description": "Items completed after a tap on their CTA while the section was on screen. Completions without a CTA tap are in finishedElsewhere instead.",
+                "enum": ["0", "1", "2", "3"]
+            },
+            {
+                "key": "dismissed",
+                "type": "string",
+                "description": "Stacked cards only: cards the user closed with the X while the section was on screen. Not sent for the check list, which has no per-item dismissal.",
+                "enum": ["0", "1", "2", "3"]
+            },
+            {
+                "key": "finishedElsewhere",
+                "type": "string",
+                "description": "Items detected complete while on screen without a tap on their CTA. Not included in completed.",
+                "enum": ["0", "1", "2", "3"]
+            },
+            {
+                "key": "alreadyComplete",
+                "type": "string",
+                "description": "Items complete when the section first rendered, so never shown as open, including items completed during an earlier section. Not included in completed.",
+                "enum": ["0", "1", "2", "3"]
+            }
+        ]
+    }
+}

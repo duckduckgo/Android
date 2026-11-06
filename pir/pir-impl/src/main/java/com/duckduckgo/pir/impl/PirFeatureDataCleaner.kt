@@ -18,11 +18,12 @@ package com.duckduckgo.pir.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.store.PirEventsRepository
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PirFeatureDataCleaner {
@@ -37,9 +38,13 @@ class RealPirFeatureDataCleaner @Inject constructor(
     private val pirEventsRepository: PirEventsRepository,
     private val pirScanWideEvent: PirScanWideEvent,
     private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent,
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
 ) : PirFeatureDataCleaner {
 
     override suspend fun removeAllData() {
+        // keep data for freemium users
+        if (pirFreemiumDataStore.didActivate) return
+
         pirScanWideEvent.onUserReset()
         pirInitialScanCompletionWideEvent.onUserReset()
         pirRepository.clearAllData()
@@ -48,6 +53,7 @@ class RealPirFeatureDataCleaner @Inject constructor(
     }
 
     override suspend fun removeUserData() {
+        pirFreemiumDataStore.reset()
         pirScanWideEvent.onUserReset()
         pirInitialScanCompletionWideEvent.onUserReset()
         pirRepository.clearUserData()

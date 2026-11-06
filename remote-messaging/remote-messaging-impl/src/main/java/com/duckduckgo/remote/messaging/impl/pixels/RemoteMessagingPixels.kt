@@ -21,13 +21,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface RemoteMessagingPixels {
 
     fun fireRemoteMessageShownPixel(remoteMessage: RemoteMessage)
     fun fireRemoteMessageDismissedPixel(remoteMessage: RemoteMessage)
+    fun fireRemoteMessageAutoDismissedPixel(remoteMessage: RemoteMessage)
     fun fireRemoteMessagePrimaryActionClickedPixel(remoteMessage: RemoteMessage)
     fun fireRemoteMessageSecondaryActionClickedPixel(remoteMessage: RemoteMessage)
     fun fireRemoteMessageActionClickedPixel(remoteMessage: RemoteMessage)
@@ -49,6 +50,10 @@ class RealRemoteMessagingPixels @Inject constructor(
 
     override fun fireRemoteMessageDismissedPixel(remoteMessage: RemoteMessage) {
         pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_DISMISSED, parameters = remoteMessage.asPixelParams())
+    }
+
+    override fun fireRemoteMessageAutoDismissedPixel(remoteMessage: RemoteMessage) {
+        pixel.fire(pixel = RemoteMessagingPixelName.REMOTE_MESSAGE_AUTO_DISMISSED, parameters = remoteMessage.asPixelParams())
     }
 
     override fun fireRemoteMessagePrimaryActionClickedPixel(remoteMessage: RemoteMessage) {

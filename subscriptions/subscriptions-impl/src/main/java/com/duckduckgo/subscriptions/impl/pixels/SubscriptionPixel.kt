@@ -77,6 +77,12 @@ enum class SubscriptionPixel(
         withSuffix = false,
         includedParameters = setOf(APP_VERSION),
     ),
+    SUBSCRIPTION_SWITCH(
+        baseName = "subscription_switch",
+        type = Count,
+        withSuffix = false,
+        includedParameters = setOf(APP_VERSION),
+    ),
     OFFER_RESTORE_PURCHASE_CLICK(
         baseName = "m_privacy-pro_offer_restore-purchase_click",
         type = Count,
@@ -157,11 +163,6 @@ enum class SubscriptionPixel(
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
     ),
-    APP_SETTINGS_PIR_CLICK(
-        baseName = "m_privacy-pro_app-settings_personal-information-removal_click",
-        type = Count,
-        includedParameters = setOf(ATB, APP_VERSION),
-    ),
     APP_SETTINGS_IDTR_CLICK(
         baseName = "m_privacy-pro_app-settings_identity-theft-restoration_click",
         type = Count,
@@ -177,6 +178,11 @@ enum class SubscriptionPixel(
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
     ),
+    APP_SETTINGS_PARTNER_BENEFITS_CLICK(
+        baseName = "m_privacy-pro_app-settings_partner-benefits_click",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
     SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK(
         baseName = "m_privacy-pro_settings_change-plan-or-billing_click",
         type = Count,
@@ -186,6 +192,26 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_settings_remove-from-device_click",
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
+    ),
+    SUBSCRIPTION_SETTINGS_WITHDRAWAL_CLICK(
+        baseName = "subscription_settings_withdrawal_click",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_SHOWN(
+        baseName = "subscription_settings_withdrawal_dialog_shown",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_CONFIRM_CLICK(
+        baseName = "subscription_settings_withdrawal_dialog_confirm_click",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_DISMISS(
+        baseName = "subscription_settings_withdrawal_dialog_dismissed",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
     ),
     SUBSCRIPTION_PRICE_MONTHLY_CLICK(
         baseName = "m_privacy-pro_offer_monthly-price_click",
@@ -359,7 +385,6 @@ object SubscriptionPixelParameter {
     const val ERROR_TYPE = "errorType"
     const val REASON = "reason"
     const val OS_VERSION = "os_version"
-    const val PETAL = "petal"
     const val ACTIVATION_DAY = "activation_day"
     const val ACTIVATION_PLATFORM = "activation_platform"
     const val DAYS_SINCE_INSTALL = "days_since_install"

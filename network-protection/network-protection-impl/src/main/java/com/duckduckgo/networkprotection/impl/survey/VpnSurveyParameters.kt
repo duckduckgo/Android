@@ -20,11 +20,11 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.survey.api.SurveyParameterPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class VpnFirstUsedSurveyParameterPlugin @Inject constructor(
     private val netpCohortStore: NetpCohortStore,
     private val currentTimeProvider: CurrentTimeProvider,

@@ -43,10 +43,10 @@ tags:
       - pressKey: Back
       - pressKey: Back
       - pressKey: Back
-      # In search-only mode (the default) the NTP uses the legacy omnibar, not
-      # the native input overlay — tap the text input directly to enter the URL.
+      # Tap whichever field is live: the legacy omnibar (native input search-only off)
+      # or the native input widget's field (native input search-only on).
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - inputText: "https://privacy-test-pages.site/content-scope-scripts/infra/pages/conditional-matching-experiments.html?automation=1"
       - pressKey: Enter
       - tapOn:

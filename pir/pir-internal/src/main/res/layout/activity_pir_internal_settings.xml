@@ -52,6 +52,12 @@
             android:paddingBottom="@dimen/keyline_4">
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirOpenDashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevOpenDashboard" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/pirDebugScan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,6 +87,38 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pirDevBrokerConfig" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirResetFreemiumState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevResetFreemiumState" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirSimulateFreeScanMatches"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevSimulateFreeScanMatches" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirSimulateFreeScanNoMatches"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevSimulateFreeScanNoMatches" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirShowFreemiumScanCompleteNotification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevShowFreemiumScanCompleteNotification" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/pirForceFreemiumEligibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/pirDevForceFreemiumEligibility"
+                app:secondaryText="@string/pirDevForceFreemiumEligibilityDescription"
+                app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="wrap_content"

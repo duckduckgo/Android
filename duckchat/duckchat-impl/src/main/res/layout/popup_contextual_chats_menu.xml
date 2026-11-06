@@ -28,6 +28,13 @@
         app:leadingIcon="@drawable/ic_compose_24"
         app:primaryText="@string/browserMenuNewChat" />
 
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/contextualChatsPopupOpenDuckAi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_ai_chat_24"
+        app:primaryText="@string/duckChatContextualOpenDuckAi" />
+
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/contextualChatsPopupHeaderDivider"
         android:layout_width="match_parent"

@@ -19,7 +19,7 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -30,7 +30,9 @@ import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState.ENABLED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
+import com.duckduckgo.subscriptions.impl.Experiment
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.PurchaseExperiments
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionTier.PLUS
@@ -66,11 +68,15 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
+import com.duckduckgo.subscriptions.impl.internal.PaywallUrlResolver
 import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.stripe.StripePlansHandler
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
@@ -102,8 +108,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
     private val subscriptionsFeature: SubscriptionsFeature,
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
     private val pirFeature: PirFeature,
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
+    private val paywallUrlResolver: PaywallUrlResolver,
+    private val subscriptionOnboardingStore: SubscriptionOnboardingStore,
+    private val stripePlansHandler: StripePlansHandler,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -118,9 +128,16 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val _currentPurchaseViewState = MutableStateFlow(CurrentPurchaseViewState())
     val currentPurchaseViewState = _currentPurchaseViewState.asStateFlow()
 
+    private val _initialUrl = MutableStateFlow<String?>(null)
+    val initialUrl = _initialUrl.asStateFlow()
+
     private lateinit var subscriptionStatus: SubscriptionStatus
 
     private var pendingScheduleNotificationDaysBeforeCancel: Int? = null
+
+    // Origin the offer webview was launched with, captured when the paywall is shown, so the subscribe
+    // (primary CTA) click can be attributed to the same subscription-funnel entry point.
+    private var launchOrigin: String? = null
 
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
@@ -138,6 +155,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     Waiting
                 }
                 is CurrentPurchase.Success -> {
+                    if (!it.isPlanSwitch) {
+                        pixelSender.reportPurchaseSuccessOrigin(launchOrigin, it.isFreeTrial)
+                    }
                     subscriptionsChecker.runChecker()
                     pendingScheduleNotificationDaysBeforeCancel?.let { days ->
                         if (subscriptionsFeature.subscriptionExpirationReminderNotification().isEnabled()) {
@@ -145,14 +165,16 @@ class SubscriptionWebViewViewModel @Inject constructor(
                         }
                         pendingScheduleNotificationDaysBeforeCancel = null
                     }
+                    val launchOnboarding = subscriptionOnboardingExperiments.isTreatment()
+                    // A resubscription must not carry over the previous subscription's onboarding progress.
+                    if (launchOnboarding) subscriptionOnboardingStore.reset()
                     Success(
                         SubscriptionEventData(
                             PURCHASE_COMPLETED_FEATURE_NAME,
                             PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
-                        isFreeTrial = it.isFreeTrial,
-                        launchOnboarding = subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled(),
+                        launchOnboarding = launchOnboarding,
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
@@ -166,6 +188,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
         subscriptionsManager.subscriptionStatus
             .onEach { subscriptionStatus = it }
             .launchIn(viewModelScope)
+    }
+
+    fun resolveInitialUrl(url: String) {
+        if (_initialUrl.value != null) return
+        viewModelScope.launch {
+            _initialUrl.value = paywallUrlResolver.resolve(url)
+        }
     }
 
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
@@ -185,6 +214,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
             "getUserSettings" -> id?.let { getUserSettings(it) }
             "requestNotificationsPermission" -> id?.let { requestNotificationsPermission(it) }
+            "completeStripePayment" -> completeStripePayment(featureName, method, id)
             else -> {
                 // NOOP
             }
@@ -315,13 +345,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private fun hasPurchasedSubscription() = currentPurchaseViewState.value.purchaseState is Success
 
     private fun subscriptionSelected(data: JSONObject?) {
-        pixelSender.reportOfferSubscribeClick()
+        pixelSender.reportOfferSubscribeClick(launchOrigin)
 
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
             val offerId = runCatching { data?.getString("offerId") }.getOrNull()
-            val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
-            val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
+            val experiments = parsePurchaseExperiments(data)
             pendingScheduleNotificationDaysBeforeCancel = if (subscriptionsFeature.userSettingsMessaging().isEnabled()) {
                 runCatching {
                     data?.getJSONObject("scheduleNotification")?.getInt("daysBeforeCancel")
@@ -333,12 +362,46 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name)
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
             } else {
-                command.send(SubscriptionSelected(id, offerId, experimentName, experimentCohort))
+                command.send(SubscriptionSelected(id, offerId, experiments))
             }
         }
     }
 
+    private fun parsePurchaseExperiments(data: JSONObject?): PurchaseExperiments {
+        if (data == null) return PurchaseExperiments()
+
+        return PurchaseExperiments(
+            experiments = parseExperiments(data),
+            legacyExperiment = parseLegacyExperiment(data),
+        )
+    }
+
+    private fun parseExperiments(data: JSONObject): List<Experiment> {
+        val experimentArray = data.optJSONArray("experiments") ?: return emptyList()
+
+        return (0 until experimentArray.length())
+            .mapNotNull { index -> experimentArray.optJSONObject(index)?.toExperiment() }
+            .distinctBy { experiment -> experiment.name }
+    }
+
+    private fun parseLegacyExperiment(data: JSONObject): Experiment? = data.optJSONObject("experiment")?.toExperiment()
+
+    private fun JSONObject.toExperiment(): Experiment? {
+        val name = nonEmptyString("name") ?: return null
+        val cohort = nonEmptyString("cohort") ?: return null
+        return Experiment(name = name, cohort = cohort)
+    }
+
+    private fun JSONObject.nonEmptyString(key: String): String? {
+        val value = opt(key)
+        return if (value is String && value.isNotEmpty()) value else null
+    }
+
     private fun subscriptionChangeSelected(data: JSONObject?) {
+        // Plus->Pro upgrade CTA comes through subscriptionChangeSelected with a launch origin set;
+        // It must still fire the subscribe click so the offer_screen_impression it followed has a matching click for the upgrade origin.
+        launchOrigin?.let { pixelSender.reportOfferSubscribeClick(it) }
+
         viewModelScope.launch(dispatcherProvider.io()) {
             val targetPlanId = runCatching { data?.getString("id") }.getOrNull()
             val change = runCatching { data?.getString("change") }.getOrNull()
@@ -371,11 +434,20 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val canHandleExpiredState = subscriptionsFeature.handleExpiredStateWhenSubscriptionChangeSelected().isEnabled()
             if (canHandleExpiredState && (subscription == null || subscription.status.isExpired())) {
                 val offerId = runCatching { data?.getString("offerId") }.getOrNull()
-                val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
-                val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
                 command.send(
-                    SubscriptionSelected(id = targetPlanId, offerId = offerId, experimentName = experimentName, experimentCohort = experimentCohort),
+                    SubscriptionSelected(id = targetPlanId, offerId = offerId, experiments = parsePurchaseExperiments(data)),
                 )
+                return@launch
+            }
+
+            // Stripe plan changes can't go through Play Billing
+            if (stripePlansHandler.shouldHandle(subscription)) {
+                val redirectEvent = stripePlansHandler.getRedirectEvent()
+                if (redirectEvent != null) {
+                    command.send(SendJsEvent(redirectEvent))
+                } else {
+                    _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
+                }
                 return@launch
             }
 
@@ -430,12 +502,11 @@ class SubscriptionWebViewViewModel @Inject constructor(
         activity: Activity,
         planId: String,
         offerId: String?,
-        experimentName: String?,
-        experimentCohort: String?,
+        experiments: PurchaseExperiments,
         origin: String?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionsManager.purchase(activity, planId, offerId, experimentName, experimentCohort, origin)
+            subscriptionsManager.purchase(activity, planId, offerId, experiments, origin)
         }
     }
 
@@ -536,6 +607,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
 
         viewModelScope.launch(dispatcherProvider.io()) {
+            val subscription = runCatching { subscriptionsManager.getSubscription() }.getOrNull()
+            if (stripePlansHandler.shouldHandle(subscription)) {
+                sendTierOptionJson(stripePlansHandler.getTierOptions())
+                return@launch
+            }
+
             val defaultOptions = SubscriptionTierOptionsJson(
                 products = emptyList(),
             )
@@ -638,6 +715,15 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun completeStripePayment(featureName: String, method: String, id: String?) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            stripePlansHandler.onPlanChangeCompleted()
+            id?.let {
+                command.send(SendResponseToJs(JsCallbackData(featureName = featureName, method = method, id = it, params = JSONObject())))
+            }
+        }
+    }
+
     private suspend fun buildProductForTier(
         monthlyOffer: SubscriptionOffer,
         yearlyOffer: SubscriptionOffer,
@@ -710,20 +796,23 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private fun backToSettingsActiveSuccess() {
         viewModelScope.launch {
-            subscriptionsManager.fetchAndStoreAllData()
             command.send(BackToSettingsActivateSuccess)
         }
     }
 
     private fun backToSettings() {
         viewModelScope.launch {
-            subscriptionsManager.fetchAndStoreAllData()
             command.send(BackToSettings)
         }
     }
 
+    /** Captures the offer's launch origin so the subscribe-CTA click can be attributed even after process death. */
+    fun setLaunchOrigin(origin: String?) {
+        launchOrigin = origin
+    }
+
     fun paywallShown() {
-        pixelSender.reportOfferScreenShown()
+        pixelSender.reportOfferScreenShown(launchOrigin)
     }
 
     data class SubscriptionOptionsJson(
@@ -779,7 +868,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object InProgress : PurchaseStateView()
         data class Success(
             val subscriptionEventData: SubscriptionEventData,
-            val isFreeTrial: Boolean,
             val launchOnboarding: Boolean,
         ) : PurchaseStateView()
         data object Waiting : PurchaseStateView()
@@ -795,8 +883,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class SubscriptionSelected(
             val id: String,
             val offerId: String?,
-            val experimentName: String?,
-            val experimentCohort: String?,
+            val experiments: PurchaseExperiments,
         ) : Command()
 
         data class SubscriptionChangeSelected(

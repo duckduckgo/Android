@@ -22,8 +22,8 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.store.InternalTestUserStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
@@ -32,7 +32,7 @@ import javax.inject.Inject
  * an internal test user.
  */
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealInternalTestUserChecker @Inject constructor(
     private val internalTestUserStore: InternalTestUserStore,
     private val appBuildConfig: AppBuildConfig,

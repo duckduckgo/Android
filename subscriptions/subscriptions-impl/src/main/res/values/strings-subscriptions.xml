@@ -93,7 +93,6 @@
     <string name="purchaseError">We\'re having trouble connecting. Please try again later.</string>
 
     <!-- PIR Settings-->
-    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
@@ -101,12 +100,6 @@
     <!-- Change Plan -->
     <string name="changePlanTitle">Update Plan or Cancel</string>
     <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple Account > Subscriptions on a device signed in to the same Apple Account used to purchase your subscription.</string>
-
-    <!-- PIR Activity-->
-    <string name="pirTitle">Activate the DuckDuckGo subscription on desktop to set up Personal Information Removal</string>
-    <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Subscribe to DuckDuckGo</b> and click <b>I Have a Subscription</b> to get started.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
 
     <string name="downloadsDownloadFinishedActionName">Open</string>
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
@@ -201,5 +194,18 @@
     <!-- Content Descriptions -->
     <string name="subscriptionExpiredStatusIconContentDescription">Subscription expired</string>
     <string name="subscriptionActiveStatusIconContentDescription">Subscription active</string>
+
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Withdraw from Contract</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">You can withdraw and get a full refund until %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Withdraw from your subscription?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Your %1$s subscription will end right away and you\'ll be refunded %2$s to your original payment method within 14 days.\n\nVPN, Personal Information Removal and advanced Duck.ai models stop working once you confirm.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Confirm Withdrawal</string>
+    <string name="subscriptionWithdrawDialogKeep">Keep Subscription</string>
+    <string name="subscriptionStatusNotSubscribed">Not Subscribed</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">You withdrew on %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Your refund of %1$s is being processed.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Your refund is being processed.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">We couldn\'t process your withdrawal automatically. Please visit <annotation type="withdrawal_help_link">this page</annotation> to complete your withdrawal.</string>
 
 </resources>

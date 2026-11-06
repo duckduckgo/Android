@@ -21,8 +21,8 @@ import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -45,16 +45,17 @@ interface AdBlockingStatusChecker {
     fun observeCanInject(): Flow<Boolean>
 
     /**
-     * Emits where (or whether) the ad blocking entry should be shown in settings and re-emits when
-     * it changes (e.g. after a remote privacy config download). This is the single source of truth
-     * for the entry's placement across the settings screen.
+     * Emits whether the ad blocking entry should be shown in settings and re-emits when it changes
+     * (e.g. after a remote privacy config download). This is the single source of truth for the
+     * entry's visibility across the settings screen.
      */
-    fun settingsPlacementFlow(): Flow<SettingsPlacement>
+    fun observeSettingsVisible(): Flow<Boolean>
 
     /**
      * Emits the current [AdBlockingState], distinguishing whether ad blocking is enabled because
-     * the user turned it on ([AdBlockingState.Enabled.UserEnabled]) or because of the remote
-     * default ([AdBlockingState.Enabled.Default]).
+     * the user turned it on having seen the consent disclaimer ([AdBlockingState.Enabled.WithPixelConsent]),
+     * turned it on without seeing it ([AdBlockingState.Enabled.WithoutPixelConsent]) or because of the
+     * remote default ([AdBlockingState.Enabled.Default]).
      */
     fun observeState(): Flow<AdBlockingState>
 
@@ -68,21 +69,20 @@ sealed interface AdBlockingState {
         data object UntilRelaunch : Disabled
     }
     sealed interface Enabled : AdBlockingState {
-        data object UserEnabled : Enabled
+        data object WithPixelConsent : Enabled
         data object Default : Enabled
+
+        /**
+         * Enabled and sticky like [WithPixelConsent] but shows no disclaimer in settings, and sends no telemetry,
+         * since user has not seen the consent disclaimer.
+         *
+         * Toggling ad-blocking pref on the settings screen Off -> On migrates this state to [WithPixelConsent].
+         */
+        data object WithoutPixelConsent : Enabled
     }
 }
 
-/**
- * Where the ad blocking entry is rendered in settings.
- */
-sealed interface SettingsPlacement {
-    data object Protections : SettingsPlacement
-    data object Other : SettingsPlacement
-    data object Hidden : SettingsPlacement
-}
-
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAdBlockingStatusChecker @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
@@ -119,30 +119,21 @@ class RealAdBlockingStatusChecker @Inject constructor(
             killSwitchOn && !contingencyModeOn && state is AdBlockingState.Enabled
         }
 
-    override fun settingsPlacementFlow(): Flow<SettingsPlacement> =
-        combine(
-            feature.self().enabled(),
-            feature.adBlockingUXImprovements().enabled(),
-        ) { killSwitchOn, uxImprovementsEnabled ->
-            when {
-                !killSwitchOn -> SettingsPlacement.Hidden
-                uxImprovementsEnabled -> SettingsPlacement.Protections
-                else -> SettingsPlacement.Other
-            }
-        }
+    override fun observeSettingsVisible(): Flow<Boolean> = feature.self().enabled()
 
     override fun observeState(): Flow<AdBlockingState> =
         combine(
             settingsRepository.isEnabledFlow(),
-            feature.enabledByDefault().enabled(),
+            settingsRepository.hasPixelConsentFlow(),
             sessionStore.observe(),
-        ) { userSetting, enabledByDefault, disabledUntilRelaunch ->
+        ) { userSetting, pixelConsent, disabledUntilRelaunch ->
             when {
                 disabledUntilRelaunch -> AdBlockingState.Disabled.UntilRelaunch
-                userSetting == true -> AdBlockingState.Enabled.UserEnabled
+                userSetting == true && pixelConsent == false -> AdBlockingState.Enabled.WithoutPixelConsent
+                // Consent is null when the setting was stored before consent was tracked, which only a settings toggle could have done.
+                userSetting == true -> AdBlockingState.Enabled.WithPixelConsent
                 userSetting == false -> AdBlockingState.Disabled.Permanent
-                enabledByDefault -> AdBlockingState.Enabled.Default
-                else -> AdBlockingState.Disabled.Permanent
+                else -> AdBlockingState.Enabled.Default
             }
         }
 

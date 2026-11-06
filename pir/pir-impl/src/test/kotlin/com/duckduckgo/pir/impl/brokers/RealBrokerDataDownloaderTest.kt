@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.brokers
 
 import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -28,6 +29,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -49,6 +52,9 @@ class RealBrokerDataDownloaderTest {
     private val mockPirRepository: PirRepository = mock()
     private val mockContext: Context = mock()
     private val mockPixelSender: PirPixelSender = mock()
+    private val mockPirUserUtils: PirUserUtils = mock {
+        onBlocking { hasPirSubscription() } doReturn true
+    }
 
     @Before
     fun setUp() {
@@ -59,7 +65,7 @@ class RealBrokerDataDownloaderTest {
             dbpService = mockDbpService,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             context = mockContext,
-            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender),
+            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender, mockPirUserUtils),
         )
     }
 
@@ -128,8 +134,8 @@ class RealBrokerDataDownloaderTest {
         verify(mockDbpService).getBrokerJsonFiles()
         verify(mockPirRepository).updateBrokerData(eq("broker1.json"), any())
         verify(mockPirRepository).updateBrokerData(eq("broker2.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker1.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker2.json"), any())
+        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker1.json"), any(), anyOrNull())
+        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker2.json"), any(), anyOrNull())
     }
 
     @Test
@@ -148,7 +154,7 @@ class RealBrokerDataDownloaderTest {
 
         verify(mockDbpService).getBrokerJsonFiles()
         verify(mockPirRepository, never()).updateBrokerData(eq("broker1.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonFailure(eq("broker1.json"), eq(0L))
+        verify(mockPixelSender).reportUpdateBrokerJsonFailure(eq("broker1.json"), eq(0L), anyOrNull())
     }
 
     @Test
@@ -205,8 +211,8 @@ class RealBrokerDataDownloaderTest {
 
         verify(mockPirRepository).updateBrokerData(eq("broker1.json"), any())
         verify(mockPirRepository, never()).updateBrokerData(eq("broker2.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker1.json"), any())
-        verify(mockPixelSender, never()).reportUpdateBrokerJsonSuccess(eq("broker2.json"), any())
+        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker1.json"), any(), anyOrNull())
+        verify(mockPixelSender, never()).reportUpdateBrokerJsonSuccess(eq("broker2.json"), any(), anyOrNull())
     }
 
     @Test
@@ -242,7 +248,7 @@ class RealBrokerDataDownloaderTest {
         testee.downloadBrokerData(brokersToUpdate)
 
         verify(mockPirRepository).updateBrokerData(eq("broker1.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonFailure(eq("broker1.json"), any())
+        verify(mockPixelSender).reportUpdateBrokerJsonFailure(eq("broker1.json"), any(), anyOrNull())
     }
 
     @Test
@@ -277,7 +283,7 @@ class RealBrokerDataDownloaderTest {
 
         testee.downloadBrokerData(brokersToUpdate)
 
-        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker1.json"), eq(removedAtMs))
+        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker1.json"), eq(removedAtMs), anyOrNull())
     }
 
     @Test

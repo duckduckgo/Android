@@ -34,13 +34,14 @@ import com.duckduckgo.pir.impl.common.toParams
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GenerateEmail
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class EmailReceivedEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -52,7 +53,7 @@ class EmailReceivedEventHandler @Inject constructor(
         state: State,
         event: Event,
     ): Next {
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         val emailReceived = event as EmailReceived
         val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
 

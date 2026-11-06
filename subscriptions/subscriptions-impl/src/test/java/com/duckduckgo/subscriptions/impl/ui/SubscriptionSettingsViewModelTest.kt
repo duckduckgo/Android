@@ -4,32 +4,49 @@ import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
+import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialogError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
+import com.duckduckgo.subscriptions.impl.withdrawal.Refund
+import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -37,8 +54,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.math.BigDecimal
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -51,16 +71,27 @@ class SubscriptionSettingsViewModelTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback = mock()
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
+    private val onboardingProgress: SubscriptionOnboardingProgress = mock()
+    private val onboardingStore: SubscriptionOnboardingStore = mock()
+    private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock()
+    private val subscriptionWithdrawal: SubscriptionWithdrawal = mock()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
     @Before
     fun before() {
+        runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
         viewModel = SubscriptionSettingsViewModel(
             subscriptionsManager,
             pixelSender,
             subscriptionUnifiedFeedback,
             subscriptionsFeature,
+            onboardingProgress,
+            onboardingStore,
+            subscriptionOnboardingExperiments,
+            currentTimeProvider,
+            subscriptionWithdrawal,
         )
     }
 
@@ -676,5 +707,446 @@ class SubscriptionSettingsViewModelTest {
             assertEquals(firstPendingPlan, state.pendingPlan)
             assertEquals(SubscriptionTier.PLUS, state.effectiveTier)
         }
+    }
+
+    @Test
+    fun whenOnboardingFeatureDisabledThenNoOnboardingEntryPoint() = runTest {
+        stubReadySubscription()
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
+        }
+    }
+
+    @Test
+    fun whenOnboardingIncompleteAndWithinPurchaseWindowThenCardShownWithPercentage() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        stubReadySubscription(startedAt = 1_000L)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1_000L)
+        whenever(onboardingProgress.completionPercentage()).thenReturn(50)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(50, (awaitItem() as Ready).onboardingEntryPoint?.percentage)
+        }
+    }
+
+    @Test
+    fun whenOnboardingIncompleteAndPastPurchaseWindowThenNoCard() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        stubReadySubscription(startedAt = 0L)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(FIFTEEN_DAYS_MILLIS)
+        whenever(onboardingProgress.completionPercentage()).thenReturn(50)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
+        }
+    }
+
+    @Test
+    fun whenOnboardingCompleteAndUnderViewCapThenCardShown() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+        whenever(onboardingStore.completedEntryPointViews()).thenReturn(0)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(100, (awaitItem() as Ready).onboardingEntryPoint?.percentage)
+        }
+    }
+
+    @Test
+    fun whenOnboardingCompleteAndViewCapReachedThenNoCard() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+        whenever(onboardingStore.completedEntryPointViews()).thenReturn(2)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
+        }
+    }
+
+    @Test
+    fun whenOnboardingCompleteAndOneViewUsedUnderCapThenCardShown() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+        // One view used, still under the cap → keep showing (even across app launches).
+        whenever(onboardingStore.completedEntryPointViews()).thenReturn(1)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(100, (awaitItem() as Ready).onboardingEntryPoint?.percentage)
+        }
+    }
+
+    @Test
+    fun whenCompletedCardShownThenViewIsCountedOnceAcrossResumeAndStatusEmission() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+
+        var views = 1
+        whenever(onboardingStore.completedEntryPointViews()).thenAnswer { views }
+        whenever(onboardingStore.incrementCompletedEntryPointViews()).thenAnswer {
+            views++
+            Unit
+        }
+
+        val status = MutableSharedFlow<SubscriptionStatus>()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(status)
+
+        viewModel.onCreate(mock())
+        viewModel.onResume(mock())
+        assertEquals(100, (viewModel.viewState.value as Ready).onboardingEntryPoint?.percentage)
+
+        status.emit(AUTO_RENEWABLE)
+
+        assertEquals(100, (viewModel.viewState.value as Ready).onboardingEntryPoint?.percentage)
+        assertEquals(2, views)
+    }
+
+    @Test
+    fun whenSubscriptionInactiveThenNoOnboardingEntryPoint() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        stubReadySubscription(status = EXPIRED)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
+        }
+    }
+
+    @Test
+    fun whenContinueSetupClickedThenLaunchOnboarding() = runTest {
+        viewModel.commands().test {
+            viewModel.onContinueSetupClicked()
+            assertTrue(awaitItem() is SubscriptionSettingsViewModel.Command.LaunchOnboarding)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStripeSubscriptionEligibleForWithdrawalThenShowWithdrawalOption() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            val withdrawal = (expectMostRecentItem() as Ready).withdrawal
+            assertNotNull(withdrawal)
+            assertEquals("October 15, 2026", withdrawal!!.deadline)
+            assertEquals(R.string.planTierNamePlus, withdrawal.tierNameResId)
+        }
+    }
+
+    @Test
+    fun whenStripeSubscriptionNotEligibleForWithdrawalThenHideWithdrawalOption() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(null)
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertNull((expectMostRecentItem() as Ready).withdrawal)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionNotWithdrawableThenDoNotCheckEligibility() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(false)
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertNull((expectMostRecentItem() as Ready).withdrawal)
+        }
+        verify(subscriptionWithdrawal, never()).getEligibility()
+    }
+
+    @Test
+    fun whenWithdrawClickedThenShowWithdrawalDialog() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+        viewModel.viewState.test { expectMostRecentItem() }
+
+        viewModel.commands().test {
+            viewModel.onWithdrawClicked()
+            val command = awaitItem() as ShowWithdrawalDialog
+            assertEquals(R.string.planTierNamePlus, command.tierNameResId)
+            assertTrue(command.refundAmount.contains("9.99"))
+        }
+    }
+
+    @Test
+    fun whenWithdrawClickedWithoutWithdrawalOptionThenNoCommand() = runTest {
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+        viewModel.viewState.test { expectMostRecentItem() }
+
+        viewModel.commands().test {
+            viewModel.onWithdrawClicked()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenWithdrawalConfirmedAndSucceedsThenHideWithdrawalOption() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            assertNotNull((expectMostRecentItem() as Ready).withdrawal)
+            viewModel.onWithdrawalConfirmed()
+            assertNull((expectMostRecentItem() as Ready).withdrawal)
+        }
+        verify(subscriptionWithdrawal).withdraw()
+    }
+
+    @Test
+    fun whenWithdrawalNoLongerEligibleThenHideWithdrawalOption() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.NotEligible)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            assertNotNull((expectMostRecentItem() as Ready).withdrawal)
+            viewModel.onWithdrawalConfirmed()
+            assertNull((expectMostRecentItem() as Ready).withdrawal)
+        }
+    }
+
+    @Test
+    fun whenWithdrawalFailsForOtherReasonThenKeepWithdrawalOption() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failed)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            assertNotNull((expectMostRecentItem() as Ready).withdrawal)
+            viewModel.onWithdrawalConfirmed()
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertNotNull((viewModel.viewState.value as Ready).withdrawal)
+    }
+
+    @Test
+    fun whenWithdrawalSucceedsThenDismissWithdrawalDialog() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.commands().test {
+            viewModel.onWithdrawalConfirmed()
+            assertEquals(DismissWithdrawalDialog, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenWithdrawalNoLongerEligibleThenDismissWithdrawalDialog() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.NotEligible)
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.commands().test {
+            viewModel.onWithdrawalConfirmed()
+            assertEquals(DismissWithdrawalDialog, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenWithdrawalFailsForOtherReasonThenShowErrorInWithdrawalDialog() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failed)
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.commands().test {
+            viewModel.onWithdrawalConfirmed()
+            assertEquals(ShowWithdrawalDialogError, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenWithdrawalRetriedAfterFailureThenWithdrawAgain() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failed)
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.onWithdrawalConfirmed()
+        viewModel.onWithdrawalConfirmed()
+
+        verify(subscriptionWithdrawal, times(2)).withdraw()
+    }
+
+    @Test
+    fun whenWithdrawClickedThenWithdrawalClickAndDialogShownPixelsAreSent() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+        viewModel.viewState.test { expectMostRecentItem() }
+
+        viewModel.onWithdrawClicked()
+
+        verify(pixelSender).reportSubscriptionSettingsWithdrawalClick()
+        verify(pixelSender).reportSubscriptionSettingsWithdrawalDialogShown()
+    }
+
+    @Test
+    fun whenWithdrawClickedWithoutWithdrawalOptionThenNoWithdrawalPixelsAreSent() = runTest {
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+        viewModel.viewState.test { expectMostRecentItem() }
+
+        viewModel.onWithdrawClicked()
+
+        verify(pixelSender, never()).reportSubscriptionSettingsWithdrawalClick()
+        verify(pixelSender, never()).reportSubscriptionSettingsWithdrawalDialogShown()
+    }
+
+    @Test
+    fun whenWithdrawalConfirmedThenConfirmClickPixelIsSent() = runTest {
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Failed)
+        stubReadySubscription(platform = "stripe")
+
+        viewModel.onWithdrawalConfirmed()
+
+        verify(pixelSender).reportSubscriptionSettingsWithdrawalDialogConfirmClick()
+    }
+
+    @Test
+    fun whenWithdrawalDialogDismissedThenDismissPixelIsSent() = runTest {
+        viewModel.onWithdrawalDialogDismissed()
+
+        verify(pixelSender).reportSubscriptionSettingsWithdrawalDialogDismissed()
+    }
+
+    @Test
+    fun whenWithdrawalHelpLinkClickedThenGoToWithdrawalHelp() = runTest {
+        viewModel.commands().test {
+            viewModel.onWithdrawalHelpLinkClicked()
+            assertEquals(GoToWithdrawalHelp, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenWithdrawalSucceedsThenShowCompletedWithdrawal() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            assertNull((expectMostRecentItem() as Ready).completedWithdrawal)
+            viewModel.onWithdrawalConfirmed()
+            val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
+            assertEquals("October 15, 2026", completedWithdrawal?.date)
+            assertTrue(completedWithdrawal!!.refundAmount!!.contains("9.99"))
+        }
+    }
+
+    @Test
+    fun whenWithdrawalSucceedsWithoutRefundThenShowCompletedWithdrawalWithoutAmount() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(refund = null))
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            expectMostRecentItem()
+            viewModel.onWithdrawalConfirmed()
+            val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
+            assertNotNull(completedWithdrawal)
+            assertNull(completedWithdrawal!!.refundAmount)
+        }
+    }
+
+    @Test
+    fun whenWithdrawalNoLongerEligibleThenNoCompletedWithdrawal() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.NotEligible)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            expectMostRecentItem()
+            viewModel.onWithdrawalConfirmed()
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertNull((viewModel.viewState.value as Ready).completedWithdrawal)
+    }
+
+    @Test
+    fun whenCompletedWithdrawalShownAndAccountSignedOutThenItStaysOnResume() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            expectMostRecentItem()
+            viewModel.onWithdrawalConfirmed()
+            expectMostRecentItem()
+            whenever(subscriptionsManager.getAccount()).thenReturn(null)
+            whenever(subscriptionsManager.getSubscription()).thenReturn(null)
+            viewModel.onResume(mock())
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertNotNull((viewModel.viewState.value as Ready).completedWithdrawal)
+    }
+
+    private suspend fun stubReadySubscription(
+        startedAt: Long = 1234,
+        status: SubscriptionStatus = AUTO_RENEWABLE,
+        platform: String = "android",
+        activeOffers: List<ActiveOfferType> = listOf(),
+    ) {
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = startedAt,
+                expiresOrRenewsAt = 1701694623000,
+                status = status,
+                platform = platform,
+                activeOffers = activeOffers,
+            ),
+        )
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow(replay = 1)
+        flowTest.tryEmit(status)
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+    }
+
+    private companion object {
+        private const val FIFTEEN_DAYS_MILLIS = 15L * 24 * 60 * 60 * 1000
+
+        // Midday UTC so the formatted date is the same in any test machine timezone
+        private val ELIGIBILITY = WithdrawalEligibility(
+            eligibleUntil = 1792065600000,
+            refundAmount = BigDecimal("9.99"),
+            refundCurrency = "EUR",
+        )
     }
 }

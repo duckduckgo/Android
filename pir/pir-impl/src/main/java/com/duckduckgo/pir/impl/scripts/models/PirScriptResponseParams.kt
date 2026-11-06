@@ -69,12 +69,14 @@ sealed class PirSuccessResponse(
             val email: String? = null,
             val removedDate: String? = null,
             val fullName: String? = null,
+            val extras: Map<String, String>? = null,
         )
 
         data class ScriptAddressCityState(
             val city: String,
             val state: String,
             val fullAddress: String? = null,
+            val extras: Map<String, String>? = null,
         )
     }
 
@@ -118,10 +120,21 @@ sealed class PirSuccessResponse(
         val meta: AdditionalData? = null,
     ) : PirSuccessResponse(actionID, actionType)
 
+    data class ExecuteScriptResponse(
+        override val actionID: String,
+        override val actionType: String,
+        val meta: AdditionalData? = null,
+    ) : PirSuccessResponse(actionID, actionType)
+
     data class ExpectationResponse(
         override val actionID: String,
         override val actionType: String,
         val meta: AdditionalData? = null,
+    ) : PirSuccessResponse(actionID, actionType)
+
+    data class ScrollResponse(
+        override val actionID: String,
+        override val actionType: String,
     ) : PirSuccessResponse(actionID, actionType)
 
     data class AdditionalData(

@@ -1,0 +1,13 @@
+appId: com.duckduckgo.mobile.android
+---
+# Search-only (Duck.ai off in the address bar) variant of launch_and_skip_onboarding.yaml.
+- extendedWaitUntil:
+    visible:
+      id: "skipOnboardingButton"
+    timeout: 30000
+- tapOn:
+    id: "skipOnboardingButton"
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget"
+    timeout: 30000

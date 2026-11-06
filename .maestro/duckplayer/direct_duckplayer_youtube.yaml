@@ -15,7 +15,7 @@ tags:
 
       - runFlow: ../shared/dismiss_native_input.yaml
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - inputText: "duck://player/3ml7yeKBUhc"
       - pressKey: Enter
 

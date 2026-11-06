@@ -1,0 +1,89 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "c41d0df1e912a443f936e87c50d24a7d",
+    "entities": [
+      {
+        "tableName": "site_permissions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `askCameraSetting` TEXT, `askMicSetting` TEXT, `askDrmSetting` TEXT, `askLocationSetting` TEXT, PRIMARY KEY(`domain`))",
+        "fields": [
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "askCameraSetting",
+            "columnName": "askCameraSetting",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "askMicSetting",
+            "columnName": "askMicSetting",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "askDrmSetting",
+            "columnName": "askDrmSetting",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "askLocationSetting",
+            "columnName": "askLocationSetting",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "domain"
+          ]
+        }
+      },
+      {
+        "tableName": "site_permission_allowed",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `tabId` TEXT NOT NULL, `permissionAllowed` TEXT NOT NULL, `allowedAt` INTEGER NOT NULL, PRIMARY KEY(`domain`, `tabId`, `permissionAllowed`))",
+        "fields": [
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tabId",
+            "columnName": "tabId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "permissionAllowed",
+            "columnName": "permissionAllowed",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "allowedAt",
+            "columnName": "allowedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "domain",
+            "tabId",
+            "permissionAllowed"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c41d0df1e912a443f936e87c50d24a7d')"
+    ]
+  }
+}

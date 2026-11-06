@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.progressbar
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -32,6 +32,12 @@ interface ProgressBarUpgradeFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun behaviourUpdate(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun animationConfigUpdate(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun indeterminateFallback(): Toggle
+    fun startProgressAtIntent(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun holdProgressOnChallengePage(): Toggle
 }

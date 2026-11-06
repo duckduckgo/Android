@@ -27,7 +27,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -73,31 +73,15 @@ class ShowOnAppLaunchPrefsDataStoreTest {
     }
 
     @Test
-    fun whenOptionNullAndBothNtpDefaultFlagsEnabledThenReturnsNewTabPage() = runTest {
+    fun whenOptionNullAndShowNtpAfterIdleEnabledThenReturnsNewTabPage() = runTest {
         androidBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
 
         assertEquals(NewTabPage, testee.optionFlow.first())
     }
 
     @Test
-    fun whenOptionNullAndOnlyShowNtpAfterIdleEnabledThenReturnsLastOpenedTab() = runTest {
+    fun whenOptionExplicitlySetThenNtpDefaultFlagIsIgnored() = runTest {
         androidBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-
-        assertEquals(LastOpenedTab, testee.optionFlow.first())
-    }
-
-    @Test
-    fun whenOptionNullAndOnlyNtpAsDefaultEnabledThenReturnsLastOpenedTab() = runTest {
-        androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-
-        assertEquals(LastOpenedTab, testee.optionFlow.first())
-    }
-
-    @Test
-    fun whenOptionExplicitlySetThenNtpDefaultFlagsAreIgnored() = runTest {
-        androidBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
         testee.setShowOnAppLaunchOption(LastOpenedTab)
 
         assertEquals(LastOpenedTab, testee.optionFlow.first())

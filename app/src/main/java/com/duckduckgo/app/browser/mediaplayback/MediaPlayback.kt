@@ -21,7 +21,7 @@ import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackRepository
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface MediaPlayback {

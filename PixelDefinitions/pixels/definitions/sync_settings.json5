@@ -1,0 +1,141 @@
+{
+    "m_settings_sync_open": {
+        "description": "The Sync settings screen was opened",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_back_up_this_device_tapped": {
+        "description": "User tapped Sync and Back Up This Device on the Sync settings screen",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_recover_synced_data_tapped": {
+        "description": "User tapped Recover Your Synced Data on the Sync settings screen",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_recovery_confirmed_tapped": {
+        "description": "User confirmed recovering synced data from the recovery flow",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_another_device_prompt_shown": {
+        "description": "The prompt asking whether to sync this device only or sync with another device was shown",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_another_device_prompt_option_tapped": {
+        "description": "User tapped an option on the sync another device prompt",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "option",
+                "type": "string",
+                "description": "Which option the user chose on the prompt",
+                "enum": ["this_device_only", "sync_another_device"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: always v2 in current app versions; v1 is only sent by older versions that still had the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "sync_turn_off_sheet_shown": {
+        "description": "The turn off sync bottom sheet was shown after the user tapped Turn Off Sync on the Sync settings screen",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_turn_off_option_selected": {
+        "description": "User chose an option on the turn off sync bottom sheet",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "option",
+                "type": "string",
+                "description": "Which option the user chose on the sheet: this_device turns off sync on this device only, all_devices_and_server_data turns off sync on all devices and deletes the server data",
+                "enum": ["this_device", "all_devices_and_server_data"]
+            }
+        ]
+    },
+    "sync_delete_server_data_confirmation_shown": {
+        "description": "The confirmation dialog for turning off sync on all devices and deleting server data was shown",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_delete_server_data_confirmation_confirmed": {
+        "description": "User confirmed turning off sync on all devices and deleting server data",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_delete_server_data_confirmation_dismissed": {
+        "description": "User dismissed the confirmation dialog for turning off sync on all devices and deleting server data, either with the cancel button or by dismissing the dialog",
+        "owners": ["MiSikora"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

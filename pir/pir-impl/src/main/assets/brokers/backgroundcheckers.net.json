@@ -1,7 +1,7 @@
 {
   "name": "BackgroundCheckers",
   "url": "backgroundcheckers.net",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.backgroundcheckers.net/optOut/name/landing",
   "steps": [
@@ -61,6 +61,17 @@
             }
           ],
           "id": "fc993b0d-773a-4279-a634-0ce401da0e20"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "cfc-da85374d-22cd-4591-9600-7f028b1c466d"
         },
         {
           "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",

@@ -22,14 +22,14 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.logcat
 import javax.inject.Inject
 
 /** Clears tabs. For now, only Fire mode tabs are being cleared, but after the Regular mode clearing
  *  gets migrated to plugins (as part of the Modularization AOI), @ClearableData.Tabs.All will delete all tabs.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class TabsDataClearingPlugin @Inject constructor(
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
 ) : DataClearingPlugin {

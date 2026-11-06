@@ -20,7 +20,9 @@ import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirConstants.DEFAULT_PROFILE_QUERIES
+import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
@@ -29,6 +31,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
+import com.duckduckgo.pir.impl.common.RealPirWorkDistributor
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -64,6 +67,8 @@ class RealPirOptOutTest {
     private val mockPirActionsRunnerFactory: RealPirActionsRunner.Factory = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockCallbacks: PluginPoint<PirCallbacks> = mock()
+    private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
+    private val mockWorkQueueToggle: Toggle = mock()
     private val mockContext: Context = mock()
     private val mockPirActionsRunner: RealPirActionsRunner = mock()
     private val mockWebViewDataCleaner: PirWebViewDataCleaner = mock()
@@ -75,6 +80,9 @@ class RealPirOptOutTest {
 
         kotlinx.coroutines.runBlocking { whenever(mockPirWebViewCountProvider.getMaxWebViewCount()).thenReturn(20) }
 
+        whenever(mockPirRemoteFeatures.workQueueScheduling()).thenReturn(mockWorkQueueToggle)
+        whenever(mockWorkQueueToggle.isEnabled()).thenReturn(true)
+
         testee = RealPirOptOut(
             repository = mockRepository,
             eventsRepository = mockEventsRepository,
@@ -83,6 +91,7 @@ class RealPirOptOutTest {
             pirActionsRunnerFactory = mockPirActionsRunnerFactory,
             currentTimeProvider = mockCurrentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            pirWorkDistributor = RealPirWorkDistributor(mockPirRemoteFeatures),
             callbacks = mockCallbacks,
             webViewDataCleaner = mockWebViewDataCleaner,
             pirWebViewCountProvider = mockPirWebViewCountProvider,
@@ -222,7 +231,7 @@ class RealPirOptOutTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT)).thenReturn(
             mockPirActionsRunner,
         )
-        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockPirActionsRunner.execute(any(), any())).thenReturn(Result.success(Unit))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         val jobRecordWithDefaultProfile =
@@ -348,7 +357,7 @@ class RealPirOptOutTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT)).thenReturn(
             mockPirActionsRunner,
         )
-        whenever(mockPirActionsRunner.start(testProfileQuery, listOf(testOptOutStep))).thenReturn(
+        whenever(mockPirActionsRunner.execute(testProfileQuery, testOptOutStep)).thenReturn(
             Result.success(Unit),
         )
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
@@ -359,7 +368,7 @@ class RealPirOptOutTest {
         // Then
         verify(mockPirCssScriptLoader).getScript()
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, OPTOUT)
-        verify(mockPirActionsRunner).start(testProfileQuery, listOf(testOptOutStep))
+        verify(mockPirActionsRunner).execute(testProfileQuery, testOptOutStep)
         verify(mockPirActionsRunner).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verify(mockWebViewDataCleaner).cleanWebViewData()
@@ -386,7 +395,7 @@ class RealPirOptOutTest {
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
             .thenReturn(mockPirActionsRunner, mock<RealPirActionsRunner>())
-        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockPirActionsRunner.execute(any(), any())).thenReturn(Result.success(Unit))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         // When
@@ -420,7 +429,7 @@ class RealPirOptOutTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT)).thenReturn(
             mockPirActionsRunner,
         )
-        whenever(mockPirActionsRunner.start(deprecatedProfile, listOf(testOptOutStep))).thenReturn(
+        whenever(mockPirActionsRunner.execute(deprecatedProfile, testOptOutStep)).thenReturn(
             Result.success(Unit),
         )
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
@@ -430,7 +439,7 @@ class RealPirOptOutTest {
 
         // Then
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, deprecatedProfile.id)
-        verify(mockPirActionsRunner).start(deprecatedProfile, listOf(testOptOutStep))
+        verify(mockPirActionsRunner).execute(deprecatedProfile, testOptOutStep)
         verify(mockPirActionsRunner).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verify(mockWebViewDataCleaner).cleanWebViewData()
@@ -482,7 +491,7 @@ class RealPirOptOutTest {
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
             .thenReturn(mockPirActionsRunner)
-        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockPirActionsRunner.execute(any(), any())).thenReturn(Result.success(Unit))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         // When
@@ -494,7 +503,7 @@ class RealPirOptOutTest {
         // Then - both deprecated and non-deprecated profiles should execute
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, deprecatedProfile.id)
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, nonDeprecatedProfile.id)
-        verify(mockPirActionsRunner, times(2)).start(any(), any())
+        verify(mockPirActionsRunner, times(2)).execute(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verify(mockWebViewDataCleaner).cleanWebViewData()
@@ -541,7 +550,7 @@ class RealPirOptOutTest {
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
             .thenReturn(mockPirActionsRunner)
-        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockPirActionsRunner.execute(any(), any())).thenReturn(Result.success(Unit))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         // When
@@ -552,7 +561,7 @@ class RealPirOptOutTest {
         verify(mockRepository).getBrokerOptOutSteps(testBrokerName2)
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, testProfileQuery.id)
         verify(mockBrokerStepsParser).parseStep(testBroker2, stepsJson2, testProfileQuery.id)
-        verify(mockPirActionsRunner, times(2)).start(any(), any())
+        verify(mockPirActionsRunner, times(2)).execute(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verify(mockWebViewDataCleaner).cleanWebViewData()
@@ -590,7 +599,7 @@ class RealPirOptOutTest {
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
             .thenReturn(mockPirActionsRunner)
-        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockPirActionsRunner.execute(any(), any())).thenReturn(Result.success(Unit))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         // When
@@ -599,7 +608,7 @@ class RealPirOptOutTest {
         // Then
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, testProfileQuery.id)
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, testProfileQuery2.id)
-        verify(mockPirActionsRunner, times(2)).start(any(), any())
+        verify(mockPirActionsRunner, times(2)).execute(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verify(mockWebViewDataCleaner).cleanWebViewData()
@@ -622,7 +631,7 @@ class RealPirOptOutTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT)).thenReturn(
             mockPirActionsRunner,
         )
-        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockPirActionsRunner.execute(any(), any())).thenReturn(Result.success(Unit))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         // Execute opt-out to create runners
@@ -660,7 +669,7 @@ class RealPirOptOutTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT)).thenReturn(
             mockPirActionsRunner,
         )
-        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockPirActionsRunner.execute(any(), any())).thenReturn(Result.success(Unit))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         // When
@@ -671,7 +680,7 @@ class RealPirOptOutTest {
         verify(mockRepository).getBrokerOptOutSteps(testBrokerName)
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, testProfileQuery.id)
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, testProfileQuery2.id)
-        verify(mockPirActionsRunner).start(any(), any())
+        verify(mockPirActionsRunner).execute(any(), any())
         verify(mockPirActionsRunner).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verify(mockWebViewDataCleaner).cleanWebViewData()
@@ -787,7 +796,7 @@ class RealPirOptOutTest {
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
             .thenReturn(mockPirActionsRunner)
-        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockPirActionsRunner.execute(any(), any())).thenReturn(Result.success(Unit))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         // When
@@ -796,7 +805,7 @@ class RealPirOptOutTest {
         // Then - all deprecated profiles with extracted profiles should execute
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, deprecatedProfile1.id)
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson, deprecatedProfile2.id)
-        verify(mockPirActionsRunner, times(2)).start(any(), any())
+        verify(mockPirActionsRunner, times(2)).execute(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
         verify(mockWebViewDataCleaner).cleanWebViewData()

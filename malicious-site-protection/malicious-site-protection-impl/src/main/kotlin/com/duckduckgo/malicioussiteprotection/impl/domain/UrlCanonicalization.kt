@@ -20,7 +20,7 @@ import android.net.Uri
 import android.util.Patterns.IP_ADDRESS
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject

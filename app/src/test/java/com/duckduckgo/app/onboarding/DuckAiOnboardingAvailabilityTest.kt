@@ -16,11 +16,8 @@
 
 package com.duckduckgo.app.onboarding
 
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -35,19 +32,16 @@ class DuckAiOnboardingAvailabilityTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val toggles: ExtendedOnboardingFeatureToggles = FakeFeatureToggleFactory.create(ExtendedOnboardingFeatureToggles::class.java)
     private val mockDuckChat: DuckChat = mock()
 
     private val testee = RealDuckAiOnboardingAvailability(
-        toggles = toggles,
         duckChat = mockDuckChat,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Test
-    fun whenAllConditionsTrueThenEnabled() = runTest {
+    fun whenDuckChatEnabledThenEnabled() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        toggles.duckAiOnboarding().setRawStoredState(Toggle.State(remoteEnableState = true))
 
         assertTrue(testee.isDuckAiOnboardingEnabled())
     }
@@ -55,15 +49,6 @@ class DuckAiOnboardingAvailabilityTest {
     @Test
     fun whenDuckChatDisabledThenNotEnabled() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        toggles.duckAiOnboarding().setRawStoredState(Toggle.State(remoteEnableState = true))
-
-        assertFalse(testee.isDuckAiOnboardingEnabled())
-    }
-
-    @Test
-    fun whenDuckAiOnboardingToggleDisabledThenNotEnabled() = runTest {
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        toggles.duckAiOnboarding().setRawStoredState(Toggle.State(remoteEnableState = false))
 
         assertFalse(testee.isDuckAiOnboardingEnabled())
     }

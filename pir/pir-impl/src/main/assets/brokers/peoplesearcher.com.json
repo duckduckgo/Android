@@ -1,9 +1,18 @@
 {
   "name": "PeopleSearcher",
   "url": "peoplesearcher.com",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.peoplesearcher.com/api/helper/optOutLight/search",
+  "mirrorSites": [
+    {
+      "name": "TruthViewer",
+      "url": "truthviewer.com",
+      "addedAt": 1790956865000,
+      "removedAt": null,
+      "optOutUrl": "https://www.peoplesearcher.com/api/helper/optOutLight/search"
+    }
+  ],
   "steps": [
     {
       "stepType": "scan",

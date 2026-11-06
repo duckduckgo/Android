@@ -27,6 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities.loadText
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.AppUrl.ParamKey
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.moshi.Moshi
@@ -58,6 +59,7 @@ class StatisticsRequesterJsonTest {
     private lateinit var statisticsStore: StatisticsDataStore
     private lateinit var testee: StatisticsRequester
     private var mockEmailManager: EmailManager = mock()
+    private var mockDeviceInfo: DeviceInfo = mock()
 
     private val server = MockWebServer()
 
@@ -72,7 +74,11 @@ class StatisticsRequesterJsonTest {
         configureStubNetworking()
 
         statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
+        // clearAtb() only clears the installation ATB, so retention values would otherwise leak between tests
         statisticsStore.clearAtb()
+        statisticsStore.searchRetentionAtb = null
+        statisticsStore.appRetentionAtb = null
+        statisticsStore.duckaiRetentionAtb = null
 
         val plugins = object : PluginPoint<AtbLifecyclePlugin> {
             override fun getPlugins(): Collection<AtbLifecyclePlugin> {
@@ -87,8 +93,10 @@ class StatisticsRequesterJsonTest {
             mockEmailManager,
             TestScope(),
             coroutineTestRule.testDispatcherProvider,
+            mockDeviceInfo,
         )
         whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
+        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
     }
 
     @After
@@ -212,6 +220,16 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
+    fun whenNotYetInitializedAtbInitializationSendsTabletSignal() {
+        queueResponseFromFile(VALID_JSON)
+        queueResponseFromString("", 200)
+        testee.initializeAtb()
+        val atbRequest = takeRequestImmediately()
+        val isTabletParam = atbRequest?.extractQueryParam(ParamKey.IS_TABLET)
+        assertEquals("0", isTabletParam)
+    }
+
+    @Test
     fun whenNotYetInitializedExtiInitializationSendsCorrectAtb() {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
@@ -259,6 +277,9 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         assertEquals("v107-7", statisticsStore.searchRetentionAtb)
+        assertEquals("100-1", statisticsStore.atb?.version)
+        assertNull(statisticsStore.appRetentionAtb)
+        assertNull(statisticsStore.duckaiRetentionAtb)
     }
 
     @Test
@@ -267,14 +288,20 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         assertEquals("v107-7", statisticsStore.appRetentionAtb)
+        assertEquals("100-1", statisticsStore.atb?.version)
+        assertNull(statisticsStore.searchRetentionAtb)
+        assertNull(statisticsStore.duckaiRetentionAtb)
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshDuckAiCallUpdatesAppRetentionAtb() {
+    fun whenAlreadyInitializedRefreshDuckAiCallUpdatesDuckAiRetentionAtb() {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshDuckAiRetentionAtb()
         assertEquals("v107-7", statisticsStore.duckaiRetentionAtb)
+        assertEquals("100-1", statisticsStore.atb?.version)
+        assertNull(statisticsStore.searchRetentionAtb)
+        assertNull(statisticsStore.appRetentionAtb)
     }
 
     @Test

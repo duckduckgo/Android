@@ -1,0 +1,878 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.sync.impl.ui.dashboard
+
+import android.Manifest
+import android.content.res.ColorStateList
+import android.os.Bundle
+import android.view.View
+import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.os.BundleCompat
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
+import androidx.core.view.plusAssign
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE_SECONDARY
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
+import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
+import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.duckduckgo.sync.api.SyncMessagePlugin
+import com.duckduckgo.sync.api.SyncSettingsPlugin
+import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.ShareAction
+import com.duckduckgo.sync.impl.auth.AuthPromptRenderer
+import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
+import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
+import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSetupSyncDeepLink
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSyncWithDesktop
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffThisDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.DeepLinkIntoSetup
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchLearnMore
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchOriginalFlow
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowDeviceUnsupported
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowPreviousSessionReady
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.SyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.CreateAccountFlow
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.SignInFlow
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.dashboard.TurnOffSyncBottomSheetDialog.Choice
+import com.duckduckgo.sync.impl.ui.devices.EditDeviceContract
+import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
+import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
+import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeContract
+import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
+import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeContract
+import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataContract
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
+import com.duckduckgo.sync.impl.ui.recoverycode.RecoveryCodeContract
+import com.duckduckgo.sync.impl.ui.setup.PreviousSessionReadyContract
+import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceContract
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
+
+@InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
+@ContributeToActivityStarter(SyncActivityStartSyncFlow::class)
+@ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
+@ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
+class SyncActivity : DuckDuckGoActivity() {
+    private val binding by viewBinding<ActivitySyncBinding>()
+
+    private val viewModel by bindViewModel<SyncActivityViewModel>()
+
+    @Inject
+    lateinit var syncSettingsPlugin: Map<Int, SyncSettingsPlugin>
+
+    @Inject
+    lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
+
+    @Inject
+    lateinit var syncMessagesPlugin: Set<SyncMessagePlugin>
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var shareAction: ShareAction
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var authPromptRenderer: AuthPromptRenderer
+
+    private val startSyncFlowParams
+        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)
+
+    private val launchSource
+        get() = startSyncFlowParams?.source
+            ?: SyncLaunchSource.from(intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source)
+
+    private val syncSetupUrl
+        get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
+
+    private val shouldDeepLinkStartSync
+        get() = startSyncFlowParams != null
+
+    private val isAnotherDeviceSync
+        get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
+
+    private val isMultiDevicePromotion
+        get() = launchSource in SyncActivityViewModel.MULTI_DEVICE_PROMOTIONS
+
+    private val backUpNewAccountLauncher = registerForActivityResult(
+        SyncThisDeviceContract(),
+    ) { output ->
+        when (output) {
+            is SyncThisDeviceContract.Output.BackedUp -> {
+                viewModel.onDeviceConnected()
+                showRecoveryCodeLauncher.launch(
+                    RecoveryCodeContract.Input(
+                        deviceName = output.device.deviceName,
+                    ),
+                )
+            }
+
+            is SyncThisDeviceContract.Output.SyncedWithAnotherDevice -> {
+                handlePairingResult(output.result)
+            }
+
+            is SyncThisDeviceContract.Output.Dismissed -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
+    private val syncWithAnotherDeviceLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { output ->
+        when (output) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val recoverSyncedDataLauncher = registerForActivityResult(
+        RecoverSyncedDataContract(),
+    ) { output ->
+        when (output) {
+            is RecoverSyncedDataContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is RecoverSyncedDataContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val restoreSavedAccountLauncher = registerForActivityResult(
+        PreviousSessionReadyContract(),
+    ) { output ->
+        when (output) {
+            is PreviousSessionReadyContract.Output.Resume -> {
+                processSyncCodeLauncher.launch(
+                    ProcessSyncCodeContract.Input(
+                        codeSource = SyncCodeSource.Restored(output.recoveryCode),
+                        launchSource = launchSource,
+                    ),
+                )
+            }
+
+            is PreviousSessionReadyContract.Output.ContinueSetup -> {
+                viewModel.onContinueSetupAfterSkipRestore(output.syncEntryPoint)
+            }
+
+            is PreviousSessionReadyContract.Output.Dismissed -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
+    private val showRecoveryCodeLauncher = registerForActivityResult(
+        RecoveryCodeContract(),
+    ) { isSuccess ->
+        if (!isSuccess) {
+            viewModel.onSyncThisDeviceCanceled()
+            viewModel.onConnectionCancelled()
+        }
+    }
+
+    private val processSyncCodeLauncher = registerForActivityResult(
+        ProcessSyncCodeContract(),
+    ) { output ->
+        when (output) {
+            is ProcessSyncCodeContract.Output.SyncCompleted -> {
+                handlePairingResult(output.result)
+            }
+
+            is ProcessSyncCodeContract.Output.Dismissed -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
+    private val editDeviceLauncher = registerForActivityResult(
+        EditDeviceContract(),
+    ) { result ->
+        when (result) {
+            is EditDeviceContract.Output.DeviceEdited -> {
+                viewModel.onDevicesUpdated()
+            }
+
+            is EditDeviceContract.Output.RemoveDeviceConfirmed -> {
+                viewModel.onRemoveDeviceConfirmed(result.device)
+            }
+
+            is EditDeviceContract.Output.TurnOffSyncConfirmed -> {
+                viewModel.onTurnOffSyncConfirmed(result.device)
+            }
+
+            is EditDeviceContract.Output.Dismissed -> Unit
+        }
+    }
+
+    private val downloadPdfPermissionLauncher = registerForActivityResult(
+        RequestPermission(),
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.generateRecoveryCode(this)
+        } else {
+            Snackbar.make(binding.root, R.string.sync_simplified_settings_storage_permission_message, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private val syncedDeviceAdapter = SyncedDeviceAdapter(
+        object : SyncedDeviceAdapter.Listener {
+            override fun onDeviceClicked(device: ConnectedDevice) {
+                viewModel.onEditDeviceClicked(device)
+            }
+        },
+    )
+
+    private val syncThisDeviceListener = OnCheckedChangeListener { _, isChecked ->
+        if (isChecked) viewModel.onSyncThisDevice(launchSource)
+    }
+
+    private val autoRestoreListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAutoRestoreToggleChanged(isChecked)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        enableTransparentEdgeToEdge()
+        setContentView(binding.root)
+        configureEdgeToEdgeInsets()
+
+        configureToolbar()
+        configureSyncThisDeviceCta()
+        configureSyncWithAnotherDeviceCta()
+        configureRecoverDataCta()
+        configureDevicesRecyclerView()
+        configureBookmarksSection()
+        configureWarningMessages()
+        configureRecoverySection()
+        configureGetOnOtherPlatformsItem()
+        configureDataExpirationNotice()
+        configureDataDeletionItem()
+        configureTurnOffSyncResultListener()
+        configureSyncWithDesktopResultListener()
+
+        observeViewModel()
+        authPromptRenderer.bind(viewModel.authPrompts)
+
+        if (savedInstanceState == null) {
+            val setupUrl = syncSetupUrl
+            when {
+                setupUrl != null -> viewModel.processSetupDeepLink(setupUrl)
+                shouldDeepLinkStartSync -> {
+                    // The Sync flow opens only after a background check, so we hide the settings to stop them from flashing until it does.
+                    // We can't rely solely on the view state for that, because it arrives asynchronously and misses the first frame.
+                    // Multi-device promotions keep the settings visible, because their flows start from the settings of a syncing user.
+                    binding.root.isInvisible = !isMultiDevicePromotion
+                    when (startSyncFlowParams?.start) {
+                        SyncFlowStart.AskSyncWithDesktop -> viewModel.processSyncWithDesktopDeepLink(launchSource)
+                        else -> viewModel.processSourceDeepLink(launchSource)
+                    }
+                }
+                isAnotherDeviceSync -> viewModel.onSyncWithAnotherDevice()
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.onScreenExit()
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle)
+            .onEach { viewState -> renderViewState(viewState) }
+            .launchIn(lifecycleScope)
+
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        binding.root.isInvisible = viewState.isContentHidden
+        binding.notifyMeContainer.isVisible = viewState.showAccount
+        binding.syncHeader.setState(
+            isSyncEnabled = viewState.showAccount,
+            isDuckAiAvailable = viewState.aiChatSyncEnabled,
+        )
+        renderEnabledState(viewState)
+        renderDisabledState(viewState)
+    }
+
+    private fun renderEnabledState(viewState: ViewState) {
+        syncedDeviceAdapter.submitList(viewState.syncedDevices)
+        binding.includeEnabledView.apply {
+            root.isVisible = viewState.showAccount
+            getOnOtherPlatformsItem.setState(
+                isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
+            )
+            deleteAccountItem.setPrimaryTextResource(
+                if (viewState.isImprovedSyncFlow) {
+                    R.string.sync_simplified_settings_turn_off_item
+                } else {
+                    R.string.sync_simplified_settings_delete_account_item
+                },
+            )
+            restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
+            if (viewState.showAutoRestoreToggle) {
+                restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, autoRestoreListener)
+                restoreOnReinstallItem.setLeadingIconResource(
+                    if (viewState.autoRestoreEnabled) R.drawable.device_default_24 else R.drawable.device_soft_alert_24,
+                )
+            }
+        }
+    }
+
+    private fun renderDisabledState(viewState: ViewState) {
+        binding.includeDisabledView.apply {
+            root.isGone = viewState.showAccount
+            syncThisDeviceToggle.quietlySetIsChecked(viewState.isThisDeviceSyncing, syncThisDeviceListener)
+            getOnOtherPlatformsItem.setState(
+                isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
+            )
+            syncWithAnotherDeviceButton.isEnabled = CreateAccountFlow !in viewState.disabledSetupFlows
+            syncThisDeviceToggle.isEnabled = CreateAccountFlow !in viewState.disabledSetupFlows
+            recoverDataItem.isEnabled = SignInFlow !in viewState.disabledSetupFlows
+        }
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is AddAnotherDevice -> {
+                syncWithAnotherDeviceLauncher.launch(
+                    ReadSyncCodeContract.Input(
+                        syncEntryPoint = SyncEntryPoint.ADD_DEVICE,
+                        launchSource = launchSource,
+                    ),
+                )
+            }
+
+            is AskDeleteAccount -> {
+                showDeleteAccountDialog()
+            }
+
+            is AskDeleteServerData -> {
+                askDeleteServerData()
+            }
+
+            is AskEditDevice -> {
+                editDeviceLauncher.launch(
+                    EditDeviceContract.Input(
+                        device = command.device,
+                        isImprovedSyncFlow = command.isImprovedSyncFlow,
+                    ),
+                )
+            }
+
+            is AskSetupSyncDeepLink -> {
+                askSetupSyncDeepLink(command.syncBarcodeUrl)
+            }
+
+            is AskSyncWithDesktop -> {
+                lifecycleScope.launch { withStarted { askSyncWithDesktop() } }
+            }
+
+            is AskTurnOffSync -> {
+                askTurnOffSync(command)
+            }
+
+            is AskTurnOffThisDevice -> {
+                askTurnOffThisDevice(command.device)
+            }
+
+            is CheckIfUserHasStoragePermission -> {
+                if (appBuildConfig.sdkInt < 30) {
+                    downloadPdfPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                } else {
+                    viewModel.generateRecoveryCode(this)
+                }
+            }
+
+            is DeepLinkIntoSetup -> {
+                val syncEntryPoint = if (command.isSignedIn) {
+                    SyncEntryPoint.ADD_DEVICE
+                } else {
+                    SyncEntryPoint.SYNC_NEW_ACCOUNT
+                }
+                processSyncCodeLauncher.launch(
+                    ProcessSyncCodeContract.Input(
+                        codeSource = SyncCodeSource.DeepLink(command.barcodeSyncUrl.asUrl(), syncEntryPoint),
+                        launchSource = launchSource,
+                    ),
+                )
+            }
+
+            is IntroCreateAccount -> {
+                backUpNewAccountLauncher.launch(
+                    SyncThisDeviceContract.Input(
+                        launchSource = launchSource,
+                        isAuthRequired = command.isAuthRequired,
+                        isImprovedSyncFlow = command.isImprovedSyncFlow,
+                    ),
+                )
+            }
+
+            is IntroRecoverSyncData -> {
+                recoverSyncedDataLauncher.launch(
+                    RecoverSyncedDataContract.Input(
+                        launchSource = launchSource,
+                        isAuthRequired = command.isAuthRequired,
+                    ),
+                )
+            }
+
+            is LaunchLearnMore -> {
+                globalActivityStarter.start(
+                    this,
+                    SettingsWebViewScreenWithParams(
+                        url = command.url,
+                        screenTitle = getString(R.string.sync_simplified_settings_learn_more_screen_title),
+                    ),
+                )
+            }
+
+            is LaunchOriginalFlow -> {
+                when (command.syncEntryPoint) {
+                    SyncEntryPoint.SYNC_NEW_ACCOUNT -> {
+                        backUpNewAccountLauncher.launch(
+                            SyncThisDeviceContract.Input(
+                                launchSource = launchSource,
+                                isAuthRequired = false,
+                                isImprovedSyncFlow = command.isImprovedSyncFlow,
+                            ),
+                        )
+                    }
+
+                    SyncEntryPoint.ADD_DEVICE -> {
+                        syncWithAnotherDeviceLauncher.launch(
+                            ReadSyncCodeContract.Input(
+                                // The view model is shared between the legacy and simplified UI, so we can't change the VM
+                                // logic for the simplified flow without breaking the legacy logic. Once the legacy flow is
+                                // removed we can fix the root cause and not hardcode SYNC_NEW_ACCOUNT below.
+                                syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                                launchSource = launchSource,
+                            ),
+                        )
+                    }
+
+                    SyncEntryPoint.RECOVER_SYNCED_DATA -> {
+                        recoverSyncedDataLauncher.launch(
+                            RecoverSyncedDataContract.Input(
+                                launchSource = launchSource,
+                                isAuthRequired = false,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            is LaunchSyncGetOnOtherPlatforms -> {
+                lifecycleScope.launch { syncDesktopAppPromotionLauncher.launch(this@SyncActivity, command.source) }
+            }
+
+            is RecoveryCodePDFSuccess -> {
+                shareAction.shareFile(this, command.recoveryCodePDFFile)
+            }
+
+            is ShowDeviceUnsupported -> {
+                startActivity(DeviceUnsupportedActivity.intent(this))
+                finish()
+            }
+
+            is ShowError -> {
+                showError(command)
+            }
+
+            is ShowMessage -> {
+                Snackbar.make(binding.root, command.message, Snackbar.LENGTH_LONG).show()
+            }
+
+            is ShowPreviousSessionReady -> {
+                restoreSavedAccountLauncher.launch(
+                    PreviousSessionReadyContract.Input(
+                        syncEntryPoint = command.syncEntryPoint,
+                        isAuthRequired = command.isAuthRequired,
+                    ),
+                )
+            }
+
+            is SyncWithAnotherDevice -> {
+                syncWithAnotherDeviceLauncher.launch(
+                    ReadSyncCodeContract.Input(
+                        syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                        launchSource = launchSource,
+                    ),
+                )
+            }
+        }
+    }
+
+    private fun handlePairingResult(result: SyncPairingResult) {
+        when (result) {
+            is SyncPairingResult.Success -> {
+                viewModel.onDeviceConnected()
+                when (result.syncEntryPoint) {
+                    SyncEntryPoint.SYNC_NEW_ACCOUNT, SyncEntryPoint.RECOVER_SYNCED_DATA -> {
+                        showRecoveryCodeLauncher.launch(
+                            RecoveryCodeContract.Input(
+                                deviceName = result.device.name,
+                            ),
+                        )
+                    }
+
+                    SyncEntryPoint.ADD_DEVICE -> Unit
+                }
+            }
+
+            is SyncPairingResult.Failure -> {
+                viewModel.onSyncThisDeviceCanceled()
+                viewModel.onConnectionCancelled()
+            }
+        }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
+    }
+
+    private fun configureToolbar() {
+        setSupportActionBar(binding.includeToolbar.toolbar)
+        binding.includeToolbar.toolbar.setNavigationIcon(CommonR.drawable.ic_arrow_left_24)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun configureSyncThisDeviceCta() {
+        binding.includeDisabledView.syncThisDeviceToggle.setOnCheckedChangeListener(syncThisDeviceListener)
+    }
+
+    private fun configureSyncWithAnotherDeviceCta() {
+        binding.includeDisabledView.syncWithAnotherDeviceButton.setOnClickListener {
+            viewModel.onSyncWithAnotherDevice()
+        }
+        binding.includeEnabledView.syncWithAnotherDeviceItem.setOnClickListener {
+            viewModel.onAddAnotherDevice()
+        }
+    }
+
+    private fun configureRecoverDataCta() {
+        binding.includeDisabledView.recoverDataItem.setOnClickListener {
+            viewModel.onRecoverYourSyncedData()
+        }
+    }
+
+    private fun configureDevicesRecyclerView() {
+        binding.includeEnabledView.devicesRecycler.apply {
+            layoutManager = LinearLayoutManager(this@SyncActivity)
+            adapter = syncedDeviceAdapter
+        }
+    }
+
+    private fun configureBookmarksSection() {
+        binding.includeEnabledView.apply {
+            val hasPlugins = syncSettingsPlugin.isNotEmpty()
+            bookmarksSectionHeader.isVisible = hasPlugins
+            bookmarksSectionContainer.isVisible = hasPlugins
+            bookmarksSectionDivider.isVisible = hasPlugins
+
+            if (hasPlugins) {
+                syncSettingsPlugin.toSortedMap().forEach { (_, plugin) ->
+                    bookmarksSectionContainer += plugin.getView(this@SyncActivity)
+                }
+            }
+        }
+    }
+
+    private fun configureWarningMessages() {
+        binding.includeEnabledView.apply {
+            val hasPlugins = syncMessagesPlugin.isNotEmpty()
+            warningsContainer.isVisible = hasPlugins
+
+            if (hasPlugins) {
+                syncMessagesPlugin.forEach { plugin ->
+                    warningsContainer += plugin.getView(this@SyncActivity)
+                }
+            }
+        }
+    }
+
+    private fun configureRecoverySection() {
+        binding.includeEnabledView.apply {
+            restoreOnReinstallItem.setOnCheckedChangeListener(autoRestoreListener)
+            downloadRecoveryCodeItem.setOnClickListener {
+                viewModel.onSaveRecoveryCodeClicked()
+            }
+            copyRecoveryCodeItem.setOnClickListener {
+                viewModel.onCopyRecoveryCodeClicked()
+            }
+        }
+    }
+
+    private fun configureGetOnOtherPlatformsItem() {
+        binding.includeEnabledView.getOnOtherPlatformsItem.setListener(
+            object : GetOnOtherPlatformsListItem.Listener {
+                override fun onClickGetDesktopBrowser() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+                }
+
+                override fun onClickGetOnOtherPlatforms() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+                }
+            },
+        )
+        binding.includeDisabledView.getOnOtherPlatformsItem.setListener(
+            object : GetOnOtherPlatformsListItem.Listener {
+                override fun onClickGetDesktopBrowser() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+                }
+
+                override fun onClickGetOnOtherPlatforms() {
+                    viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+                }
+            },
+        )
+    }
+
+    private fun configureDataExpirationNotice() {
+        binding.includeEnabledView.expirationNoticeLabel.addClickableSpan(
+            textSequence = getText(R.string.sync_simplified_settings_data_expiration_notice),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreClicked()
+                    }
+                },
+            ),
+        )
+    }
+
+    private fun configureTurnOffSyncResultListener() {
+        supportFragmentManager.setFragmentResultListener(TurnOffSyncBottomSheetDialog.REQUEST_KEY, this) { _, bundle ->
+            BundleCompat.getParcelable(bundle, TurnOffSyncBottomSheetDialog.RESULT_KEY_CHOICE, Choice::class.java)?.let { choice ->
+                when (choice) {
+                    is Choice.TurnOffThisDevice -> {
+                        viewModel.onTurnOffThisDeviceClicked(choice.device.toConnectedDevice())
+                    }
+                    is Choice.TurnOffAndDeleteServerData -> {
+                        viewModel.onTurnOffAndDeleteServerDataClicked()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun configureSyncWithDesktopResultListener() {
+        supportFragmentManager.setFragmentResultListener(SyncWithDesktopBottomSheetDialog.REQUEST_KEY, this) { _, bundle ->
+            val choice = BundleCompat.getSerializable(
+                bundle,
+                SyncWithDesktopBottomSheetDialog.RESULT_KEY_CHOICE,
+                SyncWithDesktopBottomSheetDialog.Choice::class.java,
+            )
+            when (choice) {
+                SyncWithDesktopBottomSheetDialog.Choice.SyncWithDesktop -> viewModel.onSyncWithDesktopSelected()
+                SyncWithDesktopBottomSheetDialog.Choice.NoDesktopApp -> viewModel.onNoDesktopAppSelected()
+                null -> Unit
+            }
+        }
+    }
+
+    private fun configureDataDeletionItem() {
+        val color = ColorStateList.valueOf(getColorFromAttr(CommonR.attr.daxColorDestructive))
+        binding.includeEnabledView.deleteAccountItem.apply {
+            leadingIcon().imageTintList = color
+            setPrimaryTextColorStateList(color)
+            setOnClickListener { viewModel.onDeleteAccountClicked() }
+        }
+    }
+
+    private fun showDeleteAccountDialog() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_settings_delete_server_data_dialog_title)
+            .setMessage(getString(R.string.sync_simplified_settings_delete_server_data_dialog_body))
+            .setPositiveButton(R.string.sync_simplified_settings_delete_server_data_dialog_primary_button, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_simplified_settings_delete_server_data_dialog_secondary_button, GHOST_ALT)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onDeleteAccountConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onDeleteAccountCancelled()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onDeleteAccountCancelled()
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
+    }
+
+    private fun askDeleteServerData() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_settings_delete_server_data_dialog_title_v2)
+            .setMessage(getString(R.string.sync_simplified_settings_delete_server_data_dialog_body_v2))
+            .setPositiveButton(R.string.sync_simplified_settings_delete_server_data_dialog_primary_button_v2, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_simplified_settings_delete_server_data_dialog_secondary_button_v2, SECONDARY)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onDialogShown() {
+                        viewModel.onDeleteServerDataConfirmationShown()
+                    }
+
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onDeleteServerDataConfirmed()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onDeleteServerDataCancelled()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onDeleteServerDataCancelled()
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
+    }
+
+    private fun askTurnOffThisDevice(device: ConnectedDevice) {
+        val deviceName = device.deviceName
+        TextAlertDialogBuilder(this)
+            .setTitle(getString(R.string.sync_simplified_settings_turn_off_device_dialog_title, deviceName))
+            .setMessage(getString(R.string.sync_simplified_settings_turn_off_device_dialog_body, deviceName))
+            .setPositiveButton(R.string.sync_simplified_settings_turn_off_device_dialog_primary_button, DESTRUCTIVE_SECONDARY)
+            .setNegativeButton(R.string.sync_simplified_settings_turn_off_device_dialog_secondary_button, SECONDARY)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onTurnOffSyncConfirmed(device)
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
+    }
+
+    private fun askSyncWithDesktop() {
+        if (supportFragmentManager.findFragmentByTag(SyncWithDesktopBottomSheetDialog.TAG) != null) return
+
+        SyncWithDesktopBottomSheetDialog
+            .newInstance()
+            .show(supportFragmentManager, SyncWithDesktopBottomSheetDialog.TAG)
+    }
+
+    private fun askTurnOffSync(command: AskTurnOffSync) {
+        if (supportFragmentManager.findFragmentByTag(TurnOffSyncBottomSheetDialog.TAG) != null) return
+
+        TurnOffSyncBottomSheetDialog
+            .newInstance(
+                thisDevice = ParcelableDevice.fromConnectedDevice(command.thisDevice),
+                allDevices = command.allDevices.map(ParcelableDevice::fromConnectedDevice),
+            )
+            .show(supportFragmentManager, TurnOffSyncBottomSheetDialog.TAG)
+    }
+
+    private fun askSetupSyncDeepLink(barcodeSyncUrl: SyncBarcodeUrl) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_deep_link_confirmation_dialog_title)
+            .setMessage(getString(R.string.sync_simplified_deep_link_confirmation_dialog_body, barcodeSyncUrl.deviceName))
+            .setPositiveButton(R.string.sync_simplified_deep_link_confirmation_dialog_primary_button)
+            .setNegativeButton(R.string.sync_simplified_deep_link_confirmation_dialog_secondary_button)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl)
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showError(error: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_error_dialog_title)
+            .setMessage(getString(error.message) + "\n" + error.reason)
+            .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
+            .show()
+    }
+}

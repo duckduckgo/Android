@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.messaging
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import androidx.annotation.MainThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -34,14 +35,13 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
-import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -60,17 +60,19 @@ class SubscriptionMessagingInterface @Inject constructor(
     pixelSender: SubscriptionPixelSender,
     subscriptionsChecker: SubscriptionsChecker,
     duckAiHostProvider: DuckAiHostProvider,
-    subscriptionsFeature: SubscriptionsFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
 
+    @Volatile
+    private var checkSenderHost: Boolean = true
+
     private val handlers = listOf(
         SubscriptionsHandler(),
         GetSubscriptionMessage(subscriptionsManager, dispatcherProvider),
-        SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
         SetAuthTokensMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
         InformationalEventsMessage(subscriptionsManager, appCoroutineScope, pixelSender),
         GetAccessTokenMessage(subscriptionsManager),
@@ -84,7 +86,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
             val url = runBlocking(dispatcherProvider.main()) {
-                webView.url?.toUri()?.host
+                if (checkSenderHost) webView.senderHost() else webView.url?.toUri()?.host
             }
             jsMessage?.let {
                 logcat { jsMessage.toString() }
@@ -103,6 +105,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
+        this.checkSenderHost = subscriptionsFeature.bridgeOriginCheck().isEnabled()
         this.webView.addJavascriptInterface(this, context)
     }
 
@@ -140,6 +143,19 @@ class SubscriptionMessagingInterface @Inject constructor(
         return allowedDomains.contains(host) || (eTld != null && allowedDomains.contains(eTld))
     }
 
+    /**
+     * The host of the document sending messages, or null when the WebView can't tell. While a navigation is pending,
+     * [WebView.getUrl] can already report its destination even though the previous document is still running and still
+     * sending messages; the committed back/forward entry keeps naming that previous document until the navigation
+     * commits. Only a host both agree on is the sender's.
+     */
+    @MainThread
+    private fun WebView.senderHost(): String? {
+        val host = url?.toUri()?.host ?: return null
+        val committedHost = copyBackForwardList().currentItem?.url?.toUri()?.host
+        return host.takeIf { it == committedHost }
+    }
+
     inner class SubscriptionsHandler : JsMessageHandler {
         override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
@@ -158,6 +174,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             "backToSettingsActivateSuccess",
             "getUserSettings",
             "requestNotificationsPermission",
+            "completeStripePayment",
         )
     }
 
@@ -169,22 +186,20 @@ class SubscriptionMessagingInterface @Inject constructor(
         override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             if (jsMessage.id == null) return
 
-            val authToken: String? = runBlocking(dispatcherProvider.io()) {
-                val pat = subscriptionsManager.getAuthToken()
-                when (pat) {
-                    is AuthTokenResult.Success -> pat.authToken
-                    is AuthTokenResult.Failure.TokenExpired -> pat.authToken
-                    else -> null
+            val accessToken: String? = runBlocking(dispatcherProvider.io()) {
+                when (val result = subscriptionsManager.getAccessToken()) {
+                    is AccessTokenResult.Success -> result.accessToken
+                    is AccessTokenResult.Failure -> null
                 }
             }
 
-            val data = if (authToken != null) {
+            val data = if (accessToken != null) {
                 JsRequestResponse.Success(
                     context = jsMessage.context,
                     featureName = featureName,
                     method = jsMessage.method,
                     id = jsMessage.id!!,
-                    result = JSONObject("""{ "token":"$authToken"}"""),
+                    result = JSONObject("""{ "token":"$accessToken"}"""),
                 )
             } else {
                 JsRequestResponse.Success(
@@ -202,32 +217,6 @@ class SubscriptionMessagingInterface @Inject constructor(
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
         override val methods: List<String> = listOf("getSubscription")
-    }
-
-    inner class SetSubscriptionMessage(
-        private val subscriptionsManager: SubscriptionsManager,
-        @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-        private val dispatcherProvider: DispatcherProvider,
-        private val pixelSender: SubscriptionPixelSender,
-        private val subscriptionsChecker: SubscriptionsChecker,
-    ) : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
-            try {
-                val token = jsMessage.params.getString("token")
-                appCoroutineScope.launch(dispatcherProvider.io()) {
-                    subscriptionsManager.signInV1(token)
-                    subscriptionsChecker.runChecker()
-                    pixelSender.reportRestoreUsingEmailSuccess()
-                    pixelSender.reportSubscriptionActivated()
-                }
-            } catch (e: Exception) {
-                logcat { "Error parsing the token" }
-            }
-        }
-
-        override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "useSubscription"
-        override val methods: List<String> = listOf("setSubscription")
     }
 
     inner class SetAuthTokensMessage(
@@ -304,7 +293,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         private suspend fun SubscriptionsManager.tryRefreshAccessToken() {
             try {
                 if (isSignedInV2()) {
-                    refreshAccessToken()
+                    refreshAccessToken(force = true)
                 }
             } catch (e: Exception) {
                 logcat { e.stackTraceToString() }
@@ -410,12 +399,11 @@ class SubscriptionMessagingInterface @Inject constructor(
         ) {
             val jsMessageId = jsMessage.id ?: return
 
-            val authV2Enabled = subscriptionsFeature.enableSubscriptionFlowsV2().isEnabled()
             val duckAiSubscriberModelsEnabled = subscriptionsFeature.duckAiPlus().isEnabled()
             val supportsAlternateStripePaymentFlow = subscriptionsFeature.supportsAlternateStripePaymentFlow().isEnabled()
             val useGetSubscriptionTierOptions = subscriptionsFeature.tierMessagingEnabled().isEnabled()
             val resultJson = JSONObject().apply {
-                put("useSubscriptionsAuthV2", authV2Enabled)
+                put("useSubscriptionsAuthV2", true)
                 put("usePaidDuckAi", duckAiSubscriberModelsEnabled)
                 put("useAlternateStripePaymentFlow", supportsAlternateStripePaymentFlow)
                 put("useGetSubscriptionTierOptions", useGetSubscriptionTierOptions)

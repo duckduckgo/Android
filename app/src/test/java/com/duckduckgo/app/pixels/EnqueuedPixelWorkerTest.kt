@@ -22,10 +22,10 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
@@ -53,6 +53,7 @@ class EnqueuedPixelWorkerTest {
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val appReturnPixelSender: AppReturnPixelSender = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -62,6 +63,7 @@ class EnqueuedPixelWorkerTest {
             workManager,
             { pixel },
             unsentForgetAllPixelStore,
+            appReturnPixelSender,
             webViewVersionProvider,
             defaultBrowserDetector,
             customTabDetector,
@@ -97,7 +99,7 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndLaunchByFireActionThenDoNotSendAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(appReturnPixelSender.isLaunchByFireAction()).thenReturn(true)
 
         enqueuedPixelWorker.onCreate(lifecycleOwner)
         enqueuedPixelWorker.onStart(lifecycleOwner)
@@ -257,7 +259,7 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchThenSendOneAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(appReturnPixelSender.isLaunchByFireAction()).thenReturn(true)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 

@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.SSLErrorType
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.suggestredirect.RedirectSuggestion
 import com.duckduckgo.app.global.model.MaliciousSiteStatus
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -55,6 +56,7 @@ data class BrowserViewState(
     val isPrinting: Boolean = false,
     val showAutofill: Boolean = false,
     val browserError: WebViewErrorResponse = WebViewErrorResponse.OMITTED,
+    val redirectSuggestion: RedirectSuggestion? = null,
     val sslError: SSLErrorType = SSLErrorType.NONE,
     val maliciousSiteBlocked: Boolean = false,
     val maliciousSiteStatus: MaliciousSiteStatus? = null,

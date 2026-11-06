@@ -18,12 +18,12 @@ package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.net.Uri
 import androidx.lifecycle.*
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.autofill.api.ImportFromGoogle
+import com.duckduckgo.autofill.api.ImportFromGoogleAvailability
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -70,6 +70,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -85,7 +86,7 @@ class BookmarksViewModel @Inject constructor(
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val bookmarksDataStore: BookmarksDataStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val importFromGoogle: ImportFromGoogle,
+    private val importFromGoogleAvailability: ImportFromGoogleAvailability,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
@@ -130,12 +131,15 @@ class BookmarksViewModel @Inject constructor(
 
     data class HiddenBookmarksIds(val items: List<String> = emptyList())
 
-    private val _itemsToDisplay = MutableStateFlow<List<BookmarksItemTypes>>(emptyList())
+    private val _itemsToDisplay = MutableStateFlow<List<BookmarksItemTypes>?>(null)
     val itemsToDisplay = _itemsToDisplay.asStateFlow()
 
     init {
         viewState.value = ViewState()
         viewModelScope.launch(dispatcherProvider.io()) {
+            // We sync only after the first local load because the sync's queries share the database connection and would delay the list.
+            // Whatever the sync changes still reaches the list through the saved sites flow.
+            _itemsToDisplay.firstOrNull { it != null }
             syncEngine.triggerSync(FEATURE_READ)
         }
         pixel.fire(SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
@@ -520,11 +524,7 @@ class BookmarksViewModel @Inject constructor(
         pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
 
         viewModelScope.launch {
-            val googleImportLaunchIntent = withContext(dispatcherProvider.io()) {
-                importFromGoogle.getBookmarksImportLaunchIntent()
-            }
-
-            command.value = if (googleImportLaunchIntent != null) {
+            command.value = if (importFromGoogleAvailability.isBookmarksImportAvailable()) {
                 Command.ShowBookmarkImportDialog
             } else {
                 LaunchBookmarkImportFile

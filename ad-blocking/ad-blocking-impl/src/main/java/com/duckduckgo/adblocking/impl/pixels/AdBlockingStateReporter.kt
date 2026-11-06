@@ -24,8 +24,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -36,8 +37,8 @@ import javax.inject.Inject
  * Reports the client-side ad blocking state once per day, on app foreground.
  * The [Pixel.PixelType.Daily] dedup guarantees at most one report per UTC day.
  */
-@ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<MainProcessLifecycleObserver>())
+@SingleIn(AppScope::class)
 class AdBlockingStateReporter @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     private val pixel: Pixel,
@@ -54,7 +55,7 @@ class AdBlockingStateReporter @Inject constructor(
                 AD_BLOCKING_STATE_DAILY,
                 parameters = mapOf(
                     PARAM_IS_ENABLED to isActive.toString(),
-                    PARAM_USER_OPTED_IN to (userState is AdBlockingState.Enabled.UserEnabled).toString(),
+                    PARAM_USER_OPTED_IN to (userState is AdBlockingState.Enabled.WithPixelConsent).toString(),
                 ),
                 type = Pixel.PixelType.Daily(),
             )

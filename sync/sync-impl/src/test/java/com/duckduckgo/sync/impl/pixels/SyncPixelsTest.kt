@@ -25,10 +25,16 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes
+import com.duckduckgo.sync.impl.AccountInfoKeyUnavailableReason
+import com.duckduckgo.sync.impl.DeviceCredential
+import com.duckduckgo.sync.impl.DeviceInfoReadFailureReason
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationResult
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
@@ -36,18 +42,29 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.store.SharedPrefsProvider
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
+@RunWith(TestParameterInjector::class)
 class RealSyncPixelsTest {
 
     private var pixel: Pixel = mock()
@@ -74,272 +91,470 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun whenDailyPixelCalledThenPixelFired() {
+    fun `when daily pixel is called then pixel is fired as daily`() {
+        testee.fireDailyPixel()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DAILY, emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when daily pixel is called and legacy timestamp is today then pixel is not fired`() {
+        sharedPreferences.edit().putString("SYNC_DAILY_timestamp", utcToday()).apply()
+
+        testee.fireDailyPixel()
+
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `when daily pixel is called and legacy timestamp is before today then pixel is fired as daily`() {
+        sharedPreferences.edit().putString("SYNC_DAILY_timestamp", utcYesterday()).apply()
+
+        testee.fireDailyPixel()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DAILY, emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when daily pixel is called then legacy timestamp is not stored`() {
+        testee.fireDailyPixel()
+
+        assertNull(sharedPreferences.getString("SYNC_DAILY_timestamp", null))
+    }
+
+    @Test
+    fun `when daily success rate pixel is called then pixel is fired as daily`() {
         val dailyStats = givenSomeDailyStats()
 
         testee.fireDailySuccessRatePixel()
 
-        val payload = mapOf(
-            SyncPixelParameters.COUNT to dailyStats.attempts,
-            SyncPixelParameters.DATE to dailyStats.date,
-        ).plus(dailyStats.apiErrorStats)
-
-        verify(pixel).fire(SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL, payload)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL,
+            buildMap {
+                put(SyncPixelParameters.COUNT, dailyStats.attempts)
+                put(SyncPixelParameters.DATE, dailyStats.date)
+                putAll(dailyStats.apiErrorStats)
+                putAll(dailyStats.operationErrorStats)
+            },
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     @Test
-    fun whenDailyPixelCalledTwiceThenPixelFiredOnce() {
-        val dailyStats = givenSomeDailyStats()
+    fun `when daily success rate pixel is called and legacy timestamp is today then pixel is not fired`() {
+        givenSomeDailyStats()
+        sharedPreferences.edit().putString("SYNC_DAILY_SUCCESS_RATE_PIXEL_timestamp", utcToday()).apply()
 
         testee.fireDailySuccessRatePixel()
-        testee.fireDailySuccessRatePixel()
 
-        val payload = mapOf(
-            SyncPixelParameters.COUNT to dailyStats.attempts,
-            SyncPixelParameters.DATE to dailyStats.date,
-        ).plus(dailyStats.apiErrorStats).plus(dailyStats.operationErrorStats)
-
-        verify(pixel, times(1)).fire(SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL, payload)
+        verifyNoInteractions(pixel)
     }
 
     @Test
-    fun whenLoginPixelCalledThenPixelFired() {
+    fun `when login pixel is fired then pixel is fired`() {
         testee.fireLoginPixel()
 
-        verify(pixel).fire(SyncPixelName.SYNC_LOGIN)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_LOGIN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
     }
 
     @Test
-    fun whenSignupDirectPixelCalledWithNoSourceThenPixelFired() {
-        testee.fireSignupDirectPixel(source = null)
+    fun `when signup direct pixel is called with other source then fired pixel includes other source`() {
+        testee.fireSignupDirectPixel(launchSource = SyncLaunchSource.Other)
 
-        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_DIRECT)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_DIRECT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "other",
+            ),
+        )
     }
 
     @Test
-    fun whenSignupDirectPixelCalledWithSourceThenPixelFiredIncludesSource() {
-        testee.fireSignupDirectPixel(source = "foo")
-        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_DIRECT, mapOf("source" to "foo"))
+    fun `when signup direct pixel is called with source then fired pixel includes source`() {
+        testee.fireSignupDirectPixel(launchSource = SyncLaunchSource.PromotionBookmarks)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_DIRECT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "promotion_bookmarks",
+            ),
+        )
     }
 
     @Test
-    fun whenSignupConnectPixelCalledWithNoSourceThenPixelFired() {
-        testee.fireSignupConnectPixel(source = null)
+    fun `when signup connect pixel is called with other source then fired pixel includes other source`() {
+        testee.fireSignupConnectPixel(launchSource = SyncLaunchSource.Other)
 
-        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_CONNECT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "other",
+            ),
+        )
     }
 
     @Test
-    fun whenSignupConnectPixelCalledWithSourceThenPixelFiredIncludesSource() {
-        testee.fireSignupConnectPixel(source = "foo")
-        verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT, mapOf("source" to "foo"))
+    fun `when signup connect pixel is called with source then fired pixel includes source`() {
+        testee.fireSignupConnectPixel(launchSource = SyncLaunchSource.PromotionBookmarks)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_CONNECT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "promotion_bookmarks",
+            ),
+        )
     }
 
     @Test
-    fun whenBarcodeScreenShownAndV2FlowEnabledThenPixelFiredWithV2AndDdg() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when barcode screen is shown the pixel is fired`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireSyncBarcodeScreenShown(ScreenType.SYNC_CONNECT)
+        testee.fireSyncBarcodeScreenShown(screenType)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenBarcodeScreenShownAndV2FlowDisabledThenPixelFiredWithV1AndDdg() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+    fun `when scan code screen is shown the pixel is fired`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireSyncBarcodeScreenShown(ScreenType.SYNC_EXCHANGE)
+        testee.fireScanCodeScreenShown(screenType)
 
         verify(pixel).fire(
-            SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN,
+            SyncPixelName.SYNC_SETUP_SCAN_QR_SCREEN_SHOWN,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenManualCodeEntryScreenShownAndV2FlowEnabledThenPixelFiredWithV2AndDdg() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when scanner camera permission state is reported then the pixel is fired`() {
+        testee.fireScannerCameraPermissionState(beforeRequesting = false, afterRequesting = true)
 
-        testee.fireSyncSetupManualCodeScreenShown(ScreenType.SYNC_EXCHANGE)
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SCANNER_CAMERA_PERMISSION_STATE,
+            mapOf(
+                SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to "false",
+                SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup authentication result is reported then the pixel carries the result and source`(
+        @TestParameter result: AuthenticationResult,
+        @TestParameter source: AuthenticationSource,
+    ) {
+        testee.fireSetupAuthenticationResult(result, source)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_AUTHENTICATION_RESULT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_RESULT to result.value,
+                SyncPixelParameters.SYNC_SETUP_AUTHENTICATION_SOURCE to source.value,
+            ),
+        )
+    }
+
+    @Test
+    fun `when manual code entry screen is shown the pixel is fired`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
+
+        testee.fireSyncSetupManualCodeScreenShown(screenType)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenManualCodeEntryScreenShownAndV2FlowDisabledThenPixelFiredWithV1AndDdg() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+    fun `when barcode scanner parses a v1 code then the success pixel carries no code type`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireSyncSetupManualCodeScreenShown(ScreenType.SYNC_CONNECT)
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
-                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
-            ),
-        )
-    }
-
-    @Test
-    fun whenBarcodeScannerParseSuccessOnLegacyPathThenPixelFiredWithV1AndNoCodeType() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
-
-        testee.fireBarcodeScannerParseSuccess(ScreenType.SYNC_CONNECT, CodeVersion.V1)
+        testee.fireBarcodeScannerParseSuccess(screenType, CodeVersion.V1)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenBarcodeScannerParseSuccessForV2RecoveryCodeThenPixelFiredWithCodeMetadata() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when barcode scanner parses a v2 recovery code then the success pixel carries the code metadata`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireBarcodeScannerParseSuccess(ScreenType.SYNC_EXCHANGE, CodeVersion.V2, SyncCodeType.RECOVERY)
+        testee.fireBarcodeScannerParseSuccess(screenType, CodeVersion.V2, SyncCodeType.RECOVERY)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "recovery",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenManualCodeEnteredSuccessForV2LinkingCodeThenPixelFiredWithCodeMetadata() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when a v2 linking code is entered manually then the success pixel carries the code metadata`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireSyncSetupCodePastedParseSuccess(ScreenType.SYNC_CONNECT, CodeVersion.V2, SyncCodeType.LINKING)
+        testee.fireSyncSetupCodePastedParseSuccess(screenType, CodeVersion.V2, SyncCodeType.LINKING)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "linking",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenManualCodeEnteredSuccessOnLegacyPathThenPixelFiredWithV1AndNoCodeType() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+    fun `when a v1 code is entered manually then the success pixel carries no code type`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireSyncSetupCodePastedParseSuccess(ScreenType.SYNC_EXCHANGE, CodeVersion.V1)
+        testee.fireSyncSetupCodePastedParseSuccess(screenType, CodeVersion.V1)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenBarcodeScannerParseErrorThenPixelFiredWithFlowMetadata() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+    fun `when barcode scanner parse fails without a reason then the pixel is fired`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireBarcodeScannerParseError(ScreenType.SYNC_CONNECT)
+        testee.fireBarcodeScannerParseError(screenType)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenManualCodeEnteredFailureThenPixelFiredWithFlowMetadata() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when barcode scanner parse fails with a reason then the pixel carries the reason`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireSyncSetupCodePastedParseFailure(ScreenType.SYNC_EXCHANGE)
+        testee.fireBarcodeScannerParseError(screenType, reason = SetupFailureReason.UNRECOGNIZED_CODE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun `when manual code entry fails without a reason then the pixel is fired`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
+
+        testee.fireSyncSetupCodePastedParseFailure(screenType)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenSetupFinishedV1ThenPixelFiredWithFlowMetadataOnly() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+    fun `when manual code entry fails with a reason then the pixel carries the reason`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT)
+        testee.fireSyncSetupCodePastedParseFailure(screenType, reason = SetupFailureReason.UNRECOGNIZED_CODE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup finished without a path then the pixel is fired`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
+
+        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup finished then the pixel carries the launch source`(
+        @TestParameter launchSource: SyncLaunchSource,
+    ) {
+        ProtocolVersion.ProtocolV1.configure(syncFeature)
+
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT, launchSource)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to ScreenType.SYNC_CONNECT.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to launchSource.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenSetupFinishedV2RecoveryThenPixelFiredWithPathNoRoleOrPeer() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when launch source is not a known promotion then it maps to other`() {
+        assertEquals(SyncLaunchSource.Other, SyncLaunchSource.from("duckai_card"))
+        assertEquals(SyncLaunchSource.Other, SyncLaunchSource.from(null))
+    }
 
-        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_EXCHANGE, SetupPath.RECOVERY)
+    @Test
+    fun `when launch source is a known promotion then it maps to that promotion`() {
+        assertEquals(SyncLaunchSource.PromotionPasswordsImport, SyncLaunchSource.from("promotion_passwords_import"))
+    }
+
+    @Test
+    fun `when setup finished for a recovery path then the pixel carries the path`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
+
+        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other, SetupPath.RECOVERY)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenSetupFinishedV2PairingThenPixelFiredWithPathRoleAndPeer() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup finished for a pairing path then the pixel carries the path role and peer`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSyncSetupFinishedSuccessfully(
-            ScreenType.SYNC_CONNECT,
+            screenType,
+            SyncLaunchSource.Other,
             SetupPath.PAIRING,
             SetupRole.HOST,
             PeerKind.THIRD_PARTY,
@@ -348,22 +563,28 @@ class RealSyncPixelsTest {
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
                 SyncPixelParameters.SYNC_SETUP_PEER_KIND to "3party",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenSyncSetupFailedWithPathRolePeerKindThenAllIncludedInPixel() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed with path role and peer then all are included in the pixel`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSyncSetupFailed(
-            ScreenType.SYNC_CONNECT,
+            screenType,
+            SyncLaunchSource.Other,
             SetupFailureReason.TRANSPORT_FAILURE,
             SetupPath.PAIRING,
             SetupRole.JOINER,
@@ -373,62 +594,79 @@ class RealSyncPixelsTest {
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "transport_failure",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "joiner",
                 SyncPixelParameters.SYNC_SETUP_PEER_KIND to "ddg",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenSyncSetupFailedWithoutPathRolePeerKindThenThoseParamsOmitted() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed without path role and peer then those params are omitted`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
-        testee.fireSyncSetupFailed(ScreenType.SYNC_EXCHANGE, SetupFailureReason.UNEXPECTED_FAILURE)
+        testee.fireSyncSetupFailed(screenType, SyncLaunchSource.Other, SetupFailureReason.UNEXPECTED_FAILURE)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "unexpected_failure",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedForUpgradeRequiredThenNeedsUpgrade() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed for an upgrade required outcome then needs upgrade reason is used`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSetupFailed(
-            ScreenType.SYNC_CONNECT,
+            screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
         )
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "needs_upgrade",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedForFailedOutcomeThenReasonMappedFromCode() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed for a failed outcome then the reason is mapped and the path forwarded`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSetupFailed(
-            ScreenType.SYNC_EXCHANGE,
+            screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(
                 reason = "boom",
                 code = AccountErrorCodes.INVALID_CODE.code,
@@ -439,341 +677,171 @@ class RealSyncPixelsTest {
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "invalid_credentials",
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedForCancellationCodesThenPixelNotFired() {
-        testee.fireSetupFailed(ScreenType.SYNC_CONNECT, DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code))
-        testee.fireSetupFailed(ScreenType.SYNC_CONNECT, DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code))
-
-        verifyNoInteractions(pixel)
-    }
-
-    @Test
-    fun whenSetupAbandonedWithReasonThenPixelFiredWithReasonAndFlowMetadata() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
-
-        testee.fireSyncSetupAbandoned(ScreenType.SYNC_CONNECT, CancellationReason.CANCELLED_BEFORE_FINISHED)
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
-                SyncPixelParameters.SYNC_SETUP_REASON to "cancelled_before_finished",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
-            ),
-        )
-    }
-
-    @Test
-    fun whenSetupAbandonedWithoutReasonThenReasonOmitted() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
-
-        testee.fireSyncSetupAbandoned(ScreenType.SYNC_EXCHANGE)
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
-                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
-            ),
-        )
-    }
-
-    @Test
-    fun whenFireSetupCancelledIfDeniedForPairingCancelledThenAbandonedFired() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
-
-        testee.fireSetupCancelledIfDenied(
+    fun `when setup failed for cancellation codes then pixel is not fired`() {
+        testee.fireSetupFailed(
             ScreenType.SYNC_CONNECT,
-            DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
+            SyncLaunchSource.Other,
+            DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code),
         )
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
-                SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
-            ),
-        )
-    }
-
-    @Test
-    fun whenFireSetupCancelledIfDeniedForPeerRejectionThenAbandonedFired() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
-
-        testee.fireSetupCancelledIfDenied(
-            ScreenType.SYNC_EXCHANGE,
+        testee.fireSetupFailed(
+            ScreenType.SYNC_CONNECT,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
         )
 
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
-                SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
-            ),
-        )
-    }
-
-    @Test
-    fun whenFireSetupCancelledIfDeniedForNonCancellationOutcomeThenNotFired() {
-        testee.fireSetupCancelledIfDenied(
-            ScreenType.SYNC_CONNECT,
-            DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
-        )
-
         verifyNoInteractions(pixel)
     }
 
     @Test
-    fun whenfireDailyApiErrorForObjectLimitExceededThenPixelSent() {
-        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.COUNT_LIMIT.code))
-
-        verify(pixel).fire("m_sync_bookmarks_object_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenfireDailyApiErrorForRequestSizeLimitExceededThenPixelSent() {
-        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.CONTENT_TOO_LARGE.code))
-
-        verify(pixel).fire("m_sync_bookmarks_request_size_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenfireDailyApiErrorForValidationErrorThenPixelSent() {
-        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.VALIDATION_ERROR.code))
-
-        verify(pixel).fire("m_sync_bookmarks_validation_error_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenfireDailyApiErrorForTooManyRequestsThenPixelSent() {
-        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_1.code))
-        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_2.code))
-
-        verify(pixel, times(2)).fire("m_sync_bookmarks_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenFireSyncAccountErrorPixelForRescopeTokenThenPixelSent() {
-        val error = Error(code = 401, reason = "unauthorized")
-
-        testee.fireSyncAccountErrorPixel(error, SyncAccountOperation.RESCOPE_TOKEN)
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_RESCOPE_TOKEN_FAILURE,
-            mapOf(
-                SyncPixelParameters.ERROR_CODE to "401",
-                SyncPixelParameters.ERROR_REASON to "unauthorized",
-            ),
-        )
-    }
-
-    @Test
-    fun whenFireAiChatActiveThenDailyPixelFired() {
-        testee.fireAiChatActive()
-
-        verify(pixel).fire(SyncPixelName.SYNC_AI_CHAT_ACTIVE, emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenFireAiChatsRescopeTokenErrorWith400ThenValidationErrorPixelFired() {
-        val error = Error(code = API_CODE.VALIDATION_ERROR.code, reason = "bad request")
-
-        testee.fireAiChatsRescopeTokenError(error)
-
-        verify(pixel).fire("m_sync_ai_chats_validation_error_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenFireAiChatsRescopeTokenErrorWith409ThenObjectLimitExceededPixelFired() {
-        val error = Error(code = API_CODE.COUNT_LIMIT.code, reason = "count limit")
-
-        testee.fireAiChatsRescopeTokenError(error)
-
-        verify(pixel).fire("m_sync_ai_chats_object_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenFireAiChatsRescopeTokenErrorWith413ThenRequestSizeLimitExceededPixelFired() {
-        val error = Error(code = API_CODE.CONTENT_TOO_LARGE.code, reason = "too large")
-
-        testee.fireAiChatsRescopeTokenError(error)
-
-        verify(pixel).fire("m_sync_ai_chats_request_size_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenFireAiChatsRescopeTokenErrorWith429ThenTooManyRequestsPixelFired() {
-        val error = Error(code = API_CODE.TOO_MANY_REQUESTS_1.code, reason = "rate limited")
-
-        testee.fireAiChatsRescopeTokenError(error)
-
-        verify(pixel).fire("m_sync_ai_chats_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun whenFireAiChatsRescopeTokenErrorWith401ThenNoPixelFired() {
-        val error = Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "unauthorized")
-
-        testee.fireAiChatsRescopeTokenError(error)
-
-        verifyNoInteractions(pixel)
-    }
-
-    @Test
-    fun whenBarcodeScannerParseErrorWithReasonThenPixelFiredWithReason() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
-
-        testee.fireBarcodeScannerParseError(ScreenType.SYNC_CONNECT, reason = SetupFailureReason.UNRECOGNIZED_CODE)
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
-                SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
-            ),
-        )
-    }
-
-    @Test
-    fun whenManualCodeEnteredFailureWithReasonThenPixelFiredWithReason() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
-
-        testee.fireSyncSetupCodePastedParseFailure(ScreenType.SYNC_EXCHANGE, reason = SetupFailureReason.UNRECOGNIZED_CODE)
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
-                SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
-            ),
-        )
-    }
-
-    @Test
-    fun whenFireSetupFailedForSessionTimeoutCodeThenSessionTimeoutReason() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed for a session timeout code then session timeout reason is used`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSetupFailed(
-            ScreenType.SYNC_EXCHANGE,
+            screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "Session timed out", code = AccountErrorCodes.SESSION_TIMEOUT.code),
         )
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedForCreateAccountFailedCodeThenAccountCreationFailedReason() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed for a create account failed code then account creation failed reason is used`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSetupFailed(
-            ScreenType.SYNC_CONNECT,
+            screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "create_account_failed", code = AccountErrorCodes.CREATE_ACCOUNT_FAILED.code),
         )
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "account_creation_failed",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedForAccountUpgradeFailedCodeThenAccountUpgradeFailedReason() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed for an account upgrade failed code then account upgrade failed reason is used`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSetupFailed(
-            ScreenType.SYNC_EXCHANGE,
+            screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "upgrade_failed", code = AccountErrorCodes.ACCOUNT_UPGRADE_FAILED.code),
         )
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "account_upgrade_failed",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedForAlreadyPairedCodeThenAlreadyPairedReason() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed for an already paired code then already paired reason is used`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSetupFailed(
-            ScreenType.SYNC_EXCHANGE,
+            screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "same_account", code = AccountErrorCodes.ALREADY_PAIRED.code),
         )
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedForAlreadyConnectedOutcomeThenAlreadyPairedReasonWithPairingPath() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed for an already connected outcome then already paired reason with pairing path`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         // v2 same-account case: both peers exchange intros and discover a matching user_id
-        testee.fireSetupFailed(ScreenType.SYNC_CONNECT, DispatchOutcome.AlreadyConnected)
+        testee.fireSetupFailed(screenType, SyncLaunchSource.Other, DispatchOutcome.AlreadyConnected)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedWithTimeoutStageThenPixelIncludesTimeoutStageParam() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed with a timeout stage then the pixel includes the timeout stage param`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSetupFailed(
-            ScreenType.SYNC_EXCHANGE,
+            screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(
                 reason = "Session timed out",
                 code = AccountErrorCodes.SESSION_TIMEOUT.code,
@@ -784,32 +852,458 @@ class RealSyncPixelsTest {
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
                 SyncPixelParameters.SYNC_SETUP_TIMEOUT_STAGE to "waiting_for_confirmation",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun whenFireSetupFailedForPairingUnavailableCodeThenProtocolErrorReason() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun `when setup failed for a pairing unavailable code then protocol error reason is used`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
 
         testee.fireSetupFailed(
-            ScreenType.SYNC_EXCHANGE,
+            screenType,
+            SyncLaunchSource.Other,
             DispatchOutcome.Failed(reason = "pairing_unavailable", code = AccountErrorCodes.PAIRING_UNAVAILABLE.code),
         )
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_REASON to "protocol_error",
-                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
+        )
+    }
+
+    @Test
+    fun `when setup abandoned with a reason then the pixel carries the reason`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
+
+        testee.fireSyncSetupAbandoned(screenType, SyncLaunchSource.Other, CancellationReason.CANCELLED_BEFORE_FINISHED)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
+                SyncPixelParameters.SYNC_SETUP_REASON to "cancelled_before_finished",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup abandoned without a reason then the reason is omitted`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
+
+        testee.fireSyncSetupAbandoned(screenType, SyncLaunchSource.Other)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup cancelled if denied for a pairing cancelled code then abandoned pixel fired`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
+
+        testee.fireSetupCancelledIfDenied(
+            screenType,
+            SyncLaunchSource.Other,
+            DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
+                SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup cancelled if denied for a peer rejection code then abandoned pixel fired`(
+        @TestParameter protocol: ProtocolVersion,
+        @TestParameter screenType: ScreenType,
+    ) {
+        protocol.configure(syncFeature)
+
+        testee.fireSetupCancelledIfDenied(
+            screenType,
+            SyncLaunchSource.Other,
+            DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
+                SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun `when setup cancelled if denied for a non cancellation outcome then pixel is not fired`() {
+        testee.fireSetupCancelledIfDenied(
+            ScreenType.SYNC_CONNECT,
+            SyncLaunchSource.Other,
+            DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
+        )
+
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `when daily api error for object limit exceeded then pixel is sent`() {
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.COUNT_LIMIT.code))
+
+        verify(pixel).fire("m_sync_bookmarks_object_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when daily api error for request size limit exceeded then pixel is sent`() {
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.CONTENT_TOO_LARGE.code))
+
+        verify(pixel).fire("m_sync_bookmarks_request_size_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when daily api error for validation error then pixel is sent`() {
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.VALIDATION_ERROR.code))
+
+        verify(pixel).fire("m_sync_bookmarks_validation_error_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when daily api error for too many requests then pixel is sent`() {
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_1.code))
+        testee.fireDailySyncApiErrorPixel(SyncableType.BOOKMARKS, Error(code = API_CODE.TOO_MANY_REQUESTS_2.code))
+
+        verify(pixel, times(2)).fire("m_sync_bookmarks_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when rescope token error pixel is fired then it carries the error`() {
+        val error = Error(code = 401, reason = "unauthorized")
+
+        testee.fireSyncAccountErrorPixel(error, SyncAccountOperation.RESCOPE_TOKEN)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_RESCOPE_TOKEN_FAILURE,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.ERROR_CODE to "401",
+                SyncPixelParameters.ERROR_REASON to "unauthorized",
+            ),
+        )
+    }
+
+    @Test
+    fun `when ai chat active then daily pixel is fired`() {
+        testee.fireAiChatActive()
+
+        verify(pixel).fire(SyncPixelName.SYNC_AI_CHAT_ACTIVE, emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when ai chats rescope token error with 400 then validation error pixel is fired`() {
+        val error = Error(code = API_CODE.VALIDATION_ERROR.code, reason = "bad request")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verify(pixel).fire("m_sync_ai_chats_validation_error_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when ai chats rescope token error with 409 then object limit exceeded pixel is fired`() {
+        val error = Error(code = API_CODE.COUNT_LIMIT.code, reason = "count limit")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verify(pixel).fire("m_sync_ai_chats_object_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when ai chats rescope token error with 413 then request size limit exceeded pixel is fired`() {
+        val error = Error(code = API_CODE.CONTENT_TOO_LARGE.code, reason = "too large")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verify(pixel).fire("m_sync_ai_chats_request_size_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when ai chats rescope token error with 429 then too many requests pixel is fired`() {
+        val error = Error(code = API_CODE.TOO_MANY_REQUESTS_1.code, reason = "rate limited")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verify(pixel).fire("m_sync_ai_chats_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when ai chats rescope token error with 401 then no pixel is fired`() {
+        val error = Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "unauthorized")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `when sync settings shown then the pixel is fired`() {
+        testee.fireSyncSettingsShown()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun `when backup this device tapped then the pixel is fired`() {
+        testee.fireBackupThisDeviceTapped()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_BACK_UP_THIS_DEVICE_TAPPED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun `when recover sync data tapped then the pixel is fired`() {
+        testee.fireRecoverSyncDataTapped()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_RECOVER_SYNC_DATA_TAPPED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun `when recover sync data confirmed then the pixel is fired`() {
+        testee.fireRecoverSyncDataConfirmed()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_RECOVER_SYNC_DATA_CONFIRMED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun `when another device prompt shown then the pixel is fired`() {
+        testee.fireSyncAnotherDevicePromptShown()
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ANOTHER_DEVICE_PROMPT_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun `when another device prompt option tapped then the pixel carries the option`(
+        @TestParameter option: AnotherDevicePromptOption,
+    ) {
+        testee.fireSyncAnotherDevicePromptOptionTapped(option)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.OPTION to option.value,
+            ),
+        )
+    }
+
+    @Test
+    fun `when turn off sheet is shown then the pixel is fired`() {
+        testee.fireTurnOffSheetShown()
+
+        verify(pixel).fire(SyncPixelName.SYNC_TURN_OFF_SHEET_SHOWN)
+    }
+
+    @Test
+    fun `when turn off option is selected then the pixel carries the option`(
+        @TestParameter option: TurnOffOption,
+    ) {
+        testee.fireTurnOffOptionSelected(option)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_TURN_OFF_OPTION_SELECTED,
+            mapOf(SyncPixelParameters.OPTION to option.value),
+        )
+    }
+
+    @Test
+    fun `when delete server data confirmation is shown then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationShown()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_SHOWN)
+    }
+
+    @Test
+    fun `when delete server data confirmation is confirmed then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationConfirmed()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_CONFIRMED)
+    }
+
+    @Test
+    fun `when delete server data confirmation is dismissed then the pixel is fired`() {
+        testee.fireDeleteServerDataConfirmationDismissed()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DELETE_SERVER_DATA_CONFIRMATION_DISMISSED)
+    }
+
+    @Test
+    fun `when unified device read succeeds then daily pixel is fired`() {
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedDeviceInfo)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_DEVICE_INFO,
+            emptyMap(),
+            emptyMap(),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun `when unified device read falls back then each reason keeps its wire value and own daily latch`(
+        @TestParameter reason: DeviceInfoReadFailureReason,
+    ) {
+        val wireValue = when (reason) {
+            DeviceInfoReadFailureReason.NOT_PUBLISHED_YET -> "not_published_yet"
+            DeviceInfoReadFailureReason.BLOB_ABSENT -> "blob_absent"
+            DeviceInfoReadFailureReason.BLOB_DECRYPT_FAILED -> "blob_decrypt_failed"
+        }
+
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedLegacy(reason))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_LEGACY,
+            mapOf("reason" to wireValue),
+            emptyMap(),
+            type = Pixel.PixelType.Daily("sync_unified_devices_own_row_resolved_legacy:reason:$wireValue"),
+        )
+    }
+
+    @Test
+    fun `when unified device other row fails then each credential keeps its wire value and own daily latch`(
+        @TestParameter credential: DeviceCredential,
+    ) {
+        val wireValue = when (credential) {
+            DeviceCredential.DDG -> "ddg"
+            DeviceCredential.THIRD_PARTY -> "3party"
+            DeviceCredential.NONE -> "none"
+        }
+
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OtherRowDeviceInfoFailedDecryption(credential))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OTHER_ROW_DEVICE_INFO_FAILED_DECRYPTION,
+            mapOf("credential" to wireValue),
+            emptyMap(),
+            type = Pixel.PixelType.Daily("sync_unified_devices_other_row_device_info_failed_decryption:credential:$wireValue"),
+        )
+    }
+
+    @Test
+    fun `when account info key is unavailable then each reason keeps its wire value and own daily latch`(
+        @TestParameter reason: AccountInfoKeyUnavailableReason,
+    ) {
+        val wireValue = when (reason) {
+            AccountInfoKeyUnavailableReason.NO_KEY_ON_SERVER -> "no_key_on_server"
+            AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL -> "no_wrap_for_our_credential"
+            AccountInfoKeyUnavailableReason.UNWRAP_FAILED -> "unwrap_failed"
+            AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED -> "keys_fetch_failed"
+            AccountInfoKeyUnavailableReason.RATE_LIMITED -> "rate_limited"
+        }
+
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyUnavailable(reason))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_UNAVAILABLE,
+            mapOf("reason" to wireValue),
+            emptyMap(),
+            type = Pixel.PixelType.Daily("sync_unified_devices_account_info_key_unavailable:reason:$wireValue"),
+        )
+    }
+
+    @Test
+    fun `when unified device write succeeds then count pixel is fired`() {
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowDeviceInfoUpdateSuccess)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_UPDATE_SUCCESS,
+            emptyMap(),
+            emptyMap(),
+            type = Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when unified device write fails then reason gets its own daily latch`() {
+        testee.fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.OwnRowDeviceInfoRepairFailed(UnifiedDeviceListPixel.DeviceInfoWriteFailureReason.RATE_LIMITED),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_REPAIR_FAILED,
+            mapOf("reason" to "rate_limited"),
+            emptyMap(),
+            type = Pixel.PixelType.Daily("sync_unified_devices_own_row_device_info_repair_failed:reason:rate_limited"),
         )
     }
 
@@ -819,5 +1313,25 @@ class RealSyncPixelsTest {
         whenever(syncStatsRepository.getYesterdayDailyStats()).thenReturn(dailyStats)
 
         return dailyStats
+    }
+
+    private fun utcToday(): String = LocalDate.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+    private fun utcYesterday(): String = LocalDate.now(ZoneOffset.UTC).minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+    enum class ProtocolVersion(
+        val value: String,
+    ) {
+        ProtocolV1("v1"),
+        ProtocolV2("v2"),
+        ProtocolV2Point1("v2.1"),
+        ;
+
+        fun configure(syncFeature: SyncFeature) {
+            val v2Enabled = this != ProtocolV1
+            val v2Point1Enabled = this == ProtocolV2Point1
+            syncFeature.canUseV2ConnectFlow().setRawStoredState(State(v2Enabled))
+            syncFeature.canUseExchangeV2Point1().setRawStoredState(State(v2Point1Enabled))
+        }
     }
 }

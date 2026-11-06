@@ -22,14 +22,12 @@
     <string name="voiceSearchListening">Tala nu</string>
     <string name="voiceSearchListeningFooter">Ljudet bearbetas på enheten. Det lagras inte och delas inte med någon, inte ens DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Avbryt</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo lyssnar aldrig på det du säger. Ljudet bearbetas på enheten. Det lagras inte och delas inte med någon.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Mikrofonåtkomst krävs för privat röstsökning</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">För att kunna använda röstsökning i DuckDuckGo måste du aktivera mikrofonåtkomst i systeminställningarna.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Inställningar</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofonåtkomst krävs</string>
-    <string name="voiceSearchRemovePositiveButton">Ta bort</string>
-    <string name="voiceSearchRemoveTitle">Ta bort alternativet privat röstsökning från adressfältet?</string>
-    <string name="voiceSearchRemoveSubtitle">Du kan alltid hantera den här och andra tillgänglighetsinställningar i inställningarna.</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo behöver komma åt din mikrofon</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Mikrofonbehörighet behövs om du vill använda vår privata röstsökning.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Mikrofonbehörighet behövs om du vill använda våra privata röstfunktioner.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Ändra behörigheter</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Dölj röstsökning</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Mikrofonbehörighet krävs för röstfunktioner</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Tillåt</string>
     <string name="voiceSearchTitle">Röstsökning</string>
 </resources>

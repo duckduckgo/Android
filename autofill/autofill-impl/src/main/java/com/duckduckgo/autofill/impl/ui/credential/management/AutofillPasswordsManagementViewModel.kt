@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -32,7 +31,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
@@ -96,18 +95,20 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
@@ -138,7 +139,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
     private val autofillFeature: AutofillFeature,
-    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
+    private val passwordImportAvailability: PasswordImportAvailability,
     private val autofillEffectDispatcher: AutofillEffectDispatcher,
 ) : ViewModel() {
 
@@ -192,10 +193,13 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
     private fun onShowListMode() {
         viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(
-                credentialMode = ListMode,
-                showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
-            )
+            val showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not()
+            _viewState.update {
+                it.copy(
+                    credentialMode = ListMode,
+                    showAutofillEnabledToggle = showAutofillEnabledToggle,
+                )
+            }
 
             addCommand(ShowListMode)
         }
@@ -204,9 +208,10 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun onViewCredentials(
         credentials: LoginCredentials,
     ) {
-        _viewState.value = viewState.value.copy(
-            credentialMode = Viewing(credentialsViewed = credentials, showLinkButton = credentials.shouldShowLinkButton()),
-        )
+        val showLinkButton = credentials.shouldShowLinkButton()
+        _viewState.update {
+            it.copy(credentialMode = Viewing(credentialsViewed = credentials, showLinkButton = showLinkButton))
+        }
         addCommand(ShowCredentialMode)
 
         updateDuckAddressStatus(credentials.username)
@@ -214,18 +219,20 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
     fun onCreateNewCredentials() {
         addCommand(ShowCredentialMode)
-        _viewState.value = viewState.value.copy(credentialMode = EditingNewEntry())
+        _viewState.update { it.copy(credentialMode = EditingNewEntry()) }
         addCommand(ShowManualCredentialMode)
     }
 
     fun onEditCurrentCredentials() {
         val credentials = getCurrentCredentials() ?: return
-        _viewState.value = viewState.value.copy(
-            credentialMode = EditingExisting(
-                credentialsViewed = credentials,
-                startedCredentialModeWithEdit = false,
-            ),
-        )
+        _viewState.update {
+            it.copy(
+                credentialMode = EditingExisting(
+                    credentialsViewed = credentials,
+                    startedCredentialModeWithEdit = false,
+                ),
+            )
+        }
         addCommand(ShowEditCredentialMode(credentials))
     }
 
@@ -234,13 +241,15 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun onEditCredentials(credentials: LoginCredentials) {
         addCommand(ShowCredentialMode)
 
-        _viewState.value = viewState.value.copy(
-            credentialMode = EditingExisting(
-                credentialsViewed = credentials,
-                startedCredentialModeWithEdit = true,
-                hasPopulatedFields = false,
-            ),
-        )
+        _viewState.update {
+            it.copy(
+                credentialMode = EditingExisting(
+                    credentialsViewed = credentials,
+                    startedCredentialModeWithEdit = true,
+                    hasPopulatedFields = false,
+                ),
+            )
+        }
 
         addCommand(ShowEditCredentialMode(credentials))
     }
@@ -254,9 +263,12 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     fun onCredentialEditModePopulated() {
-        _viewState.value.credentialMode.let { credentialMode ->
+        _viewState.update { state ->
+            val credentialMode = state.credentialMode
             if (credentialMode is EditingExisting) {
-                _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(hasPopulatedFields = true))
+                state.copy(credentialMode = credentialMode.copy(hasPopulatedFields = true))
+            } else {
+                state
             }
         }
     }
@@ -284,10 +296,12 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     fun allowSaveInEditMode(saveable: Boolean) {
-        when (val credentialMode = _viewState.value.credentialMode) {
-            is EditingExisting -> _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
-            is EditingNewEntry -> _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
-            else -> {}
+        _viewState.update { state ->
+            when (val credentialMode = state.credentialMode) {
+                is EditingExisting -> state.copy(credentialMode = credentialMode.copy(saveable = saveable))
+                is EditingNewEntry -> state.copy(credentialMode = credentialMode.copy(saveable = saveable))
+                else -> state
+            }
         }
     }
 
@@ -306,12 +320,12 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
                 else -> true
             }
 
-            _viewState.value = _viewState.value.copy(canShowPromo = canShowPromo)
+            _viewState.update { it.copy(canShowPromo = canShowPromo) }
             addCommand(ReevalutePromotions)
         }
     }
 
-    suspend fun launchDeviceAuth() {
+    suspend fun launchDeviceAuth(suppressAuthPrompt: Boolean = false) {
         if (!autofillStore.autofillAvailable()) {
             logcat(VERBOSE) { "Can't access secure storage so can't offer autofill functionality" }
             deviceUnsupported()
@@ -329,6 +343,9 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         if (shouldAskAuth) {
             logcat(VERBOSE) { "No credentials; can skip showing device auth" }
             unlock()
+        } else if (suppressAuthPrompt) {
+            logcat(VERBOSE) { "Auth prompt suppressed by caller; unlocking without device auth" }
+            unlock()
         } else {
             addCommand(LaunchDeviceAuth)
         }
@@ -338,7 +355,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         logcat(VERBOSE) { "Locking autofill settings" }
         trackCurrentModeBeforeLocking()
         addCommand(ShowLockedMode)
-        _viewState.value = _viewState.value.copy(credentialMode = Locked)
+        _viewState.update { it.copy(credentialMode = Locked) }
     }
 
     fun unlock() {
@@ -353,7 +370,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
         credentialModeBeforeLocking?.let { mode ->
             logcat(VERBOSE) { "Will return view state to ${mode.javaClass.name}" }
-            _viewState.value = _viewState.value.copy(credentialMode = mode)
+            _viewState.update { it.copy(credentialMode = mode) }
         }
     }
 
@@ -371,7 +388,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         addCommand(ExitCredentialMode)
         addCommand(ExitLockedMode)
         addCommand(ShowDisabledMode)
-        _viewState.value = _viewState.value.copy(credentialMode = Disabled)
+        _viewState.update { it.copy(credentialMode = Disabled) }
     }
 
     private fun deviceUnsupported() {
@@ -428,21 +445,27 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun onViewCreated() {
         if (combineJob != null) return
         combineJob = viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(
-                autofillEnabled = autofillStore.autofillEnabled,
-                prioritizeDomainMatchesOnSearch = autofillFeature.prioritizeDomainMatchesOnSearch().isEnabled(),
-            )
+            val autofillEnabled = autofillStore.autofillEnabled
+            val prioritizeDomainMatchesOnSearch = autofillFeature.prioritizeDomainMatchesOnSearch().isEnabled()
+            _viewState.update {
+                it.copy(
+                    autofillEnabled = autofillEnabled,
+                    prioritizeDomainMatchesOnSearch = prioritizeDomainMatchesOnSearch,
+                )
+            }
 
             val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
             val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
                 credentialListFilter.filter(credentials, filter)
             }
             combined.collect { credentials ->
-                val updatedBreakageState = _viewState.value.reportBreakageState.copy(allowBreakageReporting = isBreakageReportingAllowed())
-                _viewState.value = _viewState.value.copy(
-                    logins = credentials,
-                    reportBreakageState = updatedBreakageState,
-                )
+                val allowBreakageReporting = isBreakageReportingAllowed()
+                _viewState.update {
+                    it.copy(
+                        logins = credentials,
+                        reportBreakageState = it.reportBreakageState.copy(allowBreakageReporting = allowBreakageReporting),
+                    )
+                }
                 showPromotionIfEligible()
             }
         }
@@ -463,13 +486,16 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
-            val webViewSupportsImportingPasswords = importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()
-            val canImport = gpmImport && webViewSupportsImportingPasswords
+            val canImportPasswords = passwordImportAvailability.canImport()
+            val canImport = gpmImport && canImportPasswords
             logcat(VERBOSE) { "Can import from Google Password Manager: $canImport" }
-            _viewState.value = _viewState.value.copy(
-                canImportFromGooglePasswords = canImport,
-                showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
-            )
+            val showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not()
+            _viewState.update {
+                it.copy(
+                    canImportFromGooglePasswords = canImport,
+                    showAutofillEnabledToggle = showAutofillEnabledToggle,
+                )
+            }
         }
     }
 
@@ -536,12 +562,10 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     ) {
         val existingCredentials = credentialMode.credentialsViewed
         autofillStore.updateCredentials(updatedCredentials.copy(id = existingCredentials.id))?.let { updated ->
-            _viewState.value = viewState.value.copy(
-                credentialMode = Viewing(
-                    credentialsViewed = updated,
-                    showLinkButton = updated.shouldShowLinkButton(),
-                ),
-            )
+            val showLinkButton = updated.shouldShowLinkButton()
+            _viewState.update {
+                it.copy(credentialMode = Viewing(credentialsViewed = updated, showLinkButton = showLinkButton))
+            }
         }
 
         pixel.fire(AutofillPixelNames.AUTOFILL_MANUALLY_UPDATE_CREDENTIAL)
@@ -552,12 +576,10 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             rawUrl = updatedCredentials.domain ?: "",
             credentials = updatedCredentials,
         )?.let { savedCredentials ->
-            _viewState.value = viewState.value.copy(
-                credentialMode = Viewing(
-                    credentialsViewed = savedCredentials,
-                    showLinkButton = savedCredentials.shouldShowLinkButton(),
-                ),
-            )
+            val showLinkButton = savedCredentials.shouldShowLinkButton()
+            _viewState.update {
+                it.copy(credentialMode = Viewing(credentialsViewed = savedCredentials, showLinkButton = showLinkButton))
+            }
         }
 
         pixel.fire(AUTOFILL_MANUALLY_SAVE_CREDENTIAL)
@@ -565,14 +587,14 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
     fun onEnableAutofill() {
         autofillStore.autofillEnabled = true
-        _viewState.value = viewState.value.copy(autofillEnabled = true)
+        _viewState.update { it.copy(autofillEnabled = true) }
 
         pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED)
     }
 
     fun onDisableAutofill(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
         autofillStore.autofillEnabled = false
-        _viewState.value = viewState.value.copy(autofillEnabled = false)
+        _viewState.update { it.copy(autofillEnabled = false) }
 
         pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED, mapOf("source" to autofillScreenLaunchSource?.asString().orEmpty()))
     }
@@ -581,7 +603,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         logcat(VERBOSE) { "Search query changed: $searchText" }
         searchQueryFilter.value = searchText
         val showAutofillEnabledToggle = searchText.isEmpty() && autofillFeature.settingsScreen().isEnabled().not()
-        _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText, showAutofillEnabledToggle = showAutofillEnabledToggle)
+        _viewState.update { it.copy(credentialSearchQuery = searchText, showAutofillEnabledToggle = showAutofillEnabledToggle) }
     }
 
     @OptIn(ExperimentalContracts::class)
@@ -607,44 +629,40 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             if (!isPrivateDuckAddress(username, mainAddress)) {
                 logcat { "Not a private duck address: $username" }
             } else {
-                val credMode = viewState.value.credentialMode
-                if (credMode is Viewing) {
+                if (viewState.value.credentialMode is Viewing) {
                     logcat { "Fetching duck address status from the network for $username" }
-                    retrieveStatusFromNetwork(credMode, username)
+                    retrieveStatusFromNetwork(username)
                 }
             }
         }
     }
 
-    private fun retrieveStatusFromNetwork(
-        credMode: Viewing,
-        duckAddress: String,
-    ) {
-        _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FetchingActivationStatus(duckAddress)))
+    private fun retrieveStatusFromNetwork(duckAddress: String) {
+        setDuckAddressStatus(duckAddress, FetchingActivationStatus(duckAddress))
 
         viewModelScope.launch(dispatchers.io()) {
             when (duckAddressStatusRepository.getActivationStatus(duckAddress)) {
                 ActivationStatusResult.Activated -> {
-                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Activated(duckAddress)))
+                    setDuckAddressStatus(duckAddress, Activated(duckAddress))
                 }
 
                 ActivationStatusResult.Deactivated -> {
-                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Deactivated(duckAddress)))
+                    setDuckAddressStatus(duckAddress, Deactivated(duckAddress))
                 }
 
                 ActivationStatusResult.NotSignedIn -> {
                     logcat { "Not signed into email protection; can't manage $duckAddress" }
-                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = DuckAddressStatus.NotSignedIn))
+                    setDuckAddressStatus(duckAddress, DuckAddressStatus.NotSignedIn)
                 }
 
                 ActivationStatusResult.Unmanageable -> {
                     logcat(VERBOSE) { "Can't manage $duckAddress from this account" }
-                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = NotManageable))
+                    setDuckAddressStatus(duckAddress, NotManageable)
                 }
 
                 ActivationStatusResult.GeneralError -> {
                     logcat(VERBOSE) { "General error when querying status for $duckAddress" }
-                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FailedToObtainStatus))
+                    setDuckAddressStatus(duckAddress, FailedToObtainStatus)
                 }
             }
         }
@@ -654,21 +672,36 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         checked: Boolean,
         duckAddress: String,
     ) {
-        val credMode = viewState.value.credentialMode
-        if (credMode is Viewing) {
-            _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = SettingActivationStatus(checked)))
+        if (viewState.value.credentialMode is Viewing) {
+            setDuckAddressStatus(duckAddress, SettingActivationStatus(checked))
 
             viewModelScope.launch {
                 val success = duckAddressStatusRepository.setActivationStatus(duckAddress, checked)
                 if (success) {
                     if (checked) {
-                        _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Activated(duckAddress)))
+                        setDuckAddressStatus(duckAddress, Activated(duckAddress))
                     } else {
-                        _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Deactivated(duckAddress)))
+                        setDuckAddressStatus(duckAddress, Deactivated(duckAddress))
                     }
                 } else {
-                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FailedToObtainStatus))
+                    setDuckAddressStatus(duckAddress, FailedToObtainStatus)
                 }
+            }
+        }
+    }
+
+    private fun setDuckAddressStatus(
+        duckAddress: String,
+        status: DuckAddressStatus,
+    ) {
+        _viewState.update { state ->
+            val credentialMode = state.credentialMode
+            // The status arrives after a network call, so we drop it if the user has since left viewing this address, e.g. by starting
+            // an edit or returning to the list. Writing it would put the screen back into view mode.
+            if (credentialMode is Viewing && credentialMode.credentialsViewed.username == duckAddress) {
+                state.copy(credentialMode = credentialMode.copy(duckAddressStatus = status))
+            } else {
+                state
             }
         }
     }
@@ -754,17 +787,19 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         currentUrl: String?,
         privacyProtectionEnabled: Boolean?,
     ) {
-        val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(
-            currentUrl = currentUrl,
-            privacyProtectionEnabled = privacyProtectionEnabled,
-        )
-        _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
+        _viewState.update {
+            it.copy(
+                reportBreakageState = it.reportBreakageState.copy(
+                    currentUrl = currentUrl,
+                    privacyProtectionEnabled = privacyProtectionEnabled,
+                ),
+            )
+        }
     }
 
     fun onReportBreakageShown() {
         if (!_viewState.value.reportBreakageState.onReportBreakageShown) {
-            val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(onReportBreakageShown = true)
-            _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
+            _viewState.update { it.copy(reportBreakageState = it.reportBreakageState.copy(onReportBreakageShown = true)) }
 
             pixel.fire(AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE)
         }
@@ -784,8 +819,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             }
         }
 
-        val updatedReportBreakageState = _viewState.value.reportBreakageState.copy(allowBreakageReporting = false)
-        _viewState.value = _viewState.value.copy(reportBreakageState = updatedReportBreakageState)
+        _viewState.update { it.copy(reportBreakageState = it.reportBreakageState.copy(allowBreakageReporting = false)) }
 
         addCommand(ListModeCommand.ShowUserReportSentMessage)
 

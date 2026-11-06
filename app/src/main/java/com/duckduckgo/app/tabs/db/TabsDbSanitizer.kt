@@ -21,19 +21,17 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class TabsDbSanitizer @Inject constructor(
     @RegularMode private val regularTabRepository: TabRepository,
-    @FireMode private val fireTabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val adClickManager: AdClickManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -42,7 +40,6 @@ class TabsDbSanitizer @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.main()) {
             sanitize(regularTabRepository)
-            sanitize(fireTabRepository)
         }
     }
 

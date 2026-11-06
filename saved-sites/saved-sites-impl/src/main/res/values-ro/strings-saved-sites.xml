@@ -74,14 +74,14 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Sigur dorești să ștergi "</string>
     <string name="bookmarkFolderEmpty">Gol</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s și %3$d element?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s și %3$d element?</item>
         <item quantity="few">%1$s%2$s și %3$d elemente?</item>
-        <item quantity="other">%1$s%2$s și %3$d elemente?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s și %3$d elemente?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d element</item>
         <item quantity="few">%1$d elemente</item>
-        <item quantity="other">%1$d elemente</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d elemente</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -96,9 +96,9 @@
     <string name="removeFromFavorites">Elimină din favorite</string>
     <string name="addToFavoritesMenu">Adaugă la preferințe</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Sigur vrei să ștergi acest folder și %1$d element?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Sigur vrei să ștergi acest folder și %1$d element?</item>
         <item quantity="few">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
-        <item quantity="other">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigur dorești să ștergi marcajul pentru &lt;b&gt;%1$s&lt;/b&gt;?</string>
 

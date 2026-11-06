@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.callbackFlow
 interface VoiceSearchDataStore {
     var userAcceptedRationaleDialog: Boolean
     var availabilityLogged: Boolean
-    var countVoiceSearchDismissed: Int
     var lastSelectedMode: VoiceSearchMode
 
     fun isVoiceSearchEnabled(default: Boolean): Boolean
@@ -45,7 +44,6 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         const val KEY_RATIONALE_DIALOG_ACCEPTED = "KEY_RATIONALE_DIALOG_ACCEPTED"
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
         const val KEY_VOICE_SEARCH_ENABLED = "KEY_VOICE_SEARCH_ENABLED"
-        const val KEY_VOICE_SEARCH_DISMISSED = "KEY_VOICE_SEARCH_DISMISSED"
         const val KEY_LAST_SELECTED_MODE = "KEY_LAST_SELECTED_MODE"
     }
 
@@ -81,12 +79,6 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         preferences.registerOnSharedPreferenceChangeListener(listener)
         awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
-
-    override var countVoiceSearchDismissed: Int
-        get() = preferences.getInt(KEY_VOICE_SEARCH_DISMISSED, 0)
-        set(value) {
-            updateValue(KEY_VOICE_SEARCH_DISMISSED, value)
-        }
 
     override var lastSelectedMode: VoiceSearchMode
         get() = VoiceSearchMode.fromValue(preferences.getInt(KEY_LAST_SELECTED_MODE, VoiceSearchMode.SEARCH.value))

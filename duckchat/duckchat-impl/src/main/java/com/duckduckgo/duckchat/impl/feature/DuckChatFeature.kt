@@ -16,11 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.feature
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
  * This is the class that represents the aiChat feature flags
@@ -30,6 +29,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
     featureName = "aiChat",
 )
 interface DuckChatFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun pdfPageContext(): Toggle
+
     /**
      * @return `true` when the remote config has the global "aiChat" feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -62,52 +64,10 @@ interface DuckChatFeature {
     fun duckAiInputScreen(): Toggle
 
     /**
-     * @return `true` when the Input Screen should open automatically when user creates a New Tab
-     * If the remote feature is not present defaults to `enabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showInputScreenAutomaticallyOnNewTab(): Toggle
-
-    /**
-     * @return `true` when the Input Screen should be shown when user open the app from system widgets
-     * If the remote feature is not present defaults to `disabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showInputScreenOnSystemSearchLaunch(): Toggle
-
-    /**
-     * @return `true` when the Input Screen can present a bottom input box, if user has the omnibar also set to the bottom position.
-     * If disabled, the Input Screen should always show the input box at the top of the screen.
-     * If the remote feature is not present defaults to `enabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun inputScreenBottomBarSupport(): Toggle
-
-    /**
-     * @return `true` when the new address bar option choice screen should be shown.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    @InternalAlwaysEnabled
-    fun showNewAddressBarPickerScreen(): Toggle
-
-    /**
      * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun clearHistory(): Toggle
-
-    /**
-     * @return `true` when the new input screen should show the three main buttons (fire, tabs, menu)
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showMainButtonsInInputScreen(): Toggle
-
-    /**
-     * @return `true` when the new fullscreen mode is enabled
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun fullscreenMode(): Toggle
 
     /**
      * @return `true` when the remote config has the "duckAiVoiceSearch"
@@ -125,34 +85,20 @@ interface DuckChatFeature {
     fun standaloneMigration(): Toggle
 
     /**
-     * @return `true` when the "Hide AI Generated Images" option should be visible in AI Features Settings.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun showHideAiGeneratedImages(): Toggle
-
-    /**
-     * @return `true` when the Native Input Field should be used instead of the web-based input.
-     */
-    @InternalAlwaysEnabled
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun nativeInputField(): Toggle
-
-    /**
-     * @return `true` when the "Customize Responses" action is shown in the Duck.ai unified input options menu.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun customizeResponses(): Toggle
-
-    /**
      * @return `true` when Duck.ai should use the native chat input integration
      * (the `native-input` URL param plus the `supportsNativeChatInput` /
-     * `supportsNativePrompt` JS flags). Has no effect unless [nativeInputField]
-     * is also enabled. When disabled, Duck.ai contextual and full modes fall
+     * `supportsNativePrompt` JS flags). When disabled, Duck.ai contextual and full modes fall
      * back to the web input.
+     * If the remote feature is not present defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun nativeChatInput(): Toggle
+
+    /**
+     * Delegates editing an already-sent prompt to the native input instead of the Duck.ai inline editor.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun nativeChatInput(): Toggle
+    fun nativePromptEditing(): Toggle
 
     /**
      * @return `true` when the native input top nav bar (fire / tabs / menu) may be shown. This is a
@@ -233,13 +179,6 @@ interface DuckChatFeature {
     fun useNativeStorageChatData(): Toggle
 
     /**
-     * @return `true` when the native chat history screen can be launched.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun historyScreen(): Toggle
-
-    /**
      * @return `true` when the per-row Fire-icon delete affordance on Duck.ai chat-history
      * suggestions in the omnibar autocomplete is visible.
      * If the remote feature is not present defaults to `internal`.
@@ -279,13 +218,6 @@ interface DuckChatFeature {
     fun duckAiVoiceChatService(): Toggle
 
     /**
-     * @return `true` when the contextual Duck.ai sheet improvements are enabled.
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun contextualSheetImprovements(): Toggle
-
-    /**
      * @return `true` when the native controls for AI Features are enabled in the app.
      * If the remote feature is not present defaults to `internal`
      */
@@ -293,26 +225,109 @@ interface DuckChatFeature {
     fun aiFeaturesNativeControls(): Toggle
 
     /**
-     * @return `true` when the "Duck.ai Settings" link is visible in AI Features.
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun duckAiSettings(): Toggle
-
-    /**
-     * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun removeChatHistory(): Toggle
-
-    /**
      * @return `true` when the Duck.ai contextual sheet's initial INPUT state should use the native
-     * unified input widget as its composer. Gated together with [nativeChatInput] (and
-     * [nativeInputField]): when this is off but native chat input is on, the contextual sheet uses
-     * the legacy input for INPUT mode while still using the native widget in WEBVIEW (in-chat) mode.
+     * unified input widget as its composer. Gated together with [nativeChatInput]: when this is off
+     * but native chat input is on, the contextual sheet uses the legacy input for INPUT mode while
+     * still using the native widget in WEBVIEW (in-chat) mode.
      * When native chat input is off, this has no effect (everything falls back to legacy/web input).
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualNativeInput(): Toggle
+
+    /**
+     * @return `true` when the All Chats entry (and its divider) is shown in the Duck.ai address bar menu.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualMenuAllChats(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai session wide event should be sent
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendDuckAiSessionWideEvent(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai response wait wide event should be sent
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendDuckAiResponseWaitWideEvent(): Toggle
+
+    /**
+     * @return `true` when the updated Duck.ai model and reasoning pickers are enabled: models grouped
+     * by availability, backend-driven ordering and sublines, and a gated section header that follows the
+     * user's tier.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun updatedPickers(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai sidebar button should open the native chat history screen
+     * instead of the legacy web sidebar.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeDuckAiSidebar(): Toggle
+
+    /**
+     * Kill switch for dismissing the contextual Duck.ai entry dialog when its tab stops being the
+     * selected one, so it can't float over another tab.
+     * @return `true` when the dialog should be dismissed on a tab change.
+     * If the remote feature is not present defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun contextualEntryDismissOnTabChange(): Toggle
+
+    /**
+     * @return `true` when the "Ask Duck.ai" text selection menu item is enabled.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiTextSelectionAction(): Toggle
+
+    /**
+     * @return `true` when native Duck.ai usage-limit and high-usage model notices may be shown.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiUsageWarnings(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai Terms of Service consent is handled by the native input
+     * (disclaimer under the input, consent carried by the first prompt submit).
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeToSConsent(): Toggle
+
+    /**
+     * @return `true` when the native input shows the privacy disclaimer for image and file attachments.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun attachmentPrivacyDisclaimer(): Toggle
+
+    /**
+     * @return `true` when the duckduckgo.com homepage may list the user's Duck.ai chats via `getAIChats`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun homepageChatSuggestions(): Toggle
+
+    /**
+     * @return `true` when Duck.ai promo campaigns are supported. Exposed to Duck.ai as `supportsBonusOffer`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPromoCampaigns(): Toggle
+
+    /**
+     * @return `true` when Duck.ai promo cards are supported. Exposed to Duck.ai as `supportsPromoCards`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPromoCards(): Toggle
 }

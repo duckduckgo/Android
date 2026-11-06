@@ -23,21 +23,22 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppReferrer
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AppReferrerDataStore::class,
+    binding = binding<AppReferrerDataStore>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AppReferrer::class,
+    binding = binding<AppReferrer>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class AppReferrerSharedPreferences @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

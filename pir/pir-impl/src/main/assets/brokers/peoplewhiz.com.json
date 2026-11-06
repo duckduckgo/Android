@@ -1,7 +1,7 @@
 {
   "name": "PeopleWhiz.com",
   "url": "peoplewhiz.com",
-  "version": "0.9.0",
+  "version": "0.11.0",
   "addedDatetime": 1676160000000,
   "optOutUrl": "https://www.peoplewhiz.com/remove-my-info",
   "steps": [
@@ -12,13 +12,119 @@
         {
           "actionType": "navigate",
           "id": "581295d7-1fd9-4039-a207-e9b8216b3d0f",
-          "url": "https://www.peoplewhiz.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+          "_comment": "results are behind an emailed link; the path carries the search",
+          "url": "https://www.peoplewhiz.com/optout/email/${firstName|downcase}/~/${lastName|downcase}/${city|downcase}/${state|upcase}/~"
+        },
+        {
+          "actionType": "expectation",
+          "id": "dcf785c7-0132-48cd-af24-735480a8fbaf",
+          "_comment": "wait for the interstitial to clear",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "db6526c9-ec0b-4996-8818-0d2a012ceec9",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "form input[name='email']"
+            }
+          ]
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "83845275-7264-4a96-810e-01d5d1bfeb1d"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "00fbfc8b-7ef5-49a7-8e5e-b7fcdb86d5e6",
+          "dataSource": "fetchedEmail",
+          "selector": "form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "input[name='email']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "13911d69-f16b-430e-b809-80785799bd0e",
+          "_comment": "the submit carries the turnstile token",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "failSilently": true
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "f36d6cab-cba9-4751-82ce-9944f210e4b5",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "form button[type='submit']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "9862ae4a-0ca0-40ad-aa8f-8cfa57b71e15",
+          "expectations": [
+            {
+              "type": "url",
+              "selector": "body",
+              "expect": "/optout/process"
+            }
+          ]
+        },
+        {
+          "actionType": "getEmailData",
+          "id": "6718b26b-1aae-42ea-bb51-efd4ce29a383",
+          "pollingTime": 30,
+          "extract": ["confirmToken"]
+        },
+        {
+          "actionType": "navigate",
+          "id": "2ef1d3a7-f03b-4d75-bf9c-274b06ef2a4b",
+          "dataSource": "emailData",
+          "_comment": "redirects to the record list for this token",
+          "url": "https://www.peoplewhiz.com/optout/confirmed/${confirmToken}"
+        },
+        {
+          "actionType": "expectation",
+          "id": "92f84c26-5fd7-483c-9730-b241e87e1ae6",
+          "expectations": [
+            {
+              "type": "url",
+              "selector": "body",
+              "expect": "/optout/results/"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "a980bd89-85fa-487d-ae81-2d8970ce4c58",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[.//*[starts-with(@class, 'ResultsTable__Record-sc')] or .//h1[normalize-space(.) = 'No results found']]"
+            }
+          ]
         },
         {
           "actionType": "extract",
+          "_comment": "noResultsSelector is this page's empty state",
           "id": "efa321f2-f214-411f-a87b-bc42feff7931",
           "selector": "[class^='ResultsTable__Record-sc']",
-          "noResultsSelector": "div[class^=ResultNotFound__NoResults]",
+          "noResultsSelector": "//h1[normalize-space(.)='No results found']",
           "profile": {
             "name": {
               "selector": ".//div[contains(@class, 'ResultsTable__Name')]/text()"
@@ -47,16 +153,122 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "2d9dd816-ec21-4210-91d1-3725837a11b1",
-          "url": "https://www.peoplewhiz.com/optout/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+          "id": "3759baa4-b72f-4aea-b188-42203df64142",
+          "_comment": "results are behind an emailed link; the path carries the search",
+          "url": "https://www.peoplewhiz.com/optout/email/${firstName|downcase}/~/${lastName|downcase}/${city|downcase}/${state|upcase}/~"
+        },
+        {
+          "actionType": "expectation",
+          "id": "da5241df-374e-499d-a43f-657576eed141",
+          "_comment": "wait for the interstitial to clear",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "36bde673-0e1d-4b82-9074-3c674a05c8c0",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "form input[name='email']"
+            }
+          ]
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "d7fe6e82-b0e2-48dd-b435-1159a5bf7c1f"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "8ddfe207-0435-4712-978b-c60a4f599041",
+          "dataSource": "fetchedEmail",
+          "selector": "form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "input[name='email']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "57c72f09-15e1-45d3-ab20-46bd5ffd74ec",
+          "_comment": "the submit carries the turnstile token",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "failSilently": true
+            }
+          ]
         },
         {
           "actionType": "click",
-          "id": "327e4f66-a554-4aaa-9a99-f789740112a8",
+          "id": "3459811f-34b6-47e4-8354-28bf3606400c",
           "elements": [
             {
-              "selector": "button",
               "type": "button",
+              "selector": "form button[type='submit']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "c527bf01-f43f-4f1a-8b21-99a3de2f2bf2",
+          "expectations": [
+            {
+              "type": "url",
+              "selector": "body",
+              "expect": "/optout/process"
+            }
+          ]
+        },
+        {
+          "actionType": "getEmailData",
+          "id": "3286c184-aac5-4a39-a4d1-b15fccba9d05",
+          "pollingTime": 30,
+          "extract": ["confirmToken"]
+        },
+        {
+          "actionType": "navigate",
+          "id": "927e728e-d07c-4d76-8e92-29bc482fc4c1",
+          "dataSource": "emailData",
+          "_comment": "redirects to the record list for this token",
+          "url": "https://www.peoplewhiz.com/optout/confirmed/${confirmToken}"
+        },
+        {
+          "actionType": "expectation",
+          "id": "dd3ac049-9673-40c9-9239-b19849e32e8c",
+          "expectations": [
+            {
+              "type": "url",
+              "selector": "body",
+              "expect": "/optout/results/"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "2813aae1-9fb1-421a-bc43-f1a61361ba6b",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[.//*[starts-with(@class, 'ResultsTable__Record-sc')] or .//h1[normalize-space(.) = 'No results found']]"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "f12f343a-749c-4bee-be35-2ee8fbcda255",
+          "_comment": "pick the matching record",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[contains(., \"That's me\")]",
               "parent": {
                 "profileMatch": {
                   "selector": "[class^='ResultsTable__Record-sc']",
@@ -78,70 +290,13 @@
           ]
         },
         {
-          "actionType": "fillForm",
-          "id": "4c088375-cd04-4ce3-ab05-0833b55b82b4",
-          "selector": "form",
-          "elements": [
-            {
-              "type": "email",
-              "selector": "input[name='email']"
-            }
-          ]
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "checkbox",
-              "selector": "#altcha_checkbox"
-            }
-          ],
-          "id": "d04e9122-30e1-49fa-b684-2398b4f96213"
-        },
-        {
           "actionType": "expectation",
+          "id": "5d159fcd-043f-4c4f-a47d-d81401e0b1b3",
           "expectations": [
             {
-              "type": "element",
-              "selector": "//div[contains(concat(' ', normalize-space(@class), ' '), ' altcha ')]//span[@role='status' and normalize-space(.)='Verified']"
-            }
-          ],
-          "id": "538eadc4-5fdb-44e2-8cf4-d7a65bdea0d7"
-        },
-        {
-          "actionType": "click",
-          "id": "0d61b830-c740-4d55-a32e-dcc370ff0cdc",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "button[type='submit']"
-            }
-          ]
-        },
-        {
-          "actionType": "expectation",
-          "id": "5b261491-18ce-476d-9990-4afe2cbadfb3",
-          "expectations": [
-            {
-              "type": "text",
+              "type": "url",
               "selector": "body",
-              "expect": "We have Received Your Request"
-            }
-          ]
-        },
-        {
-          "actionType": "emailConfirmation",
-          "id": "86420965-0bd7-49ee-8034-bbea1d34c3d6",
-          "pollingTime": 30
-        },
-        {
-          "actionType": "expectation",
-          "id": "0884ae5d-b57b-4e62-92f5-01f4adf06005",
-          "expectations": [
-            {
-              "type": "text",
-              "selector": "body",
-              "expect": "Your request for optout is confirmed"
+              "expect": "/optout/confirmation"
             }
           ]
         }

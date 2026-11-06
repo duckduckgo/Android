@@ -175,6 +175,14 @@ data class DuckDuckGoTypography(
             fontWeight = FontWeight.Normal,
         ),
     ),
+
+    val onboardingButton: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
+        TextStyle(
+            fontSize = 18.sp,
+            fontFamily = DuckSansProduct,
+            fontWeight = FontWeight.Normal,
+        ),
+    ),
 )
 
 val Typography = DuckDuckGoTypography()

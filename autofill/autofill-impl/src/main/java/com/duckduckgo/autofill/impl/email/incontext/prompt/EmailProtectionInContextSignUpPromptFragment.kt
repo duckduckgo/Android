@@ -27,22 +27,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionInContextSignUpBinding
 import com.duckduckgo.autofill.impl.email.incontext.prompt.EmailProtectionInContextSignUpPromptViewModel.Command.FinishWithResult
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.VERBOSE
@@ -52,20 +50,13 @@ import javax.inject.Inject
 @InjectWith(FragmentScope::class)
 class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment(), EmailProtectionInContextSignUpDialog {
 
-    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        R.style.AutofillBottomSheetDialogThemeEdgeToEdge
-    } else {
-        R.style.AutofillBottomSheetDialogTheme
-    }
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogThemeEdgeToEdge
 
     @Inject
     lateinit var pixel: Pixel
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[EmailProtectionInContextSignUpPromptViewModel::class.java]
@@ -95,9 +86,7 @@ class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment()
         val binding = DialogEmailProtectionInContextSignUpBinding.inflate(inflater, container, false)
         configureViews(binding)
         observeViewModel()
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.dialogRootView.applyBottomSystemBarInsetPadding()
-        }
+        binding.dialogRootView.applyBottomSystemBarInsetPadding()
         return binding.root
     }
 

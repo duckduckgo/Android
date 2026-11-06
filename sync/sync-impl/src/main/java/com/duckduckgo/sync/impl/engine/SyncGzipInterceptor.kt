@@ -24,7 +24,8 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.MediaType
@@ -37,9 +38,9 @@ import okio.buffer
 import java.io.IOException
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class SyncGzipInterceptor @Inject constructor(
     private val syncFeature: SyncFeature,
@@ -54,11 +55,8 @@ class SyncGzipInterceptor @Inject constructor(
             return chain.proceed(chain.request())
         }
 
-        // The /sync/devices endpoint rejects gzip bodies as invalid_json, so skip compression here until the backend supports it.
-        val isDevicesEndpoint = chain.request().url.encodedPath.endsWith("/sync/devices")
-
         // check if it's http operation is PATCH
-        if (chain.request().method == "PATCH" && !isDevicesEndpoint && syncFeature.gzipPatchRequests().isEnabled()) {
+        if (chain.request().method == "PATCH" && syncFeature.gzipPatchRequests().isEnabled()) {
             kotlin.runCatching {
                 val originalRequest = chain.request()
                 val body = originalRequest.body ?: return chain.proceed(originalRequest)

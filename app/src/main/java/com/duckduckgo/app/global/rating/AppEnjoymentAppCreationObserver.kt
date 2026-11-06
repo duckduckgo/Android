@@ -18,8 +18,8 @@ package com.duckduckgo.app.global.rating
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -35,12 +35,24 @@ class AppEnjoymentAppCreationObserver(
     private val promptTypeDecider: PromptTypeDecider,
     private val appCoroutineScope: CoroutineScope,
     private val preventDialogQueuingFeature: PreventFeedbackDialogQueuingFeature,
+    private val appRatingPromptModalFeature: AppRatingPromptModalFeature,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : MainProcessLifecycleObserver {
 
     @UiThread
     override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.main()) {
+            val coordinatedByModalEvaluator = withContext(dispatchers.io()) {
+                appRatingPromptModalFeature.self().isEnabled()
+            }
+
+            if (coordinatedByModalEvaluator) {
+                // AppRatingPromptEvaluator owns the prompt now; deciding it here as well would emit
+                // it outside the coordinator and bypass modal arbitration.
+                logcat { "app enjoyment prompt is coordinated by the modal evaluator, nothing to do on app start" }
+                return@launch
+            }
+
             val shouldPreventQueueing = withContext(dispatchers.io()) {
                 preventDialogQueuingFeature.self().isEnabled()
             }

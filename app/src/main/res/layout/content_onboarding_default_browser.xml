@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,75 +20,89 @@
     android:id="@+id/longDescriptionContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:tag="onboardingDefaultBrowser"
-    tools:background="@color/white"
+    android:background="?attr/onboardingSurfaceBackdrop"
+    android:tag="onboardingDefaultBrowserUpdate"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <ImageView
-        android:id="@+id/defaultBrowserImage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/set_as_default_browser_illustration_dialog"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        app:layout_constraintWidth_max="300dp" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/browserProtectionTitle"
-        app:typography="h2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
-        android:text="@string/onboardingDefaultBrowserTitle"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/defaultBrowserImage" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/browserProtectionSubtitle"
-        app:typography="body1"
-        android:layout_width="0dp"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScroll"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="@string/defaultBrowserDescriptionNoDefault"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="@id/browserProtectionTitle"
-        app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
-        app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"
-        app:layout_constraintBottom_toTopOf="@id/continueButton"
-        app:layout_constraintWidth_max="300dp"
-        app:layout_constraintWidth_percent="0.8" />
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/defaultBrowserImage"
+                android:layout_width="match_parent"
+                android:layout_height="336dp"
+                android:layout_marginTop="@dimen/keyline_6"
+                android:importantForAccessibility="no"
+                android:maxWidth="514dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/onboarding_default_browser_update_illustration" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/browserProtectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/onboardingDefaultBrowserTitle"
+                app:typography="onboarding_title" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/browserProtectionSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="@dimen/keyline_5"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/defaultBrowserDescriptionNoDefault"
+                app:typography="onboarding_body" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+        android:id="@+id/launchSettingsButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_1"
+        android:text="@string/setAsDefaultBrowser"
+        app:daxButtonBrandTypography="duckSans"
+        app:layout_constraintBottom_toTopOf="@+id/continueButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/continueButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:daxButtonSize="large"
-        android:text="@string/defaultBrowserMaybeLater"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_5"
+        android:text="@string/defaultBrowserMaybeLater"
+        android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
+        android:theme="@style/ThemeOverlay.Rebrand"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/launchSettingsButton"
-        android:layout_width="0dp"
-        app:daxButtonSize="large"
-        android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginEnd="@dimen/keyline_5"
-        android:layout_marginBottom="@dimen/keyline_1"
-        android:layout_height="wrap_content"
-        android:text="@string/setAsDefaultBrowser"
-        app:layout_constraintBottom_toTopOf="@+id/continueButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="InvalidDaxButtonDuckSans,InvalidDaxButtonProperty" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

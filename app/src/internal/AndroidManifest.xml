@@ -4,6 +4,9 @@
     package="com.duckduckgo.app.browser">
 
     <application>
+        <!-- Allows shell tools (Perfetto, macrobenchmark) to profile internal builds without
+             making the app debuggable, so timing stays realistic. Internal flavor only. -->
+        <profileable android:shell="true" />
         <activity
             android:name=".webview.WebViewDevSettingsActivity"
             android:exported="true"
@@ -33,6 +36,10 @@
         <activity
             android:name="com.duckduckgo.app.dev.settings.onboarding.OnboardingDevSettingsActivity"
             android:label="@string/onboardingDevSettingsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.modals.ModalCoordinatorDevSettingsActivity"
+            android:label="@string/modalCoordinatorDevSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
     </application>
 

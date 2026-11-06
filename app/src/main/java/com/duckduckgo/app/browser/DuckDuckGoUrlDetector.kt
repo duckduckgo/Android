@@ -20,7 +20,7 @@ import android.net.Uri
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 

@@ -23,7 +23,6 @@ import com.duckduckgo.autofill.sync.CredentialsSyncDataPersister.Adapters.Compan
 import com.duckduckgo.autofill.sync.persister.CredentialsMergeStrategy
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
-import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
@@ -32,19 +31,20 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.*
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableDataPersister>())
 class CredentialsSyncDataPersister @Inject constructor(
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val credentialsSyncStore: CredentialsSyncStore,
-    private val strategies: DaggerMap<SyncConflictResolution, CredentialsMergeStrategy>,
+    private val strategies: Map<SyncConflictResolution, CredentialsMergeStrategy>,
     private val appBuildConfig: AppBuildConfig,
     private val credentialsSyncFeatureListener: CredentialsSyncFeatureListener,
 ) : SyncableDataPersister {

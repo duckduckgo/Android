@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M13.944,2.805C14.284,3.145 14.526,3.564 14.651,4.019C17.205,5.063 19.006,7.57 19.01,10.5L19.011,11.046C19.012,11.519 19.132,11.984 19.36,12.397L20.639,14.717C21.7,16.642 20.308,19 18.109,19H15.674C15.627,19.234 15.556,19.463 15.465,19.685C15.276,20.14 15,20.553 14.652,20.902C14.303,21.25 13.89,21.526 13.435,21.715C12.98,21.903 12.493,22 12,22C11.507,22 11.02,21.903 10.565,21.715C10.11,21.526 9.697,21.25 9.348,20.902C9,20.553 8.724,20.14 8.535,19.685C8.444,19.463 8.374,19.234 8.326,19H5.891C3.693,19 2.3,16.642 3.361,14.717L4.64,12.397C4.868,11.984 4.988,11.519 4.989,11.046L4.99,10.5C4.994,7.57 6.795,5.063 9.349,4.019C9.475,3.564 9.716,3.145 10.056,2.805C10.571,2.29 11.271,2 12,2C12.729,2 13.429,2.29 13.944,2.805ZM9.879,19C9.892,19.037 9.906,19.074 9.921,19.111C10.034,19.384 10.2,19.632 10.409,19.841C10.618,20.05 10.866,20.216 11.139,20.329C11.412,20.442 11.705,20.5 12,20.5C12.295,20.5 12.588,20.442 12.861,20.329C13.134,20.216 13.382,20.05 13.591,19.841C13.8,19.632 13.966,19.384 14.079,19.111C14.094,19.074 14.108,19.037 14.121,19H9.879ZM5.953,13.122L4.675,15.441C4.165,16.367 4.834,17.5 5.891,17.5H18.109C19.166,17.5 19.835,16.367 19.325,15.441L18.046,13.122C17.697,12.487 17.512,11.774 17.511,11.049L17.51,10.502C17.506,7.462 15.04,5 12,5C8.96,5 6.494,7.462 6.49,10.502L6.489,11.049C6.488,11.774 6.304,12.487 5.953,13.122Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
+</vector>

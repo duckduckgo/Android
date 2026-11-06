@@ -22,21 +22,21 @@ import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
 /**
  * Provides the per-mode [RealDuckAiChatStore] instances bound to the qualified [DuckAiChatStore]. Migration
  * prefs are shared across modes (one-time, app-level event).
  */
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object DuckAiChatStoreModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @RegularMode
     fun provideRegularChatStore(
         @RegularMode storage: DuckAiBridgeStorage,
@@ -45,7 +45,7 @@ object DuckAiChatStoreModule {
     ): DuckAiChatStore = RealDuckAiChatStore(storage, dispatchers, migrationPrefs)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @FireMode
     fun provideFireChatStore(
         @FireMode storage: DuckAiBridgeStorage,
@@ -60,7 +60,7 @@ object DuckAiChatStoreModule {
  * AppScope consumers must inject the qualified `@RegularMode` / `@FireMode` stores explicitly.
  */
 @ContributesTo(ActivityScope::class)
-@Module
+@BindingContainer
 object DuckAiChatStoreActivityModule {
 
     @Provides

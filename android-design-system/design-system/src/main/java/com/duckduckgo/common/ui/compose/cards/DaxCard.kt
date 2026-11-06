@@ -45,14 +45,14 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * @param content The content to be displayed inside this card.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211670215000539
- * Figma reference: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=8796-21488&t=LXCzRHiuFnp4ybLo-4
+ * Figma reference: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=8796-21488
  */
 @Composable
 fun DaxCard(
     modifier: Modifier = Modifier,
     border: BorderStroke? = null,
     shape: Shape = DaxCardDefaults.shape,
-    elevation: DaxCardElevation = DaxCardDefaults.elevation,
+    elevation: DaxCardElevation = DaxCardDefaults.Elevation,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
@@ -78,7 +78,7 @@ fun DaxCard(
  * @param content The content to be displayed inside this card.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211670215000539
- * Figma reference: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=8796-21488&t=LXCzRHiuFnp4ybLo-4
+ * Figma reference: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=8796-21488
  */
 @Composable
 fun DaxCard(
@@ -87,7 +87,7 @@ fun DaxCard(
     enabled: Boolean = true,
     border: BorderStroke? = null,
     shape: Shape = DaxCardDefaults.shape,
-    elevation: DaxCardElevation = DaxCardDefaults.elevation,
+    elevation: DaxCardElevation = DaxCardDefaults.Elevation,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -114,7 +114,7 @@ private object DaxCardDefaults {
         @Composable
         get() = DuckDuckGoTheme.shapes.medium
 
-    val elevation: DaxCardElevation = DaxCardElevation(1.dp)
+    val Elevation: DaxCardElevation = DaxCardElevation(1.dp)
 
     val colors: CardColors
         @Composable

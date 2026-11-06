@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
@@ -39,7 +38,7 @@ class RealTakeoutZipDownloaderTest {
     private val mockCookieManager = mock<CookieManager>()
     private val mockCookieManagerProvider = mock<CookieManagerProvider>()
     private val mockContext = mock<Context>()
-    private val lazyOkHttpClient = Lazy { mockOkHttpClient }
+    private val lazyOkHttpClient = lazy { mockOkHttpClient }
     private lateinit var tempFile: File
 
     private val testee =

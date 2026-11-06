@@ -19,13 +19,12 @@ package com.duckduckgo.app.browser.pageloadpixel
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedSites.Companion.sites
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -51,7 +50,6 @@ class RealPageLoadedHandler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : PageLoadedHandler {
 
     override fun onPageLoaded(
@@ -72,7 +70,6 @@ class RealPageLoadedHandler @Inject constructor(
                         webviewVersion = webViewVersionProvider.getMajorVersion(),
                         appVersion = deviceInfo.appVersion,
                         cpmEnabled = autoconsent.isAutoconsentEnabled(),
-                        trackerOptimizationEnabled = optimizeTrackerEvaluationRCWrapper.enabled,
                         isTabInForegroundOnFinish = isTabInForegroundOnFinish,
                         activeRequestsOnLoadStart = activeRequestsOnLoadStart,
                         concurrentRequestsOnFinish = concurrentRequestsOnFinish,

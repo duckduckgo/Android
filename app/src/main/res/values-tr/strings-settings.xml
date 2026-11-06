@@ -21,14 +21,14 @@
 
     <!-- Inactivity timeout -->
     <string name="afterInactivityOptionTitle">Hareketsizlik Sonrası</string>
-    <string name="afterInactivityTimeoutRowTitle">Bir hareketsizlik zamanlayıcısı seçin</string>
-    <string name="afterInactivityScreenSectionHeader">Hareketsizlikten sonra geri döndüğünüzde ne göreceğinizi seçin</string>
+    <string name="afterInactivityTimeoutTitle">Hareketsizlik Zamanlayıcısı</string>
+    <string name="afterInactivityScreenDescription">Hareketsizlikten sonra DuckDuckGo\'ya döndüğünde ne göreceğini seç</string>
     <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">%1$s dakika hareketsiz kaldıktan sonra geri döndüğünüzde ne göreceğinizi seçin</string>
     <string name="afterInactivityTimeoutAlways">Her zaman</string>
     <string name="afterInactivityTimeout1Minute">1 dakika</string>
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d dakika</string>
     <string name="afterInactivityTimeout1Hour">1 saat</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d saat</string>
-    <string name="returnToLastTabSettingTitle">Son Kullanılan Sekmeye Dön</string>
-    <string name="returnToLastTabSettingSubtitle">Uygulamayı yeniden açtığınızda Yeni Sekme Sayfasında son sekmenize giden bir bağlantı gösterin</string>
+    <string name="returnToLastTabShortcutSettingTitle">‘Geri Dön’ Kısayolu</string>
+    <string name="returnToLastTabShortcutSettingSubtitle">Hareketsizlikten sonra uygulamayı açtığında son kullanılan sekmeye dönmen için bir bağlantı gösterir.</string>
 </resources>

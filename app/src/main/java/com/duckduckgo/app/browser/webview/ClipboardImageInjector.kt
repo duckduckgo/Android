@@ -40,7 +40,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -302,9 +302,7 @@ class ClipboardImageInjectorImpl @Inject constructor(
             if (uri != null) {
                 val clipboardSuccess = withContext(dispatcherProvider.main()) {
                     runCatching {
-                        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.P) {
-                            clipboardManager.clearPrimaryClip()
-                        }
+                        clipboardManager.clearPrimaryClip()
 
                         val clipData = ClipData.newUri(context.contentResolver, "Image", uri)
                         clipboardManager.setPrimaryClip(clipData)

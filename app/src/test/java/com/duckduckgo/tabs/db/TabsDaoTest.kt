@@ -26,6 +26,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -140,6 +142,101 @@ class TabsDaoTest {
         testee.insertTab(tab)
         testee.insertTabSelection(tabSelection)
         assertEquals(tab, testee.selectedTab())
+    }
+
+    @Test
+    fun whenSelectedBlankTabIsReplacedWithNonDeletableTargetThenCurrentIsDeletedAndTargetSelected() {
+        val current = TabEntity("current", url = null, position = 0)
+        val target = TabEntity("target", url = "https://example.com", position = 1, deletable = false)
+        testee.insertTab(current)
+        testee.insertTab(target)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertTrue(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, target.tabId))
+
+        assertNull(testee.tab(current.tabId))
+        assertEquals(target, testee.selectedTab())
+    }
+
+    @Test
+    fun whenCurrentTabIsNotSelectedThenOperationDoesNothing() {
+        val current = TabEntity("current", url = null, position = 0)
+        val selected = TabEntity("selected", url = "https://example.com", position = 1)
+        testee.insertTab(current)
+        testee.insertTab(selected)
+        testee.insertTabSelection(TabSelectionEntity(tabId = selected.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, selected.tabId))
+
+        assertUnchanged(current, selected)
+        assertEquals(selected, testee.tab(selected.tabId))
+    }
+
+    @Test
+    fun whenCurrentTabHasUrlThenOperationDoesNothing() {
+        val current = TabEntity("current", url = "https://example.com", position = 0)
+        val target = TabEntity("target", url = "https://target.example.com", position = 1)
+        testee.insertTab(current)
+        testee.insertTab(target)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, target.tabId))
+
+        assertUnchanged(current, current)
+        assertEquals(target, testee.tab(target.tabId))
+    }
+
+    @Test
+    fun whenCurrentTabIsMissingThenOperationDoesNothing() {
+        val target = TabEntity("target", url = "https://example.com", position = 0)
+        testee.insertTab(target)
+        testee.insertTabSelection(TabSelectionEntity(tabId = target.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget("current", target.tabId))
+
+        assertUnchanged(target, target)
+        assertEquals(target, testee.tab(target.tabId))
+    }
+
+    @Test
+    fun whenTargetTabIsMissingThenOperationDoesNothing() {
+        val current = TabEntity("current", url = null, position = 0)
+        testee.insertTab(current)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, "target"))
+
+        assertUnchanged(current, current)
+    }
+
+    @Test
+    fun whenTargetIsDeletableThenOperationDoesNothing() {
+        val current = TabEntity("current", url = null, position = 0)
+        val target = TabEntity("target", url = "https://example.com", position = 1, deletable = true)
+        testee.insertTab(current)
+        testee.insertTab(target)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, target.tabId))
+
+        assertUnchanged(current, current)
+        assertEquals(target, testee.tab(target.tabId))
+    }
+
+    @Test
+    fun whenCurrentAndTargetAreEqualThenOperationDoesNothing() {
+        val current = TabEntity("current", url = null, position = 0)
+        testee.insertTab(current)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, current.tabId))
+
+        assertUnchanged(current, current)
+    }
+
+    private fun assertUnchanged(current: TabEntity, selected: TabEntity) {
+        assertEquals(current, testee.tab(current.tabId))
+        assertEquals(selected, testee.selectedTab())
     }
 
     @Test
@@ -511,5 +608,18 @@ class TabsDaoTest {
         this.observeForever(observer)
         this.removeObserver(observer)
         return value
+    }
+
+    @Test
+    fun allTabIdsIncludeUndoableTabsAndReflectImplicitDeletions() = runBlocking {
+        val first = TabEntity("first", deletable = true)
+        val second = TabEntity("second")
+        testee.insertTab(first)
+        testee.insertTab(second)
+        assertEquals(setOf("first", "second"), testee.flowAllTabIds().first().toSet())
+        testee.markTabAsDeletable(second)
+        assertEquals(listOf("second"), testee.flowAllTabIds().first())
+        testee.deleteAllTabs()
+        assertTrue(testee.flowAllTabIds().first().isEmpty())
     }
 }

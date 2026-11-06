@@ -22,8 +22,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.duckduckgo.adblocking.impl.di.AdBlockingPreferences
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -33,10 +33,12 @@ interface AdBlockingUserPreferences {
 
     fun isEnabledFlow(): Flow<Boolean?>
     suspend fun isEnabled(): Boolean?
-    suspend fun setEnabled(enabled: Boolean)
+    fun hasPixelConsentFlow(): Flow<Boolean?>
+    suspend fun enable(withPixelConsent: Boolean)
+    suspend fun disable()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAdBlockingUserPreferences @Inject constructor(
     @AdBlockingPreferences private val dataStore: DataStore<Preferences>,
@@ -46,11 +48,23 @@ class RealAdBlockingUserPreferences @Inject constructor(
 
     override suspend fun isEnabled(): Boolean? = isEnabledFlow().firstOrNull()
 
-    override suspend fun setEnabled(enabled: Boolean) {
-        dataStore.edit { prefs -> prefs[KEY_ENABLED] = enabled }
+    override fun hasPixelConsentFlow(): Flow<Boolean?> = dataStore.data.map { prefs -> prefs[KEY_PIXEL_CONSENT] }
+
+    override suspend fun enable(withPixelConsent: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[KEY_PIXEL_CONSENT] = withPixelConsent
+            prefs[KEY_ENABLED] = true
+        }
+    }
+
+    override suspend fun disable() {
+        dataStore.edit { prefs ->
+            prefs[KEY_ENABLED] = false
+        }
     }
 
     private companion object {
         val KEY_ENABLED = booleanPreferencesKey("ad_blocking_enabled")
+        val KEY_PIXEL_CONSENT = booleanPreferencesKey("ad_blocking_pixel_consent")
     }
 }

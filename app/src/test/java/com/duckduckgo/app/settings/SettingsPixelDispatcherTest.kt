@@ -17,12 +17,15 @@
 package com.duckduckgo.app.settings
 
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import kotlinx.coroutines.flow.emptyFlow
@@ -33,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -48,6 +52,8 @@ class SettingsPixelDispatcherTest {
     @Mock private lateinit var duckChatMock: DuckChat
 
     @Mock private lateinit var emailManagerMock: EmailManager
+
+    @Mock private lateinit var subscriptionsMock: Subscriptions
 
     lateinit var testee: SettingsPixelDispatcherImpl
 
@@ -173,11 +179,57 @@ class SettingsPixelDispatcherTest {
         )
     }
 
+    @Test
+    fun `when fireSettingsOpenedWithSubscriptionPurchaseAvailable and eligible with no subscription, then send a pixel`() = runTest {
+        whenever(subscriptionsMock.isEligible()).thenReturn(true)
+        whenever(subscriptionsMock.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+
+        val testee = createTestee()
+        testee.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
+
+        verify(pixelMock).fire(SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
+    }
+
+    @Test
+    fun `when fireSettingsOpenedWithSubscriptionPurchaseAvailable and subscription is active, then do not send a pixel`() = runTest {
+        whenever(subscriptionsMock.isEligible()).thenReturn(true)
+        whenever(subscriptionsMock.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+
+        val testee = createTestee()
+        testee.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
+
+        verify(pixelMock, never()).fire(SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
+    }
+
+    @Test
+    fun `when fireSettingsOpenedWithSubscriptionPurchaseAvailable and subscription is expired, then do not send a pixel`() = runTest {
+        whenever(subscriptionsMock.isEligible()).thenReturn(true)
+        whenever(subscriptionsMock.getSubscriptionStatus()).thenReturn(SubscriptionStatus.EXPIRED)
+
+        val testee = createTestee()
+        testee.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
+
+        verify(pixelMock, never()).fire(SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
+    }
+
+    @Test
+    fun `when fireSettingsOpenedWithSubscriptionPurchaseAvailable and not eligible, then do not send a pixel`() = runTest {
+        whenever(subscriptionsMock.isEligible()).thenReturn(false)
+        whenever(subscriptionsMock.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+
+        val testee = createTestee()
+        testee.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
+
+        verify(pixelMock, never()).fire(SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
+    }
+
     private fun createTestee() = SettingsPixelDispatcherImpl(
         appCoroutineScope = coroutinesTestRule.testScope,
         pixel = pixelMock,
         syncStateMonitor = syncStateMonitorMock,
         duckChat = duckChatMock,
         emailManager = emailManagerMock,
+        subscriptions = subscriptionsMock,
+        dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
     )
 }

@@ -35,16 +35,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -169,7 +169,7 @@ class InitMessageHandlerPlugin @Inject constructor(
             val specificRules = rules.r.slice(IntRange(rules.index.specificRuleRange[0], rules.index.specificRuleRange[1] - 1)).filter {
                 (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
                     (it[4] as Double).toInt() != 1 &&
-                    (it[3] == "" || url.matches((it[3] as String).toRegex()))
+                    (it[3] == "" || (it[3] as String).toRegex().containsMatchIn(url))
             }
             if (specificRules.isEmpty()) {
                 // no specific rules, return generic rules + strings up to genericStringEnd
@@ -191,7 +191,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val filteredRules = rules.r.filter {
             (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
                 (it[4] as Double).toInt() != 1 &&
-                (it[3] == "" || url.matches((it[3] as String).toRegex()))
+                (it[3] == "" || (it[3] as String).toRegex().containsMatchIn(url))
         }
         val filteredStrings = filterUnusedStrings(filteredRules, rules.s, 0)
         return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules, index = null))

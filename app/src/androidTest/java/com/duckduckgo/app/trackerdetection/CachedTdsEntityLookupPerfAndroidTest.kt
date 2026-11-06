@@ -23,11 +23,11 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.squareup.moshi.Moshi
 import okio.buffer
 import okio.source
@@ -74,7 +74,7 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 class CachedTdsEntityLookupPerfAndroidTest {
 
-    private lateinit var db: AppDatabase
+    private lateinit var db: TrackerDetectionDatabase
     private lateinit var entityDao: TdsEntityDao
     private lateinit var domainEntityDao: TdsDomainEntityDao
     private lateinit var legacy: TdsEntityLookup
@@ -84,7 +84,7 @@ class CachedTdsEntityLookupPerfAndroidTest {
     fun setUp() {
         db = Room.inMemoryDatabaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            AppDatabase::class.java,
+            TrackerDetectionDatabase::class.java,
         ).allowMainThreadQueries().build()
         entityDao = db.tdsEntityDao()
         domainEntityDao = db.tdsDomainEntityDao()

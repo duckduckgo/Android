@@ -18,18 +18,21 @@ package com.duckduckgo.adblocking.impl
 
 import com.duckduckgo.adblocking.impl.store.AdBlockingUserPreferences
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface AdBlockingSettingsRepository {
 
     fun isEnabledFlow(): Flow<Boolean?>
-    suspend fun setEnabled(enabled: Boolean)
+    fun hasPixelConsentFlow(): Flow<Boolean?>
+
+    suspend fun enable(withPixelConsent: Boolean)
+    suspend fun disable()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAdBlockingSettingsRepository @Inject constructor(
     private val userPreferences: AdBlockingUserPreferences,
@@ -37,7 +40,13 @@ class RealAdBlockingSettingsRepository @Inject constructor(
 
     override fun isEnabledFlow(): Flow<Boolean?> = userPreferences.isEnabledFlow()
 
-    override suspend fun setEnabled(enabled: Boolean) {
-        userPreferences.setEnabled(enabled)
+    override fun hasPixelConsentFlow(): Flow<Boolean?> = userPreferences.hasPixelConsentFlow()
+
+    override suspend fun enable(withPixelConsent: Boolean) {
+        userPreferences.enable(withPixelConsent)
+    }
+
+    override suspend fun disable() {
+        userPreferences.disable()
     }
 }

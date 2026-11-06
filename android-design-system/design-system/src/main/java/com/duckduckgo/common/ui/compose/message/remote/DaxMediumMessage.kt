@@ -74,7 +74,7 @@ private fun DaxMediumMessagePreview() {
         DaxMediumMessage(
             title = "Medium message",
             body = "Body text goes here. This component doesn't have buttons",
-            topIllustration = painterResource(R.drawable.ic_critical_update),
+            topIllustration = painterResource(R.drawable.critical_update_96),
             onDismissed = {},
             modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )

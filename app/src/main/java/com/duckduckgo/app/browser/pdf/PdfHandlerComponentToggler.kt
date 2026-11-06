@@ -22,25 +22,26 @@ import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(
+@SingleIn(AppScope::class)
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
 )
 class PdfHandlerComponentToggler @Inject constructor(
     private val context: Context,
@@ -60,7 +61,6 @@ class PdfHandlerComponentToggler @Inject constructor(
 
     internal fun sync() {
         val shouldEnable = appBuildConfig.sdkInt >= 31 &&
-            androidBrowserConfigFeature.pdfViewer().isEnabled() &&
             androidBrowserConfigFeature.externalPdfHandler().isEnabled()
         context.packageManager.setComponentEnabledSetting(
             ComponentName(appBuildConfig.applicationId, PDF_HANDLER_ALIAS),

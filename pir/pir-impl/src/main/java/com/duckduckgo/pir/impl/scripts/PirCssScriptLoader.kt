@@ -19,8 +19,8 @@ package com.duckduckgo.pir.impl.scripts
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.util.Locale
@@ -39,7 +39,7 @@ interface PirCssScriptLoader {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirCssScriptLoader @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,

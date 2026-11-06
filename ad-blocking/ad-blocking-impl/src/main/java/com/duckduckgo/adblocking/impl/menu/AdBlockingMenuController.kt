@@ -34,7 +34,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -112,12 +112,12 @@ class RealAdBlockingMenuController @Inject constructor(
         appScope.launch(dispatcherProvider.io()) {
             when (choice) {
                 AdBlockingChoice.ALWAYS_ON -> {
-                    settingsRepository.setEnabled(true)
+                    settingsRepository.enable(withPixelConsent = false)
                     sessionStore.clear()
                 }
                 AdBlockingChoice.DISABLE_UNTIL_RELAUNCH -> sessionStore.setDisabledUntilRelaunch()
                 AdBlockingChoice.ALWAYS_OFF -> {
-                    settingsRepository.setEnabled(false)
+                    settingsRepository.disable()
                     sessionStore.clear()
                 }
             }

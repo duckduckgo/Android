@@ -22,12 +22,12 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(
     scope = VpnScope::class,
-    rank = ContributesBinding.RANK_HIGHEST, // we replace the provider in AppTP using DI without having to touch production code
+    priority = Int.MAX_VALUE, // we replace the provider in AppTP using DI without having to touch production code
 )
 class NetpVpnNetworkStackProviderImpl @Inject constructor(
     private val vpnNetworkStacks: PluginPoint<VpnNetworkStack>,

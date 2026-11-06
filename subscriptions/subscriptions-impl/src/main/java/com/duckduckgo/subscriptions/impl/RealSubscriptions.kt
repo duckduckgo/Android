@@ -21,35 +21,39 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.content.edit
 import androidx.core.net.toUri
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.common.utils.replaceQueryParameters
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.model.Entitlement
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ORIGIN_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_PATH
+import com.duckduckgo.subscriptions.impl.internal.PaywallPathProvider
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -66,6 +70,7 @@ class RealSubscriptions @Inject constructor(
     private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsUrlProvider: SubscriptionsUrlProvider,
+    private val paywallPathProvider: Lazy<PaywallPathProvider>,
 ) : Subscriptions {
     override suspend fun isSignedIn(): Boolean =
         subscriptionsManager.isSignedIn()
@@ -80,7 +85,7 @@ class RealSubscriptions @Inject constructor(
     override fun getEntitlementStatus(): Flow<List<Product>> {
         return subscriptionsManager.entitlements.map { list ->
             withContext(dispatcherProvider.io()) {
-                if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                if (subscriptionsFeature.value.duckAiPlus().isEnabled().not()) {
                     list.filterNot { entitlement -> entitlement == DuckAiPlus }
                 } else {
                     list
@@ -94,7 +99,7 @@ class RealSubscriptions @Inject constructor(
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer().isNotEmpty()
 
-        if (!subscriptionsFeature.get().allowPurchase().isEnabled()) {
+        if (!subscriptionsFeature.value.allowPurchase().isEnabled()) {
             return isActive
         }
 
@@ -110,21 +115,18 @@ class RealSubscriptions @Inject constructor(
     }
 
     override suspend fun getAvailableProducts(): Set<Product> {
-        return subscriptionsManager.getFeatures()
-            .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
-            .let {
-                withContext(dispatcherProvider.io()) {
-                    if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
-                        it.filterNot { feature -> feature == DuckAiPlus }
-                    } else {
-                        it
-                    }
-                }
-            }.toSet()
+        return toEnabledProducts(subscriptionsManager.getFeatures())
+    }
+
+    override suspend fun getPurchasableProducts(): Set<Product> {
+        val offeredFeatures = subscriptionsManager.getSubscriptionOffer()
+            .flatMap { offer -> offer.entitlements }
+            .map { entitlement -> entitlement.product }
+        return toEnabledProducts(offeredFeatures)
     }
 
     override fun launchSubscription(context: Context, uri: Uri?) {
-        val origin = uri?.getQueryParameter("origin")
+        val origin = uri?.getQueryParameter(ORIGIN_QUERY_PARAM_KEY)
         // Launch the subscription web view on top of the caller's task, with no Settings screen
         // pre-stacked beneath it. The user returns to wherever they came from on a plain back; the
         // subscription screen navigates to Settings itself only on completion (see
@@ -152,9 +154,16 @@ class RealSubscriptions @Inject constructor(
 
     override fun isSubscriptionUrl(uri: Uri): Boolean {
         val eTld = uri.host?.toTldPlusOne() ?: return false
-        val size = uri.pathSegments.size
+        if (eTld != SUBSCRIPTIONS_ETLD) return false
         val path = uri.pathSegments.firstOrNull()
-        return eTld == SUBSCRIPTIONS_ETLD && size == 1 && (path == SUBSCRIPTIONS_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)
+        if (uri.pathSegments.size == 1 && (path == SUBSCRIPTIONS_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)) return true
+        return optimizedPaywallFeaturePage(uri) != null
+    }
+
+    private fun optimizedPaywallFeaturePage(uri: Uri): String? {
+        if (!subscriptionsFeature.value.performanceOptimizedPaywalls().isEnabled()) return null
+        val path = uri.path ?: return null
+        return paywallPathProvider.value.getFeaturePage(path)
     }
 
     override suspend fun isFreeTrialEligible(): Boolean {
@@ -165,19 +174,73 @@ class RealSubscriptions @Inject constructor(
         return subscriptionsManager.entitlementSet
     }
 
+    override suspend fun getCurrentEntitlements(): Set<Entitlement> {
+        return subscriptionsManager.getCurrentEntitlements()
+    }
+
+    private suspend fun toEnabledProducts(features: Collection<String>): Set<Product> {
+        return features
+            .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
+            .let {
+                withContext(dispatcherProvider.io()) {
+                    if (subscriptionsFeature.value.duckAiPlus().isEnabled().not()) {
+                        it.filterNot { feature -> feature == DuckAiPlus }
+                    } else {
+                        it
+                    }
+                }
+            }.toSet()
+    }
+
     private fun buildSubscriptionUrl(uri: Uri?): String {
-        val queryParams = uri?.query
-        return if (!queryParams.isNullOrBlank()) {
-            "${subscriptionsUrlProvider.buyUrl}?$queryParams"
+        val buyUrl = subscriptionsUrlProvider.buyUrl
+        if (uri == null) return buyUrl
+
+        val buyUri = buyUrl.toUri()
+        val builder = buyUri.buildUpon()
+
+        val featurePage = featurePageFromPath(uri)
+
+        val incomingQuery = if (featurePage != null) {
+            uri.withoutParam(FEATURE_PAGE_QUERY_PARAM_KEY)
         } else {
-            subscriptionsUrlProvider.buyUrl
+            uri.encodedQuery
         }
+
+        val query = mergeQueries(buyUri.encodedQuery, incomingQuery)
+        if (!query.isNullOrBlank()) builder.encodedQuery(query)
+
+        if (featurePage != null) builder.appendQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY, featurePage)
+
+        return builder.build().toString()
+    }
+
+    private fun mergeQueries(
+        buyUrlQuery: String?,
+        incomingQuery: String?,
+    ): String? = when {
+        buyUrlQuery.isNullOrBlank() -> incomingQuery
+        incomingQuery.isNullOrBlank() -> buyUrlQuery
+        else -> "$buyUrlQuery&$incomingQuery"
+    }
+
+    private fun featurePageFromPath(uri: Uri): String? {
+        val explicitPage = uri.getQueryParameters(FEATURE_PAGE_QUERY_PARAM_KEY).firstOrNull { it.isNotBlank() }
+        if (explicitPage != null) return null
+        return optimizedPaywallFeaturePage(uri)
+    }
+
+    private fun Uri.withoutParam(key: String): String? {
+        val keysToKeep = queryParameterNames.filterNot { it == key }
+        return replaceQueryParameters(keysToKeep).encodedQuery
     }
 }
 
+const val PRIVACY_PRO_FEATURE_NAME = "privacyPro"
+
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "privacyPro",
+    featureName = PRIVACY_PRO_FEATURE_NAME,
     toggleStore = SubscriptionsFeatureStore::class,
 )
 interface SubscriptionsFeature {
@@ -193,9 +256,6 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun serpPromoCookie(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun authApiV2(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProFreeTrial(): Toggle
 
@@ -205,16 +265,6 @@ interface SubscriptionsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAiPlus(): Toggle
-
-    /**
-     * When enabled, we signal FE if v2 is available, enabling v2 messaging
-     * When disabled, FE works with old messaging (v1)
-     * This flag will be used to select FE subscription messaging mode.
-     * The value is added into GetFeatureConfig to allow FE to select the mode.
-     * Note: best to remove together with v1 clean up.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun enableSubscriptionFlowsV2(): Toggle
 
     /**
      * Kill-switch for in-memory caching of auth v2 JWKs.
@@ -239,6 +289,13 @@ interface SubscriptionsFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendAuthTokenRefreshWideEvent(): Toggle
+
+    /**
+     * When enabled, refreshAccessToken(force = false) returns the stored access token without
+     * rotating if that token is still usable. When disabled, every call rotates (previous behaviour).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun skipValidAccessTokenRefresh(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionSwitchWideEvent(): Toggle
@@ -265,6 +322,12 @@ interface SubscriptionsFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun allowProTierPurchase(): Toggle
+
+    /**
+     * When enabled, the paywall opens a faster-rendering page
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun performanceOptimizedPaywalls(): Toggle
 
     /**
      * When enabled, pending plan hint is displayed to users.
@@ -298,6 +361,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun notificationsPermissionMessaging(): Toggle
 
+    /**
+     * When enabled, the Partnerships Hub entry point is shown in Settings.
+     * The flag settings carry the hub URL to open.
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun partnershipsHub(): Toggle
+
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
 
@@ -308,17 +378,57 @@ interface SubscriptionsFeature {
     fun schedulePaywallNotSeenPixels(): Toggle
 
     /**
-     * When enabled, showing a native subscription onboarding purchase
-     * instead of redirecting the FE to /welcome.
-     *
-     * TODO: Change for experiment framework
+     * Experiment for free-trial purchases
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun onboardingSubscriptionExperiment(): Toggle
+    fun subscriptionOnboardingFreeTrialsOct2026(): Toggle
+
+    /**
+     * Experiment for paid (non-free-trial) purchases
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun subscriptionOnboardingPaidSubsOct2026(): Toggle
+
+    enum class SubscriptionOnboardingCohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        TREATMENT("treatment"),
+    }
+
+    /**
+     * Controls the experiment attribution sent with purchase confirmation.
+     * When enabled, sends every active subscription experiment enrollment.
+     * When disabled, sends only the single legacy assignment.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionConcurrentExperiments(): Toggle
+
+    /**
+     * Kill-switch for checking subscription page messages against the committed back/forward entry as well as the
+     * WebView url.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun bridgeOriginCheck(): Toggle
+
+    /**
+     * When enabled, eligible Stripe subscribers can withdraw from their subscription
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionWithdrawal(): Toggle
+
+    /**
+     * When enabled, Stripe subscribers see Stripe products on the plans page and plan changes are redirected to Stripe
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun stripeTierOptions(): Toggle
+
+    enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        TREATMENT("treatment"),
+    }
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @RemoteFeatureStoreNamed(SubscriptionsFeature::class)
 class SubscriptionsFeatureStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

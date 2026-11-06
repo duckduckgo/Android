@@ -52,7 +52,7 @@ import com.duckduckgo.referral.api.ParsedReferrerResult.EuAuctionSearchChoiceRef
 import com.duckduckgo.referral.api.ParsedReferrerResult.ParseFailure
 import com.duckduckgo.referral.api.ParsedReferrerResult.ReferrerInitialising
 import com.duckduckgo.referral.api.ParsedReferrerResult.ReferrerNotFound
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.delay
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -62,7 +62,7 @@ import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class PlayStoreAppReferrerStateListener @Inject constructor(
     val context: Context,
     private val packageManager: PackageManager,

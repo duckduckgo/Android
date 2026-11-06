@@ -21,8 +21,8 @@ import android.widget.ArrayAdapter
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -146,10 +146,11 @@ class PirResultsActivity : DuckDuckGoActivity() {
                     stringBuilder.append("NAME: ${profile.name}\n")
                     stringBuilder.append("FULL NAME: ${profile.fullName}\n")
                     stringBuilder.append("AGE: ${profile.age}\n")
-                    stringBuilder.append("ADDRESSES: ${profile.addresses.joinToString { "${it.city}, ${it.state}" }}\n")
+                    stringBuilder.append("ADDRESSES: ${profile.addresses.joinToString(" | ") { "${it.city}, ${it.state} ${it.extras}" }}\n")
                     stringBuilder.append("RELATIVES: ${profile.relatives.joinToString()}\n")
                     stringBuilder.append("PROFILE URL: ${profile.profileUrl}\n")
                     stringBuilder.append("IDENTIFIER: ${profile.identifier}\n")
+                    stringBuilder.append("PROFILE EXTRAS: ${profile.extras}\n")
                     stringBuilder.append("DEPRECATED: ${profile.deprecated}\n")
                     stringBuilder.toString()
                 }.also {

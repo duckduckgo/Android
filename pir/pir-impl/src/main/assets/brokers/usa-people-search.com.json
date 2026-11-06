@@ -1,7 +1,7 @@
 {
   "name": "USA People Search",
   "url": "usa-people-search.com",
-  "version": "0.8.0",
+  "version": "0.10.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "optOutUrl": "https://www.usa-people-search.com/manage",

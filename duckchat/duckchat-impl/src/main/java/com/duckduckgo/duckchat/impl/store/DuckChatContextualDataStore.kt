@@ -23,12 +23,13 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.contextual.ContextualEntryPromptStore
 import com.duckduckgo.duckchat.impl.di.DuckChat
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -46,12 +47,13 @@ interface DuckChatContextualDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealDuckChatContextualDataStore @Inject constructor(
     @DuckChat private val store: DataStore<Preferences>,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     moshi: Moshi,
+    private val contextualEntryPromptStore: ContextualEntryPromptStore,
 ) : DuckChatContextualDataStore {
 
     private object Keys {
@@ -116,6 +118,9 @@ class RealDuckChatContextualDataStore @Inject constructor(
     }
 
     override fun clearTabChatUrl(tabId: String) {
+        // A tab's contextual chat state includes any pending entry-dialog prompt parked for it, so drop
+        // that too (covers tab deletion and fire, which both route through here).
+        contextualEntryPromptStore.clear(tabId)
         coroutineScope.launch(dispatchers.io()) {
             store.edit { prefs ->
                 val updated =
@@ -140,6 +145,7 @@ class RealDuckChatContextualDataStore @Inject constructor(
     }
 
     override fun clearAll() {
+        contextualEntryPromptStore.clearAll()
         coroutineScope.launch(dispatchers.io()) {
             store.edit { prefs ->
                 prefs.remove(Keys.TAB_CHAT_URLS)

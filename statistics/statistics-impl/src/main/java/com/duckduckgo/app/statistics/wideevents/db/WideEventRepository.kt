@@ -27,6 +27,8 @@ interface WideEventRepository {
         metadata: Map<String, String?>,
         cleanupPolicy: CleanupPolicy,
         samplingProbability: Float = 1.0f,
+        metaType: String,
+        metaVersion: String,
     ): Long
 
     suspend fun addWideEventStep(
@@ -39,6 +41,15 @@ interface WideEventRepository {
         eventId: Long,
         status: WideEventStatus,
         metadata: Map<String, String?>,
+    )
+
+    /**
+     * Closes the event with the status returned by [decide], evaluated against the event's current state inside the same transaction.
+     * Does nothing when the event is missing, already completed, or [decide] returns null.
+     */
+    suspend fun cleanUpWideEvent(
+        eventId: Long,
+        decide: (WideEvent) -> CleanupDecision?,
     )
 
     suspend fun deleteWideEvent(eventId: Long): Boolean
@@ -76,6 +87,10 @@ interface WideEventRepository {
         val activeIntervals: List<WideEventInterval>,
         val createdAt: Instant,
         val samplingProbability: Float = 1.0f,
+        val metaType: String,
+        val metaVersion: String,
+        val isFirstDailyOccurrence: Boolean = false,
+        val appVersion: String,
     )
 
     data class WideEventStep(
@@ -95,6 +110,7 @@ interface WideEventRepository {
         abstract val metadata: Map<String, String>
 
         data class OnProcessStart(
+            val ownerProcessName: String,
             val ignoreIfIntervalTimeoutPresent: Boolean,
             override val status: WideEventStatus,
             override val metadata: Map<String, String> = emptyMap(),
@@ -112,5 +128,10 @@ interface WideEventRepository {
         val startedAt: Instant,
         val timeout: Duration?,
         val buckets: List<Duration>?,
+    )
+
+    data class CleanupDecision(
+        val status: WideEventStatus,
+        val metadata: Map<String, String>,
     )
 }

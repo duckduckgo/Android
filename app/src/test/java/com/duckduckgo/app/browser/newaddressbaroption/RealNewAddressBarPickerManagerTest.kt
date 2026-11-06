@@ -23,10 +23,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNotNull
@@ -43,36 +42,33 @@ class RealNewAddressBarPickerManagerTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val duckAiFeatureStateMock: DuckAiFeatureState = mock()
     private val duckChatMock: DuckChat = mock()
     private val userStageStoreMock: UserStageStore = mock()
     private val dataStoreMock: NewAddressBarPickerDataStore = mock()
     private val dialogFactoryMock: NewAddressBarPickerBottomSheetDialogFactory = mock()
     private val pixelMock: Pixel = mock()
     private val appThemeMock: AppTheme = mock()
+    private val promptExposureReporterMock: PromptExposureReporter = mock()
     private val dialogMock: BottomSheetDialog = mock()
-
-    private val showPickerFlow = MutableStateFlow(false)
 
     private lateinit var testee: RealNewAddressBarPickerManager
 
     @Before
     fun setUp() =
         runTest {
-            whenever(duckAiFeatureStateMock.showAIChatAddressBarOptionChoiceScreen).thenReturn(showPickerFlow)
             whenever(dialogFactoryMock.create(any(), any(), any())).thenReturn(dialogMock)
             whenever(appThemeMock.isLightModeEnabled()).thenReturn(true)
             whenever(dataStoreMock.incrementDisplayCount()).thenReturn(1)
 
             testee =
                 RealNewAddressBarPickerManager(
-                    duckAiFeatureStateMock,
                     duckChatMock,
                     userStageStoreMock,
                     dataStoreMock,
                     dialogFactoryMock,
                     pixelMock,
                     appThemeMock,
+                    promptExposureReporterMock,
                     coroutineTestRule.testScope,
                     coroutineTestRule.testDispatcherProvider,
                 )
@@ -87,18 +83,6 @@ class RealNewAddressBarPickerManagerTest {
 
             verify(dialogFactoryMock).create(any(), any(), any())
             verify(dialogMock).show()
-        }
-
-    @Test
-    fun `when picker flag disabled then does not show`() =
-        runTest {
-            setupAllConditionsMet()
-            showPickerFlow.value = false
-
-            testee.showChoiceScreen(mock())
-
-            verify(dialogFactoryMock, never()).create(any(), any(), any())
-            verify(dataStoreMock, never()).setAsShown()
         }
 
     @Test
@@ -186,6 +170,7 @@ class RealNewAddressBarPickerManagerTest {
             capturedCallback!!.onDisplayed()
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_COUNT)
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_DAILY, type = Pixel.PixelType.Daily())
+            verify(promptExposureReporterMock).reportPromptShown("new_address_bar_picker")
         }
 
     @Test
@@ -296,7 +281,6 @@ class RealNewAddressBarPickerManagerTest {
         }
 
     private suspend fun setupAllConditionsMet() {
-        showPickerFlow.value = true
         whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(duckChatMock.isInputScreenEverEnabled()).thenReturn(false)

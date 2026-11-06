@@ -193,7 +193,6 @@ class EmailDataReceivedEventHandlerTest {
 
         val result = testee.invoke(state, event)
 
-        assertEquals(0, result.nextState.currentBrokerStepIndex)
         assertEquals("test-attempt", result.nextState.attemptId)
     }
 
@@ -282,9 +281,8 @@ class EmailDataReceivedEventHandlerTest {
         )
         return State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = currentActionIndex,
             actionRetryCount = actionRetryCount,
             attemptId = attemptId,
@@ -300,9 +298,8 @@ class EmailDataReceivedEventHandlerTest {
         runType: RunType,
     ): State = State(
         runType = runType,
-        brokerStepsToExecute = listOf(step),
+        brokerStep = step,
         profileQuery = testProfileQuery,
-        currentBrokerStepIndex = 0,
         currentActionIndex = 0,
         stageStatus = PirStageStatus(
             currentStage = PirStage.EMAIL_DATA_POLL,

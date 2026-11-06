@@ -35,4 +35,10 @@ interface HatchInteractionsPlugin {
 
     /** User touched the NTP body. */
     fun onNtpEngaged() {}
+
+    /** User tapped the close-tab action on the hatch. */
+    fun onCloseTabTapped() {}
+
+    /** User tapped the burn-tab action on the hatch. */
+    fun onBurnTabTapped() {}
 }

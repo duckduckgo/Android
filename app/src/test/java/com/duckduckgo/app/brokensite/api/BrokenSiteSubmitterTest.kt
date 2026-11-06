@@ -9,10 +9,12 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.trackerdetection.TdsMetadataProvider
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
 import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
+import com.duckduckgo.app.trackerdetection.blocklist.RealBlockListExperiment
 import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
-import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
@@ -82,7 +84,7 @@ class BrokenSiteSubmitterTest {
 
     private val mockVariantManager: VariantManager = mock()
 
-    private val mockTdsMetadataDao: TdsMetadataDao = mock()
+    private val mockTdsMetadataProvider: TdsMetadataProvider = mock()
 
     private val mockGpc: Gpc = mock()
 
@@ -123,7 +125,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockAppBuildConfig.model).thenReturn("model")
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(true)
-        whenever(mockTdsMetadataDao.eTag()).thenReturn("eTAG")
+        whenever(mockTdsMetadataProvider.eTag()).thenReturn("eTAG")
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("v123-456"))
         whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(PrivacyConfigData(version = "v", eTag = "e"))
@@ -150,7 +152,7 @@ class BrokenSiteSubmitterTest {
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
-            mockTdsMetadataDao,
+            mockTdsMetadataProvider,
             mockGpc,
             mockFeatureToggle,
             mockPixel,
@@ -165,7 +167,7 @@ class BrokenSiteSubmitterTest {
             networkProtectionState,
             webViewVersionProvider,
             ampLinks,
-            inventory,
+            RealBlockListExperiment(inventory, BlockListPixelsPlugin(inventory)),
             sitePermissionsRepository,
         )
     }

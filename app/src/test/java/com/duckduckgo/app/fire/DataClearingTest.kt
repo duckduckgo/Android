@@ -20,6 +20,7 @@ package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -42,6 +43,8 @@ import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -130,6 +133,9 @@ class DataClearingTest {
     @Mock
     private lateinit var mockDataClearingTrigger: DataClearingTrigger
 
+    private val fireModeDataClearingState = FireModeDataClearingState()
+    private val customTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java)
+
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
     private val showOnAppLaunchOptionFlow = MutableStateFlow<ShowOnAppLaunchOption>(ShowOnAppLaunchOption.LastOpenedTab)
 
@@ -144,6 +150,7 @@ class DataClearingTest {
         // test explicitly enables it.
         whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
         whenever(mockTabRepositoryProvider.forMode(any())).thenReturn(mockTabRepository)
+        fireModeDataClearingState.markDataForClearing()
         runBlocking {
             whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
@@ -165,6 +172,8 @@ class DataClearingTest {
             contextualDataStore = mockContextualDataStore,
             showOnAppLaunchOptionDataStore = mockShowOnAppLaunchOptionDataStore,
             dataClearingTrigger = mockDataClearingTrigger,
+            fireModeDataClearingState = fireModeDataClearingState,
+            customTabsFeature = customTabsFeature,
         )
     }
 
@@ -178,7 +187,56 @@ class DataClearingTest {
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenManualClearWithTabs_thenCloseCustomTabs() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = true))
+        configureManualOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.REGULAR)
+
+        verify(mockClearDataAction).closeCustomTabs()
+    }
+
+    @Test
+    fun whenManualClearWithTabsAndKeepCustomTabDisabled_thenDoNotCloseCustomTabs() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = false))
+        configureManualOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.REGULAR)
+
+        verify(mockClearDataAction, never()).closeCustomTabs()
+    }
+
+    @Test
+    fun whenManualClearWithoutTabs_thenDoNotCloseCustomTabs() = runTest {
+        configureManualOptions(setOf(FireClearOption.DATA))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.REGULAR)
+
+        verify(mockClearDataAction, never()).closeCustomTabs()
+    }
+
+    @Test
+    fun whenAutomaticClearWithTabs_thenCloseCustomTabs() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = true))
+        configureAutomaticOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        verify(mockClearDataAction).closeCustomTabs()
+    }
+
+    @Test
+    fun whenAutomaticClearWithTabsAndKeepCustomTabDisabled_thenDoNotCloseCustomTabs() = runTest {
+        customTabsFeature.keepCustomTabOnAppSwitch().setRawStoredState(State(enable = false))
+        configureAutomaticOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        verify(mockClearDataAction, never()).closeCustomTabs()
     }
 
     @Test
@@ -191,7 +249,7 @@ class DataClearingTest {
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -204,7 +262,7 @@ class DataClearingTest {
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -217,7 +275,7 @@ class DataClearingTest {
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -241,7 +299,7 @@ class DataClearingTest {
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -254,7 +312,7 @@ class DataClearingTest {
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -267,7 +325,7 @@ class DataClearingTest {
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -278,7 +336,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -327,7 +385,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -352,7 +410,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -1090,7 +1148,7 @@ class DataClearingTest {
         testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"), BrowserMode.REGULAR)
 
         verify(mockClearDataAction, never()).setAppUsedSinceLastClearFlag(any())
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -1181,6 +1239,51 @@ class DataClearingTest {
                 ),
             ),
         )
+    }
+
+    @Test
+    fun `fire burn marks the fire profile clean so the auto burner does not burn again`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        assertFalse(fireModeDataClearingState.hasUnclearedData.value)
+    }
+
+    @Test
+    fun `fire profile is marked clean before the clear runs so emptying the fire tabs does not burn again`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+        var dirtyWhileClearing: Boolean? = null
+        whenever(mockDataClearingTrigger.clearData(any())).thenAnswer {
+            dirtyWhileClearing = fireModeDataClearingState.hasUnclearedData.value
+            Unit
+        }
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        assertEquals(false, dirtyWhileClearing)
+    }
+
+    @Test
+    fun `automatic clear marks the fire profile clean`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
+
+        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        assertFalse(fireModeDataClearingState.hasUnclearedData.value)
+    }
+
+    @Test
+    fun `clear with fire mode unavailable leaves the fire profile dirty`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        assertTrue(fireModeDataClearingState.hasUnclearedData.value)
     }
 
     @Test
@@ -1280,7 +1383,7 @@ class DataClearingTest {
 
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
 
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any(), anyOrNull())
         verify(mockClearDataAction, never()).setAppUsedSinceLastClearFlag(any())
     }
 

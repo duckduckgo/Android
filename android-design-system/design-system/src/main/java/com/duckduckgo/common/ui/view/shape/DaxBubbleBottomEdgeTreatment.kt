@@ -34,6 +34,15 @@ open class DaxBubbleBottomEdgeTreatment(
 
     var depthFraction: Float = 1f
 
+    /**
+     * The tail is asymmetric — it hooks towards one side — so a card whose artwork sits on the opposite side
+     * needs the shape reflected rather than just repositioned.
+     *
+     * 0 is the default hook direction and 1 is fully reflected. Intermediate values morph between the two so
+     * the reflection can be animated
+     */
+    var mirrorFraction: Float = 0f
+
     override fun getEdgePath(
         length: Float,
         center: Float,
@@ -46,92 +55,80 @@ open class DaxBubbleBottomEdgeTreatment(
 
         shapePath.lineTo(arrowStart, 0f)
 
-        shapePath.cubicToPoint(
-            arrowStart + 2.8355f * scaleFactor,
-            0f,
-            arrowStart + 4.9409f * scaleFactor,
-            -1.32054f * scaleFactor,
-            arrowStart + 6.8544f * scaleFactor,
-            -3.33789f * scaleFactor,
-        )
-
-        shapePath.cubicToPoint(
-            arrowStart + 8.7314f * scaleFactor,
-            -5.31666f * scaleFactor,
-            arrowStart + 10.5271f * scaleFactor,
-            -8.08434f * scaleFactor,
-            arrowStart + 12.6835f * scaleFactor,
-            -11.06444f * scaleFactor,
-        )
-
-        shapePath.cubicToPoint(
-            arrowStart + 17.0304f * scaleFactor,
-            -17.07144f * scaleFactor,
-            arrowStart + 23.1365f * scaleFactor,
-            -24.39164f * scaleFactor,
-            arrowStart + 35.3339f * scaleFactor,
-            -29.80464f * scaleFactor,
-        )
-
-        shapePath.cubicToPoint(
-            arrowStart + 36.846f * scaleFactor,
-            -30.47574f * scaleFactor,
-            arrowStart + 38.3232f * scaleFactor,
-            -30.09324f * scaleFactor,
-            arrowStart + 39.3369f * scaleFactor,
-            -29.13864f * scaleFactor,
-        )
-
-        shapePath.cubicToPoint(
-            arrowStart + 40.3586f * scaleFactor,
-            -28.17644f * scaleFactor,
-            arrowStart + 40.9016f * scaleFactor,
-            -26.63464f * scaleFactor,
-            arrowStart + 40.4628f * scaleFactor,
-            -24.99804f * scaleFactor,
-        )
-
-        shapePath.cubicToPoint(
-            arrowStart + 39.6477f * scaleFactor,
-            -21.95764f * scaleFactor,
-            arrowStart + 38.7778f * scaleFactor,
-            -18.57714f * scaleFactor,
-            arrowStart + 38.1083f * scaleFactor,
-            -15.63474f * scaleFactor,
-        )
-
-        shapePath.cubicToPoint(
-            arrowStart + 37.4462f * scaleFactor,
-            -12.72454f * scaleFactor,
-            arrowStart + 36.9582f * scaleFactor,
-            -10.15444f * scaleFactor,
-            arrowStart + 36.9453f * scaleFactor,
-            -8.78514f * scaleFactor,
-        )
-
-        shapePath.cubicToPoint(
-            arrowStart + 36.9208f * scaleFactor,
-            -6.20757f * scaleFactor,
-            arrowStart + 38.2915f * scaleFactor,
-            -3.99944f * scaleFactor,
-            arrowStart + 40.2158f * scaleFactor,
-            -2.46093f * scaleFactor,
-        )
-
-        shapePath.cubicToPoint(
-            arrowStart + 42.1375f * scaleFactor,
-            -0.92451f * scaleFactor,
-            arrowStart + 44.6734f * scaleFactor,
-            0f,
-            arrowStart + arrowWidth,
-            0f,
-        )
+        TAIL.indices.forEach { index ->
+            val curve = tailCurveAt(index)
+            shapePath.cubicToPoint(
+                arrowStart + curve.control1X * scaleFactor,
+                curve.control1Y * scaleFactor,
+                arrowStart + curve.control2X * scaleFactor,
+                curve.control2Y * scaleFactor,
+                arrowStart + curve.endX * scaleFactor,
+                curve.endY * scaleFactor,
+            )
+        }
 
         shapePath.lineTo(arrowStart + arrowWidth, 0f)
     }
 
+    private fun tailCurveAt(index: Int): Curve {
+        val plain = TAIL[index]
+        if (mirrorFraction <= 0f) return plain
+        val mirrored = MIRRORED_TAIL[index]
+        if (mirrorFraction >= 1f) return mirrored
+        return Curve(
+            control1X = lerp(plain.control1X, mirrored.control1X),
+            control1Y = lerp(plain.control1Y, mirrored.control1Y),
+            control2X = lerp(plain.control2X, mirrored.control2X),
+            control2Y = lerp(plain.control2Y, mirrored.control2Y),
+            endX = lerp(plain.endX, mirrored.endX),
+            endY = lerp(plain.endY, mirrored.endY),
+        )
+    }
+
+    private fun lerp(from: Float, to: Float): Float = from + (to - from) * mirrorFraction
+
+    /** One cubic of the tail outline, in unscaled dp relative to the tail's leading edge. */
+    private class Curve(
+        val control1X: Float,
+        val control1Y: Float,
+        val control2X: Float,
+        val control2Y: Float,
+        val endX: Float,
+        val endY: Float,
+    )
+
     companion object {
         const val ORIGINAL_BOTTOM_ARROW_HEIGHT_DP = 30
         const val ORIGINAL_BOTTOM_ARROW_WIDTH_DP = 47.14058f
+
+        private val TAIL = listOf(
+            Curve(2.8355f, 0f, 4.9409f, -1.32054f, 6.8544f, -3.33789f),
+            Curve(8.7314f, -5.31666f, 10.5271f, -8.08434f, 12.6835f, -11.06444f),
+            Curve(17.0304f, -17.07144f, 23.1365f, -24.39164f, 35.3339f, -29.80464f),
+            Curve(36.846f, -30.47574f, 38.3232f, -30.09324f, 39.3369f, -29.13864f),
+            Curve(40.3586f, -28.17644f, 40.9016f, -26.63464f, 40.4628f, -24.99804f),
+            Curve(39.6477f, -21.95764f, 38.7778f, -18.57714f, 38.1083f, -15.63474f),
+            Curve(37.4462f, -12.72454f, 36.9582f, -10.15444f, 36.9453f, -8.78514f),
+            Curve(36.9208f, -6.20757f, 38.2915f, -3.99944f, 40.2158f, -2.46093f),
+            Curve(42.1375f, -0.92451f, 44.6734f, 0f, ORIGINAL_BOTTOM_ARROW_WIDTH_DP, 0f),
+        )
+
+        /**
+         * Reflected about the tail's vertical centre. The edge path has to stay left-to-right, so the curves
+         * are walked backwards: each one runs from its own end point to its predecessor's, which swaps its
+         * control points too.
+         */
+        private val MIRRORED_TAIL = TAIL.indices.reversed().map { index ->
+            val curve = TAIL[index]
+            val start = if (index == 0) null else TAIL[index - 1]
+            Curve(
+                control1X = ORIGINAL_BOTTOM_ARROW_WIDTH_DP - curve.control2X,
+                control1Y = curve.control2Y,
+                control2X = ORIGINAL_BOTTOM_ARROW_WIDTH_DP - curve.control1X,
+                control2Y = curve.control1Y,
+                endX = ORIGINAL_BOTTOM_ARROW_WIDTH_DP - (start?.endX ?: 0f),
+                endY = start?.endY ?: 0f,
+            )
+        }
     }
 }

@@ -24,8 +24,6 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetAdBlockingDisabledBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.duckduckgo.mobile.android.R as CommonR
@@ -33,15 +31,10 @@ import com.duckduckgo.mobile.android.R as CommonR
 @SuppressLint("NoBottomSheetDialog")
 class AdBlockingDisabledBottomSheetDialog(
     builderContext: Context,
-    private val edgeToEdgeProvider: EdgeToEdgeProvider,
     private val brokenSiteReportRequester: BrokenSiteReportRequester,
 ) : BottomSheetDialog(
     builderContext,
-    if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
-    } else {
-        0
-    },
+    CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
 
     private val binding: BottomSheetAdBlockingDisabledBinding =
@@ -52,9 +45,7 @@ class AdBlockingDisabledBottomSheetDialog(
     init {
         setContentView(binding.root)
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
 
         behavior.skipCollapsed = true
         behavior.isDraggable = false

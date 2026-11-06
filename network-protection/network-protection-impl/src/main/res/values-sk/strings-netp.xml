@@ -89,10 +89,10 @@
     <string name="netpManagementManageItemExclusion">Vylúčené aplikácie</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Žiadne</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d aplikácia</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d aplikácia</item>
         <item quantity="few">%1$d aplikácie</item>
         <item quantity="many">%1$d aplikácie</item>
-        <item quantity="other">%1$d aplikácií</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d aplikácií</item>
     </plurals>
     <string name="netpManagementVpnSettings">Nastavenia siete VPN</string>
 
@@ -244,18 +244,18 @@
     <string name="netpAutoExcludePromptTitle">Chceš vylúčiť aplikácie, ktoré nie sú kompatibilné s VPN sieťami?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Počas pripojenia VPN sme našli %1$s .</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d novú aplikáciu, ktorý nie je kompatibilná s VPN sieťami. Vylúč túto aplikáciu, aby si ich mohol/mohla používať.</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d novú aplikáciu, ktorý nie je kompatibilná s VPN sieťami. Vylúč túto aplikáciu, aby si ich mohol/mohla používať.</item>
         <item quantity="few">%1$d nové aplikácie, ktoré nie sú kompatibilné s VPN sieťami. Vylúč tieto aplikácie, aby si ich mohol/mohla používať.</item>
         <item quantity="many">%1$d nových aplikácií, ktoré nie sú kompatibilné s VPN sieťami. Vylúč tieto aplikácie, aby si ich mohol/mohla používať.</item>
-        <item quantity="other">%1$d nových aplikácií, ktoré nie sú kompatibilné s VPN sieťami. Vylúč tieto aplikácie, aby si ich mohol/mohla používať.</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d nových aplikácií, ktoré nie sú kompatibilné s VPN sieťami. Vylúč tieto aplikácie, aby si ich mohol/mohla používať.</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Chceš vylúčiť všetky aplikácie, ktoré nie sú kompatibilné s VPN?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d ďalšia aplikácia, ktoré nie je kompatibilná s VPN sieťami. Vylúč túto aplikáciu, aby si ich mohol používať.</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d ďalšia aplikácia, ktoré nie je kompatibilná s VPN sieťami. Vylúč túto aplikáciu, aby si ich mohol používať.</item>
         <item quantity="few">%1$d ďalšie aplikácie, ktoré nie sú kompatibilné s VPN. Vylúč tieto aplikácie, aby si ich mohol/mohla používať.</item>
         <item quantity="many">%1$d ďalších aplikácií, ktoré nie sú kompatibilné s VPN. Vylúč tieto aplikácie, aby si ich mohol/mohla používať.</item>
-        <item quantity="other">%1$d ďalších aplikácií, ktoré nie sú kompatibilné s VPN. Vylúč tieto aplikácie, aby si ich mohol/mohla používať.</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d ďalších aplikácií, ktoré nie sú kompatibilné s VPN. Vylúč tieto aplikácie, aby si ich mohol/mohla používať.</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Automaticky vylúčiť nekompatibilné aplikácie</string>
     <string name="netpAutoExcludePromptActionAdd">Vylúčiť aplikácie</string>

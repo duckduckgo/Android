@@ -1,0 +1,146 @@
+{
+    "android-page-load": {
+        "description": "Monitors page load performance across lifecycle phases to track stuck-at-progress issues and overall load times",
+        "owners": ["GerardPaligot"],
+        "meta": {
+            "type": "android-page-load",
+            "version": "0.1"
+        },
+        "feature": {
+            "name": "page-load",
+            "status": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "elapsed_time_to_finish_ms_bucketed": {
+                        "type": "string",
+                        "description": "Total duration from page_start to page_finish, bucketed. Uses lower end of the bucket. -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                        "enum": ["-1", "0", "1000", "2000", "3000", "4000", "5000", "10000", "30000", "60000"]
+                    },
+                    "elapsed_time_to_visible_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration from page_start to page_visible, bucketed. Uses lower end of the bucket. -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                        "enum": ["-1", "0", "1000", "2000", "3000", "4000", "5000", "10000", "30000", "60000"]
+                    },
+                    "elapsed_time_to_escaped_fixed_progress_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration from page_start to page_escaped_fixed_progress, bucketed. Uses lower end of the bucket. -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                        "enum": ["-1", "0", "1000", "2000", "3000", "4000", "5000", "10000", "30000", "60000"]
+                    },
+                    "elapsed_time_to_content_scope_experiments_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration from page_start until the active content scope experiments were resolved, bucketed. Uses lower end of the bucket. Recorded during the page_content_scope_experiments_resolved step, so it is absent when the navigation ended before the experiments resolved.",
+                        "enum": ["-1", "0", "5", "10", "25", "50", "100", "200", "400", "800", "1600", "3200", "6400"]
+                    },
+                    "elapsed_time_to_js_injection_complete_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration from page_start until every JS injector plugin has run for the navigation, content scope scripts among them, bucketed. Also covers resolving the active experiments and the browser tab's own page-started handling, so it is an upper bound on content scope injection rather than a measure of it alone. Uses lower end of the bucket. Recorded during the page_js_injection_complete step, so it is absent when the navigation ended before injection completed.",
+                        "enum": ["-1", "0", "5", "10", "25", "50", "100", "200", "400", "800", "1600", "3200", "6400"]
+                    },
+                    "content_scope_injection_optimized": {
+                        "type": "string",
+                        "description": "Whether the optimized content scope script assembly path is enabled. Temporary: recorded to compare the durations above across kill-switch states during rollout of the content scope performance work.",
+                        "enum": ["true", "false"]
+                    },
+                    "content_scope_messaging_optimized": {
+                        "type": "string",
+                        "description": "Whether inbound content scope JS messages are queued off the WebView JavaBridge thread. Temporary: recorded to compare overall page load time across kill-switch states during rollout of the content scope performance work.",
+                        "enum": ["true", "false"]
+                    },
+                    "content_scope_experiments_cached": {
+                        "type": "string",
+                        "description": "Whether resolved content scope experiments are held between privacy config updates. Temporary: recorded to compare the durations above across kill-switch states during rollout of the content scope performance work.",
+                        "enum": ["true", "false"]
+                    },
+                    "webview_version": {
+                        "type": "string",
+                        "description": "WebView major version"
+                    },
+                    "cpm_enabled": {
+                        "type": "string",
+                        "description": "Whether Cookie Pop-up Management (autoconsent) is enabled",
+                        "enum": ["true", "false"]
+                    },
+                    "tracker_optimization_enabled_v2": {
+                        "type": "string",
+                        "description": "Whether tracker evaluation optimization is enabled. Deprecated key sent by app versions released before the field was renamed to tracker_optimization_enabled_v3; kept so historical data still validates.",
+                        "enum": ["true", "false"]
+                    },
+                    "tracker_optimization_enabled_v3": {
+                        "type": "string",
+                        "description": "Whether tracker evaluation optimization is enabled. Deprecated key sent by app versions released before the field was removed; kept so historical data still validates",
+                        "enum": ["true", "false"]
+                    },
+                    "is_tab_in_foreground_on_finish": {
+                        "type": "string",
+                        "description": "Whether the tab was in foreground when page finished loading. Reported by the caller at finish, so it is absent on a cancelled load.",
+                        "enum": ["true", "false"]
+                    },
+                    "active_requests_on_load_start": {
+                        "type": "string",
+                        "description": "Number of active network requests when page load started. Reported by the caller at finish, so it is absent on a cancelled load.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "concurrent_requests_on_finish": {
+                        "type": "string",
+                        "description": "Number of concurrent network requests when page finished loading. Reported by the caller at finish, so it is absent on a cancelled load.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "progress": {
+                        "type": "string",
+                        "description": "True if page became visible at or after fixed progress threshold (50%), false if before. Recorded during the page_visible step.",
+                        "enum": ["true", "false"]
+                    },
+                    "outcome": {
+                        "type": "string",
+                        "description": "Final outcome of the page load. Recorded during the page_finish step.",
+                        "enum": ["success", "error"]
+                    },
+                    "error_code": {
+                        "type": "string",
+                        "description": "WebViewClient error constant name (e.g., ERROR_HOST_LOOKUP, ERROR_CONNECT). Only present on error outcomes.",
+                        "examples": ["ERROR_HOST_LOOKUP", "ERROR_CONNECT"]
+                    },
+                    "failure_reason": {
+                        "type": "string",
+                        "description": "Failure reason auto-attached by the wide event client when the flow finishes with FlowStatus.Failure. Mirrors error_code for page-load failures."
+                    },
+                    "cancellation_reason": {
+                        "type": "string",
+                        "description": "Why a load ended without finishing. Only present on CANCELLED loads, which are loads superseded by another main frame load in the same tab before they finished. superseded_same_url covers a reload or restart; superseded_different_url covers a redirect hop and the user navigating away - WebView does not distinguish them.",
+                        "enum": ["superseded_same_url", "superseded_different_url"]
+                    },
+                    "step.page_start": {
+                        "type": "string",
+                        "description": "Parameter present when page load begins",
+                        "enum": ["true"]
+                    },
+                    "step.page_content_scope_experiments_resolved": {
+                        "type": "string",
+                        "description": "Parameter present when the active content scope experiments have been resolved for the navigation",
+                        "enum": ["true"]
+                    },
+                    "step.page_js_injection_complete": {
+                        "type": "string",
+                        "description": "Parameter present when every JS injector plugin has run for the navigation",
+                        "enum": ["true"]
+                    },
+                    "step.page_visible": {
+                        "type": "string",
+                        "description": "Parameter present when page becomes visible",
+                        "enum": ["true"]
+                    },
+                    "step.page_escaped_fixed_progress": {
+                        "type": "string",
+                        "description": "Parameter present when progress escapes the fixed progress zone (typically 50%)",
+                        "enum": ["true"]
+                    },
+                    "step.page_finish": {
+                        "type": "string",
+                        "description": "Parameter present when page load completes or fails",
+                        "enum": ["true", "false"]
+                    }
+                }
+            }
+        }
+    }
+}

@@ -24,7 +24,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -37,26 +38,27 @@ enum class CustomAiOnboardingPixelName(override val pixelName: String) : Pixel.P
     RETURNING_SYNC_USER_IGNORED("onboarding_ai_returning-sync-user-ignored"),
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class CustomAiOnboardingPixels @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     appUserStageStore: AppUserStageStore,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
     private val pixel: Pixel,
+    private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
 ) : MainProcessLifecycleObserver {
     init {
         appUserStageStore.userAppStageFlow().onEach {
-            if (it == AppStage.ESTABLISHED && customAiOnboardingStore.isEnabled()) {
+            if (it == AppStage.ESTABLISHED && customAiOnboardingStore.isEnabled() && !contextualOnboardingTimeLimit.wasOnboardingEndedByTimeLimit()) {
                 pixel.fire(CustomAiOnboardingPixelName.PLAN_FINISHED, type = Pixel.PixelType.Unique())
             }
         }.launchIn(coroutineScope)
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class CustomAiOnboardingPixelRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(

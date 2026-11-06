@@ -5,7 +5,7 @@ androidWebViewHierarchy: devtools
 # Navigate to a YouTube video
 - runFlow: ../../shared/dismiss_native_input.yaml
 - tapOn:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
 - inputText: "https://m.youtube.com/@duckduckgo/search?query=DuckDuckGo%20vs%20Google%3A%205%20Reasons%20You%20Should%20Switch"
 - pressKey: Enter
 - runFlow: handle_youtube_cookies.yaml

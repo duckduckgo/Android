@@ -1,0 +1,14 @@
+{
+  "maxSuggestedPrompts": 4,
+  "defaults": ["summarize-page", "translate-page"],
+  "catalog": {
+    "summarize-page": { "label": "Summarize", "icon": "summary", "prompt": "Summarize." },
+    "translate-page": { "label": "Translate", "icon": "translate", "prompt": "Translate into {language}.", "condition": "differentLanguage" },
+    "unknown-id": { "label": "Unknown", "icon": "idea", "prompt": "Unknown." }
+  },
+  "byJsonLdType": [],
+  "byOgType": {},
+  "byDomain": {
+    "example.com": ["unknown-id"]
+  }
+}

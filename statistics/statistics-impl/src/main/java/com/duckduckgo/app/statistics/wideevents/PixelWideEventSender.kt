@@ -27,8 +27,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
@@ -47,8 +47,11 @@ class PixelWideEventSender @Inject constructor(
 
         val parameters =
             mutableMapOf<String, String>().apply {
-                putAll(getCommonPixelParameters())
+                putAll(getCommonPixelParameters(event))
+                put(PARAM_META_TYPE, event.metaType)
+                put(PARAM_META_VERSION, event.metaVersion)
                 put(PARAM_SAMPLE_RATE, event.samplingProbability.toString())
+                put(PARAM_IS_FIRST_DAILY_OCCURRENCE, event.isFirstDailyOccurrence.toString())
                 put(PARAM_STATUS, event.status.toParamValue())
 
                 if (event.flowEntryPoint != null) {
@@ -100,12 +103,12 @@ class PixelWideEventSender @Inject constructor(
         }
     }
 
-    private fun getCommonPixelParameters(): Map<String, String> {
+    private fun getCommonPixelParameters(event: WideEventRepository.WideEvent): Map<String, String> {
         return mapOf(
             PARAM_PLATFORM to "Android",
             PARAM_TYPE to "app",
             PARAM_APP_NAME to "DuckDuckGo Android",
-            PARAM_APP_VERSION to appBuildConfig.versionName,
+            PARAM_APP_VERSION to event.appVersion,
             PARAM_FORM_FACTOR to deviceInfo.formFactor().description,
             PARAM_DEV_MODE to appBuildConfig.isDebug.toString(),
         )
@@ -119,9 +122,12 @@ class PixelWideEventSender @Inject constructor(
         const val COUNT_PIXEL_SUFFIX = "_c"
         const val DAILY_PIXEL_SUFFIX = "_d"
 
+        const val PARAM_META_TYPE = "meta.type"
+        const val PARAM_META_VERSION = "meta.version"
         const val PARAM_PLATFORM = "global.platform"
         const val PARAM_TYPE = "global.type"
         const val PARAM_SAMPLE_RATE = "global.sample_rate"
+        const val PARAM_IS_FIRST_DAILY_OCCURRENCE = "global.is_first_daily_occurrence"
         const val PARAM_CONTEXT_NAME = "context.name"
         const val PARAM_STATUS = "feature.status"
         const val PARAM_APP_NAME = "app.name"
@@ -142,7 +148,7 @@ private fun WideEventRepository.WideEventStatus.toParamValue(): String =
         UNKNOWN -> "UNKNOWN"
     }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WideEventPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParamRemovalPlugin.PixelParameter>>> =
         listOf(PIXEL_NAME_PREFIX to PixelParamRemovalPlugin.PixelParameter.Companion.removeAll())

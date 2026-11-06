@@ -26,15 +26,17 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
+import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
@@ -44,7 +46,6 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -55,7 +56,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+) : FrameLayout(context, attrs, defStyle), CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
@@ -78,9 +79,16 @@ class ReasoningModePickerView @JvmOverloads constructor(
     private var lastInputContext: InputContext = InputContext.BROWSER
     private var lastNativeInputState: NativeInputState? = null
 
+    var isEditMode: Boolean = false
+
     init {
         inflate(context, R.layout.view_reasoning_mode_picker, this)
     }
+
+    override fun setCompactLevel(level: Int) = Unit
+
+    // A fixed-size button that only comes and goes with the selected model.
+    override fun worstCaseWidth(level: Int): Int = resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -115,8 +123,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
     }
 
     private fun applyVisibility(pickerVisible: Boolean) {
-        val nativeState = lastNativeInputState
-        val show = pickerVisible && nativeState?.shouldShowPluginControls() == true
+        val show = shouldShowReasoningPicker(lastNativeInputState, pickerVisible, isEditMode)
         isVisible = show
         (parent as? View)?.isVisible = show
         // Popup is positioned by screen coordinates, not parented to the button. Dismiss
@@ -158,19 +165,24 @@ class ReasoningModePickerView @JvmOverloads constructor(
         }
 
     private fun showMenu() {
+        // Guard against a re-tap opening an already-showing popup.
+        if (popupWindow?.isShowing == true) return
         val state = viewModel.state.value
         if (!state.visible) return
 
+        viewModel.onPickerShown(currentSurface())
+
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
         }
         val popup = PopupWindow(
             ScrollView(context).apply {
                 addView(container)
+                setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+                applyMenuRadiusClipping()
                 isVerticalScrollBarEnabled = false
             },
-            resources.getDimensionPixelSize(R.dimen.reasoningModePickerMenuWidth),
+            resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),
             LayoutParams.WRAP_CONTENT,
             false,
         ).apply {
@@ -184,22 +196,31 @@ class ReasoningModePickerView @JvmOverloads constructor(
     }
 
     private fun populate(container: LinearLayout, popup: PopupWindow, state: ReasoningModePickerState) {
-        state.rows.forEach { row ->
-            val item = LayoutInflater.from(context)
-                .inflate(R.layout.view_reasoning_mode_picker_item, container, false)
-            item.findViewById<ImageView>(R.id.reasoningModeItemLeadingIcon)
-                .setImageDrawable(AppCompatResources.getDrawable(context, row.iconRes))
-            item.findViewById<DaxTextView>(R.id.reasoningModeItemTitle).setText(row.titleRes)
-            item.findViewById<DaxTextView>(R.id.reasoningModeItemSubtitle).setText(row.subtitleRes)
-            val trailingIcon = item.findViewById<ImageView>(R.id.reasoningModeItemTrailingIcon)
-            trailingIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
-            trailingIcon.visibility = if (row.selected) VISIBLE else INVISIBLE
-            item.setOnClickListener {
-                viewModel.onModeTapped(row.mode, currentSurface())
-                popup.dismiss()
+        state.sections.forEachIndexed { index, section ->
+            if (index > 0) container.addView(HorizontalDivider(context))
+            section.headerRes?.let { container.addSectionHeader(context.getString(it)) }
+            section.rows.forEach { row ->
+                val item = pickerMenuItem(
+                    parent = container,
+                    title = context.getString(row.titleRes),
+                    leadingIconRes = row.iconRes,
+                    subtitle = context.getString(row.subtitleRes),
+                    selected = row.selected,
+                    // Only the gated section carries a header, and its rows open an upsell.
+                    showsFollowUpEllipsis = section.headerRes != null,
+                ) {
+                    viewModel.onModeTapped(row.mode, currentSurface())
+                    popup.dismiss()
+                }
+                container.addView(item)
             }
-            container.addView(item)
         }
+    }
+
+    private fun LinearLayout.addSectionHeader(title: String) {
+        val header = LayoutInflater.from(context).inflate(R.layout.view_model_picker_section_header, this, false) as DaxTextView
+        header.text = title
+        addView(header)
     }
 
     private fun showAtPosition(popup: PopupWindow) {
@@ -217,3 +238,14 @@ class ReasoningModePickerView @JvmOverloads constructor(
         popupWindow = null
     }
 }
+
+/**
+ * The reasoning mode picker follows the same visibility rule as the other plugin controls:
+ * derived purely from [NativeInputState] plus its own visibility flag, so it is unit-testable
+ * without Robolectric.
+ */
+internal fun shouldShowReasoningPicker(
+    nativeInputState: NativeInputState?,
+    pickerVisible: Boolean,
+    isEditMode: Boolean,
+): Boolean = pickerVisible && nativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true

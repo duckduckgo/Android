@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.postidle
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -28,9 +27,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
@@ -38,18 +37,16 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserInteractionsPlugin::class)
-@ContributesMultibinding(AppScope::class, boundType = HatchInteractionsPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserInteractionsPlugin>())
+@ContributesIntoSet(AppScope::class, binding = binding<HatchInteractionsPlugin>())
 class RealPostIdleSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val duckChatInputModeState: DuckChatInputModeState,
-    private val androidBrowserConfigFeature: Lazy<AndroidBrowserConfigFeature>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
 ) : BrowserInteractionsPlugin, HatchInteractionsPlugin, BrowserLifecycleObserver {
@@ -80,8 +77,6 @@ class RealPostIdleSessionWideEvent @Inject constructor(
     private fun onSurfaceShown(surface: Surface) {
         coroutineScope.launch {
             mutex.withLock {
-                if (!isFeatureEnabled()) return@launch
-
                 activeSession?.let { prior ->
                     logcat(tag = TAG) { "Aborting prior post-idle session ${prior.flowId} on new surface ${surface.value}" }
                     wideEventClient.flowAbort(prior.flowId)
@@ -95,6 +90,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
                         flowStatus = FlowStatus.Unknown,
                     ),
                     metadata = mapOf(KEY_SURFACE to surface.value),
+                    samplingProbability = SAMPLING_PROBABILITY,
                 )
 
                 result.onSuccess { flowId ->
@@ -165,7 +161,6 @@ class RealPostIdleSessionWideEvent @Inject constructor(
     ) {
         coroutineScope.launch {
             mutex.withLock {
-                if (!isFeatureEnabled()) return@launch
                 val session = activeSession ?: return@launch
                 if (isAlreadyRecorded(session)) return@launch
 
@@ -182,7 +177,6 @@ class RealPostIdleSessionWideEvent @Inject constructor(
     private fun finishSession(statusReason: String, status: FlowStatus) {
         coroutineScope.launch {
             mutex.withLock {
-                if (!isFeatureEnabled()) return@launch
                 val session = activeSession ?: return@launch
                 activeSession = null
 
@@ -206,10 +200,6 @@ class RealPostIdleSessionWideEvent @Inject constructor(
         }
     }
 
-    private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        androidBrowserConfigFeature.get().sendPostIdleSessionWideEvent().isEnabled()
-    }
-
     private class SessionState(
         val flowId: Long,
         val surface: Surface,
@@ -222,6 +212,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
     private companion object {
         const val TAG = "RealPostIdleSessionWideEvent"
         const val FEATURE_NAME = "post_idle_session"
+        const val SAMPLING_PROBABILITY = 0.05f
 
         const val REASON_BAR_USED = "bar_used"
         const val REASON_CHAT_SELECTED = "chat_selected"

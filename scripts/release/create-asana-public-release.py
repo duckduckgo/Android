@@ -25,6 +25,7 @@ def main():
     parser.add_argument('--asana-workspace-id', required=True, help='Asana workspace ID')
     parser.add_argument('--asana-api-key-env-var', required=True, help='Environment variable name containing the API key')
     parser.add_argument('--template-task-id', required=True, help='Asana template task ID to duplicate')
+    parser.add_argument('--grafana-dashboard-base-url', help="Grafana app-health-monitoring dashboard URL up to and including 'var-Default='; the release tag is appended to it. Optional: if omitted, the task's Grafana link placeholder is left for the release DRI to fill in by hand")
 
     args = parser.parse_args()
 
@@ -71,7 +72,8 @@ def main():
             args.template_task_id,
             args.asana_section_id,
             args.asana_project_id,
-            task_links
+            task_links,
+            args.grafana_dashboard_base_url
         )
 
         # Tag all linked tasks with the release version

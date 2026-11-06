@@ -24,7 +24,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import javax.inject.Inject
  * them before emitting [Completed] / [Skipped], so the [AppStage] write is visible to any listener
  * that routes off the terminal state.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class NewUserOnboardingPlanBootstrapper @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
     private val planProvider: NewUserOnboardingPlanProvider,
@@ -49,8 +49,15 @@ class NewUserOnboardingPlanBootstrapper @Inject constructor(
     /**
      * Starts the orchestrator-driven onboarding plan and returns the resulting [LinearOnboardingState].
      * The caller is responsible for only invoking this for a new user.
+     *
+     * A run already in progress is returned as-is without building a plan: [NewUserOnboardingPlanProvider.buildRootPlan]
+     * is side-effecting (it resets per-run state and enrols experiments), and the orchestrator would discard the plan
+     * anyway. This is reachable whenever the launch screen runs again while the process is alive.
      */
     suspend fun startNewUserOnboardingPlan(): LinearOnboardingState.InProgress = mutex.withLock {
+        val inProgress = orchestrator.state.value as? LinearOnboardingState.InProgress
+        if (inProgress != null) return@withLock inProgress
+
         orchestrator.startPlan(
             planProvider.buildRootPlan(
                 onCompleted = { userStageStore.stageCompleted(AppStage.NEW) },

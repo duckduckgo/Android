@@ -28,12 +28,13 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.google.android.material.card.MaterialCardView
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -55,13 +56,14 @@ data class NativeInputPrompt(
     val selectedTool: String?,
     val imagesJson: JSONArray?,
     val filesJson: JSONArray?,
+    val selectionsJson: JSONArray? = null,
 )
 
 interface ContextualNativeInputManager {
     fun init(
         tabId: String,
-        card: MaterialCardView,
-        widget: NativeInputModeWidget,
+        inputLayout: NativeInputLayout,
+        footer: NativeInputFooterView? = null,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         chatIdFlow: Flow<String?>,
@@ -75,6 +77,8 @@ interface ContextualNativeInputManager {
         onPageContextRemoved: () -> Unit = {},
         onVoiceChatRequested: () -> Unit = {},
         onVoiceSearchRequested: () -> Unit = {},
+        onInputFocusChanged: (Boolean) -> Unit = {},
+        onInputVisibilityChanged: (Boolean) -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -107,18 +111,20 @@ class RealContextualNativeInputManager @Inject constructor(
 
     private var isNativeInputEnabled = false
     private var isContextualNativeInputEnabled = false
-    private var card: MaterialCardView? = null
+    private var inputLayout: NativeInputLayout? = null
+    private var footer: NativeInputFooterView? = null
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
     private var lastMode: Mode? = null
+    private var onInputVisibilityChanged: (Boolean) -> Unit = {}
     private val modelPickerEnabled = MutableStateFlow(true)
 
     private enum class Mode { WEBVIEW, INPUT }
 
     override fun init(
         tabId: String,
-        card: MaterialCardView,
-        widget: NativeInputModeWidget,
+        inputLayout: NativeInputLayout,
+        footer: NativeInputFooterView?,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         chatIdFlow: Flow<String?>,
@@ -130,17 +136,21 @@ class RealContextualNativeInputManager @Inject constructor(
         onPageContextRemoved: () -> Unit,
         onVoiceChatRequested: () -> Unit,
         onVoiceSearchRequested: () -> Unit,
+        onInputFocusChanged: (Boolean) -> Unit,
+        onInputVisibilityChanged: (Boolean) -> Unit,
     ) {
-        this.card = card
+        this.inputLayout = inputLayout
+        this.footer = footer
         this.jsMessaging = jsMessaging
+        val widget = inputLayout.widget
         this.widget = widget
+        this.onInputVisibilityChanged = onInputVisibilityChanged
 
-        applyCardShape(card)
         setupWidget(
             tabId, widget, chatIdFlow, onSearchSubmitted,
             onCameraCaptureRequested, onFilePickerRequested,
             onPromptSubmitted, onAskAboutPage, onPageContextRemoved,
-            onVoiceChatRequested, onVoiceSearchRequested,
+            onVoiceChatRequested, onVoiceSearchRequested, onInputFocusChanged,
         )
         observeNativeInputSetting(lifecycleOwner)
         observeVoiceChatEntry(widget, lifecycleOwner)
@@ -172,12 +182,12 @@ class RealContextualNativeInputManager @Inject constructor(
     override fun onWebViewMode() {
         lastMode = Mode.WEBVIEW
         if (isNativeInputEnabled) {
-            card?.show()
+            setInputVisible(true)
             // WEBVIEW mode means a chat is in progress.
             // Hide the picker so the user can't change models mid-chat.
             modelPickerEnabled.value = false
         } else {
-            card?.gone()
+            setInputVisible(false)
         }
     }
 
@@ -185,24 +195,23 @@ class RealContextualNativeInputManager @Inject constructor(
         lastMode = Mode.INPUT
         if (isContextualNativeInputEnabled) {
             // The unified input widget is the composer for the initial sheet.
-            card?.show()
+            setInputVisible(true)
             // INPUT mode is a new chat: restore the picker so the user can pick a model before starting.
             modelPickerEnabled.value = true
         } else {
             // contextualNativeInput off: the legacy EditText composer is shown instead, so keep the card hidden.
-            card?.gone()
+            setInputVisible(false)
         }
     }
 
-    private fun applyCardShape(card: MaterialCardView) {
-        // The card floats within the input area (margins on all sides), matching the Duck.ai omnibar
-        // card, so all four corners are rounded rather than the docked top-only shape.
-        val radius = card.resources.getDimension(
-            com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius,
-        )
-        card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
-            .setAllCornerSizes(radius)
-            .build()
+    private fun setInputVisible(visible: Boolean) {
+        if (visible) {
+            inputLayout?.show()
+        } else {
+            inputLayout?.gone()
+        }
+        footer?.setSurfaceVisible(visible)
+        onInputVisibilityChanged(visible)
     }
 
     private fun setupWidget(
@@ -217,12 +226,17 @@ class RealContextualNativeInputManager @Inject constructor(
         onPageContextRemoved: () -> Unit,
         onVoiceChatRequested: () -> Unit,
         onVoiceSearchRequested: () -> Unit,
+        onInputFocusChanged: (Boolean) -> Unit,
     ) {
         widget.configureContextual(tabId)
+        widget.bindTextSelections(tabId, textSelection = null)
         widget.bindChatIdSource(chatIdFlow)
         widget.bindModelPickerEnabledSource(modelPickerEnabled)
-        widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
+        widget.onInputFocusChanged = { focused ->
+            sendInputFocusedEvent(focused)
+            onInputFocusChanged(focused)
+        }
         widget.onVoiceChatClick = onVoiceChatRequested
         widget.onVoiceSearchClick = onVoiceSearchRequested
         widget.bindAttachmentCallbacks(
@@ -241,6 +255,7 @@ class RealContextualNativeInputManager @Inject constructor(
             onChatSubmitted = { prompt ->
                 val imagesJson = widget.getImageAttachmentsJson()
                 val filesJson = widget.getFileAttachmentsJson()
+                val selectionsJson = widget.getTextSelectionsJson()
                 val modelId = widget.getSelectedModelId()
                 val reasoningEffort = widget.getResolvedReasoningEffort()
                 val selectedTool = widget.getSelectedTool()
@@ -251,8 +266,9 @@ class RealContextualNativeInputManager @Inject constructor(
                 // shortcut built its own JS event and silently dropped that context. onPromptSent starts a
                 // new chat from INPUT and appends to the active chat from WEBVIEW — the web page decides
                 // which, based on its own state, not on the native caller.
+                widget.onPromptSubmitted()
                 onPromptSubmitted(
-                    NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson),
+                    NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson),
                 )
                 widget.clearSelectedTool()
                 widget.text = ""
@@ -295,6 +311,26 @@ class RealContextualNativeInputManager @Inject constructor(
         }
             .onEach { widget.setVoiceSearchAvailable(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
+    private fun sendStartUsingWeeklyLimitEvent() {
+        jsMessaging?.sendSubscriptionEvent(
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitStartUsingWeeklyLimitAction",
+                params = JSONObject().put("platform", "android"),
+            ),
+        )
+    }
+
+    private fun sendInputFocusedEvent(focused: Boolean) {
+        jsMessaging?.sendSubscriptionEvent(
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitNativeInputFocused",
+                params = JSONObject().put("focused", focused),
+            ),
+        )
     }
 
     private fun sendStopEvent() {

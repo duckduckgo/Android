@@ -12,6 +12,11 @@
         "description": "Pixel schedule type - d=daily, c=count.",
         "enum": ["d", "c"]
     },
+    "count_short": {
+        "type": "string",
+        "description": "Pixel schedule type - c=count.",
+        "enum": ["c"]
+    },
     "form_factor": {
         "type": "string",
         "description": "Platform and device form-factor",

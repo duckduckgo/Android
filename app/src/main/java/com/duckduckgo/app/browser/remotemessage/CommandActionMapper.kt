@@ -17,11 +17,12 @@
 package com.duckduckgo.app.browser.remotemessage
 
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel
+import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.*
 import com.duckduckgo.survey.api.SurveyParameterManager
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface CommandActionMapper {
@@ -47,6 +48,7 @@ class RealCommandActionMapper @Inject constructor(
                 NewTabPageViewModel.Command.SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
             }
             is DefaultCredentialProvider -> NewTabPageViewModel.Command.LaunchDefaultCredentialProvider
+            is AddWidget -> NewTabPageViewModel.Command.LaunchAddWidget(WidgetType.fromValue(action.value))
         }
     }
 }

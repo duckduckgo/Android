@@ -19,12 +19,10 @@ package com.duckduckgo.sync.impl.promotion.chat
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
@@ -33,6 +31,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
 import com.duckduckgo.sync.impl.databinding.DialogChatSyncPromoBinding
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
@@ -54,14 +53,13 @@ class ChatSyncPromoChatTabItemPlugin @Inject constructor(
     private val chatSyncPromotion: ChatSyncPromotion,
     private val duckChatInput: DuckChatInputModeState,
     private val activityStarter: GlobalActivityStarter,
-    private val edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : NativeInputChatTabItemPlugin {
     override fun create(
         context: Context,
         scope: CoroutineScope,
         browserMode: BrowserMode,
     ): NativeInputChatTabItem {
-        val listener = ChatTabPluginAdapterListener(context, chatSyncPromotion, scope, activityStarter, edgeToEdgeProvider)
+        val listener = ChatTabPluginAdapterListener(context, chatSyncPromotion, scope, activityStarter)
         val adapter = ChatSyncPromoAdapter(listener)
 
         val showJob = scope.showPromotionBanner(adapter, browserMode)
@@ -99,7 +97,6 @@ private class ChatTabPluginAdapterListener(
     private val promotion: ChatSyncPromotion,
     private val scope: CoroutineScope,
     private val activityStarter: GlobalActivityStarter,
-    private val edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : ChatSyncPromoAdapter.Listener {
     private var didBannerShow = false
     private var isDialogShowing = false
@@ -113,9 +110,8 @@ private class ChatTabPluginAdapterListener(
             val dialog = ChatSyncPromoBottomSheetDialog(
                 context = context,
                 onScanQrCodeClicked = {
-                    activityStarter.start(context, SyncActivityWithAnotherDevice(source = "promotion_ai_chat"))
+                    activityStarter.start(context, SyncActivityWithAnotherDevice(source = SyncLaunchSource.PromotionAiChat.value))
                 },
-                edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
             )
             dialog.setOnDismissListener { isDialogShowing = false }
             dialog.show()
@@ -139,10 +135,9 @@ private class ChatTabPluginAdapterListener(
 private class ChatSyncPromoBottomSheetDialog(
     context: Context,
     onScanQrCodeClicked: () -> Unit,
-    edgeToEdgeEnabled: Boolean,
 ) : BottomSheetDialog(
     context,
-    if (edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
+    com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
     init {
         val binding = DialogChatSyncPromoBinding.inflate(layoutInflater).apply {
@@ -154,9 +149,7 @@ private class ChatSyncPromoBottomSheetDialog(
             closeButton.setOnClickListener { dismiss() }
         }
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
 
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
         behavior.isDraggable = false

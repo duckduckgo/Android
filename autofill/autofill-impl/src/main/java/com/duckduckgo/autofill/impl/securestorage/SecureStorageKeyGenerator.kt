@@ -18,14 +18,13 @@ package com.duckduckgo.autofill.impl.securestorage
 
 import android.security.keystore.KeyProperties
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.security.Key
 import javax.crypto.KeyGenerator
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Provider
 
 interface SecureStorageKeyGenerator {
     fun generateKey(): Key
@@ -38,7 +37,7 @@ interface SecureStorageKeyGenerator {
 
 @ContributesBinding(AppScope::class)
 class RealSecureStorageKeyGenerator @Inject constructor(
-    @Named("DerivedKeySecretFactoryFor26Up") private val derivedKeySecretFactory: Provider<DerivedKeySecretFactory>,
+    @Named("DerivedKeySecretFactoryFor26Up") private val derivedKeySecretFactory: () -> DerivedKeySecretFactory,
 ) : SecureStorageKeyGenerator {
     private val keyGenerator: KeyGenerator by lazy {
         KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES).also {
@@ -57,7 +56,7 @@ class RealSecureStorageKeyGenerator @Inject constructor(
         password: String,
         salt: ByteArray,
     ): Key =
-        derivedKeySecretFactory.get().getKey(
+        derivedKeySecretFactory().getKey(
             PBEKeySpec(
                 password.toCharArray(),
                 salt,

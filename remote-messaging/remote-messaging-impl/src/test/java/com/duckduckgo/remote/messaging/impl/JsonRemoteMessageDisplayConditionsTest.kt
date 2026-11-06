@@ -81,4 +81,97 @@ class JsonRemoteMessageDisplayConditionsTest {
 
         assertNull(mapped.single().displayConditions)
     }
+
+    @Test
+    fun whenMaxImpressionsPresentThenParsed() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(maxImpressions = 3))
+
+        assertEquals(3, conditions?.maxImpressions)
+    }
+
+    @Test
+    fun whenMaxImpressionsAbsentThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterDaysShown = 5))
+
+        assertNull(conditions?.maxImpressions)
+    }
+
+    @Test
+    fun whenMaxImpressionsIsZeroThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(maxImpressions = 0))
+
+        assertNull(conditions?.maxImpressions)
+    }
+
+    @Test
+    fun whenMaxImpressionsIsNegativeThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(maxImpressions = -1))
+
+        assertNull(conditions?.maxImpressions)
+    }
+
+    @Test
+    fun whenDismissAfterUniqueDailyImpressionsPresentThenParsed() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterUniqueDailyImpressions = 3))
+
+        assertEquals(3, conditions?.dismissAfterUniqueDailyImpressions)
+    }
+
+    @Test
+    fun whenDismissAfterUniqueDailyImpressionsAbsentThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterDaysShown = 5))
+
+        assertNull(conditions?.dismissAfterUniqueDailyImpressions)
+    }
+
+    @Test
+    fun whenDismissAfterUniqueDailyImpressionsIsZeroThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterUniqueDailyImpressions = 0))
+
+        assertNull(conditions?.dismissAfterUniqueDailyImpressions)
+    }
+
+    @Test
+    fun whenDismissAfterUniqueDailyImpressionsIsNegativeThenNull() {
+        val conditions = displayConditionsOf(JsonDisplayConditions(dismissAfterUniqueDailyImpressions = -1))
+
+        assertNull(conditions?.dismissAfterUniqueDailyImpressions)
+    }
+
+    @Test
+    fun whenMaxImpressionsCombinedWithTriggerAndExpiryThenAllParsed() {
+        val conditions = displayConditionsOf(
+            JsonDisplayConditions(
+                trigger = "after_idle",
+                dismissAfterDaysShown = 5,
+                maxImpressions = 3,
+            ),
+        )
+
+        assertEquals(MessageTrigger.AFTER_IDLE, conditions?.trigger)
+        assertEquals(5, conditions?.dismissAfterDaysShown)
+        assertEquals(3, conditions?.maxImpressions)
+    }
+
+    @Test
+    fun whenTriggerUnrecognizedThenMessageDroppedEvenWithValidMaxImpressions() {
+        val mapped = listOf(
+            aJsonMessage(
+                id = "id",
+                content = smallJsonContent(),
+                displayConditions = JsonDisplayConditions(
+                    trigger = "some_future_trigger",
+                    maxImpressions = 3,
+                ),
+            ),
+        ).mapToRemoteMessage(Locale.US, messageActionPlugins)
+
+        assertTrue(mapped.isEmpty())
+    }
+
+    private fun displayConditionsOf(conditions: JsonDisplayConditions) =
+        listOf(aJsonMessage(id = "id", content = smallJsonContent(), displayConditions = conditions))
+            .mapToRemoteMessage(Locale.US, messageActionPlugins)
+            .single()
+            .displayConditions
 }

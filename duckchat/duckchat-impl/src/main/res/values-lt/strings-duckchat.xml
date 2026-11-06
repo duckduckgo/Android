@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Ieškoti arba įvesti adresą</string>
     <string name="input_screen_search_only_hint">Paieška</string>
-    <string name="input_screen_chat_hint">Klauskite privačiai</string>
     <string name="input_screen_user_pref_without_ai">Tik paieška</string>
     <string name="input_screen_user_pref_with_ai">Paieška ir „Duck.ai“</string>
     <string name="input_screen_user_pref_description">Išbandykite naują parinktį ir užduokite klausimus „Duck.ai“ tiesiai iš adresų juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
@@ -71,9 +70,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Kalbėkis privačiai su išskirtiniais abonentams skirtais DI modeliais.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Atidaryti „Duck.ai“</string>
     <string name="duck_ai_paid_settings_learn_more_title">Sužinoti daugiau</string>
-
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai“</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Norite lengviau pasiekti privačius DI pokalbius?</string>
@@ -121,13 +117,87 @@
     <string name="duckAIContextualPromptSummarize">Apibendrinti šį puslapį</string>
     <string name="duckAIContextualAutomaticContextTitle">Automatiškai siųsti puslapio turinį</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatiškai siųsti puslapio turinį į „Duck.ai“</string>
-    <string name="duckAIContextualAttachPageContent">Pridėkite puslapio turinį</string>
 
-    <!-- Contextual sheet quick action -->
-    <string name="duckAIContextualPromptAskAboutPage">Klausk apie puslapį</string>
+    <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
+    <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Išversk šį puslapį</string>
+    <string name="duckAiSuggestionTranslatePagePrompt" instruction="Suggested prompt submitted text: translate the page. %1$s is replaced with the name of the user&apos;s language.">Išversk šį puslapį į %1$s.</string>
+    <string name="duckAiSuggestionKeyTakeawaysLabel" instruction="Suggested prompt chip: key takeaways of an article">Kokie pagrindiniai akcentai?</string>
+    <string name="duckAiSuggestionKeyTakeawaysPrompt" instruction="Suggested prompt submitted text: key takeaways of an article">Kokie pagrindiniai šio straipsnio akcentai?</string>
+    <string name="duckAiSuggestionExplainSimplyLabel" instruction="Suggested prompt chip: explain the content simply">Paaiškink tai paprastai</string>
+    <string name="duckAiSuggestionExplainSimplyPrompt" instruction="Suggested prompt submitted text: explain the content simply">Paaiškink tai paprasta, suprantama kalba.</string>
+    <string name="duckAiSuggestionCounterargumentsLabel" instruction="Suggested prompt chip: counterarguments">Kokie kontrargumentai?</string>
+    <string name="duckAiSuggestionCounterargumentsPrompt" instruction="Suggested prompt submitted text: counterarguments">Kokie pagrindiniai to kontrargumentai ar kritika?</string>
+    <string name="duckAiSuggestionRelatedArticlesLabel" instruction="Suggested prompt chip: related articles">Pasiūlyk susijusių straipsnių, kuriais verta pasidomėti</string>
+    <string name="duckAiSuggestionRelatedArticlesPrompt" instruction="Suggested prompt submitted text: related articles">Pasiūlyk susijusių straipsnių ar temų, kuriomis verta pasidomėti toliau.</string>
+    <string name="duckAiSuggestionShoppingListLabel" instruction="Suggested prompt chip: shopping list from a recipe">Sudaryk pirkinių sąrašą</string>
+    <string name="duckAiSuggestionShoppingListPrompt" instruction="Suggested prompt submitted text: shopping list from a recipe">Pagal šį receptą sudaryk pirkinių sąrašą su kiekiais.</string>
+    <string name="duckAiSuggestionRecipeNutritionLabel" instruction="Suggested prompt chip: recipe nutrition">Įvertink maistinę vertę</string>
+    <string name="duckAiSuggestionRecipeNutritionPrompt" instruction="Suggested prompt submitted text: recipe nutrition">Įvertink šio recepto maistinės vertės informaciją.</string>
+    <string name="duckAiSuggestionScaleRecipeLabel" instruction="Suggested prompt chip: scale a recipe">Pakeisk porcijų kiekį</string>
+    <string name="duckAiSuggestionScaleRecipePrompt" instruction="Suggested prompt submitted text: scale a recipe">Pritaikyk šį receptą kitam porcijų kiekiui.</string>
+    <string name="duckAiSuggestionProductProsConsLabel" instruction="Suggested prompt chip: product pros and cons">Kokie privalumai ir trūkumai?</string>
+    <string name="duckAiSuggestionProductProsConsPrompt" instruction="Suggested prompt submitted text: product pros and cons">Kokie šio produkto privalumai ir trūkumai?</string>
+    <string name="duckAiSuggestionFindAlternativesLabel" instruction="Suggested prompt chip: product alternatives">Rask alternatyvų</string>
+    <string name="duckAiSuggestionFindAlternativesPrompt" instruction="Suggested prompt submitted text: product alternatives">Pasiūlyk kelias šio produkto alternatyvas.</string>
+    <string name="duckAiSuggestionSummarizeVideoLabel" instruction="Suggested prompt chip: summarize a video">Pateik šio vaizdo įrašo santrauką</string>
+    <string name="duckAiSuggestionSummarizeVideoPrompt" instruction="Suggested prompt submitted text: summarize a video">Pateik šio vaizdo įrašo santrauką.</string>
+    <string name="duckAiSuggestionVideoKeyPointsLabel" instruction="Suggested prompt chip: video key points">Kokios svarbiausios mintys?</string>
+    <string name="duckAiSuggestionVideoKeyPointsPrompt" instruction="Suggested prompt submitted text: video key points">Kokios svarbiausios mintys pateikiamos šiame vaizdo įraše?</string>
+    <string name="duckAiSuggestionTailorResumeLabel" instruction="Suggested prompt chip: tailor a resume to a job">Pritaikyk mano gyvenimo aprašymą</string>
+    <string name="duckAiSuggestionTailorResumePrompt" instruction="Suggested prompt submitted text: tailor a resume to a job">Padėk pritaikyti mano gyvenimo aprašymą šioms pareigoms.</string>
+    <string name="duckAiSuggestionInterviewPrepLabel" instruction="Suggested prompt chip: interview prep">Padėk pasiruošti darbo pokalbiui</string>
+    <string name="duckAiSuggestionInterviewPrepPrompt" instruction="Suggested prompt submitted text: interview prep">Kokių darbo pokalbio klausimų galima sulaukti pretenduojant į šias pareigas?</string>
+    <string name="duckAiSuggestionCoverLetterLabel" instruction="Suggested prompt chip: draft a cover letter">Parenk motyvacinį laišką</string>
+    <string name="duckAiSuggestionCoverLetterPrompt" instruction="Suggested prompt submitted text: draft a cover letter">Parenk motyvacinį laišką šioms pareigoms.</string>
+    <string name="duckAiSuggestionEventDetailsLabel" instruction="Suggested prompt chip: event details">Kokia yra svarbiausia informacija?</string>
+    <string name="duckAiSuggestionEventDetailsPrompt" instruction="Suggested prompt submitted text: event details">Apibendrink svarbiausią informaciją apie šį įvykį.</string>
+    <string name="duckAiSuggestionWorthWatchingLabel" instruction="Suggested prompt chip: is a movie/show worth watching">Ar verta žiūrėti?</string>
+    <string name="duckAiSuggestionWorthWatchingPrompt" instruction="Suggested prompt submitted text: is a movie/show worth watching">Ar verta žiūrėti? Aprašyk neatskleisdamas siužeto.</string>
+    <string name="duckAiSuggestionSimilarTitlesLabel" instruction="Suggested prompt chip: similar movies or shows">Rekomenduok panašių kūrinių</string>
+    <string name="duckAiSuggestionSimilarTitlesPrompt" instruction="Suggested prompt submitted text: similar movies or shows">Rekomenduok panašių filmų ar laidų.</string>
+    <string name="duckAiSuggestionCastCrewLabel" instruction="Suggested prompt chip: cast and crew">Aktoriai ir kūrybinė grupė</string>
+    <string name="duckAiSuggestionCastCrewPrompt" instruction="Suggested prompt submitted text: cast and crew">Kas sudaro pagrindinę aktorių ir kūrybinę grupę ir kuo jie dar žinomi?</string>
+    <string name="duckAiSuggestionSummarizeBookLabel" instruction="Suggested prompt chip: summarize a book">Pateik šios knygos santrauką</string>
+    <string name="duckAiSuggestionSummarizeBookPrompt" instruction="Suggested prompt submitted text: summarize a book">Pateik šios knygos santrauką.</string>
+    <string name="duckAiSuggestionSimilarBooksLabel" instruction="Suggested prompt chip: similar books">Rekomenduok panašių knygų</string>
+    <string name="duckAiSuggestionSimilarBooksPrompt" instruction="Suggested prompt submitted text: similar books">Rekomenduok panašių knygų.</string>
+    <string name="duckAiSuggestionExplainPaperLabel" instruction="Suggested prompt chip: explain a research paper">Paaiškink šį mokslinį darbą</string>
+    <string name="duckAiSuggestionExplainPaperPrompt" instruction="Suggested prompt submitted text: explain a research paper">Paaiškink šį mokslinį darbą paprasta kalba.</string>
+    <string name="duckAiSuggestionPaperContributionsLabel" instruction="Suggested prompt chip: paper contributions">Koks pagrindinis indėlis?</string>
+    <string name="duckAiSuggestionPaperContributionsPrompt" instruction="Suggested prompt submitted text: paper contributions">Koks pagrindinis šio mokslinio darbo indėlis?</string>
+    <string name="duckAiSuggestionMenuHighlightsLabel" instruction="Suggested prompt chip: restaurant menu highlights">Ką užsisakyti?</string>
+    <string name="duckAiSuggestionMenuHighlightsPrompt" instruction="Suggested prompt submitted text: restaurant menu highlights">Kokių patiekalų čia būtina paragauti?</string>
+    <string name="duckAiSuggestionPlaceHoursLabel" instruction="Suggested prompt chip: place hours and location">Koks darbo laikas ir vieta?</string>
+    <string name="duckAiSuggestionPlaceHoursPrompt" instruction="Suggested prompt submitted text: place hours and location">Koks šios vietos darbo laikas, adresas ir kontaktiniai duomenys?</string>
+    <string name="duckAiSuggestionPlaceReviewsLabel" instruction="Suggested prompt chip: place reputation">Ar ši vieta verta dėmesio?</string>
+    <string name="duckAiSuggestionPlaceReviewsPrompt" instruction="Suggested prompt submitted text: place reputation">Ar ši vieta verta dėmesio? Apibendrink reputaciją pagal atsiliepimus ir įvertinimus.</string>
+    <string name="duckAiSuggestionSummarizeThreadLabel" instruction="Suggested prompt chip: summarize a discussion thread">Pateik šios diskusijos santrauką</string>
+    <string name="duckAiSuggestionSummarizeThreadPrompt" instruction="Suggested prompt submitted text: summarize a discussion thread">Pateik šios diskusijos gijos santrauką.</string>
+    <string name="duckAiSuggestionExplainRepoLabel" instruction="Suggested prompt chip: explain a code repository">Paaiškink šią saugyklą</string>
+    <string name="duckAiSuggestionExplainRepoPrompt" instruction="Suggested prompt submitted text: explain a code repository">Paaiškink, kam skirta ši saugykla ir kaip ja naudotis.</string>
+    <string name="duckAiSuggestionExplainAnswerLabel" instruction="Suggested prompt chip: explain the top answer">Paaiškink viršutinį atsakymą</string>
+    <string name="duckAiSuggestionExplainAnswerPrompt" instruction="Suggested prompt submitted text: explain the top answer">Paprastais žodžiais paaiškink priimtą atsakymą.</string>
+    <string name="duckAiSuggestionHowtoStepsLabel" instruction="Suggested prompt chip: how-to steps">Paaiškink man žingsnius</string>
+    <string name="duckAiSuggestionHowtoStepsPrompt" instruction="Suggested prompt submitted text: how-to steps">Išskaidyk tai į aiškius, sunumeruotus žingsnius.</string>
+    <string name="duckAiSuggestionHowtoMaterialsLabel" instruction="Suggested prompt chip: how-to materials">Ko prireiks?</string>
+    <string name="duckAiSuggestionHowtoMaterialsPrompt" instruction="Suggested prompt submitted text: how-to materials">Išvardyk įrankius, medžiagas ar išankstines sąlygas, kurių tam prireiks.</string>
+    <string name="duckAiSuggestionCourseLearnLabel" instruction="Suggested prompt chip: course learning outcomes">Ko išmoksiu?</string>
+    <string name="duckAiSuggestionCourseLearnPrompt" instruction="Suggested prompt submitted text: course learning outcomes">Kokie pagrindiniai dalykai, kurių išmoksiu šiame kurse?</string>
+    <string name="duckAiSuggestionCourseWorthLabel" instruction="Suggested prompt chip: is a course worth taking">Ar verta rinktis?</string>
+    <string name="duckAiSuggestionCourseWorthPrompt" instruction="Suggested prompt submitted text: is a course worth taking">Sprendžiant iš šio puslapio, ar verta rinktis šį kursą?</string>
+    <string name="duckAiSuggestionFaqAnswerLabel" instruction="Suggested prompt chip: what an FAQ page answers">Į ką tai atsako?</string>
+    <string name="duckAiSuggestionFaqAnswerPrompt" instruction="Suggested prompt submitted text: what an FAQ page answers">Į kokius pagrindinius klausimus atsako šis puslapis?</string>
+    <string name="duckAiSuggestionFaqSummaryLabel" instruction="Suggested prompt chip: summarize FAQ Q&amp;As">Apibendrink klausimus ir atsakymus</string>
+    <string name="duckAiSuggestionFaqSummaryPrompt" instruction="Suggested prompt submitted text: summarize FAQ Q&amp;As">Apibendrink šiame puslapyje esančius klausimus ir atsakymus.</string>
+    <string name="duckAiSuggestionReviewVerdictLabel" instruction="Suggested prompt chip: review verdict">Kokia išvada?</string>
+    <string name="duckAiSuggestionReviewVerdictPrompt" instruction="Suggested prompt submitted text: review verdict">Kokia bendra išvada ir įvertinimas?</string>
+    <string name="duckAiSuggestionReviewSummaryLabel" instruction="Suggested prompt chip: summarize reviews">Apibendrink atsiliepimus</string>
+    <string name="duckAiSuggestionReviewSummaryPrompt" instruction="Suggested prompt submitted text: summarize reviews">Apibendrink, kas rašoma atsiliepimuose.</string>
+    <string name="duckAiSuggestionWhoIsThisLabel" instruction="Suggested prompt chip: person background">Kas yra šis asmuo?</string>
+    <string name="duckAiSuggestionWhoIsThisPrompt" instruction="Suggested prompt submitted text: person background">Pateik trumpą informaciją apie šį asmenį.</string>
+    <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person&apos;s background">Apibendrink šio asmens biografiją</string>
+    <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Apibendrink šio asmens biografiją ir svarbiausius darbus.</string>
 
-    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
-    <string name="contextualSheetImprovedHint">Klausk bet ko privačiai</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Naujausi pokalbiai</string>
 
     <!-- duck.ai contextual fire button -->
@@ -177,10 +247,10 @@
     <string name="duck_ai_chat_history_action_new">Naujas</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Atsisiųsk pokalbius</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">%1$d pokalbio atsisiuntimas baigtas</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">%1$d pokalbio atsisiuntimas baigtas</item>
         <item quantity="few">%1$d pokalbių atsisiuntimas baigtas</item>
         <item quantity="many">%1$d pokalbio atsisiuntimas baigtas</item>
-        <item quantity="other">%1$d pokalbių atsisiuntimas baigtas</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">%1$d pokalbių atsisiuntimas baigtas</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Atidaryti papildomą meniu</string>
     <string name="duck_ai_chat_history_select_all">Pasirinkti viską</string>
@@ -206,6 +276,11 @@
     <string name="native_input_chat_duck_mode_hint">Atsakyk…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Geriausiai tinka naudoti kasdien</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Patikimas, bet greičiau pasiekia apribojimus</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Išbandykite nemokamai</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Tik prenumeratoriams.</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Tik plano „Pro“ prenumeratoriams</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -266,6 +341,76 @@
     <string name="duckAiSettingsTitle">„Duck.ai“ nuostatos</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Klausti apie kortelę</string>
+
+    <!-- Editing a message already sent to Duck.ai -->
+    <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Redaguoti žinutę</string>
+    <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Redaguojant atsakymas bus pakeistas nauju.</string>
+
     <string name="duckChatContextualAskAboutPage">Klausk apie puslapį</string>
+    <string name="duckChatContextualAskAboutSearch">Tęsti platformoje „Duck.ai“</string>
+    <string name="duckChatContextualOpenDuckAi">Atidaryti „Duck.ai“</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Pateik pasirinkto teksto santrauką</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Pateik pasirinkto teksto santrauką.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Išversk pasirinktą tekstą</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Išversk pasirinktą tekstą į %1$s kalbą.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Pasirinktas tekstas</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Gali pridėti iki %1$d pažymėto teksto fragmentų. Pašalink vieną, kad pridėtum kitą.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Klauskite „Duck.ai“</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d žodis</item>
+        <item quantity="few">%1$d žodžiai</item>
+        <item quantity="many">%1$d žodžio</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d žodžių</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s limitus išnaudoja iki 2–5 kartų greičiau nei baziniai modeliai.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Atmesti</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d %% dienos limito</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d %% savaitės limito</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Pasiektas dienos limitas</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Pasiektas savaitės limitas</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Pasiektas savaitės naudojimo limitas</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Pasiektas pažangių DI modelių limitas</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Pakeisti modelį</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Pradėti naudoti savaitės limitą</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Išbandyti prenumeratą nemokamai</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Prenumeruoti</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Atsinaujins po %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d diena</item>
+        <item quantity="few">%1$d dienos</item>
+        <item quantity="many">%1$d dienos</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dienų</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d valanda</item>
+        <item quantity="few">%1$d valandos</item>
+        <item quantity="many">%1$d valandos</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d valandų</item>
+    </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Pateik šio dokumento santrauką</string>
+
+    <!-- Duck.ai ToS consent submit button -->
+    <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Klausti</string>
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">„DuckDuckGo“ anonimina tavo pokalbius. Kai spusteli „^1“, sutinki su mūsų <annotation type="privacy_link">privatumo politika</annotation> ir <annotation type="terms_link">paslaugų teikimo sąlygomis</annotation>.</string>
+    <!-- Duck.ai tab switcher card -->
+    <string name="duckAiTabCardChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a text or image chat, as opposed to a voice chat.">Pokalbis</string>
+    <string name="duckAiTabCardThinkingTitle" instruction="Header on a tab switcher card for a Duck.ai chat whose question has been sent but whose reply has not started yet. The chat title, if any, is shown below it.">Mąstoma…</string>
+    <string name="duckAiTabCardListeningTitle" instruction="Header on a tab switcher card for a Duck.ai tab with a voice chat in progress, shown while Duck.ai is listening to the user.">Klausomasi…</string>
+    <string name="duckAiTabCardVoiceChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a voice chat, as opposed to a text chat.">Balso pokalbis</string>
+    <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Stenograma</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Failai automatiškai tikrinami, ar juose nėra neteisėto turinio. Pažymėtų pokalbių duomenys saugomi ribotą laiką. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
 </resources>

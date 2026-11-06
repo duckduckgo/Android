@@ -21,14 +21,10 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsEntryViewModel.Command.OpenSettings
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -38,9 +34,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -50,7 +46,7 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class DuckPlayerSettingsEntryViewModel @Inject constructor(
     private val duckPlayer: DuckPlayerInternal,
-    private val statusChecker: AdBlockingStatusChecker,
+    private val placementProvider: DuckPlayerSettingsPlacementProvider,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -72,14 +68,8 @@ class DuckPlayerSettingsEntryViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        viewStateJob += combine(
-            duckPlayer.observeDuckPlayerState(),
-            statusChecker.settingsPlacementFlow(),
-        ) { duckPlayerState, adBlockingPlacement ->
-            val isVisible = adBlockingPlacement == SettingsPlacement.Hidden &&
-                (duckPlayerState == ENABLED || duckPlayerState == DISABLED_WIH_HELP_LINK)
-            _viewState.update { it.copy(isVisible = isVisible) }
-        }
+        viewStateJob += placementProvider.placementFlow()
+            .onEach { placement -> _viewState.update { it.copy(isVisible = placement == DuckPlayerSettingsPlacement.Standalone) } }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }

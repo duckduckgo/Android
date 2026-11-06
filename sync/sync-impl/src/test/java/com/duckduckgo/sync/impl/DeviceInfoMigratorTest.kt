@@ -24,6 +24,7 @@ import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -41,16 +42,14 @@ class DeviceInfoMigratorTest {
     private val syncStore: SyncStore = mock()
     private val syncApi: SyncApi = mock()
     private val syncDeviceIds: SyncDeviceIds = mock()
-    private val accountInfoKeyManager: AccountInfoKeyManager = mock()
     private val deviceInfoUpdater: DeviceInfoUpdater = mock()
+    private val publishTracker = DeviceInfoPublishWatcher()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
     private lateinit var migrator: DeviceInfoMigrator
-
-    private val keyResult = AccountInfoKeyResult(kid = "kid-1", publicKey = RsaJwk(n = "n", e = "AQAB"), created = true, wrapsSent = 1)
 
     @Before
     fun before() {
@@ -59,8 +58,8 @@ class DeviceInfoMigratorTest {
             syncApi = syncApi,
             syncFeature = syncFeature,
             syncDeviceIds = syncDeviceIds,
-            accountInfoKeyManager = accountInfoKeyManager,
             deviceInfoUpdater = deviceInfoUpdater,
+            deviceInfoPublishWatcher = publishTracker,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
@@ -92,6 +91,17 @@ class DeviceInfoMigratorTest {
     }
 
     @Test
+    fun whenV2ConnectFlowDisabledThenNoOpAndNotMarked() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(enable = false))
+
+        val result = migrator.ensureMigrated()
+
+        assertTrue(result is Result.Success)
+        verify(syncApi, never()).getDevices(any())
+        verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()
+    }
+
+    @Test
     fun whenNotSignedInThenErrorWithoutNetwork() = runTest {
         whenever(syncStore.userId).thenReturn(null)
 
@@ -100,7 +110,7 @@ class DeviceInfoMigratorTest {
     }
 
     @Test
-    fun whenServerAlreadyHasDeviceInfoThenMarkDoneWithoutKeyOrPatch() = runTest {
+    fun whenServerAlreadyHasDeviceInfoThenMarkDoneWithoutWriting() = runTest {
         whenever(syncApi.getDevices(token)).thenReturn(
             Result.Success(deviceEntries(deviceInfo = "existing.device.info.jwe")),
         )
@@ -109,21 +119,44 @@ class DeviceInfoMigratorTest {
 
         assertTrue(result is Result.Success)
         verify(syncStore).unifiedDeviceListMigratedForUserId = userId
-        verify(accountInfoKeyManager, never()).ensureKeyRegistered()
-        verify(deviceInfoUpdater, never()).updateThisDevice(any())
+        verify(deviceInfoUpdater, never()).setThisDeviceName(name = any(), source = any())
     }
 
     @Test
-    fun whenKeyEnsuredAndPatchSucceedsThenMarkDone() = runTest {
+    fun whenDeviceInfoWrittenThenMarkDone() = runTest {
         whenever(syncApi.getDevices(token)).thenReturn(Result.Success(deviceEntries(deviceInfo = null)))
-        whenever(accountInfoKeyManager.ensureKeyRegistered()).thenReturn(Result.Success(keyResult))
-        whenever(deviceInfoUpdater.updateThisDevice("deviceName")).thenReturn(Result.Success(emptyList()))
+        whenever(deviceInfoUpdater.setThisDeviceName(name = "deviceName", source = DeviceInfoUpdateSource.FIRST_WRITE))
+            .thenReturn(Result.Success(emptyList()))
 
         val result = migrator.ensureMigrated()
 
         assertTrue(result is Result.Success)
-        verify(deviceInfoUpdater).updateThisDevice("deviceName")
+        verify(deviceInfoUpdater).setThisDeviceName(name = "deviceName", source = DeviceInfoUpdateSource.FIRST_WRITE)
         verify(syncStore).unifiedDeviceListMigratedForUserId = userId
+    }
+
+    @Test
+    fun whenDeviceInfoWrittenThenPublishRecorded() = runTest {
+        val snapshot = publishTracker.snapshot()
+        whenever(syncApi.getDevices(token)).thenReturn(Result.Success(deviceEntries(deviceInfo = null)))
+        whenever(deviceInfoUpdater.setThisDeviceName(name = "deviceName", source = DeviceInfoUpdateSource.FIRST_WRITE))
+            .thenReturn(Result.Success(emptyList()))
+
+        migrator.ensureMigrated()
+
+        assertTrue(publishTracker.publishedSince(snapshot))
+    }
+
+    @Test
+    fun whenServerAlreadyHasDeviceInfoThenNoPublishRecorded() = runTest {
+        val snapshot = publishTracker.snapshot()
+        whenever(syncApi.getDevices(token)).thenReturn(
+            Result.Success(deviceEntries(deviceInfo = "existing.device.info.jwe")),
+        )
+
+        migrator.ensureMigrated()
+
+        assertFalse(publishTracker.publishedSince(snapshot))
     }
 
     @Test
@@ -131,25 +164,15 @@ class DeviceInfoMigratorTest {
         whenever(syncApi.getDevices(token)).thenReturn(Result.Error(reason = "network"))
 
         assertTrue(migrator.ensureMigrated() is Result.Error)
-        verify(accountInfoKeyManager, never()).ensureKeyRegistered()
+        verify(deviceInfoUpdater, never()).setThisDeviceName(name = any(), source = any())
         verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()
     }
 
     @Test
-    fun whenEnsureKeyFailsThenErrorAndNotMarked() = runTest {
+    fun whenWriteFailsThenErrorAndNotMarked() = runTest {
         whenever(syncApi.getDevices(token)).thenReturn(Result.Success(deviceEntries(deviceInfo = null)))
-        whenever(accountInfoKeyManager.ensureKeyRegistered()).thenReturn(Result.Error(reason = "no secret key"))
-
-        assertTrue(migrator.ensureMigrated() is Result.Error)
-        verify(deviceInfoUpdater, never()).updateThisDevice(any())
-        verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()
-    }
-
-    @Test
-    fun whenPatchFailsThenErrorAndNotMarked() = runTest {
-        whenever(syncApi.getDevices(token)).thenReturn(Result.Success(deviceEntries(deviceInfo = null)))
-        whenever(accountInfoKeyManager.ensureKeyRegistered()).thenReturn(Result.Success(keyResult))
-        whenever(deviceInfoUpdater.updateThisDevice("deviceName")).thenReturn(Result.Error(reason = "patch failed"))
+        whenever(deviceInfoUpdater.setThisDeviceName(name = "deviceName", source = DeviceInfoUpdateSource.FIRST_WRITE))
+            .thenReturn(Result.Error(reason = "patch failed"))
 
         assertTrue(migrator.ensureMigrated() is Result.Error)
         verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()

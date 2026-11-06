@@ -17,8 +17,8 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.io.BufferedReader
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ interface ContentScopeJSReader {
     fun getContentScopeJS(): String
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealContentScopeJSReader @Inject constructor() : ContentScopeJSReader {
     private lateinit var contentScopeJS: String

@@ -7,7 +7,7 @@ Pixels are lightweight telemetry events sent via HTTP with a name and optional p
 - Conversion and retention (e.g., subscription purchase, activation, onboarding completion)
 
 The privacy invariants every pixel must satisfy (no PII, no URLs, no correlation IDs, bucketed numbers,
-bounded enums) are in CLAUDE.md and apply to all outbound data — they are not repeated here.
+bounded enums) are in AGENTS.md and apply to all outbound data — they are not repeated here.
 
 ## Types of Pixels
 
@@ -18,6 +18,11 @@ Sent every time the event occurs. Use for events where per-occurrence volume mat
 ### Daily Pixels
 
 Sent at most once per calendar day per event. Use to measure the number of unique users affected by something (e.g., how many users hit a particular error per day). Most daily pixel implementations also support a "count" variant that fires every time.
+
+When a pixel fires as a plain count+daily pair with identical parameters, register it as **one**
+definition entry using the `first_daily_count` suffix rather than two separate `_count`/`_daily`
+entries — see `.claude/rules/pixel-definitions.md`. The firing code is unchanged either way: it still
+calls `pixel.fire()` twice with the explicit `_count`/`_daily` wire-string names.
 
 ### Unique Pixels
 
@@ -60,6 +65,8 @@ Every pixel fired in code **must** have a corresponding entry in a definition fi
 - Find the appropriate definition file for your feature area (or create a new one)
 - Add an entry keyed by the full pixel name
 - Include `description`, `owners`, `triggers`, `parameters`, and `suffixes` fields
+- Choose `triggers` with the decision procedure in `.claude/rules/pixel-definitions.md` — classify by
+  the event that causes the pixel to fire, and never default to `["other"]`
 - The `owners` field must contain the author's GitHub username
 - Match the format of existing entries in the same file
 

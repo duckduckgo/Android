@@ -394,6 +394,17 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when hasSubmittedPromptBefore default then return false`() = runTest {
+        assertFalse(testee.hasSubmittedPromptBefore())
+    }
+
+    @Test
+    fun `when setPromptSubmitted then hasSubmittedPromptBefore returns true`() = runTest {
+        testee.setPromptSubmitted()
+        assertTrue(testee.hasSubmittedPromptBefore())
+    }
+
+    @Test
     fun `when observeDefaultTogglePosition then receive updates`() = runTest {
         val results = mutableListOf<String?>()
         val job = launch {
@@ -416,6 +427,17 @@ class SharedPreferencesDuckChatDataStoreTest {
     fun `when setDefaultTogglePosition then getDefaultTogglePosition returns value`() = runTest {
         testee.setDefaultTogglePosition("DUCK_AI")
         assertEquals("DUCK_AI", testee.getDefaultTogglePosition())
+    }
+
+    @Test
+    fun `when getLastUsedTogglePosition default then return null`() = runTest {
+        assertNull(testee.getLastUsedTogglePosition())
+    }
+
+    @Test
+    fun `when setLastUsedTogglePosition then getLastUsedTogglePosition returns value`() = runTest {
+        testee.setLastUsedTogglePosition("DUCK_AI")
+        assertEquals("DUCK_AI", testee.getLastUsedTogglePosition())
     }
 
     @Test

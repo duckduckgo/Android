@@ -18,7 +18,6 @@ package com.duckduckgo.app.generalsettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
@@ -31,11 +30,12 @@ import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_
 import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT
 import com.duckduckgo.app.pixels.AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -168,7 +168,6 @@ class GeneralSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             voiceSearchRepository.setVoiceSearchUserEnabled(checked)
             if (checked) {
-                voiceSearchRepository.resetVoiceSearchDismissed()
                 pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_ON)
             } else {
                 pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)

@@ -17,13 +17,10 @@
 package com.duckduckgo.common.ui
 
 import android.annotation.SuppressLint
-import android.app.UiModeManager
 import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -35,20 +32,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.view.isFullScreen
+import com.duckduckgo.di.android.AndroidInjection
+import com.duckduckgo.di.android.InjectableActivity
 import com.duckduckgo.mobile.android.R
-import dagger.android.AndroidInjection
-import dagger.android.DaggerActivity
 import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
 @HasMemberInjections
-abstract class DuckDuckGoActivity : DaggerActivity() {
+abstract class DuckDuckGoActivity : InjectableActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
     @Inject lateinit var themingDataStore: ThemingDataStore
+
+    @Inject lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     /**
      * Override in subclasses whose look should follow the fire-mode theme.
@@ -69,21 +69,29 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     }
 
     /**
-     * We need to conditionally defer the Dagger initialization in certain places. So if this method
-     * is called from an Activity with daggerInject=false, you'll probably need to call
-     * daggerInject() directly.
+     * We need to conditionally defer the injection in certain places. So if this method
+     * is called from an Activity with injectDependencies=false, you'll probably need to call
+     * injectDependencies() directly.
      */
     fun onCreate(
         savedInstanceState: Bundle?,
-        daggerInject: Boolean = true,
+        injectDependencies: Boolean = true,
     ) {
-        if (daggerInject) daggerInject()
-        themeChangeReceiver = applyTheme(themingDataStore.theme, applyFireTheme)
+        if (injectDependencies) injectDependencies()
+        themeChangeReceiver = applyTheme(
+            themingDataStore.theme,
+            applyFireTheme,
+            appBrandDesignUpdateToggles.theme().isEnabled(),
+            listOfNotNull(
+                R.style.ThemeOverlay_Rebrand_Radius.takeIf { appBrandDesignUpdateToggles.radius().isEnabled() },
+                R.style.ThemeOverlay_Rebrand_Badges.takeIf { appBrandDesignUpdateToggles.badges().isEnabled() },
+            ),
+        )
         super.onCreate(savedInstanceState)
     }
 
-    protected fun daggerInject() {
-        AndroidInjection.inject(this, bindingKey = DaggerActivity::class.java)
+    protected fun injectDependencies() {
+        AndroidInjection.inject(this, bindingKey = InjectableActivity::class.java)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -111,13 +119,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
 
     fun isDarkThemeEnabled(): Boolean {
         return when (themingDataStore.theme) {
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-                when (uiManager.nightMode) {
-                    UiModeManager.MODE_NIGHT_YES -> true
-                    else -> false
-                }
-            }
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> isInNightMode()
             DARK -> true
             else -> false
         }
@@ -148,13 +150,11 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
      */
     protected fun applyDisplayCutoutMode(orientation: Int) {
         displayCutoutModeManaged = true
-        if (Build.VERSION.SDK_INT >= 28) {
-            window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-                } else {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
-                }
+        window.attributes = window.attributes.apply {
+            layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+            } else {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
             }
         }
     }

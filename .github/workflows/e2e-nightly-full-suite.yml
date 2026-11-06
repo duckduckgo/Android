@@ -1,7 +1,5 @@
 name: 'End to End Tests - Full Suite (Nightly)'
 
-run-name: 'End to End Tests - Full Suite (${{ inputs.ddg_di || ''AnvilDagger'' }} Nightly)'
-
 on:
   workflow_call:
     inputs:
@@ -14,11 +12,26 @@ on:
         required: false
         type: boolean
         default: true
-      ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+      internal_binary_id:
+        description: 'Maestro Cloud binary ID of an already uploaded Internal APK (builds and uploads one when empty)'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
+      release_binary_id:
+        description: 'Maestro Cloud binary ID of an already uploaded Play release APK (builds and uploads one when empty)'
+        required: false
+        type: string
+        default: ''
+      fail_fast:
+        description: 'Cancel the remaining suites as soon as one fails'
+        required: false
+        type: boolean
+        default: false
+      maestro_priority:
+        description: 'Maestro Cloud queue priority (high, normal or low)'
+        required: false
+        type: string
+        default: normal
   workflow_dispatch:
     inputs:
       commit:
@@ -30,382 +43,156 @@ on:
         required: false
         type: boolean
         default: true
-      ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+      maestro_priority:
+        description: 'Maestro Cloud queue priority'
         required: false
-        type: string
-        default: 'AnvilDagger'
+        type: choice
+        options:
+          - high
+          - normal
+          - low
+        default: normal
 
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-e2e-full-suite
   cancel-in-progress: true
 
-# Workflow-level env: compute DI-variant suffixes once. Empty when AnvilDagger
-# (or input missing) so maestro test names and Asana task names stay
-# byte-identical to pre-change for the default Anvil path. Pattern uses
-# truthy-first ternary because `A && '' || X` is broken in GHA expressions
-# (empty string is falsy).
-env:
-  DDG_DI: ${{ inputs.ddg_di || 'AnvilDagger' }}
-  DI_UNDERSCORE_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format('_{0}', inputs.ddg_di) || '' }}
-  DI_PAREN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format(' ({0})', inputs.ddg_di) || '' }}
-
 jobs:
+  build:
+    if: ${{ inputs.internal_binary_id == '' || inputs.release_binary_id == '' }}
+    uses: ./.github/workflows/e2e-build-and-upload.yml
+    with:
+      commit: ${{ inputs.commit }}
+      create_asana_tasks: ${{ inputs.create_asana_tasks }}
+    secrets: inherit
+
   instrumentation_tests:
+    needs: build
+    if: ${{ !cancelled() && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
     runs-on: ubuntu-latest
-    name: End-to-End tests
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: ${{ inputs.fail_fast == true }}
+      matrix:
+        include:
+          - name: Autofill Critical Path
+            test-name: autofillCriticalPath
+            binary: release
+            api-level: 34
+            include-tags: autofillNoAuthTests
+            suite-name: Autofill Critical Path (Nightly)
+          - name: Custom tabs flows
+            test-name: customTabs
+            binary: internal
+            api-level: 34
+            include-tags: customTabsTest
+            suite-name: Custom Tabs
+          - name: Internal Privacy Tests
+            test-name: internalPrivacyTest
+            binary: internal
+            api-level: 34
+            include-tags: privacyTestInternal
+            suite-name: Internal Privacy (Nightly)
+          - name: Onboarding flows
+            test-name: onboardingTest
+            binary: release
+            api-level: 34
+            include-tags: onboardingTest
+            suite-name: Onboarding (Nightly)
+          - name: Internal Onboarding Flows
+            test-name: internalonboarding
+            binary: internal
+            api-level: 36
+            include-tags: onboardingInternalTest
+            suite-name: Internal Onboarding (Nightly)
+          - name: Deeplink tests
+            test-name: navigationTest
+            binary: release
+            api-level: 34
+            include-tags: navigationTest
+            suite-name: Deeplink (Nightly)
+          - name: Ad click detection flows
+            test-name: adClickTest
+            binary: release
+            api-level: 30
+            include-tags: adClickTest
+            suite-name: Ad Click (Nightly)
+          - name: Privacy Tests
+            test-name: privacyTest
+            binary: release
+            api-level: 34
+            include-tags: privacyTest
+            suite-name: Privacy (Nightly)
+          - name: Security Tests
+            test-name: securityTest
+            binary: release
+            api-level: 34
+            include-tags: securityTest
+            suite-name: Security (Nightly)
+          - name: Release Tests
+            test-name: releaseTest
+            binary: release
+            api-level: 34
+            include-tags: releaseTest
+            suite-name: Release Tests (Nightly)
+          - name: Unified Input Field
+            test-name: unifiedInputTest
+            binary: internal
+            api-level: 34
+            include-tags: unifiedInputTest
+            suite-name: Unified Input Field (Nightly)
+          - name: Notifications permissions Android 13+
+            test-name: notificationPermissionTest
+            binary: release
+            api-level: 34
+            include-tags: permissionsTest
+            suite-name: Notification Permissions (Nightly)
+    env:
+      INTERNAL_BINARY_ID: ${{ needs.build.outputs.internal_binary_id || inputs.internal_binary_id }}
+      RELEASE_BINARY_ID: ${{ needs.build.outputs.release_binary_id || inputs.release_binary_id }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
-      - name: Assemble APKs
-        id: assemble
-        uses: ./.github/actions/checkout-and-assemble
-        with:
-          commit: ${{ inputs.commit }}
-          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
-          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
-          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle_flags: '-Pautofill-disable-auth-requirement -Pddg.di=${{ env.DDG_DI }}'
-          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
-          ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
-
-      - name: Upload Internal Binary to Maestro
-        id: maestro-upload-internal-binary
+      - name: ${{ matrix.name }}
+        id: maestro-suite
         uses: ./.github/actions/maestro-cloud-asana-reporter
+        # The suites queue for the same Maestro Cloud devices, so this includes the wait for a free device.
         timeout-minutes: 120
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: binary_internal_upload${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_test_name: ${{ matrix.test-name }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
-          maestro_api_level: 34
-          maestro_include_tags: binaryUpload
+          maestro_app_binary_id: ${{ matrix.binary == 'internal' && env.INTERNAL_BINARY_ID || env.RELEASE_BINARY_ID }}
+          maestro_api_level: ${{ matrix.api-level }}
+          maestro_include_tags: ${{ matrix.include-tags }}
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Internal Binary Upload${{ env.DI_PAREN_SUFFIX }}
+          test_suite_name: ${{ matrix.suite-name }}
+          maestro_priority: ${{ inputs.maestro_priority }}
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-
-      - name: Upload Release Binary to Maestro
-        id: maestro-upload-release-binary
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: binary_release_upload${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
-          maestro_api_level: 34
-          maestro_include_tags: binaryUpload
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Release Binary Upload${{ env.DI_PAREN_SUFFIX }}
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-
-      - name: Autofill Critical Path
-        id: maestro-autofill-critical
-        # Run regardless of earlier suite failures, but only if the release binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: autofillCriticalPath${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: autofillNoAuthTests
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Autofill Critical Path (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
+          is_release_blocker: true
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
-      - name: Custom tabs flows
-        id: maestro-custom-tabs
-        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: customTabs${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: customTabsTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Custom Tabs${{ env.DI_PAREN_SUFFIX }}
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+  report_failure:
+    needs: instrumentation_tests
+    # One task for the whole run rather than one per failed suite.
+    if: ${{ always() && needs.instrumentation_tests.result == 'failure' && inputs.create_asana_tasks == true && github.event_name != 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    name: Report failure
 
-      - name: Internal Privacy Tests
-        id: maestro-internal-privacy
-        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: internalPrivacyTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: privacyTestInternal
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Internal Privacy (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Onboarding flows
-        id: maestro-onboarding
-        # Run regardless of earlier suite failures, but only if the release binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: onboardingTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: onboardingTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Onboarding (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Internal Onboarding Flows
-        id: maestro-internal-onboarding
-        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: internalonboarding${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 36
-          maestro_include_tags: onboardingInternalTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Internal Onboarding (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Deeplink tests
-        id: maestro-deeplink
-        # Run regardless of earlier suite failures, but only if the release binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: navigationTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: navigationTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Deeplink (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Ad click detection flows
-        id: maestro-ad-click
-        # Run regardless of earlier suite failures, but only if the release binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: adClickTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
-          maestro_include_tags: adClickTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Ad Click (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Privacy Tests
-        id: maestro-privacy
-        # Run regardless of earlier suite failures, but only if the release binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: privacyTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: privacyTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Privacy (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Security Tests
-        id: maestro-security
-        # Run regardless of earlier suite failures, but only if the release binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: securityTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: securityTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Security (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Release Tests
-        id: maestro-release
-        # Run regardless of earlier suite failures, but only if the release binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: releaseTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: releaseTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Release Tests (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Unified Input Field
-        id: maestro-unified-input
-        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: unifiedInputTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: unifiedInputTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Unified Input Field (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
-      - name: Notifications permissions Android 13+
-        id: maestro-notification-permissions
-        # Run regardless of earlier suite failures, but only if the release binary uploaded.
-        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
-        uses: ./.github/actions/maestro-cloud-asana-reporter
-        timeout-minutes: 120
-        with:
-          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
-          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: notificationPermissionTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
-          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
-          maestro_include_tags: permissionsTest
-          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Notification Permissions (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
-          create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          # Only block releases for the default Anvil path. Metro is informational.
-          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
-          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
-          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
-
+    steps:
       - name: Create Asana task when workflow failed
-        if: ${{ failure() && inputs.create_asana_tasks == true && github.event_name != 'workflow_dispatch' }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
           asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - End to End tests${{ env.DDG_DI == 'AnvilDagger' && ' (Release Blockers)' || format(' ({0})', env.DDG_DI) }}
-          asana-task-description: The end to end workflow${{ env.DI_PAREN_SUFFIX }} has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - End to End tests (Release Blockers)
+          asana-task-description: The end to end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'

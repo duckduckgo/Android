@@ -35,10 +35,13 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
+class SearchWidgetLight : SearchWidget(R.layout.search_widget_light, WidgetTheme.LIGHT)
 
 @HasMemberInjections
-open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWidgetProvider() {
+open class SearchWidget(
+    val layoutId: Int = R.layout.search_widget_dark,
+    private val widgetTheme: WidgetTheme = WidgetTheme.DARK,
+) : AppWidgetProvider() {
 
     @Inject
     lateinit var searchWidgetConfigurator: SearchWidgetConfigurator
@@ -60,7 +63,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
 
     private fun inject(context: Context) {
         val application = context.applicationContext as DuckDuckGoApplication
-        application.daggerAppComponent.inject(this)
+        application.appComponent.inject(this)
     }
 
     override fun onEnabled(context: Context) {
@@ -109,6 +112,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
                 context = context,
                 remoteViews = views,
                 fromFavWidget = false,
+                widgetTheme = widgetTheme,
             )
             appWidgetManager.updateAppWidget(appWidgetId, views)
             logcat { "SearchWidget updateAppWidget completed for widget id = $appWidgetId" }

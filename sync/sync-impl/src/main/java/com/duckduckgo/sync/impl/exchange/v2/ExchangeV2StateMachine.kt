@@ -16,16 +16,19 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Bye
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfirmed
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDenied
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeUnavailable
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown
 import javax.inject.Inject
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown as UnknownMessage
 
 /**
  * Pure validator for the Exchange V2 wire protocol. Stateful (it tracks [currentState] and the
@@ -33,11 +36,35 @@ import javax.inject.Inject
  * input returns a [TransitionResult] that the runner forwards to the event sink and whose declared
  * [SideEffect]s the runner executes.
  *
- * Spec: Asana 1215056232572322 — Exchange V2 Message Sequence State Machine.
+ * Validates order, never content: it decides whether an input is allowed where the session
+ * currently is, and leaves what the input means to the runner. Which is why role election,
+ * provisioning and all network work live there instead.
+ *
+ * Every input is answered with a transition, so there is no way to ask "may I" without also moving.
+ * An input the current state doesn't allow is a protocol violation and aborts the session, with the
+ * single exception of an unrecognized message type, which is dropped so a newer peer can't kill the
+ * session by talking about things we don't model.
+ *
+ * Not thread-safe: one instance belongs to one session, and the runner serializes access to it.
+ *
+ * Spec: Asana 1215056232572322, Exchange V2 Message Sequence State Machine.
  */
 interface ExchangeV2StateMachine {
+
+    /** Where the session is now. Moves on every [receive] and [localTrigger], including aborts. */
     val currentState: ExchangeV2State
+
+    /**
+     * Feed in a message received from the peer. Accepts it, drops it, or aborts the session, per
+     * [TransitionResult.outcome].
+     */
     fun receive(msg: ExchangeV2Message): TransitionResult
+
+    /**
+     * Feed in something that didn't come off the wire: a user decision, role election, or the
+     * completion of work the runner was doing. Aborts the session if the current state does not
+     * allow the trigger.
+     */
     fun localTrigger(trigger: LocalTrigger): TransitionResult
 }
 
@@ -76,13 +103,19 @@ internal class RealExchangeV2StateMachine(
         private set
 
     override fun receive(msg: ExchangeV2Message): TransitionResult {
-        if (msg is Unknown) return drop(msg)
+        // Forward-compat rule, applied once for every state: a type this client doesn't model is
+        // dropped, never treated as a protocol error. Handlers below therefore only decide between
+        // "expected here" and the implicit abort.
+        if (msg is UnknownMessage) return drop(msg)
         return when (val state = currentState) {
             ExchangeV2State.Bootstrapped -> receiveInBootstrapped(state, msg)
             ExchangeV2State.Negotiating -> receiveInNegotiating(state, msg)
+            ExchangeV2State.Host.AwaitingStatus -> receiveInHostAwaitingStatus(state, msg)
+            ExchangeV2State.Host.Unknown -> receiveInHostUnknownStatus(state, msg)
             ExchangeV2State.Joiner.Confirming -> receiveInJoinerConfirming(state, msg)
             ExchangeV2State.Joiner.Waiting -> receiveInJoinerWaiting(state, msg)
-            else -> abort(state, msg, RejectReason.ImplicitAbort)
+            ExchangeV2State.Joiner.Joining -> receiveInJoinerJoining(state, msg)
+            else -> if (msg is Bye) receiveBye(state, msg) else abort(state, msg, RejectReason.ImplicitAbort)
         }
     }
 
@@ -91,12 +124,15 @@ internal class RealExchangeV2StateMachine(
             ExchangeV2State.Negotiating -> localTriggerInNegotiating(state, trigger)
             ExchangeV2State.Host.Confirming -> localTriggerInHostConfirming(state, trigger)
             ExchangeV2State.Host.Sending -> localTriggerInHostSending(state, trigger)
+            ExchangeV2State.Host.AwaitingStatus -> localTriggerInHostAwaitingStatus(state, trigger)
             ExchangeV2State.Joiner.Confirming -> localTriggerInJoinerConfirming(state, trigger)
+            ExchangeV2State.Joiner.Joining -> localTriggerInJoinerJoining(state, trigger)
             else -> abortLocal(state, trigger)
         }
     }
 
     private fun receiveInBootstrapped(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
+        if (msg is Bye) return receiveBye(state, msg)
         return if (msg is Hello) {
             accept(state, ExchangeV2State.Negotiating, msg)
         } else {
@@ -129,17 +165,36 @@ internal class RealExchangeV2StateMachine(
             is RecoveryCodeDenied,
             is RecoveryCodeUnavailable,
             is RecoveryCodeResponse,
+            is RecoveryCodeDone,
             -> abort(state, msg, RejectReason.ImplicitAbort)
-            is Unknown -> drop(msg)
+            is Bye -> receiveBye(state, msg)
+            is UnknownMessage -> drop(msg)
         }
     }
 
-    // If the peer aborts while we're still showing the confirm prompt, act on it now instead of
+    private fun receiveInHostAwaitingStatus(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
+        return when (msg) {
+            is RecoveryCodeDone -> accept(state, ExchangeV2State.Host.Done, msg)
+            is Bye -> receiveBye(state, msg)
+            else -> abort(state, msg, RejectReason.ImplicitAbort)
+        }
+    }
+
+    private fun receiveInHostUnknownStatus(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
+        return when (msg) {
+            is RecoveryCodeDone -> accept(state, ExchangeV2State.Host.Done, msg)
+            is Bye -> receiveBye(state, msg)
+            else -> abort(state, msg, RejectReason.ImplicitAbort)
+        }
+    }
+
+    // If the peer aborts while we're still showing the confirmation prompt, act on it now instead of
     // making the user confirm a doomed pairing.
     private fun receiveInJoinerConfirming(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
         return when (msg) {
             is RecoveryCodeDenied -> accept(state, ExchangeV2State.Joiner.AbortedByHost, msg)
             is RecoveryCodeUnavailable -> accept(state, ExchangeV2State.Joiner.AbortedByHost, msg)
+            is Bye -> receiveBye(state, msg)
             else -> abort(state, msg, RejectReason.ImplicitAbort)
         }
     }
@@ -150,13 +205,53 @@ internal class RealExchangeV2StateMachine(
             is RecoveryCodeConfirmed -> accept(state, ExchangeV2State.Joiner.Waiting, msg)
             is RecoveryCodeDenied -> accept(state, ExchangeV2State.Joiner.AbortedByHost, msg)
             is RecoveryCodeUnavailable -> accept(state, ExchangeV2State.Joiner.AbortedByHost, msg)
-            is RecoveryCodeResponse -> accept(state, ExchangeV2State.Joiner.Done, msg)
+            is RecoveryCodeResponse -> accept(state, ExchangeV2State.Joiner.Joining, msg)
             is Hello,
             is RecoveryCodeAvailable,
             is RecoveryCodeRequest,
+            is RecoveryCodeDone,
             -> abort(state, msg, RejectReason.ImplicitAbort)
-            is Unknown -> drop(msg)
+            is Bye -> receiveBye(state, msg)
+            is UnknownMessage -> drop(msg)
         }
+    }
+
+    private fun receiveInJoinerJoining(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
+        return when (msg) {
+            is Bye -> receiveBye(state, msg)
+            else -> abort(state, msg, RejectReason.ImplicitAbort)
+        }
+    }
+
+    /**
+     * `bye` is accepted in every state and is the only exception to the implicit abort rule: a peer
+     * saying goodbye is not a protocol error, so it never reports [RejectReason.ImplicitAbort].
+     * Delivery is not guaranteed, so no state may depend on having received one.
+     *
+     * The reason matters only in the Host join-status states: `done` leaves the join outcome
+     * unknown, while any other reason ends the session as the peer's cancellation or failure.
+     *
+     * Spec: Asana 1216906888491126 §Rules.
+     */
+    private fun receiveBye(state: ExchangeV2State, msg: Bye): TransitionResult = when (state) {
+        // bye(done): no report is coming, but the peer may well have joined; never a failure. Any
+        // other reason is the peer declaring the pairing over (cancelled, failed, or something this
+        // client doesn't model), so there is no join outcome left to wait for.
+        ExchangeV2State.Host.AwaitingStatus -> when (msg.reason) {
+            Bye.Reason.Done -> accept(state, ExchangeV2State.Host.Unknown, msg)
+            else -> abort(state, msg, RejectReason.PeerLeft)
+        }
+        // Same split, but the join outcome is already unknown, so bye(done) changes nothing.
+        ExchangeV2State.Host.Unknown -> when (msg.reason) {
+            Bye.Reason.Done -> accept(state, state, msg)
+            else -> abort(state, msg, RejectReason.PeerLeft)
+        }
+        // Past the point of no return: the peer going away is not a reason to abandon a login,
+        // upgrade or sync that is already running. The later recovery_code_done just won't land.
+        ExchangeV2State.Joiner.Joining -> accept(state, state, msg)
+        // Before the recovery code is released there is nobody left to pair with. In an already
+        // terminal state abort() keeps the state and only records the message.
+        else -> abort(state, msg, RejectReason.PeerLeft)
     }
 
     private fun localTriggerInNegotiating(state: ExchangeV2State, trigger: LocalTrigger): TransitionResult {
@@ -200,10 +295,24 @@ internal class RealExchangeV2StateMachine(
 
     private fun localTriggerInHostSending(state: ExchangeV2State, trigger: LocalTrigger): TransitionResult {
         return when (trigger) {
-            LocalTrigger.HostSendComplete -> acceptLocal(state, ExchangeV2State.Host.Done, trigger)
+            // Spec 1216906886019334 §"Capability negotiation": only wait when the peer will actually
+            // report. A pre-2.1 peer never sends recovery_code_done, so waiting on one would turn a
+            // successful pairing into a spinner that only ends at the session deadline.
+            is LocalTrigger.HostSendComplete -> if (trigger.negotiatedVersion >= ExchangeProtocolVersion.V2_1) {
+                acceptLocal(state, ExchangeV2State.Host.AwaitingStatus, trigger, sideEffects = listOf(SideEffect.AwaitJoinStatus))
+            } else {
+                acceptLocal(state, ExchangeV2State.Host.Done, trigger)
+            }
             // Host couldn't produce a recovery code (no account, no 3party credential, etc.).
             // Runner has already sent recovery_code_unavailable to peer; this just tears down.
             LocalTrigger.HostUnavailable -> acceptLocal(state, ExchangeV2State.Host.Aborted, trigger)
+            else -> abortLocal(state, trigger)
+        }
+    }
+
+    private fun localTriggerInHostAwaitingStatus(state: ExchangeV2State, trigger: LocalTrigger): TransitionResult {
+        return when (trigger) {
+            is LocalTrigger.HostStatusDeadlineElapsed -> acceptLocal(state, ExchangeV2State.Host.Unknown, trigger)
             else -> abortLocal(state, trigger)
         }
     }
@@ -212,6 +321,20 @@ internal class RealExchangeV2StateMachine(
         return when (trigger) {
             LocalTrigger.UserConfirmedJoiner -> acceptLocal(state, ExchangeV2State.Joiner.Waiting, trigger)
             LocalTrigger.UserDeniedJoiner -> acceptLocal(state, ExchangeV2State.Joiner.AbortedLocal, trigger)
+            else -> abortLocal(state, trigger)
+        }
+    }
+
+    private fun localTriggerInJoinerJoining(state: ExchangeV2State, trigger: LocalTrigger): TransitionResult {
+        return when (trigger) {
+            is LocalTrigger.JoinerJoinComplete -> {
+                val terminal = if (trigger.reason == RecoveryCodeDone.Reason.Success) {
+                    ExchangeV2State.Joiner.Done
+                } else {
+                    ExchangeV2State.Joiner.JoinFailed
+                }
+                acceptLocal(state, terminal, trigger, sideEffects = listOf(SideEffect.SendRecoveryCodeDone(trigger.reason)))
+            }
             else -> abortLocal(state, trigger)
         }
     }
@@ -245,9 +368,9 @@ internal class RealExchangeV2StateMachine(
     }
 
     /**
-     * Reject [msg] and abort. By default we drive to [from]'s terminal state (see [abortTerminal]):
-     *  - If [from] is still active, that's a real transition into the terminal → emit [Transition].
-     *  - If [from] is already terminal, [abortTerminal] returns itself, so we stay put → emit [MessageRejected].
+     * Reject [msg] and abort. By default, we drive to [from]'s terminal state (see [abortTerminal]):
+     *  - If [from] is still active, that's a real transition into the terminal → emit [ExchangeV2Event.Transition].
+     *  - If [from] is already terminal, [abortTerminal] returns itself, so we stay put → emit [ExchangeV2Event.MessageRejected].
      *
      * Callers can override [newState] to abort somewhere other than the default terminal.
      */
@@ -300,9 +423,21 @@ internal class RealExchangeV2StateMachine(
 
 /** Terminal state to drive into on an implicit abort from [this]. Terminals return themselves. */
 private fun ExchangeV2State.abortTerminal(): ExchangeV2State = when (this) {
-    ExchangeV2State.Host.Confirming, ExchangeV2State.Host.Sending -> ExchangeV2State.Host.Aborted
-    ExchangeV2State.Joiner.Confirming, ExchangeV2State.Joiner.Waiting -> ExchangeV2State.Joiner.AbortedLocal
-    ExchangeV2State.Bootstrapped, ExchangeV2State.Negotiating -> ExchangeV2State.Aborted
+    ExchangeV2State.Host.Confirming,
+    ExchangeV2State.Host.Sending,
+    ExchangeV2State.Host.AwaitingStatus,
+    ExchangeV2State.Host.Unknown,
+    -> ExchangeV2State.Host.Aborted
+
+    ExchangeV2State.Joiner.Confirming,
+    ExchangeV2State.Joiner.Waiting,
+    ExchangeV2State.Joiner.Joining,
+    -> ExchangeV2State.Joiner.AbortedLocal
+
+    ExchangeV2State.Bootstrapped,
+    ExchangeV2State.Negotiating,
+    -> ExchangeV2State.Aborted
+
     ExchangeV2State.Aborted,
     ExchangeV2State.SameAccountAbort,
     ExchangeV2State.Host.Aborted,
@@ -310,5 +445,6 @@ private fun ExchangeV2State.abortTerminal(): ExchangeV2State = when (this) {
     ExchangeV2State.Joiner.AbortedByHost,
     ExchangeV2State.Joiner.AbortedLocal,
     ExchangeV2State.Joiner.Done,
+    ExchangeV2State.Joiner.JoinFailed,
     -> this
 }

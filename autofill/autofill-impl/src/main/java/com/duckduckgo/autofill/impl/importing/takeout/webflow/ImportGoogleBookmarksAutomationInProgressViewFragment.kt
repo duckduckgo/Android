@@ -18,9 +18,9 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.os.Bundle
 import android.view.View
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentImportBookmarksProgressBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 

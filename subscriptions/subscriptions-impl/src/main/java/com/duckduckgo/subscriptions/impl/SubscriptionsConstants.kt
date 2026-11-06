@@ -86,11 +86,50 @@ object SubscriptionsConstants {
 
     // URLs
     const val ITR_URL = "https://duckduckgo.com/identity-theft-restoration"
+    const val ITR_SUMMARY_OF_BENEFITS_URL =
+        "https://duckduckgo.com/static-assets/files/pages/identity-theft-restoration/Summary_of_Benefits.pdf"
     const val FAQS_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
+    const val PARTNER_BENEFITS_URL = "https://duckduckgo.com/partner-benefits"
     const val SUBSCRIPTIONS_ETLD = "duckduckgo.com"
     const val FEATURE_PAGE_QUERY_PARAM_KEY = "featurePage"
+    const val ORIGIN_QUERY_PARAM_KEY = "origin"
     const val SUBSCRIPTIONS_PATH = "pro"
     const val PRIVACY_SUBSCRIPTIONS_PATH = "subscriptions"
+
+    const val DUCK_AI_FEATURE_PAGE = "duckai"
+    const val VPN_FEATURE_PAGE = "vpn"
+
+    const val TRIAL_QUERY_PARAM_KEY = "trial"
+    const val PIR_QUERY_PARAM_KEY = "pir"
+    const val PERFORMANCE_OPTIMIZED_PAYWALLS_COHORT_QUERY_PARAM_KEY = "experiment_perfpaywall"
+
+    // Subscription-funnel origin for the app-settings "Get Subscription" entry point. Used both to
+    // launch the buy webview (ProSettingView) and on the app-settings click pixel (SubscriptionPixelSender).
+    const val ORIGIN_APP_SETTINGS = "funnel_appsettings_android"
+
+    // Allowlist of funnel entry-point origins permitted on subscription telemetry and on the `?origin=`
+    // param of the URL loaded in the subscriptions webview. The origin can arrive from a web-supplied
+    // URL param or JS message, so it is bounded to this set.
+    // TODO: Consider moving this list to the remove privacy configuration if it will change regularly.
+    val FUNNEL_ORIGIN_ALLOWLIST = setOf(
+        "funnel_addressbar_android__aitoggle",
+        "funnel_addressbar_android__modelpicker",
+        "funnel_addressbar_android__reasoningdropdown",
+        "funnel_appmenu_android",
+        "funnel_appsettings_android",
+        "funnel_duckai_android__freelabel",
+        "funnel_duckai_android__modelpicker",
+        "funnel_duckai_android__reasoningdropdown",
+        "funnel_duckai_android__switchmodel",
+        "funnel_freescan_android",
+        "funnel_modal_android__skippedonboardingupsell",
+        "funnel_modal_android__subscriptionnudge",
+        "funnel_onboarding_android",
+        "funnel_playstore",
+        "funnel_purchase_offer_page_android",
+        "funnel_restore_android__viewplans",
+        "funnel_subscriptionsettings_android__viewplans",
+    )
 }
 
 enum class SubscriptionTier(val value: String) {

@@ -26,7 +26,6 @@ import logcat.logcat
 
 interface TrackerAllowlistRepository {
     fun updateAll(exceptions: List<TrackerAllowlistEntity>)
-    val exceptions: List<TrackerAllowlistEntity>
     val rulesByDomain: Map<String, List<CompiledRule>>
 }
 
@@ -45,10 +44,8 @@ class RealTrackerAllowlistRepository(
     private val trackerAllowlistDao: TrackerAllowlistDao = database.trackerAllowlistDao()
 
     @Volatile
-    private var snapshot: Snapshot = Snapshot(emptyList(), emptyMap())
-
-    override val exceptions get() = snapshot.exceptions
-    override val rulesByDomain get() = snapshot.rulesByDomain
+    override var rulesByDomain: Map<String, List<CompiledRule>> = emptyMap()
+        private set
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -64,14 +61,8 @@ class RealTrackerAllowlistRepository(
     }
 
     private fun loadToMemory() {
-        val fresh = trackerAllowlistDao.getAll()
-        snapshot = Snapshot(fresh, buildRulesByDomain(fresh))
+        rulesByDomain = buildRulesByDomain(trackerAllowlistDao.getAll())
     }
-
-    private data class Snapshot(
-        val exceptions: List<TrackerAllowlistEntity>,
-        val rulesByDomain: Map<String, List<CompiledRule>>,
-    )
 }
 
 fun buildRulesByDomain(exceptions: List<TrackerAllowlistEntity>): Map<String, List<CompiledRule>> {

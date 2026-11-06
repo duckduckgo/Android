@@ -1,7 +1,7 @@
 {
   "name": "InmatesSearcher",
   "url": "inmatessearcher.com",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.inmatessearcher.com/optOut/name/landing",
   "steps": [
@@ -57,6 +57,17 @@
             }
           ],
           "id": "c19c3169-28a6-4b2d-af77-06eddfbf3c6b"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "cfc-a274586f-bc2f-4176-889c-414c373f4235"
         },
         {
           "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",

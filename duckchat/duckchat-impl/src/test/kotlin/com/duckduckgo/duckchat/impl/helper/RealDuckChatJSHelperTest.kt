@@ -18,36 +18,59 @@ package com.duckduckgo.duckchat.impl.helper
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckAiTermsConsent
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_OPEN_HISTORY
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_ITEM
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -59,15 +82,22 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -101,7 +131,28 @@ class RealDuckChatJSHelperTest {
     private val mockSubscriptions: Subscriptions = mock {
         onBlocking { isEligible() } doReturn false
     }
+    private val mockEditPromptSessionStore: EditPromptSessionStore = mock()
+    private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
+    private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val mockRegularChatStore: DuckAiChatStore = mock()
+    private val mockFireChatStore: DuckAiChatStore = mock()
+    private val fakeChatHistoryFeature: DuckAiChatHistoryFeature =
+        FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
+    private val mockTermsConsent: DuckAiTermsConsent = mock()
+    private val chatStateStore = ChatStateStore()
+    private val mockResponseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
+
+    private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock {
+        on { isDuckDuckGoQueryUrl(SERP_URL) } doReturn true
+    }
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
+    private val tabSessions: DuckAiTabSessionRepository = mock()
+
+    private val pdfPageContextResolver: PdfPageContextResolver = mock()
+
     private val testee = RealDuckChatJSHelper(
+        pdfPageContextResolver = pdfPageContextResolver,
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
@@ -118,7 +169,23 @@ class RealDuckChatJSHelperTest {
         appInstall = mockAppInstall,
         appBuildConfig = mockAppBuildConfig,
         subscriptions = mockSubscriptions,
+        editPromptSessionStore = mockEditPromptSessionStore,
+        browserInteractionsPlugins = mockBrowserInteractionsPlugins,
+        duckAiSessionCallback = mockDuckAiSessionCallback,
+        entryWideEvent = lazy { entryWideEvent },
+        regularChatStore = mockRegularChatStore,
+        fireChatStore = mockFireChatStore,
+        duckAiChatHistoryFeature = fakeChatHistoryFeature,
+        termsConsent = mockTermsConsent,
+        chatStateStore = chatStateStore,
+        responseWaitWideEvent = mockResponseWaitWideEvent,
+        duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        tabSessions = tabSessions,
     )
+
+    init {
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(mockBrowserInteractionsPlugin))
+    }
     private val viewModel =
         object {
             val updatedPageContext: String =
@@ -303,16 +370,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -323,6 +397,165 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCampaignsEnabledThenSupportsBonusOfferIsTrue() = runTest {
+        mockDuckChatFeature.duckAiPromoCampaigns().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsBonusOffer"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCampaignsDisabledThenSupportsBonusOfferIsFalse() = runTest {
+        mockDuckChatFeature.duckAiPromoCampaigns().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsBonusOffer"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCardsEnabledThenSupportsPromoCardsIsTrue() = runTest {
+        mockDuckChatFeature.duckAiPromoCards().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsPromoCards"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCardsDisabledThenSupportsPromoCardsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiPromoCards().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsPromoCards"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndAllUsageWarningGatesPassThenSupportsNativeUsageWarningsIsTrue() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndUsageWarningsFlagDisabledThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = false))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativeStorageDisabledThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesInFireModeThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            browserMode = BrowserMode.FIRE,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativePromptEditingEnabledThenCapabilityIsTrue() = runTest {
+        whenever(mockDuckChat.isNativePromptEditingEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsNativePromptEditing"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativePromptEditingDisabledThenCapabilityIsFalse() = runTest {
+        whenever(mockDuckChat.isNativePromptEditingEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativePromptEditing"))
     }
 
     @Test
@@ -441,6 +674,92 @@ class RealDuckChatJSHelperTest {
         assertTrue(result!!.params.has("pageContext"))
         assertTrue(result.params.isNull("pageContext"))
     }
+
+    @Test
+    fun `manual PDF attachment reports frontend attachment pixel`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(true), any())).thenReturn(pdfContextResult("JVBERi0="))
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "userAction"),
+            tabId = "tab-1",
+        )!!
+
+        val context = response.params.getJSONObject("pageContext")
+        assertEquals("JVBERi0=", context.getString("data"))
+        assertTrue(context.getBoolean("attached"))
+        verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
+    }
+
+    @Test
+    fun `manual PDF response without bytes does not report attached`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(true), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "userAction"),
+            tabId = "tab-1",
+        )!!
+
+        assertFalse(response.params.getJSONObject("pageContext").getBoolean("attached"))
+        verify(mockDuckChatPixels, never()).reportContextualPageContextManuallyAttachedFrontend()
+    }
+
+    @Test
+    fun `PDF initialization with auto attachment off sends unattached metadata`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(false), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "init"),
+            tabId = "tab-1",
+        )!!
+
+        val context = response.params.getJSONObject("pageContext")
+        assertTrue(context.getBoolean("attachable"))
+        assertFalse(context.getBoolean("attached"))
+        assertFalse(context.has("data"))
+        verify(pdfPageContextResolver).resolve(eq("tab-1"), anyOrNull(), eq(false), any())
+    }
+
+    @Test
+    fun `PDF initialization after removal does not read bytes when auto attachment is on`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(false), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "init"),
+            tabId = "tab-1",
+            allowAutomaticPageContextAttachment = false,
+        )!!
+
+        assertFalse(response.params.getJSONObject("pageContext").getBoolean("attached"))
+        verify(pdfPageContextResolver).resolve(eq("tab-1"), anyOrNull(), eq(false), any())
+        verify(pdfPageContextResolver, never()).resolve(eq("tab-1"), anyOrNull(), eq(true), any())
+    }
+
+    private fun pdfContextResult(data: String? = null) = PdfPageContextResolver.Result.Pdf(
+        DuckAiPdfMetadata(
+            "document.pdf",
+            "https://example.com/document.pdf",
+            DuckAiPdfMetadata.Availability.AVAILABLE,
+        ),
+        data,
+    )
 
     @Test
     fun whenGetPageContextUserActionThenReturnsContextRegardlessOfAutoFlag() = runTest {
@@ -644,16 +963,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -741,16 +1067,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", true)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", true)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -900,16 +1233,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", true)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -920,6 +1260,57 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndContextualModeThenSupportsSuggestionsTrue() = runTest {
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            Mode.CONTEXTUAL,
+            viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsSuggestions"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndModeFullThenSupportsSuggestionsFalse() = runTest {
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            Mode.FULL,
+            viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSuggestions"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndContextualModeDisabledThenSupportsSuggestionsFalse() = runTest {
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            Mode.CONTEXTUAL,
+            viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSuggestions"))
     }
 
     @Test
@@ -948,16 +1339,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", true)
+            put("supportsSuggestions", true)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -993,16 +1391,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", true)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1038,16 +1443,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", true)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1075,12 +1487,13 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
+                mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
             ),
         )
 
         verify(mockDataStore).updateUserPreferences(payloadString)
-        verify(mockDuckChat).openNewDuckChatSession()
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
     }
 
     @Test
@@ -1095,11 +1508,12 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 null,
+                mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
             ),
         )
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openNewDuckChatSession()
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
     }
 
     @Test
@@ -1115,11 +1529,90 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
+                mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
             ),
         )
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openNewDuckChatSession()
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
+    }
+
+    @Test
+    fun whenOpenAIChatFromOtherWebpageThenOpenDuckChatWithDirectUrlEntryPoint() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "openAIChat",
+                "123",
+                null,
+                mode = Mode.FULL,
+            ),
+        )
+
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.DIRECT_URL)
+    }
+
+    @Test
+    fun whenOpenAIChatFromSerpThenOpenDuckChatWithSerpEntryPoint() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "openAIChat",
+                "123",
+                null,
+                mode = Mode.FULL,
+                pageUrl = SERP_URL,
+            ),
+        )
+
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.SERP)
+    }
+
+    @Test
+    fun whenOpenAIChatFromNonSerpPageThenOpenDuckChatWithDirectUrlEntryPoint() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "openAIChat",
+                "123",
+                null,
+                mode = Mode.FULL,
+                pageUrl = "https://example.com",
+            ),
+        )
+
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.DIRECT_URL)
+    }
+
+    @Test
+    fun whenOpenAIChatFromContextualOnSerpThenOpenDuckChatWithContextualEntryPoint() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "openAIChat",
+                "123",
+                null,
+                mode = Mode.CONTEXTUAL,
+                pageUrl = SERP_URL,
+            ),
+        )
+
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
+    }
+
+    @Test
+    fun whenOpenAIChatFromContextualThenOpenDuckChatWithContextualEntryPoint() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "openAIChat",
+                "123",
+                null,
+                mode = Mode.CONTEXTUAL,
+            ),
+        )
+
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
     }
 
     @Test
@@ -1136,10 +1629,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.START_STREAM_NEW_PROMPT)
+        assertEquals(ChatState.START_STREAM_NEW_PROMPT, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1156,10 +1650,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.LOADING)
+        assertEquals(ChatState.LOADING, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1176,10 +1671,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.STREAMING)
+        assertEquals(ChatState.STREAMING, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1196,10 +1692,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.ERROR)
+        assertEquals(ChatState.ERROR, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1216,10 +1713,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.READY)
+        assertEquals(ChatState.READY, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1236,14 +1734,16 @@ class RealDuckChatJSHelperTest {
                 id,
                 data,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.BLOCKED)
+        assertEquals(ChatState.BLOCKED, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
     fun whenHideChatInputThenUpdateChatStateWithHide() = runTest {
+        chatStateStore.update("tab-1", ChatState.SHOW)
         val featureName = "aiChat"
         val method = "hideChatInput"
         val id = "123"
@@ -1255,10 +1755,11 @@ class RealDuckChatJSHelperTest {
                 id,
                 null,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.HIDE)
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test
@@ -1274,10 +1775,30 @@ class RealDuckChatJSHelperTest {
                 id,
                 null,
                 pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
             ),
         )
 
-        verify(mockDuckChat).updateChatState(ChatState.SHOW)
+        assertEquals(ChatState.SHOW, chatStateStore.stateFor("tab-1").value)
+    }
+
+    @Test
+    fun whenResponseStateReceivedThenOtherTabsAreUnaffected() = runTest {
+        val data = JSONObject(mapOf("status" to "streaming"))
+
+        testee.processJsCallbackMessage("aiChat", "responseState", "123", data, tabId = "tab-1")
+
+        assertEquals(ChatState.STREAMING, chatStateStore.stateFor("tab-1").value)
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-2").value)
+    }
+
+    @Test
+    fun whenResponseStateReceivedWithoutTabIdThenItIsDropped() = runTest {
+        val data = JSONObject(mapOf("status" to "streaming"))
+
+        testee.processJsCallbackMessage("aiChat", "responseState", "123", data)
+
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("").value)
     }
 
     @Test
@@ -1326,6 +1847,200 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenEditPromptSubmittedThenReplyCarriesTheEditedPromptAndKeptAttachments() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(
+            EditPromptResult.Submitted(
+                prompt = "edited",
+                images = listOf(SubmittedImage(data = "img", format = "png")),
+                files = emptyList(),
+            ),
+        )
+        val data = JSONObject(
+            """
+            {
+              "prompt": "original",
+              "images": [{"data": "img", "format": "png"}],
+              "files": [],
+              "hasResponsesToLose": true
+            }
+            """.trimIndent(),
+        )
+
+        val result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        assertEquals("edited", result!!.params.getString("prompt"))
+        assertEquals(1, result.params.getJSONArray("images").length())
+        verify(mockDuckChat).requestEditPrompt(EditPromptRequest(sessionId = "session-1", tabId = "tab-1", contextual = false))
+    }
+
+    @Test
+    fun whenEditPromptCancelledThenReplyIsCancelled() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(EditPromptResult.Cancelled)
+        val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        val result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        assertTrue(result!!.params.getBoolean("cancelled"))
+    }
+
+    @Test
+    fun whenEditPromptHasNoIdThenNoSessionIsOpened() = runTest {
+        val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        val result = testee.processJsCallbackMessage("aiChat", "editPrompt", null, data, tabId = "tab-1")
+
+        assertNull(result)
+        verifyNoInteractions(mockEditPromptSessionStore)
+    }
+
+    @Test
+    fun whenEditPromptSessionNeverResolvesThenBackstopTimeoutResolvesAsCancelledAndClearsSession() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        val neverCompletes = CompletableDeferred<EditPromptResult>()
+        mockEditPromptSessionStore.stub {
+            onBlocking { await("session-1") } doSuspendableAnswer { neverCompletes.await() }
+        }
+        val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        var result: JsCallbackData? = null
+        val editJob = launch {
+            result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+        }
+        advanceTimeBy(RealDuckChatJSHelper.EDIT_SESSION_TIMEOUT_MS + 1_000)
+        advanceUntilIdle()
+
+        assertTrue(editJob.isCompleted)
+        assertTrue(result!!.params.getBoolean("cancelled"))
+        verify(mockEditPromptSessionStore).clear("session-1")
+    }
+
+    @Test
+    fun whenCancelEditReceivedThenPendingSessionIsCancelled() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        val pending = CompletableDeferred<EditPromptResult>()
+        mockEditPromptSessionStore.stub {
+            onBlocking { await("session-1") } doSuspendableAnswer { pending.await() }
+            on { resolve(eq("session-1"), any()) } doAnswer { invocation ->
+                pending.complete(invocation.getArgument<EditPromptResult>(1))
+                Unit
+            }
+        }
+        val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        var result: JsCallbackData? = null
+        val editJob = launch {
+            result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+        }
+        // runCurrent(), not advanceUntilIdle(): the latter would fast-forward straight through the
+        // backstop timeout's scheduled delay, completing the job before cancelEdit ever runs.
+        runCurrent()
+        assertTrue(editJob.isActive)
+
+        val cancelResult = testee.processJsCallbackMessage("aiChat", "cancelEdit", null, null, tabId = "tab-1")
+        advanceUntilIdle()
+
+        assertNull(cancelResult)
+        assertTrue(editJob.isCompleted)
+        assertTrue(result!!.params.getBoolean("cancelled"))
+    }
+
+    @Test
+    fun whenCancelEditArrivesAfterAnEarlierEditAlreadyResolvedThenItDoesNotAffectALaterEdit() = runTest {
+        // Reproduces the trace: edit A opens and resolves, edit B opens next and is still pending,
+        // then a stray cancelEdit meant for A arrives. The tracker must have been released when A
+        // resolved, so this cancelEdit must not resolve anything -- in particular not B.
+        whenever(mockEditPromptSessionStore.open(any()))
+            .thenReturn("session-A")
+            .thenReturn("session-B")
+        whenever(mockEditPromptSessionStore.await("session-A")).thenReturn(EditPromptResult.Cancelled)
+        val dataA = JSONObject("""{"prompt": "a", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        testee.processJsCallbackMessage("aiChat", "editPrompt", "id-a", dataA, tabId = "tab-1")
+
+        // Stray cancelEdit for the already-resolved A arrives before B starts.
+        testee.processJsCallbackMessage("aiChat", "cancelEdit", null, null, tabId = "tab-1")
+        verify(mockEditPromptSessionStore, never()).resolve(any(), any())
+
+        val pendingB = CompletableDeferred<EditPromptResult>()
+        mockEditPromptSessionStore.stub {
+            onBlocking { await("session-B") } doSuspendableAnswer { pendingB.await() }
+        }
+        var resultB: JsCallbackData? = null
+        val dataB = JSONObject("""{"prompt": "b", "images": [], "files": [], "hasResponsesToLose": false}""")
+        val editBJob = launch {
+            resultB = testee.processJsCallbackMessage("aiChat", "editPrompt", "id-b", dataB, tabId = "tab-1")
+        }
+        // runCurrent(), not advanceUntilIdle(): see the note in whenCancelEditReceivedThenPendingSessionIsCancelled.
+        runCurrent()
+
+        assertTrue(editBJob.isActive)
+        assertNull(resultB)
+        verify(mockEditPromptSessionStore, never()).resolve(eq("session-B"), any())
+
+        editBJob.cancel()
+    }
+
+    @Test
+    fun whenEditPromptHasImagesAndFilesThenParsedPayloadMatchesTheRequest() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(EditPromptResult.Cancelled)
+        val data = JSONObject(
+            """
+            {
+              "prompt": "original",
+              "images": [{"data": "img-data", "format": "png"}],
+              "files": [{"data": "file-data", "fileName": "notes.txt", "mimeType": "text/plain"}],
+              "hasResponsesToLose": false
+            }
+            """.trimIndent(),
+        )
+
+        testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        val captor = argumentCaptor<EditPromptPayload>()
+        verify(mockEditPromptSessionStore).open(captor.capture())
+        val payload = captor.firstValue
+        assertEquals("original", payload.prompt)
+        assertEquals(listOf(SubmittedImage(data = "img-data", format = "png")), payload.images)
+        assertEquals(listOf(SubmittedFile(data = "file-data", fileName = "notes.txt", mimeType = "text/plain")), payload.files)
+    }
+
+    @Test
+    fun whenEditPromptSubmittedWithFilesThenReplyFilesArrayHasTheCorrectFields() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(
+            EditPromptResult.Submitted(
+                prompt = "edited",
+                images = emptyList(),
+                files = listOf(SubmittedFile(data = "file-data", fileName = "notes.txt", mimeType = "text/plain")),
+            ),
+        )
+        val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        val result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        val files = result!!.params.getJSONArray("files")
+        assertEquals(1, files.length())
+        val file = files.getJSONObject(0)
+        assertEquals("file-data", file.getString("data"))
+        assertEquals("notes.txt", file.getString("fileName"))
+        assertEquals("text/plain", file.getString("mimeType"))
+    }
+
+    @Test
+    fun whenEditPromptForContextualModeThenRequestIsMarkedContextual() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(EditPromptResult.Cancelled)
+        val data = JSONObject("""{"prompt": "original", "images": [], "files": [], "hasResponsesToLose": false}""")
+
+        testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, mode = Mode.CONTEXTUAL, tabId = "tab-1")
+
+        verify(mockDuckChat).requestEditPrompt(EditPromptRequest(sessionId = "session-1", tabId = "tab-1", contextual = true))
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndSupportsImageUploadThenReturnJsCallbackDataWithSupportsImageUploadEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
@@ -1350,16 +2065,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1392,16 +2114,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", true)
             put("supportsNativePrompt", true)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1434,16 +2163,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", true)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1477,16 +2213,23 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsCanonicalChatFormat", true)
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
+            put("supportsHomePageChatSuggestions", false)
+            put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1554,6 +2297,160 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenReportMetricWithSubmittedPromptThenNotifiesAiPromptSubmittedOnly() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+        )
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted()
+        verify(mockBrowserInteractionsPlugin, never()).onInputSubmitted()
+    }
+
+    @Test
+    fun whenPageReportsPromptThenPromptPixelAndReturnSessionUseStoredEntrySource() = runTest {
+        whenever(tabSessions.getEntryPointSource("tab")).thenReturn("onboarding_completion_promo")
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt", "source" to "untrusted-page-source")),
+            mode = Mode.FULL,
+            tabId = "tab",
+        )
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT, source = "onboarding_completion_promo")
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted("onboarding_completion_promo")
+    }
+
+    @Test
+    fun whenContextualPageReportsPromptThenReturnSessionReceivesContextualSource() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt")),
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab",
+        )
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted("contextual_chat")
+    }
+
+    @Test
+    fun whenReportMetricWithFirstSubmittedPromptThenNotifiesAiPromptSubmittedOnly() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+        )
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted()
+        verify(mockBrowserInteractionsPlugin, never()).onInputSubmitted()
+    }
+
+    @Test
+    fun whenReportMetricWithSubmittedPromptInFullModeThenPromptSubmittedReported() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+            mode = Mode.FULL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback).onPromptSubmitted("tab-1")
+    }
+
+    @Test
+    fun whenReportMetricWithSubmittedPromptInContextualModeThenOnlyEntryPromptIsReported() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback, never()).onPromptSubmitted(any())
+        verify(entryWideEvent).onPromptSubmitted("tab-1")
+    }
+
+    @Test
+    fun whenFirstPromptMetricInContextualModeThenEntryPromptIsReported() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt")),
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(entryWideEvent).onPromptSubmitted("tab-1")
+        verify(mockDuckAiSessionCallback, never()).onPromptSubmitted(any())
+    }
+
+    @Test
+    fun whenCloseAiChatInFullModeThenPendingBackOrCloseExitRecordedBeforeClosing() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "closeAIChat",
+            id = "123",
+            data = null,
+            mode = Mode.FULL,
+            tabId = "tab-1",
+        )
+
+        val inOrder = inOrder(mockDuckAiSessionCallback, mockDuckChat)
+        inOrder.verify(mockDuckAiSessionCallback).onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+        inOrder.verify(mockDuckChat).closeDuckChat()
+    }
+
+    @Test
+    fun whenCloseAiChatInContextualModeThenNoPendingExitRecorded() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "closeAIChat",
+            id = "123",
+            data = null,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
+        verify(mockDuckChat).closeDuckChat()
+    }
+
+    @Test
+    fun whenReportMetricIsUnrelatedThenDoesNotNotifyBrowserInteractions() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidOpenHistory"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+        )
+
+        verifyNoInteractions(mockBrowserInteractionsPlugin)
+    }
+
+    @Test
     fun whenReportMetricWithOpenHistoryThenPixelSent() = runTest {
         val featureName = "aiChat"
         val method = "reportMetric"
@@ -1611,6 +2508,38 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_CREATE_NEW_CHAT)
+    }
+
+    @Test
+    fun whenReportMetricWithCreateNewChatInFullModeThenNewChatCreatedReported() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidCreateNewChat"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+            mode = Mode.FULL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback).onNewChatCreated("tab-1")
+    }
+
+    @Test
+    fun whenReportMetricWithCreateNewChatInContextualModeThenNewChatCreatedNotReported() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidCreateNewChat"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
     }
 
     @Test
@@ -1823,12 +2752,23 @@ class RealDuckChatJSHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
+    fun whenConsumingTheHandoffPromptThenTheTermsConsentIsCarriedOnTheEvent() {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockPendingTabContextStore.consume()).thenReturn(PendingTabContext("prompt", emptyList()))
+
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
+
+        verify(mockTermsConsent).carry(eq(result!!.params), eq(BrowserMode.REGULAR))
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
     fun whenConsumeTabContextPromptOnHandoffWithHandoffMethodAndFeatureEnabledThenReturnsEvent() = runTest {
         mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
         val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
         whenever(mockPendingTabContextStore.consume()).thenReturn(PendingTabContext("hello", listOf(pageContext)))
 
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNotNull(result)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result!!.featureName)
@@ -1840,7 +2780,7 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenConsumeTabContextPromptOnHandoffWithOtherMethodThenReturnsNull() {
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeConfigValues")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeConfigValues", BrowserMode.REGULAR)
 
         assertNull(result)
         verify(mockPendingTabContextStore, never()).consume()
@@ -1852,14 +2792,14 @@ class RealDuckChatJSHelperTest {
         mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
         whenever(mockPendingTabContextStore.consume()).thenReturn(null)
 
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNull(result)
     }
 
     @Test
     fun whenConsumeTabContextPromptOnHandoffWithFeatureDisabledThenReturnsNull() {
-        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData", BrowserMode.REGULAR)
 
         assertNull(result)
         verify(mockPendingTabContextStore, never()).consume()
@@ -1889,6 +2829,62 @@ class RealDuckChatJSHelperTest {
     // endregion
 
     @Test
+    fun whenResponseStateInFullModeThenResponseWaitGetsRawStatus() = runTest {
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "responseState",
+            "123",
+            JSONObject(mapOf("status" to "start_stream:restart_stream")),
+            pageContext = viewModel.updatedPageContext,
+            tabId = "tab-1",
+        )
+
+        verify(mockResponseWaitWideEvent).onResponseState("tab-1", "start_stream:restart_stream")
+    }
+
+    @Test
+    fun whenResponseStateInContextualModeThenResponseWaitIsNotCalled() = runTest {
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "responseState",
+            "123",
+            JSONObject(mapOf("status" to "ready")),
+            mode = Mode.CONTEXTUAL,
+            pageContext = viewModel.updatedPageContext,
+            tabId = "tab-1",
+        )
+
+        verifyNoInteractions(mockResponseWaitWideEvent)
+    }
+
+    @Test
+    fun whenNativePromptConsumedInFullModeThenResponseWaitGetsModePendingEffortAndTool() = runTest {
+        whenever(mockPendingNativePromptStore.consume())
+            .thenReturn(PendingNativePrompt("test prompt", "model", "high", selectedTool = "WebSearch"))
+
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            tabId = "tab-1",
+            browserMode = BrowserMode.FIRE,
+        )
+
+        verify(mockResponseWaitWideEvent).onNativePromptSubmitted("tab-1", BrowserMode.FIRE, "high", "WebSearch")
+    }
+
+    @Test
+    fun whenNoPendingNativePromptThenResponseWaitIsNotCalled() = runTest {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
+
+        testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext, tabId = "tab-1")
+
+        verifyNoInteractions(mockResponseWaitWideEvent)
+    }
+
+    @Test
     fun whenGetAIChatNativePromptWithPendingPromptThenReturnsPromptData() = runTest {
         val pending = PendingNativePrompt("test prompt", "model", null)
         whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
@@ -1909,6 +2905,35 @@ class RealDuckChatJSHelperTest {
         assertTrue(query.getBoolean("autoSubmit"))
         assertEquals("model", query.getString("modelId"))
         assertFalse(query.has("reasoningEffort"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithPendingPromptThatDoesNotCarryTermsThenTheConsentIsNotCarried() = runTest {
+        whenever(mockPendingNativePromptStore.consume())
+            .thenReturn(PendingNativePrompt("test prompt", null, null, carriesTermsConsent = false))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        assertEquals("test prompt", result!!.params.getJSONObject("query").getString("prompt"))
+        verify(mockTermsConsent, never()).carry(any(), any())
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithPendingPromptThenTheTermsConsentIsCarriedOnThePayload() = runTest {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        verify(mockTermsConsent).carry(eq(result!!.params), any())
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoPendingPromptThenTheTermsConsentIsNotCarried() = runTest {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
+
+        testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        verify(mockTermsConsent, never()).carry(any(), any())
     }
 
     @Test
@@ -2205,5 +3230,173 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockVoiceSessionStateManager, never()).onVoiceSessionEnded(any())
+    }
+
+    @Test
+    fun whenGetAIChatsAndHomepageFlagDisabledThenReturnsNoChatsWithoutReadingStore() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        mockDuckChatFeature.homepageChatSuggestions().setRawStoredState(Toggle.State(enable = false))
+        whenever(mockRegularChatStore.getChats()).thenReturn(listOf(chat("a", "A", daysAgo = 0)))
+
+        val result = getAIChats()
+
+        assertEquals(0, result.getJSONArray("chats").length())
+        verify(mockRegularChatStore, never()).getChats()
+    }
+
+    @Test
+    fun whenGetAIChatsAndNotMigratedThenReturnsNoChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.hasMigrated()).thenReturn(false)
+        whenever(mockRegularChatStore.getChats()).thenReturn(listOf(chat("a", "A", daysAgo = 0)))
+
+        assertEquals(0, getAIChats().getJSONArray("chats").length())
+    }
+
+    @Test
+    fun whenGetAIChatsThenPinnedFirstThenRecentNewestFirstWithinLastWeek() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("recent-old", "Older", daysAgo = 2),
+                chat("pinned", "Pinned", daysAgo = 30, pinned = true),
+                chat("recent-new", "Newer", daysAgo = 0, model = "voice-mode"),
+                chat("stale", "Stale", daysAgo = 10),
+            ),
+        )
+
+        val chats = getAIChats().getJSONArray("chats")
+
+        assertEquals(listOf("pinned", "recent-new", "recent-old"), chats.chatIds())
+        assertTrue(chats.getJSONObject(0).getBoolean("pinned"))
+        assertEquals("voice-mode", chats.getJSONObject(1).getString("model"))
+        assertEquals(setOf("chatId", "title", "pinned", "lastEdit", "model"), chats.getJSONObject(1).keys().asSequence().toSet())
+    }
+
+    @Test
+    fun whenGetAIChatsWithMaxChatsThenChatsAreCappedAndClamped() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn((0 until 30).map { chat("c$it", "Chat $it", minutesAgo = it.toLong()) })
+
+        assertEquals(listOf("c0", "c1"), getAIChats(JSONObject().put("maxChats", 2)).getJSONArray("chats").chatIds())
+        assertEquals(20, getAIChats(JSONObject().put("maxChats", 1000)).getJSONArray("chats").length())
+    }
+
+    @Test
+    fun whenGetAIChatsWithoutMaxChatsThenCapIsRemoteMaxHistoryCount() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        fakeChatHistoryFeature.self().setRawStoredState(Toggle.State(enable = true, settings = """{"maxHistoryCount":3}"""))
+        whenever(mockRegularChatStore.getChats()).thenReturn((0 until 30).map { chat("c$it", "Chat $it", minutesAgo = it.toLong()) })
+
+        assertEquals(listOf("c0", "c1", "c2"), getAIChats().getJSONArray("chats").chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsThenPinnedChatsCountTowardMaxChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("recent", "Recent", daysAgo = 0),
+                chat("pinned", "Pinned", daysAgo = 30, pinned = true),
+                chat("recent-older", "Older", daysAgo = 1),
+            ),
+        )
+
+        val chats = getAIChats(JSONObject().put("maxChats", 2)).getJSONArray("chats")
+
+        assertEquals(listOf("pinned", "recent"), chats.chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsThenRecentWindowFollowsRemoteRecentDaysCutoff() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        fakeChatHistoryFeature.self().setRawStoredState(Toggle.State(enable = true, settings = """{"recentDaysCutoff":30}"""))
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("ten-days", "Ten days", daysAgo = 10),
+                chat("sixty-days", "Sixty days", daysAgo = 60),
+            ),
+        )
+
+        assertEquals(listOf("ten-days"), getAIChats().getJSONArray("chats").chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsWithQueryThenFiltersByTitleIncludingOlderChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenReturn(
+            listOf(
+                chat("a", "Sourdough recipe", daysAgo = 30),
+                chat("b", "Trip ideas", daysAgo = 0),
+                chat("pinned-match", "Pinned bread recipe", daysAgo = 60, pinned = true),
+                chat("pinned-miss", "Pinned trip", daysAgo = 0, pinned = true),
+            ),
+        )
+
+        val chats = getAIChats(JSONObject().put("query", "  RECIPE ")).getJSONArray("chats")
+
+        assertEquals(listOf("pinned-match", "a"), chats.chatIds())
+    }
+
+    @Test
+    fun whenGetAIChatsAndStoreThrowsThenReturnsNoChats() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockRegularChatStore.getChats()).thenThrow(RuntimeException("boom"))
+
+        assertEquals(0, getAIChats().getJSONArray("chats").length())
+    }
+
+    @Test
+    fun whenGetAIChatsInFireModeThenReadsFireStoreOnly() = runTest {
+        givenHomepageChatSuggestionsSupported()
+        whenever(mockFireChatStore.hasMigrated()).thenReturn(true)
+        whenever(mockFireChatStore.getChats()).thenReturn(listOf(chat("fire", "Fire", daysAgo = 0)))
+
+        val chats = getAIChats(browserMode = BrowserMode.FIRE).getJSONArray("chats")
+
+        assertEquals(listOf("fire"), chats.chatIds())
+        verify(mockRegularChatStore, never()).getChats()
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndHomepageChatSuggestionsSupportedThenFlagIsTrue() = runTest {
+        givenHomepageChatSuggestionsSupported()
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativeConfigValues", "123", null)
+
+        assertTrue(result!!.params.getBoolean("supportsHomePageChatSuggestions"))
+    }
+
+    private suspend fun givenHomepageChatSuggestionsSupported() {
+        mockDuckChatFeature.homepageChatSuggestions().setRawStoredState(Toggle.State(enable = true))
+        mockDuckChatFeature.useNativeStorageChatData().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+        whenever(mockRegularChatStore.hasMigrated()).thenReturn(true)
+    }
+
+    private suspend fun getAIChats(
+        params: JSONObject? = null,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+    ): JSONObject = testee.processJsCallbackMessage("aiChat", "getAIChats", "123", params, browserMode = browserMode)!!.params
+
+    private fun chat(
+        chatId: String,
+        title: String,
+        daysAgo: Long = 0,
+        minutesAgo: Long = 0,
+        pinned: Boolean = false,
+        model: String = "gpt-4o-mini",
+    ) = DuckAiChat(
+        chatId = chatId,
+        title = title,
+        model = model,
+        lastEdit = Instant.now().minus(daysAgo, ChronoUnit.DAYS).minus(minutesAgo, ChronoUnit.MINUTES).toString(),
+        pinned = pinned,
+    )
+
+    private fun org.json.JSONArray.chatIds(): List<String> = (0 until length()).map { getJSONObject(it).getString("chatId") }
+
+    private companion object {
+        const val SERP_URL = "https://duckduckgo.com/?q=test"
     }
 }

@@ -34,6 +34,7 @@ interface WideEventClient {
      *   E.g., 0.1 means ~10 % of events are kept and the rest are silently dropped.
      *   When an event is sampled out, [SAMPLED_OUT_FLOW_ID] is returned and all subsequent
      *   operations on that ID become no-ops.
+     * @param definition Definition that this event conforms to, see [WideEventDefinition].
      * @return Wide event ID used for subsequent calls.
      */
     suspend fun flowStart(
@@ -42,6 +43,7 @@ interface WideEventClient {
         metadata: Map<String, String> = emptyMap(),
         cleanupPolicy: CleanupPolicy = OnTimeout(duration = 7.days),
         samplingProbability: Float = 1.0f,
+        definition: WideEventDefinition = WideEventDefinition(),
     ): Result<Long>
 
     /**
@@ -80,7 +82,7 @@ interface WideEventClient {
     suspend fun flowAbort(wideEventId: Long): Result<Unit>
 
     /**
-     * Get ids of active flows by their name.
+     * Get ids of active flows by their name, regardless of the process that started them.
      * Ids are ordered chronologically based on wide event creation time.
      *
      * Use to pick up wideEventId after process restart or if the flow started
@@ -146,6 +148,31 @@ interface WideEventClient {
     }
 }
 
+/**
+ * Identifies the wide event definition that a flow conforms to.
+ *
+ * @param version Version of the event definition. Bump it whenever the set of parameters the event sends changes.
+ * @param type Globally unique identifier of the event definition. Defaults to the flow name prefixed with
+ *   the platform, e.g. "android-subscription-purchase".
+ */
+data class WideEventDefinition(
+    val version: Version = Version.INITIAL,
+    val type: String? = null,
+) {
+    /**
+     * MINOR and PATCH components of the definition version, as declared in the definition itself.
+     * MAJOR is shared by all wide events and set automatically.
+     */
+    data class Version(
+        val minor: Int,
+        val patch: Int,
+    ) {
+        companion object {
+            val INITIAL = Version(minor = 0, patch = 0)
+        }
+    }
+}
+
 /** Represents the final outcome status of a wide event. */
 sealed class FlowStatus {
     /** The operation completed successfully */
@@ -178,7 +205,9 @@ sealed class CleanupPolicy {
     abstract val flowStatus: FlowStatus
 
     /**
-     * Apply cleanup on the next (main) process start for any still-open flow.
+     * Apply cleanup on the next start of the process that began the flow: the main process cleans up on startup, a secondary
+     * process on its first wide-event operation. Ownership never moves to another process, so a flow that must outlive the
+     * process that started it should use [OnTimeout] instead.
      *
      * If [ignoreIfIntervalTimeoutPresent] is true and the flow has a pending interval timeout,
      * this policy is skipped so the interval timeout can handle cleanup.

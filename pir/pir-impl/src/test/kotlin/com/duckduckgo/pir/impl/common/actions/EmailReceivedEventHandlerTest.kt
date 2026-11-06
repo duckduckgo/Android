@@ -201,9 +201,8 @@ class EmailReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_GENERATE,
@@ -215,7 +214,7 @@ class EmailReceivedEventHandlerTest {
         val result = testee.invoke(state, event)
 
         // Broker steps should be unchanged — profileToOptOut.email is NOT updated (KDL3)
-        val unchangedOptOutStep = result.nextState.brokerStepsToExecute[0] as OptOutStep
+        val unchangedOptOutStep = result.nextState.brokerStep as OptOutStep
         assertEquals("", unchangedOptOutStep.profileToOptOut.email)
     }
 
@@ -233,9 +232,8 @@ class EmailReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.EMAIL_CONFIRMATION,
-            brokerStepsToExecute = listOf(emailConfirmationStep),
+            brokerStep = emailConfirmationStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_GENERATE,
@@ -265,9 +263,8 @@ class EmailReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_GENERATE,
@@ -301,9 +298,8 @@ class EmailReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_GENERATE,
@@ -334,9 +330,8 @@ class EmailReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_GENERATE,
@@ -369,9 +364,8 @@ class EmailReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.EMAIL_CONFIRMATION,
-            brokerStepsToExecute = listOf(emailConfirmationStep),
+            brokerStep = emailConfirmationStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_GENERATE,
@@ -418,9 +412,8 @@ class EmailReceivedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_GENERATE,
@@ -442,19 +435,16 @@ class EmailReceivedEventHandlerTest {
     fun whenEmailReceivedThenPreservesOtherStateFields() = runTest {
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(
-                OptOutStep(
-                    broker = testBroker,
-                    step = OptOutStepActions(
-                        stepType = "optout",
-                        actions = listOf(testFillFormAction),
-                        optOutType = "form",
-                    ),
-                    profileToOptOut = testExtractedProfile,
+            brokerStep = OptOutStep(
+                broker = testBroker,
+                step = OptOutStepActions(
+                    stepType = "optout",
+                    actions = listOf(testFillFormAction),
+                    optOutType = "form",
                 ),
+                profileToOptOut = testExtractedProfile,
             ),
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             brokerStepStartTime = 10000L,
             transactionID = "transaction-789",
@@ -471,54 +461,12 @@ class EmailReceivedEventHandlerTest {
         val result = testee.invoke(state, event)
 
         assertEquals(RunType.OPTOUT, result.nextState.runType)
-        assertEquals(0, result.nextState.currentBrokerStepIndex)
         assertEquals(0, result.nextState.currentActionIndex)
         assertEquals(10000L, result.nextState.brokerStepStartTime)
         assertEquals("transaction-789", result.nextState.transactionID)
         assertEquals("https://example.com", result.nextState.pendingUrl)
         assertEquals(1, result.nextState.actionRetryCount)
         assertEquals("attempt-xyz", result.nextState.attemptId)
-    }
-
-    @Test
-    fun whenEmailReceivedWithMultipleBrokerStepsThenDoesNotModifyAnyStep() = runTest {
-        val optOutStep1 = OptOutStep(
-            broker = testBroker,
-            step = OptOutStepActions(
-                stepType = "optout",
-                actions = listOf(testFillFormAction),
-                optOutType = "form",
-            ),
-            profileToOptOut = testExtractedProfile.copy(email = ""),
-        )
-        val optOutStep2 = OptOutStep(
-            broker = testBroker.copy(name = "broker-2"),
-            step = OptOutStepActions(
-                stepType = "optout",
-                actions = listOf(testFillFormAction),
-                optOutType = "form",
-            ),
-            profileToOptOut = testExtractedProfile.copy(email = "old@example.com"),
-        )
-        val state = State(
-            runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep1, optOutStep2),
-            profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
-            stageStatus = PirStageStatus(
-                currentStage = PirStage.EMAIL_GENERATE,
-                stageStartMs = testStageStartMs,
-            ),
-        )
-        val event = EmailReceived(generatedEmailData = testGeneratedEmailData)
-
-        val result = testee.invoke(state, event)
-
-        // Neither step should be modified
-        val unchangedStep1 = result.nextState.brokerStepsToExecute[0] as OptOutStep
-        val unchangedStep2 = result.nextState.brokerStepsToExecute[1] as OptOutStep
-        assertEquals("", unchangedStep1.profileToOptOut.email)
-        assertEquals("old@example.com", unchangedStep2.profileToOptOut.email)
     }
 
     // endregion
@@ -539,9 +487,8 @@ class EmailReceivedEventHandlerTest {
         )
         return State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = actionRetryCount,
             attemptId = attemptId,

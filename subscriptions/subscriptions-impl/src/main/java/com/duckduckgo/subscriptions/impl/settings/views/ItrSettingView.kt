@@ -25,11 +25,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R
@@ -41,7 +42,6 @@ import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Comm
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState.ItrState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -104,7 +104,7 @@ class ItrSettingView @JvmOverloads constructor(
                 is ItrState.Enabled -> {
                     isVisible = true
                     setStatus(isOn = true)
-                    setLeadingIconResource(R.drawable.ic_identity_theft_restoration_color_24)
+                    setLeadingIconResource(R.drawable.identity_theft_restoration_color_24)
                     isClickable = true
                     setClickListener { viewModel.onItr() }
                 }
@@ -113,7 +113,7 @@ class ItrSettingView @JvmOverloads constructor(
                     isClickable = false
                     setStatus(isOn = false)
                     setClickListener(null)
-                    setLeadingIconResource(R.drawable.ic_identity_theft_restoration_grayscale_color_24)
+                    setLeadingIconResource(R.drawable.identity_theft_restoration_grayscale_color_24)
                 }
                 ItrState.Hidden -> isGone = true
             }

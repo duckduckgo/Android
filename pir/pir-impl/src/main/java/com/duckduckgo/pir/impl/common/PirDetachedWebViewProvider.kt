@@ -33,7 +33,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -119,6 +119,7 @@ class RealPirDetachedWebViewProvider @Inject constructor(
             webViewClient = object : WebViewClient() {
                 private var requestedUrl: String? = null
                 private var receivedError: Boolean = false
+                private var pageLoadReported: Boolean = false
 
                 override fun shouldInterceptRequest(
                     view: WebView?,
@@ -148,6 +149,7 @@ class RealPirDetachedWebViewProvider @Inject constructor(
                     logcat { "PIR-SCAN: webview onPageStarted $url" }
                     requestedUrl = url
                     receivedError = false
+                    pageLoadReported = false
                     view?.evaluateJavascript("javascript:$scriptToLoad", null)
                 }
 
@@ -155,7 +157,12 @@ class RealPirDetachedWebViewProvider @Inject constructor(
                     view: WebView?,
                     url: String?,
                 ) {
-                    if (!receivedError) {
+                    // WebView can fire onPageFinished more than once for a single navigation.
+                    // A duplicate that arrives while the engine is already awaiting its next
+                    // requested load gets consumed as that load's completion, advancing the
+                    // engine one navigation early, so report at most once per onPageStarted.
+                    if (!receivedError && !pageLoadReported) {
+                        pageLoadReported = true
                         logcat { "PIR-SCAN: webview onPageFinished receivedError $receivedError requestedUrl $requestedUrl for url $url" }
                         onPageLoaded(url)
                     }

@@ -21,18 +21,19 @@ import android.os.Bundle
 import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalShownReporter
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ActivityLifecycleCallbacks::class,
+    binding = binding<ActivityLifecycleCallbacks>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class NotificationLaunchModalReporter @Inject constructor(
     private val modalShownReporter: ModalShownReporter,
 ) : ActivityLifecycleCallbacks {

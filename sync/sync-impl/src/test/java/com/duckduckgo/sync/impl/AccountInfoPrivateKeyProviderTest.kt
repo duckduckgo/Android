@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.sync.TestSyncFixtures.token
+import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -26,6 +27,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -54,36 +56,115 @@ class AccountInfoPrivateKeyProviderTest {
         val result = provider.privateKey()
 
         // base64url of {0xFB, 0xF0, 0x00}, unpadded — "+" and "/" would appear in standard base64.
-        assertEquals(Result.Success("-_AA"), result)
+        assertEquals(AccountInfoPrivateKeyResult.Available("-_AA"), result)
     }
 
     @Test
     fun whenNotSignedInThenErrorWithoutFetching() {
         whenever(syncStore.token).thenReturn(null)
 
-        assertTrue(provider.privateKey() is Result.Error)
+        assertTrue(provider.privateKey() is AccountInfoPrivateKeyResult.Unavailable)
         verify(syncApi, never()).getProtectedKeys(any())
     }
 
     @Test
-    fun whenNoKeyWrappedForCurrentCredentialThenError() {
+    fun whenAccountInfoKeyExistsForAnotherCredentialThenTypedOutcomeIsNoWrapForOurCredential() {
         stubSignedIn()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Success(listOf(ddgKey.copy(encryptedWith = "3party"))))
 
-        assertTrue(provider.privateKey() is Result.Error)
+        val result = provider.privateKey()
+
+        assertEquals(
+            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL),
+            result,
+        )
     }
 
     @Test
-    fun whenUnwrapFailsThenError() {
+    fun whenNoAccountInfoKeyExistsThenTypedOutcomeIsNoKeyOnServer() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Success(emptyList()))
+
+        val result = provider.privateKey()
+
+        assertEquals(
+            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.NO_KEY_ON_SERVER),
+            result,
+        )
+    }
+
+    @Test
+    fun whenKeysFetchIsRateLimitedThenTypedOutcomeIsRateLimited() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Error(code = 429))
+
+        val result = provider.privateKey()
+
+        assertEquals(
+            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.RATE_LIMITED),
+            result,
+        )
+    }
+
+    @Test
+    fun whenUnwrapFailsThenTypedOutcomeIsUnwrapFailed() {
         stubSignedIn()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Success(listOf(ddgKey)))
         whenever(protectedKeyUnwrapper.unwrap(ddgKey)).thenReturn(Result.Error(reason = "no account secret key"))
 
-        assertTrue(provider.privateKey() is Result.Error)
+        assertEquals(
+            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.UNWRAP_FAILED),
+            provider.privateKey(),
+        )
+    }
+
+    @Test
+    fun whenCalledTwiceForSameAccountThenWrappedKeyFetchedOnceButUnwrappedEachCall() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Success(listOf(ddgKey)))
+        whenever(protectedKeyUnwrapper.unwrap(ddgKey)).thenReturn(Result.Success(byteArrayOf(-5, -16, 0)))
+
+        val first = provider.privateKey()
+        val second = provider.privateKey()
+
+        assertEquals(AccountInfoPrivateKeyResult.Available("-_AA"), first)
+        assertEquals(AccountInfoPrivateKeyResult.Available("-_AA"), second)
+        // the wrapped entry is cached (one network fetch), but we unwrap per call so the plaintext key is never cached
+        verify(syncApi, times(1)).getProtectedKeys(token)
+        verify(protectedKeyUnwrapper, times(2)).unwrap(ddgKey)
+    }
+
+    @Test
+    fun whenFetchFailsThenNotCachedAndRetriedNextCall() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token))
+            .thenReturn(Result.Error(code = 418, reason = ""))
+            .thenReturn(Result.Success(listOf(ddgKey)))
+        whenever(protectedKeyUnwrapper.unwrap(ddgKey)).thenReturn(Result.Success(byteArrayOf(-5, -16, 0)))
+
+        val first = provider.privateKey()
+        val second = provider.privateKey()
+
+        assertTrue(first is AccountInfoPrivateKeyResult.Unavailable)
+        assertEquals(AccountInfoPrivateKeyResult.Available("-_AA"), second)
+        verify(syncApi, times(2)).getProtectedKeys(token)
+    }
+
+    @Test
+    fun whenSignedOutAfterCachingThenCacheClearedAndErrorOnNextCall() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Success(listOf(ddgKey)))
+        whenever(protectedKeyUnwrapper.unwrap(ddgKey)).thenReturn(Result.Success(byteArrayOf(-5, -16, 0)))
+        provider.privateKey()
+
+        whenever(syncStore.token).thenReturn(null)
+
+        assertTrue(provider.privateKey() is AccountInfoPrivateKeyResult.Unavailable)
     }
 
     private fun stubSignedIn() {
         whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.userId).thenReturn(userId)
         whenever(syncStore.credentialId).thenReturn("ddg")
     }
 }

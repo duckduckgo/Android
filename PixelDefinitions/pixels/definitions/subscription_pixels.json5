@@ -48,6 +48,48 @@
             }
         ]
     },
+    "subscription_onboarding_step_shown": {
+        "description": "Fired when a native subscription onboarding step screen is shown",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": [
+            {
+                "description": "The onboarding step that was shown",
+                "type": "string"
+            },
+            "count_short",
+            "form_factor"
+        ],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_completed": {
+        "description": "Fired when a native subscription onboarding step is completed by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": [
+            {
+                "description": "The onboarding step that was completed",
+                "type": "string"
+            },
+            "count_short",
+            "form_factor"
+        ],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_skipped": {
+        "description": "Fired when a native subscription onboarding step is skipped by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": [
+            {
+                "description": "The onboarding step that was skipped",
+                "type": "string"
+            },
+            "count_short",
+            "form_factor"
+        ],
+        "parameters": ["appVersion", "freeTrial"]
+    },
     "subscription_webview_render_process_crash": {
         "description": "Fired when a render process crash is reported by the WebView that shows subscription pages.",
         "owners": ["lmac012"],
@@ -139,6 +181,13 @@
             "freeTrial"
         ]
     },
+    "subscription_switch": {
+        "description": "Fired when a switch of an active subscription to another plan is confirmed by the backend after Google Play billing completes.",
+        "owners": ["nalcalag"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_privacy-pro_app_subscription_active_d": {
         "description": "Fired once daily on app start for an active subscription",
         "owners": ["lmac012"],
@@ -152,6 +201,92 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_privacy-pro_offer_screen_impression": {
+        "description": "The subscription offer screen (paywall) was shown. Carries the entry-point origin the offer was launched with.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "origin",
+                "description": "Entry-point origin the offer was launched from, if available. Bounded to an allowlist of funnel entry points.",
+                "type": "string",
+                "enum": [
+                    "funnel_addressbar_android__aitoggle",
+                    "funnel_addressbar_android__modelpicker",
+                    "funnel_addressbar_android__reasoningdropdown",
+                    "funnel_appmenu_android",
+                    "funnel_appsettings_android",
+                    "funnel_duckai_android__freelabel",
+                    "funnel_duckai_android__modelpicker",
+                    "funnel_duckai_android__reasoningdropdown",
+                    "funnel_duckai_android__switchmodel",
+                    "funnel_modal_android__skippedonboardingupsell",
+                    "funnel_modal_android__subscriptionnudge",
+                    "funnel_onboarding_android",
+                    "funnel_playstore",
+                    "funnel_purchase_offer_page_android",
+                    "funnel_restore_android__viewplans",
+                    "funnel_subscriptionsettings_android__viewplans"
+                ]
+            }
+        ]
+    },
+    "m_privacy-pro_app-settings_partner-benefits_click": {
+        "description": "The user tapped 'Partner Benefits' (DuckDuckGo Subscription) in the app-wide Settings.",
+        "owners": ["Kyriakos-Georgiopoulos"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_privacy-pro_app-settings_get_click": {
+        "description": "The user tapped 'Get Subscription' (DuckDuckGo Subscription) in the app-wide Settings.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "origin",
+                "description": "Subscription-funnel entry point.",
+                "type": "string",
+                "enum": ["funnel_appsettings_android"]
+            }
+        ]
+    },
+    "m_privacy-pro_terms-conditions_subscribe_click": {
+        "description": "Subscription-funnel click: the user tapped the primary Subscribe CTA on the subscription offer page. Carries the entry-point origin the offer was launched with.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "origin",
+                "description": "Entry-point origin the offer was launched from, if available. Bounded to an allowlist of funnel entry points.",
+                "type": "string",
+                "enum": [
+                    "funnel_addressbar_android__aitoggle",
+                    "funnel_addressbar_android__modelpicker",
+                    "funnel_addressbar_android__reasoningdropdown",
+                    "funnel_appmenu_android",
+                    "funnel_appsettings_android",
+                    "funnel_duckai_android__freelabel",
+                    "funnel_duckai_android__modelpicker",
+                    "funnel_duckai_android__reasoningdropdown",
+                    "funnel_duckai_android__switchmodel",
+                    "funnel_modal_android__skippedonboardingupsell",
+                    "funnel_modal_android__subscriptionnudge",
+                    "funnel_onboarding_android",
+                    "funnel_playstore",
+                    "funnel_purchase_offer_page_android",
+                    "funnel_restore_android__viewplans",
+                    "funnel_subscriptionsettings_android__viewplans"
+                ]
+            }
+        ]
     },
     "m_subscription_expiration_reminder_scheduled": {
         "description": "Fired when the subscription expiration reminder local notification is successfully scheduled after a purchase.",
@@ -179,6 +314,41 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_subscription_settings_impression": {
+        "description": "Fired each time the app settings screen is opened by a user who is eligible for subscription purchase",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_settings_withdrawal_click": {
+        "description": "The user tapped 'Withdraw from Contract' in Subscription Settings.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_settings_withdrawal_dialog_shown": {
+        "description": "The withdrawal confirmation dialog was shown after the user tapped 'Withdraw from Contract' in Subscription Settings.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_settings_withdrawal_dialog_confirm_click": {
+        "description": "The user tapped 'Confirm Withdrawal' in the withdrawal confirmation dialog.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_settings_withdrawal_dialog_dismissed": {
+        "description": "The user closed the withdrawal confirmation dialog without withdrawing by tapping 'Keep Subscription'.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion"]
     }
 }

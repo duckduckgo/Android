@@ -31,7 +31,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat.getString
 import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetNewAddressBarPickerBinding
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker.Transition
@@ -41,16 +40,23 @@ import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-// Wrap with the onboarding theme so the dialog's bottomSheetStyle can resolve ?attr/onboardingSurfaceBackdrop.
+// The full onboarding theme restores base radius values, so the enabled radius overlay must be reapplied afterward.
 // Night mode (not a light/dark flag) decides which onboarding theme applies, matching the onboarding content.
-private fun onboardingThemedContext(context: Context): Context {
+private fun onboardingThemedContext(
+    context: Context,
+    radiusOverlayEnabled: Boolean,
+): Context {
     val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val themeRes = if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
         com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
     } else {
         com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light_Onboarding
     }
-    return ContextThemeWrapper(context, themeRes)
+    return ContextThemeWrapper(context, themeRes).apply {
+        if (radiusOverlayEnabled) {
+            theme.applyStyle(com.duckduckgo.mobile.android.R.style.ThemeOverlay_Rebrand_Radius, true)
+        }
+    }
 }
 
 @SuppressLint("NoBottomSheetDialog")
@@ -58,14 +64,10 @@ class NewAddressBarPickerBottomSheetDialog(
     private val context: Context,
     private val isLightMode: Boolean,
     private val callback: NewAddressBarCallback?,
-    private val edgeToEdgeEnabled: Boolean,
+    private val radiusOverlayEnabled: Boolean,
 ) : BottomSheetDialog(
-    onboardingThemedContext(context),
-    if (edgeToEdgeEnabled) {
-        R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker_EdgeToEdge
-    } else {
-        R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker
-    },
+    onboardingThemedContext(context, radiusOverlayEnabled),
+    R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker_EdgeToEdge,
 ) {
 
     private val binding: BottomSheetNewAddressBarPickerBinding =
@@ -73,14 +75,11 @@ class NewAddressBarPickerBottomSheetDialog(
 
     private var searchAndDuckAiSelected = true
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    private var leftWingRunnable: Runnable? = null
     private var contentFadeInAnimatorSet: AnimatorSet? = null
 
     init {
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
 
         this.behavior.isDraggable = false
         this.behavior.isHideable = false
@@ -111,7 +110,6 @@ class NewAddressBarPickerBottomSheetDialog(
             if (!isWindowValid()) return@setOnShowListener
             (it as BottomSheetDialog).setRoundCorners()
             callback?.onDisplayed()
-            playLeftWingAnimation()
             revealContent()
         }
 
@@ -159,17 +157,6 @@ class NewAddressBarPickerBottomSheetDialog(
         }
     }
 
-    private fun playLeftWingAnimation() {
-        binding.leftWing.apply {
-            alpha = 0f
-            setMaxProgress(WING_STOP_PROGRESS)
-            leftWingRunnable = postDelayed(WING_START_DELAY) {
-                animate().alpha(1f).setDuration(WING_FADE_IN_DURATION).start()
-                playAnimation()
-            }
-        }
-    }
-
     @SuppressLint("SourceLockedOrientationActivity")
     private fun lockOrientationToPortrait() {
         (context as? Activity)?.let {
@@ -187,8 +174,6 @@ class NewAddressBarPickerBottomSheetDialog(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         contentFadeInAnimatorSet?.cancel()
-        leftWingRunnable?.let { binding.leftWing.removeCallbacks(it) }
-        binding.leftWing.cancelAnimation()
         binding.inputScreen.inputScreenPicker.cancelLottieAnimations()
         restoreOrientation()
     }
@@ -198,9 +183,6 @@ class NewAddressBarPickerBottomSheetDialog(
     } ?: false
 
     private companion object {
-        private const val WING_STOP_PROGRESS = 0.5f
-        private const val WING_START_DELAY = 300L
-        private const val WING_FADE_IN_DURATION = 150L
         private const val CONTENT_FADE_IN_DURATION = 200L
     }
 }

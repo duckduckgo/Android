@@ -1,10 +1,18 @@
 {
   "name": "USA Trace",
   "url": "usatrace.com",
-  "version": "0.7.0",
+  "version": "0.9.1",
   "parent": "peoplefinders.com",
   "addedDatetime": 1674540000000,
   "optOutUrl": "https://www.usatrace.com/contact-us/",
+  "mirrorSites": [
+    {
+      "name": "Quick People Trace",
+      "url": "quickpeopletrace.com",
+      "addedAt": 1791559037961,
+      "removedAt": null
+    }
+  ],
   "steps": [
     {
       "stepType": "scan",

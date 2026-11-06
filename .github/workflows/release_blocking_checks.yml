@@ -1,7 +1,5 @@
 name: Release Blocking Checks
 
-run-name: 'Release Blocking Checks (${{ inputs.ddg_di || ''AnvilDagger'' }})'
-
 on:
   workflow_call:
     inputs:
@@ -14,11 +12,16 @@ on:
         required: false
         type: boolean
         default: true
-      ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+      fail_fast:
+        description: 'Cancel the remaining end-to-end suites as soon as one fails'
+        required: false
+        type: boolean
+        default: false
+      maestro_priority:
+        description: 'Maestro Cloud queue priority for E2E tests (high, normal or low)'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: normal
   workflow_dispatch:
     inputs:
       commit:
@@ -30,11 +33,15 @@ on:
         required: false
         type: boolean
         default: true
-      ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+      maestro_priority:
+        description: 'Maestro Cloud queue priority for E2E tests'
         required: false
-        type: string
-        default: 'AnvilDagger'
+        type: choice
+        options:
+          - high
+          - normal
+          - low
+        default: normal
 
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}
@@ -45,22 +52,30 @@ jobs:
     uses: ./.github/workflows/nightly.yml
     with:
       commit: ${{ inputs.commit }}
-      ddg_di: ${{ inputs.ddg_di }}
+    secrets: inherit
+
+  end-to-end-build:
+    uses: ./.github/workflows/e2e-build-and-upload.yml
+    with:
+      commit: ${{ inputs.commit }}
+      create_asana_tasks: ${{ inputs.create_asana_tasks }}
     secrets: inherit
 
   end-to-end:
-    needs: nightly
+    needs: [nightly, end-to-end-build]
     uses: ./.github/workflows/e2e-nightly-full-suite.yml
     with:
       commit: ${{ inputs.commit }}
       create_asana_tasks: ${{ inputs.create_asana_tasks }}
-      ddg_di: ${{ inputs.ddg_di }}
+      internal_binary_id: ${{ needs.end-to-end-build.outputs.internal_binary_id }}
+      release_binary_id: ${{ needs.end-to-end-build.outputs.release_binary_id }}
+      fail_fast: ${{ inputs.fail_fast == true }}
+      maestro_priority: ${{ inputs.maestro_priority }}
     secrets: inherit
 
   privacy:
-    needs: end-to-end
+    needs: nightly
     uses: ./.github/workflows/privacy.yml
     with:
       commit: ${{ inputs.commit }}
-      ddg_di: ${{ inputs.ddg_di }}
     secrets: inherit

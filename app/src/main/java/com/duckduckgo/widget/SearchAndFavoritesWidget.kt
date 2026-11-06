@@ -180,6 +180,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
                 context = context,
                 remoteViews = remoteViews,
                 fromFavWidget = true,
+                widgetTheme = widgetTheme,
             )
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
             configureEmptyWidgetCta(context, appWidgetId, remoteViews)
@@ -271,7 +272,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     private fun inject(context: Context) {
         val application = context.applicationContext as DuckDuckGoApplication
-        application.daggerAppComponent.inject(this)
+        application.appComponent.inject(this)
     }
 
     private suspend fun buildRemoteCollectionItems(

@@ -22,7 +22,7 @@ import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing.Companion.NONE
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing.Companion.SOME
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AutofillEngagementBucketing {

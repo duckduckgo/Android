@@ -39,6 +39,15 @@ interface WebViewClientListener {
 
     fun pageRefreshed(refreshedUrl: String)
 
+    /**
+     * Called synchronously when a main-frame load starts, with the id identifying that load for
+     * [com.duckduckgo.app.browser.pageload.PageLoadWideEvent]. A redirect hop starts a load of its own, so this fires
+     * more than once per navigation. Progress reported from here until the next call belongs to [navigationId].
+     */
+    fun onMainFrameLoadStarted(navigationId: Long)
+
+    fun onPageLoadTimeout()
+
     fun progressChanged(
         newProgress: Int,
         webViewNavigationState: WebViewNavigationState,
@@ -180,6 +189,22 @@ interface WebViewClientListener {
     )
 
     fun onShouldOverride()
+
+    /**
+     * Called from shouldOverrideUrlLoading for main-frame navigations, after routing is decided.
+     * [loadsInThisTab] is false when the navigation leaves this tab (external app, mailto/tel/sms, new tab, Duck.ai...).
+     */
+    fun onMainFrameNavigationDecided(loadsInThisTab: Boolean)
+
+    /**
+     * Called synchronously from onPageStarted, so unlike [pageStarted] it can't land after a newer shouldOverrideUrlLoading.
+     */
+    fun onMainFrameNavigationCommitted()
+
+    /**
+     * For navigations that never commit, e.g. HTTP 204.
+     */
+    fun onNavigationFinishedWithoutCommit()
 
     fun pageFinished(
         webView: WebView,

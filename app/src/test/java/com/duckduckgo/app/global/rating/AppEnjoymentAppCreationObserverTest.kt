@@ -24,6 +24,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +44,7 @@ class AppEnjoymentAppCreationObserverTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val feature = FakeFeatureToggleFactory.create(PreventFeedbackDialogQueuingFeature::class.java)
+    private val appRatingPromptModalFeature = FakeFeatureToggleFactory.create(AppRatingPromptModalFeature::class.java)
 
     private lateinit var testee: AppEnjoymentAppCreationObserver
     private val mockAppEnjoymentPromptEmitter: AppEnjoymentPromptEmitter = mock()
@@ -61,8 +63,11 @@ class AppEnjoymentAppCreationObserverTest {
             promptTypeDecider = mockPromptTypeDecider,
             appCoroutineScope = testScope,
             preventDialogQueuingFeature = feature,
+            appRatingPromptModalFeature = appRatingPromptModalFeature,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
+
+        appRatingPromptModalFeature.self().setRawStoredState(Toggle.State(enable = false))
     }
 
     @Test
@@ -174,5 +179,37 @@ class AppEnjoymentAppCreationObserverTest {
         testee.onStart(mock())
 
         verify(mockPromptTypeDecider, times(2)).determineInitialPromptType()
+    }
+
+    @Test
+    fun whenAppRatingPromptModalFeatureEnabledThenShouldNotDetermineInitialPromptType() = runTest {
+        appRatingPromptModalFeature.self().setRawStoredState(Toggle.State(enable = true))
+        feature.self().setRawStoredState(Toggle.State(enable = false))
+        promptTypeLiveData.value = null
+
+        testee.onStart(mock())
+
+        verify(mockPromptTypeDecider, never()).determineInitialPromptType()
+    }
+
+    @Test
+    fun whenAppRatingPromptModalFeatureEnabledThenShouldNotEmitPromptType() = runTest {
+        appRatingPromptModalFeature.self().setRawStoredState(Toggle.State(enable = true))
+        promptTypeLiveData.value = null
+
+        testee.onStart(mock())
+
+        assertNull(promptTypeLiveData.value)
+    }
+
+    @Test
+    fun whenAppRatingPromptModalFeatureDisabledThenShouldDetermineInitialPromptType() = runTest {
+        appRatingPromptModalFeature.self().setRawStoredState(Toggle.State(enable = false))
+        feature.self().setRawStoredState(Toggle.State(enable = true))
+        promptTypeLiveData.value = null
+
+        testee.onStart(mock())
+
+        verify(mockPromptTypeDecider).determineInitialPromptType()
     }
 }

@@ -24,9 +24,8 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -99,7 +98,7 @@ data class StoredUserPreferences(
     val privatePlayerMode: PrivatePlayerMode?,
 )
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckPlayerFeatureRepository @Inject constructor(
     private val duckPlayerDataStore: DuckPlayerDataStore,
@@ -243,7 +242,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
     ): InputStream? {
         return try {
             val okHttpRequest = Request.Builder().url(url).headers(headers.toHeaders()).build()
-            withContext(dispatcherProvider.io()) { okHttpClient.get().newCall(okHttpRequest).execute().body?.byteStream() }
+            withContext(dispatcherProvider.io()) { okHttpClient.value.newCall(okHttpRequest).execute().body?.byteStream() }
         } catch (e: IOException) {
             logcat { "Request failed: ${e.message}" }
             null

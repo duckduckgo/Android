@@ -16,6 +16,13 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
+import androidx.annotation.StringRes
+import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
+import com.duckduckgo.app.onboarding.ui.page.welcome.ContentConfig
+import com.duckduckgo.app.onboarding.ui.page.welcome.Embellishment
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
+
 /**
  * What the [com.duckduckgo.app.onboarding.ui.OnboardingActivity] renderer should present for the current step.
  */
@@ -26,15 +33,35 @@ sealed interface NewUserOnboardingActivityDialog {
     data object InitialReinstallUser : NewUserOnboardingActivityDialog
     data object Initial : NewUserOnboardingActivityDialog
     data object ComparisonChart : NewUserOnboardingActivityDialog
+    data object DownloadReason : NewUserOnboardingActivityDialog
     data object AiComparisonChart : NewUserOnboardingActivityDialog
+    data class SegmentedComparisonChart(val chart: ComparisonChartConfig) : NewUserOnboardingActivityDialog
     data object DefaultBrowserPrompt : NewUserOnboardingActivityDialog
-    data object AddToDock : NewUserOnboardingActivityDialog
     data object WidgetPrompt : NewUserOnboardingActivityDialog
 
     data object AddWidget : NewUserOnboardingActivityDialog
+
+    data object ImportPasswords : NewUserOnboardingActivityDialog
+
+    data object ImportPasswordsLaunch : NewUserOnboardingActivityDialog
+
+    data class ImportComplete(val result: PasswordImportResult?) : NewUserOnboardingActivityDialog
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
-    data object InputScreen : NewUserOnboardingActivityDialog
-    data class InputScreenPreview(val isSearchDefault: Boolean) : NewUserOnboardingActivityDialog
+    data class InputScreen(
+        val embellishment: Embellishment = Embellishment.LeftWing,
+        val background: OnboardingBackground = OnboardingBackground.Shoreline,
+    ) : NewUserOnboardingActivityDialog
+
+    /**
+     * @param isSearchDefault when true, the search tab is pre-selected, otherwise, the Duck.ai tab is pre-selected.
+     * @param showModeToggle when true, the toggle is visible and allows changing the pre-selected input method ([isSearchDefault]).
+     */
+    data class InputScreenPreview(
+        val isSearchDefault: Boolean,
+        val showModeToggle: Boolean,
+        @get:StringRes val titleRes: Int,
+    ) : NewUserOnboardingActivityDialog
+
     data class QuickSetup(
         val showSplitOption: Boolean,
         val hideSetDefaultBrowserRow: Boolean,
@@ -42,4 +69,21 @@ sealed interface NewUserOnboardingActivityDialog {
         val hideAddressBarRow: Boolean,
         val isReinstallUser: Boolean,
     ) : NewUserOnboardingActivityDialog
+
+    /** [rows] holds only the preferences to offer, in row order, each already resolved against its definition. */
+    data class PreferenceSelector(
+        @get:StringRes val titleRes: Int,
+        val rows: List<ContentConfig.PreferenceSelector.Row>,
+        @get:StringRes val caption: Int? = null,
+    ) : NewUserOnboardingActivityDialog
+
+    data class SingleChoice(
+        @field:StringRes val title: Int,
+        @field:StringRes val body: Int,
+        val options: List<Option>,
+    ) : NewUserOnboardingActivityDialog
+
+    data class TogglePosition(val options: List<Option>) : NewUserOnboardingActivityDialog
+
+    data class DuckAiState(val options: List<Option>) : NewUserOnboardingActivityDialog
 }

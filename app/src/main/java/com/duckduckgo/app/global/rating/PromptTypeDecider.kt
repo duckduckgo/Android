@@ -95,11 +95,3 @@ sealed class AppEnjoymentPromptOptions {
     data class ShowFeedbackPrompt(val promptCount: PromptCount) : AppEnjoymentPromptOptions()
     data class ShowRatingPrompt(val promptCount: PromptCount) : AppEnjoymentPromptOptions()
 }
-
-data class PromptCount(val value: Int) {
-
-    companion object {
-        fun first(): PromptCount = PromptCount(1)
-        fun second(): PromptCount = PromptCount(2)
-    }
-}

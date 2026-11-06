@@ -66,7 +66,7 @@ class RetryAwaitCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.CAPTCHA_SOLVE,
@@ -101,7 +101,7 @@ class RetryAwaitCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.CAPTCHA_SOLVE,
@@ -127,7 +127,7 @@ class RetryAwaitCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.CAPTCHA_SOLVE,
@@ -156,9 +156,8 @@ class RetryAwaitCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
-                currentBrokerStepIndex = 3,
                 currentActionIndex = 5,
                 actionRetryCount = 2,
                 stageStatus = PirStageStatus(
@@ -177,7 +176,6 @@ class RetryAwaitCaptchaSolutionEventHandlerTest {
         val result = testee.invoke(state, event)
 
         assertEquals(state, result.nextState)
-        assertEquals(3, result.nextState.currentBrokerStepIndex)
         assertEquals(5, result.nextState.currentActionIndex)
         assertEquals(2, result.nextState.actionRetryCount)
     }

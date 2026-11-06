@@ -21,9 +21,10 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 interface DuckChatFeatureRepository {
@@ -67,8 +68,6 @@ interface DuckChatFeatureRepository {
 
     suspend fun isInputScreenEverEnabled(): Boolean
 
-    suspend fun isFullScreenModeUserSettingEnabled(): Boolean
-
     suspend fun isAutomaticPageContextAttachmentUserSettingEnabled(): Boolean
 
     suspend fun shouldShowInBrowserMenu(): Boolean
@@ -101,14 +100,18 @@ interface DuckChatFeatureRepository {
 
     suspend fun getDefaultTogglePosition(): String?
 
-    fun observeDefaultTogglePosition(): Flow<String?>
+    fun observeDefaultTogglePosition(): StateFlow<String?>
 
     suspend fun setLastUsedTogglePosition(position: String)
 
-    fun observeLastUsedTogglePosition(): Flow<String?>
+    suspend fun getLastUsedTogglePosition(): String?
+
+    fun observeLastUsedTogglePosition(): StateFlow<String?>
+
+    suspend fun checkAndMarkFirstPromptSubmission(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckChatFeatureRepository @Inject constructor(
     private val duckChatDataStore: DuckChatDataStore,
@@ -172,8 +175,6 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun isInputScreenEverEnabled(): Boolean = duckChatDataStore.isInputScreenEverEnabled()
 
-    override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
-
     override suspend fun isAutomaticPageContextAttachmentUserSettingEnabled() = duckChatDataStore.isAutomaticPageContextAttachmentEnabled()
 
     override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
@@ -219,13 +220,23 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun getDefaultTogglePosition(): String? = duckChatDataStore.getDefaultTogglePosition()
 
-    override fun observeDefaultTogglePosition(): Flow<String?> = duckChatDataStore.observeDefaultTogglePosition()
+    override fun observeDefaultTogglePosition(): StateFlow<String?> = duckChatDataStore.observeDefaultTogglePosition()
 
     override suspend fun setLastUsedTogglePosition(position: String) {
         duckChatDataStore.setLastUsedTogglePosition(position)
     }
 
-    override fun observeLastUsedTogglePosition(): Flow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
+    override suspend fun getLastUsedTogglePosition(): String? = duckChatDataStore.getLastUsedTogglePosition()
+
+    override fun observeLastUsedTogglePosition(): StateFlow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
+
+    override suspend fun checkAndMarkFirstPromptSubmission(): Boolean {
+        val isFirst = !duckChatDataStore.hasSubmittedPromptBefore()
+        if (isFirst) {
+            duckChatDataStore.setPromptSubmitted()
+        }
+        return isFirst
+    }
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

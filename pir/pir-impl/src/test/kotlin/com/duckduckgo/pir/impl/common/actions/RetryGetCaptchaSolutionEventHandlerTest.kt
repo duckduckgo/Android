@@ -75,7 +75,7 @@ class RetryGetCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.CAPTCHA_SEND,
@@ -107,7 +107,7 @@ class RetryGetCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.CAPTCHA_SEND,
@@ -131,7 +131,7 @@ class RetryGetCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.CAPTCHA_SEND,
@@ -157,7 +157,7 @@ class RetryGetCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.CAPTCHA_SEND,
@@ -182,9 +182,8 @@ class RetryGetCaptchaSolutionEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
-                currentBrokerStepIndex = 2,
                 currentActionIndex = 4,
                 actionRetryCount = 1,
                 stageStatus = PirStageStatus(
@@ -201,7 +200,6 @@ class RetryGetCaptchaSolutionEventHandlerTest {
         val result = testee.invoke(state, event)
 
         assertEquals(state, result.nextState)
-        assertEquals(2, result.nextState.currentBrokerStepIndex)
         assertEquals(4, result.nextState.currentActionIndex)
         assertEquals(1, result.nextState.actionRetryCount)
     }

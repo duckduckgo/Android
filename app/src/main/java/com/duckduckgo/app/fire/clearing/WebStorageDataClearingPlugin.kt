@@ -29,7 +29,7 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -38,7 +38,7 @@ import javax.inject.Inject
 /**
  * Owns Fire site/web-storage clearing logic.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WebStorageDataClearingPlugin @Inject constructor(
     private val webStorageProvider: WebStorageProvider,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,

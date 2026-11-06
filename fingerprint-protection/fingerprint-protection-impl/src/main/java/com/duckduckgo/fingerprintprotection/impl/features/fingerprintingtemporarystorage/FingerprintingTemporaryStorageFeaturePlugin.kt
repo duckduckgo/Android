@@ -22,10 +22,10 @@ import com.duckduckgo.fingerprintprotection.impl.fingerprintProtectionFeatureVal
 import com.duckduckgo.fingerprintprotection.store.FingerprintingTemporaryStorageEntity
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingtemporarystorage.FingerprintingTemporaryStorageRepository
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class FingerprintingTemporaryStorageFeaturePlugin @Inject constructor(
     private val fingerprintingTemporaryStorageRepository: FingerprintingTemporaryStorageRepository,
 ) : PrivacyFeaturePlugin {

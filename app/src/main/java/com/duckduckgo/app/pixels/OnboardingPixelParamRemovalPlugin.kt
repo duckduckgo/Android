@@ -19,10 +19,10 @@ package com.duckduckgo.app.pixels
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class OnboardingPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
 
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
@@ -41,8 +41,17 @@ class OnboardingPixelParamRemovalPlugin @Inject constructor() : PixelParamRemova
             OnboardingPixelName.ONBOARDING_VISIT_SITE.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_END.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_END_TRY_DUCK_AI.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SUBSCRIPTION_PROMO.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_WIDGET_PROMPT.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_PREFERENCES_SERP.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_PREFERENCES_AI_TOGGLE_MODE.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_PREFERENCES_DUCK_AI.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

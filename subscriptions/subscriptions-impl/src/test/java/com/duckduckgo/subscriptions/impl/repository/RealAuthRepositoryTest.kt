@@ -33,7 +33,7 @@ class RealAuthRepositoryTest {
         authStore,
         coroutineRule.testDispatcherProvider,
         serpPromo,
-        dagger.Lazy { subscriptionsFeature },
+        lazy { subscriptionsFeature },
     )
 
     @Test
@@ -150,7 +150,7 @@ class RealAuthRepositoryTest {
             FakeSubscriptionsDataStore(supportEncryption = false),
             coroutineRule.testDispatcherProvider,
             serpPromo,
-            dagger.Lazy { subscriptionsFeature },
+            lazy { subscriptionsFeature },
         )
         assertFalse(repository.canSupportEncryption())
     }

@@ -29,6 +29,27 @@ enum class AppLinkSettingType {
             NEVER -> 3
         }
     }
+
+    fun getPixelValue(): String {
+        return when (this) {
+            ASK_EVERYTIME -> "ask_everytime"
+            ALWAYS -> "always"
+            NEVER -> "never"
+        }
+    }
+
+    companion object {
+        fun getForState(
+            appLinksEnabled: Boolean,
+            showAppLinksPrompt: Boolean,
+        ): AppLinkSettingType {
+            return if (appLinksEnabled) {
+                if (showAppLinksPrompt) ASK_EVERYTIME else ALWAYS
+            } else {
+                NEVER
+            }
+        }
+    }
 }
 
 fun Int.getAppLinkSettingForIndex(): AppLinkSettingType {

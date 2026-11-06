@@ -73,12 +73,12 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Er du sikker på, at du vil slette "</string>
     <string name="bookmarkFolderEmpty">Tom</string>
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s og %3$d element?</item>
-        <item quantity="other">%1$s%2$s og %3$d elementer?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s og %3$d element?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s og %3$d elementer?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
-        <item quantity="other">%1$d elementer</item>
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d element</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d elementer</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -93,8 +93,8 @@
     <string name="removeFromFavorites">Fjern fra favoritter</string>
     <string name="addToFavoritesMenu">Tilføj til favoritter</string>
     <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one">Er du sikker på, at du vil slette denne mappe og %1$d element?</item>
-        <item quantity="other">Er du sikker på, at du vil slette denne mappe og %1$d elementer?</item>
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Er du sikker på, at du vil slette denne mappe og %1$d element?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Er du sikker på, at du vil slette denne mappe og %1$d elementer?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Er du sikker på, at du vil slette dit bogmærke &lt;b&gt;%1$s&lt;/b&gt;?</string>
 

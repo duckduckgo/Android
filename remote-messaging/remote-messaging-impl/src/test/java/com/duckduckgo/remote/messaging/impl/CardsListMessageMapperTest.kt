@@ -452,4 +452,22 @@ class CardsListMessageMapperTest {
         assertEquals(emptyList<Int>(), item.matchingRules)
         assertEquals(emptyList<Int>(), item.exclusionRules)
     }
+
+    @Test
+    fun whenCardsListContainsOneActionItemThenItemIsDropped() {
+        val oneActionItem = JsonListItem(
+            id = "one_action_item",
+            type = "one_action_item",
+            titleText = "Set as default",
+            descriptionText = "Description",
+            placeholder = "Announce",
+            primaryAction = JsonMessageAction(type = "defaultBrowser", value = "", additionalParameters = null),
+        )
+        val listItems = cardsListJsonContent().listItems.orEmpty() + oneActionItem
+        val jsonMessages = listOf(aJsonMessage(id = "cards1", content = cardsListJsonContent(listItems = listItems)))
+
+        val content = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins).first().content as Content.CardsList
+
+        assertEquals(listOf("item1", "item2"), content.listItems.map { it.id })
+    }
 }

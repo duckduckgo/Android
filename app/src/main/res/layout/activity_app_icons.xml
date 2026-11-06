@@ -14,11 +14,11 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <include
             android:id="@+id/includeToolbar"
@@ -26,8 +26,12 @@
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/appIconsList"
-            android:padding="@dimen/keyline_4"
+            android:paddingHorizontal="@dimen/keyline_5"
+            android:paddingVertical="@dimen/keyline_4"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            tools:listitem="@layout/item_app_icon"
+            tools:spanCount="3" />
 
 </LinearLayout>

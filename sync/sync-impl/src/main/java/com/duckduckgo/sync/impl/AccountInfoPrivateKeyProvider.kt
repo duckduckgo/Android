@@ -22,18 +22,38 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
- * Supplies the account's `account_info` private key, unwrapped for the current credential and
- * encoded as base64url PKCS#8.
+ * Supplies the account's `account_info` private key, unwrapped for the current credential and encoded as base64url PKCS#8.
+ *
+ * The *wrapped* key entry (still encrypted, as on disk) is cached in memory keyed by account+credential: the `account_info` key is
+ * immutable for the account lifetime, so a burst of reads (e.g. repeated device-list renders) does a single `GET /sync/keys` instead of
+ * hammering it and tripping rate limits. The key is unwrapped on every call, so the plaintext key is only ever held transiently by the
+ * caller — it is not persisted or cached. Only successful fetches are cached; the cache is cleared on sign-out and
+ * refreshed automatically on an account/credential switch.
  */
 @WorkerThread
 interface AccountInfoPrivateKeyProvider {
-    fun privateKey(): Result<String>
+    fun privateKey(): AccountInfoPrivateKeyResult
 }
 
+sealed interface AccountInfoPrivateKeyResult {
+    data class Available(val privateKey: String) : AccountInfoPrivateKeyResult
+    data class Unavailable(val reason: AccountInfoKeyUnavailableReason) : AccountInfoPrivateKeyResult
+}
+
+enum class AccountInfoKeyUnavailableReason {
+    NO_KEY_ON_SERVER,
+    NO_WRAP_FOR_OUR_CREDENTIAL,
+    UNWRAP_FAILED,
+    KEYS_FETCH_FAILED,
+    RATE_LIMITED,
+}
+
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAccountInfoPrivateKeyProvider @Inject constructor(
     private val syncStore: SyncStore,
@@ -41,22 +61,80 @@ class RealAccountInfoPrivateKeyProvider @Inject constructor(
     private val protectedKeyUnwrapper: ProtectedKeyUnwrapper,
 ) : AccountInfoPrivateKeyProvider {
 
-    override fun privateKey(): Result<String> {
+    private val fetchLock = Any()
+
+    @Volatile
+    private var cachedEntry: CachedEntry? = null
+
+    private data class CachedEntry(val userId: String, val credentialId: String, val wrappedEntry: ProtectedKeyEntry)
+
+    override fun privateKey(): AccountInfoPrivateKeyResult {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
-            ?: return Error(reason = "AccountInfoPrivateKey: not signed in")
+            ?: run {
+                cachedEntry = null
+                return AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED)
+            }
+        val userId = syncStore.userId.takeUnless { it.isNullOrEmpty() }
+            ?: run {
+                cachedEntry = null
+                return AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED)
+            }
         val credentialId = syncStore.credentialId ?: CREDENTIAL_ID_DDG
 
-        val entry = when (val result = syncApi.getProtectedKeys(token)) {
-            is Success -> result.data.firstOrNull { it.purpose == SYNC_PURPOSE_ACCOUNT_INFO && it.encryptedWith == credentialId }
-                ?: return Error(reason = "AccountInfoPrivateKey: no account_info key wrapped for credential=$credentialId")
-            is Error -> return result
+        val entry = when (val result = wrappedEntry(token, userId, credentialId)) {
+            is WrappedEntryOutcome.Available -> result.entry
+            is WrappedEntryOutcome.Unavailable -> return AccountInfoPrivateKeyResult.Unavailable(result.reason)
         }
 
-        val rawKeyBytes = when (val result = protectedKeyUnwrapper.unwrap(entry)) {
-            is Success -> result.data
-            is Error -> return result
+        return when (val result = protectedKeyUnwrapper.unwrap(entry)) {
+            is Success -> AccountInfoPrivateKeyResult.Available(
+                Base64.encodeToString(result.data, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP),
+            )
+            is Error -> AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.UNWRAP_FAILED)
         }
+    }
 
-        return Success(Base64.encodeToString(rawKeyBytes, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP))
+    /** Returns the wrapped `account_info` entry from cache, or fetches it once (deduping a concurrent burst) and caches it. */
+    private fun wrappedEntry(token: String, userId: String, credentialId: String): WrappedEntryOutcome {
+        cachedEntry?.let { if (it.userId == userId && it.credentialId == credentialId) return WrappedEntryOutcome.Available(it.wrappedEntry) }
+
+        return synchronized(fetchLock) {
+            // another thread may have populated the cache while we waited on the lock
+            cachedEntry?.let {
+                if (it.userId == userId && it.credentialId == credentialId) {
+                    return@synchronized WrappedEntryOutcome.Available(it.wrappedEntry)
+                }
+            }
+
+            val entry = when (val result = syncApi.getProtectedKeys(token)) {
+                is Success -> {
+                    result.data.firstOrNull { it.purpose == SYNC_PURPOSE_ACCOUNT_INFO && it.encryptedWith == credentialId }
+                        ?: return@synchronized WrappedEntryOutcome.Unavailable(
+                            if (result.data.any { it.purpose == SYNC_PURPOSE_ACCOUNT_INFO }) {
+                                AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL
+                            } else {
+                                AccountInfoKeyUnavailableReason.NO_KEY_ON_SERVER
+                            },
+                        )
+                }
+                is Error -> {
+                    return@synchronized WrappedEntryOutcome.Unavailable(
+                        if (result.code == API_CODE.TOO_MANY_REQUESTS_1.code) {
+                            AccountInfoKeyUnavailableReason.RATE_LIMITED
+                        } else {
+                            AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED
+                        },
+                    )
+                }
+            }
+
+            cachedEntry = CachedEntry(userId = userId, credentialId = credentialId, wrappedEntry = entry)
+            WrappedEntryOutcome.Available(entry)
+        }
+    }
+
+    private sealed interface WrappedEntryOutcome {
+        data class Available(val entry: ProtectedKeyEntry) : WrappedEntryOutcome
+        data class Unavailable(val reason: AccountInfoKeyUnavailableReason) : WrappedEntryOutcome
     }
 }

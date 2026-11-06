@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">So synchronisierst du Desktop-Passwörter</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importiere Passwörter in der Desktop-Version des DuckDuckGo-Browsers und synchronisiere sie dann auf allen Geräten.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Desktop-Browser herunterladen</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopiert</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hole dir den DuckDuckGo-Browser für Mac oder Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Suche privat und blockiere Tracker mit dem DuckDuckGo Desktop-Browser. Besuche zum Herunterladen diesen Link auf deinem Computer.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Mit Desktop synchronisieren</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Lade dir die Desktop-App herunter</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hole dir DuckDuckGo für Mac oder Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Gehe auf deinem Computer zu:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Download-Link teilen</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Problem mit Autofill melden</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Melde anonym, dass das automatische Ausfüllen auf dieser Seite nicht funktioniert. Passwörter werden niemals geteilt.</string>
@@ -252,6 +249,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Passwörter von Google importieren</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
+    <string name="importPasswordsChooseMethodDialogSubtitleDeviceAuth">Dein Gerät fordert dich möglicherweise auf, zur Bestätigung deine PIN, dein Passwort oder dein Muster einzugeben.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Von Google importieren</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">CSV-Datei wählen</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Aus Desktop-Browser importieren</string>
@@ -283,8 +281,10 @@
 
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Übertrage deine Passwörter von&lt;br /&gt;Google zu DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Importiere deine Passwörter schnell und sicher zu DuckDuckGo. Google fordert dich möglicherweise auf, dein Passwort einzugeben.</string>
+    <string name="passwords_import_promo_subtitle_device_auth">Importiere deine Passwörter schnell und sicher zu DuckDuckGo. Dein Gerät fordert dich möglicherweise auf, zur Bestätigung deine PIN, dein Passwort oder dein Muster einzugeben.</string>
     <string name="passwords_import_promo_action">Von Google importieren</string>
     <string name="passwords_import_promo_in_browser_title">Übertrage deine Passwörter von Google zu DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_title_device_auth">Importiere deine Passwörter von Google zu DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Nicht erneut fragen</string>
     <string name="passwords_import_promo_in_settings_title">Passwörter von Google importieren</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ausblenden</string>
@@ -311,5 +311,17 @@
     <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksErrorGenericMessage">Etwas ist schiefgelaufen</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Bitte stelle sicher, dass du mit dem Internet verbunden bist, und versuche es erneut.</string>
+
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import abgeschlossen!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Warte kurz – lass dieses Fenster geöffnet. Es sollte nicht länger als ein oder zwei Minuten dauern.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google fragt möglicherweise nach deinem Passwort.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google sendet dir eine E-Mail, in der bestätigt wird, dass deine Daten exportiert wurden. Du musst nichts tun.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import abgeschlossen!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Lesezeichen importiert: <b>%1$d</b>]]></string>
 
 </resources>

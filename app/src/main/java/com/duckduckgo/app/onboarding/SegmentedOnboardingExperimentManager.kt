@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.onboarding
+
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.SegmentedOnboardingFeatureToggles.Cohorts
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+
+interface SegmentedOnboardingExperimentManager {
+    suspend fun enroll(): SegmentedOnboardingExperimentVariant?
+
+    enum class SegmentedOnboardingExperimentVariant {
+        CONTROL,
+        TREATMENT,
+    }
+}
+
+@ContributesBinding(AppScope::class, binding = binding<SegmentedOnboardingExperimentManager>())
+@SingleIn(AppScope::class)
+class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
+    private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
+    private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,
+    private val appBuildConfig: AppBuildConfig,
+    private val dispatcherProvider: DispatcherProvider,
+    private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
+) : SegmentedOnboardingExperimentManager {
+
+    override suspend fun enroll(): SegmentedOnboardingExperimentVariant? = withContext(dispatcherProvider.io()) {
+        if (!onboardingPrivacyConfigPersistedGate.awaitPersisted() || !checkPrerequisites()) {
+            return@withContext null
+        }
+
+        val toggle = segmentedOnboardingFeatureToggles.onboardingFlowByDownloadReasonExperiment()
+        toggle.enroll()
+        when {
+            toggle.isEnrolledAndEnabled(Cohorts.TREATMENT) -> SegmentedOnboardingExperimentVariant.TREATMENT
+            toggle.isEnrolledAndEnabled(Cohorts.CONTROL) -> SegmentedOnboardingExperimentVariant.CONTROL
+            else -> null
+        }
+    }
+
+    private suspend fun checkPrerequisites() =
+        !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
+            !appBuildConfig.isAppReinstall()
+}

@@ -32,6 +32,7 @@
     <string name="removeAll">Odstrániť všetky</string>
     <string name="undo">Zrušiť zmenu</string>
     <string name="cancel">Zrušiť</string>
+    <string name="done">Hotovo</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Vždy zapnuté</string>

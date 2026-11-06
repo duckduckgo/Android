@@ -39,7 +39,7 @@
             android:id="@+id/setDefaultBrowserItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:quickSetupRowIcon="@drawable/ic_default_browser_mobile_color_24"
+            app:quickSetupRowIcon="@drawable/default_browser_mobile_color_24"
             app:quickSetupRowPrimaryText="@string/preOnboardingReinstallSetDefaultLabel" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -53,7 +53,7 @@
             android:id="@+id/addWidgetItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:quickSetupRowIcon="@drawable/ic_add_widget_color_24"
+            app:quickSetupRowIcon="@drawable/add_widget_color_24"
             app:quickSetupRowPrimaryText="@string/preOnboardingReinstallAddHomeScreenWidgetLabel" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider

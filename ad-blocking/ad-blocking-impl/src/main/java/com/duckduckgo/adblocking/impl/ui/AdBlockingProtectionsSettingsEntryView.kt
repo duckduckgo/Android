@@ -27,13 +27,13 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.ui.AdBlockingProtectionsSettingsEntryViewModel.Command
 import com.duckduckgo.adblocking.impl.ui.AdBlockingProtectionsSettingsEntryViewModel.Command.OpenSettings
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.listitem.SettingsListItem
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -53,7 +53,7 @@ class AdBlockingProtectionsSettingsEntryView @JvmOverloads constructor(
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val listItem = SettingsListItem(context).apply {
-        setLeadingIconResource(CommonR.drawable.ic_ads_blocked_color_24)
+        setLeadingIconResource(CommonR.drawable.ads_blocked_color_24)
         setPrimaryText(context.getString(R.string.ad_blocking_settings_title_v2))
         setStatus(true)
     }
@@ -102,7 +102,7 @@ class AdBlockingProtectionsSettingsEntryView @JvmOverloads constructor(
 
     private fun processCommand(command: Command) {
         when (command) {
-            is OpenSettings -> globalActivityStarter.start(context, AdBlockingSettingsV2NoParams, null)
+            is OpenSettings -> globalActivityStarter.start(context, AdBlockingSettingsNoParams, null)
         }
     }
 }

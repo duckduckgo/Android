@@ -1,0 +1,69 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.common.ui.store
+
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+
+/**
+ * App-wide, theme-related design changes feature flag.
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "appBrandDesignUpdate",
+)
+interface AppBrandDesignUpdateToggles {
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun self(): Toggle
+
+    /**
+     * Off leaves Change app icon below the theme and night mode settings on the Appearance screen.
+     * */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun appIcon(): Toggle
+
+    /**
+     * Gates theme-level design changes. This currently includes the rebrand button styling and
+     * theme-specific accent blue; future theme-controlled changes should use this sub-toggle.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun theme(): Toggle
+
+    /** Gates the radius changes separately so the rest of the brand design update can roll out independently. */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun radius(): Toggle
+
+    /**
+     * Gates the address bar radius, Lotties: shield, cookies, ad-blocking and Duck Player
+     * assets, the 40dp shield icon box, and the home screen widget search bar, previews, and promo artwork.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun addressBar(): Toggle
+
+    /**
+     * Gates pictogram swaps that change drawable type or call-site behaviour. The remaining
+     * pictogram swaps are flavour-gated.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun pictograms(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun badges(): Toggle
+}

@@ -64,7 +64,13 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadFeature
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutPixels
+import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Event
+import com.duckduckgo.app.browser.pageload.PageLoadTraceMarker
+import com.duckduckgo.app.browser.pageload.PageLoadTracer
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pageload.RealPageLoadTimeoutWatchdog
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -78,12 +84,15 @@ import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
+import com.duckduckgo.common.utils.AppUrl.Url.HOST
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -99,6 +108,7 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
@@ -139,15 +149,36 @@ class BrowserWebViewClient @Inject constructor(
     private val contentScopeExperiments: ContentScopeExperiments,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
     private val forceWebViewRecompositeFeature: ForceWebViewRecompositeFeature,
+    private val pageLoadTracer: PageLoadTracer,
     private val browserMode: BrowserMode,
+    pageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory,
+    private val pageLoadTimeoutPixels: PageLoadTimeoutPixels,
+    private val pageLoadFeature: PageLoadFeature,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
+
+    // WebView clears hasGesture() on redirect hops, but the App Link rules assume Chromium's per-navigation gesture flag.
+    private var mainFrameGestureOriginUrl: String? = null
+    private var duckChatEntryReportedForCurrentNavigation = false
     private var start: Long? = null
+
+    // Needed for PageLoadWideEvent: it identifies the page load the wide event is currently measuring,
+    // so every callback reports against the flow that load opened and no later one can claim them.
+    private var navigationId: Long? = null
+
+    // Needed for PageLoadWideEvent: it identifies the url the measured load started with, so a main frame error
+    // can be told apart from one reported against some other url.
+    private var navigationUrl: String? = null
     private var lastInterceptedAppSchemeUrl: String? = null
     private var pageCommitVisibleFired: Boolean = false
     private var recompositeScheduled: Boolean = false
+
+    private val pageLoadTraceMarker = PageLoadTraceMarker(pageLoadTracer)
+
+    private val pageLoadTimeoutWatchdog = pageLoadTimeoutWatchdogFactory.create(appCoroutineScope)
+    private val pageLoadTimeoutsJob = ConflatedJob()
 
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
     private val isForceRecompositeEnabled = AtomicBoolean(true)
@@ -169,10 +200,27 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    init {
+        pageLoadTimeoutsJob += appCoroutineScope.launch(dispatcherProvider.main()) {
+            pageLoadTimeoutWatchdog.events.collect { event ->
+                when (event) {
+                    is Event.TimedOut -> {
+                        pageLoadTimeoutPixels.fireTimeoutShown(event.phase)
+                        if (pageLoadFeature.pageLoadTimeoutError().isEnabled()) {
+                            webViewClientListener?.onPageLoadTimeout()
+                        }
+                    }
+                    is Event.Recovered -> pageLoadTimeoutPixels.fireTimeoutRecovered(event.elapsedSinceTimeoutMs)
+                }
+            }
+        }
+    }
+
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
     private var currentLoadOperationId: String? = null
     private var parallelRequestsOnStart = 0
+    private var parallelRequestsOnMeasuredLoadStart = 0
 
     init {
         appCoroutineScope.launch {
@@ -222,7 +270,32 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        val isMainFrameRedirect = request.isForMainFrame && request.isRedirect
+        // Reported before the override logic so a reload issued from inside it is not undone by the cancellation below.
+        if (isMainFrameRedirect) {
+            pageLoadTimeoutWatchdog.onRedirect(url.toString())
+        }
+        val overridden = shouldOverride(view, url, request.isForMainFrame, request.isRedirect, request.hasGesture())
+        if (request.isForMainFrame) {
+            webViewClientListener?.onMainFrameNavigationDecided(loadsInThisTab = !overridden)
+        }
+        if (isMainFrameRedirect && overridden) {
+            pageLoadTimeoutWatchdog.onNavigationCancelled(url.toString())
+        }
+        return overridden
+    }
+
+    fun onUserInitiatedLoad() = pageLoadTimeoutWatchdog.onUserInitiatedLoad()
+
+    fun onTabBackgrounded() = pageLoadTimeoutWatchdog.onBackgrounded()
+
+    fun onTabForegrounded() = pageLoadTimeoutWatchdog.onForegrounded()
+
+    fun onDownloadStarted() = pageLoadTimeoutWatchdog.onDownloadStarted()
+
+    fun destroy() {
+        pageLoadTimeoutWatchdog.onNavigatedAway()
+        pageLoadTimeoutsJob.cancel()
     }
 
     /**
@@ -237,6 +310,14 @@ class BrowserWebViewClient @Inject constructor(
     ): Boolean {
         try {
             logcat(VERBOSE) { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
+            if (isForMainFrame && !isRedirect) {
+                // Anchored to originalUrl, not the request's own URL, so both comparison sides share one source,
+                // stable across a chain's redirects, changes once an unrelated navigation commits.
+                mainFrameGestureOriginUrl = webView.originalUrl.takeIf { hasGesture }
+                duckChatEntryReportedForCurrentNavigation = false
+            }
+            val hasGestureInNavigation = hasGesture ||
+                (isForMainFrame && isRedirect && mainFrameGestureOriginUrl != null && mainFrameGestureOriginUrl == webView.originalUrl)
             webViewClientListener?.onShouldOverride()
             if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, webView.url?.toUri(), isForMainFrame)) {
                 return true
@@ -277,19 +358,24 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     logcat(INFO) { "Found app link for ${urlType.uriString}" }
+                    if (hasGestureInNavigation) {
+                        // Re-anchor here so a further redirect (e.g. app-not-installed fallback) still carries the gesture, not the stale first hop.
+                        mainFrameGestureOriginUrl = webView.originalUrl
+                    }
                     webViewClientListener?.let { listener ->
-                        return listener.handleAppLink(urlType, isForMainFrame, hasGesture)
+                        return listener.handleAppLink(urlType, isForMainFrame, hasGestureInNavigation)
                     }
                     false
                 }
 
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
                     runCatching {
+                        val entryPoint = duckChatEntryPointFor(webView.originalUrl)
                         val query = url.getQueryParameter(QUERY)
                         if (query != null) {
-                            duckChat.openDuckChatWithPrefill(query)
+                            duckChat.openDuckChatWithPrefill(query, entryPoint)
                         } else {
-                            duckChat.openDuckChat()
+                            duckChat.openDuckChat(entryPoint)
                         }
                     }.isSuccess
                 }
@@ -335,6 +421,20 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
+                    if (
+                        isForMainFrame &&
+                        hasGestureInNavigation &&
+                        !duckChatEntryReportedForCurrentNavigation &&
+                        duckChat.isDuckChatUrl(url) &&
+                        webView.originalUrl?.toUri()?.let(duckChat::isDuckChatUrl) != true
+                    ) {
+                        duckChat.reportDuckChatEntry(
+                            entryPoint = duckChatEntryPointFor(webView.originalUrl),
+                            opensNewTab = false,
+                            hasPrompt = url.getQueryParameter("prompt") == "1" && !url.getQueryParameter(QUERY).isNullOrBlank(),
+                        )
+                        duckChatEntryReportedForCurrentNavigation = true
+                    }
                     shouldOverrideWebRequest(url, webView, isForMainFrame)
                 }
 
@@ -373,7 +473,7 @@ class BrowserWebViewClient @Inject constructor(
                             ) {
                                 is SpecialUrlDetector.UrlType.AppLink -> {
                                     loadUrl(listener, webView, urlType.cleanedUrl)
-                                    listener.handleAppLink(parameterStrippedType, isForMainFrame, hasGesture)
+                                    listener.handleAppLink(parameterStrippedType, isForMainFrame, hasGestureInNavigation)
                                 }
 
                                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
@@ -412,6 +512,20 @@ class BrowserWebViewClient @Inject constructor(
             }
             return false
         }
+    }
+
+    private fun duckChatEntryPointFor(initiatingUrl: String?): DuckChatEntryPoint {
+        val isSerp = initiatingUrl?.let(duckDuckGoUrlDetector::isDuckDuckGoQueryUrl) == true
+        val initiatingUri = initiatingUrl?.toUri()
+        val isDdgRoot = initiatingUri?.run { host == HOST && (path.isNullOrEmpty() || path == "/") } == true
+        val isDuckAiPage = isDdgRoot && initiatingUri?.let(duckChat::isDuckChatUrl) == true
+        val isDdgHomepage = isDdgRoot && !isDuckAiPage
+        val entryPoint = when {
+            isSerp -> DuckChatEntryPoint.SERP
+            isDdgHomepage -> DuckChatEntryPoint.DDG_HOMEPAGE
+            else -> DuckChatEntryPoint.DIRECT_URL
+        }
+        return entryPoint
     }
 
     private fun shouldOverrideWebRequest(
@@ -476,13 +590,16 @@ class BrowserWebViewClient @Inject constructor(
         url: String,
     ) {
         logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        pageLoadTimeoutWatchdog.onFirstContentVisible(url)
         pageCommitVisibleFired = true
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
-            webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                pageLoadWideEvent.onPageVisible(tabId, url, webView.progress)
+            navigationId?.let { loadNavigationId ->
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadWideEvent.onPageVisible(tabId, loadNavigationId, webView.progress)
+                }
             }
         }
     }
@@ -527,16 +644,21 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
+        webViewClientListener?.onMainFrameNavigationCommitted()
+        if (url != null && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) pageLoadTimeoutWatchdog.onCommitted(url)
 
+        var wideEventNavigation: Pair<String, Long>? = null
         url?.let {
-            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (it != ABOUT_BLANK && start == null) {
-                start = currentTimeProvider.elapsedRealtime()
-                webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    pageLoadWideEvent.onPageStarted(tabId, it)
+            pageLoadTraceMarker.onPageStarted(it)
+            if (it != ABOUT_BLANK) {
+                if (start == null) {
+                    start = currentTimeProvider.elapsedRealtime()
+                    incrementAndTrackLoad() // increment the request counter
+                    requestInterceptor.onPageStarted(url)
                 }
-                incrementAndTrackLoad() // increment the request counter
-                requestInterceptor.onPageStarted(url)
+                // A page start arriving while another load is in flight opens its own measured load, so a redirect
+                // chain is measured from its last hop.
+                wideEventNavigation = startWideEventPageLoad(it)
             }
 
             handleMediaPlayback(webView, it)
@@ -552,9 +674,15 @@ class BrowserWebViewClient @Inject constructor(
 
         appCoroutineScope.launch(dispatcherProvider.main()) {
             val activeExperiments = contentScopeExperiments.getActiveExperiments()
+            wideEventNavigation?.let { (tabId, navigationId) ->
+                pageLoadWideEvent.onContentScopeExperimentsResolved(tabId, navigationId)
+            }
             webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
             jsPlugins.getPlugins().forEach {
                 it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
+            }
+            wideEventNavigation?.let { (tabId, navigationId) ->
+                pageLoadWideEvent.onJsInjectionComplete(tabId, navigationId)
             }
         }
         if (url != null && url == lastPageStarted) {
@@ -563,6 +691,56 @@ class BrowserWebViewClient @Inject constructor(
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url, browserMode)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    private fun startWideEventPageLoad(url: String): Pair<String, Long>? {
+        val loadNavigationId = wideEventNavigationIdCounter.incrementAndGet()
+        val replacedNavigationId = navigationId
+        navigationId = loadNavigationId
+        navigationUrl = url
+        parallelRequestsOnMeasuredLoadStart = otherPageLoadsInFlight()
+        logcat { "Page load measured as navigationId=$loadNavigationId: url=$url, replacing=$replacedNavigationId" }
+        webViewClientListener?.onMainFrameLoadStarted(loadNavigationId)
+        val tabId = webViewClientListener?.getCurrentTabId() ?: return null
+        pageLoadWideEvent.onPageStarted(tabId, url, loadNavigationId)
+        return tabId to loadNavigationId
+    }
+
+    private fun endMeasuredPageLoad() {
+        navigationId = null
+        navigationUrl = null
+    }
+
+    private fun reportMeasuredLoadFailed(url: String?, errorDescription: String) {
+        failedNavigationIdFor(url)?.let { reportMeasuredLoadEnded(it, errorDescription) }
+    }
+
+    private fun reportMeasuredLoadFinished() {
+        navigationId?.let { reportMeasuredLoadEnded(it, errorDescription = null) }
+    }
+
+    private fun reportMeasuredLoadEnded(loadNavigationId: Long, errorDescription: String?) {
+        endMeasuredPageLoad()
+        val tabId = webViewClientListener?.getCurrentTabId() ?: return
+        pageLoadWideEvent.onPageLoadFinished(
+            tabId = tabId,
+            navigationId = loadNavigationId,
+            errorDescription = errorDescription,
+            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+            activeRequestsOnLoadStart = parallelRequestsOnMeasuredLoadStart,
+            concurrentRequestsOnFinish = otherPageLoadsInFlight(),
+        )
+    }
+
+    private fun otherPageLoadsInFlight(): Int = (parallelRequestCounter.get() - 1).coerceAtLeast(0)
+
+    private fun failedNavigationIdFor(url: String?): Long? {
+        val currentNavigationId = navigationId ?: return null
+        if (url == null || url != navigationUrl) {
+            logcat { "Ignoring load failure for $url: navigationId=$currentNavigationId is measuring $navigationUrl" }
+            return null
+        }
+        return currentNavigationId
     }
 
     override fun doUpdateVisitedHistory(
@@ -625,9 +803,14 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
     ) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        url?.let { pageLoadTimeoutWatchdog.onFinished(it) }
+
+        // WebView reports the outgoing page's progress for a never-committing (204) navigation, so this can't wait for the progress check below.
+        if (url != null && url != ABOUT_BLANK && url != webView.url) webViewClientListener?.onNavigationFinishedWithoutCommit()
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            pageLoadTraceMarker.onPageFinished(url, webView.progress)
             // Without onPageCommitVisible a recycled WebView keeps drawing the previous
             // navigation's frame until a re-composite. Only worth doing for a foreground tab.
             // onPageFinished can fire more than once per load (redirects, subframes), so latch
@@ -661,18 +844,9 @@ class BrowserWebViewClient @Inject constructor(
             printInjector.injectPrint(webView)
 
             if (url != null && url != ABOUT_BLANK) {
+                reportMeasuredLoadFinished()
                 start?.let { safeStart ->
                     val concurrentRequestsOnFinish = decrementLoadCountAndGet()
-                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                        pageLoadWideEvent.onPageLoadFinished(
-                            tabId = tabId,
-                            url = url,
-                            errorDescription = null,
-                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                            activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = concurrentRequestsOnFinish,
-                        )
-                    }
 
                     // TODO (cbarreiro - 22/05/2024): Extract to plugins
                     pageLoadedHandler.onPageLoaded(
@@ -743,6 +917,11 @@ class BrowserWebViewClient @Inject constructor(
                 if (request.method == "POST") {
                     loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 }
+                // The request waits here, so this always runs before the load can commit.
+                if (request.isForMainFrame && !request.isSpeculativeLoad() && pageLoadFeature.pageLoadTimeoutWatchdog().isEnabled()) {
+                    if (request.hasGesture()) pageLoadTimeoutWatchdog.onUserInitiatedLoad()
+                    pageLoadTimeoutWatchdog.onMainFrameRequest(request.url.toString())
+                }
                 webView.url
             }
             logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
@@ -753,6 +932,20 @@ class BrowserWebViewClient @Inject constructor(
                 webViewClientListener,
             )
         }
+
+    // Speculative loads (prefetch/prerender) never commit, so they must not arm the page-load watchdog.
+    private fun WebResourceRequest.isSpeculativeLoad(): Boolean {
+        val headers = requestHeaders ?: return false
+        return headers.any { (name, value) ->
+            val purpose = value.trim()
+            when {
+                name.equals("Sec-Purpose", ignoreCase = true) ->
+                    purpose.startsWith("prefetch", ignoreCase = true) || purpose.startsWith("prerender", ignoreCase = true)
+                name.equals("Purpose", ignoreCase = true) -> purpose.equals("prefetch", ignoreCase = true)
+                else -> false
+            }
+        }
+    }
 
     override fun onRenderProcessGone(
         view: WebView?,
@@ -766,23 +959,19 @@ class BrowserWebViewClient @Inject constructor(
             pixel.fire(WEB_RENDERER_GONE_KILLED)
         }
 
+        // Not url-scoped, and not gated on the cycle: a dead renderer ends whatever load it was running.
+        navigationId?.let { loadNavigationId ->
+            reportMeasuredLoadEnded(
+                loadNavigationId = loadNavigationId,
+                errorDescription = if (didCrash) "ERROR_RENDERER_CRASHED" else "ERROR_RENDERER_KILLED",
+            )
+        }
         if (this.start != null) {
-            val concurrentRequestsOnFinish = decrementLoadCountAndGet()
-            view?.url?.let { url ->
-                webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    pageLoadWideEvent.onPageLoadFinished(
-                        tabId = tabId,
-                        url = url,
-                        errorDescription = if (didCrash) "ERROR_RENDERER_CRASHED" else "ERROR_RENDERER_KILLED",
-                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                        activeRequestsOnLoadStart = parallelRequestsOnStart,
-                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
-                    )
-                }
-            }
+            decrementLoadCountAndGet()
             this.start = null
         }
 
+        pageLoadTimeoutWatchdog.onEngineError()
         webViewClientListener?.recoverFromRenderProcessGone()
         return true
     }
@@ -836,6 +1025,7 @@ class BrowserWebViewClient @Inject constructor(
         if (trusted is CertificateValidationState.TrustedChain) {
             handler.proceed()
         } else {
+            pageLoadTimeoutWatchdog.onEngineError()
             webViewClientListener?.onReceivedSslError(handler, parseSSlErrorResponse(error))
         }
     }
@@ -897,25 +1087,19 @@ class BrowserWebViewClient @Inject constructor(
 
             val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
+                // Reported for every main-frame error, not just ones shown to the user. Otherwise, other failures
+                // never close properly and later get marked Unknown, making failed loads look like abandoned ones.
+                reportMeasuredLoadFailed(
+                    url = request.url?.toString(),
+                    errorDescription = webResourceError.errorCode.asStringErrorCode(),
+                )
                 if (parsedError != OMITTED) {
                     if (this.start != null) {
-                        // Trigger Wide Event failure for main frame errors
-                        val concurrentRequestsOnFinish = decrementLoadCountAndGet()
-                        request.url?.toString()?.let { url ->
-                            webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                                pageLoadWideEvent.onPageLoadFinished(
-                                    tabId = tabId,
-                                    url = url,
-                                    errorDescription = webResourceError.errorCode.asStringErrorCode(),
-                                    isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                                    activeRequestsOnLoadStart = parallelRequestsOnStart,
-                                    concurrentRequestsOnFinish = concurrentRequestsOnFinish,
-                                )
-                            }
-                        }
+                        decrementLoadCountAndGet()
                         this.start = null
                     }
                 }
+                pageLoadTimeoutWatchdog.onEngineError()
                 webViewClientListener?.onReceivedError(parsedError, request.url.toString(), webResourceError.errorCode.asStringErrorCode())
                 logcat { "recordErrorCode for ${request.url}" }
                 webViewClientListener?.recordErrorCode(
@@ -952,6 +1136,7 @@ class BrowserWebViewClient @Inject constructor(
         }
         if (request?.isForMainFrame == true) {
             errorResponse?.let {
+                pageLoadTimeoutWatchdog.onEngineError()
                 logcat { "recordHttpErrorCode for ${request.url}" }
                 webViewClientListener?.recordHttpErrorCode(it.statusCode, request.url.toString())
             }
@@ -993,6 +1178,12 @@ class BrowserWebViewClient @Inject constructor(
 
     companion object {
         val parallelRequestCounter = AtomicInteger(0)
+
+        // Identifies each navigation that starts a page load wide event flow, so a measurement reported once that
+        // navigation may already be over cannot be attributed to a later one. Static, because a tab's client is
+        // recreated with the tab's fragment while the flows and the coroutines reporting into them outlive it.
+        private val wideEventNavigationIdCounter = AtomicLong(0)
+
         private val activeRequestTimeoutJobs = ConcurrentHashMap<String, Job>()
         private const val REQUEST_TIMEOUT_MS = 30000L // 30 seconds
 
@@ -1008,6 +1199,8 @@ enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_PAGE_LOADED("m_web_view_page_loaded"),
     WEB_PAGE_PAINTED("m_web_view_page_painted"),
     WEB_VIEW_FORCED_RECOMPOSITE("m_web_view_forced_recomposite"),
+    WEB_PAGE_LOAD_TIMEOUT_SHOWN("m_page_load_timeout_shown"),
+    WEB_PAGE_LOAD_TIMEOUT_RECOVERED("m_page_load_timeout_recovered"),
 }
 
 enum class WebViewErrorResponse(
@@ -1018,6 +1211,7 @@ enum class WebViewErrorResponse(
     OMITTED(R.string.webViewErrorNoConnection),
     LOADING(R.string.webViewErrorNoConnection),
     SSL_PROTOCOL_ERROR(R.string.webViewErrorSslProtocol),
+    TIMEOUT(R.string.webViewErrorTimeout),
 }
 
 data class SslErrorResponse(

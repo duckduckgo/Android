@@ -21,8 +21,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,7 +56,7 @@ interface SyncStatusChangedObserver {
  * The SyncStateMonitor may emit an initial OFF state before fully initializing
  * This observer is meant to push state CHANGES, not the initial state
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSyncStatusChangedObserver @Inject constructor(
     private val syncStatusHelper: SyncStatusHelper,

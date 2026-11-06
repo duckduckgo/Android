@@ -90,6 +90,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
         atbLifecyclePlugin.onSearchRetentionAtbRefreshed("", "")
 
         val expected = searchMetricPixelsPlugin.getMetrics()
+        assertTrue(expected.isNotEmpty())
         assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.size)
         assertTrue(fakeMetricsPixelExtension.sentMetrics.all { it.metric == "search" })
     }
@@ -102,6 +103,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
         atbLifecyclePlugin.onAppRetentionAtbRefreshed("", "")
 
         val expected = appUseMetricPixelsPlugin.getMetrics()
+        assertTrue(expected.isNotEmpty())
         assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.size)
         assertTrue(fakeMetricsPixelExtension.sentMetrics.all { it.metric == "app_use" })
     }
@@ -186,8 +188,8 @@ class RetentionMetricsAtbLifecyclePluginTest {
         atbLifecyclePlugin.onDuckAiRetentionAtbRefreshed("", "", emptyMap())
 
         val expected = duckAiPromptSentMetricPixelsPlugin.getMetrics()
-        assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.size)
-        assertTrue(fakeMetricsPixelExtension.sentMetrics.all { it.metric == "duck_ai_prompt_sent" })
+        assertTrue(expected.isNotEmpty())
+        assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.count { it.metric == "duck_ai_prompt_sent" })
     }
 
     @Test
@@ -238,20 +240,33 @@ class RetentionMetricsAtbLifecyclePluginTest {
     }
 
     private suspend fun setCohorts(today: String) {
+        val cohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today)
         testFeature.experimentFooFeature().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
-                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+                cohorts = listOf(cohort),
+                assignedCohort = cohort,
             ),
         )
         testFeature.fooFeature().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
-                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+                cohorts = listOf(cohort),
+                assignedCohort = cohort,
             ),
         )
+    }
+
+    @Test
+    fun `when duck ai atb refreshed then search metrics are also sent`() = runTest {
+        setCohorts(ZonedDateTime.now(ZoneId.of("America/New_York")).toString())
+
+        atbLifecyclePlugin.onDuckAiRetentionAtbRefreshed("", "", emptyMap())
+
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.any { it.metric == "search" })
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.any { it.metric == "duck_ai_prompt_sent" })
     }
 }
 

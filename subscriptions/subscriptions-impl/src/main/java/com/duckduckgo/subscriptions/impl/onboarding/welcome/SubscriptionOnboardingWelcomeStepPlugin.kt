@@ -17,21 +17,17 @@
 package com.duckduckgo.subscriptions.impl.onboarding.welcome
 
 import androidx.fragment.app.Fragment
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.duckduckgo.subscriptions.impl.R
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-/** Step 1 (Welcome) of the subscription onboarding, contributed from `subscriptions-impl` itself. */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(100)
 class SubscriptionOnboardingWelcomeStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 
     override val stepId: String = WELCOME_STEP_ID
-
-    override val titleResId: Int = R.string.subscriptionOnboardingWelcomeTitle
 
     override suspend fun shouldShow(): Boolean = true
 

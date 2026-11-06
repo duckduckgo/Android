@@ -17,14 +17,13 @@
 package com.duckduckgo.mobile.android.vpn.ui.newtab
 
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.*
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -32,6 +31,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.vpn.R
@@ -47,11 +47,11 @@ import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ViewScope::class)
 class AppTrackingProtectionStateView @JvmOverloads constructor(
@@ -91,9 +91,7 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
 
         configureViewReferences()
 
-        if (Build.VERSION.SDK_INT >= 28) {
-            binding.root.addBottomShadow()
-        }
+        binding.root.addBottomShadow()
     }
 
     override fun onDetachedFromWindow() {
@@ -126,18 +124,18 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
             renderTrackersBlockedWhenEnabled(viewState.trackersBlocked)
         } else {
             binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabEnabled)
-            binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_default)
+            binding.deviceShieldCtaImage.setImageResource(CommonR.drawable.shield_check_recolorable_24)
         }
     }
 
     private fun renderStateDisabled() {
         binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabDisabled)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_warning)
+        binding.deviceShieldCtaImage.setImageResource(CommonR.drawable.exclamation_recolorable_24)
     }
 
     private fun renderStateRevoked() {
         binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabRevoked)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_warning)
+        binding.deviceShieldCtaImage.setImageResource(CommonR.drawable.exclamation_recolorable_24)
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: TrackersBlocked) {
@@ -197,7 +195,7 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
             }
 
         binding.deviceShieldCtaHeader.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_default)
+        binding.deviceShieldCtaImage.setImageResource(CommonR.drawable.shield_check_recolorable_24)
     }
 }
 

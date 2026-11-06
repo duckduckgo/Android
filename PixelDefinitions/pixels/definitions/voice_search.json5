@@ -19,5 +19,48 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "source"]
+    },
+    "m_voice_search_icon_clicked": {
+        "description": "User tapped the voice search mic icon (entry point), fired before any permission check regardless of the outcome.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "source"]
+    },
+    "m_voice_search_mic_denied_dialog_shown": {
+        "description": "The mic-access-denied dialog was shown after the microphone permission was permanently denied.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "mode",
+                "type": "string",
+                "description": "Voice search mode",
+                "enum": ["search", "duckai"]
+            }
+        ]
+    },
+    "m_voice_search_mic_denied_dialog_click": {
+        "description": "User clicked a button on the mic-access-denied dialog.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "mode",
+                "type": "string",
+                "description": "Voice search mode",
+                "enum": ["search", "duckai"]
+            },
+            {
+                "key": "action",
+                "type": "string",
+                "description": "Which dialog button was clicked.",
+                "enum": ["change_permissions", "hide_voice_search", "cancel"]
+            }
+        ]
     }
 }

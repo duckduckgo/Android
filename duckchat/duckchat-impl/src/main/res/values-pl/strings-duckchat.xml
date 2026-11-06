@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Wyszukaj lub wprowadź adres</string>
     <string name="input_screen_search_only_hint">Szukaj</string>
-    <string name="input_screen_chat_hint">Zapytaj prywatnie</string>
     <string name="input_screen_user_pref_without_ai">Tylko wyszukiwanie</string>
     <string name="input_screen_user_pref_with_ai">Wyszukiwanie i Duck.ai</string>
     <string name="input_screen_user_pref_description">Wypróbuj nową opcję umożliwiającą zapytanie Duck.ai bezpośrednio z paska adresu. <annotation type="share_feedback">Podziel się opinią</annotation></string>
@@ -71,9 +70,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Czatuj prywatnie z modelami AI dostępnymi wyłącznie dla subskrybentów.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Otwórz Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Dowiedz się więcej</string>
-
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Zapytaj Duck.ai</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Chcesz łatwiejszego dostępu\ndo prywatnego czatu AI?</string>
@@ -121,13 +117,87 @@
     <string name="duckAIContextualPromptSummarize">Podsumuj tę stronę</string>
     <string name="duckAIContextualAutomaticContextTitle">Automatycznie wysyłaj zawartość strony</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatycznie wysyłaj zawartość strony do Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Dołącz zawartość strony</string>
 
-    <!-- Contextual sheet quick action -->
-    <string name="duckAIContextualPromptAskAboutPage">Zapytaj o stronę</string>
+    <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
+    <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Przetłumacz tę stronę</string>
+    <string name="duckAiSuggestionTranslatePagePrompt" instruction="Suggested prompt submitted text: translate the page. %1$s is replaced with the name of the user&apos;s language.">Przetłumacz tę stronę na język %1$s.</string>
+    <string name="duckAiSuggestionKeyTakeawaysLabel" instruction="Suggested prompt chip: key takeaways of an article">Jakie są najważniejsze wnioski?</string>
+    <string name="duckAiSuggestionKeyTakeawaysPrompt" instruction="Suggested prompt submitted text: key takeaways of an article">Jakie są najważniejsze wnioski z tego artykułu?</string>
+    <string name="duckAiSuggestionExplainSimplyLabel" instruction="Suggested prompt chip: explain the content simply">Wyjaśnij to prosto</string>
+    <string name="duckAiSuggestionExplainSimplyPrompt" instruction="Suggested prompt submitted text: explain the content simply">Wyjaśnij to prostym, zrozumiałym językiem.</string>
+    <string name="duckAiSuggestionCounterargumentsLabel" instruction="Suggested prompt chip: counterarguments">Jakie są argumenty przeciw?</string>
+    <string name="duckAiSuggestionCounterargumentsPrompt" instruction="Suggested prompt submitted text: counterarguments">Jakie są główne kontrargumenty i zarzuty wobec tego stwierdzenia?</string>
+    <string name="duckAiSuggestionRelatedArticlesLabel" instruction="Suggested prompt chip: related articles">Zaproponuj powiązane artykuły do przejrzenia</string>
+    <string name="duckAiSuggestionRelatedArticlesPrompt" instruction="Suggested prompt submitted text: related articles">Zaproponuj powiązane artykuły lub tematy, które warto sprawdzić w następnej kolejności.</string>
+    <string name="duckAiSuggestionShoppingListLabel" instruction="Suggested prompt chip: shopping list from a recipe">Wygeneruj listę zakupów</string>
+    <string name="duckAiSuggestionShoppingListPrompt" instruction="Suggested prompt submitted text: shopping list from a recipe">Przygotuj listę zakupów z ilościami potrzebnymi do tego przepisu.</string>
+    <string name="duckAiSuggestionRecipeNutritionLabel" instruction="Suggested prompt chip: recipe nutrition">Oszacuj wartość odżywczą</string>
+    <string name="duckAiSuggestionRecipeNutritionPrompt" instruction="Suggested prompt submitted text: recipe nutrition">Oszacuj wartość odżywczą tego przepisu.</string>
+    <string name="duckAiSuggestionScaleRecipeLabel" instruction="Suggested prompt chip: scale a recipe">Dostosuj porcje</string>
+    <string name="duckAiSuggestionScaleRecipePrompt" instruction="Suggested prompt submitted text: scale a recipe">Przepisz ten przepis z inną liczbą porcji.</string>
+    <string name="duckAiSuggestionProductProsConsLabel" instruction="Suggested prompt chip: product pros and cons">Jakie są zalety i wady?</string>
+    <string name="duckAiSuggestionProductProsConsPrompt" instruction="Suggested prompt submitted text: product pros and cons">Jakie są zalety i wady tego produktu?</string>
+    <string name="duckAiSuggestionFindAlternativesLabel" instruction="Suggested prompt chip: product alternatives">Znajdź alternatywy</string>
+    <string name="duckAiSuggestionFindAlternativesPrompt" instruction="Suggested prompt submitted text: product alternatives">Zaproponuj alternatywy dla tego produktu.</string>
+    <string name="duckAiSuggestionSummarizeVideoLabel" instruction="Suggested prompt chip: summarize a video">Podsumuj ten film</string>
+    <string name="duckAiSuggestionSummarizeVideoPrompt" instruction="Suggested prompt submitted text: summarize a video">Podsumuj ten film.</string>
+    <string name="duckAiSuggestionVideoKeyPointsLabel" instruction="Suggested prompt chip: video key points">Jakie są najważniejsze punkty?</string>
+    <string name="duckAiSuggestionVideoKeyPointsPrompt" instruction="Suggested prompt submitted text: video key points">Jakie są najważniejsze punkty omówione w tym filmie?</string>
+    <string name="duckAiSuggestionTailorResumeLabel" instruction="Suggested prompt chip: tailor a resume to a job">Dopasuj moje CV</string>
+    <string name="duckAiSuggestionTailorResumePrompt" instruction="Suggested prompt submitted text: tailor a resume to a job">Pomóż mi dopasować moje CV do tej oferty pracy.</string>
+    <string name="duckAiSuggestionInterviewPrepLabel" instruction="Suggested prompt chip: interview prep">Pomóż mi przygotować się do rozmowy kwalifikacyjnej</string>
+    <string name="duckAiSuggestionInterviewPrepPrompt" instruction="Suggested prompt submitted text: interview prep">Jakie pytania mogą pojawić się podczas rozmowy kwalifikacyjnej na to stanowisko?</string>
+    <string name="duckAiSuggestionCoverLetterLabel" instruction="Suggested prompt chip: draft a cover letter">Napisz list motywacyjny</string>
+    <string name="duckAiSuggestionCoverLetterPrompt" instruction="Suggested prompt submitted text: draft a cover letter">Napisz list motywacyjny na to stanowisko.</string>
+    <string name="duckAiSuggestionEventDetailsLabel" instruction="Suggested prompt chip: event details">Jakie są najważniejsze szczegóły?</string>
+    <string name="duckAiSuggestionEventDetailsPrompt" instruction="Suggested prompt submitted text: event details">Podsumuj najważniejsze szczegóły tego wydarzenia.</string>
+    <string name="duckAiSuggestionWorthWatchingLabel" instruction="Suggested prompt chip: is a movie/show worth watching">Warto to obejrzeć?</string>
+    <string name="duckAiSuggestionWorthWatchingPrompt" instruction="Suggested prompt submitted text: is a movie/show worth watching">Warto to obejrzeć? Opowiedz o tym bez zdradzania fabuły.</string>
+    <string name="duckAiSuggestionSimilarTitlesLabel" instruction="Suggested prompt chip: similar movies or shows">Poleć podobne tytuły</string>
+    <string name="duckAiSuggestionSimilarTitlesPrompt" instruction="Suggested prompt submitted text: similar movies or shows">Poleć podobne filmy lub programy.</string>
+    <string name="duckAiSuggestionCastCrewLabel" instruction="Suggested prompt chip: cast and crew">Obsada &amp; ekipa</string>
+    <string name="duckAiSuggestionCastCrewPrompt" instruction="Suggested prompt submitted text: cast and crew">Kto należy do głównej obsady i ekipy oraz z czego jeszcze są znani?</string>
+    <string name="duckAiSuggestionSummarizeBookLabel" instruction="Suggested prompt chip: summarize a book">Podsumuj tę książkę</string>
+    <string name="duckAiSuggestionSummarizeBookPrompt" instruction="Suggested prompt submitted text: summarize a book">Podsumuj tę książkę.</string>
+    <string name="duckAiSuggestionSimilarBooksLabel" instruction="Suggested prompt chip: similar books">Poleć podobne książki</string>
+    <string name="duckAiSuggestionSimilarBooksPrompt" instruction="Suggested prompt submitted text: similar books">Poleć podobne książki.</string>
+    <string name="duckAiSuggestionExplainPaperLabel" instruction="Suggested prompt chip: explain a research paper">Wyjaśnij ten artykuł</string>
+    <string name="duckAiSuggestionExplainPaperPrompt" instruction="Suggested prompt submitted text: explain a research paper">Wyjaśnij ten artykuł naukowy prostym językiem.</string>
+    <string name="duckAiSuggestionPaperContributionsLabel" instruction="Suggested prompt chip: paper contributions">Jakie są najważniejsze wnioski?</string>
+    <string name="duckAiSuggestionPaperContributionsPrompt" instruction="Suggested prompt submitted text: paper contributions">Jakie są najważniejsze wnioski zawarte w tym artykule?</string>
+    <string name="duckAiSuggestionMenuHighlightsLabel" instruction="Suggested prompt chip: restaurant menu highlights">Co powinienem zamówić?</string>
+    <string name="duckAiSuggestionMenuHighlightsPrompt" instruction="Suggested prompt submitted text: restaurant menu highlights">Jakie dania warto tu zjeść?</string>
+    <string name="duckAiSuggestionPlaceHoursLabel" instruction="Suggested prompt chip: place hours and location">Jakie są godziny otwarcia i lokalizacja?</string>
+    <string name="duckAiSuggestionPlaceHoursPrompt" instruction="Suggested prompt submitted text: place hours and location">Jakie są godziny otwarcia, lokalizacja i dane kontaktowe tego miejsca?</string>
+    <string name="duckAiSuggestionPlaceReviewsLabel" instruction="Suggested prompt chip: place reputation">Czy warto odwiedzić to miejsce?</string>
+    <string name="duckAiSuggestionPlaceReviewsPrompt" instruction="Suggested prompt submitted text: place reputation">Czy warto odwiedzić to miejsce? Podsumuj reputację tego miejsca na podstawie recenzji i ocen.</string>
+    <string name="duckAiSuggestionSummarizeThreadLabel" instruction="Suggested prompt chip: summarize a discussion thread">Podsumuj tę dyskusję</string>
+    <string name="duckAiSuggestionSummarizeThreadPrompt" instruction="Suggested prompt submitted text: summarize a discussion thread">Podsumuj ten wątek dyskusji.</string>
+    <string name="duckAiSuggestionExplainRepoLabel" instruction="Suggested prompt chip: explain a code repository">Wyjaśnij to repozytorium</string>
+    <string name="duckAiSuggestionExplainRepoPrompt" instruction="Suggested prompt submitted text: explain a code repository">Wyjaśnij, co robi to repozytorium i jak z niego korzystać.</string>
+    <string name="duckAiSuggestionExplainAnswerLabel" instruction="Suggested prompt chip: explain the top answer">Wyjaśnij najlepszą odpowiedź</string>
+    <string name="duckAiSuggestionExplainAnswerPrompt" instruction="Suggested prompt submitted text: explain the top answer">Wyjaśnij zaakceptowaną odpowiedź w prostych słowach.</string>
+    <string name="duckAiSuggestionHowtoStepsLabel" instruction="Suggested prompt chip: how-to steps">Przeprowadź mnie przez kolejne kroki</string>
+    <string name="duckAiSuggestionHowtoStepsPrompt" instruction="Suggested prompt submitted text: how-to steps">Podziel to na jasne, ponumerowane kroki.</string>
+    <string name="duckAiSuggestionHowtoMaterialsLabel" instruction="Suggested prompt chip: how-to materials">Czego będę potrzebować?</string>
+    <string name="duckAiSuggestionHowtoMaterialsPrompt" instruction="Suggested prompt submitted text: how-to materials">Wymień narzędzia, materiały lub warunki wstępne, których do tego potrzebuję.</string>
+    <string name="duckAiSuggestionCourseLearnLabel" instruction="Suggested prompt chip: course learning outcomes">Czego się dowiem?</string>
+    <string name="duckAiSuggestionCourseLearnPrompt" instruction="Suggested prompt submitted text: course learning outcomes">Jakie są najważniejsze rzeczy, których dowiem się z tego kursu?</string>
+    <string name="duckAiSuggestionCourseWorthLabel" instruction="Suggested prompt chip: is a course worth taking">Warto w nim wziąć udział?</string>
+    <string name="duckAiSuggestionCourseWorthPrompt" instruction="Suggested prompt submitted text: is a course worth taking">Czy na podstawie tej strony warto wziąć udział w tym kursie?</string>
+    <string name="duckAiSuggestionFaqAnswerLabel" instruction="Suggested prompt chip: what an FAQ page answers">Na jakie pytania odpowiada ta strona?</string>
+    <string name="duckAiSuggestionFaqAnswerPrompt" instruction="Suggested prompt submitted text: what an FAQ page answers">Na jakie główne pytania odpowiada ta strona?</string>
+    <string name="duckAiSuggestionFaqSummaryLabel" instruction="Suggested prompt chip: summarize FAQ Q&amp;As">Podsumuj pytania i odpowiedzi</string>
+    <string name="duckAiSuggestionFaqSummaryPrompt" instruction="Suggested prompt submitted text: summarize FAQ Q&amp;As">Podsumuj pytania i odpowiedzi na tej stronie.</string>
+    <string name="duckAiSuggestionReviewVerdictLabel" instruction="Suggested prompt chip: review verdict">Jaki jest werdykt?</string>
+    <string name="duckAiSuggestionReviewVerdictPrompt" instruction="Suggested prompt submitted text: review verdict">Jaki jest ogólny werdykt i ocena?</string>
+    <string name="duckAiSuggestionReviewSummaryLabel" instruction="Suggested prompt chip: summarize reviews">Podsumuj recenzje</string>
+    <string name="duckAiSuggestionReviewSummaryPrompt" instruction="Suggested prompt submitted text: summarize reviews">Podsumuj, co mówią recenzje.</string>
+    <string name="duckAiSuggestionWhoIsThisLabel" instruction="Suggested prompt chip: person background">Kim jest ta osoba?</string>
+    <string name="duckAiSuggestionWhoIsThisPrompt" instruction="Suggested prompt submitted text: person background">Podaj mi krótkie informacje o tej osobie.</string>
+    <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person&apos;s background">Podsumuj doświadczenie tej osoby</string>
+    <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Podsumuj doświadczenie tej osoby i jej najważniejsze osiągnięcia zawodowe.</string>
 
-    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
-    <string name="contextualSheetImprovedHint">Zapytaj o cokolwiek prywatnie</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Ostatnie czaty</string>
 
     <!-- duck.ai contextual fire button -->
@@ -177,10 +247,10 @@
     <string name="duck_ai_chat_history_action_new">Nowe</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Pobierz czaty</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Pobieranie zakończone dla %1$d czatu</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Pobieranie zakończone dla %1$d czatu</item>
         <item quantity="few">Pobieranie zakończone dla %1$d czatów</item>
         <item quantity="many">Pobieranie zakończone dla %1$d czatów</item>
-        <item quantity="other">Pobieranie zakończone dla %1$d czatów</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Pobieranie zakończone dla %1$d czatów</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Otwórz menu przepełnienia</string>
     <string name="duck_ai_chat_history_select_all">Wybierz wszystko</string>
@@ -206,6 +276,11 @@
     <string name="native_input_chat_duck_mode_hint">Odpowiedz…</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Najlepszy do codziennego użytku</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Dobry, ale szybciej wyczerpuje limit</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Wypróbuj bezpłatnie</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Tylko dla subskrybentów</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Tylko dla planu Pro</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -266,6 +341,76 @@
     <string name="duckAiSettingsTitle">Ustawienia Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Zapytaj o kartę</string>
+
+    <!-- Editing a message already sent to Duck.ai -->
+    <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Edytuj wiadomość</string>
+    <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Edycja spowoduje zastąpienie odpowiedzi nową.</string>
+
     <string name="duckChatContextualAskAboutPage">Zapytaj o stronę</string>
+    <string name="duckChatContextualAskAboutSearch">Kontynuuj w Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Otwórz Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Podsumuj to zaznaczenie</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Podsumuj to zaznaczenie.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Przetłumacz to zaznaczenie</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Przetłumacz to zaznaczenie na język %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Zaznaczenie tekstu</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Możesz dodać do %1$d zaznaczonych tekstów. Usuń jeden z nich, aby dodać kolejny.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Zapytaj Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d słowo</item>
+        <item quantity="few">%1$d słowa</item>
+        <item quantity="many">%1$d słów</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d słowa</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s zużywa limity nawet 2–5 razy szybciej niż podstawowe modele.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Odrzuć</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% limitu dziennego</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% limitu tygodniowego</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Osiągnięto limit dzienny</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Osiągnięto limit tygodniowy</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Osiągnięto tygodniowy limit użycia</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Osiągnięto limit zaawansowanych modeli AI</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Zmień model</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Zacznij korzystać z limitu tygodniowego</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Wypróbuj subskrypcję bezpłatnie</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Subskrybuj</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Reset za %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dzień</item>
+        <item quantity="few">%1$d dni</item>
+        <item quantity="many">%1$d dni</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dnia</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d godz.</item>
+        <item quantity="few">%1$d godz.</item>
+        <item quantity="many">%1$d godz.</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d godz.</item>
+    </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Podsumuj ten dokument</string>
+
+    <!-- Duck.ai ToS consent submit button -->
+    <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Zapytaj</string>
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo anonimizuje Twoje czaty. Klikając „^1”, akceptujesz naszą <annotation type="privacy_link">Politykę prywatności</annotation> i <annotation type="terms_link">Warunki korzystania z usługi</annotation>.</string>
+    <!-- Duck.ai tab switcher card -->
+    <string name="duckAiTabCardChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a text or image chat, as opposed to a voice chat.">Czat</string>
+    <string name="duckAiTabCardThinkingTitle" instruction="Header on a tab switcher card for a Duck.ai chat whose question has been sent but whose reply has not started yet. The chat title, if any, is shown below it.">Zastanawiam się…</string>
+    <string name="duckAiTabCardListeningTitle" instruction="Header on a tab switcher card for a Duck.ai tab with a voice chat in progress, shown while Duck.ai is listening to the user.">Słuchanie…</string>
+    <string name="duckAiTabCardVoiceChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a voice chat, as opposed to a text chat.">Czat głosowy</string>
+    <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Transkrypcja</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Pliki są automatycznie skanowane pod kątem nielegalnych treści. Oznaczone czaty są przechowywane przez ograniczony czas. <annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
 </resources>

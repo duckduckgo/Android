@@ -1,6 +1,7 @@
 package com.duckduckgo.autofill.impl.importing
 
 import app.cash.turbine.test
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementEmptyState
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -13,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -22,6 +24,7 @@ class CredentialImporterImplTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val autofillStore: InternalAutofillStore = mock()
+    private val credentialImportTimestamp: CredentialImportTimestamp = mock()
     private val dispatchers = coroutinesTestRule.testDispatcherProvider
     private val appCoroutineScope: CoroutineScope = coroutinesTestRule.testScope
 
@@ -31,6 +34,7 @@ class CredentialImporterImplTest {
         autofillStore = autofillStore,
         dispatchers = dispatchers,
         appCoroutineScope = appCoroutineScope,
+        credentialImportTimestamp = credentialImportTimestamp,
     )
 
     @Before
@@ -131,8 +135,28 @@ class CredentialImporterImplTest {
         verify(autofillStore).hasEverImportedPasswords = true
     }
 
+    @Test
+    fun whenImportingCredentialsSuccessfullyThenImportTimestampIsRecorded() = runTest {
+        listOf(creds()).import()
+        verify(credentialImportTimestamp).onPasswordsImported()
+    }
+
+    @Test
+    fun whenImportingNoCredentialsThenImportTimestampIsNotRecorded() = runTest {
+        listOf<LoginCredentials>().import()
+        verify(credentialImportTimestamp, never()).onPasswordsImported()
+    }
+
+    @Test
+    fun whenImportingOnlyDuplicatesThenImportTimestampIsNotRecorded() = runTest {
+        val duplicatedLogin = creds(username = "username")
+        duplicatedLogin.treatAsDuplicate()
+        listOf(duplicatedLogin).import()
+        verify(credentialImportTimestamp, never()).onPasswordsImported()
+    }
+
     private suspend fun List<LoginCredentials>.import(originalListSize: Int = this.size) {
-        testee.import(this, originalListSize)
+        testee.import(this, originalListSize, PasswordManagementEmptyState)
     }
 
     private suspend fun assertResult(
@@ -143,6 +167,7 @@ class CredentialImporterImplTest {
             with(awaitItem() as ImportResult.Finished) {
                 assertEquals("Wrong number of duplicates in result", numberSkippedExpected, numberSkipped)
                 assertEquals("Wrong import size in result", importListSizeExpected, savedCredentials)
+                assertEquals("Wrong launch source in result", PasswordManagementEmptyState, source)
             }
         }
     }

@@ -10,10 +10,6 @@
             android:label="@string/autofillManagementHowToSyncDesktopPasswords"
             android:exported="false" />
         <activity
-            android:name=".ui.credential.management.importpassword.desktopapp.ImportPasswordsGetDesktopAppActivity"
-            android:label="@string/autofillManagementImportPasswordsGetDesktopAppTitle"
-            android:exported="false" />
-        <activity
             android:name=".email.incontext.EmailProtectionInContextSignupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false" />

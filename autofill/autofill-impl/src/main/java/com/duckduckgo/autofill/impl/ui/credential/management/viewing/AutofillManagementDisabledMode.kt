@@ -23,20 +23,17 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.ACTION_BIOMETRIC_ENROLL
 import android.provider.Settings.ACTION_FINGERPRINT_ENROLL
-import android.provider.Settings.ACTION_SECURITY_SETTINGS
 import android.provider.Settings.ACTION_SETTINGS
 import android.provider.Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementDisabledBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import logcat.LogPriority.WARN
 import logcat.asLog
@@ -48,9 +45,6 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -71,9 +65,7 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)) {
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.root)
-        }
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.root)
         binding.disabledCta.setOnClickListener {
             launchDeviceAuthEnrollment()
         }
@@ -98,12 +90,8 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
                 intent.safeLaunchSettingsActivity(tryFallback = true)
             }
 
-            appBuildConfig.sdkInt >= Build.VERSION_CODES.P -> {
-                Intent(ACTION_FINGERPRINT_ENROLL).safeLaunchSettingsActivity(tryFallback = true)
-            }
-
             else -> {
-                Intent(ACTION_SECURITY_SETTINGS).safeLaunchSettingsActivity(tryFallback = true)
+                Intent(ACTION_FINGERPRINT_ENROLL).safeLaunchSettingsActivity(tryFallback = true)
             }
         }
 

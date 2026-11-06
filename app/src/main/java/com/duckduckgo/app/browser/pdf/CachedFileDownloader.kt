@@ -25,8 +25,8 @@ import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.io.File
@@ -55,7 +55,7 @@ interface CachedFileDownloader {
     suspend fun saveToDownloads(cachedFileUri: Uri, fileName: String, mimeType: String): String?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealCachedFileDownloader @Inject constructor(
     private val context: Context,

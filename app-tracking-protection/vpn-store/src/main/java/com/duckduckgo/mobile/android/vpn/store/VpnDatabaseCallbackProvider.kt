@@ -21,11 +21,10 @@ import androidx.room.RoomDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
-import javax.inject.Provider
 
 class VpnDatabaseCallbackProvider constructor(
     private val context: Context,
-    private val vpnDatabaseProvider: Provider<VpnDatabase>,
+    private val vpnDatabaseProvider: () -> VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,
     private val coroutineScope: CoroutineScope,
     private val mutex: Mutex,

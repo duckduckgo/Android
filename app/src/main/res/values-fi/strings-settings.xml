@@ -21,14 +21,14 @@
 
     <!-- Inactivity timeout -->
     <string name="afterInactivityOptionTitle">Toimettomuuden jälkeen</string>
-    <string name="afterInactivityTimeoutRowTitle">Valitse passiivisuusajastin</string>
-    <string name="afterInactivityScreenSectionHeader">Valitse, mitä näet, kun palaat palveluun</string>
+    <string name="afterInactivityTimeoutTitle">Passiivisuusajastin</string>
+    <string name="afterInactivityScreenDescription">Valitse, mitä näet, kun palaat DuckDuckGoon passiivisuuden jälkeen</string>
     <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Valitse, mitä näet, kun palaat palveluun %1$s minuutin jälkeen.</string>
     <string name="afterInactivityTimeoutAlways">Aina</string>
     <string name="afterInactivityTimeout1Minute">1 minuutti</string>
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minuuttia</string>
     <string name="afterInactivityTimeout1Hour">1 tunti</string>
     <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d tuntia</string>
-    <string name="returnToLastTabSettingTitle">Palaa viimeisimpään välilehteen</string>
-    <string name="returnToLastTabSettingSubtitle">Näytä linkki viimeisimpään välilehteen uudella välilehdellä, kun avaat sovelluksen uudelleen</string>
+    <string name="returnToLastTabShortcutSettingTitle">”Palaa kohtaan” -pikavalinta</string>
+    <string name="returnToLastTabShortcutSettingSubtitle">Näyttää linkin viimeksi käytettyyn välilehteen palaamista varten, kun avaat sovelluksen käyttämättömyyden jälkeen.</string>
 </resources>

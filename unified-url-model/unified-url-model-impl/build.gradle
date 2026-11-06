@@ -17,15 +17,15 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(':codegen-annotations')
 
     implementation project(':unified-url-model-api')
     implementation project(':feature-toggles-api')
@@ -37,7 +37,6 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation Square.moshi
     implementation Square.okio
     implementation Square.okHttp3.okHttp
@@ -59,9 +58,6 @@ dependencies {
 
 android {
     namespace 'com.duckduckgo.url.impl'
-    anvil {
-        generateDaggerFactories = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true

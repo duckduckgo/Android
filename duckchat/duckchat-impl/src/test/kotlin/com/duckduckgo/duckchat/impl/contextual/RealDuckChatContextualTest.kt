@@ -1,0 +1,124 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.duckchat.impl.contextual
+
+import android.view.View
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
+
+class RealDuckChatContextualTest {
+
+    private val duckChatInternal: DuckChatInternal = mock()
+    private val browserNav: BrowserNav = mock()
+    private val contextualDataStore: DuckChatContextualDataStore = mock()
+    private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider = mock()
+    private val timeProvider: DuckChatContextualTimeProvider = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val contextualEntryPromptStore = RealContextualEntryPromptStore()
+    private val globalActivityStarter: GlobalActivityStarter = mock()
+    private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, mock())
+    private val anchor: View = mock()
+
+    private val testee = RealDuckChatContextual(
+        duckChatInternal,
+        browserNav,
+        contextualDataStore,
+        sessionTimeoutProvider,
+        timeProvider,
+        duckChatPixels,
+        duckDuckGoUrlDetector,
+        contextualEntryPromptStore,
+        globalActivityStarter,
+        textSelectionRepository,
+    )
+
+    @Before
+    fun setup() {
+        whenever(duckChatInternal.isDuckChatContextualModeEnabled()).thenReturn(true)
+    }
+
+    @Test
+    fun whenContextualModeDisabledThenNothingIsShown() = runTest {
+        whenever(duckChatInternal.isDuckChatContextualModeEnabled()).thenReturn(false)
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
+
+        assertEquals(0, askAboutPageCount)
+        verifyNoInteractions(browserNav)
+    }
+
+    @Test
+    fun whenAnchorNullThenAskAboutPageInvokedDirectly() = runTest {
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = null) { askAboutPageCount++ }
+
+        assertEquals(1, askAboutPageCount)
+        verifyNoInteractions(browserNav)
+    }
+
+    @Test
+    fun whenNoPageAndChatsEntryDisabledThenChatSurfaceShownInsteadOfMenu() = runTest {
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(false)
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
+
+        // A menu of just New Chat is worse than the caller's own fallback.
+        assertEquals(1, askAboutPageCount)
+    }
+
+    @Test
+    fun whenChatInProgressThenAskAboutPageInvokedWithoutShowingMenu() = runTest {
+        whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
+        whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(null)
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
+
+        assertEquals(1, askAboutPageCount)
+    }
+
+    @Test
+    fun whenStoredChatSessionExpiredThenTreatedAsNoChatInProgress() = runTest {
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
+        whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
+        whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(0L)
+        whenever(sessionTimeoutProvider.sessionTimeoutMillis()).thenReturn(1L)
+        whenever(timeProvider.currentTimeMillis()).thenReturn(1_000L)
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
+
+        // Session expired: the menu path is taken instead of opening the chat directly.
+        assertEquals(0, askAboutPageCount)
+    }
+}

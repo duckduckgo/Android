@@ -19,10 +19,10 @@ package com.duckduckgo.sync.impl.pixels
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
@@ -58,6 +58,11 @@ class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugi
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_ENDED_FAILED.pixelName to PixelParameter.removeAtb(),
+
+            SyncPixelName.SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS_DAILY.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED_DAILY.pixelName to PixelParameter.removeAtb(),
 
             SyncPixelName.SYNC_AUTO_RESTORE_TOGGLE_SHOWN.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_AUTO_RESTORE_TOGGLE_OPTED_OUT.pixelName to PixelParameter.removeAtb(),

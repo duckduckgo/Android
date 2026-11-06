@@ -20,15 +20,13 @@ package com.duckduckgo.gradle
 
 import com.duckduckgo.gradle.ModuleType.ApiAndroid
 import com.duckduckgo.gradle.ModuleType.ApiPureKotlin
-import com.duckduckgo.gradle.ModuleType.Companion
-import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_KOTLIN
 import com.duckduckgo.gradle.ModuleType.Companion.destinationDirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Companion.exampleSubdirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Companion.namespaceSuffix
 import com.duckduckgo.gradle.ModuleType.Impl
 import com.duckduckgo.gradle.ModuleType.Internal
-import org.gradle.internal.impldep.junit.framework.TestCase.assertEquals
-import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.IllegalArgumentException

@@ -1,0 +1,246 @@
+{
+  "name": "Glad I Know",
+  "url": "gladiknow.com",
+  "version": "0.1.0",
+  "addedDatetime": 1789516800000,
+  "optOutUrl": "https://gladiknow.com/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "_comment": "Scan the Data Privacy Center, not the home-page search funnel.",
+          "actionType": "navigate",
+          "url": "https://gladiknow.com/opt-out",
+          "id": "0a41f7c6-7e1b-4d92-9f35-2c8ad4b0e117"
+        },
+        {
+          "_comment": "Two near-identical forms on the page. Scope everything to the removal form, which is the one with the success-styled submit button.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//form[.//button[contains(@class, 'success')]]//input[@id='city']"
+            }
+          ],
+          "id": "1b52a8d7-8f2c-4ea3-8046-3d9be5c1f228"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "//form[.//button[contains(@class, 'success')]]",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": ".//input[@id='firstName']"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@id='lastName']"
+            },
+            {
+              "type": "city",
+              "selector": ".//input[@id='city']"
+            },
+            {
+              "type": "state",
+              "selector": ".//select[@id='state']"
+            }
+          ],
+          "id": "2c63b9e8-9a3d-4fb4-9157-4eacf6d2a339"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//form[.//button[contains(@class, 'success')]]//button[@type='submit']"
+            }
+          ],
+          "id": "3d74caf9-ab4e-40c5-a268-5fbd07e3b44a"
+        },
+        {
+          "_comment": "Results list on a hit, status banner on a miss.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(@class, 'optout-record-item')] | //div[contains(@class, 'optout-status-error')]"
+            }
+          ],
+          "id": "4e85db0a-bc5f-41d6-b379-6cae18f4c55b"
+        },
+        {
+          "_comment": "The location cell is a street address, so addressFull and not addressCityState.",
+          "actionType": "extract",
+          "selector": ".optout-record-item",
+          "noResultsSelector": "//div[contains(@class, 'optout-status-error')]",
+          "profile": {
+            "name": {
+              "selector": ".//div[contains(@class, 'optout-record-name')]"
+            },
+            "addressFull": {
+              "selector": ".//div[contains(@class, 'optout-record-location')]"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "5f96ec1b-cd60-42e7-c48a-7dbf29a5d66c"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://gladiknow.com/opt-out",
+          "id": "6a07fd2c-de71-43f8-d59b-8eac3ab6e77d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//form[.//button[contains(@class, 'success')]]//input[@id='city']"
+            }
+          ],
+          "id": "7b18ae3d-ef82-44a9-e6ac-9fbd4bc7f88e"
+        },
+        {
+          "_comment": "Re-search from userProfile. An extracted profile carries name as one string, so first and last name selectors fail against it.",
+          "actionType": "fillForm",
+          "selector": "//form[.//button[contains(@class, 'success')]]",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": ".//input[@id='firstName']"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@id='lastName']"
+            },
+            {
+              "type": "city",
+              "selector": ".//input[@id='city']"
+            },
+            {
+              "type": "state",
+              "selector": ".//select[@id='state']"
+            }
+          ],
+          "id": "8c29bf4e-fa93-45ba-f7bd-0aac5cd8a99f"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//form[.//button[contains(@class, 'success')]]//button[@type='submit']"
+            }
+          ],
+          "id": "9d3ac05f-0ba4-46cb-a8ce-1bbd6de6ba00"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(@class, 'optout-record-item')]"
+            }
+          ],
+          "id": "ae4bd160-1cb5-47dc-b9df-2cced7f7cb11"
+        },
+        {
+          "_comment": "Remove only the user's row. The profile must mirror the scan's extract, addressFull included, or nothing matches.",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button.optout-record-remove-btn",
+              "parent": {
+                "profileMatch": {
+                  "selector": ".optout-record-item",
+                  "profile": {
+                    "name": {
+                      "selector": ".//div[contains(@class, 'optout-record-name')]"
+                    },
+                    "addressFull": {
+                      "selector": ".//div[contains(@class, 'optout-record-location')]"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "bf5ce271-2cd6-48ed-cae0-3ddef808dc22"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@id='email']"
+            }
+          ],
+          "id": "c06df382-3de7-49fe-dbf1-4eef019f9d33"
+        },
+        {
+          "_comment": "Wait for the widget iframe, not the empty container it mounts into.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//iframe[contains(@src, 'recaptcha/api2/anchor')]"
+            }
+          ],
+          "id": "3d7ea493-4ef8-4a0f-e02a-5ff02a1aed44"
+        },
+        {
+          "_comment": "The email field is optional so there is no generateEmail. The captcha is not optional.",
+          "actionType": "getCaptchaInfo",
+          "captchaType": "recaptcha2",
+          "selector": ".g-recaptcha",
+          "id": "f39ac6b5-60a2-4b21-a24c-711214a3cf66"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "captchaType": "recaptcha2",
+          "selector": ".g-recaptcha",
+          "id": "0a4bd7c6-71b3-4c32-b35d-822325b4da77"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//form[.//input[@id='email']]//button[@type='submit' and contains(@class, 'success')]"
+            }
+          ],
+          "id": "1b5ce8d7-82c4-4d43-c46e-933436c5eb88"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(@class, 'optout-status-success')]"
+            }
+          ],
+          "id": "2c6df9e8-93d5-4e54-d57f-a44547c6fc99"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

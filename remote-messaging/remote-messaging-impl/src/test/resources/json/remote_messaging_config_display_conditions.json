@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "messages": [
+    {
+      "id": "message-with-display-conditions",
+      "content": {
+        "messageType": "small",
+        "titleText": "title",
+        "descriptionText": "description"
+      },
+      "displayConditions": {
+        "trigger": "after_idle",
+        "dismissAfterDaysShown": 5,
+        "maxImpressions": 3
+      },
+      "translations": {}
+    },
+    {
+      "id": "message-with-only-max-impressions",
+      "content": {
+        "messageType": "small",
+        "titleText": "title",
+        "descriptionText": "description"
+      },
+      "displayConditions": {
+        "maxImpressions": 1
+      },
+      "translations": {}
+    }
+  ],
+  "rules": []
+}

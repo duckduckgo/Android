@@ -16,8 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -41,8 +40,8 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':settings-api')
 
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
     implementation AndroidX.room.runtime
@@ -50,7 +49,6 @@ dependencies {
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx
-    implementation Google.dagger
 
     implementation project(path: ':common-utils')
 
@@ -86,9 +84,6 @@ ext {
 
 android {
     namespace "com.duckduckgo.malicioussiteprotection.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"

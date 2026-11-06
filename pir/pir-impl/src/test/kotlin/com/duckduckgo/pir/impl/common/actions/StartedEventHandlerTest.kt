@@ -68,7 +68,7 @@ class StartedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.OTHER,
@@ -87,7 +87,7 @@ class StartedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 attemptId = "",
                 stageStatus = PirStageStatus(
@@ -107,7 +107,7 @@ class StartedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.OTHER,
@@ -127,9 +127,8 @@ class StartedEventHandlerTest {
         val state =
             State(
                 runType = RunType.SCHEDULED,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
-                currentBrokerStepIndex = 5,
                 currentActionIndex = 3,
                 brokerStepStartTime = 1000L,
                 transactionID = "test-transaction-id",
@@ -144,7 +143,6 @@ class StartedEventHandlerTest {
         val result = testee.invoke(state, event)
 
         assertEquals(RunType.SCHEDULED, result.nextState.runType)
-        assertEquals(5, result.nextState.currentBrokerStepIndex)
         assertEquals(3, result.nextState.currentActionIndex)
         assertEquals(1000L, result.nextState.brokerStepStartTime)
         assertEquals("test-transaction-id", result.nextState.transactionID)

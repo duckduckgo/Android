@@ -1,0 +1,48 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF8D5C"
+        android:pathData="M2.875 7.625c0-2.071 1.679-3.75 3.75-3.75h10.75c2.071 0 3.75 1.679 3.75 3.75v8.75c0 2.071-1.679 3.75-3.75 3.75H6.625c-2.071 0-3.75-1.679-3.75-3.75v-8.75z" />
+    <path android:pathData="M21 16.375c0 2.071-1.679 3.75-3.75 3.75H6.75c-2.071 0-3.75-1.679-3.75-3.75V16h14.25c2.071 0 3.75-1.679 3.75-3.75v4.125z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="3.875"
+                android:endY="12"
+                android:startX="20.125"
+                android:startY="12"
+                android:type="linear">
+                <item
+                    android:color="#FFFFDACC"
+                    android:offset="0" />
+                <item
+                    android:color="#00FFDACC"
+                    android:offset="0.831" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#9E2B08"
+        android:pathData="M17.257 3.007C19.899 3.141 22 5.325 22 8v8c0 2.761-2.239 5-5 5H7c-2.761 0-5-2.239-5-5V8c0-2.761 2.239-5 5-5h10l0.257 0.007zM7 4.25C4.929 4.25 3.25 5.929 3.25 8v8c0 2.071 1.679 3.75 3.75 3.75h10c2.071 0 3.75-1.679 3.75-3.75V8c0-2.006-1.575-3.644-3.557-3.745L17 4.25H7zm6.625 10.875c0.345 0 0.625 0.28 0.625 0.625V17c0 0.345-0.28 0.625-0.625 0.625S13 17.345 13 17v-1.25c0-0.345 0.28-0.625 0.625-0.625zM11.75 17H5.625C5.28 17 5 16.72 5 16.375s0.28-0.625 0.625-0.625h6.125V17zm6.625-1.25c0.345 0 0.625 0.28 0.625 0.625S18.72 17 18.375 17H15.5v-1.25h2.875z" />
+    <path
+        android:fillColor="#47140B"
+        android:pathData="M15.178 9.114c0.716 0.374 0.716 1.398 0 1.772l-4.715 2.463C9.797 13.697 9 13.214 9 12.463V7.537c0-0.751 0.797-1.234 1.463-0.886l4.715 2.463z" />
+</vector>

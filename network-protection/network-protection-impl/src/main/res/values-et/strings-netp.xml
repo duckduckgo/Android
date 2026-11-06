@@ -89,8 +89,8 @@
     <string name="netpManagementManageItemExclusion">Välistatud rakendused</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Puudub</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d rakendus</item>
-        <item quantity="other">%1$d rakendused</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d rakendus</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d rakendused</item>
     </plurals>
     <string name="netpManagementVpnSettings">VPN-i seaded</string>
 
@@ -242,14 +242,14 @@
     <string name="netpAutoExcludePromptTitle">Kas tahad välistada rakendused, mis ei ühildu VPN-idega?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Leidsime %1$s VPN-i ühenduse ajal.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d uus rakendus, mis ei ühildu VPN-idega. Välista rakendus, et seda kasutada</item>
-        <item quantity="other">%1$d uut rakendust, mis ei ühildu VPN-idega. Välista need rakendused, et neid kasutada</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d uus rakendus, mis ei ühildu VPN-idega. Välista rakendus, et seda kasutada</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d uut rakendust, mis ei ühildu VPN-idega. Välista need rakendused, et neid kasutada</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Kas tahad välja jätta kõik rakendused, mis ei ühildu VPN-idega?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d muu rakendus, mis ei ühildu VPN-idega. Välista rakendus, et seda kasutada</item>
-        <item quantity="other">%1$d muud rakendust, mis ei ühildu VPN-idega. Välista need rakendused, et neid kasutada</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d muu rakendus, mis ei ühildu VPN-idega. Välista rakendus, et seda kasutada</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d muud rakendust, mis ei ühildu VPN-idega. Välista need rakendused, et neid kasutada</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Ühildumatud rakendused välistatakse automaatselt</string>
     <string name="netpAutoExcludePromptActionAdd">Välista rakendused</string>

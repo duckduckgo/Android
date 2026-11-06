@@ -19,10 +19,11 @@ package com.duckduckgo.sync.internal.ui
 import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.Context
+import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -34,36 +35,44 @@ import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceFieldDecryptor
 import com.duckduckgo.sync.impl.DeviceInfoDecryptor
 import com.duckduckgo.sync.impl.DeviceInfoMigrator
+import com.duckduckgo.sync.impl.DeviceInfoSessionResult
 import com.duckduckgo.sync.impl.DeviceInfoUpdater
 import com.duckduckgo.sync.impl.DeviceV2
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.auth.AuthPrompt
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
+import com.duckduckgo.sync.impl.auth.DeviceAuthorizationGracePeriod
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
-import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
+import com.duckduckgo.sync.impl.promotion.InternalSyncPromotionDataStore
 import com.duckduckgo.sync.internal.TestSyncWarningPlugin
+import com.duckduckgo.sync.internal.promotion.InternalSyncPromotionAppInstall
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.store.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -81,7 +90,6 @@ constructor(
     private val syncEnvDataStore: SyncInternalEnvDataStore,
     private val syncFaviconFetchingStore: FaviconsFetchingStore,
     private val dispatchers: DispatcherProvider,
-    private val syncPromotionDataStore: SyncPromotionDataStore,
     private val persistentStorage: PersistentStorage,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
@@ -94,6 +102,12 @@ constructor(
     private val deviceFieldDecryptor: DeviceFieldDecryptor,
     private val deviceInfoMigrator: DeviceInfoMigrator,
     private val syncDeviceIds: SyncDeviceIds,
+    private val exchangeV2QrCode: ExchangeV2QrCode,
+    private val syncCodeDispatcher: SyncCodeDispatcher,
+    private val deviceAuthenticator: DeviceAuthenticator,
+    private val gracePeriod: DeviceAuthorizationGracePeriod,
+    private val promotionDataStore: InternalSyncPromotionDataStore,
+    private val promotionAppInstall: InternalSyncPromotionAppInstall,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -101,6 +115,9 @@ constructor(
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart { getConnectedDevices() }
     fun commands(): Flow<Command> = command.receiveAsFlow()
+    val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
+    private var authJob: Job? = null
+    private val authLog = mutableListOf<String>()
 
     data class ViewState(
         val userId: String = "",
@@ -130,6 +147,8 @@ constructor(
         val blockStoreCurrentValueText: String = "Loading...",
         val canUseV2ConnectFlowEnabled: Boolean = false,
         val canShowV2ConnectCodeEnabled: Boolean = false,
+        val canUseExchangeV2Point1Enabled: Boolean = false,
+        val checkLinkingCodeResult: String = "",
         val accessCredentialsText: String = "",
         val scopedTokenResult: String = "",
         val v2StoreFieldsText: String = "",
@@ -141,8 +160,11 @@ constructor(
         val renameDeviceResult: String = "",
         val fetchDecryptDevicesResult: String = "",
         val canWriteUnifiedDeviceListEnabled: Boolean = false,
+        val canReadUnifiedDeviceListEnabled: Boolean = false,
+        val canUsePatchEndpointForLegacyDeviceRenameEnabled: Boolean = false,
         val migrationStatusText: String = "",
         val migrationResult: String = "",
+        val authenticateResult: String = "",
     )
 
     sealed class BlockStoreValue {
@@ -170,6 +192,26 @@ constructor(
             refreshBlockStoreValue()
         }
         observeTestSyncWarningState()
+    }
+
+    fun onAuthenticateClicked() {
+        if (authJob?.isActive == true) return
+        authLog.clear()
+        authJob = viewModelScope.launch {
+            appendAuthLog("Authenticating…")
+            val response = deviceAuthenticator.authenticate(DeviceAuthenticator.Request()) { event -> appendAuthLog("Event: $event") }
+            appendAuthLog("Response: $response")
+        }
+    }
+
+    fun onInvalidateGracePeriodClicked() {
+        gracePeriod.invalidate()
+        appendAuthLog("Grace period invalidated")
+    }
+
+    private fun appendAuthLog(line: String) {
+        authLog += "${System.currentTimeMillis().toLogTimestamp()} $line"
+        viewState.update { it.copy(authenticateResult = authLog.joinToString("\n")) }
     }
 
     fun onResume() {
@@ -255,6 +297,15 @@ constructor(
     }
 
     @SuppressLint("DenyListedApi")
+    fun onCanUseExchangeV2Point1FlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-ScopedToken: setting canUseExchangeV2Point1 flag = $enabled" }
+            setRawToggleState(syncFeature.canUseExchangeV2Point1(), enabled)
+            updateViewState()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
     private fun setRawToggleState(
         toggle: Toggle,
         enabled: Boolean,
@@ -326,6 +377,7 @@ constructor(
                 environment = syncEnvDataStore.syncEnvironmentUrl,
                 canUseV2ConnectFlowEnabled = syncFeature.canUseV2ConnectFlow().isEnabled(),
                 canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
+                canUseExchangeV2Point1Enabled = syncFeature.canUseExchangeV2Point1().isEnabled(),
                 v2StoreFieldsText = buildV2StoreFieldsText(),
                 // Clear per-session dev-tool results once signed out so stale keys aren't shown.
                 keysText = if (accountInfo.isSignedIn) viewState.value.keysText else "",
@@ -334,6 +386,8 @@ constructor(
                 renameDeviceResult = if (accountInfo.isSignedIn) viewState.value.renameDeviceResult else "",
                 fetchDecryptDevicesResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptDevicesResult else "",
                 canWriteUnifiedDeviceListEnabled = syncFeature.canWriteUnifiedDeviceList().isEnabled(),
+                canReadUnifiedDeviceListEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled(),
+                canUsePatchEndpointForLegacyDeviceRenameEnabled = syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled(),
                 migrationStatusText = buildMigrationStatusText(),
                 migrationResult = if (accountInfo.isSignedIn) viewState.value.migrationResult else "",
             ),
@@ -357,6 +411,23 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
             command.send(ShowQR(recoveryCode.qrCode))
+        }
+    }
+
+    private fun describeQrCode(rawCode: String): String {
+        val decodedPayload = runCatching {
+            String(Base64.decode(rawCode, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP), Charsets.UTF_8)
+        }.getOrDefault(rawCode)
+        return when (val parsed = exchangeV2QrCode.parse(rawCode)) {
+            is ExchangeV2CodeParseResult.LinkingV1 -> "v1 linking code\n$decodedPayload"
+
+            is ExchangeV2CodeParseResult.LinkingV2 -> {
+                "v2 linking code\nversion ${parsed.version}\nchannel_id: ${parsed.channelId}\npublic_key: ${parsed.publicKey}"
+            }
+
+            is ExchangeV2CodeParseResult.RecoveryCode -> "recovery code\n${parsed.rawJson}"
+
+            is ExchangeV2CodeParseResult.Unknown -> decodedPayload
         }
     }
 
@@ -429,6 +500,38 @@ constructor(
         }
     }
 
+    fun onCheckLinkingCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val useV2 = syncFeature.canUseV2ConnectFlow().isEnabled() && syncFeature.canShowV2ConnectCode().isEnabled()
+            viewState.update { it.copy(checkLinkingCodeResult = "Fetching ${if (useV2) "v2" else "v1"} linking code…") }
+            val result = if (useV2) fetchV2LinkingCode() else fetchV1LinkingCode()
+            viewState.update { it.copy(checkLinkingCodeResult = result) }
+        }
+    }
+
+    private fun fetchV1LinkingCode(): String {
+        val signedIn = syncAccountRepository.isSignedIn()
+        val result = if (signedIn) {
+            syncAccountRepository.generateExchangeInvitationCode()
+        } else {
+            syncAccountRepository.getConnectQR()
+        }
+        val label = if (signedIn) "invitation" else "connect"
+        return when (result) {
+            is Success -> describeQrCode(result.data.qrCode)
+            is Error -> "Failed to fetch v1 $label code: $result"
+        }
+    }
+
+    private suspend fun fetchV2LinkingCode(): String {
+        val outcome = syncCodeDispatcher.presentV2().firstOrNull { it is DispatchOutcome.LinkingCodeReady || it is DispatchOutcome.Failed }
+        return when (outcome) {
+            is DispatchOutcome.LinkingCodeReady -> describeQrCode(outcome.linkingCode)
+            is DispatchOutcome.Failed -> "Failed to fetch v2 linking code: ${outcome.reason}"
+            else -> "v2 session ended without a linking code"
+        }
+    }
+
     fun onReadConnectQRClicked() {
         viewModelScope.launch(dispatchers.io()) {
             viewModelScope.launch(dispatchers.io()) {
@@ -478,31 +581,11 @@ constructor(
         }
     }
 
-    fun onClearHistoryBookmarkAddedDialogPromoClicked() {
+    fun onResetAllPromotionDataClicked() {
         viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(BookmarkAddedDialog)
-            command.send(ShowMessage("'Bookmark added' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryBookmarkScreenPromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(BookmarksScreen)
-            command.send(ShowMessage("'Bookmark screen' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryPasswordScreenPromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(PasswordsScreen)
-            command.send(ShowMessage("'Password screen' promo history cleared"))
-        }
-    }
-
-    fun onClearHistoryChatTabPagePromoClicked() {
-        viewModelScope.launch {
-            syncPromotionDataStore.clearPromoHistory(ChatTabPage)
-            command.send(ShowMessage("'Chat tab page' promo history cleared"))
+            promotionDataStore.clearAllPromoHistory()
+            promotionAppInstall.setInstallationTimeOverride(null)
+            command.send(ShowMessage("All promo data reset"))
         }
     }
 
@@ -693,10 +776,6 @@ constructor(
                 command.send(ShowMessage("Not signed in"))
                 return@launch
             }
-            if (syncStore.accountInfoPublicKey == null) {
-                command.send(ShowMessage("No cached account_info key — tap 'Create & Register account_info Key' first"))
-                return@launch
-            }
             command.send(
                 Command.ShowRenameDeviceDialog(
                     currentName = syncDeviceIds.deviceName(),
@@ -708,7 +787,7 @@ constructor(
 
     fun onRenameDeviceConfirmed(newName: String) {
         viewModelScope.launch(dispatchers.io()) {
-            when (val result = deviceInfoUpdater.updateThisDevice(newName)) {
+            when (val result = deviceInfoUpdater.setThisDeviceName(name = newName)) {
                 is Success -> {
                     val text = "PATCH ok — ${result.data.size} devices_v2 returned; name set to \"$newName\""
                     logcat { "Sync-UnifiedDevices: $text" }
@@ -755,7 +834,7 @@ constructor(
         }
     }
 
-    private fun describeDeviceInfo(entry: DeviceV2, session: Result<DeviceInfoDecryptor.Session>): String {
+    private fun describeDeviceInfo(entry: DeviceV2, session: DeviceInfoSessionResult): String {
         val id = entry.deviceId ?: "(no id)"
         val marker = if (entry.deviceId != null && entry.deviceId == syncStore.deviceId) " (this device)" else ""
 
@@ -767,8 +846,8 @@ constructor(
         val info = entry.deviceInfo
         val deviceInfo = when {
             info.isNullOrEmpty() -> "(no device_info)"
-            session is Error -> "(cannot decrypt: ${session.reason})"
-            session is Success -> when (val result = session.data.decrypt(info)) {
+            session is DeviceInfoSessionResult.Unavailable -> "(cannot decrypt: ${session.reason})"
+            session is DeviceInfoSessionResult.Available -> when (val result = session.session.decrypt(info)) {
                 is Success -> "name=${result.data.name}, type=${result.data.type ?: "(none)"}"
                 is Error -> "(cannot decrypt: ${result.reason})"
             }
@@ -790,6 +869,22 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Sync-UnifiedDevices: setting canWriteUnifiedDeviceList flag = $enabled" }
             setRawToggleState(syncFeature.canWriteUnifiedDeviceList(), enabled)
+            updateViewState()
+        }
+    }
+
+    fun onCanReadUnifiedDeviceListFlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-UnifiedDevices: setting canReadUnifiedDeviceList flag = $enabled" }
+            setRawToggleState(syncFeature.canReadUnifiedDeviceList(), enabled)
+            updateViewState()
+        }
+    }
+
+    fun onCanUsePatchEndpointForLegacyDeviceRenameFlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-UnifiedDevices: setting canUsePatchEndpointForLegacyDeviceRename flag = $enabled" }
+            setRawToggleState(syncFeature.canUsePatchEndpointForLegacyDeviceRename(), enabled)
             updateViewState()
         }
     }

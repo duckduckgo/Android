@@ -17,12 +17,13 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 
@@ -35,6 +36,7 @@ class RealBrokenSitePrompt @Inject constructor(
 ) : BrokenSitePrompt {
 
     private val _featureEnabled by lazy { brokenSitePromptRCFeature.self().isEnabled() }
+    private val refreshPatternOwner = RefreshPatternOwner()
 
     override suspend fun userDismissedPrompt() {
         if (!_featureEnabled) return
@@ -57,11 +59,11 @@ class RealBrokenSitePrompt @Inject constructor(
     override fun pageRefreshed(
         url: Uri,
     ) {
-        brokenSiteReportRepository.addRefresh(url, currentTimeProvider.localDateTimeNow())
+        brokenSiteReportRepository.addRefresh(refreshPatternOwner, url, currentTimeProvider.localDateTimeNow())
     }
 
     override fun getUserRefreshPatterns(): Set<RefreshPattern> {
-        return brokenSiteReportRepository.getRefreshPatterns(currentTimeProvider.localDateTimeNow())
+        return brokenSiteReportRepository.getRefreshPatterns(refreshPatternOwner, currentTimeProvider.localDateTimeNow())
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<RefreshPattern>): Boolean {
@@ -74,6 +76,9 @@ class RealBrokenSitePrompt @Inject constructor(
         }
 
         val currentTimestamp = currentTimeProvider.localDateTimeNow()
+        if (!brokenSiteReportRepository.isRefreshPatternDetectionValid(url.toUri(), currentTimestamp)) {
+            return false
+        }
 
         // Check if we're still in a cooldown period
         brokenSiteReportRepository.getNextShownDate()?.let { nextDate ->

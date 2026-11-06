@@ -21,6 +21,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.content.res.Resources
+import android.util.TypedValue
+import androidx.annotation.AttrRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -48,14 +51,9 @@ object Theming {
     object Constants {
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
         val FIXED_THEME_ACTIVITIES = listOf(
-            "com.duckduckgo.sync.impl.ui.SyncLoginActivity",
-            "com.duckduckgo.sync.impl.ui.SyncConnectActivity",
-            "com.duckduckgo.sync.impl.ui.ShowQRCodeActivity",
-            "com.duckduckgo.sync.impl.ui.EnterCodeActivity",
-            "com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity",
             "com.duckduckgo.autofill.impl.service.AutofillProviderFillSuggestionActivity",
-            "com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeActivity",
-            "com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeActivity",
+            "com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeActivity",
+            "com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeActivity",
         )
     }
 }
@@ -63,11 +61,27 @@ object Theming {
 fun AppCompatActivity.applyTheme(
     theme: DuckDuckGoTheme,
     isFireMode: Boolean = false,
+    applyBrandDesignUpdate: Boolean = false,
+    overlayStyleIds: List<Int> = emptyList(),
 ): BroadcastReceiver? {
     if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
         setTheme(getThemeId(theme, isFireMode))
     }
+    if (applyBrandDesignUpdate && this.theme.supportsRebrandOverlay()) {
+        this.theme.applyStyle(R.style.ThemeOverlay_Rebrand, true)
+    }
+    if (this.theme.supportsRebrandOverlay()) {
+        overlayStyleIds.forEach { this.theme.applyStyle(it, true) }
+    }
     return registerForThemeChangeBroadcast()
+}
+
+internal fun Resources.Theme.supportsRebrandOverlay(): Boolean =
+    resolveAttribute(R.attr.daxColorRebrandButtonPrimaryContainer, TypedValue(), true)
+
+fun Context.isRebrandAreaEnabled(@AttrRes areaAttr: Int): Boolean {
+    val value = TypedValue()
+    return theme.resolveAttribute(areaAttr, value, true) && value.data != 0
 }
 
 fun AppCompatActivity.getThemeId(

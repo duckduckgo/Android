@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/apptp_shield_enabled"/>
+                    android:src="@drawable/mobile_device_protected_128"/>
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/deviceShieldTrackerBlockingTrackersDescription"

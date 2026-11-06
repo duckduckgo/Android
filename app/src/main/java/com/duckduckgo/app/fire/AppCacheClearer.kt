@@ -22,7 +22,7 @@ import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
 import com.duckduckgo.app.fire.wideevents.DataClearingFlowStep
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.api.NetworkApiCache
-import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.common.utils.file.FileDeleter
 import com.duckduckgo.common.utils.plugins.PluginPoint
 
 interface AppCacheClearer {

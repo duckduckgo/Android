@@ -32,14 +32,14 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class DuckAiNativeStorageJsMessageHandler @Inject constructor(
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val duckAiHostProvider: DuckAiHostProvider,
@@ -107,7 +107,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         val key = jsMessage.params.optString("key")
                         val value = jsMessage.params.optString("value")
                         if (key.isNotBlank()) {
-                            logcat { "DuckAiNativeStorage: putEntry key=$key value=${value.take(80)}" }
+                            logcat { "DuckAiNativeStorage: putEntry" }
                             try {
                                 settingsDao.upsert(DuckAiBridgeSettingEntity(key = key, value = value))
                             } catch (e: Exception) {
@@ -256,7 +256,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     }
                     "putChats", "migrateChats" -> {
                         val array = jsMessage.params.optJSONArray("chats") ?: return
-                        logcat { "DuckAiNativeStorage: putChats $array" }
+                        logcat { "DuckAiNativeStorage: putChats" }
                         try {
                             val entities = (0 until array.length()).mapNotNull { i ->
                                 val obj = array.optJSONObject(i) ?: return@mapNotNull null

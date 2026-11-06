@@ -47,6 +47,11 @@ class RealDuckChatPixelsPickerTest {
         statisticsUpdater = statisticsUpdater,
         duckAiMetricCollector = duckAiMetricCollector,
         termsOfServiceHandler = termsOfServiceHandler,
+        duckAiTabSessionRepository = mock(),
+        appBuildConfig = mock(),
+        browserInteractionsPlugins = mock(),
+        duckAiNewChatMetricPixelsPlugin = mock(),
+        duckAiSessionCallback = mock(),
     )
 
     @Test
@@ -75,7 +80,13 @@ class RealDuckChatPixelsPickerTest {
 
     @Test
     fun whenUpsellTriggeredThenSingleCountWithAllParams() = runTest {
-        testee.fireSubscriptionUpsellTriggered(source = "model_picker", currentTier = "free", requiredTier = "plus", flowType = "purchase")
+        testee.fireSubscriptionUpsellTriggered(
+            source = "model_picker",
+            currentTier = "free",
+            requiredTier = "plus",
+            flowType = "purchase",
+            origin = "funnel_duckai_android__modelpicker",
+        )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED,
             parameters = mapOf(
@@ -83,7 +94,19 @@ class RealDuckChatPixelsPickerTest {
                 DuckChatPixelParameters.UPSELL_CURRENT_TIER to "free",
                 DuckChatPixelParameters.UPSELL_REQUIRED_TIER to "plus",
                 DuckChatPixelParameters.UPSELL_FLOW_TYPE to "purchase",
+                DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__modelpicker",
             ),
+        )
+    }
+
+    @Test
+    fun whenUnknownModelLabelThenDailyIsTaggedByLabelSoOtherLabelsStillReport() = runTest {
+        testee.fireUnknownModelLabel("EXTRA_PRIVACY")
+
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_MODEL_LABEL_UNKNOWN_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.MODEL_LABEL to "EXTRA_PRIVACY"),
+            type = Pixel.PixelType.Daily(tag = "m_aichat_model_label_unknown_daily_EXTRA_PRIVACY"),
         )
     }
 
@@ -126,6 +149,26 @@ class RealDuckChatPixelsPickerTest {
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY,
             parameters = params,
             type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenModelPickerShownThenFiresShownPixelWithOrigin() = runTest {
+        testee.fireModelPickerShown(origin = "funnel_duckai_android__modelpicker")
+
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_PICKER_SHOWN,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__modelpicker"),
+        )
+    }
+
+    @Test
+    fun whenReasoningEffortPickerShownThenFiresShownPixelWithOrigin() = runTest {
+        testee.fireReasoningEffortPickerShown(origin = "funnel_addressbar_android__reasoningdropdown")
+
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_PICKER_SHOWN,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_addressbar_android__reasoningdropdown"),
         )
     }
 }

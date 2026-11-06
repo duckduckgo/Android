@@ -23,12 +23,13 @@ import com.duckduckgo.url.DaxDomain
 import com.duckduckgo.url.DaxScheme
 import com.duckduckgo.url.DaxUrl
 import com.duckduckgo.url.DaxUrlProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<DaxUrlProvider>())
 class RealDaxUrlProvider @Inject constructor(
     private val unifiedUrlModelFeature: UnifiedUrlModelFeature,
 ) : DaxUrlProvider {

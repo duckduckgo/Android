@@ -28,6 +28,8 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
+import com.duckduckgo.remote.messaging.api.DisplayConditions
+import com.duckduckgo.remote.messaging.api.MessageTrigger.AFTER_IDLE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface.MODAL
 import com.duckduckgo.remote.messaging.api.Surface.NEW_TAB_PAGE
@@ -350,6 +352,72 @@ class RemoteMessagingConfigJsonMapperTest {
             surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(bigSingleActionMessage, config.messages[0])
+    }
+
+    @Test
+    fun whenActionableItemsMessageThenMappedIntoRemoteConfig() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config_actionable_items.json")
+
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
+
+        val config = testee.map(result)
+
+        assertEquals(1, config.messages.size)
+        val expected = RemoteMessage(
+            id = "android_complete_your_setup",
+            content = Content.ActionableItems(
+                titleText = "Complete your setup",
+                listItems = listOf(
+                    CardItem.ListItem(
+                        id = "setup_default_browser",
+                        type = CardItemType.ONE_ACTION_ITEM,
+                        titleText = "Set as default browser",
+                        descriptionText = "Open links in DuckDuckGo.",
+                        placeholder = ANNOUNCE,
+                        primaryAction = Action.DefaultBrowser,
+                        primaryActionText = "Set as default",
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
+                        imageUrl = "https://example.com/default_browser.png",
+                    ),
+                    CardItem.ListItem(
+                        id = "setup_add_widget",
+                        type = CardItemType.ONE_ACTION_ITEM,
+                        titleText = "Add widget",
+                        descriptionText = "Search from your home screen.",
+                        placeholder = Content.Placeholder.RADAR,
+                        primaryAction = Action.AddWidget("search"),
+                        primaryActionText = "Add widget",
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
+                    ),
+                ),
+            ),
+            matchingRules = listOf(1),
+            exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
+        )
+        assertEquals(expected, config.messages[0])
+    }
+
+    @Test
+    fun whenJsonHasDisplayConditionsThenMappedIntoRemoteConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
+        val result = getConfigFromJson("json/remote_messaging_config_display_conditions.json")
+
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
+
+        val config = testee.map(result)
+
+        assertEquals(2, config.messages.size)
+        assertEquals(
+            DisplayConditions(trigger = AFTER_IDLE, dismissAfterDaysShown = 5, maxImpressions = 3),
+            config.messages[0].displayConditions,
+        )
+        assertEquals(
+            DisplayConditions(trigger = null, dismissAfterDaysShown = null, maxImpressions = 1),
+            config.messages[1].displayConditions,
+        )
     }
 
     private fun getConfigFromJson(resourceName: String): JsonRemoteMessagingConfig {

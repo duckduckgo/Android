@@ -32,8 +32,8 @@ import androidx.autofill.inline.v1.InlineSuggestionUi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface AutofillServiceViewProvider {
@@ -54,7 +54,7 @@ interface AutofillServiceViewProvider {
     ): InlinePresentation?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAutofillServiceViewProvider @Inject constructor(
     private val appBuildConfig: AppBuildConfig,

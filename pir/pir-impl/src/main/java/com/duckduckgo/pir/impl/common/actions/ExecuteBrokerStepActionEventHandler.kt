@@ -23,6 +23,8 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirma
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob
+import com.duckduckgo.pir.impl.common.PirJobConstants.GATED_ACTION_PUSH_DELAY_MS
+import com.duckduckgo.pir.impl.common.PirJobConstants.OPT_OUT_FILL_FORM_PUSH_DELAY_MS
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaSolved
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageSubmit
@@ -58,13 +60,14 @@ import com.duckduckgo.pir.impl.scripts.models.FetchedEmail
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class ExecuteBrokerStepActionEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -88,7 +91,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
          *      we are ready to push the action to js layer
          *  - For any other action, we push it to the js layer via [PushJsAction]
          */
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         val requestData = (event as ExecuteBrokerStepAction).actionRequestData
 
         return if (state.currentActionIndex == currentBrokerStep.step.actions.size) {
@@ -150,14 +153,14 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                 var pushDelay = 0L
                 // Adding a delay here similar to macOS - to ensure the site completes loading before executing anything.
                 if (actionToExecute is Click || actionToExecute is Expectation) {
-                    pushDelay = 10_000
+                    pushDelay = GATED_ACTION_PUSH_DELAY_MS
                 }
 
                 // Adding a temporary delay to potentially workaround captcha for optouts
                 if ((state.runType == PirJob.RunType.OPTOUT || state.runType == PirJob.RunType.EMAIL_CONFIRMATION) &&
                     actionToExecute is BrokerAction.FillForm
                 ) {
-                    pushDelay = 5_000
+                    pushDelay = OPT_OUT_FILL_FORM_PUSH_DELAY_MS
                 }
 
                 if (currentBrokerStep is OptOutStep && actionToExecute is EmailConfirmation) {
@@ -231,6 +234,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                                 profileQueryId = state.profileQuery.id,
                                 currentActionAttemptCount = state.actionRetryCount + 1, // actionRetryCount starts at 0
                                 currentAction = actionToExecute,
+                                isFreeScan = currentBrokerStep.isFreeScan,
                             ),
                         )
                     } else if (currentBrokerStep is OptOutStep && actionToExecute is SolveCaptcha) {

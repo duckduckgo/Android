@@ -26,26 +26,27 @@ import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
 interface AppLinksLauncher {
-    fun openAppLink(context: Context?, appLink: AppLink, viewModel: BrowserTabViewModel)
+    fun openAppLink(context: Context?, appLink: AppLink, viewModel: BrowserTabViewModel): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 class DuckDuckGoAppLinksLauncher @Inject constructor() : AppLinksLauncher {
 
-    override fun openAppLink(context: Context?, appLink: AppLink, viewModel: BrowserTabViewModel) {
-        if (context == null) return
-        appLink.appIntent?.let {
+    override fun openAppLink(context: Context?, appLink: AppLink, viewModel: BrowserTabViewModel): Boolean {
+        if (context == null) return false
+        val launched = appLink.appIntent?.let {
             configureIntent(it, context)
             startActivityOrQuietlyFail(context, it)
-        }
+        } ?: false
         viewModel.clearPreviousUrl()
+        return launched
     }
 
     private fun configureIntent(
@@ -63,13 +64,16 @@ class DuckDuckGoAppLinksLauncher @Inject constructor() : AppLinksLauncher {
         intent.putExtra(EXTRA_APPLICATION_ID, context.packageName)
     }
 
-    private fun startActivityOrQuietlyFail(context: Context, intent: Intent) {
-        try {
+    private fun startActivityOrQuietlyFail(context: Context, intent: Intent): Boolean {
+        return try {
             context.startActivity(intent)
+            true
         } catch (exception: ActivityNotFoundException) {
             logcat(ERROR) { "Activity not found: ${exception.asLog()}" }
+            false
         } catch (exception: SecurityException) {
             showToast(context, R.string.unableToOpenLink)
+            false
         }
     }
 

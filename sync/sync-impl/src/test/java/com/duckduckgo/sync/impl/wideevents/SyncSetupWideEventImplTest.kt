@@ -20,71 +20,86 @@ import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
+@RunWith(TestParameterInjector::class)
 class SyncSetupWideEventImplTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private val wideEventClient: WideEventClient = mock()
-    private val syncFeature: SyncFeature = mock()
-    private val toggle: Toggle = mock()
-    private val deviceAuthenticator: DeviceAuthenticator = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+
+    var isAuthRequired = true
+    private val buildConfig = mock<SyncBuildConfig> {
+        on { isAuthRequired } doAnswer { isAuthRequired }
+    }
 
     private lateinit var wideEvent: SyncSetupWideEventImpl
 
     @Before
     fun setup() {
-        whenever(syncFeature.sendSyncSetupWideEvent()).thenReturn(toggle)
-        whenever(toggle.isEnabled()).thenReturn(true)
-        whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
+        syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(true))
 
         wideEvent = SyncSetupWideEventImpl(
             wideEventClient = wideEventClient,
-            syncFeature = { syncFeature },
+            syncFeature = lazy { syncFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
-            deviceAuthenticator = deviceAuthenticator,
+            buildConfig = buildConfig,
         )
     }
 
     @Test
-    fun `onFlowStarted starts a new flow with correct parameters`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+    fun `onFlowStarted starts a new flow with correct ui and flow parameters`(
+        @TestParameter protocol: ProtocolVersion,
+    ) = runTest {
+        protocol.configure(syncFeature)
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
         wideEvent.onFlowStarted()
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
-            metadata = mapOf("user_auth_required" to "true"),
+            flowEntryPoint = "other",
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to protocol.value),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
 
     @Test
-    fun `onFlowStarted passes source as flowEntryPoint`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+    fun `onFlowStarted passes source as flowEntryPoint`(
+        @TestParameter protocol: ProtocolVersion,
+    ) = runTest {
+        protocol.configure(syncFeature)
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
-        wideEvent.onFlowStarted(source = "settings")
+        wideEvent.onFlowStarted(launchSource = SyncLaunchSource.PromotionPasswords)
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
-            flowEntryPoint = "settings",
-            metadata = mapOf("user_auth_required" to "true"),
+            flowEntryPoint = "promotion_passwords",
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to protocol.value),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
@@ -104,7 +119,7 @@ class SyncSetupWideEventImplTest {
 
     @Test
     fun `feature disabled results in no interactions`() = runTest {
-        whenever(toggle.isEnabled()).thenReturn(false)
+        syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(false))
 
         wideEvent.onFlowStarted()
         wideEvent.onIntroScreenShown()
@@ -334,5 +349,21 @@ class SyncSetupWideEventImplTest {
 
         verify(wideEventClient, org.mockito.kotlin.times(2)).getFlowIds("sync-setup")
         verifyNoMoreInteractions(wideEventClient)
+    }
+
+    enum class ProtocolVersion(
+        val value: String,
+    ) {
+        ProtocolV1("v1"),
+        ProtocolV2("v2"),
+        ProtocolV2Point1("v2.1"),
+        ;
+
+        fun configure(syncFeature: SyncFeature) {
+            val v2Enabled = this != ProtocolV1
+            val v2Point1Enabled = this == ProtocolV2Point1
+            syncFeature.canUseV2ConnectFlow().setRawStoredState(State(v2Enabled))
+            syncFeature.canUseExchangeV2Point1().setRawStoredState(State(v2Point1Enabled))
+        }
     }
 }

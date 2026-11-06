@@ -16,14 +16,14 @@
 
 package com.duckduckgo.sync.impl.di
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
 
 /**
  * This is here to trigger the code generations
  * [SyncablePlugin] lives in the api module but we don't want to add
- * anvil dependencies
+ * codegen dependencies (-api modules apply neither the Metro plugin nor our KSP processors)
  * CodeGen should not be generated in public api modules.
  */
 @ContributesPluginPoint(

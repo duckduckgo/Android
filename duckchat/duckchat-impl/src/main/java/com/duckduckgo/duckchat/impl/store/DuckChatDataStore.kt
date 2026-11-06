@@ -30,13 +30,13 @@ import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_DEFAULT_TOGGLE_POSITION
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_HAS_SUBMITTED_PROMPT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_EVER_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_LAST_USED_TOGGLE_POSITION
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_TERMS_ACCEPTED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_BACKGROUND_TIMESTAMP
-import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_FULLSCREEN_MODE_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_HISTORY_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_LAST_SESSION_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
@@ -47,8 +47,8 @@ import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Key
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_VOICE_SEARCH
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_PREFERENCES
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -72,8 +72,6 @@ interface DuckChatDataStore {
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
-
-    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
 
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
@@ -106,8 +104,6 @@ interface DuckChatDataStore {
     suspend fun isInputScreenUserSettingEnabled(): Boolean
 
     suspend fun isInputScreenEverEnabled(): Boolean
-
-    suspend fun isFullScreenUserSettingEnabled(): Boolean
 
     suspend fun getShowInBrowserMenu(): Boolean
 
@@ -145,23 +141,37 @@ interface DuckChatDataStore {
 
     suspend fun setUserAcceptedTerms()
 
+    suspend fun hasSubmittedPromptBefore(): Boolean
+
+    suspend fun setPromptSubmitted()
+
     suspend fun setDefaultTogglePosition(position: String)
 
     suspend fun getDefaultTogglePosition(): String?
 
-    fun observeDefaultTogglePosition(): Flow<String?>
+    fun observeDefaultTogglePosition(): StateFlow<String?>
 
     suspend fun setLastUsedTogglePosition(position: String)
 
-    fun observeLastUsedTogglePosition(): Flow<String?>
+    suspend fun getLastUsedTogglePosition(): String?
+
+    fun observeLastUsedTogglePosition(): StateFlow<String?>
 
     suspend fun getSelectedModel(): SelectedModel?
 
     suspend fun setSelectedModel(model: SelectedModel?)
 
+    suspend fun getSelectedProvider(): String?
+
+    suspend fun setSelectedProvider(rawValue: String?)
+
     suspend fun getSelectedReasoningMode(): String?
 
     suspend fun setSelectedReasoningMode(rawValue: String?)
+
+    suspend fun hasClearedPinnedDefaultModel(): Boolean
+
+    suspend fun setClearedPinnedDefaultModel()
 
     suspend fun storeAddressBarPickerSelectedAt(timestampMillis: Long)
 
@@ -176,7 +186,7 @@ data class SelectedModel(
 )
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SharedPreferencesDuckChatDataStore @Inject constructor(
     @DuckChat private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
@@ -196,17 +206,19 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
         val DUCK_CHAT_LAST_SESSION_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_LAST_SESSION_TIMESTAMP")
         val DUCK_CHAT_SESSION_DELTA_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_SESSION_DELTA_TIMESTAMP")
-        val DUCK_CHAT_FULLSCREEN_MODE_SETTING = booleanPreferencesKey(name = "DUCK_CHAT_FULLSCREEN_MODE_SETTING")
         val DUCK_CHAT_BACKGROUND_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_BACKGROUND_TIMESTAMP")
         val DUCK_CHAT_HISTORY_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_HISTORY_ENABLED")
         val DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT = booleanPreferencesKey(name = "DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT")
         val DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING")
         val DUCK_AI_TERMS_ACCEPTED = booleanPreferencesKey(name = "DUCK_AI_TERMS_ACCEPTED")
+        val DUCK_AI_HAS_SUBMITTED_PROMPT = booleanPreferencesKey(name = "DUCK_AI_HAS_SUBMITTED_PROMPT")
         val DUCK_AI_DEFAULT_TOGGLE_POSITION = stringPreferencesKey(name = "DUCK_AI_DEFAULT_TOGGLE_POSITION")
         val DUCK_AI_LAST_USED_TOGGLE_POSITION = stringPreferencesKey(name = "DUCK_AI_LAST_USED_TOGGLE_POSITION")
         val DUCK_AI_SELECTED_MODEL_ID = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_ID")
         val DUCK_AI_SELECTED_MODEL_SHORT_NAME = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_SHORT_NAME")
         val DUCK_AI_SELECTED_MODEL_REASONING_MODE = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_REASONING_MODE")
+        val DUCK_AI_SELECTED_PROVIDER = stringPreferencesKey(name = "DUCK_AI_SELECTED_PROVIDER")
+        val DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL = booleanPreferencesKey(name = "DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL")
         val DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT = longPreferencesKey(name = "DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT")
     }
 
@@ -315,10 +327,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] = enabled }
     }
 
-    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
-        store.edit { prefs -> prefs[DUCK_CHAT_FULLSCREEN_MODE_SETTING] = enabled }
-    }
-
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] = showDuckChat }
     }
@@ -375,10 +383,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         }
         return everInteracted
     }
-
-    override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
-        it[DUCK_CHAT_FULLSCREEN_MODE_SETTING]
-    } ?: false
 
     override suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING]
@@ -455,6 +459,12 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_AI_TERMS_ACCEPTED] = true }
     }
 
+    override suspend fun hasSubmittedPromptBefore(): Boolean = store.data.firstOrNull()?.let { it[DUCK_AI_HAS_SUBMITTED_PROMPT] } ?: false
+
+    override suspend fun setPromptSubmitted() {
+        store.edit { prefs -> prefs[DUCK_AI_HAS_SUBMITTED_PROMPT] = true }
+    }
+
     override suspend fun setDefaultTogglePosition(position: String) {
         store.edit { prefs -> prefs[DUCK_AI_DEFAULT_TOGGLE_POSITION] = position }
     }
@@ -462,13 +472,16 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun getDefaultTogglePosition(): String? =
         store.data.firstOrNull()?.let { it[DUCK_AI_DEFAULT_TOGGLE_POSITION] }
 
-    override fun observeDefaultTogglePosition(): Flow<String?> = defaultTogglePositionFlow
+    override fun observeDefaultTogglePosition(): StateFlow<String?> = defaultTogglePositionFlow
 
     override suspend fun setLastUsedTogglePosition(position: String) {
         store.edit { prefs -> prefs[DUCK_AI_LAST_USED_TOGGLE_POSITION] = position }
     }
 
-    override fun observeLastUsedTogglePosition(): Flow<String?> = lastUsedTogglePositionFlow
+    override suspend fun getLastUsedTogglePosition(): String? =
+        store.data.firstOrNull()?.let { it[DUCK_AI_LAST_USED_TOGGLE_POSITION] }
+
+    override fun observeLastUsedTogglePosition(): StateFlow<String?> = lastUsedTogglePositionFlow
 
     override suspend fun getSelectedModel(): SelectedModel? {
         val prefs = store.data.firstOrNull() ?: return null
@@ -489,6 +502,19 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         }
     }
 
+    override suspend fun getSelectedProvider(): String? =
+        store.data.firstOrNull()?.let { it[Keys.DUCK_AI_SELECTED_PROVIDER] }
+
+    override suspend fun setSelectedProvider(rawValue: String?) {
+        store.edit { prefs ->
+            if (rawValue == null) {
+                prefs.remove(Keys.DUCK_AI_SELECTED_PROVIDER)
+            } else {
+                prefs[Keys.DUCK_AI_SELECTED_PROVIDER] = rawValue
+            }
+        }
+    }
+
     override suspend fun getSelectedReasoningMode(): String? =
         store.data.firstOrNull()?.let { it[Keys.DUCK_AI_SELECTED_MODEL_REASONING_MODE] }
 
@@ -500,6 +526,13 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
                 prefs[Keys.DUCK_AI_SELECTED_MODEL_REASONING_MODE] = rawValue
             }
         }
+    }
+
+    override suspend fun hasClearedPinnedDefaultModel(): Boolean =
+        store.data.firstOrNull()?.get(Keys.DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL) ?: false
+
+    override suspend fun setClearedPinnedDefaultModel() {
+        store.edit { prefs -> prefs[Keys.DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL] = true }
     }
 
     override suspend fun storeAddressBarPickerSelectedAt(timestampMillis: Long) {

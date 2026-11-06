@@ -83,56 +83,6 @@ class PreseedCookiesEventHandlerTest {
     }
 
     @Test
-    fun whenCurrentBrokerStepIsNullThenReturnsStateUnchanged() = runTest {
-        val state = State(
-            runType = RunType.MANUAL,
-            brokerStepsToExecute = emptyList(),
-            profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
-            stageStatus = PirStageStatus(
-                currentStage = PirStage.OTHER,
-                stageStartMs = 0,
-            ),
-        )
-        val event = PreSeedCookies
-
-        val result = testee.invoke(state, event)
-
-        assertEquals(state, result.nextState)
-        assertNull(result.nextEvent)
-        assertNull(result.sideEffect)
-    }
-
-    @Test
-    fun whenCurrentBrokerStepIndexOutOfBoundsThenReturnsStateUnchanged() = runTest {
-        val scanStep = ScanStep(
-            broker = testBroker,
-            step = ScanStepActions(
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            ),
-        )
-        val state = State(
-            runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
-            profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 5, // Out of bounds
-            stageStatus = PirStageStatus(
-                currentStage = PirStage.OTHER,
-                stageStartMs = 0,
-            ),
-        )
-        val event = PreSeedCookies
-
-        val result = testee.invoke(state, event)
-
-        assertEquals(state, result.nextState)
-        assertNull(result.nextEvent)
-        assertNull(result.sideEffect)
-    }
-
-    @Test
     fun whenCurrentBrokerStepExistsThenSetsPendingUrlAndPreseedingAndReturnsLoadUrlSideEffect() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
@@ -144,9 +94,8 @@ class PreseedCookiesEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             preseeding = false,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
@@ -164,46 +113,6 @@ class PreseedCookiesEventHandlerTest {
     }
 
     @Test
-    fun whenMultipleBrokerStepsThenUsesCurrentBrokerStepUrl() = runTest {
-        val broker1 = testBroker.copy(name = "broker-1", url = "https://broker1.com")
-        val broker2 = testBroker.copy(name = "broker-2", url = "https://broker2.com")
-        val scanStep1 = ScanStep(
-            broker = broker1,
-            step = ScanStepActions(
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            ),
-        )
-        val scanStep2 = ScanStep(
-            broker = broker2,
-            step = ScanStepActions(
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            ),
-        )
-        val state = State(
-            runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep1, scanStep2),
-            profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 1, // Second broker
-            preseeding = false,
-            stageStatus = PirStageStatus(
-                currentStage = PirStage.OTHER,
-                stageStartMs = 0,
-            ),
-        )
-        val event = PreSeedCookies
-
-        val result = testee.invoke(state, event)
-
-        assertEquals("https://broker2.com", result.nextState.pendingUrl)
-        assertEquals(true, result.nextState.preseeding)
-        assertEquals(LoadUrl("https://broker2.com"), result.sideEffect)
-    }
-
-    @Test
     fun whenPreseedCookiesThenPreservesOtherStateFields() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
@@ -215,9 +124,8 @@ class PreseedCookiesEventHandlerTest {
         )
         val state = State(
             runType = RunType.SCHEDULED,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 3,
             actionRetryCount = 2,
             transactionID = "txn-123",
@@ -234,7 +142,6 @@ class PreseedCookiesEventHandlerTest {
         // Verify other state fields are preserved
         assertEquals(RunType.SCHEDULED, result.nextState.runType)
         assertEquals(testProfileQuery, result.nextState.profileQuery)
-        assertEquals(0, result.nextState.currentBrokerStepIndex)
         assertEquals(3, result.nextState.currentActionIndex)
         assertEquals(2, result.nextState.actionRetryCount)
         assertEquals("txn-123", result.nextState.transactionID)

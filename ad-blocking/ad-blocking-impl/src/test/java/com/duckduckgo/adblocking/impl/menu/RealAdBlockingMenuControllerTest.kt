@@ -53,15 +53,22 @@ class RealAdBlockingMenuControllerTest {
     val coroutineRule = CoroutineTestRule()
 
     private val userEnabledFlow = MutableStateFlow<Boolean?>(true)
+    private val pixelConsentFlow = MutableStateFlow<Boolean?>(null)
     private val settingsRepository = object : AdBlockingSettingsRepository {
         override fun isEnabledFlow(): Flow<Boolean?> = userEnabledFlow
-        override suspend fun setEnabled(enabled: Boolean) {
-            userEnabledFlow.value = enabled
+        override fun hasPixelConsentFlow(): Flow<Boolean?> = pixelConsentFlow
+        override suspend fun enable(withPixelConsent: Boolean) {
+            userEnabledFlow.value = true
+            pixelConsentFlow.value = withPixelConsent
+        }
+
+        override suspend fun disable() {
+            userEnabledFlow.value = false
         }
     }
     private val sessionStore = RealAdBlockingSessionStore()
     private val statusChecker: AdBlockingStatusChecker = mock {
-        on { currentState() } doReturn AdBlockingState.Enabled.UserEnabled
+        on { currentState() } doReturn AdBlockingState.Enabled.WithPixelConsent
     }
     private val pixel: Pixel = mock()
 
@@ -82,8 +89,8 @@ class RealAdBlockingMenuControllerTest {
     }
 
     @Test
-    fun whenStateIsUserEnabledThenChoiceIsAlwaysOn() {
-        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.UserEnabled)
+    fun whenStateIsWithPixelConsentThenChoiceIsAlwaysOn() {
+        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.WithPixelConsent)
 
         assertEquals(AdBlockingChoice.ALWAYS_ON, controller.currentChoice())
     }
@@ -109,6 +116,7 @@ class RealAdBlockingMenuControllerTest {
         controller.onChoiceSelected(AdBlockingChoice.ALWAYS_ON)
 
         assertEquals(true, userEnabledFlow.value)
+        assertEquals(false, pixelConsentFlow.value)
         assertFalse(sessionStore.isDisabledUntilRelaunch())
     }
 
@@ -163,6 +171,7 @@ class RealAdBlockingMenuControllerTest {
         controller.onEnableTapped()
 
         assertEquals(true, userEnabledFlow.value)
+        assertEquals(false, pixelConsentFlow.value)
         assertFalse(sessionStore.isDisabledUntilRelaunch())
     }
 

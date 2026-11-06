@@ -53,7 +53,8 @@ jobs:
           --asana-section-id "${{ vars.GH_ANDROID_RELEASE_BOARD_QA_SECTION_ID }}" \
           --asana-workspace-id "${{ secrets.GH_ASANA_WORKSPACE_ID }}" \
           --asana-api-key-env-var ASANA_ACCESS_TOKEN \
-          --template-task-id "${{ vars.GH_ANDROID_RELEASE_BOARD_TEMPLATE_TASK_ID }}")
+          --template-task-id "${{ vars.GH_ANDROID_RELEASE_BOARD_TEMPLATE_TASK_ID }}" \
+          --grafana-dashboard-base-url "${{ vars.GH_ANDROID_GRAFANA_DASHBOARD_BASE_URL }}")
           echo "RELEASE_TASK_URL=$RELEASE_TASK_URL" >> "$GITHUB_ENV"
 
       - name: Assign task to Github Actor
@@ -67,7 +68,7 @@ jobs:
 
       - name: Get Asana Task Permalink
         id: get-task-permalink
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-task-id: ${{ steps.assign-release-task.outputs.task_id }}
@@ -75,7 +76,7 @@ jobs:
 
       - name: Notify Mattermost of Task created
         id: send-mm-task-created
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -85,7 +86,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
@@ -97,7 +98,7 @@ jobs:
       - name: Notify Mattermost when workflow failed
         if: ${{ failure() }}
         id: send-mm-message-error
-        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}

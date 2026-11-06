@@ -16,43 +16,41 @@
 
 package com.duckduckgo.voice.impl.fakes
 
+import android.app.Activity
 import android.content.Context
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.VoiceSearchPermissionDialogsLauncher
 
 class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLauncher {
-    var noMicAccessDialogShown = false
-    var rationaleDialogShown = false
-    var removeVoiceSearchDialogShown = false
-    var boundOnRationaleAccepted: () -> Unit = {}
-    var boundOnRationaleDeclined: () -> Unit = {}
-    var boundNoMicAccessDialogDeclined: () -> Unit = {}
-    var boundRemoveVoiceSearchAccepted: () -> Unit = {}
+    var micAccessDeniedDialogShown = false
+    var micAccessDeniedDialogOfferedHideVoiceSearch = false
+    var micAccessDeniedDialogMode: VoiceSearchMode? = null
+    var micPermissionDeniedSnackbarShown = false
+    var boundChangePermissionsSelected: () -> Unit = {}
+    var boundHideVoiceSearchSelected: () -> Unit = {}
+    var boundMicAccessDeniedCancelled: () -> Unit = {}
+    var boundSnackbarAllowSelected: () -> Unit = {}
 
-    override fun showNoMicAccessDialog(
+    override fun showMicAccessDeniedDialog(
         context: Context,
-        onSettingsLaunchSelected: () -> Unit,
-        onSettingsLaunchDeclined: () -> Unit,
+        mode: VoiceSearchMode,
+        onChangePermissionsSelected: () -> Unit,
+        onHideVoiceSearchSelected: () -> Unit,
+        onCancelled: () -> Unit,
     ) {
-        noMicAccessDialogShown = true
-        boundNoMicAccessDialogDeclined = onSettingsLaunchDeclined
+        micAccessDeniedDialogShown = true
+        micAccessDeniedDialogMode = mode
+        micAccessDeniedDialogOfferedHideVoiceSearch = mode != VoiceSearchMode.DUCK_AI
+        boundChangePermissionsSelected = onChangePermissionsSelected
+        boundHideVoiceSearchSelected = onHideVoiceSearchSelected
+        boundMicAccessDeniedCancelled = onCancelled
     }
 
-    override fun showPermissionRationale(
-        context: Context,
-        onRationaleAccepted: () -> Unit,
-        onRationaleDeclined: () -> Unit,
+    override fun showMicPermissionDeniedSnackbar(
+        activity: Activity,
+        onAllowSelected: () -> Unit,
     ) {
-        rationaleDialogShown = true
-        boundOnRationaleAccepted = onRationaleAccepted
-        boundOnRationaleDeclined = onRationaleDeclined
-    }
-
-    override fun showRemoveVoiceSearchDialog(
-        context: Context,
-        onRemoveVoiceSearch: () -> Unit,
-        onRemoveVoiceSearchCancelled: () -> Unit,
-    ) {
-        removeVoiceSearchDialogShown = true
-        boundRemoveVoiceSearchAccepted = onRemoveVoiceSearch
+        micPermissionDeniedSnackbarShown = true
+        boundSnackbarAllowSelected = onAllowSelected
     }
 }

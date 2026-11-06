@@ -6,8 +6,6 @@
 
     <issue id="UnusedResources">
         <!-- We reference these dynamically in code -->
-        <ignore regexp="res/.*/network_logo_.*" />
-        <!-- We reference these dynamically in code -->
         <ignore regexp="res/.*/tracking_network_logo_.*" />
     </issue>
 </lint>

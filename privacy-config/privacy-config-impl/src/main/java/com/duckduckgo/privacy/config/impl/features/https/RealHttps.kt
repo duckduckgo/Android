@@ -22,12 +22,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealHttps @Inject constructor(
     private val httpsRepository: HttpsRepository,
     private val unprotectedTemporary: UnprotectedTemporary,

@@ -15,6 +15,9 @@
             "widePixelAppName",
             "widePixelFormFactor",
             "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
             {
                 "key": "context.name",
                 "description": "Entry point to the Input Screen onboarding flow.",

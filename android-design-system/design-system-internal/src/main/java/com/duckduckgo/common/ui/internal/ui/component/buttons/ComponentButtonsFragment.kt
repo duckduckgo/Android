@@ -27,7 +27,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import com.duckduckgo.common.ui.compose.button.DaxBrandButton
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostButton
@@ -38,6 +40,7 @@ import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButtonDefaults
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.databinding.ComponentButtonsBinding
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -67,7 +70,39 @@ class ComponentButtonsFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val isBrandDesignUpdate = runBlocking { appComponentsViewModel.brandDesignUpdateFlow.first() }
         setupComposeViews(view, isDarkTheme)
+        applyBrandDesignSpacing(isBrandDesignUpdate)
+    }
+
+    private fun applyBrandDesignSpacing(isBrandDesignUpdate: Boolean) {
+        if (!isBrandDesignUpdate) return
+
+        val largeButtons = listOf(
+            binding.daxButtonBrandLarge,
+            binding.daxButtonBrandLargeIcon,
+            binding.daxButtonPrimaryLarge,
+            binding.daxButtonPrimaryLargeIcon,
+            binding.daxButtonSecondaryLarge,
+            binding.daxButtonSecondaryLargeIcon,
+            binding.daxButtonDestructiveLarge,
+            binding.daxButtonDestructiveLargeIcon,
+            binding.daxButtonGhostLarge,
+            binding.daxButtonGhostLargeIcon,
+            binding.daxButtonDestructiveSecondaryLarge,
+            binding.daxButtonDestructiveSecondaryLargeIcon,
+            binding.daxButtonGhostDestructiveLarge,
+            binding.daxButtonGhostDestructiveLargeIcon,
+            binding.daxButtonGhostAltLarge,
+            binding.daxButtonGhostAltLargeIcon,
+        )
+        val verticalInsetPx = resources.getDimensionPixelSize(R.dimen.rebrandButtonLargeVerticalInset)
+        largeButtons.forEach { button ->
+            button.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = verticalInsetPx
+                bottomMargin = verticalInsetPx
+            }
+        }
     }
 
     @Suppress("LongMethod")
@@ -75,6 +110,41 @@ class ComponentButtonsFragment : Fragment() {
         view: View,
         isDarkTheme: Boolean,
     ) {
+        // Brand
+        view.setupThemedComposeView(
+            id = com.duckduckgo.common.ui.internal.R.id.compose_button_brand,
+            isDarkTheme = isDarkTheme,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                DaxBrandButton(text = "Brand Small", onClick = {})
+                DaxBrandButton(
+                    text = "Brand Small",
+                    onClick = {},
+                    leadingIconPainter = painterResource(R.drawable.ic_add_16),
+                )
+                DaxBrandButton(
+                    text = "Brand Large",
+                    onClick = {},
+                    size = DaxButtonSize.Large,
+                )
+                DaxBrandButton(
+                    text = "Brand Large",
+                    onClick = {},
+                    size = DaxButtonSize.Large,
+                    leadingIconPainter = painterResource(R.drawable.ic_device_desktop_16),
+                )
+                DaxBrandButton(text = "Brand Disabled", onClick = {}, enabled = false)
+                DaxBrandButton(
+                    text = "Brand DuckSans",
+                    onClick = {},
+                    textStyle = DuckDuckGoTheme.typography.onboardingButton,
+                )
+            }
+        }
+
         // Primary
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_primary,

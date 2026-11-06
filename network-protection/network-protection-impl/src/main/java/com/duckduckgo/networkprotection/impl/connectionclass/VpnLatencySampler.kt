@@ -31,7 +31,7 @@ import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.P
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.TERRIBLE
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.UNKNOWN
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.*
 import logcat.logcat
 import java.time.Instant
@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class VpnLatencySampler @Inject constructor(
     private val connectionClassManager: ConnectionClassManager,
     private val latencyMeasurer: LatencyMeasurer,

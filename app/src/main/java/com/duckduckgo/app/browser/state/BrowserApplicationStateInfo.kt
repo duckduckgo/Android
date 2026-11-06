@@ -19,19 +19,18 @@ package com.duckduckgo.app.browser.state
 import android.app.Activity
 import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class BrowserApplicationStateInfo @Inject constructor(
-    private val observers: DaggerSet<BrowserLifecycleObserver>,
+    private val observers: Set<BrowserLifecycleObserver>,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ActivityLifecycleCallbacks {
     private var created = 0

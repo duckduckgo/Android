@@ -24,6 +24,7 @@ import com.duckduckgo.lint.DenyListedApiDetector
 import com.duckduckgo.lint.NoDispatcherComputation.Companion.ISSUE_AVOID_COMPUTATION
 import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoHardcodedCoroutineDispatcherDetector.Companion.NO_HARCODED_COROUTINE_DISPATCHER
+import com.duckduckgo.lint.NoHardcodedPetalPixelParamDetector.Companion.NO_HARDCODED_PETAL_PIXEL_PARAM
 import com.duckduckgo.lint.NoImplImportsInAppModuleDetector.Companion.NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE
 import com.duckduckgo.lint.MetricsPixelNumericValueDetector.Companion.NUMERIC_VALUE_REQUIRED
 import com.duckduckgo.lint.MissingContributesToOnModuleDetector.Companion.MISSING_CONTRIBUTES_TO_ON_MODULE
@@ -37,19 +38,29 @@ import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECT
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
+import com.duckduckgo.lint.NonSerializableActivityParamsDetector.Companion.NON_SERIALIZABLE_ACTIVITY_PARAMS
 import com.duckduckgo.lint.NoPostValueOnSingleLiveEventDetector.Companion.NO_POST_VALUE_ON_SINGLE_LIVE_EVENT
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector
+import com.duckduckgo.lint.NoNewAppDatabaseTableDetector.Companion.NO_NEW_APP_DATABASE_TABLE
+import com.duckduckgo.lint.NoNewBrowserFeatureToggleDetector.Companion.NO_NEW_BROWSER_FEATURE_TOGGLE
 import com.duckduckgo.lint.RemoteFeatureNameDetector.Companion.UNDERSCORE_IN_FEATURE_NAME
 import com.duckduckgo.lint.WrongPluginPointCollectorDetector.Companion.WRONG_PLUGIN_POINT_ISSUE
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
 import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Companion.MISSING_SMARTLING_REQUIRED_DIRECTIVES
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
+import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_DUCK_SANS
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
+import com.duckduckgo.lint.ui.DaxContextMenuContentDetector.Companion.INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE
+import com.duckduckgo.lint.ui.DaxContextMenuItemContentDetector.Companion.INVALID_DAX_CONTEXT_MENU_ITEM_CONTENT_USAGE
 import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
+import com.duckduckgo.lint.ui.DaxListItemColorUsageDetector.Companion.INVALID_DAX_LIST_ITEM_COLOR_USAGE
+import com.duckduckgo.lint.ui.DaxListItemContentDetector.Companion.INVALID_DAX_LIST_ITEM_CONTENT_USAGE
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
+import com.duckduckgo.lint.ui.DefaultsObjectCasingDetector.Companion.DEFAULTS_PROPERTY_CASING
 import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
 import com.duckduckgo.lint.ui.NoRawM3ButtonUsageDetector.Companion.NO_RAW_M3_BUTTON_USAGE
+import com.duckduckgo.lint.ui.NoRawM3SliderUsageDetector.Companion.NO_RAW_M3_SLIDER_USAGE
 import com.duckduckgo.lint.ui.NoRawM3SnackbarUsageDetector.Companion.NO_RAW_M3_SNACKBAR_USAGE
 import com.duckduckgo.lint.ui.NoRawM3SurfaceUsageDetector.Companion.NO_RAW_M3_SURFACE_USAGE
 import com.duckduckgo.lint.ui.DaxTextFieldTrailingIconDetector.Companion.INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE
@@ -59,7 +70,9 @@ import com.duckduckgo.lint.ui.NoMaterial3CircularProgressIndicatorUsageDetector.
 import com.duckduckgo.lint.ui.NoMaterial3DividerUsageDetector.Companion.NO_MATERIAL3_HORIZONTAL_DIVIDER_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3DividerUsageDetector.Companion.NO_MATERIAL3_VERTICAL_DIVIDER_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3RadioButtonUsageDetector.Companion.NO_MATERIAL3_RADIO_BUTTON_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3ScaffoldUsageDetector.Companion.NO_MATERIAL3_SCAFFOLD_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3SwitchUsageDetector.Companion.NO_MATERIAL3_SWITCH_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3TopAppBarUsageDetector.Companion.NO_MATERIAL3_TOP_APP_BAR_USAGE
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
 import com.duckduckgo.lint.ui.DeprecatedAndroidWidgetsUsedInXmlDetector.Companion.DEPRECATED_WIDGET_IN_XML
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
@@ -79,11 +92,14 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
         get() = listOf(
             WRONG_PLUGIN_POINT_ISSUE,
             UNDERSCORE_IN_FEATURE_NAME,
+            NO_NEW_BROWSER_FEATURE_TOGGLE,
+            NO_NEW_APP_DATABASE_TABLE,
             NO_SINGLETON_ISSUE,
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,
             NO_SYSTEM_LOAD_LIBRARY,
             NO_HARCODED_COROUTINE_DISPATCHER,
+            NO_HARDCODED_PETAL_PIXEL_PARAM,
             NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE,
             NO_METRICS_PIXEL_EXTENSION_USAGE,
             NUMERIC_VALUE_REQUIRED,
@@ -100,6 +116,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             MISSING_CONTRIBUTES_TO_ON_MODULE,
             MISSING_HAS_MEMBER_INJECTIONS,
             MISSING_EXPLICIT_RETURN_TYPE,
+            NON_SERIALIZABLE_ACTIVITY_PARAMS,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,
@@ -110,6 +127,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_BOTTOM_SHEET,
             INVALID_DAX_TEXT_VIEW_PROPERTY,
             INVALID_DAX_BUTTON_PROPERTY,
+            INVALID_DAX_BUTTON_DUCK_SANS,
             INVALID_SKELETON_VIEW_BACKGROUND,
             WRONG_STYLE_PARAMETER,
             WRONG_STYLE_NAME,
@@ -120,16 +138,24 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_DAX_DIVIDER_COLOR_USAGE,
             INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE,
             INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
+            INVALID_DAX_LIST_ITEM_CONTENT_USAGE,
+            INVALID_DAX_LIST_ITEM_COLOR_USAGE,
+            INVALID_DAX_CONTEXT_MENU_ITEM_CONTENT_USAGE,
+            INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE,
             NO_MATERIAL3_SWITCH_USAGE,
+            NO_MATERIAL3_TOP_APP_BAR_USAGE,
             NO_MATERIAL3_RADIO_BUTTON_USAGE,
             NO_MATERIAL3_CHECKBOX_USAGE,
             NO_MATERIAL3_CIRCULAR_PROGRESS_INDICATOR_USAGE,
             NO_MATERIAL3_HORIZONTAL_DIVIDER_USAGE,
             NO_MATERIAL3_VERTICAL_DIVIDER_USAGE,
+            NO_MATERIAL3_SCAFFOLD_USAGE,
             NO_RAW_M3_BUTTON_USAGE,
             NO_RAW_M3_ALERT_DIALOG_USAGE,
             NO_RAW_M3_SURFACE_USAGE,
             NO_RAW_M3_SNACKBAR_USAGE,
+            NO_RAW_M3_SLIDER_USAGE,
+            DEFAULTS_PROPERTY_CASING,
 
         ).plus(WebViewCompatApisUsageDetector.issues)
 

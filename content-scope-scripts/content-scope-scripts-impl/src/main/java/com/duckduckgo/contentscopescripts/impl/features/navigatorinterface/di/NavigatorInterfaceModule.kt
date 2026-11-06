@@ -25,17 +25,17 @@ import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store
 import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.NavigatorInterfaceRepository
 import com.duckduckgo.contentscopescripts.impl.features.navigatorinterface.store.RealNavigatorInterfaceRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object NavigatorInterfaceModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideNavigatorInterfaceDatabase(context: Context): NavigatorInterfaceDatabase {
         return Room.databaseBuilder(context, NavigatorInterfaceDatabase::class.java, "navigator_interface.db")
@@ -45,7 +45,7 @@ object NavigatorInterfaceModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideNavigatorInterfaceRepository(
         database: NavigatorInterfaceDatabase,

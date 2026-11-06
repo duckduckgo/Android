@@ -20,8 +20,6 @@ import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -38,12 +36,9 @@ class RealFireModeAvailabilityTest {
 
     @get:Rule val coroutineRule = CoroutineTestRule()
 
-    private val fireModeFeature: FireModeFeature = FakeFeatureToggleFactory.create(FireModeFeature::class.java)
-
     private lateinit var webViewFeatureMock: MockedStatic<WebViewFeature>
 
     private val testee = RealFireModeAvailability(
-        fireModeFeature,
         coroutineRule.testDispatcherProvider,
         coroutineRule.testScope,
     )
@@ -53,7 +48,6 @@ class RealFireModeAvailabilityTest {
         webViewFeatureMock = mockStatic(WebViewFeature::class.java)
         setMultiProfileSupported(true)
         setDeleteBrowsingDataSupported(true)
-        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = true))
     }
 
     @After
@@ -62,15 +56,8 @@ class RealFireModeAvailabilityTest {
     }
 
     @Test
-    fun `is available when both WebView features are supported and fireTabs flag is enabled`() {
+    fun `is available when both WebView features are supported`() {
         assertTrue(testee.isAvailable())
-    }
-
-    @Test
-    fun `is unavailable when fireTabs flag is disabled`() {
-        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = false))
-
-        assertFalse(testee.isAvailable())
     }
 
     @Test
@@ -88,11 +75,11 @@ class RealFireModeAvailabilityTest {
     }
 
     @Test
-    fun `availability is frozen on first computation even if flag flips later`() {
-        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = false))
+    fun `availability is frozen on first computation even if WebView support changes later`() {
+        setMultiProfileSupported(false)
         assertFalse(testee.isAvailable())
 
-        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = true))
+        setMultiProfileSupported(true)
         assertFalse(testee.isAvailable())
     }
 

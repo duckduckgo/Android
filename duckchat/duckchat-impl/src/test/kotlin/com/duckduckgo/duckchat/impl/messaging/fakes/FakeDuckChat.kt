@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.messaging.fakes
 
 import android.net.Uri
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -36,7 +37,6 @@ class FakeDuckChat(
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
-    private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
     private val nativeChatInputEnabled = MutableStateFlow(false)
     private val nativeInputNavBarEnabled = MutableStateFlow(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
@@ -44,17 +44,19 @@ class FakeDuckChat(
 
     override fun isEnabled(): Boolean = enabled
 
-    override fun openDuckChat() {
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint) {
         openDuckChatCalls.add(Unit)
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String) {
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {
         openDuckChatWithAutoPromptCalls.add(query)
     }
 
-    override fun openDuckChatWithPrefill(query: String) {
+    override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) {
         openDuckChatWithPrefillCalls.add(query)
     }
+
+    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean, voice: Boolean) { }
 
     override fun getDuckChatUrl(
         query: String,
@@ -96,10 +98,6 @@ class FakeDuckChat(
         return automaticContextAttachmentUserSettingEnabled
     }
 
-    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> {
-        return nativeInputFieldUserSettingEnabled
-    }
-
     override fun observeNativeChatInputEnabled(): Flow<Boolean> {
         return nativeChatInputEnabled
     }
@@ -118,7 +116,7 @@ class FakeDuckChat(
 
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
-    override fun openVoiceDuckChat() { }
+    override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) { }
     override fun isVoiceChatSessionActive(tabId: String): Boolean = false
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()
@@ -131,6 +129,8 @@ class FakeDuckChat(
     override fun observeHasChatSuggestions(): Flow<Boolean> = emptyFlow()
 
     override suspend fun onAddressBarPickerDuckAiSelected() { }
+
+    override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) { }
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

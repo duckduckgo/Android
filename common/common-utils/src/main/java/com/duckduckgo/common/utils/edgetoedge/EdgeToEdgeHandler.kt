@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
@@ -37,27 +38,41 @@ import javax.inject.Inject
  * system-bar inset on top of the view's *original* padding (captured once), so repeated inset
  * dispatches never accumulate padding. Insets are requested as soon as the view is attached.
  *
- * Callers should only invoke these when edge-to-edge is enabled for the screen's bucket
- * (see [EdgeToEdgeProvider]); when disabled the window reserves the bars itself and no padding
- * should be added.
+ * Callers should only invoke these on screens that enable edge-to-edge; otherwise the window
+ * reserves the bars itself and no padding should be added.
  */
 class EdgeToEdgeHandler @Inject constructor() {
 
     /**
      * Pads [view]'s top (status bar + cutout) and left/right (side system bars + cutout) edges.
      *
+     * While [isFullScreen] reports true (e.g. a fullscreen video) no padding is reserved, so the content spans the
+     * whole display (including the cutout) instead of leaving a letterbox bar beside the notch. [isFullScreen] is
+     * evaluated on every inset dispatch; the caller — which owns the fullscreen state — forces a re-evaluation on
+     * entering/exiting fullscreen with [ViewCompat.requestApplyInsets].
+     *
      * @param view The view to pad, typically the screen's root.
      * @param installScrim When true (default), a status-bar scrim (see [installStatusBarScrim]) is drawn behind
      *   the transparent status bar. Pass false for screens that colour their own system bars (e.g. via SystemBarStyle).
+     * @param isFullScreen Reports whether the screen is currently in immersive fullscreen. Defaults to never; supply
+     *   it only for screens that host fullscreen video.
      */
-    fun applyStatusBarAndHorizontalInsets(view: View, installScrim: Boolean = true) {
+    fun applyStatusBarAndHorizontalInsets(
+        view: View,
+        installScrim: Boolean = true,
+        isFullScreen: () -> Boolean = { false },
+    ) {
         val initialLeft = view.paddingLeft
         val initialTop = view.paddingTop
         val initialRight = view.paddingRight
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val windowInsets = insets.getInsets(
-                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
-            )
+            val windowInsets = if (isFullScreen()) {
+                Insets.NONE
+            } else {
+                insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+                )
+            }
             v.updatePadding(
                 left = initialLeft + windowInsets.left,
                 top = initialTop + windowInsets.top,
@@ -87,6 +102,29 @@ class EdgeToEdgeHandler @Inject constructor() {
         }
         ViewCompat.requestApplyInsets(view)
         if (installScrim) installStatusBarScrim(view)
+    }
+
+    /**
+     * Adds the status-bar + cutout inset as [view]'s top margin; [view] must use [ViewGroup.MarginLayoutParams].
+     *
+     * Use instead of [applyStatusBarInsets] for a view whose background fills its whole box — a
+     * [com.google.android.material.button.MaterialButton] pill grows with padding, so only its label moves down.
+     */
+    fun applyStatusBarInsetsAsMargin(view: View) {
+        val initialTop = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin ?: 0
+        view.applyInsets { insets ->
+            val top = insets.getInsets(
+                WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
+            ).top
+
+            (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                val newMargin = initialTop + top
+                if (lp.topMargin != newMargin) {
+                    lp.topMargin = newMargin
+                    view.requestLayout()
+                }
+            }
+        }
     }
 
     /**
@@ -271,9 +309,7 @@ class EdgeToEdgeHandler @Inject constructor() {
      * e.g. a collapsible/draggable BottomSheetDialog, whose sheet surface only extends behind the bar while it is
      * settled expanded. The caller must already pad its content clear of the navigation bar (e.g. via
      * applyBottomSystemBarInsetPadding) so the scrim only repaints the otherwise-empty strip; where the surface
-     * does cover the strip the scrim sits on top in the identical colour and is seamless. Idempotent per window;
-     * no scrim under gesture navigation (the tappable-element inset is 0 there), so the surface stays edge-to-edge
-     * behind the gesture pill.
+     * does cover the strip the scrim sits on top in the identical colour and is seamless. Idempotent per window.
      *
      * Unlike the status-bar scrim, the colour is passed in rather than resolved from a framework attr: the
      * navigation-bar colour is transparent under the edge-to-edge themes, and `common-utils` can't reference the
@@ -281,8 +317,17 @@ class EdgeToEdgeHandler @Inject constructor() {
      *
      * @param anchor Any view attached to the target window; its window content frame hosts the scrim.
      * @param scrimColor The colour painted behind the navigation bar (typically the surface colour).
+     * @param coverGestureNav When false (default) the scrim uses the *tappable* inset: the button-bar height under
+     *   2/3-button navigation but 0 under gesture navigation, so nothing is painted behind the gesture pill and a
+     *   surface that draws itself edge-to-edge stays visible there. Pass true when the caller reserves the *full*
+     *   navigation-bar inset (e.g. as bottom margin) so its own surface never reaches the bar in any mode — then the
+     *   scrim uses the navigation-bar inset and paints the strip behind the gesture pill too.
      */
-    fun applyNavigationBarScrim(anchor: View, @ColorInt scrimColor: Int) {
+    fun applyNavigationBarScrim(
+        anchor: View,
+        @ColorInt scrimColor: Int,
+        coverGestureNav: Boolean = false,
+    ) {
         val contentRoot = anchor.rootView?.findViewById<ViewGroup>(android.R.id.content) ?: return
         if (contentRoot.findViewWithTag<View>(NAVIGATION_BAR_SCRIM_TAG) != null) return
 
@@ -293,10 +338,13 @@ class EdgeToEdgeHandler @Inject constructor() {
         }
         contentRoot.addView(scrim)
 
+        val insetType = if (coverGestureNav) {
+            WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout()
+        } else {
+            WindowInsetsCompat.Type.tappableElement()
+        }
         ViewCompat.setOnApplyWindowInsetsListener(scrim) { v, insets ->
-            // tappableElement (not navigationBars): the button-bar height under 2/3-button navigation, but 0 under
-            // gesture navigation — so no scrim is painted there and the surface stays edge-to-edge behind the pill.
-            val bottom = insets.getInsets(WindowInsetsCompat.Type.tappableElement()).bottom
+            val bottom = insets.getInsets(insetType).bottom
             if (v.layoutParams.height != bottom) {
                 v.updateLayoutParams { height = bottom }
             }

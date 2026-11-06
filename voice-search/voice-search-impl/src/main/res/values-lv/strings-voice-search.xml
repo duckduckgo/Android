@@ -22,14 +22,12 @@
     <string name="voiceSearchListening">Runā tagad</string>
     <string name="voiceSearchListeningFooter">Audio tiek apstrādāts ierīcē. Tas netiek glabāts, un tam nevar piekļūt neviens, pat ne DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Atcelt</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nekad nenoklausās tevis teikto. Audio tiek apstrādāts ierīcē. Tas netiek glabāts vai koplietots ne ar vienu.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Privātajai meklēšanai ar balsi ir nepieciešama piekļuve mikrofonam</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">Labi</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Lai DuckDuckGo izmantotu balss meklēšanu, sistēmas iestatījumos ir jāiespējo piekļuve mikrofonam.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Iestatījumi</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Nepieciešama piekļuve mikrofonam</string>
-    <string name="voiceSearchRemovePositiveButton">Noņemt</string>
-    <string name="voiceSearchRemoveTitle">Vai noņemt opciju \"Privātā meklēšana ar balsi\" no adreses joslas?</string>
-    <string name="voiceSearchRemoveSubtitle">Šīs un citas pieejamības preferences vienmēr vari pārvaldīt sadaļā Iestatījumi.</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo ir nepieciešama piekļuve mikrofonam.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Ja vēlies izmantot mūsu privāto meklēšanu ar balsi, ir nepieciešamas mikrofona atļaujas.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Ja vēlies izmantot mūsu privātās balss funkcijas, ir nepieciešamas mikrofona atļaujas.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Mainīt atļaujas</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Paslēpt meklēšanu ar balsi</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Balss funkcijām nepieciešama mikrofona atļauja</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Atļaut</string>
     <string name="voiceSearchTitle">Balss meklēšana</string>
 </resources>

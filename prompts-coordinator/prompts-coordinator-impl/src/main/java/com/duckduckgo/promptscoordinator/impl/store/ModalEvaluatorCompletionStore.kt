@@ -24,8 +24,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.impl.di.ModalEvaluatorCompletion
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -52,10 +52,15 @@ interface ModalEvaluatorCompletionStore {
      * @return true if blocked (within 24 hours of last completion)
      */
     suspend fun isBlockedBy24HourWindow(): Boolean
+
+    /**
+     * Clears the last completion timestamp, so the next evaluation pass is not blocked by the 24-hour window.
+     */
+    suspend fun resetCooldown()
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ModalEvaluatorCompletionStoreImpl @Inject constructor(
     @ModalEvaluatorCompletion private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
@@ -94,6 +99,14 @@ class ModalEvaluatorCompletionStoreImpl @Inject constructor(
         }
         if (timestamp == NO_COMPLETION) return false
         return System.currentTimeMillis() - timestamp < TWENTY_FOUR_HOURS_MILLIS
+    }
+
+    override suspend fun resetCooldown() {
+        lastCompletionTimestamp.set(NO_COMPLETION)
+        withContext(dispatchers.io()) {
+            val key = getKeyCompletionTimestamp()
+            store.edit { it.remove(key) }
+        }
     }
 
     private suspend fun getLastCompletionTimestamp(): Long? {

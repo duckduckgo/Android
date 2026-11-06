@@ -47,8 +47,8 @@
     <string name="atp_OnNoTrackersNotificationHeader">"Notiek izsekošanas aktivitāšu skenēšana… bīp… bīp..."</string>
     <plurals name="atp_OnNotification">
         <item quantity="zero"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnēs</b> (pēdējās stundas laikā).]]></item>
-        <item quantity="one"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnē</b> (pēdējās stundas laikā).]]></item>
-        <item quantity="other"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnēs</b> (pēdējās stundas laikā).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnē</b> (pēdējās stundas laikā).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnēs</b> (pēdējās stundas laikā).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Lietotņu pretizsekošanas aizsardzība ir atspējota. Pieskaries, lai turpinātu bloķēt izsekošanas mēģinājumus.</string>
     <string name="atp_RevokedNotification">Kāda VPN lietotne tavā ierīcē traucē Lietotņu pretizsekošanas aizsardzību. Pieskaries, lai iespējotu no jauna.</string>
@@ -61,14 +61,14 @@
 
     <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="zero"><![CDATA[%1$s mēģināja tevi izsekot <b>%2$d lietotnēs</b> (pēdējās diennakts laikā). <b>Skatīt vairāk</b>]]></item>
-        <item quantity="one"><![CDATA[%1$s mēģināja tevi izsekot <b>%2$d lietotnē</b> (pēdējās diennakts laikā). <b>Skatīt vairāk</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s mēģināja tevi izsekot <b>%2$d lietotnēs</b> (pēdējās diennakts laikā). <b>Skatīt vairāk</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s mēģināja tevi izsekot <b>%2$d lietotnē</b> (pēdējās diennakts laikā). <b>Skatīt vairāk</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s mēģināja tevi izsekot <b>%2$d lietotnēs</b> (pēdējās diennakts laikā). <b>Skatīt vairāk</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
         <item quantity="zero"><![CDATA[Lietotņu pretizsekošanas aizsardzība visvairāk izsekošanas mēģinājumu bloķējusi lietotnēs <b>%1$s</b> un <b>%2$s</b> (pēdējās diennakts laikā).]]></item>
-        <item quantity="one"><![CDATA[Lietotņu pretizsekošanas aizsardzība visvairāk izsekošanas mēģinājumu bloķējusi lietotnē <b>%1$s</b> (pēdējās diennakts laikā).]]></item>
-        <item quantity="other"><![CDATA[Lietotņu pretizsekošanas aizsardzība visvairāk izsekošanas mēģinājumu bloķējusi lietotnēs <b>%1$s</b> un <b>%2$s</b> (pēdējās diennakts laikā).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[Lietotņu pretizsekošanas aizsardzība visvairāk izsekošanas mēģinājumu bloķējusi lietotnē <b>%1$s</b> (pēdējās diennakts laikā).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[Lietotņu pretizsekošanas aizsardzība visvairāk izsekošanas mēģinājumu bloķējusi lietotnēs <b>%1$s</b> un <b>%2$s</b> (pēdējās diennakts laikā).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d reizi lietotnē %3$s</b> (pēdējās diennakts laikā).]]></string>
@@ -89,8 +89,8 @@
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="zero"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d lietotnēs, tostarp %3$s</b> (pēdējās nedēļas laikā).]]></item>
-        <item quantity="one"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d lietotnē, %3$s</b> (pēdējās nedēļas laikā).]]></item>
-        <item quantity="other"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d lietotnēs, tostarp %3$s</b> (pēdējās nedēļas laikā).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d lietotnē, %3$s</b> (pēdējās nedēļas laikā).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d lietotnēs, tostarp %3$s</b> (pēdējās nedēļas laikā).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Iespējot Lietotņu pretizsekošanas aizsardzību</string>
@@ -276,13 +276,13 @@
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
         <item quantity="zero">%1$d mēģinājumi. Zināms, ka vāc šādus datus:</item>
-        <item quantity="one">%1$d mēģinājums. Zināms, ka vāc šādus datus:</item>
-        <item quantity="other">%1$d mēģinājumi. Zināms, ka vāc šādus datus:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d mēģinājums. Zināms, ka vāc šādus datus:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d mēģinājumi. Zināms, ka vāc šādus datus:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
         <item quantity="zero">DuckDuckGo bloķēja %1$d izsekošanas mēģinājumus</item>
-        <item quantity="one">DuckDuckGo bloķēja %1$d izsekošanas mēģinājumu</item>
-        <item quantity="other">DuckDuckGo bloķēja %1$d izsekošanas mēģinājumus</item>
+        <item quantity="one" instruction="Placeholder is a number">DuckDuckGo bloķēja %1$d izsekošanas mēģinājumu</item>
+        <item quantity="other" instruction="Placeholder is a number">DuckDuckGo bloķēja %1$d izsekošanas mēģinājumus</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Ziņot par problēmu ar šo lietotni</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Rādīt vēl %1$d</string>

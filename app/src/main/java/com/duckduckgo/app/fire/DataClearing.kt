@@ -20,6 +20,7 @@ package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -42,8 +43,9 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -55,13 +57,13 @@ import javax.inject.Inject
  */
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = ManualDataClearing::class,
+    binding = binding<ManualDataClearing>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AutomaticDataClearing::class,
+    binding = binding<AutomaticDataClearing>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DataClearing @Inject constructor(
     private val fireDataStore: FireDataStore,
     private val clearDataAction: ClearDataAction,
@@ -78,6 +80,8 @@ class DataClearing @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val dataClearingTrigger: DataClearingTrigger,
+    private val fireModeDataClearingState: FireModeDataClearingState,
+    private val customTabsFeature: CustomTabsFeature,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String, replaceCurrentTab: Boolean, browserMode: BrowserMode): ClearDataResult {
@@ -192,6 +196,10 @@ class DataClearing @Inject constructor(
             shouldFireDataClearPixel = true,
         )
 
+        if (FireClearOption.TABS in options && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
+            clearDataAction.closeCustomTabs()
+        }
+
         val wasDuckAiChatsCleared = options.contains(FireClearOption.DUCKAI_CHATS) &&
             duckAiFeatureState.showClearDuckAIChatHistory.value
         val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
@@ -208,6 +216,11 @@ class DataClearing @Inject constructor(
             shouldFireDataClearPixel = false,
         )
         performFireModeClear()
+
+        // Only with the flag on: it makes the clear wait while a custom tab is opening, so this can't close that tab.
+        if (FireClearOption.TABS in options && customTabsFeature.keepCustomTabOnAppSwitch().isEnabled()) {
+            clearDataAction.closeCustomTabs()
+        }
 
         clearDataAction.setAppUsedSinceLastClearFlag(!killProcessIfNeeded)
 
@@ -319,12 +332,16 @@ class DataClearing @Inject constructor(
 
         val fireModeCleared = fireModeAvailability.isAvailable()
         if (fireModeCleared) {
-            val fireTypes = setOf(
-                ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
-                ClearableData.BrowserData.AllForMode(BrowserMode.FIRE),
-                ClearableData.DuckChats.AllForMode(BrowserMode.FIRE),
+            // avoids duplicate burn when tabs removed
+            fireModeDataClearingState.onDataCleared()
+
+            dataClearingTrigger.clearData(
+                setOf(
+                    ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
+                    ClearableData.BrowserData.AllForMode(BrowserMode.FIRE),
+                    ClearableData.DuckChats.AllForMode(BrowserMode.FIRE),
+                ),
             )
-            dataClearingTrigger.clearData(fireTypes)
         }
 
         logcat { "Fire mode clear completed" }

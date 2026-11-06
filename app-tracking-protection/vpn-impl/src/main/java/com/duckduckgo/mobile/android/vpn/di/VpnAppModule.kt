@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.di
 
 import android.content.Context
 import android.content.res.Resources
-import android.net.ConnectivityManager
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -28,29 +27,21 @@ import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsReposi
 import com.duckduckgo.mobile.android.vpn.store.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
-import javax.inject.Provider
 import javax.inject.Qualifier
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object VpnAppModule {
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun providesConnectivityManager(context: Context): ConnectivityManager {
-        return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    }
-
     @Provides
     fun provideVpnDatabaseCallbackProvider(
         context: Context,
-        vpnDatabase: Provider<VpnDatabase>,
+        vpnDatabase: () -> VpnDatabase,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         @AppTpBlocklistUpdateMutex mutex: Mutex,
@@ -59,7 +50,7 @@ object VpnAppModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @AppTpBlocklistUpdateMutex
     fun providesAppTpBlocklistUpdateMutex(): Mutex {
         return Mutex()
@@ -67,9 +58,9 @@ object VpnAppModule {
 
     /**
      * TODO this class should also not be needed in the AppScope.
-     * It is needed because the DaggerWorkerFactory is not modular. Easy to fix tho
+     * It is needed because the InjectingWorkerFactory is not modular. Easy to fix tho
      */
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun bindVpnDatabase(
         context: Context,
@@ -84,7 +75,7 @@ object VpnAppModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAppTrackerLoader(
         vpnDatabase: VpnDatabase,
     ): AppTrackerRepository {
@@ -92,7 +83,7 @@ object VpnAppModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesResources(context: Context): Resources {
         return context.resources
     }

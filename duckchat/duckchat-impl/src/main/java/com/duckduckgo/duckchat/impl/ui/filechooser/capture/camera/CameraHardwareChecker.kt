@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera
 import android.content.Context
 import android.content.pm.PackageManager.FEATURE_CAMERA_ANY
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface CameraHardwareChecker {

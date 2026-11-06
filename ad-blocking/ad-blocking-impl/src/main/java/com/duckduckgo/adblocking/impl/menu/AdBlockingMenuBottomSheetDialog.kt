@@ -26,8 +26,6 @@ import com.duckduckgo.adblocking.impl.databinding.BottomSheetAdBlockingMenuBindi
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.duckduckgo.mobile.android.R as CommonR
@@ -36,14 +34,9 @@ import com.duckduckgo.mobile.android.R as CommonR
 class AdBlockingMenuBottomSheetDialog(
     builderContext: Context,
     selectedChoice: AdBlockingChoice,
-    edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : BottomSheetDialog(
     builderContext,
-    if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
-    } else {
-        0
-    },
+    CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
 
     interface EventListener {
@@ -58,9 +51,7 @@ class AdBlockingMenuBottomSheetDialog(
     init {
         setContentView(binding.root)
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
 
         behavior.skipCollapsed = true
         behavior.maxHeight = context.resources.displayMetrics.heightPixels * MAX_HEIGHT_PERCENT / 100

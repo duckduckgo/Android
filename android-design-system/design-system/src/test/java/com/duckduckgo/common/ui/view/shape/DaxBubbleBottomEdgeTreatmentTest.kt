@@ -39,6 +39,16 @@ class DaxBubbleBottomEdgeTreatmentTest {
             val y3: Float,
         )
         val cubics = mutableListOf<Cubic>()
+        val lines = mutableListOf<Pair<Float, Float>>()
+
+        override fun lineTo(
+            x: Float,
+            y: Float,
+        ) {
+            lines.add(x to y)
+            super.lineTo(x, y)
+        }
+
         override fun cubicToPoint(
             x1: Float,
             y1: Float,
@@ -86,6 +96,45 @@ class DaxBubbleBottomEdgeTreatmentTest {
     }
 
     @Test
+    fun `mirroring is off by default`() {
+        val treatment = DaxBubbleBottomEdgeTreatment(heightPx = 100)
+        assertEquals(0f, treatment.mirrorFraction, 0.0001f)
+    }
+
+    @Test
+    fun `mirroring reflects every tail coordinate about the centre`() {
+        val plain = tailOf(mirrorFraction = 0f)
+        val mirrored = tailOf(mirrorFraction = 1f)
+
+        assertEquals(plain.size, mirrored.size)
+        val reflected = plain.map { (x, y) -> (2 * CENTER - x) to y }.sortedBy { it.first }
+        mirrored.sortedBy { it.first }.zip(reflected).forEach { (actual, expected) ->
+            assertEquals(expected.first, actual.first, 0.01f)
+            assertEquals(expected.second, actual.second, 0.01f)
+        }
+    }
+
+    @Test
+    fun `mirroring moves the tail hook to the other side of the centre`() {
+        val plainHook = tailOf(mirrorFraction = 0f).minByOrNull { it.second }!!.first
+        val mirroredHook = tailOf(mirrorFraction = 1f).minByOrNull { it.second }!!.first
+
+        assertTrue("Expected the plain hook past the centre, got $plainHook", plainHook > CENTER)
+        assertTrue("Expected the mirrored hook before the centre, got $mirroredHook", mirroredHook < CENTER)
+    }
+
+    @Test
+    fun `a half mirror fraction produces a tail that is symmetric about the centre`() {
+        val halfway = tailOf(mirrorFraction = 0.5f)
+
+        val reflected = halfway.map { (x, y) -> (2 * CENTER - x) to y }.sortedBy { it.first }
+        halfway.sortedBy { it.first }.zip(reflected).forEach { (actual, expected) ->
+            assertEquals(expected.first, actual.first, 0.01f)
+            assertEquals(expected.second, actual.second, 0.01f)
+        }
+    }
+
+    @Test
     fun `depth fraction 0_5 scales y coordinates linearly`() {
         val fullPath = RecordingShapePath()
         DaxBubbleBottomEdgeTreatment(heightPx = 100).apply { depthFraction = 1f }
@@ -101,5 +150,18 @@ class DaxBubbleBottomEdgeTreatmentTest {
         fullYs.zip(halfYs).forEach { (full, half) ->
             assertEquals(full * 0.5f, half, 0.01f)
         }
+    }
+
+    private fun tailOf(mirrorFraction: Float): List<Pair<Float, Float>> {
+        val path = RecordingShapePath()
+        DaxBubbleBottomEdgeTreatment(heightPx = 100).apply { this.mirrorFraction = mirrorFraction }
+            .getEdgePath(length = 400f, center = CENTER, interpolation = 1f, shapePath = path)
+        // Distinct because the closing lineTo repeats the last curve's end point, and mirroring moves that
+        // duplicate to the opposite end of the tail.
+        return (path.lines + path.cubics.flatMap { listOf(it.x1 to it.y1, it.x2 to it.y2, it.x3 to it.y3) }).distinct()
+    }
+
+    private companion object {
+        const val CENTER = 200f
     }
 }

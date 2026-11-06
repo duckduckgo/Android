@@ -1,0 +1,60 @@
+{
+    "android-post-idle-session": {
+        "description": "Captures a post-idle session — NTP (with hatch) or LUT shown after an idle return — from surface shown to terminal user action or app background.",
+        "owners": ["GerardPaligot"],
+        "meta": {
+            "type": "android-post-idle-session",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "post_idle_session",
+            "status": ["SUCCESS", "CANCELLED", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "surface": {
+                        "type": "string",
+                        "description": "Which post-idle surface was shown",
+                        "enum": ["ntp", "lut"]
+                    },
+                    "status_reason": {
+                        "type": "string",
+                        "description": "Reason the session ended",
+                        "enum": [
+                            "bar_used",
+                            "chat_selected",
+                            "return_to_page_tapped",
+                            "tab_switcher_selected",
+                            "app_backgrounded",
+                            "favorite_selected"
+                        ]
+                    },
+                    "session_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration from surface shown to session end, bucketed (lower end of bucket, in ms). -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "time_to_first_interaction_ms_bucketed": {
+                        "type": "string",
+                        "description": "Duration from surface shown to the first non-terminal interaction (page_engaged, toggle_used, or back_pressed), bucketed (lower end of bucket, in ms). -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "page_engaged": {
+                        "type": "string",
+                        "description": "Whether the user touched the page content during the session (NTP body or WebView)",
+                        "enum": ["true", "false"]
+                    },
+                    "toggle_used": {
+                        "type": "string",
+                        "description": "Whether the user switched between search and Duck.ai modes during the session",
+                        "enum": ["true", "false"]
+                    },
+                    "back_pressed": {
+                        "type": "string",
+                        "description": "Whether the user pressed back at least once during the session",
+                        "enum": ["true", "false"]
+                    }
+                }
+            }
+        }
+    }
+}

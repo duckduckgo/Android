@@ -30,13 +30,14 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = EventHandler::class,
+    binding = binding<EventHandler>(),
 )
 class EmailDataReceivedEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
@@ -49,7 +50,7 @@ class EmailDataReceivedEventHandler @Inject constructor(
         event: Event,
     ): Next {
         val actualEvent = event as EmailDataReceived
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
 
         val durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs
         val actionId = currentBrokerStep.step.actions[state.currentActionIndex].id

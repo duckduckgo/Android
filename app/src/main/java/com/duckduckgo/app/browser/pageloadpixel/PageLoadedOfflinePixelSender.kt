@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import io.reactivex.Completable
 import logcat.logcat
 import javax.inject.Inject
@@ -29,7 +29,6 @@ import javax.inject.Inject
 private const val ELAPSED_TIME = "elapsed_time"
 private const val WEBVIEW_VERSION = "webview_version"
 private const val CPM_ENABLED = "cpm_enabled"
-private const val TRACKER_OPTIMIZATION_ENABLED_V3 = "tracker_optimization_enabled_v3"
 private const val IS_TAB_IN_FOREGROUND_ON_FINISH = "is_tab_in_foreground_on_finish"
 private const val ACTIVE_REQUESTS_ON_LOAD_START = "active_requests_on_load_start"
 private const val CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish"
@@ -37,7 +36,7 @@ private const val CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish
 // This is used to ensure the app version we send is the one from the moment the page was loaded, and not then the pixel is fired later on
 private const val APP_VERSION = "app_version_when_page_loaded"
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PageLoadedOfflinePixelSender @Inject constructor(
     private val pageLoadedPixelDao: PageLoadedPixelDao,
     private val pixelSender: PixelSender,
@@ -53,7 +52,6 @@ class PageLoadedOfflinePixelSender @Inject constructor(
                     ELAPSED_TIME to it.elapsedTime.toString(),
                     WEBVIEW_VERSION to it.webviewVersion,
                     CPM_ENABLED to it.cpmEnabled.toString(),
-                    TRACKER_OPTIMIZATION_ENABLED_V3 to it.trackerOptimizationEnabled.toString(),
                     IS_TAB_IN_FOREGROUND_ON_FINISH to it.isTabInForegroundOnFinish.toString(),
                     ACTIVE_REQUESTS_ON_LOAD_START to it.activeRequestsOnLoadStart.toString(),
                     CONCURRENT_REQUESTS_ON_FINISH to it.concurrentRequestsOnFinish.toString(),

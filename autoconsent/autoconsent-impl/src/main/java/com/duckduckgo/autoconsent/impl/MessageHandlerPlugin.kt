@@ -17,8 +17,8 @@
 package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(

@@ -46,7 +46,8 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
                     (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected &&
-                    (oldItem as? SelectableTab)?.isDuckAi == (newItem as? SelectableTab)?.isDuckAi
+                    (oldItem as? SelectableTab)?.isDuckAi == (newItem as? SelectableTab)?.isDuckAi &&
+                    oldItem.isRichDuckAiCard == newItem.isRichDuckAiCard
             }
             else -> false
         }
@@ -61,6 +62,10 @@ class TabSwitcherItemDiffCallback(
         }
 
         if ((oldItem as? SelectableTab)?.isDuckAi != (newItem as? SelectableTab)?.isDuckAi) {
+            return null
+        }
+
+        if ((oldItem as? TabSwitcherItem.Tab)?.isRichDuckAiCard != (newItem as? TabSwitcherItem.Tab)?.isRichDuckAiCard) {
             return null
         }
 

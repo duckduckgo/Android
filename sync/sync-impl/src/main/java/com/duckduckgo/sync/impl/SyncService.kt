@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Json
 import okhttp3.RequestBody
@@ -164,32 +164,38 @@ interface SyncService {
         @Body request: CreateAccessCredentialRequest,
     ): Call<Void>
 
-    @PUT("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}")
+    @PUT("$SYNC_PROD_ENVIRONMENT_URL$EXCHANGE_CHANNEL_PATH_PREFIX{channelId}")
     fun createExchangeChannel(
+        @Header("Authorization") authorization: String?,
         @Path("channelId") channelId: String,
         @Body body: ExchangeChannelCreateRequest,
     ): Call<Void>
 
-    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}/messages")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL$EXCHANGE_CHANNEL_PATH_PREFIX{channelId}/messages")
     fun postExchangeMessages(
+        @Header("Authorization") authorization: String?,
         @Path("channelId") channelId: String,
         @Body body: ExchangeMessagesRequest,
     ): Call<Void>
 
-    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}/messages")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL$EXCHANGE_CHANNEL_PATH_PREFIX{channelId}/messages")
     fun pollExchangeMessages(
+        @Header("Authorization") authorization: String?,
         @Path("channelId") channelId: String,
         @Query("after") after: Int,
     ): Call<ExchangeMessagesResponse>
 
-    @DELETE("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}")
+    @DELETE("$SYNC_PROD_ENVIRONMENT_URL$EXCHANGE_CHANNEL_PATH_PREFIX{channelId}")
     fun deleteExchangeChannel(
+        @Header("Authorization") authorization: String?,
         @Path("channelId") channelId: String,
     ): Call<Void>
 
     companion object {
         const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
         const val SYNC_DEV_ENVIRONMENT_URL = "https://sync-staging.duckduckgo.com"
+
+        const val EXCHANGE_CHANNEL_PATH_PREFIX = "/sync/v2/exchange/"
     }
 }
 
@@ -210,6 +216,8 @@ data class Signup(
     @field:Json(name = "device_name") val deviceName: String,
     @field:Json(name = "device_type") val deviceType: String,
     @field:Json(name = "credential_id") val credentialId: String? = null,
+    @field:Json(name = "device_info") val deviceInfo: String? = null,
+    @field:Json(name = "keys") val keys: List<ProtectedKeyEntry>? = null,
 )
 
 data class Logout(

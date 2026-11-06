@@ -54,7 +54,7 @@ class RetryAwaitEmailDataEventHandlerTest {
     private val baseState =
         State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = emptyList(),
+            brokerStep = testScanStep(),
             profileQuery = testProfileQuery,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.EMAIL_DATA_POLL,
@@ -144,7 +144,6 @@ class RetryAwaitEmailDataEventHandlerTest {
     @Test
     fun whenRetryAwaitEmailDataThenStateRemainsUnchanged() = runTest {
         val state = baseState.copy(
-            currentBrokerStepIndex = 3,
             currentActionIndex = 5,
             actionRetryCount = 2,
         )
@@ -152,7 +151,6 @@ class RetryAwaitEmailDataEventHandlerTest {
         val result = testee.invoke(state, baseEvent)
 
         assertEquals(state, result.nextState)
-        assertEquals(3, result.nextState.currentBrokerStepIndex)
         assertEquals(5, result.nextState.currentActionIndex)
         assertEquals(2, result.nextState.actionRetryCount)
     }

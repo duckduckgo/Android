@@ -24,17 +24,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
+import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -44,25 +46,27 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
-import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.cancel
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class)
+@ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
 class SyncPasswordsPromotion @Inject constructor(
     private val syncPromotions: SyncPromotions,
+    private val setUpPromotion: SyncPasswordsSetUpPromotion,
 ) : PasswordsScreenPromotionPlugin {
 
     override suspend fun getView(context: Context, numberSavedPasswords: Int): View? {
-        return if (syncPromotions.canShowPasswordsPromotion(numberSavedPasswords)) {
-            SyncPasswordsPromotionView(context)
-        } else {
-            null
+        return when {
+            setUpPromotion.canShowPromotion(numberSavedPasswords) -> SyncPasswordsSetUpPromotionView(context).apply {
+                actionStyle = if (setUpPromotion.shouldUseToggle()) ActionStyle.Toggle else ActionStyle.Buttons
+            }
+            syncPromotions.canShowPasswordsPromotion(numberSavedPasswords) -> SyncPasswordsPromotionView(context)
+            else -> null
         }
     }
 }
@@ -122,7 +126,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityWithSourceParams(source = "promotion_passwords"))
+            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswords))
             context.startActivity(intent)
         }
     }
@@ -131,7 +135,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
         with(binding.syncPromotion) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.ic_sync_ok_48,
+                    topIllustration = R.drawable.sync_check_56,
                     title = context.getString(R.string.syncPromoTitlePasswords),
                     subtitle = context.getString(R.string.syncPromoSubtitlePasswords),
                     action = context.getString(R.string.syncPromoPrimaryButton),

@@ -21,7 +21,7 @@ import com.duckduckgo.autofill.impl.deduper.AutofillDeduplicationMatchTypeDetect
 import com.duckduckgo.autofill.impl.deduper.AutofillDeduplicationMatchTypeDetector.MatchType.PartialMatch
 import com.duckduckgo.autofill.impl.deduper.AutofillDeduplicationMatchTypeDetector.MatchType.PerfectMatch
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AutofillDeduplicationBestMatchFinder {

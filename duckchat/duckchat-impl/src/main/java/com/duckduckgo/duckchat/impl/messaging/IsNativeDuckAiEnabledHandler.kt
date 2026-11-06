@@ -25,7 +25,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ import javax.inject.Inject
  * Purpose: SERP hides its Duck.ai toggle when in native browser and queries
  * native state instead, making native settings the single source of truth.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class IsNativeDuckAiEnabledHandler @Inject constructor(
     private val duckChat: DuckChat,
 ) : ContentScopeJsMessageHandlersPlugin {

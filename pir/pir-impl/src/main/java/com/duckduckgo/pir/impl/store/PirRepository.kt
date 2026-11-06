@@ -18,6 +18,8 @@ package com.duckduckgo.pir.impl.store
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.pir.impl.common.refreshedWith
+import com.duckduckgo.pir.impl.common.toKey
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
@@ -48,6 +50,7 @@ import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -137,10 +140,13 @@ interface PirRepository {
     suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String>
 
     /**
-     * This method saves the new extracted profiles to the database.
-     * Any existing profiles (see indices of the table), we ignore them
+     * This method saves the extracted profiles to the database.
+     *
+     * Profiles we already store (see indices of the table) are refreshed with the newly scraped
+     * attributes, keeping their local id, date added and deprecated flag. Extras are merged into
+     * the stored extras so that a key missing from this scrape keeps the value we already hold.
      */
-    suspend fun saveNewExtractedProfiles(extractedProfiles: List<ExtractedProfile>)
+    suspend fun saveExtractedProfiles(extractedProfiles: List<ExtractedProfile>)
 
     /**
      * Returns a list of all [ExtractedProfile] found for this particular broker.
@@ -175,6 +181,11 @@ interface PirRepository {
      * Returns all user profile queries that are not marked as deprecated.
      */
     suspend fun getValidUserProfileQueries(): List<ProfileQuery>
+
+    /**
+     * Returns whether any user profile query not marked as deprecated is stored.
+     */
+    suspend fun hasValidUserProfileQueries(): Boolean
 
     suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery>
 
@@ -318,7 +329,10 @@ class RealPirRepository(
         prepareDatabase()
     }
 
-    private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(AddressCityState::class.java) }
+    // Kotlin defaults are needed here so that addresses stored before a field was introduced still parse.
+    private val addressCityStateAdapter by lazy {
+        Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(AddressCityState::class.java)
+    }
 
     override suspend fun isRepositoryAvailable(): Boolean = database.await() != null
 
@@ -542,26 +556,40 @@ class RealPirRepository(
                 }.orEmpty()
         }
 
-    override suspend fun saveNewExtractedProfiles(extractedProfiles: List<ExtractedProfile>) {
+    override suspend fun saveExtractedProfiles(extractedProfiles: List<ExtractedProfile>) {
         withContext(dispatcherProvider.io()) {
             if (extractedProfiles.isEmpty()) {
                 return@withContext
             }
 
+            val db = database.await() ?: return@withContext
+            val userProfileDao = db.userProfileDao()
+            val dao = db.extractedProfileDao()
             val profileQueryId = extractedProfiles.first().profileQueryId
-            val profileQuery = userProfileDao()?.getUserProfile(profileQueryId)
-            if (profileQuery?.deprecated == true) {
-                // we should not store any new extracted profiles for a deprecated user profile
-                // also don't mark them as deprecated as we still want to show them on the UI
-                return@withContext
-            }
 
-            extractedProfiles
-                .map {
-                    it.toStoredExtractedProfile()
-                }.also {
-                    extractedProfileDao()?.insertNewExtractedProfiles(it)
+            db.runInTransaction {
+                if (userProfileDao.getUserProfile(profileQueryId)?.deprecated == true) {
+                    // we should not store any new extracted profiles for a deprecated user profile
+                    // also don't mark them as deprecated as we still want to show them on the UI
+                    return@runInTransaction
                 }
+
+                val storedProfiles = extractedProfiles
+                    .map { it.brokerName }
+                    .distinct()
+                    .flatMap { dao.getExtractedProfilesForBrokerAndProfile(it, profileQueryId) }
+                    .map { it.toExtractedProfile() }
+                    .associateBy { it.toKey() }
+
+                val (alreadyStored, newlyFound) = extractedProfiles.partition { it.toKey() in storedProfiles }
+
+                dao.insertNewExtractedProfiles(newlyFound.map { it.toStoredExtractedProfile() })
+                dao.updateExtractedProfiles(
+                    alreadyStored.map { scraped ->
+                        storedProfiles.getValue(scraped.toKey()).refreshedWith(scraped).toStoredExtractedProfile()
+                    },
+                )
+            }
         }
     }
 
@@ -630,6 +658,11 @@ class RealPirRepository(
             }.orEmpty()
         }
 
+    override suspend fun hasValidUserProfileQueries(): Boolean =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao()?.hasValidUserProfiles() ?: false
+        }
+
     override suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery> =
         withContext(dispatcherProvider.io()) {
             userProfileDao()?.getUserProfilesWithIds(ids)?.map {
@@ -679,8 +712,9 @@ class RealPirRepository(
         profileQueriesToUpdate: List<ProfileQuery>,
         profileQueryIdsToDelete: List<Long>,
     ): Boolean = withContext(dispatcherProvider.io()) {
+        val dao = userProfileDao() ?: return@withContext false
         try {
-            userProfileDao()?.updateUserProfiles(
+            dao.updateUserProfiles(
                 profilesToAdd = profileQueriesToAdd.map { query -> query.toUserProfile() },
                 profilesToUpdate = profileQueriesToUpdate.map { query -> query.toUserProfile() },
                 profileIdsToDelete = profileQueryIdsToDelete,
@@ -890,6 +924,7 @@ class RealPirRepository(
             fullName = this.fullName,
             dateAddedInMillis = this.dateAddedInMillis,
             deprecated = this.deprecated,
+            extras = this.extras,
         )
 
     private fun ExtractedProfile.toStoredExtractedProfile(): StoredExtractedProfile =
@@ -918,6 +953,7 @@ class RealPirRepository(
                 this.dateAddedInMillis
             },
             deprecated = this.deprecated,
+            extras = this.extras,
         )
 
     private fun ProfileQuery.toUserProfile(): UserProfile =

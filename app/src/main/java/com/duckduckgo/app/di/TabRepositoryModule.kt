@@ -27,6 +27,8 @@ import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.PageTitleFetcher
 import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -36,17 +38,18 @@ import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiPageContextLifecycle
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 abstract class TabRepositoryModule {
 
     @Binds
@@ -63,7 +66,7 @@ abstract class TabRepositoryModule {
     companion object {
 
         @Provides
-        @SingleInstanceIn(AppScope::class)
+        @SingleIn(AppScope::class)
         @RegularMode
         fun provideRegularTabRepository(
             @RegularMode tabsDao: TabsDao,
@@ -80,6 +83,9 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore: DuckChatContextualDataStore,
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
+            duckAiTabSessionRepository: DuckAiTabSessionRepository,
+            pageTitleFetcher: PageTitleFetcher,
+            pageContextJSHelper: DuckAiPageContextLifecycle,
         ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
@@ -95,10 +101,13 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore = duckChatContextualDataStore,
             tabVisitedSitesRepository = tabVisitedSitesRepository,
             nativeInputStatePublisher = nativeInputStatePublisher,
+            duckAiTabSessionRepository = duckAiTabSessionRepository,
+            pageTitleFetcher = pageTitleFetcher,
+            pageContextJSHelper = pageContextJSHelper,
         )
 
         @Provides
-        @SingleInstanceIn(AppScope::class)
+        @SingleIn(AppScope::class)
         @FireMode
         fun provideFireTabRepository(
             @FireMode tabsDao: TabsDao,
@@ -115,6 +124,9 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore: DuckChatContextualDataStore,
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
+            duckAiTabSessionRepository: DuckAiTabSessionRepository,
+            pageTitleFetcher: PageTitleFetcher,
+            pageContextJSHelper: DuckAiPageContextLifecycle,
         ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
@@ -130,6 +142,9 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore = duckChatContextualDataStore,
             tabVisitedSitesRepository = tabVisitedSitesRepository,
             nativeInputStatePublisher = nativeInputStatePublisher,
+            duckAiTabSessionRepository = duckAiTabSessionRepository,
+            pageTitleFetcher = pageTitleFetcher,
+            pageContextJSHelper = pageContextJSHelper,
         )
     }
 }

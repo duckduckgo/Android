@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_5"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem1Description"
+        app:featureInfoIcon="@drawable/device_all_24"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem1Title">
+
+        <com.duckduckgo.subscriptions.impl.onboarding.features.PlatformIconsView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            app:platformsVisible="ios|android|mac|windows" />
+
+    </com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView>
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem2Description"
+        app:featureInfoIcon="@drawable/shield_16"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem2Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem3Description"
+        app:featureInfoIcon="@drawable/heart_16"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem3Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem4Description"
+        app:featureInfoIcon="@drawable/device_all_24"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem4Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem5Description"
+        app:featureInfoIcon="@drawable/globe_16"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem5Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem6Description"
+        app:featureInfoIcon="@drawable/profile_lock_16"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem6Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem7Description"
+        app:featureInfoIcon="@drawable/device_laptop_lock_16"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem7Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem8Description"
+        app:featureInfoIcon="@drawable/check_circle_16"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem8Title" />
+
+    <com.duckduckgo.subscriptions.impl.onboarding.features.FeatureInfoListItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:featureInfoDescription="@string/subscriptionOnboardingFeatureInfoVpnItem9Description"
+        app:featureInfoIcon="@drawable/lock_16"
+        app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoVpnItem9Title" />
+
+</merge>

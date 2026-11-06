@@ -46,7 +46,7 @@ class DaxDialogsJourneyTest {
     @Test
     @UserJourney
     @FlakyTest
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O, maxSdkVersion = Build.VERSION_CODES.P)
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.P)
     fun daxDialogs_supports_default_browser_journey() {
         onView(isRoot()).perform(waitForView(withId(R.id.primaryCta)))
         onView(withId(R.id.primaryCta)).perform(click())

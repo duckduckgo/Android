@@ -66,8 +66,8 @@ import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
@@ -91,6 +91,7 @@ interface PirRunStateHandler {
             val totalTimeMillis: Long,
             val isManualRun: Boolean,
             val lastAction: BrokerAction,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerScanFailed(
@@ -103,6 +104,7 @@ interface PirRunStateHandler {
             val errorCategory: String?,
             val errorDetails: String?,
             val failedAction: BrokerAction,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerScanActionStarted(
@@ -110,6 +112,7 @@ interface PirRunStateHandler {
             val profileQueryId: Long,
             val currentActionAttemptCount: Int,
             val currentAction: BrokerAction,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerScanActionSucceeded(
@@ -273,6 +276,7 @@ interface PirRunStateHandler {
             val actionType: String,
             val actionID: String,
             val errorMessage: String,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerStepInvalidEvent(
@@ -469,6 +473,7 @@ class RealPirRunStateHandler @Inject constructor(
             parentUrl = state.broker.parent.orEmpty(),
             actionId = state.currentAction.id,
             actionType = state.currentAction.asActionType(),
+            isFreeScan = state.isFreeScan,
         )
     }
 
@@ -496,6 +501,7 @@ class RealPirRunStateHandler @Inject constructor(
             parentUrl = state.broker.parent.orEmpty(),
             actionId = state.failedAction.id,
             actionType = state.failedAction.asActionType(),
+            isFreeScan = state.isFreeScan,
         )
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
@@ -524,6 +530,7 @@ class RealPirRunStateHandler @Inject constructor(
                 parentUrl = state.broker.parent.orEmpty(),
                 actionId = state.lastAction.id,
                 actionType = state.lastAction.asActionType(),
+                isFreeScan = state.isFreeScan,
             )
         } else {
             pixelSender.reportScanMatches(
@@ -532,6 +539,7 @@ class RealPirRunStateHandler @Inject constructor(
                 inManualStarted = state.isManualRun,
                 parentUrl = state.broker.parent.orEmpty(),
                 totalMatches = matchCount,
+                isFreeScan = state.isFreeScan,
             )
         }
         val brokerName = state.broker.name
@@ -668,6 +676,7 @@ class RealPirRunStateHandler @Inject constructor(
                                     city = item.city,
                                     state = item.state,
                                     fullAddress = item.fullAddress,
+                                    extras = item.extras.orEmpty(),
                                 )
                             },
                             phoneNumbers = it.phoneNumbers,
@@ -676,18 +685,28 @@ class RealPirRunStateHandler @Inject constructor(
                             reportId = it.reportId.orEmpty(),
                             email = it.email.orEmpty(),
                             fullName = it.fullName.orEmpty(),
+                            extras = it.extras.orEmpty(),
                         )
                     }.also {
                         /**
                          * For every locally stored extractedProfile for the broker x profile that is not part of the newly received
                          * extracted Profiles, or no extracted Profiles were found on the broker:
                          * - We update the optOut status to REMOVED
-                         * - We store the new extracted profiles (if profile query is not deprecated). We ignore the ones that already exist.
+                         * - We store the new extracted profiles (if profile query is not deprecated) and refresh the ones we already have.
                          * - Update the corresponding ScanJobRecord
                          * For every stored extractedProfile that reappears in the results and whose opt-out was previously
                          * REMOVED, we revert it back to REQUESTED and report a reappearance pixel.
+                         * For every stored extractedProfile marked REMOVED although a profile with the same identifier was
+                         * found, we report a pixel: other platforms match on the identifier alone and would have kept it.
                          */
                         jobRecordUpdater.markRemovedOptOutJobRecords(it, brokerName, state.profileQueryId)
+                            .forEach { removal ->
+                                pixelSender.reportBrokerOptOutRemovedWithIdentifierFound(
+                                    brokerUrl = state.broker.url,
+                                    changedField = removal.changedField,
+                                    previousStatus = removal.previousStatus,
+                                )
+                            }
 
                         if (it.isNotEmpty()) {
                             jobRecordUpdater.markReappearedOptOutJobRecords(it, brokerName, state.profileQueryId)
@@ -695,7 +714,7 @@ class RealPirRunStateHandler @Inject constructor(
                                     pixelSender.reportBrokerOptOutProfileReappeared(state.broker.url)
                                 }
                             jobRecordUpdater.updateScanMatchesFound(it, brokerName, state.profileQueryId)
-                            repository.saveNewExtractedProfiles(it)
+                            repository.saveExtractedProfiles(it)
                         } else {
                             jobRecordUpdater.updateScanNoMatchFound(brokerName, state.profileQueryId)
                         }
@@ -714,6 +733,7 @@ class RealPirRunStateHandler @Inject constructor(
             actionId = state.actionID,
             errorMessage = state.errorMessage,
             stepType = state.stepType,
+            isFreeScan = state.isFreeScan,
         )
 
         if (state.stepType == KEY_STEPTYPE_OPTOUT && state.extractedProfile != null) {

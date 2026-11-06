@@ -18,11 +18,14 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewTreeObserver
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
@@ -33,50 +36,62 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
-import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.json.JSONArray
+import javax.inject.Inject
 
 @SuppressLint("ViewConstructor")
+@InjectWith(ViewScope::class)
 class AttachmentView(
     context: Context,
 ) : FrameLayout(context) {
 
+    @Inject lateinit var viewModelFactory: ViewViewModelFactory
+
+    @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
+    @Inject lateinit var faviconManager: FaviconManager
+
     var host: NativeInputHost? = null
-    var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
-    var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
-    var isContextual: Boolean = false
-    var onAskAboutPage: (() -> Unit)? = null
-    var onPageContextRemoved: (() -> Unit)? = null
+    var isEditMode: Boolean = false
 
     private var viewModel: AttachmentViewModel? = null
-    private var faviconManager: FaviconManager? = null
+
+    /** The contextual sheet is the only surface that offers page context. */
+    private val isContextual: Boolean
+        get() = host?.isContextualSurface() == true
     private var supportsUpload: Boolean = false
     private var nativeInputStateJob: Job? = null
+    private var attachmentStateJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
+    private var hasAttachmentsOrError: Boolean = false
     private var popupWindow: PopupWindow? = null
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
     private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
     private var pageContextContainer: PageContextAttachmentView? = null
+    private var textSelectionsContainer: TextSelectionAttachmentsContainerView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -84,52 +99,40 @@ class AttachmentView(
         setOnClickListener { showPopupMenu() }
     }
 
-    fun bind(
-        scope: CoroutineScope,
-        factory: ViewViewModelFactory,
-        nativeInputStateProvider: NativeInputStateProvider,
-        faviconManager: FaviconManager,
-    ) {
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
         val owner = findViewTreeViewModelStoreOwner() ?: return
-        val vm = ViewModelProvider(owner, factory)[AttachmentViewModel::class.java]
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        val vm = ViewModelProvider(owner, viewModelFactory)[AttachmentViewModel::class.java]
         viewModel = vm
-        this.faviconManager = faviconManager
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
-        scope.launch {
+        attachmentStateJob?.cancel()
+        attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
         }
-        nativeInputStateJob = nativeInputStateProvider.state
+        val editTabId = host?.takeIf { it.isEditSurface() }?.tabId()
+        val nativeInputState = editTabId?.let { nativeInputStateProvider.stateForTab(it) } ?: nativeInputStateProvider.state
+        nativeInputStateJob = nativeInputState
             .onEach { state ->
                 lastNativeInputState = state
                 updateButtonVisibility()
+                updateContainerVisibility(container)
             }
             .launchIn(scope)
     }
 
     private fun updateButtonVisibility() {
-        val show = (supportsUpload || isContextual) && lastNativeInputState?.shouldShowPluginControls() == true
+        val show = shouldShowAttachButton(
+            supportsUpload = supportsUpload,
+            isContextual = isContextual,
+            isEditMode = isEditMode,
+            pluginControlsVisible = lastNativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true,
+        )
         isVisible = show
         (parent as? View)?.isVisible = show
     }
-
-    fun getImageAttachments(): List<ImageAttachment> = viewModel?.getImageAttachments() ?: emptyList()
-
-    fun getFileAttachments(): List<FileAttachment> = viewModel?.getFileAttachments() ?: emptyList()
-
-    fun getImageAttachmentsJson(): JSONArray? = viewModel?.getImageAttachmentsJson()
-
-    fun getFileAttachmentsJson(): JSONArray? = viewModel?.getFileAttachmentsJson()
-
-    fun clearAttachments() = viewModel?.clearAttachments()
-
-    fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
-
-    fun setPageContext(attachment: PageContextAttachment) = viewModel?.setPageContext(attachment)
-
-    fun clearPageContext() = viewModel?.removePageContext()
-
-    fun getPageContext(): PageContextAttachment? = viewModel?.getPageContext()
 
     private fun buildAttachButton(): ImageView {
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
@@ -182,14 +185,20 @@ class AttachmentView(
         row.addView(pageContext)
         pageContextContainer = pageContext
 
+        val selections = TextSelectionAttachmentsContainerView(context).also {
+            it.onAttachmentRemoved = { id -> vm.removeTextSelection(id) }
+        }
+        row.addView(selections)
+        textSelectionsContainer = selections
+
         val imagesContainer = ImageAttachmentsContainerView(context).also {
-            it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id) }
+            it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id, isEditMode) }
         }
         row.addView(imagesContainer)
         imageAttachmentsContainer = imagesContainer
 
         val filesContainer = FileAttachmentsContainerView(context).also {
-            it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id) }
+            it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id, isEditMode) }
         }
         row.addView(filesContainer)
         fileAttachmentsContainer = filesContainer
@@ -198,7 +207,7 @@ class AttachmentView(
     private fun buildLimitErrorView(parent: LinearLayout): TextView {
         return TextView(context).apply {
             setPadding(12.toPx(), 4.toPx(), 12.toPx(), 4.toPx())
-            setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
+            setTextColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorDestructive))
             textSize = 13f
             setTypeface(typeface, Typeface.BOLD)
             visibility = GONE
@@ -210,16 +219,25 @@ class AttachmentView(
         syncImages(imagesView, state)
         syncFiles(state)
         syncPageContext(state)
-        val errorMessage =
-            state.imageLimitError
+        syncTextSelections(state)
+        val errorMessage = effectiveLimitError(
+            imageLimitError = state.imageLimitError
                 ?: state.fileLimitError
                 ?: state.fileSizeError
                 ?: state.filePageCountError
                 ?: state.fileTotalSizeError
-        val notStreaming = lastNativeInputState?.isChatStreaming != true
-        container.isVisible = (state.hasAttachments || errorMessage != null) && notStreaming
+                ?: state.textSelectionLimitError,
+            isEditMode = isEditMode,
+        )
+        hasAttachmentsOrError = state.hasAttachments || errorMessage != null
+        updateContainerVisibility(container)
         updateLimitError(errorMessage)
         notifyStateChanged(state)
+    }
+
+    private fun updateContainerVisibility(container: FrameLayout) {
+        val isDuckAi = isEditMode || isContextual || lastNativeInputState?.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI
+        container.isVisible = hasAttachmentsOrError && isDuckAi && lastNativeInputState?.isChatStreaming != true
     }
 
     private fun syncImages(imagesView: ImageAttachmentsContainerView, state: AttachmentViewModel.AttachmentState) {
@@ -241,6 +259,24 @@ class AttachmentView(
         (stateFileIds - containerFileIds).forEach { id ->
             state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
         }
+        filesView.updateOversizedFiles(if (isEditMode) emptySet() else state.oversizedFileIds)
+    }
+
+    private fun syncTextSelections(state: AttachmentViewModel.AttachmentState) {
+        val view = textSelectionsContainer ?: return
+        if (view.current() != state.textSelections) {
+            val isNewAttachment = state.textSelections.size > view.current().size
+            view.render(state.textSelections)
+            if (isNewAttachment) showLastTextSelection()
+        }
+    }
+
+    private fun showLastTextSelection() {
+        val container = textSelectionsContainer ?: return
+        container.post {
+            val chip = container.getChildAt(container.childCount - 1) ?: return@post
+            chip.requestRectangleOnScreen(Rect(0, 0, chip.width, chip.height), true)
+        }
     }
 
     private fun syncPageContext(state: AttachmentViewModel.AttachmentState) {
@@ -251,11 +287,11 @@ class AttachmentView(
         } else if (view.current() != next) {
             view.show(next) {
                 viewModel?.removePageContext()
-                onPageContextRemoved?.invoke()
+                host?.pageContextRemoved()
             }
             view.faviconView()?.let { faviconView ->
                 viewModel?.viewModelScope?.launch {
-                    faviconManager?.loadToViewFromLocalWithRetry(tabId = next.tabId, url = next.url, view = faviconView)
+                    faviconManager.loadToViewFromLocalWithRetry(tabId = next.tabId, url = next.url, view = faviconView)
                 }
             }
         }
@@ -270,8 +306,8 @@ class AttachmentView(
         supportsUpload = state.supportsUpload
         updateButtonVisibility()
         host?.attachmentChanged(
-            hasAttachments = state.hasAttachments,
-            limitExceeded = (
+            hasStandaloneAttachments = state.hasStandaloneAttachments,
+            limitExceeded = !isEditMode && (
                 state.imageLimitError != null ||
                     state.fileLimitError != null ||
                     state.fileSizeError != null ||
@@ -286,6 +322,8 @@ class AttachmentView(
         super.onDetachedFromWindow()
         nativeInputStateJob?.cancel()
         nativeInputStateJob = null
+        attachmentStateJob?.cancel()
+        attachmentStateJob = null
         lastNativeInputState = null
         dismissPopup()
     }
@@ -300,11 +338,12 @@ class AttachmentView(
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
         }
         val popup = PopupWindow(
             ScrollView(context).apply {
                 addView(container)
+                setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+                applyMenuRadiusClipping()
                 isVerticalScrollBarEnabled = false
             },
             resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),
@@ -324,7 +363,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onCameraCaptureRequested?.invoke(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
+                host?.requestCameraCapture(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
             }
 
             addMenuItem(
@@ -334,7 +373,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onFilePickerRequested?.invoke(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
+                host?.requestFilePicker(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
             }
         }
 
@@ -346,7 +385,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onFilePickerRequested?.invoke(buildFilePickerCallback(), supportedFileTypes)
+                host?.requestFilePicker(buildFilePickerCallback(), supportedFileTypes)
             }
         }
 
@@ -357,7 +396,7 @@ class AttachmentView(
                 titleRes = R.string.duckChatContextualAskAboutPage,
             ) {
                 popup.dismiss()
-                onAskAboutPage?.invoke()
+                host?.askAboutPage()
             }
         }
 
@@ -394,10 +433,49 @@ class AttachmentView(
     private fun buildImagePickerCallback(source: AttachmentViewModel.ImageSource): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list, source)
+        restoreInputFocus()
     }
 
     private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
+        restoreInputFocus()
+    }
+
+    private fun restoreInputFocus() {
+        val restore = {
+            if (resources.configuration.keyboard == Configuration.KEYBOARD_NOKEYS) host?.focusInput() else host?.requestInputFocus()
+        }
+        if (hasWindowFocus()) {
+            restore()
+            return
+        }
+        // Picker results arrive before the window regains focus, and the IME ignores show requests from a view
+        // it is not serving yet. Posting from the focus callback lets the IME attach to the window first.
+        viewTreeObserver.addOnWindowFocusChangeListener(
+            object : ViewTreeObserver.OnWindowFocusChangeListener {
+                override fun onWindowFocusChanged(hasFocus: Boolean) {
+                    if (!hasFocus) return
+                    viewTreeObserver.removeOnWindowFocusChangeListener(this)
+                    post { restore() }
+                }
+            },
+        )
     }
 }
+
+internal fun shouldShowAttachButton(
+    supportsUpload: Boolean,
+    isContextual: Boolean,
+    isEditMode: Boolean,
+    pluginControlsVisible: Boolean,
+): Boolean = !isEditMode && (supportsUpload || isContextual) && pluginControlsVisible
+
+/**
+ * Adopted attachments are counted against the conversation limits, so an edit of a message already at
+ * the limit would show an error the user cannot act on. Editing only ever removes, so drop the errors.
+ */
+internal fun effectiveLimitError(
+    imageLimitError: String?,
+    isEditMode: Boolean,
+): String? = if (isEditMode) null else imageLimitError

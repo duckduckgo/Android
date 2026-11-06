@@ -33,19 +33,20 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -103,9 +104,6 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts
 
-    @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
-    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
-
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
 
     private val browserModeFlow = MutableStateFlow(BrowserMode.REGULAR)
@@ -113,6 +111,7 @@ class BrowserViewModelTest {
         on { currentMode } doReturn browserModeFlow
     }
     private val mockFireModeAvailability: FireModeAvailability = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
 
     // The activity's frozen BrowserMode value injected into BrowserViewModel; defaults to REGULAR.
     private var browserMode = BrowserMode.REGULAR
@@ -148,7 +147,6 @@ class BrowserViewModelTest {
         runTest {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
             whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
-            whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         }
     }
 
@@ -157,6 +155,33 @@ class BrowserViewModelTest {
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
+    }
+
+    @Test
+    fun whenNewTabRequestedThenPendingNewTabOpenedExitRecordedForCurrentlySelectedTab() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "current-tab", url = "https://duck.ai/"))
+
+        testee.onNewTabRequested()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("current-tab", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenOpenInNewTabRequestedThenPendingNewTabOpenedExitRecordedForCurrentlySelectedTab() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "current-tab", url = "https://duck.ai/"))
+
+        testee.onOpenInNewTabRequested(query = "https://example.com")
+
+        verify(mockDuckAiSessionCallback).onExitIntent("current-tab", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenOpenInNewTabRequestedWithNoSelectedTabThenNoPendingExitRecorded() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(null)
+
+        testee.onOpenInNewTabRequested(query = "https://example.com")
+
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
     }
 
     // --- selectedTab flow → NtpAfterIdleManager.onNtpShown ---
@@ -679,19 +704,6 @@ class BrowserViewModelTest {
         }
     }
 
-    @Test
-    fun `when openDuckChat called then command is sent`() = runTest {
-        initTestee()
-
-        testee.openDuckChat(duckChatUrl = "duck://chat", duckChatSessionActive = false, withTransition = false)
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertTrue(command is Command.OpenDuckChat)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
     // --- Fire mode: switchToMode ---
 
     @Test
@@ -753,19 +765,18 @@ class BrowserViewModelTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             browserModeStateHolder = mockBrowserModeStateHolder,
             fireModeAvailability = mockFireModeAvailability,
             browserMode = browserMode,
+            duckAiSessionCallback = mockDuckAiSessionCallback,
         )
     }
 
     private suspend fun initSuspendTestee() {
         whenever(mockTabRepository.add()).thenReturn(TAB_ID)
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
-        whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
 
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -779,12 +790,12 @@ class BrowserViewModelTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             browserModeStateHolder = mockBrowserModeStateHolder,
             fireModeAvailability = mockFireModeAvailability,
             browserMode = browserMode,
+            duckAiSessionCallback = mockDuckAiSessionCallback,
         )
     }
 

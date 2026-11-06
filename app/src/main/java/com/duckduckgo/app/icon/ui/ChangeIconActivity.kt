@@ -19,49 +19,42 @@ package com.duckduckgo.app.icon.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.GridLayoutManager
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppIconsBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class ChangeIconActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityAppIconsBinding by viewBinding()
     private val viewModel: ChangeIconViewModel by bindViewModel()
-    private val iconsAdapter: AppIconsAdapter = AppIconsAdapter { icon ->
-        viewModel.onIconSelected(icon)
+    private val metrics by lazy { AppIconCellMetrics(resources) }
+    private val iconsAdapter: AppIconsAdapter by lazy {
+        AppIconsAdapter(metrics) { icon ->
+            viewModel.onIconSelected(icon)
+        }
     }
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         setupToolbar(toolbar)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
         configureRecycler()
 
         observeViewModel()
@@ -74,10 +67,18 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRecycler() {
-        binding.appIconsList.layoutManager = GridLayoutManager(this, 4)
-        binding.appIconsList.addItemDecoration(ItemOffsetDecoration(this, CommonR.dimen.keyline_1))
+        val horizontalPadding = binding.appIconsList.paddingStart + binding.appIconsList.paddingEnd
+        val layoutManager = GridLayoutManager(this, spanCountFor(resources.displayMetrics.widthPixels - horizontalPadding))
+        binding.appIconsList.layoutManager = layoutManager
+        binding.appIconsList.addItemDecoration(AppIconSpacingDecoration(metrics))
         binding.appIconsList.adapter = iconsAdapter
+        binding.appIconsList.doOnLayout {
+            layoutManager.spanCount = spanCountFor(it.width - it.paddingStart - it.paddingEnd)
+        }
     }
+
+    /** Fits as many columns as the width allows while keeping at least the design's gap between icons. */
+    private fun spanCountFor(availableWidth: Int): Int = ((availableWidth + metrics.cellGap) / (metrics.cellSize + metrics.cellGap)).coerceAtLeast(1)
 
     private fun observeViewModel() {
         viewModel.viewState.observe(this) { viewState ->

@@ -22,11 +22,16 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
+import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
+import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.MirrorSite
 import com.duckduckgo.pir.impl.store.PirRepository
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -38,6 +43,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -51,20 +57,67 @@ class PirWebGetDataBrokersMessageHandlerTest {
     private val mockRepository: PirRepository = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
+    private val mockPirWorkHandler: PirWorkHandler = mock()
+    private val mockPirFreeScanBrokerFilter: PirFreeScanBrokerFilter = mock()
     private val testScope = TestScope()
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
+
         testee = PirWebGetDataBrokersMessageHandler(
             repository = mockRepository,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = testScope,
+            pirWorkHandler = mockPirWorkHandler,
+            pirFreeScanBrokerFilter = mockPirFreeScanBrokerFilter,
         )
     }
 
     @Test
     fun whenMessageIsSetThenReturnsCorrectMessage() {
         assertEquals(PirDashboardWebMessages.GET_DATA_BROKERS, testee.message)
+    }
+
+    @Test
+    fun whenScanOnlyThenGatedBrokersAndTheirMirrorsAreOmitted() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_DATA_BROKERS)
+        val ungated = createBrokerObject("Ungated", "https://ungated.com", null)
+        val gated = createBrokerObject("Gated", "https://gated.com", null)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(ungated, gated))
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(listOf(ungated, gated))).thenReturn(listOf(ungated))
+        whenever(mockRepository.getAllMirrorSites()).thenReturn(
+            listOf(
+                createMirrorSite("UngatedMirror", "https://ungatedmirror.com", "Ungated", removedAt = 0L),
+                createMirrorSite("GatedMirror", "https://gatedmirror.com", "Gated", removedAt = 0L),
+            ),
+        )
+        whenever(mockRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verifyDataBrokerNames(listOf("Ungated", "UngatedMirror"))
+    }
+
+    @Test
+    fun whenScanAndOptOutThenNoBrokerIsFilteredOut() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_DATA_BROKERS)
+        val ungated = createBrokerObject("Ungated", "https://ungated.com", null)
+        val gated = createBrokerObject("Gated", "https://gated.com", null)
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(ungated, gated))
+        whenever(mockRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verifyNoInteractions(mockPirFreeScanBrokerFilter)
     }
 
     @Test
@@ -349,6 +402,14 @@ class PirWebGetDataBrokersMessageHandlerTest {
         val sortedActual = actualBrokers.sortedBy { it.name }
 
         assertEquals("Broker data mismatch", sortedExpected, sortedActual)
+    }
+
+    private fun verifyDataBrokerNames(expectedNames: List<String>) {
+        val callbackDataCaptor = argumentCaptor<JsCallbackData>()
+        verify(mockJsMessaging).onResponse(callbackDataCaptor.capture())
+        val dataBrokers = callbackDataCaptor.firstValue.params.getJSONArray("dataBrokers")
+        val actualNames = (0 until dataBrokers.length()).map { dataBrokers.getJSONObject(it).getString("name") }
+        assertEquals(expectedNames, actualNames)
     }
 
     data class ExpectedDataBroker(

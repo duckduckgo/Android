@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -35,14 +36,21 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,6 +71,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.ByteArrayOutputStream
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -83,6 +92,8 @@ class AttachmentViewModelTest {
     private val context: Context = mock<Context>().also {
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatImageAttachmentLimitPerConversation, 5))
             .thenReturn("Conversation limit reached")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckAiTextSelectionLimitReached, TextSelectionRepository.MAX_SELECTIONS))
+            .thenReturn("Selection limit reached")
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatImageAttachmentLimitPerMessage, 3))
             .thenReturn("Per-message limit reached")
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentLimitPerConversation, 2))
@@ -114,11 +125,17 @@ class AttachmentViewModelTest {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
     private val nativeInputStateStore = RealNativeInputStateStore(
-        dagger.Lazy { tabRepositoryProvider },
+        lazy { tabRepositoryProvider },
         browserModeStateHolder,
+        RealTextSelectionRepository(lazy { mock() }, mock()),
+        ChatStateStore(),
     )
 
     private lateinit var viewModel: AttachmentViewModel
+
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
+    private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
+    private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
     @Before
     fun setUp() {
@@ -132,6 +149,9 @@ class AttachmentViewModelTest {
             appBuildConfig = appBuildConfig,
             nativeInputStateProvider = nativeInputStateStore,
             duckChatPixels = duckChatPixels,
+            textSelectionRepository = textSelectionRepository,
+            textSelectionPayloadBuilder = textSelectionPayloadBuilder,
+            selectionJourney = selectionJourney,
         )
     }
 
@@ -274,6 +294,124 @@ class AttachmentViewModelTest {
     }
 
     @Test
+    fun whenAtSelectionLimitThenNoLimitErrorUntilAnotherIsAttempted() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+
+        assertNull(viewModel.attachmentState.value.textSelectionLimitError)
+    }
+
+    @Test
+    fun whenSelectionRefusedAtLimitThenLimitErrorShown() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+
+        textSelectionRepository.add("tab-1", "one too many", "https://example.com")
+
+        assertEquals("Selection limit reached", viewModel.attachmentState.value.textSelectionLimitError)
+    }
+
+    @Test
+    fun whenSelectionRemovedAfterLimitThenLimitErrorCleared() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+        textSelectionRepository.add("tab-1", "one too many", "https://example.com")
+        val target = textSelectionRepository.selections("tab-1").value.first()
+
+        viewModel.removeTextSelection(target.id)
+
+        assertNull(viewModel.attachmentState.value.textSelectionLimitError)
+    }
+
+    @Test
+    fun whenOnlyTextSelectionsAttachedThenHasNoStandaloneAttachments() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        assertTrue(viewModel.attachmentState.value.hasAttachments)
+        assertFalse(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenOnlyPageContextAttachedThenHasNoStandaloneAttachments() = runTest {
+        viewModel.setPageContext(PageContextAttachment(title = "Title", url = "https://example.com", tabId = "tab-1"))
+
+        assertTrue(viewModel.attachmentState.value.hasAttachments)
+        assertFalse(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenImagesAddedThenHasStandaloneAttachments() = runTest {
+        addImages(1)
+
+        assertTrue(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenFilesAddedThenHasStandaloneAttachments() = runTest {
+        addFiles(aFileAttachment())
+
+        assertTrue(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenBoundWithTextSelectionThenItIsAttachedToThatTab() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        assertEquals(listOf("selected words"), viewModel.attachmentState.value.textSelections.map { it.text })
+    }
+
+    @Test
+    fun whenBoundWithoutTextSelectionThenNothingIsAttached() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+    }
+
+    @Test
+    fun whenBoundToADifferentTabThenOtherTabsSelectionsAreNotShown() = runTest {
+        textSelectionRepository.add("tab-other", "not mine", "https://example.com")
+
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+    }
+
+    @Test
+    fun whenTextSelectionRemovedThenItIsDroppedFromState() = runTest {
+        viewModel.bindTextSelections("tab-1", "keep me")
+        viewModel.bindTextSelections("tab-1", "remove me")
+        val idToRemove = viewModel.attachmentState.value.textSelections.last().id
+
+        viewModel.removeTextSelection(idToRemove)
+
+        assertEquals(listOf("keep me"), viewModel.attachmentState.value.textSelections.map { it.text })
+    }
+
+    @Test
+    fun whenTextSelectionsConsumedThenTheyAreClearedFromState() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        viewModel.getTextSelectionsJson()
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+        verify(selectionJourney).onPromptSubmitted("tab-1")
+    }
+
+    @Test
+    fun whenNoTextSelectionsToConsumeThenJourneyNotSubmitted() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        viewModel.getTextSelectionsJson()
+
+        verify(selectionJourney, never()).onPromptSubmitted(any())
+    }
+
+    @Test
+    fun whenNotBoundThenTextSelectionsJsonIsNull() = runTest {
+        assertNull(viewModel.getTextSelectionsJson())
+    }
+
+    @Test
     fun whenImageRemovedByIdThenItIsNoLongerInState() = runTest {
         addImages(2)
         val idToRemove = viewModel.attachmentState.value.images[0].id
@@ -410,6 +548,34 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment(sizeBytes = maxBytes + 1))
 
         assertEquals("File too large", viewModel.attachmentState.value.fileSizeError)
+    }
+
+    @Test
+    fun whenFilesHaveDifferentSizesThenOnlyFilesAboveLimitAreMarkedOversized() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = FileLimits(maxFileSizeBytes = maxBytes)))
+        addFiles(
+            aFileAttachment(id = "small", sizeBytes = maxBytes - 1),
+            aFileAttachment(id = "exact", sizeBytes = maxBytes),
+            aFileAttachment(id = "large", sizeBytes = maxBytes + 1),
+        )
+
+        assertEquals(setOf("large"), viewModel.attachmentState.value.oversizedFileIds)
+    }
+
+    @Test
+    fun whenFileSizeLimitChangesThenExistingFileOversizeStateUpdates() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        addFiles(aFileAttachment(id = "file", sizeBytes = maxBytes + 1))
+        assertEquals(setOf("file"), viewModel.attachmentState.value.oversizedFileIds)
+
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = FileLimits(maxFileSizeBytes = maxBytes * 2)))
+        advanceUntilIdle()
+        assertTrue(viewModel.attachmentState.value.oversizedFileIds.isEmpty())
+
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = FileLimits(maxFileSizeBytes = maxBytes)))
+        advanceUntilIdle()
+        assertEquals(setOf("file"), viewModel.attachmentState.value.oversizedFileIds)
     }
 
     @Test
@@ -1016,5 +1182,85 @@ class AttachmentViewModelTest {
         viewModel.clearAttachments()
 
         assertNull(viewModel.attachmentState.value.pageContext)
+    }
+
+    @Test
+    fun whenAdoptingImagesThenTheyAppearInStateWithBase64Preserved() = runTest {
+        val png = validPngBase64()
+
+        viewModel.adopt(images = listOf(SubmittedImage(data = png, format = "png")), files = emptyList())
+
+        val adopted = viewModel.getImageAttachments()
+        assertEquals(1, adopted.size)
+        assertEquals(png, adopted.first().base64Data)
+        assertEquals("png", adopted.first().format)
+    }
+
+    @Test
+    fun whenAdoptingAnUndecodableImageThenItIsStillAdoptedWithAPlaceholderBitmap() = runTest {
+        viewModel.adopt(images = listOf(SubmittedImage(data = "not-base64-image-bytes", format = "png")), files = emptyList())
+
+        val adopted = viewModel.getImageAttachments()
+        assertEquals(1, adopted.size)
+        assertEquals("not-base64-image-bytes", adopted.first().base64Data)
+        assertFalse(adopted.first().bitmap.isRecycled)
+    }
+
+    @Test
+    fun whenAdoptingFilesThenSizeIsDerivedFromTheDecodedBytes() = runTest {
+        val base64 = Base64.encodeToString(ByteArray(1024), Base64.NO_WRAP)
+
+        viewModel.adopt(
+            images = emptyList(),
+            files = listOf(SubmittedFile(data = base64, fileName = "doc.pdf", mimeType = "application/pdf")),
+        )
+
+        val adopted = viewModel.getFileAttachments()
+        assertEquals(1, adopted.size)
+        assertEquals("doc.pdf", adopted.first().fileName)
+        assertEquals(1024L, adopted.first().sizeBytes)
+        assertNull(adopted.first().pageCount)
+    }
+
+    @Test
+    fun whenAdoptedAttachmentIsRemovedThenItLeavesTheReplyPayload() = runTest {
+        viewModel.adopt(images = listOf(SubmittedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        val id = viewModel.getImageAttachments().first().id
+
+        viewModel.removeImageAttachment(id)
+
+        assertNull(viewModel.getImageAttachmentsJson())
+    }
+
+    @Test
+    fun whenSubmittedFileAttachmentIsRemovedThenItLeavesTheReplyPayload() = runTest {
+        val base64 = Base64.encodeToString(ByteArray(1024), Base64.NO_WRAP)
+        viewModel.adopt(
+            images = emptyList(),
+            files = listOf(SubmittedFile(data = base64, fileName = "doc.pdf", mimeType = "application/pdf")),
+        )
+        val id = viewModel.getFileAttachments().first().id
+
+        viewModel.removeFileAttachment(id)
+
+        assertNull(viewModel.getFileAttachmentsJson())
+    }
+
+    @Test
+    fun whenAdoptCalledAgainThenPreviouslyAdoptedBitmapsAreRecycled() = runTest {
+        viewModel.adopt(images = listOf(SubmittedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        val firstRoundBitmap = viewModel.getImageAttachments().first().bitmap
+
+        viewModel.adopt(images = listOf(SubmittedImage(data = validPngBase64(), format = "png")), files = emptyList())
+        advanceUntilIdle()
+
+        assertTrue(firstRoundBitmap.isRecycled)
+    }
+
+    private fun validPngBase64(): String {
+        val bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
+        val out = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        return Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
     }
 }

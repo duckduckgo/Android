@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"

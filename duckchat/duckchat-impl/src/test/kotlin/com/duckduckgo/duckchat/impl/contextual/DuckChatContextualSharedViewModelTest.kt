@@ -18,9 +18,12 @@ package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -63,12 +66,12 @@ class DuckChatContextualSharedViewModelTest {
     }
 
     @Test
-    fun whenOpenRequestedThenOpenSheetCommandEmitted() = runTest {
+    fun whenReloadChatRequestedThenReloadChatCommandEmitted() = runTest {
         testee.commands.test {
-            testee.onOpenRequested()
+            testee.onReloadChatRequested()
 
             val command = awaitItem()
-            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, command)
+            assertEquals(DuckChatContextualSharedViewModel.Command.ReloadChat, command)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -121,25 +124,47 @@ class DuckChatContextualSharedViewModelTest {
     fun whenMultipleSubscribersThenAllReceiveCommands() = runTest {
         testee.commands.test {
             testee.commands.test {
-                testee.onOpenRequested()
+                testee.onReloadChatRequested()
 
-                assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+                assertEquals(DuckChatContextualSharedViewModel.Command.ReloadChat, awaitItem())
                 cancelAndConsumeRemainingEvents()
             }
 
-            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+            assertEquals(DuckChatContextualSharedViewModel.Command.ReloadChat, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOpenRequestedThenSingleOpenSheetCommandEmitted() = runTest {
+    fun whenReloadChatRequestedThenSingleReloadChatCommandEmitted() = runTest {
         testee.commands.test {
-            testee.onOpenRequested()
+            testee.onReloadChatRequested()
 
-            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+            assertEquals(DuckChatContextualSharedViewModel.Command.ReloadChat, awaitItem())
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test fun whenTypedPdfMetadataReceivedThenSerializedWithoutBytesOrPersistence() = runTest {
+        val metadata = DuckAiPdfMetadata("private.pdf", "https://private.example", DuckAiPdfMetadata.Availability.AVAILABLE)
+        testee.commands.test {
+            testee.onPdfPageContextReceived("tab", metadata)
+            val result = awaitItem() as DuckChatContextualSharedViewModel.Command.PageContextAttached
+            val json = JSONObject(result.pageContext)
+            assertEquals("private.pdf", json.getString("title"))
+            assertEquals("application/pdf", json.getString("mimeType"))
+            assertFalse(json.has("data"))
+            assertFalse(json.getBoolean("attached"))
+            assertFalse(result.isStorePageContextEnabled)
+            assertEquals("PageContextAttached", result.toString())
+        }
+    }
+
+    @Test fun whenTypedPdfMetadataStaleThenNoCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onPdfPageContextReceived("tab", DuckAiPdfMetadata("private.pdf", "https://private.example", DuckAiPdfMetadata.Availability.STALE))
+            expectNoEvents()
         }
     }
 }

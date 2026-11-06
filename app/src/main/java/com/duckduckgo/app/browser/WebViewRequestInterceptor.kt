@@ -31,16 +31,15 @@ import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegra
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.WaitForConfirmation
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -79,7 +78,6 @@ interface RequestInterceptor {
 
     fun onPageStarted(url: String)
 
-    @WorkerThread
     fun shouldOverrideUrlLoading(
         webViewClientListener: WebViewClientListener?,
         url: Uri,
@@ -110,7 +108,7 @@ class WebViewRequestInterceptor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @IsMainProcess private val isMainProcess: Boolean,
-    private val webTrackersBlockedDao: WebTrackersBlockedDao,
+    private val webTrackersBlockedHistory: WebTrackersBlockedHistory,
 ) : RequestInterceptor {
 
     private var checkMaliciousAfterHttpsUpgrade = false
@@ -178,11 +176,12 @@ class WebViewRequestInterceptor(
             val newUri = url?.let { httpsUpgrader.upgrade(url) }
 
             withContext(dispatchers.main()) {
+                // Must run before loadUrl: the cancelled http request's callbacks must see the upgrade
+                webViewClientListener?.upgradedToHttps()
                 webView.loadUrl(newUri.toString(), getHeaders(request))
             }
 
-            webViewClientListener?.upgradedToHttps()
-            privacyProtectionCountDao.incrementUpgradeCount()
+            appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementUpgradeCount() }
             return WebResourceResponse(null, null, null)
         }
 
@@ -386,7 +385,7 @@ class WebViewRequestInterceptor(
         }
 
         logcat { "Blocking request ${request.url}" }
-        privacyProtectionCountDao.incrementBlockedTrackerCount()
+        appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementBlockedTrackerCount() }
         return WebResourceResponse(null, null, null)
     }
 
@@ -457,7 +456,9 @@ class WebViewRequestInterceptor(
 
     private fun recordTrackerBlocked(trackingEvent: TrackingEvent) {
         val trackerCompany = trackingEvent.entity?.displayName ?: "Undefined"
-        webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany))
+        appCoroutineScope.launch(dispatchers.io()) {
+            webTrackersBlockedHistory.onTrackerBlocked(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany)
+        }
     }
 
     private fun appUrlPixel(url: Uri?): Boolean =

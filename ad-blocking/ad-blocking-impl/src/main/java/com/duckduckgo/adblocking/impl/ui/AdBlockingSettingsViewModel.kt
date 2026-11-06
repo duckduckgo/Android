@@ -30,12 +30,14 @@ import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
+import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -56,6 +58,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
     private val sessionStore: AdBlockingSessionStore,
     private val pixel: Pixel,
     duckPlayer: DuckPlayer,
+    duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider,
 ) : ViewModel() {
 
     init {
@@ -69,7 +72,14 @@ class AdBlockingSettingsViewModel @Inject constructor(
         val showConsentDescription: Boolean? = null,
         val duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
         val isContingencyMode: Boolean = false,
+        val duckPlayerSection: DuckPlayerSection = DuckPlayerSection.None,
     )
+
+    sealed interface DuckPlayerSection {
+        data object Entry : DuckPlayerSection
+        data object Link : DuckPlayerSection
+        data object None : DuckPlayerSection
+    }
 
     sealed class Command {
         data class OpenLearnMore(val url: String) : Command()
@@ -79,15 +89,21 @@ class AdBlockingSettingsViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = combine(
         statusChecker.observeState(),
         duckPlayer.observeUserPreferences(),
-        feature.adBlockingUXImprovements().enabled(),
         feature.enableContingencyMode().enabled(),
-    ) { state, duckPlayerPreferences, uxImprovements, contingencyModeOn ->
+        duckPlayerSettingsPlacementProvider.placementFlow(),
+    ) { state, duckPlayerPreferences, contingencyModeOn, duckPlayerSettingsPlacement ->
         ViewState(
             isEnabled = state is AdBlockingState.Enabled,
             disabledUntilRelaunch = state is AdBlockingState.Disabled.UntilRelaunch,
-            showConsentDescription = state !is AdBlockingState.Enabled.Default,
-            isContingencyMode = uxImprovements && contingencyModeOn,
+            showConsentDescription = state !is AdBlockingState.Enabled.Default &&
+                state !is AdBlockingState.Enabled.WithoutPixelConsent,
+            isContingencyMode = contingencyModeOn,
             duckPlayerMode = duckPlayerPreferences.privatePlayerMode,
+            duckPlayerSection = when (duckPlayerSettingsPlacement) {
+                DuckPlayerSettingsPlacement.InAdBlocking -> DuckPlayerSection.Entry
+                DuckPlayerSettingsPlacement.Standalone -> DuckPlayerSection.Link
+                DuckPlayerSettingsPlacement.Hidden -> DuckPlayerSection.None
+            },
         )
     }
         .stateIn(
@@ -102,15 +118,16 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     fun onBlockAdsToggled(enabled: Boolean) {
         viewModelScope.launch {
-            repository.setEnabled(enabled)
-            sessionStore.clear()
             if (enabled) {
+                repository.enable(withPixelConsent = true)
                 pixel.fire(AD_BLOCKING_ENABLED_DAILY, type = Pixel.PixelType.Daily())
                 pixel.fire(AD_BLOCKING_ENABLED_COUNT)
             } else {
+                repository.disable()
                 pixel.fire(AD_BLOCKING_DISABLED_DAILY, type = Pixel.PixelType.Daily())
                 pixel.fire(AD_BLOCKING_DISABLED_COUNT)
             }
+            sessionStore.clear()
         }
     }
 

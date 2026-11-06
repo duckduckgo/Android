@@ -60,7 +60,7 @@ class OnboardingDecorationFitCorrectorTest {
         viewportMeasuredHeight: Int = viewportHeight,
         bottomOverlapPx: Int = 0,
         cardBottomInsetPx: Int = 0,
-        enabled: Boolean = true,
+        cardBottomInsetPxProvider: () -> Int = { cardBottomInsetPx },
         onDecorationHidden: () -> Unit = {},
     ): Harness {
         val root = ConstraintLayout(context)
@@ -97,6 +97,7 @@ class OnboardingDecorationFitCorrectorTest {
         dialog.measureExactly(dialogMeasuredHeight)
 
         val decoration = View(context)
+        decoration.id = View.generateViewId()
         root.addView(decoration)
         (decoration.layoutParams as ViewGroup.MarginLayoutParams).apply {
             height = decorationHeight
@@ -104,8 +105,7 @@ class OnboardingDecorationFitCorrectorTest {
         }
         decoration.layout(0, 0, 200, decorationHeight)
 
-        val corrector = OnboardingDecorationFitCorrector(root, dialog, cardContainer, onDecorationHidden, { cardBottomInsetPx })
-        corrector.enabled = enabled
+        val corrector = OnboardingDecorationFitCorrector(root, dialog, cardContainer, onDecorationHidden, cardBottomInsetPxProvider)
         corrector.track(decoration, minHeightPx = minHeightPx, maxHeightPx = maxHeightPx, bottomOverlapPx = bottomOverlapPx)
         return Harness(corrector, dialog, decoration)
     }
@@ -127,27 +127,6 @@ class OnboardingDecorationFitCorrectorTest {
 
         assertFalse(h.corrector.correctOnce())
         assertEquals(247, h.decoration.layoutParams.height)
-    }
-
-    @Test
-    fun whenDisabledThenDecorationIsNeitherShrunkNorHidden() {
-        // Same tight fit that would hide the decoration when enabled, but with the flag off the
-        // corrector must leave the decoration's height and visibility untouched (V2-off == develop).
-        val h = harness(
-            rootHeight = 1200,
-            rootPaddingBottom = 84,
-            dialogHeight = 1080,
-            contentHeight = 1100,
-            viewportHeight = 1080,
-            decorationHeight = 299,
-            minHeightPx = 247,
-            maxHeightPx = 299,
-            enabled = false,
-        )
-
-        assertTrue(h.corrector.correctOnce())
-        assertEquals(299, h.decoration.layoutParams.height)
-        assertFalse(h.decoration.isGone)
     }
 
     @Test
@@ -189,6 +168,7 @@ class OnboardingDecorationFitCorrectorTest {
             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
         }
 
+        assertFalse(h.corrector.correctOnce()) // clamps the overflowing card first
         assertFalse(h.corrector.correctOnce())
 
         assertTrue(h.decoration.isGone)
@@ -408,52 +388,27 @@ class OnboardingDecorationFitCorrectorTest {
     }
 
     @Test
-    fun whenDisabledThenBottomAnchoredCardReservesNoInset() {
-        // V2 off: the corrector must stay inert so V2-off layout matches legacy, which never reserved an
-        // inset. Even bottom-anchored with no decoration, the margin stays 0.
+    fun whenSideDecorationLeavesCardBottomAnchoredThenCardStillReservesTheInset() {
+        // Phone regime with a side decoration (LeftWing, BobbingDax): the card stays pinned
+        // to the parent bottom while the decoration sits beside it, covering nothing below the card, so
+        // the card must still clear the full inset — the keyboard.
         val h = harness(
-            rootHeight = 1200,
+            rootHeight = 2000,
             dialogHeight = 600,
             contentHeight = 600,
             viewportHeight = 600,
-            decorationHeight = 200,
+            decorationHeight = 422,
             minHeightPx = 247,
-            maxHeightPx = 299,
-            cardBottomInsetPx = 108,
-            enabled = false,
-        )
-        h.corrector.clear()
-        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
-            bottomToTop = ConstraintLayout.LayoutParams.UNSET
-            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-        }
-
-        h.corrector.correctOnce()
-        assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
-    }
-
-    @Test
-    fun whenCardBottomAnchoredButDecorationShownThenNoBottomInset() {
-        // Phone regime: the card is bottom-anchored even while a decoration is shown (only tablets stack
-        // it above). The decoration covers the bar, so the card must reserve NO inset — otherwise the
-        // inset feeds dialogSpace and the corrector hides the very decoration below it.
-        val h = harness(
-            rootHeight = 1200,
-            dialogHeight = 600,
-            contentHeight = 600,
-            viewportHeight = 600,
-            decorationHeight = 200,
-            minHeightPx = 247,
-            maxHeightPx = 299,
-            cardBottomInsetPx = 108,
+            maxHeightPx = 422,
+            cardBottomInsetPx = 863,
         )
         (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
             bottomToTop = ConstraintLayout.LayoutParams.UNSET
             bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
         }
 
-        h.corrector.correctOnce()
-        assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(863, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
     }
 
     @Test
@@ -502,6 +457,231 @@ class OnboardingDecorationFitCorrectorTest {
 
         assertFalse(h.corrector.correctOnce())
         assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenInsetExceedsTheDecorationBelowThenCardReservesTheRemainder() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            cardBottomInsetPx = 500,
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(300, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenTheInsetDropsThenTheReservationAndTheClampRelease() {
+        // The keyboard hiding must give the card its room back: a reservation that only ever grows parks
+        // the card at the top of the screen for the rest of the flow.
+        var inset = 863
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 422,
+            minHeightPx = 247,
+            maxHeightPx = 422,
+            cardBottomInsetPxProvider = { inset },
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(441, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+        assertFalse(h.corrector.correctOnce())
+        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+
+        inset = 0
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+        assertFalse(h.corrector.correctOnce())
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+    }
+
+    @Test
+    fun whenDecorationBelowAlreadyCoversTheInsetThenCardReservesNothing() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            cardBottomInsetPx = 108,
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        h.corrector.correctOnce()
+        assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenDecorationBelowHasNoAppliedHeightThenItsMeasuredHeightCountsAsRoomItCovers() {
+        // The engine applies an explicit height before handing the decoration over, so this pins the
+        // fallback: should that invariant ever break, the reservation must come from the measured height
+        // rather than silently treating WRAP_CONTENT as the room the decoration covers.
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            cardBottomInsetPx = 500,
+        )
+        (h.decoration.layoutParams as ViewGroup.MarginLayoutParams).height = ViewGroup.LayoutParams.WRAP_CONTENT
+        h.decoration.measure(
+            View.MeasureSpec.makeMeasureSpec(200, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(200, View.MeasureSpec.EXACTLY),
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(300, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenDecorationBelowHasABottomMarginThenThatCountsAsRoomItCovers() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 200,
+            decorationBottomMargin = 56,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            cardBottomInsetPx = 500,
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(244, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenDecorationBelowIsGoneThenTheHostReanchorsInsteadOfTheCardReservingTheInset() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            cardBottomInsetPx = 500,
+        )
+        h.decoration.isGone = true
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertTrue(h.corrector.correctOnce())
+        assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenCardReservesAnInsetAboveTheDecorationThenThatInsetDoesNotShrinkTheDecoration() {
+        val h = harness(
+            rootHeight = 1752,
+            dialogHeight = 873,
+            dialogTopMargin = 64,
+            contentHeight = 822,
+            viewportHeight = 822,
+            decorationHeight = 422,
+            minHeightPx = 66,
+            maxHeightPx = 422,
+            cardBottomInsetPx = 863,
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+        }
+
+        assertFalse(h.corrector.correctOnce()) // reserves 863 - 422 = 441
+        assertEquals(441, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+
+        // Settles: the decoration keeps its height, so the reservation does not grow on the next pass.
+        h.corrector.correctOnce()
+        h.corrector.correctOnce()
+        assertEquals(422, h.decoration.layoutParams.height)
+        assertFalse(h.decoration.isGone)
+        assertEquals(441, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenCardAboveDecorationOverflowsItsRemainingSpanThenClampEnabled() {
+        // span = 1752 - 64 (top margin) - 441 (reserved inset) - 422 (decoration) = 825 < content 873.
+        val h = harness(
+            rootHeight = 1752,
+            dialogHeight = 873,
+            dialogTopMargin = 64,
+            contentHeight = 873,
+            viewportHeight = 873,
+            decorationHeight = 422,
+            minHeightPx = 66,
+            maxHeightPx = 422,
+            cardBottomInsetPx = 863,
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+            constrainedHeight = false
+        }
+
+        assertFalse(h.corrector.correctOnce()) // reserves the inset
+        assertFalse(h.corrector.correctOnce()) // then clamps
+        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+    }
+
+    @Test
+    fun whenCardAboveDecorationFitsItsRemainingSpanThenClampDisabled() {
+        val h = harness(
+            rootHeight = 1752,
+            dialogHeight = 600,
+            dialogTopMargin = 64,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 422,
+            minHeightPx = 66,
+            maxHeightPx = 422,
+            cardBottomInsetPx = 66,
+        )
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            bottomToTop = h.decoration.id
+            constrainedHeight = true
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
     }
 
     @Test
@@ -592,28 +772,5 @@ class OnboardingDecorationFitCorrectorTest {
 
         assertTrue(h.corrector.correctOnce())
         assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
-    }
-
-    @Test
-    fun whenDisabledThenBottomAnchoredClampNotTouched() {
-        val h = harness(
-            rootHeight = 1200,
-            dialogHeight = 620,
-            contentHeight = 584,
-            viewportHeight = 582,
-            decorationHeight = 200,
-            minHeightPx = 247,
-            maxHeightPx = 299,
-            enabled = false,
-        )
-        h.corrector.clear()
-        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
-            bottomToTop = ConstraintLayout.LayoutParams.UNSET
-            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-            constrainedHeight = true
-        }
-
-        assertTrue(h.corrector.correctOnce())
-        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
     }
 }

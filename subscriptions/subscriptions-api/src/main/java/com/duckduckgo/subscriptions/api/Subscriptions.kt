@@ -67,6 +67,18 @@ interface Subscriptions {
     suspend fun getAvailableProducts(): Set<Product>
 
     /**
+     * Returns the products included in the subscription plans the store currently offers the user. Plans differ by
+     * region, so a product such as [Product.PIR] may not be offered everywhere.
+     *
+     * This does not check whether the user is allowed to purchase; use [isEligible] for that.
+     *
+     * You DO NOT need to set any dispatcher to call this suspend function.
+     *
+     * @return the products in the currently offered plans, or an empty set when no plans are offered
+     */
+    suspend fun getPurchasableProducts(): Set<Product>
+
+    /**
      * @return `true` if the given URL can be handled internally or `false` otherwise
      */
     fun shouldLaunchSubscriptionForUrl(url: String): Boolean
@@ -91,6 +103,19 @@ interface Subscriptions {
      * Emits an empty set when there is no active subscription.
      */
     fun getEntitlements(): Flow<Set<Entitlement>>
+
+    /**
+     * Returns the [Entitlement]s granted by the current active subscription, read from storage at call
+     * time, so the result is current in every app process.
+     *
+     * Prefer this over `getEntitlements().first()` for a one-off check: the flow can first return a value
+     * cached earlier in the same process, which outside the main process may be out of date.
+     *
+     * You DO NOT need to set any dispatcher to call this suspend function.
+     *
+     * @return the granted entitlements, or an empty set when there is no active subscription
+     */
+    suspend fun getCurrentEntitlements(): Set<Entitlement>
 }
 
 enum class Product(val value: String) {

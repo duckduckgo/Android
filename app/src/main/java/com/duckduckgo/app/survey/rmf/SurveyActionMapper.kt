@@ -23,11 +23,11 @@ import com.duckduckgo.remote.messaging.api.JsonActionType.SURVEY
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.survey.api.SurveyParameterManager
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SurveyActionMapper @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val surveyParameterManager: SurveyParameterManager,

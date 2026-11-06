@@ -19,10 +19,6 @@ package com.duckduckgo.serp.logos.impl.ui
 import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureToggles
-import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
 import com.duckduckgo.serp.logos.impl.ui.SerpEasterEggLogoViewModel.Command.CloseScreen
 import kotlinx.coroutines.flow.Flow
@@ -46,25 +42,17 @@ class SerpEasterEggLogoViewModelTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private lateinit var fakeFavouriteSerpLogoDataStore: FakeFavouriteSerpLogoDataStore
-    private lateinit var serpEasterEggLogosToggles: SerpEasterEggLogosToggles
 
     private lateinit var testee: SerpEasterEggLogoViewModel
 
     @Before
     fun setUp() {
         fakeFavouriteSerpLogoDataStore = FakeFavouriteSerpLogoDataStore()
-        serpEasterEggLogosToggles = FeatureToggles.Builder()
-            .store(FakeToggleStore())
-            .featureName("fakeFeature")
-            .ioDispatcher(coroutineTestRule.testDispatcher)
-            .build()
-            .create(SerpEasterEggLogosToggles::class.java)
     }
 
     private fun createViewModel(): SerpEasterEggLogoViewModel {
         return SerpEasterEggLogoViewModel(
             fakeFavouriteSerpLogoDataStore,
-            serpEasterEggLogosToggles,
         )
     }
 
@@ -72,7 +60,6 @@ class SerpEasterEggLogoViewModelTest {
     fun whenLogoUrlMatchesStoredFavouriteThenIsFavouriteIsTrue() = runTest {
         val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
         fakeFavouriteSerpLogoDataStore.favouriteLogoValue = logoUrl
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
         testee = createViewModel()
 
         testee.setLogoUrl(logoUrl)
@@ -87,7 +74,6 @@ class SerpEasterEggLogoViewModelTest {
         val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
         val storedFavourite = "https://duckduckgo.com/assets/logo/different.png"
         fakeFavouriteSerpLogoDataStore.favouriteLogoValue = storedFavourite
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
         testee = createViewModel()
 
         testee.setLogoUrl(logoUrl)
@@ -100,7 +86,6 @@ class SerpEasterEggLogoViewModelTest {
     fun whenNoFavouriteStoredThenIsFavouriteIsFalse() = runTest {
         val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
         fakeFavouriteSerpLogoDataStore.favouriteLogoValue = null
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
         testee = createViewModel()
 
         testee.setLogoUrl(logoUrl)
@@ -110,34 +95,23 @@ class SerpEasterEggLogoViewModelTest {
     }
 
     @Test
-    fun whenFeatureToggleDisabledThenIsSetFavouriteEnabledIsFalse() = runTest {
+    fun whenFavouritePreferenceChangesThenIsFavouriteUpdates() = runTest {
         val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = false))
         testee = createViewModel()
 
         testee.setLogoUrl(logoUrl)
 
-        val viewState = testee.viewState.first { it.logoUrl.isNotEmpty() }
-        assertFalse(viewState.isSetFavouriteEnabled)
-    }
-
-    @Test
-    fun whenFeatureToggleEnabledThenIsSetFavouriteEnabledIsTrue() = runTest {
-        val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
-        testee = createViewModel()
-
-        testee.setLogoUrl(logoUrl)
-
-        val viewState = testee.viewState.first { it.logoUrl.isNotEmpty() }
-        assertTrue(viewState.isSetFavouriteEnabled)
+        assertFalse(testee.viewState.first { it.logoUrl == logoUrl }.isFavourite)
+        fakeFavouriteSerpLogoDataStore.favouriteLogoValue = logoUrl
+        assertTrue(testee.viewState.first { it.isFavourite }.isFavourite)
+        fakeFavouriteSerpLogoDataStore.favouriteLogoValue = null
+        assertFalse(testee.viewState.first { it.logoUrl == logoUrl && !it.isFavourite }.isFavourite)
     }
 
     @Test
     fun whenFavouriteButtonClickedAndNotFavouriteThenSetsFavourite() = runTest {
         val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
         fakeFavouriteSerpLogoDataStore.favouriteLogoValue = null
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
         testee = createViewModel()
 
         testee.setLogoUrl(logoUrl)
@@ -150,7 +124,6 @@ class SerpEasterEggLogoViewModelTest {
     fun whenFavouriteButtonClickedAndIsFavouriteThenClearsFavourite() = runTest {
         val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
         fakeFavouriteSerpLogoDataStore.favouriteLogoValue = logoUrl
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
         testee = createViewModel()
 
         testee.setLogoUrl(logoUrl)
@@ -175,7 +148,6 @@ class SerpEasterEggLogoViewModelTest {
     fun whenFavouriteButtonClickedAndNotFavouriteThenCloseScreenCommandEmitted() = runTest {
         val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
         fakeFavouriteSerpLogoDataStore.favouriteLogoValue = null
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
         testee = createViewModel()
 
         testee.commands.test {
@@ -190,7 +162,6 @@ class SerpEasterEggLogoViewModelTest {
     fun whenFavouriteButtonClickedAndIsFavouriteThenCloseScreenCommandEmitted() = runTest {
         val logoUrl = "https://duckduckgo.com/assets/logo/easter-egg.png"
         fakeFavouriteSerpLogoDataStore.favouriteLogoValue = logoUrl
-        serpEasterEggLogosToggles.setFavourite().setRawStoredState(State(enable = true))
         testee = createViewModel()
 
         testee.commands.test {

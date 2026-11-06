@@ -28,14 +28,14 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 /**
@@ -74,16 +74,21 @@ class DuckChatVoiceMicrophoneService : Service() {
         startId: Int,
     ): Int {
         val tabId = intent?.getStringExtra(EXTRA_TAB_ID)?.takeIf { it.isNotBlank() }
-        ServiceCompat.startForeground(
-            this,
-            NOTIFICATION_ID,
-            buildNotification(tabId),
-            if (appBuildConfig.sdkInt >= 30) {
-                FOREGROUND_SERVICE_TYPE_MICROPHONE
-            } else {
-                0
-            },
-        )
+        try {
+            ServiceCompat.startForeground(
+                this,
+                NOTIFICATION_ID,
+                buildNotification(tabId),
+                if (appBuildConfig.sdkInt >= 30) {
+                    FOREGROUND_SERVICE_TYPE_MICROPHONE
+                } else {
+                    0
+                },
+            )
+        } catch (_: Exception) {
+            duckChatPixels.reportVoiceServiceStartFailed()
+            stopSelf()
+        }
         return START_NOT_STICKY
     }
 

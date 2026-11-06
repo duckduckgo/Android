@@ -22,16 +22,24 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyAction
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
+import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
+import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
+import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -48,10 +56,10 @@ interface SitePermissionsRepository {
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
     fun sitePermissionPermanentlySaved(url: String, permission: String, settingType: SitePermissionAskSettingType)
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
-    fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
+    fun domainsWithPermissions(): Set<String>
     fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
-    fun getDrmForSession(domain: String): Boolean?
-    fun saveDrmForSession(domain: String, allowed: Boolean)
+    fun getDrmForSession(tabId: String, domain: String): Boolean?
+    fun saveDrmForSession(tabId: String, domain: String, allowed: Boolean)
     fun isDrmBlockedForUrlByConfig(url: String): Boolean
     suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>)
     suspend fun deleteAll()
@@ -69,6 +77,10 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val drmBlock: DrmBlock,
+    private val drmSessionStore: DrmSessionStore,
+    private val drmPolicyFeature: DrmPolicyFeature,
+    private val drmPolicyManager: Lazy<DrmPolicyManager>,
+    private val sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature,
 ) : SitePermissionsRepository {
 
     override var askCameraEnabled: Boolean
@@ -94,11 +106,16 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             sitePermissionsPreferences.askLocationEnabled = value
         }
 
+    // Kept for the flag-off path only; the shared DrmSessionStore replaces it once drmPolicy is fully rolled out.
     private val drmSessions = mutableMapOf<String, Boolean>()
 
     override suspend fun isDrmEnabledForSite(url: String): Boolean {
-        val domain = url.extractDomain() ?: url
+        if (withContext(dispatcherProvider.io()) { drmPolicyFeature.isCentralPolicyEnabled() }) {
+            // "Permitted or promptable" rather than "granted" — this feeds the breakage report's drmEnabled field.
+            return drmPolicyManager.value.decide(url).action != DrmPolicyAction.DENY
+        }
 
+        val domain = url.extractDomain() ?: url
         drmSessions[domain]?.let { return it }
         if (isDrmBlockedForUrlByConfig(url)) return false
 
@@ -175,38 +192,50 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override fun sitePermissionGranted(url: String, tabId: String, permission: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val domain = url.extractDomain() ?: url
-            val existingPermission = sitePermissionsDao.getSitePermissionsByDomain(domain)
-            if (existingPermission == null) {
+            val explicitPermissionsOnly = sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().isEnabled()
+            if (!explicitPermissionsOnly && sitePermissionsDao.getSitePermissionsByDomain(domain) == null) {
                 sitePermissionsDao.insert(SitePermissionsEntity(domain = domain))
             }
-            val sitePermissionAllowed = SitePermissionAllowedEntity(
-                domain,
-                tabId,
-                permission,
-                System.currentTimeMillis(),
-            )
-            sitePermissionsAllowedDao.insert(sitePermissionAllowed)
+            val now = System.currentTimeMillis()
+            if (explicitPermissionsOnly) {
+                sitePermissionsAllowedDao.deleteAllowedBefore(now - SitePermissionAllowedEntity.EXPIRY_MILLIS)
+            }
+            sitePermissionsAllowedDao.insert(SitePermissionAllowedEntity(domain, tabId, permission, now))
         }
     }
 
     override fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>> {
-        return sitePermissionsDao.getAllSitesPermissionsAsFlow()
+        return sitePermissionsDao.getAllSitesPermissionsAsFlow().map { sites ->
+            if (sitePermissionsDialogRedesignFeature.explicitPermissionsOnly().isEnabled()) {
+                sites.filterNot { it.hasNoSettings() }
+            } else {
+                sites
+            }
+        }.flowOn(dispatcherProvider.io())
     }
 
-    override fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity> {
-        return sitePermissionsDao.getAllSitesPermissions()
+    override fun domainsWithPermissions(): Set<String> {
+        return sitePermissionsDao.getAllSitesPermissions().map { it.domain }.toSet() + sitePermissionsAllowedDao.getAllowedDomains()
     }
 
     override fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>> {
         return sitePermissionsAllowedDao.getAllSitesPermissionsAllowedAsFlow()
     }
 
-    override fun getDrmForSession(domain: String): Boolean? {
-        return drmSessions[domain]
+    override fun getDrmForSession(tabId: String, domain: String): Boolean? {
+        return if (drmPolicyFeature.isCentralPolicyEnabled()) {
+            drmSessionStore.get(tabId, domain)
+        } else {
+            drmSessions[domain]
+        }
     }
 
-    override fun saveDrmForSession(domain: String, allowed: Boolean) {
-        drmSessions[domain] = allowed
+    override fun saveDrmForSession(tabId: String, domain: String, allowed: Boolean) {
+        if (drmPolicyFeature.isCentralPolicyEnabled()) {
+            drmSessionStore.save(tabId, domain, allowed)
+        } else {
+            drmSessions[domain] = allowed
+        }
     }
 
     override fun isDrmBlockedForUrlByConfig(url: String): Boolean {
@@ -279,3 +308,6 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         }
     }
 }
+
+private fun SitePermissionsEntity.hasNoSettings(): Boolean =
+    askCameraSetting == null && askMicSetting == null && askDrmSetting == null && askLocationSetting == null

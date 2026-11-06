@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl.email.service
 
-import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
+import com.duckduckgo.codegen.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.GET
 import retrofit2.http.Header

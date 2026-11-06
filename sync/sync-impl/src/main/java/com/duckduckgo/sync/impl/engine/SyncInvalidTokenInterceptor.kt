@@ -23,16 +23,17 @@ import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.SyncService
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class SyncInvalidTokenInterceptor @Inject constructor(
     private val context: Context,
@@ -51,7 +52,12 @@ class SyncInvalidTokenInterceptor @Inject constructor(
         val response = chain.proceed(chain.request())
 
         val method = chain.request().method
-        if (response.code == API_CODE.INVALID_LOGIN_CREDENTIALS.code && method in METHODS_TRIGGERING_LOGGED_OUT_NOTIFICATION) {
+        val path = chain.request().url.encodedPath
+        if (
+            response.code == API_CODE.INVALID_LOGIN_CREDENTIALS.code &&
+            method in METHODS_TRIGGERING_LOGGED_OUT_NOTIFICATION &&
+            !path.startsWith(SyncService.EXCHANGE_CHANNEL_PATH_PREFIX)
+        ) {
             logcat { "Sync-Engine: User logged out, invalid token detected." }
             notificationManager.checkPermissionAndNotify(
                 context,

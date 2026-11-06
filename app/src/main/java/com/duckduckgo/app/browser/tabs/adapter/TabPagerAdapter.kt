@@ -25,12 +25,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
+import com.duckduckgo.app.browser.tabs.TabReuseDistanceReporter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
+    private val tabReuseDistanceReporter: TabReuseDistanceReporter,
 ) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
 
@@ -71,19 +73,28 @@ class TabPagerAdapter(
         // Check if there's a message specifically for this tab's source tab ID
         val pendingMessage = pendingMessages.remove(tab.sourceTabId)
         pendingMessage?.cleanupJob?.cancel()
+        val inputModeTarget = activity.consumeInputModeTargetForTab(tab.tabId)
 
         return if (pendingMessage != null) {
             BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal).apply {
                 this.messageFromPreviousTab = pendingMessage.message
+                this.inputModeTarget = inputModeTarget
             }
         } else {
-            BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
+            BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal).apply {
+                this.inputModeTarget = inputModeTarget
+            }
         }
     }
 
     // This method prevents the creation of a tab fragment for the first tab when we don't know the current tab index yet
     override fun shouldPlaceFragmentInViewHolder(position: Int): Boolean {
         return currentTabIndex != -1 || position != 0
+    }
+
+    override fun onItemPlaced(itemId: Long) {
+        val tab = tabs.firstOrNull { it.tabId.hashCode().toLong() == itemId } ?: return
+        tabReuseDistanceReporter.onTabActivated(tab.tabId)
     }
 
     fun restore(state: Bundle) {
@@ -112,14 +123,16 @@ class TabPagerAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun onTabsUpdated(newTabs: List<TabModel>) {
+        tabReuseDistanceReporter.onTabCountChanged(newTabs.size)
         if (tabs.map { it.tabId } != newTabs.map { it.tabId }) {
             val newIds = newTabs.map { it.tabId }.toSet()
-            val hadRemovals = tabs.any { it.tabId !in newIds }
+            val removedIds = tabs.map { it.tabId }.filter { it !in newIds }
             tabs.clear()
             tabs.addAll(newTabs)
             notifyDataSetChanged()
-            if (hadRemovals) {
+            if (removedIds.isNotEmpty()) {
                 cleanupRemovedItems()
+                tabReuseDistanceReporter.onTabsRemoved(removedIds)
             }
         } else {
             // the state of tabs is managed separately, so we don't need to notify the adapter, but we need URL and skipHome to create new fragments

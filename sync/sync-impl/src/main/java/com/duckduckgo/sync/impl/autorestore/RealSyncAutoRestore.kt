@@ -25,8 +25,9 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -35,9 +36,9 @@ import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = SyncAutoRestore::class)
-@ContributesBinding(AppScope::class, boundType = SyncOnboardingRestoreState::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<SyncAutoRestore>())
+@ContributesBinding(AppScope::class, binding = binding<SyncOnboardingRestoreState>())
 class RealSyncAutoRestore @Inject constructor(
     private val manager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,

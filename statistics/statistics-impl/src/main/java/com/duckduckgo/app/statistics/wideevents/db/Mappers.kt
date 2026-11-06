@@ -28,6 +28,10 @@ fun WideEventEntity.mapToRepositoryWideEvent(): WideEventRepository.WideEvent =
         activeIntervals = activeIntervals.map { it.mapToRepositoryWideEventInterval() },
         createdAt = createdAt,
         samplingProbability = samplingProbability,
+        metaType = metaType,
+        metaVersion = metaVersion,
+        isFirstDailyOccurrence = isFirstDailyOccurrence,
+        appVersion = appVersion,
     )
 
 fun WideEventRepository.WideEventStatus.mapToDbWideEventStatus(): WideEventEntity.WideEventStatus =
@@ -56,6 +60,7 @@ fun WideEventEntity.CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepos
     when (this) {
         is WideEventEntity.CleanupPolicy.OnProcessStart ->
             WideEventRepository.CleanupPolicy.OnProcessStart(
+                ownerProcessName = ownerProcessName,
                 ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
                 status = status.mapToRepositoryWideEventStatus(),
                 metadata = metadata,
@@ -72,6 +77,7 @@ fun WideEventRepository.CleanupPolicy.mapToDbCleanupPolicy(): WideEventEntity.Cl
     when (this) {
         is WideEventRepository.CleanupPolicy.OnProcessStart ->
             WideEventEntity.CleanupPolicy.OnProcessStart(
+                ownerProcessName = ownerProcessName,
                 ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
                 status = status.mapToDbWideEventStatus(),
                 metadata = metadata,

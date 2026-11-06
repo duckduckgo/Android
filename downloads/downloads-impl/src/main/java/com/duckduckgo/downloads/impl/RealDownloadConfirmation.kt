@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadConfirmation
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

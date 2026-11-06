@@ -28,10 +28,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -45,8 +46,9 @@ import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
 import com.duckduckgo.autofill.impl.importing.InternalInBrowserPromoStore
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Error
@@ -59,6 +61,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurv
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
@@ -69,6 +72,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.extensions.launchAutofillProviderSystemSettings
+import com.duckduckgo.credentialexchange.api.CredentialExchangeLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -146,6 +150,12 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var credentialExchangePasswordImporter: CredentialExchangePasswordImporter
+
+    @Inject
+    lateinit var credentialExchangeLauncher: CredentialExchangeLauncher
+
     private var passwordImportWatcher = ConflatedJob()
 
     // used to output duration of import
@@ -167,6 +177,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                                 credentialImporter.import(
                                     parseResult.loginCredentialsToImport,
                                     parseResult.numberCredentialsInSource,
+                                    Unknown,
                                 )
                                 observePasswordInputUpdates()
                             }
@@ -309,7 +320,10 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             lifecycleScope.launch {
                 if (importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()) {
                     val intent =
-                        globalActivityStarter.startIntent(this@AutofillInternalSettingsActivity, AutofillImportViaGooglePasswordManagerScreen)
+                        globalActivityStarter.startIntent(
+                            this@AutofillInternalSettingsActivity,
+                            AutofillImportPasswordsScreen(Unknown),
+                        )
                     importGooglePasswordsFlowLauncher.launch(intent)
                 } else {
                     Toast.makeText(this@AutofillInternalSettingsActivity, "WebView version not supported", Toast.LENGTH_SHORT).show()
@@ -357,6 +371,26 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                     getString(R.string.autofillDevSettingsSimulatePasswordsImportedConfirmation),
                     Toast.LENGTH_SHORT,
                 ).show()
+        }
+
+        binding.importPasswordsCredentialExchangeButton.setClickListener {
+            lifecycleScope.launch {
+                if (!credentialExchangePasswordImporter.isSupported()) {
+                    getString(R.string.autofillDevSettingsCredentialExchangeNotSupported).showSnackbar()
+                    return@launch
+                }
+
+                val exchangeResult = credentialExchangeLauncher.launchImportFlow()
+                when (val result = credentialExchangePasswordImporter.convertAndDeduplicate(exchangeResult)) {
+                    is CredentialExchangeImportResult.Success -> {
+                        importStartTime = System.currentTimeMillis()
+                        credentialImporter.import(result.credentials, result.originalCount, Unknown)
+                        observePasswordInputUpdates()
+                    }
+                    is CredentialExchangeImportResult.Cancelled -> "Cancelled".showSnackbar()
+                    is CredentialExchangeImportResult.Failure -> "Failed: ${result.reason}".showSnackbar()
+                }
+            }
         }
     }
 

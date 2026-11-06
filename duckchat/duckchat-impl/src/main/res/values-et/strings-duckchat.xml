@@ -59,8 +59,7 @@
 
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
-    <string name="input_screen_search_only_hint">Otsing</string>
-    <string name="input_screen_chat_hint">Küsi privaatselt</string>
+    <string name="input_screen_search_only_hint">Otsi</string>
     <string name="input_screen_user_pref_without_ai">Ainult otsi</string>
     <string name="input_screen_user_pref_with_ai">Otsi ja Duck.ai</string>
     <string name="input_screen_user_pref_description">\"Proovi meie uut valikut küsida Duck.ai käest otse aadressiribalt.\" <annotation type="share_feedback">Jaga tagasisidet</annotation></string>
@@ -71,9 +70,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Vestle privaatselt tellijatele mõeldud eksklusiivsete AI-mudelitega.\n<a href=\"\">Loe edasi</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Ava Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Loe edasi</string>
-
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Küsi Duck.ai käest</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Kas soovid lihtsamat juurdepääsu privaatsele AI-vestlusele?</string>
@@ -121,13 +117,87 @@
     <string name="duckAIContextualPromptSummarize">Loo lehekülje kokkuvõte</string>
     <string name="duckAIContextualAutomaticContextTitle">Saada lehe sisu automaatselt</string>
     <string name="duckAIContextualAutomaticContextMessage">Saada lehe sisu automaatselt Duck.ai-le</string>
-    <string name="duckAIContextualAttachPageContent">Lisa lehe sisu</string>
 
-    <!-- Contextual sheet quick action -->
-    <string name="duckAIContextualPromptAskAboutPage">Küsi lehe kohta</string>
+    <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
+    <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Tõlgi see leht</string>
+    <string name="duckAiSuggestionTranslatePagePrompt" instruction="Suggested prompt submitted text: translate the page. %1$s is replaced with the name of the user&apos;s language.">Tõlgi see leht keelde %1$s.</string>
+    <string name="duckAiSuggestionKeyTakeawaysLabel" instruction="Suggested prompt chip: key takeaways of an article">Millised on peamised järeldused?</string>
+    <string name="duckAiSuggestionKeyTakeawaysPrompt" instruction="Suggested prompt submitted text: key takeaways of an article">Millised on selle artikli peamised järeldused?</string>
+    <string name="duckAiSuggestionExplainSimplyLabel" instruction="Suggested prompt chip: explain the content simply">Selgita seda lihtsalt</string>
+    <string name="duckAiSuggestionExplainSimplyPrompt" instruction="Suggested prompt submitted text: explain the content simply">Selgita seda lihtsalt ja arusaadavalt.</string>
+    <string name="duckAiSuggestionCounterargumentsLabel" instruction="Suggested prompt chip: counterarguments">Millised on vastuväited?</string>
+    <string name="duckAiSuggestionCounterargumentsPrompt" instruction="Suggested prompt submitted text: counterarguments">Millised on selle peamised vastuväited või kriitika?</string>
+    <string name="duckAiSuggestionRelatedArticlesLabel" instruction="Suggested prompt chip: related articles">Soovita seotud artikleid, mida uurida</string>
+    <string name="duckAiSuggestionRelatedArticlesPrompt" instruction="Suggested prompt submitted text: related articles">Soovita seotud artikleid või teemasid, mida tasub järgmisena uurida.</string>
+    <string name="duckAiSuggestionShoppingListLabel" instruction="Suggested prompt chip: shopping list from a recipe">Loo ostunimekiri</string>
+    <string name="duckAiSuggestionShoppingListPrompt" instruction="Suggested prompt submitted text: shopping list from a recipe">Loo selle retsepti põhjal kogustega ostunimekiri.</string>
+    <string name="duckAiSuggestionRecipeNutritionLabel" instruction="Suggested prompt chip: recipe nutrition">Hinda toiteväärtust</string>
+    <string name="duckAiSuggestionRecipeNutritionPrompt" instruction="Suggested prompt submitted text: recipe nutrition">Hinda selle retsepti toiteväärtust.</string>
+    <string name="duckAiSuggestionScaleRecipeLabel" instruction="Suggested prompt chip: scale a recipe">Kohanda portsjonid</string>
+    <string name="duckAiSuggestionScaleRecipePrompt" instruction="Suggested prompt submitted text: scale a recipe">Kirjuta see retsept ümber, kohandades seda teistsugusele portsjonite arvule.</string>
+    <string name="duckAiSuggestionProductProsConsLabel" instruction="Suggested prompt chip: product pros and cons">Millised on plussid ja miinused?</string>
+    <string name="duckAiSuggestionProductProsConsPrompt" instruction="Suggested prompt submitted text: product pros and cons">Millised on selle toote plussid ja miinused?</string>
+    <string name="duckAiSuggestionFindAlternativesLabel" instruction="Suggested prompt chip: product alternatives">Leia mulle alternatiive</string>
+    <string name="duckAiSuggestionFindAlternativesPrompt" instruction="Suggested prompt submitted text: product alternatives">Soovita sellele tootele alternatiive.</string>
+    <string name="duckAiSuggestionSummarizeVideoLabel" instruction="Suggested prompt chip: summarize a video">Tee sellest videost kokkuvõte</string>
+    <string name="duckAiSuggestionSummarizeVideoPrompt" instruction="Suggested prompt submitted text: summarize a video">Tee sellest videost kokkuvõte.</string>
+    <string name="duckAiSuggestionVideoKeyPointsLabel" instruction="Suggested prompt chip: video key points">Millised on põhipunktid?</string>
+    <string name="duckAiSuggestionVideoKeyPointsPrompt" instruction="Suggested prompt submitted text: video key points">Millised on selle video peamised punktid?</string>
+    <string name="duckAiSuggestionTailorResumeLabel" instruction="Suggested prompt chip: tailor a resume to a job">Kohanda minu CV-d</string>
+    <string name="duckAiSuggestionTailorResumePrompt" instruction="Suggested prompt submitted text: tailor a resume to a job">Aita mul kohandada oma CV selle töökoha jaoks.</string>
+    <string name="duckAiSuggestionInterviewPrepLabel" instruction="Suggested prompt chip: interview prep">Aita mul intervjuuks valmistuda</string>
+    <string name="duckAiSuggestionInterviewPrepPrompt" instruction="Suggested prompt submitted text: interview prep">Millised töövestluse küsimused võivad selle rolli puhul ette tulla?</string>
+    <string name="duckAiSuggestionCoverLetterLabel" instruction="Suggested prompt chip: draft a cover letter">Koosta kaaskiri</string>
+    <string name="duckAiSuggestionCoverLetterPrompt" instruction="Suggested prompt submitted text: draft a cover letter">Koosta selle töö jaoks kaaskiri.</string>
+    <string name="duckAiSuggestionEventDetailsLabel" instruction="Suggested prompt chip: event details">Millised on peamised üksikasjad?</string>
+    <string name="duckAiSuggestionEventDetailsPrompt" instruction="Suggested prompt submitted text: event details">Tee selle sündmuse põhiandmetest kokkuvõte.</string>
+    <string name="duckAiSuggestionWorthWatchingLabel" instruction="Suggested prompt chip: is a movie/show worth watching">Kas seda tasub vaadata?</string>
+    <string name="duckAiSuggestionWorthWatchingPrompt" instruction="Suggested prompt submitted text: is a movie/show worth watching">Kas seda tasub vaadata? Anna mulle ülevaade ilma sisu avaldamata.</string>
+    <string name="duckAiSuggestionSimilarTitlesLabel" instruction="Suggested prompt chip: similar movies or shows">Soovita sarnaseid teoseid</string>
+    <string name="duckAiSuggestionSimilarTitlesPrompt" instruction="Suggested prompt submitted text: similar movies or shows">Soovita sarnaseid filme või sarju.</string>
+    <string name="duckAiSuggestionCastCrewLabel" instruction="Suggested prompt chip: cast and crew">Osatäitjad ja võttemeeskond</string>
+    <string name="duckAiSuggestionCastCrewPrompt" instruction="Suggested prompt submitted text: cast and crew">Kes on peamised näitlejad ja võttegrupi liikmed ning mille poolest neid veel teatakse?</string>
+    <string name="duckAiSuggestionSummarizeBookLabel" instruction="Suggested prompt chip: summarize a book">Tee sellest raamatu kokkuvõte</string>
+    <string name="duckAiSuggestionSummarizeBookPrompt" instruction="Suggested prompt submitted text: summarize a book">Tee sellest raamatust kokkuvõte.</string>
+    <string name="duckAiSuggestionSimilarBooksLabel" instruction="Suggested prompt chip: similar books">Soovita sarnaseid raamatuid</string>
+    <string name="duckAiSuggestionSimilarBooksPrompt" instruction="Suggested prompt submitted text: similar books">Soovita sarnaseid raamatuid.</string>
+    <string name="duckAiSuggestionExplainPaperLabel" instruction="Suggested prompt chip: explain a research paper">Selgita seda artiklit</string>
+    <string name="duckAiSuggestionExplainPaperPrompt" instruction="Suggested prompt submitted text: explain a research paper">Selgita seda uurimistööd lihtsas keeles.</string>
+    <string name="duckAiSuggestionPaperContributionsLabel" instruction="Suggested prompt chip: paper contributions">Millised on peamised panused?</string>
+    <string name="duckAiSuggestionPaperContributionsPrompt" instruction="Suggested prompt submitted text: paper contributions">Millised on selle artikli peamised panused?</string>
+    <string name="duckAiSuggestionMenuHighlightsLabel" instruction="Suggested prompt chip: restaurant menu highlights">Mida peaksin tellima?</string>
+    <string name="duckAiSuggestionMenuHighlightsPrompt" instruction="Suggested prompt submitted text: restaurant menu highlights">Milliseid roogi peab siin kindlasti proovima?</string>
+    <string name="duckAiSuggestionPlaceHoursLabel" instruction="Suggested prompt chip: place hours and location">Millised on lahtiolekuajad ja asukoht?</string>
+    <string name="duckAiSuggestionPlaceHoursPrompt" instruction="Suggested prompt submitted text: place hours and location">Millised on selle koha lahtiolekuajad, asukoht ja kontaktandmed?</string>
+    <string name="duckAiSuggestionPlaceReviewsLabel" instruction="Suggested prompt chip: place reputation">Kas see koht on üldse hea?</string>
+    <string name="duckAiSuggestionPlaceReviewsPrompt" instruction="Suggested prompt submitted text: place reputation">Kas see koht on üldse hea? Tee kokkuvõte selle mainest arvustuste ja hinnangute põhjal.</string>
+    <string name="duckAiSuggestionSummarizeThreadLabel" instruction="Suggested prompt chip: summarize a discussion thread">Tee arutelust kokkuvõte</string>
+    <string name="duckAiSuggestionSummarizeThreadPrompt" instruction="Suggested prompt submitted text: summarize a discussion thread">Tee sellest aruteluteemast kokkuvõte.</string>
+    <string name="duckAiSuggestionExplainRepoLabel" instruction="Suggested prompt chip: explain a code repository">Selgita seda repo\'t</string>
+    <string name="duckAiSuggestionExplainRepoPrompt" instruction="Suggested prompt submitted text: explain a code repository">Selgita, mida see repositoorium teeb ja kuidas seda kasutada.</string>
+    <string name="duckAiSuggestionExplainAnswerLabel" instruction="Suggested prompt chip: explain the top answer">Selgita esimest vastust</string>
+    <string name="duckAiSuggestionExplainAnswerPrompt" instruction="Suggested prompt submitted text: explain the top answer">Selgita aktsepteeritud vastust lihtsate sõnadega.</string>
+    <string name="duckAiSuggestionHowtoStepsLabel" instruction="Suggested prompt chip: how-to steps">Juhenda mind samm-sammult</string>
+    <string name="duckAiSuggestionHowtoStepsPrompt" instruction="Suggested prompt submitted text: how-to steps">Jaota see selgeteks nummerdatud sammudeks.</string>
+    <string name="duckAiSuggestionHowtoMaterialsLabel" instruction="Suggested prompt chip: how-to materials">Mida mul vaja läheb?</string>
+    <string name="duckAiSuggestionHowtoMaterialsPrompt" instruction="Suggested prompt submitted text: how-to materials">Loetle tööriistad, materjalid või eeltingimused, mida ma selleks vajan.</string>
+    <string name="duckAiSuggestionCourseLearnLabel" instruction="Suggested prompt chip: course learning outcomes">Mida ma õpin?</string>
+    <string name="duckAiSuggestionCourseLearnPrompt" instruction="Suggested prompt submitted text: course learning outcomes">Millised on peamised asjad, mida ma sellest kursusest õpin?</string>
+    <string name="duckAiSuggestionCourseWorthLabel" instruction="Suggested prompt chip: is a course worth taking">Kas sellest tasub osa võtta?</string>
+    <string name="duckAiSuggestionCourseWorthPrompt" instruction="Suggested prompt submitted text: is a course worth taking">Kas see kursus on selle lehe põhjal läbimist väärt?</string>
+    <string name="duckAiSuggestionFaqAnswerLabel" instruction="Suggested prompt chip: what an FAQ page answers">Millele see vastab?</string>
+    <string name="duckAiSuggestionFaqAnswerPrompt" instruction="Suggested prompt submitted text: what an FAQ page answers">Millistele peamistele küsimustele see leht vastab?</string>
+    <string name="duckAiSuggestionFaqSummaryLabel" instruction="Suggested prompt chip: summarize FAQ Q&amp;As">Tee küsimustest ja vastustest kokkuvõte</string>
+    <string name="duckAiSuggestionFaqSummaryPrompt" instruction="Suggested prompt submitted text: summarize FAQ Q&amp;As">Tee selle lehe küsimustest ja vastustest kokkuvõte.</string>
+    <string name="duckAiSuggestionReviewVerdictLabel" instruction="Suggested prompt chip: review verdict">Mis on otsus?</string>
+    <string name="duckAiSuggestionReviewVerdictPrompt" instruction="Suggested prompt submitted text: review verdict">Milline on selle üldine hinnang ja reiting?</string>
+    <string name="duckAiSuggestionReviewSummaryLabel" instruction="Suggested prompt chip: summarize reviews">Võta arvustused kokku</string>
+    <string name="duckAiSuggestionReviewSummaryPrompt" instruction="Suggested prompt submitted text: summarize reviews">Võta kokku, mida arvustused ütlevad.</string>
+    <string name="duckAiSuggestionWhoIsThisLabel" instruction="Suggested prompt chip: person background">Kes see inimene on?</string>
+    <string name="duckAiSuggestionWhoIsThisPrompt" instruction="Suggested prompt submitted text: person background">Anna mulle selle isiku kohta lühike ülevaade.</string>
+    <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person&apos;s background">Tee nende taustast kokkuvõte</string>
+    <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Tee kokkuvõte selle isiku taustast ja tähelepanuväärsest tööst.</string>
 
-    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
-    <string name="contextualSheetImprovedHint">Küsi ükskõik mida privaatselt</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Hiljutised vestlused</string>
 
     <!-- duck.ai contextual fire button -->
@@ -177,8 +247,8 @@
     <string name="duck_ai_chat_history_action_new">Uus</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Laadi alla vestlused</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
-        <item quantity="other">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Ava ülevoolu menüü</string>
     <string name="duck_ai_chat_history_select_all">Vali kõik</string>
@@ -204,6 +274,11 @@
     <string name="native_input_chat_duck_mode_hint">Vasta...</string>
 
     <!-- Model Picker -->
+    <string name="duckAiModelPickerLabelEverydayUse" instruction="Subline under a model in the Duck.ai model picker, describing what that model suits.">Parim igapäevaseks kasutamiseks</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster" instruction="Subline under a model in the Duck.ai model picker. &apos;Limits&apos; means the user&apos;s usage allowance, which this model consumes more quickly.">Töökindel, aga ammendab piiranguid varem</string>
+    <string name="duckAiModelPickerTryFreeTrial" instruction="Header above the locked models in the Duck.ai model picker, shown when the user can still start a free trial.">Proovi tasuta</string>
+    <string name="duckAiModelPickerSubscriberExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when unlocking them requires a paid subscription.">Ainult tellijatele</string>
+    <string name="duckAiModelPickerProExclusive" instruction="Header above the locked models in the Duck.ai model picker, shown when they require the Pro plan specifically. &apos;Pro&apos; is the plan name and stays untranslated.">Ainult Pro-paketi kasutajatele</string>
     <string name="duckAiModelPickerPlusModels">Plus</string>
     <string name="duckAiModelPickerProModels">Pro</string>
 
@@ -264,6 +339,70 @@
     <string name="duckAiSettingsTitle">Duck.ai seaded</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Küsi vahekaardi kohta</string>
+
+    <!-- Editing a message already sent to Duck.ai -->
+    <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Muuda sõnumit</string>
+    <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Muutmine asendab vastuse uuega.</string>
+
     <string name="duckChatContextualAskAboutPage">Küsi lehe kohta</string>
+    <string name="duckChatContextualAskAboutSearch">Jätka Duck.ai-s</string>
+    <string name="duckChatContextualOpenDuckAi">Ava Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Tee sellest valikust kokkuvõte</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Tee sellest valikust kokkuvõte.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Tõlgi see valik</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Tõlgi see valik keelde %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Tekstivalik</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Saad lisada kuni %1$d tekstivalikut. Eemalda üks, et teist lisada.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Küsi Duck.ai käest</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d sõna</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d sõna</item>
+    </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s kasutab piiranguid kuni 2–5 korda kiiremini kui baasmudelid.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Loobu</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% päevasest piirangust</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% nädalapiirangust</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Päevane piirang on saavutatud</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Oled jõudnud nädala piiranguni</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Nädala kasutuspiirang on saavutatud</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Täiustatud tehisintellekti mudelite piirang on saavutatud</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Vaheta mudelit</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Alusta nädalapiirangu kasutamist</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Proovi tellimust tasuta</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Telli</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Lähtestatakse %1$s pärast</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d päev</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d päeva</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d tund</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d tundi</item>
+    </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Tee sellest dokumendist kokkuvõte</string>
+
+    <!-- Duck.ai ToS consent submit button -->
+    <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Küsi</string>
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo anonümiseerib sinu vestlused. Kui klõpsad nupul „^1”, nõustud meie <annotation type="privacy_link">privaatsuspoliitika</annotation> ja <annotation type="terms_link">kasutustingimustega</annotation>.</string>
+    <!-- Duck.ai tab switcher card -->
+    <string name="duckAiTabCardChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a text or image chat, as opposed to a voice chat.">Vestlus</string>
+    <string name="duckAiTabCardThinkingTitle" instruction="Header on a tab switcher card for a Duck.ai chat whose question has been sent but whose reply has not started yet. The chat title, if any, is shown below it.">Mõtlemine...</string>
+    <string name="duckAiTabCardListeningTitle" instruction="Header on a tab switcher card for a Duck.ai tab with a voice chat in progress, shown while Duck.ai is listening to the user.">Kuulan…</string>
+    <string name="duckAiTabCardVoiceChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a voice chat, as opposed to a text chat.">Häälvestlus</string>
+    <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Transkript</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Faile kontrollitakse automaatselt ebaseadusliku sisu suhtes. Märgistatud vestlustel on piiratud andmete säilitamise aeg. <annotation type="learn_more_link">Lisateave</annotation></string>
 </resources>

@@ -1,7 +1,7 @@
 {
   "name": "FastPeopleSearch",
   "url": "fastpeoplesearch.com",
-  "version": "0.8.0",
+  "version": "0.10.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1675317600000,
   "optOutUrl": "https://www.fastpeoplesearch.com/removal",

@@ -25,7 +25,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -91,6 +91,13 @@ class RealRemoteMessageModel @Inject constructor(
 
     override suspend fun clearMessageImage(surface: Surface) {
         remoteMessagingRepository.clearMessageImage(surface)
+    }
+
+    override suspend fun getItemImageFile(
+        remoteMessage: RemoteMessage,
+        itemId: String,
+    ): String? {
+        return remoteMessagingRepository.getItemImageFilePath(remoteMessage, itemId)
     }
 
     override suspend fun isMessageDismissed(id: String): Boolean = withContext(dispatchers.io()) {

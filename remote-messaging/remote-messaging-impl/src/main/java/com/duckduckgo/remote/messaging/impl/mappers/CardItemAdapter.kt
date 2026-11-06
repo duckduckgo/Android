@@ -64,6 +64,7 @@ class CardItemAdapter {
         return when (type) {
             CardItemType.TWO_LINE_LIST_ITEM,
             CardItemType.FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM,
+            CardItemType.ONE_ACTION_ITEM,
             -> {
                 CardItem.ListItem(
                     id = json.id,

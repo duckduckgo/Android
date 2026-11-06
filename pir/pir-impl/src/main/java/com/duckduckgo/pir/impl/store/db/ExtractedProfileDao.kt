@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -50,6 +51,9 @@ interface ExtractedProfileDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertNewExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
+
+    @Update
+    fun updateExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
 
     @Query("DELETE from pir_extracted_profiles")
     fun deleteAllExtractedProfiles()

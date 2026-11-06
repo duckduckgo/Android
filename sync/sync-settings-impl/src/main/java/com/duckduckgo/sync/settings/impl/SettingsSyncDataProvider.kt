@@ -26,15 +26,16 @@ import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.settings.api.SyncableSetting
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.*
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableDataProvider>())
 class SettingsSyncDataProvider @Inject constructor(
     val syncableSettings: PluginPoint<SyncableSetting>,
     val settingsSyncMetadataDao: SettingsSyncMetadataDao,

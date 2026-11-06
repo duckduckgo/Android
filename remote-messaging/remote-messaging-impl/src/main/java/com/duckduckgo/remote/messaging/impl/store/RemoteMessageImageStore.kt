@@ -50,9 +50,13 @@ interface RemoteMessageImageStore {
     suspend fun clearStoredImageFile(surface: Surface)
 
     /**
-     * Returns the local file path for a card item image, or null if it doesn't exist.
+     * Returns the local file path for the image of the list item [itemId] in [message], or null when the message
+     * has no per-item images or the file doesn't exist.
      */
-    suspend fun getCardItemImageFilePath(itemId: String): String?
+    suspend fun getItemImageFilePath(
+        message: RemoteMessage,
+        itemId: String,
+    ): String?
 }
 
 class GlideRemoteMessageImageStore(
@@ -109,18 +113,31 @@ class GlideRemoteMessageImageStore(
         return File(context.filesDir, fileName)
     }
 
-    override suspend fun getCardItemImageFilePath(itemId: String): String? {
+    override suspend fun getItemImageFilePath(
+        message: RemoteMessage,
+        itemId: String,
+    ): String? {
+        val imagesDir = message.content.itemImagesDir() ?: return null
         return withContext(dispatcherProvider.io()) {
-            val file = getCardItemImageFile(itemId)
+            val file = itemImageFile(imagesDir, itemId)
             if (file.exists()) file.absolutePath else null
         }
     }
 
     private suspend fun fetchAndStoreCardItemImages(message: RemoteMessage?) {
-        val cardsList = message?.content as? Content.CardsList ?: return
+        clearItemImages(ACTIONABLE_ITEM_IMAGES_DIR)
+        val content = message?.content ?: return
+        val imagesDir = content.itemImagesDir() ?: return
+        val listItems = when (content) {
+            is Content.CardsList -> {
+                clearItemImages(imagesDir)
+                content.listItems
+            }
+            is Content.ActionableItems -> content.listItems
+            else -> return
+        }
 
-        clearAllCardItemImages()
-        val itemsWithImages = cardsList.listItems
+        val itemsWithImages = listItems
             .filterIsInstance<CardItem.ListItem>()
             .filter { !it.imageUrl.isNullOrEmpty() }
 
@@ -129,7 +146,7 @@ class GlideRemoteMessageImageStore(
         withContext(dispatcherProvider.io()) {
             itemsWithImages.map { item ->
                 async {
-                    val targetFile = getCardItemImageFile(item.id)
+                    val targetFile = itemImageFile(imagesDir, item.id)
                     targetFile.parentFile?.mkdirs()
                     downloadImageToFile(item.imageUrl.orEmpty(), targetFile)
                 }
@@ -137,12 +154,12 @@ class GlideRemoteMessageImageStore(
         }
     }
 
-    private suspend fun clearAllCardItemImages() {
+    private suspend fun clearItemImages(imagesDir: String) {
         withContext(dispatcherProvider.io()) {
             runCatching {
-                val dir = File(context.filesDir, CARD_ITEM_IMAGES_DIR)
+                val dir = File(context.filesDir, imagesDir)
                 if (dir.exists()) {
-                    logcat { "RMF: Clearing all card item images" }
+                    logcat { "RMF: Clearing all item images in $imagesDir" }
                     dir.deleteRecursively()
                 }
             }.onFailure {
@@ -166,8 +183,17 @@ class GlideRemoteMessageImageStore(
         }
     }
 
-    private fun getCardItemImageFile(itemId: String): File {
-        return File(context.filesDir, "$CARD_ITEM_IMAGES_DIR/$itemId.png")
+    private fun itemImageFile(
+        imagesDir: String,
+        itemId: String,
+    ): File = File(context.filesDir, "$imagesDir/$itemId.png")
+
+    private fun Content.itemImagesDir(): String? {
+        return when (this) {
+            is Content.CardsList -> CARD_ITEM_IMAGES_DIR
+            is Content.ActionableItems -> ACTIONABLE_ITEM_IMAGES_DIR
+            else -> null
+        }
     }
 
     private fun Content.getImageUrl(): String? {
@@ -178,11 +204,13 @@ class GlideRemoteMessageImageStore(
             is Content.BigTwoActions -> this.imageUrl
             is Content.PromoSingleAction -> this.imageUrl
             is Content.CardsList -> this.imageUrl
+            is Content.ActionableItems -> null
         }
     }
 
     companion object {
         private const val REMOTE_IMAGE_FILE_PREFIX = "active_message_remote_image"
         private const val CARD_ITEM_IMAGES_DIR = "rmf_card_item_images"
+        private const val ACTIONABLE_ITEM_IMAGES_DIR = "rmf_actionable_item_images"
     }
 }

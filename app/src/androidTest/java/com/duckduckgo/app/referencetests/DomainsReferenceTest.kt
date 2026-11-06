@@ -33,8 +33,6 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.FakeMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
-import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
@@ -48,12 +46,15 @@ import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetectorClientProvider
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
+import com.duckduckgo.app.trackerdetection.flags.OptimizeCnameDetectionRCWrapper
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -91,7 +92,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var entityLookup: EntityLookup
-    private lateinit var db: AppDatabase
+    private lateinit var db: TrackerDetectionDatabase
     private lateinit var trackerDetector: TrackerDetector
     private lateinit var trackerDetectorClientProvider: TrackerDetectorClientProvider
     private lateinit var tdsEntityDao: TdsEntityDao
@@ -105,13 +106,16 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val mockRequestBlocklist: RequestBlocklist = mock()
-    private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
+    private var mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockRequestFilterer: RequestFilterer = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
+    private val cachedCnameLookupEnabled = object : OptimizeCnameDetectionRCWrapper {
+        override val enabled: Boolean = true
+    }
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
@@ -180,7 +184,12 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
             adClickManager = mockAdClickManager,
-            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao, mockTrackerAllowlist, mockUserAllowListRepository),
+            cloakedCnameDetector = CloakedCnameDetectorImpl(
+                tdsCnameEntityDao,
+                mockTrackerAllowlist,
+                mockUserAllowListRepository,
+                cachedCnameLookupEnabled,
+            ),
             requestFilterer = mockRequestFilterer,
             requestBlocklist = mockRequestBlocklist,
             contentBlocking = mockContentBlocking,
@@ -192,7 +201,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             appCoroutineScope = coroutinesTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
-            webTrackersBlockedDao = mockWebTrackersBlockedDao,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
     }
 
@@ -233,7 +242,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     }
 
     private fun initialiseTds() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, TrackerDetectionDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 
@@ -259,7 +268,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
         val cnameEntities = tdsJson.jsonToCnameEntities()
-        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper(), false, false)
+        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper())
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)

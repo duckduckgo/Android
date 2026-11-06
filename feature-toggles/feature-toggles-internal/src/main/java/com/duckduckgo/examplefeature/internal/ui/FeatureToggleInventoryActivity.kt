@@ -24,9 +24,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -42,9 +42,9 @@ import com.duckduckgo.featuretoggles.internal.databinding.ActivityFeatureToggleI
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -273,7 +273,7 @@ object LaunchFeatureToggleInventoryActivityNoParams : ActivityParams {
     private fun readResolve(): Any = LaunchFeatureToggleInventoryActivityNoParams
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(InternalFeaturePlugin.FEATURE_INVENTORY_PRIO_KEY)
 class FeatureInventoryInternalFeaturePlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

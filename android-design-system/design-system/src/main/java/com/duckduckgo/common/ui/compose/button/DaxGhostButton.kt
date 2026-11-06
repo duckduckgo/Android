@@ -30,8 +30,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.duckduckgo.common.ui.compose.theme.Blue20
-import com.duckduckgo.common.ui.compose.theme.Blue30_20
-import com.duckduckgo.common.ui.compose.theme.Blue50_12
+import com.duckduckgo.common.ui.compose.theme.Blue30
+import com.duckduckgo.common.ui.compose.theme.Blue50
 import com.duckduckgo.common.ui.compose.theme.Blue70
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -41,7 +41,7 @@ import com.duckduckgo.mobile.android.R
  * DuckDuckGo ghost button with transparent background.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1213826087792401
- * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12110-29651&t=ZNNQ3qIoJQfTS14R-4
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12110-29651
  *
  * @param text The button label.
  * @param onClick Called when the button is clicked.
@@ -81,9 +81,9 @@ private object DaxGhostButtonDefaults {
 
     val adsColorButtonGhostContainerPressed: Color
         @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue30_20
+            Blue30
         } else {
-            Blue50_12
+            Blue50
         }
 
     val adsColorButtonGhostText: Color
@@ -111,7 +111,7 @@ private object DaxGhostButtonDefaults {
     @Composable
     fun rippleConfiguration(): RippleConfiguration {
         val color = adsColorButtonGhostContainerPressed
-        return remember(color) { RippleConfiguration(color = color) }
+        return remember(color) { daxRippleConfiguration(color) }
     }
 }
 

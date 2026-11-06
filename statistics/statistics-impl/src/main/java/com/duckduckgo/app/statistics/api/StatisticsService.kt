@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.app.statistics.BuildConfig
 import com.duckduckgo.app.statistics.model.Atb
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.di.scopes.AppScope
 import io.reactivex.Observable
@@ -32,11 +32,13 @@ interface StatisticsService {
     @GET("/exti/")
     fun exti(
         @Query(ParamKey.ATB) atb: String,
+        @Query(ParamKey.IS_TABLET) isTablet: Int,
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
     ): Observable<ResponseBody>
 
     @GET("/atb.js")
     fun atb(
+        @Query(ParamKey.IS_TABLET) isTablet: Int,
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
         @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>
@@ -45,6 +47,7 @@ interface StatisticsService {
     fun updateSearchAtb(
         @Query(ParamKey.ATB) atb: String,
         @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
+        @Query(ParamKey.IS_TABLET) isTablet: Int,
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
         @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>
@@ -53,6 +56,7 @@ interface StatisticsService {
     fun updateAppAtb(
         @Query(ParamKey.ATB) atb: String,
         @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
+        @Query(ParamKey.IS_TABLET) isTablet: Int,
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
         @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>
@@ -61,6 +65,7 @@ interface StatisticsService {
     fun updateDuckAiAtb(
         @Query(ParamKey.ATB) atb: String,
         @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
+        @Query(ParamKey.IS_TABLET) isTablet: Int,
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
         @Query(ParamKey.EMAIL) email: Int?,
     ): Observable<Atb>

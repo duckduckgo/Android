@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Вперёд</string>
     <string name="browserMenuRefresh">Обновить</string>
     <string name="browserMenuFireTabsData">Удалить вкладки и данные</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Новый голосовой чат</string>
+    <string name="chatMenuPopupNewImage">Новое изображение</string>
+    <string name="chatMenuPopupNewTab">Новая вкладка</string>
+    <string name="chatMenuPopupNewFireTab">Новая Fire-вкладка</string>
 </resources>

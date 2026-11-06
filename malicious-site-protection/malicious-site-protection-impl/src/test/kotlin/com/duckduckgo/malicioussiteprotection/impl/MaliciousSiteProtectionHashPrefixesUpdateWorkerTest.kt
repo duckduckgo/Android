@@ -20,11 +20,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
-import org.mockito.kotlin.capture
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.whenever
@@ -135,11 +134,11 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerSchedulerTest {
 
         scheduler.onPrivacyConfigDownloaded()
 
-        val workRequestCaptor = ArgumentCaptor.forClass(PeriodicWorkRequest::class.java)
+        val workRequestCaptor = argumentCaptor<PeriodicWorkRequest>()
         verify(workManager).enqueueUniquePeriodicWork(
             eq("MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG"),
             eq(ExistingPeriodicWorkPolicy.UPDATE),
-            capture(workRequestCaptor),
+            workRequestCaptor.capture(),
         )
 
         verify(workManager).cancelUniqueWork(
@@ -151,7 +150,7 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerSchedulerTest {
             any(),
         )
 
-        val capturedWorkRequest = workRequestCaptor.value
+        val capturedWorkRequest = workRequestCaptor.firstValue
         val repeatInterval = capturedWorkRequest.workSpec.intervalDuration
         val expectedInterval = TimeUnit.MINUTES.toMillis(updateFrequencyMinutes)
 
@@ -169,13 +168,13 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerSchedulerTest {
 
         scheduler.onPrivacyConfigDownloaded()
 
-        val workRequestCaptor = ArgumentCaptor.forClass(PeriodicWorkRequest::class.java)
+        val workRequestCaptor = argumentCaptor<PeriodicWorkRequest>()
         verify(workManager).enqueueUniquePeriodicWork(
             eq("MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_TAG"),
             eq(ExistingPeriodicWorkPolicy.UPDATE),
-            capture(workRequestCaptor),
+            workRequestCaptor.capture(),
         )
-        var capturedWorkRequest = workRequestCaptor.value
+        var capturedWorkRequest = workRequestCaptor.firstValue
         var repeatInterval = capturedWorkRequest.workSpec.intervalDuration
         val expectedInterval = TimeUnit.MINUTES.toMillis(updateFrequencyMinutes)
         var inputData = capturedWorkRequest.workSpec.input
@@ -186,14 +185,14 @@ class MaliciousSiteProtectionHashPrefixesUpdateWorkerSchedulerTest {
             listOf(PHISHING.name, MALWARE.name),
         )
 
-        val scamWorkRequestCaptor = ArgumentCaptor.forClass(PeriodicWorkRequest::class.java)
+        val scamWorkRequestCaptor = argumentCaptor<PeriodicWorkRequest>()
         verify(workManager).enqueueUniquePeriodicWork(
             eq("MALICIOUS_SITE_PROTECTION_HASH_PREFIXES_UPDATE_WORKER_SCAM_TAG"),
             eq(ExistingPeriodicWorkPolicy.UPDATE),
-            capture(scamWorkRequestCaptor),
+            scamWorkRequestCaptor.capture(),
         )
 
-        capturedWorkRequest = scamWorkRequestCaptor.value
+        capturedWorkRequest = scamWorkRequestCaptor.firstValue
         repeatInterval = capturedWorkRequest.workSpec.intervalDuration
         inputData = capturedWorkRequest.workSpec.input
 

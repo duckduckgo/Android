@@ -22,30 +22,36 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isGone
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.setEnabledOpacity
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsDescriptionBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsEmptyListBinding
+import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsSettingBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsSiteBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsTitleBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsToggleBinding
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.Divider
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.EmptySites
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SiteAllowedItem
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionSetting
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionToggle
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionsDescription
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionsHeader
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.DESCRIPTION
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.DIVIDER
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.HEADER
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.SETTING
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.SITES_EMPTY
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.SITE_ALLOWED_ITEM
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsListViewType.TOGGLE
@@ -55,6 +61,9 @@ class SitePermissionsAdapter(
     private val viewModel: SitePermissionsViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
+    private val permissionSettingsRedesign: Boolean,
+    private val onPermissionSettingClicked: (SitePermissionSetting) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items: List<SitePermissionListItem> = listOf()
@@ -67,21 +76,7 @@ class SitePermissionsAdapter(
         isMicEnabled: Boolean,
         isDrmEnabled: Boolean,
     ) {
-        val listItems = mutableListOf<SitePermissionListItem>()
-        listItems.add(SitePermissionsDescription())
-        listItems.add(SitePermissionsHeader(R.string.sitePermissionsSettingsEnablePermissionTitle))
-        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsLocation, isLocationEnabled))
-        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsCamera, isCameraEnabled))
-        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsMicrophone, isMicEnabled))
-        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsDRM, isDrmEnabled))
-        listItems.add(Divider())
-        listItems.add(SitePermissionsHeader(R.string.sitePermissionsSettingsAllowedSitesTitle))
-        if (sites.isEmpty()) {
-            listItems.add(EmptySites())
-        } else {
-            sites.forEach { listItems.add(SiteAllowedItem(it)) }
-        }
-        items = listItems
+        items = buildSitePermissionItems(sites, isLocationEnabled, isCameraEnabled, isMicEnabled, isDrmEnabled, permissionSettingsRedesign)
         sitesEmpty = sites.isEmpty()
         notifyDataSetChanged()
     }
@@ -106,6 +101,11 @@ class SitePermissionsAdapter(
                 SitePermissionToggleViewHolder(binding)
             }
 
+            SETTING -> {
+                val binding = ViewSitePermissionsSettingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                SitePermissionSettingViewHolder(binding)
+            }
+
             DIVIDER -> {
                 val view = HorizontalDivider(parent.context)
                 SitePermissionsDividerViewHolder(view)
@@ -113,6 +113,7 @@ class SitePermissionsAdapter(
 
             SITES_EMPTY -> {
                 val binding = ViewSitePermissionsEmptyListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                binding.sitesEmptyImage.isGone = appBrandDesignUpdateToggles.pictograms().isEnabled()
                 SitePermissionsSimpleViewHolder(binding)
             }
 
@@ -132,9 +133,14 @@ class SitePermissionsAdapter(
                 viewModel.permissionToggleSelected(isChecked, item.text)
             }
 
+            is SitePermissionSetting -> (holder as SitePermissionSettingViewHolder).bind(item) { onPermissionSettingClicked(item) }
             is SiteAllowedItem -> (holder as SiteViewHolder).bind(item)
             else -> {}
         }
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        (holder as? SiteViewHolder)?.cancelFaviconLoad()
     }
 
     override fun getItemViewType(position: Int) = items[position].viewType.ordinal
@@ -235,21 +241,79 @@ class SitePermissionsAdapter(
         }
     }
 
+    class SitePermissionSettingViewHolder(val binding: ViewSitePermissionsSettingBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(
+            item: SitePermissionSetting,
+            onClick: () -> Unit,
+        ) {
+            val permission = GlobalPermission.from(item.text)
+            with(binding.sitePermissionSetting) {
+                setPrimaryText(context.getString(permission?.settingTitle ?: item.text))
+                setSecondaryText(
+                    context.getString(
+                        if (item.askEnabled) R.string.permissionSettingsAskEachTime else R.string.sitePermissionsDialogNeverAllowButton,
+                    ),
+                )
+                permission?.let { setLeadingIconResource(if (item.askEnabled) it.icon else it.blockedIcon) }
+                setClickListener(onClick)
+            }
+        }
+    }
+
     class SiteViewHolder(
         private val binding: ViewSitePermissionsSiteBinding,
         private val viewModel: SitePermissionsViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
     ) : RecyclerView.ViewHolder(binding.root) {
+        private val faviconJob = ConflatedJob()
+
         fun bind(item: SiteAllowedItem) {
             val oneListItem = binding.root
             oneListItem.setPrimaryText(item.domain)
-            lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalWithPlaceholder(url = item.domain, view = oneListItem.leadingIcon())
+            faviconJob += lifecycleOwner.lifecycleScope.launch {
+                faviconManager.loadToViewFromLocalWithRetry(url = item.domain, view = oneListItem.leadingIcon())
             }
             oneListItem.setClickListener {
                 viewModel.allowedSiteSelected(item.domain)
             }
+        }
+
+        fun cancelFaviconLoad() = faviconJob.cancel()
+    }
+}
+
+internal fun buildSitePermissionItems(
+    sites: List<String>,
+    isLocationEnabled: Boolean,
+    isCameraEnabled: Boolean,
+    isMicEnabled: Boolean,
+    isDrmEnabled: Boolean,
+    permissionSettingsRedesign: Boolean,
+): List<SitePermissionListItem> = buildList {
+    val permissions = listOf(
+        R.string.sitePermissionsSettingsLocation to isLocationEnabled,
+        R.string.sitePermissionsSettingsCamera to isCameraEnabled,
+        R.string.sitePermissionsSettingsMicrophone to isMicEnabled,
+        R.string.sitePermissionsSettingsDRM to isDrmEnabled,
+    )
+    if (permissionSettingsRedesign) {
+        add(SitePermissionsHeader(R.string.settingsSitePermissions))
+        permissions.forEach { (text, enabled) -> add(SitePermissionSetting(text, enabled)) }
+        if (sites.isNotEmpty()) {
+            add(SitePermissionsHeader(R.string.sitePermissionsSettingsAllowedSitesTitle))
+            sites.forEach { add(SiteAllowedItem(it)) }
+        }
+    } else {
+        add(SitePermissionsDescription())
+        add(SitePermissionsHeader(R.string.sitePermissionsSettingsEnablePermissionTitle))
+        permissions.forEach { (text, enabled) -> add(SitePermissionToggle(text, enabled)) }
+        add(Divider())
+        add(SitePermissionsHeader(R.string.sitePermissionsSettingsAllowedSitesTitle))
+        if (sites.isEmpty()) {
+            add(EmptySites())
+        } else {
+            sites.forEach { add(SiteAllowedItem(it)) }
         }
     }
 }
@@ -265,6 +329,11 @@ sealed class SitePermissionListItem(val viewType: SitePermissionsListViewType) {
         val enable: Boolean,
     ) : SitePermissionListItem(TOGGLE)
 
+    data class SitePermissionSetting(
+        @StringRes val text: Int,
+        val askEnabled: Boolean,
+    ) : SitePermissionListItem(SETTING)
+
     class Divider : SitePermissionListItem(DIVIDER)
     data class SiteAllowedItem(val domain: String) : SitePermissionListItem(SITE_ALLOWED_ITEM)
     class EmptySites : SitePermissionListItem(SITES_EMPTY)
@@ -274,6 +343,7 @@ enum class SitePermissionsListViewType {
     DESCRIPTION,
     HEADER,
     TOGGLE,
+    SETTING,
     DIVIDER,
     SITE_ALLOWED_ITEM,
     SITES_EMPTY,

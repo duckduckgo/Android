@@ -20,7 +20,7 @@
         <item name="bottomSheetStyle">@style/AutofillBottomSheetStyle</item>
     </style>
 
-    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: draws the sheet behind the
+    <!-- Edge-to-edge variant used by bottom sheets: draws the sheet behind the
          transparent system bars (edge-to-edge, Android 15+); content clears the nav bar via
          View.applyBottomSystemBarInsetPadding() and Material adds the top status-bar inset. -->
     <style name="AutofillBottomSheetDialogThemeEdgeToEdge" parent="AutofillBottomSheetDialogTheme">
@@ -87,7 +87,7 @@
         <item name="typography">h3</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/autofill_import_instruction_bullet</item>
-        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textColor">?attr/daxColorAccentAltTextPrimary</item>
     </style>
 
     <style name="AutofillImportNumberedInstructionText">

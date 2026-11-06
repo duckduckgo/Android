@@ -19,17 +19,20 @@ package com.duckduckgo.app.tabs.db
 import com.duckduckgo.app.tabs.model.CachedPageContext
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealTabPageContextRepository @Inject constructor(
     private val dao: TabPageContextDao,
 ) : TabPageContextRepository {
 
     override suspend fun storePageContext(tabId: String, url: String, serializedPageContext: String) {
+        val metadata = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return
+        if (metadata.optString("mimeType") == "application/pdf" || metadata.has("data")) return
         dao.insertOrReplace(
             TabPageContextEntity(
                 tabId = tabId,

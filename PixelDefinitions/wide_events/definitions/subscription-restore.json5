@@ -1,0 +1,60 @@
+{
+    "android-subscription-restore": {
+        "description": "User attempts to restore their Privacy Pro subscription",
+        "owners": ["lmac012"],
+        "meta": {
+            "type": "android-subscription-restore",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "subscription-restore",
+            "status": ["SUCCESS", "FAILURE", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "restore_platform": {
+                        "type": "string",
+                        "description": "The platform used to restore the subscription",
+                        "enum": ["google_play", "email_address"]
+                    },
+                    "is_purchase_attempt": {
+                        "type": "string",
+                        "description": "true if the restore was triggered during a purchase attempt, false otherwise",
+                        "enum": ["true", "false"]
+                    },
+                    "use_query_purchases": {
+                        "type": "string",
+                        "description": "Value of the `useQueryPurchases` feature flag at flow start. When true, storeLogin() reads from PlayBillingManager.getLatestPurchase() (queryPurchases, active subscriptions only) and may surface the new NoActivePurchase / PurchaseInfoNotAvailable failure types. When false, the legacy purchaseHistory path is used.",
+                        "enum": ["true", "false"]
+                    },
+                    "restore_latency_ms_bucketed": {
+                        "type": "string",
+                        "description": "The duration of the restore flow in milliseconds, bucketed using the lower bucket boundary",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "failure_reason": {
+                        "type": "string",
+                        "description": "Error message indicating cause of the failure. Only present on FAILURE events."
+                    },
+                    "step.activation_flow_started": {
+                        "type": "string",
+                        "description": "Parameter present if the activation flow page was displayed during restore using email address.",
+                        "enum": ["true"]
+                    },
+                    "step.email_address_input": {
+                        "type": "string",
+                        "description": "Parameter present if the email address input page was displayed during restore using email address.",
+                        "enum": ["true"]
+                    },
+                    "step.one_time_password_input": {
+                        "type": "string",
+                        "description": "Parameter present if the otp input page was displayed during restore using email address.",
+                        "enum": ["true"]
+                    }
+                }
+            }
+        },
+        "context": {
+            "name": ["funnel_appsettings_android", "funnel_purchase_offer_page_android"]
+        }
+    }
+}

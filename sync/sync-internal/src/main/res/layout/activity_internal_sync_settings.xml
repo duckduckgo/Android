@@ -45,14 +45,6 @@
             android:layout_margin="10dp"
             android:text="Launch Sync Settings" />
 
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/launchSimplifiedSyncSettingsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Launch Sync Settings V2" />
-
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -96,6 +88,29 @@
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:primaryText="@string/sync_internal_promotions_header" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/openPromotionDebugButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_promotions_open_dev_screen" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+            android:id="@+id/resetAllPromotionDataButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_promotions_reset_all_data" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:primaryText="V2 Connect Flow flags" />
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -111,6 +126,13 @@
             android:layout_height="wrap_content"
             app:showSwitch="true"
             app:primaryText="canShowV2ConnectCode (display, requires canUseV2ConnectFlow)" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canUseExchangeV2Point1Toggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canUseExchangeV2Point1 (v2.1 protocol)" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/openV2PairingDebugButton"
@@ -259,6 +281,22 @@
             android:layout_height="wrap_content"
             app:showSwitch="true"
             app:primaryText="canWriteUnifiedDeviceList" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canReadUnifiedDeviceListToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canReadUnifiedDeviceList" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/canUsePatchEndpointForLegacyDeviceRenameToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canUsePatchEndpointFor\nLegacyDeviceRename"
+            app:primaryTextTruncated="false"
+        />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/migrationStatusTextView"
@@ -681,6 +719,28 @@
                 app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Check linking code" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/checkLinkingCodeCta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/sync_internal_check_linking_code_cta"
+                app:daxButtonSize="large" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/checkLinkingCodeResultTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginEnd="@dimen/keyline_4"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/connectedDevicesSectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -781,35 +841,30 @@
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="@string/sync_internal_promotions_header" />
+            app:primaryText="Device Authentication" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/clearHistoryBookmarkAddedDialogPromo"
+            android:id="@+id/authenticateButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="@string/sync_internal_promotions_clear_history_bookmark_added_promo" />
+            android:text="Authenticate" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/clearHistoryBookmarkScreenPromo"
+            android:id="@+id/invalidateGracePeriodButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="@string/sync_internal_promotions_clear_history_bookmark_screen_promo" />
+            android:text="Invalidate Grace Period" />
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/clearHistoryPasswordScreenPromo"
-            android:layout_width="wrap_content"
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/authenticateResultTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/sync_internal_promotions_clear_history_password_screen_promo" />
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/clearHistoryChatTabPagePromo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/sync_internal_promotions_clear_history_chat_tab_page_promo" />
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
 
     </LinearLayout>
     </ScrollView>

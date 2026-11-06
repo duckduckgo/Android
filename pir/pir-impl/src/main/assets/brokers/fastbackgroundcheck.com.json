@@ -1,7 +1,7 @@
 {
   "name": "FastBackgroundCheck.com",
   "url": "fastbackgroundcheck.com",
-  "version": "0.8.0",
+  "version": "0.10.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1706248800000,
   "optOutUrl": "https://www.fastbackgroundcheck.com/opt-out",

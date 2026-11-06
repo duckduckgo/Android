@@ -21,12 +21,12 @@ import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AutofillRefreshRetentionListener @Inject constructor(
     private val engagementRepository: AutofillEngagementRepository,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

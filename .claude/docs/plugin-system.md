@@ -4,7 +4,7 @@ Two kinds of plugin points exist. Pick based on whether you need remote feature 
 
 ## `@ContributesPluginPoint` — basic
 
-`PluginPoint<T>` — Dagger multibinding under the hood. Returns all registered plugins, no runtime filtering.
+`PluginPoint<T>` — Metro multibinding under the hood. Returns all registered plugins, no runtime filtering.
 
 ```kotlin
 // Declare (in -api or -impl module)
@@ -12,11 +12,11 @@ Two kinds of plugin points exist. Pick based on whether you need remote feature 
 interface MyPlugin { fun doThing() }
 
 // Contribute
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class MyPluginImpl @Inject constructor() : MyPlugin
 
 // Contribute with explicit ordering (lower value = higher priority)
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(100)
 class MyPluginImpl @Inject constructor() : MyPlugin
 

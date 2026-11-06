@@ -25,7 +25,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,9 +37,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class OnboardingInputScreenSelectionObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -63,7 +64,12 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
         }
             .distinctUntilChanged()
             .drop(1)
-            .filter { canProcess() }
+            .filter {
+                // Flows that enable the real setting themselves, just-in-time before the End CTA, produce a
+                // pre-ESTABLISHED cosmetic/real match that is not a user override.
+                !onboardingStore.isDuckAiOnboardingFlow() &&
+                    onboardingStore.getSegmentedPathWithAiInput() == null
+            }
             .onEach { (isInputScreenCosmeticallyEnabled, isInputScreenEnabled) ->
                 if (isInputScreenCosmeticallyEnabled != isInputScreenEnabled) return@onEach
 
@@ -81,7 +87,8 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .distinctUntilChanged()
             .drop(1)
             .filter {
-                canProcess() && it == AppStage.ESTABLISHED
+                // AI flows force the setting on, so we can skip changes in those cases.
+                !onboardingStore.isDuckAiOnboardingFlow() && it == AppStage.ESTABLISHED
             }
             .onEach {
                 val selection = onboardingStore.getInputScreenSelection()
@@ -91,12 +98,5 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             }
             .flowOn(dispatchers.io())
             .launchIn(appCoroutineScope)
-    }
-
-    private fun canProcess(): Boolean {
-        // AI flows enable the real setting themselves, just-in-time before the End CTA, so a
-        // pre-ESTABLISHED match there is expected rather than a user override. Detection only
-        // applies to flows that defer the setting to ESTABLISHED (i.e. non-AI flows).
-        return !onboardingStore.isDuckAiOnboardingFlow()
     }
 }

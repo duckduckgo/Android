@@ -24,7 +24,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
-import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -52,7 +51,7 @@ class FireproofWebsiteRepositoryImplTest {
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
     private lateinit var fireproofWebsiteRepositoryImpl: FireproofWebsiteRepositoryImpl
     private val mockFaviconManager: FaviconManager = mock()
-    private val lazyFaviconManager = Lazy { mockFaviconManager }
+    private val lazyFaviconManager = lazy { mockFaviconManager }
 
     @Before
     fun before() {

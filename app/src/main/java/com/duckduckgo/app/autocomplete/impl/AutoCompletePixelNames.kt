@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 enum class AutoCompletePixelNames(override val pixelName: String) : Pixel.PixelName {
@@ -48,7 +48,7 @@ enum class AutoCompletePixelNames(override val pixelName: String) : Pixel.PixelN
     AUTOCOMPLETE_DUCKAI_SWITCH_TO_TAB_SELECTION("m_autocomplete_duckai_click_switch_to_tab"),
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AutocompleteParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(

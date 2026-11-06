@@ -17,17 +17,16 @@
 package com.duckduckgo.app.onboarding
 
 import androidx.core.content.edit
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import com.duckduckgo.referral.api.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.referral.api.ReferrerParserPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -45,19 +44,6 @@ interface CustomAiOnboardingStore {
      * Calling [isEnabled] does not re-evaluate.
      */
     suspend fun isEnabled(): Boolean
-
-    /**
-     * Arms a one-shot signal that the next auto-launched input screen should open on the Duck.ai (chat) tab.
-     * Set when the custom-AI onboarding finishes (completed or skipped); consumed once by
-     * [consumeOpenInputOnDuckAiTab].
-     */
-    fun setOpenInputOnDuckAiTab()
-
-    /**
-     * Returns whether the next auto-launched input screen should open on the Duck.ai (chat) tab, clearing the
-     * signal so subsequent launches behave normally. Returns `false` when not armed.
-     */
-    fun consumeOpenInputOnDuckAiTab(): Boolean
 }
 
 interface CustomAiOnboardingResolver {
@@ -74,16 +60,15 @@ interface CustomAiOnboardingResolver {
     suspend fun resolve(): Boolean
 }
 
-@SingleInstanceIn(scope = AppScope::class)
-@ContributesBinding(scope = AppScope::class, boundType = CustomAiOnboardingStore::class)
-@ContributesBinding(scope = AppScope::class, boundType = CustomAiOnboardingResolver::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = ReferrerParserPlugin::class)
+@SingleIn(scope = AppScope::class)
+@ContributesBinding(scope = AppScope::class, binding = binding<CustomAiOnboardingStore>())
+@ContributesBinding(scope = AppScope::class, binding = binding<CustomAiOnboardingResolver>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<ReferrerParserPlugin>())
 class CustomAiOnboardingStoreImpl @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val referrerStateListener: Lazy<AppInstallationReferrerStateListener>,
     private val dispatcherProvider: DispatcherProvider,
     private val customAiOnboardingFeature: CustomAiOnboardingFeature,
-    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : CustomAiOnboardingStore, CustomAiOnboardingResolver, ReferrerParserPlugin {
 
     private val preferences by lazy { sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME) }
@@ -102,13 +87,12 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
     override suspend fun resolve() = resolveMutex.withLock {
         withContext(dispatcherProvider.io()) {
             // Ensure the install referrer (and therefore the processing function) has resolved before reading.
-            withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.get().waitForReferrerCode() }
+            withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.value.waitForReferrerCode() }
             val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRER_PARAM_PRESENT, false)
 
             val customAiOnboardingEnabled = customAiOnboardingFeature.self().isEnabled()
-            val brandDesignEnabled = brandDesignUpdateToggles.brandDesignUpdate().isEnabled()
 
-            val resolution = referrerExists && customAiOnboardingEnabled && brandDesignEnabled
+            val resolution = referrerExists && customAiOnboardingEnabled
             preferences.edit { putBoolean(PREFS_KEY_ENABLED, resolution) }
 
             return@withContext resolution
@@ -119,19 +103,6 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
         withContext(dispatcherProvider.io()) {
             preferences.getBoolean(PREFS_KEY_ENABLED, false)
         }
-    }
-
-    // Deliberately not persisted: a one-shot that should only influence the input screen launched
-    // immediately after onboarding finishes within this process.
-    @Volatile
-    private var openInputOnDuckAiTab: Boolean = false
-
-    override fun setOpenInputOnDuckAiTab() {
-        openInputOnDuckAiTab = true
-    }
-
-    override fun consumeOpenInputOnDuckAiTab(): Boolean {
-        return openInputOnDuckAiTab.also { openInputOnDuckAiTab = false }
     }
 
     companion object {

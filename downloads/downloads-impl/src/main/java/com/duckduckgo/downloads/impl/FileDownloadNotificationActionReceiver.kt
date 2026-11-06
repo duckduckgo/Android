@@ -35,18 +35,19 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_RETRIED
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class FileDownloadNotificationActionReceiver @Inject constructor(
     private val context: Context,
     private val fileDownloader: FileDownloader,
@@ -56,6 +57,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val failedDownloadRetryUrlStore: FailedDownloadRetryUrlStore,
+    private val newDownloadState: InternalNewDownloadState,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -112,6 +114,8 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
             coroutineScope.launch(dispatcherProvider.io()) {
                 failedDownloadRetryUrlStore.removeRetryUrl(downloadId)
             }
+        } else if (isDownloadSeenIntent(intent)) {
+            newDownloadState.onNewDownloadAcknowledged()
         }
     }
 
@@ -140,6 +144,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
         private const val EXTRA_CANCEL = "EXTRA_CANCEL"
         private const val EXTRA_RETRY = "EXTRA_RETRY"
         private const val EXTRA_DISMISS = "EXTRA_DISMISS"
+        private const val EXTRA_DOWNLOAD_SEEN = "EXTRA_DOWNLOAD_SEEN"
         private const val DISMISS_NOTIFICATION_EXTRA = "DISMISS_NOTIFICATION_EXTRA"
         private const val DOWNLOAD_ID_EXTRA = "downloadId"
 
@@ -170,6 +175,14 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
             }
         }
 
+        fun downloadSeenIntent(context: Context, downloadId: Long): Intent {
+            return Intent(INTENT_DOWNLOADS_NOTIFICATION_ACTION).apply {
+                setPackage(context.packageName)
+                putExtra(DOWNLOAD_ID_EXTRA, downloadId)
+                putExtra(CTA, EXTRA_DOWNLOAD_SEEN)
+            }
+        }
+
         private fun isCancelIntent(intent: Intent): Boolean {
             return intent.getStringExtra(CTA) == EXTRA_CANCEL
         }
@@ -180,6 +193,10 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
 
         private fun isDismissIntent(intent: Intent): Boolean {
             return intent.getStringExtra(CTA) == EXTRA_DISMISS
+        }
+
+        private fun isDownloadSeenIntent(intent: Intent): Boolean {
+            return intent.getStringExtra(CTA) == EXTRA_DOWNLOAD_SEEN
         }
 
         private fun shouldDismissNotification(intent: Intent): Boolean {

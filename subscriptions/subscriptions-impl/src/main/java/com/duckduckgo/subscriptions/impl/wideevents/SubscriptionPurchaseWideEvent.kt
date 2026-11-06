@@ -24,9 +24,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.repository.isActive
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.hours
@@ -95,7 +94,7 @@ interface SubscriptionPurchaseWideEvent {
     suspend fun onPurchaseFailed(error: String)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class SubscriptionPurchaseWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -359,7 +358,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        subscriptionsFeature.get().sendSubscriptionPurchaseWideEvent().isEnabled()
+        subscriptionsFeature.value.sendSubscriptionPurchaseWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

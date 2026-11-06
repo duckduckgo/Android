@@ -27,7 +27,6 @@ import android.view.ViewOutlineProvider
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import androidx.annotation.ColorInt
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
@@ -265,7 +264,6 @@ private inline fun <reified T : ViewGroup.LayoutParams> updateLayoutParam(
  * @param insetDp Optional horizontal inset in dp to prevent shadow from being cut off
  * @param shadowColor Optional shadow color (Android P and above only)
  */
-@RequiresApi(28)
 fun View.addBottomShadow(
     shadowSizeDp: Float = 12f,
     offsetYDp: Float = 3f,
@@ -276,14 +274,12 @@ fun View.addBottomShadow(
     val offsetY = offsetYDp.toPx(context)
     val inset = insetDp.toPx(context).toInt()
 
-    // Get corner radius if view is a card
-    val cornerRadius = when (this) {
-        is MaterialCardView -> this.radius
-        else -> 0f
-    }
-
     outlineProvider = object : ViewOutlineProvider() {
         override fun getOutline(view: View, outline: Outline) {
+            val cornerRadius = when (view) {
+                is MaterialCardView -> view.radius
+                else -> 0f
+            }
             // Create outline with rounded corners that match the view
             outline.setRoundRect(
                 -inset,

@@ -21,8 +21,9 @@ import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -33,11 +34,11 @@ interface NetpCohortStore {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = NetpCohortStore::class,
+    binding = binding<NetpCohortStore>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
+    binding = binding<NetPFeatureRemover.NetPStoreRemovalPlugin>(),
 )
 class RealNetpCohortStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,

@@ -18,12 +18,15 @@ package com.duckduckgo.app.statistics.wideevents.db
 
 import androidx.room.withTransaction
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPolicy
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -31,6 +34,7 @@ class WideEventRepositoryImpl @Inject constructor(
     private val database: WideEventDatabase,
     private val wideEventDao: WideEventDao,
     private val timeProvider: CurrentTimeProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : WideEventRepository {
     override suspend fun insertWideEvent(
         name: String,
@@ -38,6 +42,8 @@ class WideEventRepositoryImpl @Inject constructor(
         metadata: Map<String, String?>,
         cleanupPolicy: CleanupPolicy,
         samplingProbability: Float,
+        metaType: String,
+        metaVersion: String,
     ): Long {
         val entity =
             WideEventEntity(
@@ -50,6 +56,9 @@ class WideEventRepositoryImpl @Inject constructor(
                 cleanupPolicy = cleanupPolicy.mapToDbCleanupPolicy(),
                 activeIntervals = emptyList(),
                 samplingProbability = samplingProbability,
+                metaType = metaType,
+                metaVersion = metaVersion,
+                appVersion = appBuildConfig.versionName,
             )
 
         return wideEventDao.insertWideEvent(entity)
@@ -82,10 +91,36 @@ class WideEventRepositoryImpl @Inject constructor(
         updateWideEvent(eventId) { event ->
             checkEventIsActive(event)
 
+            val dbStatus = status.mapToDbWideEventStatus()
+
             event.copy(
-                status = status.mapToDbWideEventStatus(),
+                status = dbStatus,
                 metadata = mergeMetadata(event.metadata, metadata),
+                isFirstDailyOccurrence = recordDailyOccurrence(event.name, dbStatus),
             )
+        }
+    }
+
+    override suspend fun cleanUpWideEvent(
+        eventId: Long,
+        decide: (WideEventRepository.WideEvent) -> WideEventRepository.CleanupDecision?,
+    ) {
+        database.withTransaction {
+            val event = wideEventDao.getWideEventById(eventId) ?: return@withTransaction
+            if (event.status != null) return@withTransaction
+
+            val decision = decide(event.mapToRepositoryWideEvent()) ?: return@withTransaction
+            val dbStatus = decision.status.mapToDbWideEventStatus()
+
+            val updatedEvent =
+                event.copy(
+                    status = dbStatus,
+                    metadata = mergeMetadata(event.metadata, decision.metadata),
+                    isFirstDailyOccurrence = recordDailyOccurrence(event.name, dbStatus),
+                )
+
+            val updateSuccessful = wideEventDao.updateWideEvent(updatedEvent) == 1
+            check(updateSuccessful) { "Failed to clean up wide event" }
         }
     }
 
@@ -177,9 +212,24 @@ class WideEventRepositoryImpl @Inject constructor(
         return duration
     }
 
+    private suspend fun recordDailyOccurrence(
+        eventName: String,
+        status: WideEventEntity.WideEventStatus,
+    ): Boolean {
+        val dedupKey = "$eventName:${status.statusCode}"
+        val today = LocalDate.ofInstant(timeProvider.getCurrentTime(), ZoneOffset.UTC)
+
+        if (wideEventDao.getLastDailyOccurrenceDate(dedupKey) == today) return false
+
+        wideEventDao.upsertDailyOccurrence(
+            WideEventDailyOccurrenceEntity(dedupKey = dedupKey, lastOccurrenceDate = today),
+        )
+        return true
+    }
+
     private suspend fun updateWideEvent(
         id: Long,
-        updateAction: (WideEventEntity) -> WideEventEntity,
+        updateAction: suspend (WideEventEntity) -> WideEventEntity,
     ) {
         database.withTransaction {
             val event =

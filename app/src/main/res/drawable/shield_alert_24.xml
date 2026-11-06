@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:pathData="M12 2c1.077 0 2.186 0.359 3.124 1.266 0.608 0.589 1.626 1.2 3.043 1.653l0.345 0.111c0.806 0.263 1.603 0.56 2.212 1.123 0.744 0.688 1.118 1.668 1.224 3.096l0.025 0.39c0.06 1.083 0.037 2.286-0.266 3.584-0.395-0.389-0.843-0.724-1.333-0.992 0.161-1.017 0.144-1.973 0.078-2.871-0.091-1.227-0.388-1.775-0.746-2.106-0.355-0.328-0.852-0.531-1.64-0.79l-0.355-0.116c-1.574-0.502-2.814-1.215-3.63-2.004C13.45 3.734 12.727 3.5 12 3.5s-1.45 0.234-2.08 0.844c-0.817 0.79-2.058 1.502-3.63 2.004-1 0.32-1.59 0.532-1.996 0.907-0.358 0.33-0.655 0.88-0.745 2.104-0.14 1.885-0.064 4.033 1.436 6.453 0.906 1.46 2.272 2.644 3.638 3.463 1.389 0.833 2.666 1.225 3.357 1.225q0.14 0 0.31-0.022c0.279 0.487 0.624 0.93 1.023 1.319C12.823 21.929 12.37 22 11.98 22c-1.082 0-2.637-0.543-4.129-1.438-1.515-0.909-3.078-2.247-4.14-3.96-1.734-2.796-1.81-5.305-1.658-7.353l0.023-0.263c0.13-1.286 0.502-2.188 1.2-2.833 0.696-0.643 1.637-0.94 2.557-1.234 1.416-0.452 2.435-1.065 3.043-1.653C9.814 2.36 10.923 2 12 2m0.134 3.505c0.28-0.022 0.555 0.061 0.756 0.234 0.202 0.172 0.314 0.418 0.32 0.684l0.012 0.558c0.056 2.129 0.031 4.289-0.114 6.432-0.493 0.529-0.891 1.147-1.168 1.828-0.026-2.72-0.272-5.406-0.65-8.113L11.216 6.58c-0.036-0.263 0.036-0.524 0.208-0.726s0.43-0.327 0.71-0.35" />
+    <path
+        android:fillColor="?attr/daxColorStatusRed"
+        android:pathData="M13 17.5a4.5 4.5 0 1 1 9 0 4.5 4.5 0 1 1-9 0" />
+</vector>

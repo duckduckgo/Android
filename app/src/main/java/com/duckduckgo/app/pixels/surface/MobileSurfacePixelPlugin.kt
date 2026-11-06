@@ -22,12 +22,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixelNames
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = SurfacePixelPlugin::class,
+    binding = binding<SurfacePixelPlugin>(),
 )
 class MobileSurfacePixelPlugin @Inject constructor() : SurfacePixelPlugin {
 

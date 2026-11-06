@@ -96,29 +96,34 @@ class RealNativeInputOmnibarControllerTest {
     }
 
     @Test
-    fun whenTierUpdatedToFreeWithoutOverlayActiveThenFreePillStaysHidden() {
+    fun whenTierUpdatedToFreeWithoutOverlayActiveThenFreePillStaysHiddenAndNoImpression() {
         whenever(omnibar.omnibarView).thenReturn(omnibarView)
         duckAIFreePill.visibility = View.VISIBLE
+        var impressions = 0
 
-        testee.updateTierTitle(DuckAiTier.Free) {}
+        testee.updateTierTitle(DuckAiTier.Free, {}) { impressions++ }
 
         assertEquals(View.GONE, duckAIFreePill.visibility)
+        assertEquals(0, impressions) // pill not rendered -> no free-label impression
     }
 
     @Test
-    fun whenOverlayActiveAndTierFreeThenFreePillShown() {
+    fun whenOverlayActiveAndTierFreeThenFreePillShownAndImpressionFired() {
         whenever(omnibar.omnibarView).thenReturn(omnibarView)
-        testee.updateTierTitle(DuckAiTier.Free) {}
+        var impressions = 0
+        testee.updateTierTitle(DuckAiTier.Free, {}) { impressions++ }
 
         testee.hideBackground()
 
         assertEquals(View.VISIBLE, duckAIFreePill.visibility)
+        assertEquals(1, impressions) // upgradeable pill rendered -> exactly one impression
     }
 
     @Test
-    fun whenOverlayActiveAndTierFreeNoUpgradeThenPillShownButUpgradeAffordanceHidden() {
+    fun whenOverlayActiveAndTierFreeNoUpgradeThenPillShownButUpgradeAffordanceHiddenAndNoImpression() {
         whenever(omnibar.omnibarView).thenReturn(omnibarView)
-        testee.updateTierTitle(DuckAiTier.FreeNoUpgrade) {}
+        var impressions = 0
+        testee.updateTierTitle(DuckAiTier.FreeNoUpgrade, {}) { impressions++ }
 
         testee.hideBackground()
 
@@ -128,18 +133,46 @@ class RealNativeInputOmnibarControllerTest {
         assertEquals(View.GONE, duckAIFreePillChevron.visibility)
         assertEquals(View.GONE, aiTitle.visibility)
         assertFalse(duckAIFreePill.isClickable)
+        assertEquals(0, impressions) // non-upgradeable pill -> no free-label impression
     }
 
     @Test
     fun whenOverlayRestoredThenLaterFreeTierUpdateDoesNotResurrectFreePill() {
         whenever(omnibar.omnibarView).thenReturn(omnibarView)
-        testee.updateTierTitle(DuckAiTier.Free) {}
+        testee.updateTierTitle(DuckAiTier.Free, {}) {}
         testee.hideBackground()
         assertEquals(View.VISIBLE, duckAIFreePill.visibility)
 
         testee.restore()
-        testee.updateTierTitle(DuckAiTier.Free) {}
+        testee.updateTierTitle(DuckAiTier.Free, {}) {}
 
         assertEquals(View.GONE, duckAIFreePill.visibility)
+    }
+
+    @Test
+    fun whenPillReDisplayedAfterRestoreThenImpressionFiresAgain() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        var impressions = 0
+
+        testee.updateTierTitle(DuckAiTier.Free, {}) { impressions++ }
+        testee.hideBackground() // pill shown -> impression 1
+
+        testee.restore()
+        testee.updateTierTitle(DuckAiTier.Free, {}) { impressions++ }
+        testee.hideBackground() // pill shown again after restore -> impression 2 (latch reset)
+
+        assertEquals(2, impressions)
+    }
+
+    @Test
+    fun whenUpgradeablePillStaysVisibleAcrossReapplyThenImpressionFiresOnce() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        var impressions = 0
+
+        testee.updateTierTitle(DuckAiTier.Free, {}) { impressions++ }
+        testee.hideBackground() // pill shown -> impression 1
+        testee.setTierVisible(true) // re-apply while still visible -> no re-fire
+
+        assertEquals(1, impressions)
     }
 }

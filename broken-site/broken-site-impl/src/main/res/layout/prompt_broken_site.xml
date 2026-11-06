@@ -48,14 +48,30 @@
         app:layout_constraintTop_toBottomOf="@id/titleText"
         app:typography="body2" />
 
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/buttonFlow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:constraint_referenced_ids="reportButton,dismissButton"
+        app:flow_wrapMode="chain"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalBias="0"
+        app:flow_firstHorizontalStyle="packed"
+        app:flow_firstHorizontalBias="0"
+        app:flow_lastHorizontalStyle="packed"
+        app:flow_lastHorizontalBias="0.5"
+        app:flow_horizontalGap="@dimen/keyline_2"
+        app:flow_verticalGap="@dimen/keyline_2"
+        app:layout_constraintTop_toBottomOf="@id/bodyText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/reportButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/broken_site_prompt_button_report"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bodyText"
-        android:layout_marginTop="@dimen/keyline_2"
         app:daxButtonSize="small" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonGhost
@@ -63,10 +79,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/broken_site_prompt_button_dismiss"
-        android:layout_marginStart="@dimen/keyline_2"
-        app:layout_constraintStart_toEndOf="@id/reportButton"
-        app:layout_constraintTop_toTopOf="@id/reportButton"
         app:daxButtonSize="small" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

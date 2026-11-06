@@ -18,10 +18,10 @@ package com.duckduckgo.breakagereporting.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class BreakageReportingFeaturePlugin @Inject constructor(
     private val breakageReportingRepository: BreakageReportingRepository,
 ) : PrivacyFeaturePlugin {

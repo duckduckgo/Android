@@ -54,7 +54,7 @@ fun DaxBottomSheetDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
-    shape: Shape = DaxBottomSheetDefaults.shape,
+    shape: Shape = DaxBottomSheetDefaults.Shape,
     containerColor: Color = DaxBottomSheetDefaults.containerColor,
     contentColor: Color = DaxBottomSheetDefaults.contentColor,
     scrimColor: Color = DaxBottomSheetDefaults.scrimColor,
@@ -87,5 +87,5 @@ object DaxBottomSheetDefaults {
     val scrimColor: Color
         @Composable get() = Black.copy(alpha = .6f)
 
-    val shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+    val Shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
 }
