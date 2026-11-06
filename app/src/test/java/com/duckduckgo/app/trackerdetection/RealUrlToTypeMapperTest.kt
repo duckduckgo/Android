@@ -17,11 +17,16 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.os.Build
+import android.webkit.MimeTypeMap
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.Shadows.shadowOf
 
+@RunWith(AndroidJUnit4::class)
 class RealUrlToTypeMapperTest {
 
     private lateinit var testee: UrlToTypeMapper
@@ -29,6 +34,7 @@ class RealUrlToTypeMapperTest {
 
     @Before
     fun setup() {
+        registerMimeTypes()
         testee = RealUrlToTypeMapper()
         givenAcceptHeadersIsWildcard()
     }
@@ -94,6 +100,20 @@ class RealUrlToTypeMapperTest {
     fun whenXRequestedWithHeadersAreXmlHttpRequestThenReturnXmlHttpRequestType() {
         requestHeaders["X-Requested-With"] = "XMLHttpRequest"
         assertEquals("xmlhttprequest", testee.map("example.com/test", requestHeaders))
+    }
+
+    private fun registerMimeTypes() {
+        val mimeTypeMap = shadowOf(MimeTypeMap.getSingleton())
+        mapOf(
+            "jpg" to "image/jpeg",
+            "png" to "image/png",
+            "gif" to "image/gif",
+            "svg" to "image/svg+xml",
+            "bmp" to "image/bmp",
+            "tif" to "image/tiff",
+            "js" to "application/javascript",
+            "css" to "text/css",
+        ).forEach { (extension, mimeType) -> mimeTypeMap.addExtensionMimeTypeMapping(extension, mimeType) }
     }
 
     private fun givenAcceptHeadersIsWildcard() {

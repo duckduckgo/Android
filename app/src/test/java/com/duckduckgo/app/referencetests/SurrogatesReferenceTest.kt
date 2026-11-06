@@ -24,7 +24,6 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.room.Room
-import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adclick.api.AdClickManager
@@ -82,11 +81,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.robolectric.ParameterizedRobolectricTestRunner
 
-@RunWith(Parameterized::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 class SurrogatesReferenceTest(private val testCase: TestCase) {
 
     @get:Rule
@@ -136,7 +135,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         private val adapter: JsonAdapter<SurrogateTest> = moshi.adapter(SurrogateTest::class.java)
 
         @JvmStatic
-        @Parameterized.Parameters(name = "Test case: {index} - {0}")
+        @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             var surrogateTests: SurrogateTest? = null
             val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
@@ -168,7 +167,6 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         val expectRedirect: String,
     )
 
-    @UiThreadTest
     @Before
     fun setup() {
         initialiseTds()
