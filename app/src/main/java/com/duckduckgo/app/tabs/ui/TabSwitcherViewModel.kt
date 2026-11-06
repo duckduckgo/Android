@@ -71,6 +71,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -702,7 +703,7 @@ class TabSwitcherViewModel @Inject constructor(
         val repository = tabRepository
         val currentTabId = repository.getSelectedTab()?.tabId
         val emptyChats = repository.getTabs().filter { tab ->
-            tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && it.getQueryParameter("chatID").isNullOrBlank() } == true
+            tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && it.toChatIdOrNull(duckChat) == null } == true
         }
         val emptyChat = emptyChats.firstOrNull { it.tabId == currentTabId } ?: emptyChats.firstOrNull()
         if (emptyChat != null) {
