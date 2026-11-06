@@ -480,9 +480,18 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Access your passwords across Mobile&#160;and&#160;Desktop.</string>
-    <string name="sync_passwords_import_promo_primary_button">Turn on Sync&#160;&amp;&#160;Backup</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Start Syncing</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Access your bookmarks across Mobile&#160;and&#160;Desktop.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Turn on Sync&#160;&amp;&#160;Backup</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Start Syncing</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_primary_button_label">Start Syncing</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_primary_button_label">Start Syncing</string>
+
+    <!-- Sync promo menu in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Start Syncing</string>
 </resources>

@@ -18,7 +18,6 @@
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Sync&#160;&amp;&#160;Back&#160;Up Your&#160;Bookmarks</string>
     <string name="sync_bookmarks_promo_message">End-to-end encrypted. Nobody can see your&#160;bookmarks, not&#160;even&#160;us.</string>
-    <string name="sync_bookmarks_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
     <string name="sync_bookmarks_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
@@ -31,7 +30,6 @@
     <string name="sync_bookmark_added_set_up_promo_title">Sync&#160;&amp;&#160;Back&#160;Up Bookmarks</string>
     <string name="sync_bookmark_added_set_up_promo_more_options">More options</string>
     <string name="sync_bookmark_added_set_up_promo_menu_hide">Hide</string>
-    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Turn On Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Sync With Desktop&#160;App</string>
@@ -46,7 +44,6 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Sync&#160;&amp;&#160;Back&#160;Up Your&#160;Passwords</string>
     <string name="sync_passwords_promo_message">End-to-end encryption means nobody but you can see your&#160;passwords, not&#160;even&#160;us.</string>
-    <string name="sync_passwords_promo_primary_button">Turn On Sync&#160;&amp;&#160;Backup</string>
     <string name="sync_passwords_promo_toggle">Sync&#160;&amp;&#160;Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
