@@ -475,6 +475,18 @@ class NativeInputLayoutCoordinator(
     }
 
     /**
+     * Must be invoked when the widget is removed from the root view. Restores the padding, floated
+     * overlays and reflow transition that [configureAutocompleteLayout] and
+     * [configureContentOffset] set up for it.
+     */
+    fun onWidgetRemoved() {
+        if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+            clearAutocompleteLayoutResources?.invoke()
+            clearContentOffsetResources?.invoke()
+        }
+    }
+
+    /**
      * Around a nav bar show/hide slide (widget stays open): silence the layout listeners and suspend the
      * content-reflow transition so the per-frame [updateNavBarInset] drive moves the content in lock-step
      * with the bar. Paired with [endNavBarSlide]; both idempotent, so a rapid re-toggle that cancels the

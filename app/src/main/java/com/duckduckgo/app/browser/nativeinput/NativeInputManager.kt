@@ -1015,6 +1015,7 @@ class RealNativeInputManager @Inject constructor(
         var removed = false
         rootView.findViewById<View?>(R.id.inputModeRoot)?.let {
             rootView.removeView(it)
+            layoutCoordinator.onWidgetRemoved()
             removed = true
         }
         rootView.findViewById<View?>(R.id.inputModeWidgetNavLayout)?.let {
