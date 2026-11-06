@@ -6,6 +6,8 @@ name: "Autofill: Prompted to save and update credentials on web form"
 - retry:
       maxRetries: 3
       commands:
+        # Maestro Cloud requires launchApp first; clearState then drops the onboarding it starts.
+        - launchApp
         - clearState
 
         - openLink:
