@@ -33,6 +33,14 @@ class NextStepsCompletionChecker @Inject constructor(
         return items.filterIsInstance<CardItem.ListItem>().filter { it.id in supportedIds }
     }
 
+    suspend fun hasRemainingItems(items: List<CardItem>, dismissedIds: Set<String>): Boolean = withContext(dispatchers.io()) {
+        val checks = completionChecks.getPlugins().associateBy { it.itemId }
+        val completedIds = itemsStore.completedItemIds()
+        supportedItems(items).any { item ->
+            item.id !in completedIds && item.id !in dismissedIds && checks[item.id]?.isComplete() != true
+        }
+    }
+
     suspend fun refresh(
         items: List<CardItem.ListItem>,
         onNewlyCompleted: suspend (Set<String>) -> Unit = {},
