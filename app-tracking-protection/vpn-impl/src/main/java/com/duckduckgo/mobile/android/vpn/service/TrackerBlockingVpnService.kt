@@ -61,6 +61,9 @@ import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getUnderlyingNetworks
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.VpnEnableWideEvent
+import com.duckduckgo.mobile.android.vpn.pixels.VpnRestartWideEvent
+import com.duckduckgo.mobile.android.vpn.pixels.VpnRestartWideEvent.FailureReason
+import com.duckduckgo.mobile.android.vpn.pixels.VpnRestartWideEvent.Phase
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
@@ -156,6 +159,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     @Inject lateinit var appTpRemoteFeatures: AppTpRemoteFeatures
 
     @Inject lateinit var vpnEnableWideEvent: VpnEnableWideEvent
+
+    @Inject lateinit var vpnRestartWideEvent: VpnRestartWideEvent
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
@@ -317,6 +322,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
+        val restartInPlace = restarting && appTpRemoteFeatures.restartInPlace().isEnabled()
 
         if (!restarting) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
@@ -327,52 +333,99 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: skipping service callbacks while restarting" }
         }
 
-        // Create a null route tunnel so that leaks can't scape
-        val nullTun = createNullRouteTempTunnel()?.let {
-            if (!it.waitForTunnelUpOrTimeout()) {
-                logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
-                null
-            } else {
-                it
-            }
-        }
-        if (nullTun == null) {
-            logcat(ERROR) { "VPN log: Failed to establish the null TUN interface" }
-            deviceShieldPixels.vpnEstablishNullTunInterfaceError()
-            stopVpn(VpnStopReason.ERROR, false)
-            return@withContext
+        if (restarting) {
+            // Every timed phase runs on the stack the restart brings up, which differs from the running one when a VPN feature was toggled
+            val nextStackName = vpnNetworkStackProvider.provideNetworkStack().name
+            vpnRestartWideEvent.onRestartStarted(networkStackName = nextStackName, inPlace = restartInPlace)
         }
 
-        vpnEnableWideEvent.onNullTunnelCreated()
-
-        activeTun?.let {
-            logcat { "VPN log: restarting the tunnel" }
-            updateNetworkStackUponRestart()
-            it
-        }
-        activeTun = nullTun
-
-        val tunnelConfig = vpnNetworkStack.onPrepareVpn().getOrNull().also {
-            if (it != null) {
-                activeTun = createTunnelInterface(it)
-                activeTun?.let { tun ->
-                    if (!tun.waitForTunnelUpOrTimeout()) {
-                        activeTun = null
-                    }
+        // An in-place restart prepares the next stack and establishes the new tunnel while the current tunnel is
+        // still up. Nothing reads the current tunnel once its stack is stopped, so it keeps traffic blackholed
+        // until Android hands over to the new tunnel and no temporary null-route tunnel is needed.
+        val handover = if (restartInPlace) {
+            VpnNetworkStackHandover(
+                current = vpnNetworkStack,
+                next = vpnNetworkStackProvider.provideNetworkStack(),
+            ).also { handover ->
+                logcat { "VPN log: in-place restart, ${if (handover.isSameStack) "reusing" else "switching to"} ${handover.next.name}" }
+                if (!handover.isSameStack) {
+                    vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_CREATE)
+                    handover.next.onCreateVpnWithErrorReporting()
+                    vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_CREATE)
                 }
-            } else {
-                logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
+            }
+        } else {
+            null
+        }
+
+        if (handover == null) {
+            // Create a null route tunnel so that leaks can't scape
+            val nullTun = createNullRouteTempTunnel()?.let {
+                if (!it.waitForTunnelUpOrTimeout()) {
+                    logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
+                    null
+                } else {
+                    it
+                }
+            }
+            if (nullTun == null) {
+                logcat(ERROR) { "VPN log: Failed to establish the null TUN interface" }
+                deviceShieldPixels.vpnEstablishNullTunInterfaceError()
+                vpnRestartWideEvent.onRestartFailed(FailureReason.NULL_TUNNEL_FAILED)
                 stopVpn(VpnStopReason.ERROR, false)
                 return@withContext
             }
+
+            vpnEnableWideEvent.onNullTunnelCreated()
+
+            if (restarting) {
+                logcat { "VPN log: restarting the tunnel" }
+                vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_SWITCH)
+                updateNetworkStackUponRestart()
+                vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_SWITCH)
+            }
+            activeTun = nullTun
         }
 
-        if (activeTun == null) {
-            logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
-            deviceShieldPixels.vpnEstablishTunInterfaceError()
+        val nextNetworkStack = handover?.next ?: vpnNetworkStack
+        vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_PREPARE)
+        val tunnelConfig = nextNetworkStack.onPrepareVpn().getOrNull()
+        if (tunnelConfig == null) {
+            logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
+            vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_PREPARE_FAILED)
+            handover?.abort()
             stopVpn(VpnStopReason.ERROR, false)
             return@withContext
         }
+        vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_PREPARE)
+
+        vpnRestartWideEvent.onPhaseStarted(Phase.TUNNEL_ESTABLISH)
+        val newTun = createTunnelInterface(tunnelConfig)?.let { tun ->
+            if (tun.waitForTunnelUpOrTimeout()) {
+                tun
+            } else {
+                runCatching { tun.close() }
+                null
+            }
+        }
+        if (newTun == null) {
+            logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
+            deviceShieldPixels.vpnEstablishTunInterfaceError()
+            vpnRestartWideEvent.onRestartFailed(FailureReason.TUNNEL_ESTABLISH_FAILED)
+            handover?.abort()
+            stopVpn(VpnStopReason.ERROR, false)
+            return@withContext
+        }
+        vpnRestartWideEvent.onPhaseCompleted(Phase.TUNNEL_ESTABLISH)
+
+        handover?.let {
+            vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_SWITCH)
+            it.switch()
+            vpnNetworkStack = it.next
+            vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_SWITCH)
+        }
+        // Closes the tunnel this one replaces: the null-route tunnel, or the previous tunnel on an in-place restart
+        activeTun = newTun
 
         vpnEnableWideEvent.onVpnPrepared()
 
@@ -380,11 +433,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         // configureUnderlyingNetworks()
 
         logcat { "VPN log: Enable new error handling for onStartVpn" }
+        vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_START)
         vpnNetworkStack.onStartVpn(activeTun!!).getOrElse {
             logcat(ERROR) { "VPN log: Failed to start VPN" }
+            vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_START_FAILED)
             stopVpn(VpnStopReason.ERROR, false)
             return@withContext
         }
+        vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_START)
+        vpnRestartWideEvent.onRestartSucceeded()
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             if (restarting) {
