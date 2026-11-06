@@ -25,17 +25,29 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.codegen.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.impl.PirUserUtils
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.FREE_SCAN_BANNER
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint.VIEW_RESULTS_BANNER
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromRemoteMessage
+import com.duckduckgo.pir.impl.dashboard.entrypoint.freeScanOrigin
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -45,6 +57,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -57,6 +70,8 @@ class PirDashboardWebViewViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val pirRepository: PirRepository,
     private val subscriptions: Subscriptions,
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
+    private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -64,6 +79,18 @@ class PirDashboardWebViewViewModel @Inject constructor(
 
     private val command = Channel<Command>(Channel.BUFFERED)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    private val freeScanEntryPointResult = CompletableDeferred<PirFreeScanEntryPoint?>()
+    private var isFreeScanEntryPointRequested = false
+
+    /**
+     * Where a free scan user opened this dashboard from. It's resolved once, when the dashboard opens, so a scan that
+     * finishes during the visit doesn't change which entry point the visit is attributed to.
+     */
+    val freeScanEntryPoint: Deferred<PirFreeScanEntryPoint?> = freeScanEntryPointResult
+
+    var resolvedFreeScanEntryPoint: PirFreeScanEntryPoint? = null
+        private set
 
     init {
         // The dashboard needs to be reloaded on purchase
@@ -94,7 +121,7 @@ class PirDashboardWebViewViewModel @Inject constructor(
         viewModelScope.launch {
             command.send(
                 Command.LaunchSubscriptionPurchase(
-                    origin = route.origin,
+                    origin = freeScanOrigin(route.origin, freeScanEntryPointResult.await()),
                     featurePage = route.featurePage,
                 ),
             )
@@ -104,13 +131,22 @@ class PirDashboardWebViewViewModel @Inject constructor(
     fun onLaunched(
         isRestored: Boolean,
         fromFreemiumScanCompleteNotification: Boolean,
+        freemiumLaunch: PirFreemiumDashboardScreens?,
     ) {
+        resolveFreeScanEntryPoint(freemiumLaunch, fromFreemiumScanCompleteNotification)
+
         // a restored dashboard keeps its launch intent, and the tap was already counted when it was first created
         if (isRestored || !fromFreemiumScanCompleteNotification) {
             return
         }
 
         pirPixelSender.reportFreemiumScanCompleteNotificationOpened()
+    }
+
+    override fun onCleared() {
+        // the handshake waits on the entry point from the app scope, so it must not wait on a cleared ViewModel forever
+        freeScanEntryPointResult.cancel()
+        super.onCleared()
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -131,6 +167,28 @@ class PirDashboardWebViewViewModel @Inject constructor(
             }
         }
     }
+
+    private fun resolveFreeScanEntryPoint(
+        freemiumLaunch: PirFreemiumDashboardScreens?,
+        fromFreemiumScanCompleteNotification: Boolean,
+    ) {
+        // the ViewModel survives a configuration change, and the visit keeps the entry point it was opened with
+        if (isFreeScanEntryPointRequested) return
+        isFreeScanEntryPointRequested = true
+
+        viewModelScope.launch {
+            val entryPoint = when (freemiumLaunch) {
+                is FromEntryPoint -> freemiumLaunch.entryPoint
+                FromRemoteMessage -> withContext(dispatcherProvider.io()) { remoteMessageBannerEntryPoint() }
+                null -> if (fromFreemiumScanCompleteNotification) SCAN_COMPLETE_NOTIFICATION else null
+            }
+            resolvedFreeScanEntryPoint = entryPoint
+            freeScanEntryPointResult.complete(entryPoint)
+        }
+    }
+
+    private fun remoteMessageBannerEntryPoint(): PirFreeScanEntryPoint =
+        if (pirFreemiumDataStore.firstScanResult == null) FREE_SCAN_BANNER else VIEW_RESULTS_BANNER
 
     sealed class Command {
         data class SendJsEvent(val event: SubscriptionEventData) : Command()

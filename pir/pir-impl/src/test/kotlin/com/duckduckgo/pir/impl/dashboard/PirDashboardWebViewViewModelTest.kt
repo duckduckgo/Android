@@ -22,9 +22,15 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.LaunchSubscriptionPurchase
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromRemoteMessage
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -32,6 +38,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -51,6 +58,7 @@ class PirDashboardWebViewViewModelTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val pirRepository: PirRepository = mock()
     private val subscriptions: Subscriptions = mock()
+    private val pirFreemiumDataStore: PirFreemiumDataStore = mock()
     private val subscriptionStatus = MutableStateFlow(SubscriptionStatus.UNKNOWN)
 
     private val route = PirPurchaseRoute.NativePurchaseFlow(origin = "funnel_freescan_android", featurePage = "pir")
@@ -67,12 +75,16 @@ class PirDashboardWebViewViewModelTest {
             appBuildConfig = appBuildConfig,
             pirRepository = pirRepository,
             subscriptions = subscriptions,
+            pirFreemiumDataStore = pirFreemiumDataStore,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
         )
     }
 
     @Test
     fun `test emits launch purchase command carrying the routes parameters`() = runTest {
+        openDashboard(freemiumLaunch = null)
+
         testee.commands().test {
             testee.onSubscriptionPurchaseRequested(
                 PirPurchaseRoute.NativePurchaseFlow(origin = "funnel_freescan_android", featurePage = "pir"),
@@ -88,6 +100,7 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test ignores a second purchase request while one is already outstanding`() = runTest {
+        openDashboard(freemiumLaunch = null)
         advanceUntilIdle()
 
         testee.commands().test {
@@ -103,6 +116,7 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test allows a purchase request again after returning to the dashboard`() = runTest {
+        openDashboard(freemiumLaunch = null)
         advanceUntilIdle()
 
         testee.commands().test {
@@ -156,23 +170,163 @@ class PirDashboardWebViewViewModelTest {
 
     @Test
     fun `test reports the notification opened pixel when launched from the freemium scan complete notification`() {
-        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = true)
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = true, freemiumLaunch = null)
 
         verify(pirPixelSender).reportFreemiumScanCompleteNotificationOpened()
     }
 
     @Test
     fun `test does not report the notification opened pixel for a normal launch`() {
-        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = false)
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = false, freemiumLaunch = null)
 
         verify(pirPixelSender, never()).reportFreemiumScanCompleteNotificationOpened()
     }
 
     @Test
     fun `test does not report the notification opened pixel again when the dashboard is restored`() {
-        testee.onLaunched(isRestored = true, fromFreemiumScanCompleteNotification = true)
+        testee.onLaunched(isRestored = true, fromFreemiumScanCompleteNotification = true, freemiumLaunch = null)
 
         verify(pirPixelSender, never()).reportFreemiumScanCompleteNotificationOpened()
+    }
+
+    @Test
+    fun `test a launch without free scan attribution has no entry point`() = runTest {
+        openDashboard(freemiumLaunch = null)
+
+        assertNull(testee.freeScanEntryPoint.await())
+        assertNull(testee.resolvedFreeScanEntryPoint)
+    }
+
+    @Test
+    fun `test a launch from a known entry point keeps that entry point`() = runTest {
+        openDashboard(FromEntryPoint(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN))
+
+        assertEquals(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN, testee.freeScanEntryPoint.await())
+        assertEquals(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN, testee.resolvedFreeScanEntryPoint)
+    }
+
+    @Test
+    fun `test a remote message launch before any first scan result is the free scan banner`() = runTest {
+        whenever(pirFreemiumDataStore.firstScanResult).thenReturn(null)
+
+        openDashboard(FromRemoteMessage)
+
+        assertEquals(PirFreeScanEntryPoint.FREE_SCAN_BANNER, testee.freeScanEntryPoint.await())
+    }
+
+    @Test
+    fun `test a remote message launch with no matches found is the view results banner`() = runTest {
+        whenever(pirFreemiumDataStore.firstScanResult).thenReturn(PirFreemiumFirstScanResult.NO_MATCHES)
+
+        openDashboard(FromRemoteMessage)
+
+        assertEquals(PirFreeScanEntryPoint.VIEW_RESULTS_BANNER, testee.freeScanEntryPoint.await())
+    }
+
+    @Test
+    fun `test a remote message launch with matches found is the view results banner`() = runTest {
+        whenever(pirFreemiumDataStore.firstScanResult).thenReturn(PirFreemiumFirstScanResult.MATCHES_FOUND)
+
+        openDashboard(FromRemoteMessage)
+
+        assertEquals(PirFreeScanEntryPoint.VIEW_RESULTS_BANNER, testee.freeScanEntryPoint.await())
+    }
+
+    @Test
+    fun `test a launch from the scan complete notification is the notification entry point`() = runTest {
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = true, freemiumLaunch = null)
+
+        assertEquals(PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION, testee.freeScanEntryPoint.await())
+        assertEquals(PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION, testee.resolvedFreeScanEntryPoint)
+    }
+
+    @Test
+    fun `test a notification launch restored after process death keeps the notification entry point`() = runTest {
+        testee.onLaunched(
+            isRestored = true,
+            fromFreemiumScanCompleteNotification = true,
+            freemiumLaunch = FromEntryPoint(PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION),
+        )
+
+        assertEquals(PirFreeScanEntryPoint.SCAN_COMPLETE_NOTIFICATION, testee.freeScanEntryPoint.await())
+    }
+
+    @Test
+    fun `test a purchase from the scan complete notification carries it in the origin`() = runTest {
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = true, freemiumLaunch = null)
+
+        testee.commands().test {
+            testee.onSubscriptionPurchaseRequested(route)
+
+            assertEquals(
+                LaunchSubscriptionPurchase(origin = "funnel_freescan_android__scancompletenotification", featurePage = "pir"),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test the entry point stays the one the dashboard was opened with after it is recreated`() = runTest {
+        whenever(pirFreemiumDataStore.firstScanResult).thenReturn(null)
+        openDashboard(FromRemoteMessage)
+
+        whenever(pirFreemiumDataStore.firstScanResult).thenReturn(PirFreemiumFirstScanResult.MATCHES_FOUND)
+        testee.onLaunched(isRestored = true, fromFreemiumScanCompleteNotification = false, freemiumLaunch = FromRemoteMessage)
+
+        assertEquals(PirFreeScanEntryPoint.FREE_SCAN_BANNER, testee.freeScanEntryPoint.await())
+        assertEquals(PirFreeScanEntryPoint.FREE_SCAN_BANNER, testee.resolvedFreeScanEntryPoint)
+    }
+
+    @Test
+    fun `test a purchase from a known entry point carries it in the origin`() = runTest {
+        openDashboard(FromEntryPoint(PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN))
+
+        testee.commands().test {
+            testee.onSubscriptionPurchaseRequested(route)
+
+            assertEquals(
+                LaunchSubscriptionPurchase(origin = "funnel_freescan_android__appsettingspostscan", featurePage = "pir"),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test a purchase from a remote message launch carries the banner in the origin`() = runTest {
+        whenever(pirFreemiumDataStore.firstScanResult).thenReturn(null)
+        openDashboard(FromRemoteMessage)
+
+        testee.commands().test {
+            testee.onSubscriptionPurchaseRequested(route)
+
+            assertEquals(
+                LaunchSubscriptionPurchase(origin = "funnel_freescan_android__freescanbanner", featurePage = "pir"),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test a purchase waits for the entry point when it has not resolved yet`() = runTest {
+        testee.commands().test {
+            testee.onSubscriptionPurchaseRequested(route)
+            expectNoEvents()
+
+            openDashboard(FromEntryPoint(PirFreeScanEntryPoint.FREE_SCAN_BANNER))
+
+            assertEquals(
+                LaunchSubscriptionPurchase(origin = "funnel_freescan_android__freescanbanner", featurePage = "pir"),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private fun openDashboard(freemiumLaunch: PirFreemiumDashboardScreens?) {
+        testee.onLaunched(isRestored = false, fromFreemiumScanCompleteNotification = false, freemiumLaunch = freemiumLaunch)
     }
 
     @Test

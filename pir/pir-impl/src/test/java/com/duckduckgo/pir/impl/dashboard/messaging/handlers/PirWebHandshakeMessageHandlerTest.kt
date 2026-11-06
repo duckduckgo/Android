@@ -23,20 +23,26 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirUserUtils
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.RealPirDashboardFreeScanEntryPointHolder
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -52,6 +58,7 @@ class PirWebHandshakeMessageHandlerTest {
     private val mockPirUserUtils: PirUserUtils = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
+    private val freeScanEntryPointHolder = RealPirDashboardFreeScanEntryPointHolder()
     private val testScope = TestScope()
 
     @Before
@@ -59,6 +66,7 @@ class PirWebHandshakeMessageHandlerTest {
         testee = PirWebHandshakeMessageHandler(
             subscriptions = mockSubscriptions,
             pirUserUtils = mockPirUserUtils,
+            freeScanEntryPointHolder = freeScanEntryPointHolder,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = testScope,
         )
@@ -133,10 +141,66 @@ class PirWebHandshakeMessageHandlerTest {
         verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false)
     }
 
+    @Test
+    fun whenDashboardHasNoFreeScanEntryPointThenResponseOmitsIt() = runTest {
+        givenFreeUserNotEligibleForTrial()
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
+        freeScanEntryPointHolder.freeScanEntryPoint = CompletableDeferred(value = null)
+
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false, freeScanEntryPoint = null)
+    }
+
+    @Test
+    fun whenDashboardHasAFreeScanEntryPointThenResponseCarriesItsToken() = runTest {
+        givenFreeUserNotEligibleForTrial()
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
+        freeScanEntryPointHolder.freeScanEntryPoint = CompletableDeferred(value = PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN)
+
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false, freeScanEntryPoint = "appsettingspostscan")
+    }
+
+    @Test
+    fun whenFreeScanEntryPointIsNotResolvedYetThenResponseWaitsForIt() = runTest {
+        givenFreeUserNotEligibleForTrial()
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
+        val pendingEntryPoint = CompletableDeferred<PirFreeScanEntryPoint?>()
+        freeScanEntryPointHolder.freeScanEntryPoint = pendingEntryPoint
+
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+        verify(mockJsMessaging, never()).onResponse(any())
+
+        pendingEntryPoint.complete(PirFreeScanEntryPoint.VIEW_RESULTS_BANNER)
+
+        verifyHandshakeResponse(jsMessage, isAuthenticated = false, isEligibleForTrial = false, freeScanEntryPoint = "viewresultsbanner")
+    }
+
+    @Test
+    fun whenFreeScanEntryPointIsCancelledThenNoResponseIsSent() = runTest {
+        givenFreeUserNotEligibleForTrial()
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.HANDSHAKE)
+        val pendingEntryPoint = CompletableDeferred<PirFreeScanEntryPoint?>()
+        freeScanEntryPointHolder.freeScanEntryPoint = pendingEntryPoint
+
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+        pendingEntryPoint.cancel()
+
+        verify(mockJsMessaging, never()).onResponse(any())
+    }
+
+    private suspend fun givenFreeUserNotEligibleForTrial() {
+        whenever(mockPirUserUtils.hasPirSubscription()).thenReturn(false)
+        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(false)
+    }
+
     private fun verifyHandshakeResponse(
         jsMessage: JsMessage,
         isAuthenticated: Boolean,
         isEligibleForTrial: Boolean,
+        freeScanEntryPoint: String? = null,
     ) {
         val callbackDataCaptor = argumentCaptor<JsCallbackData>()
         verify(mockJsMessaging).onResponse(callbackDataCaptor.capture())
@@ -158,6 +222,12 @@ class PirWebHandshakeMessageHandlerTest {
 
         assertTrue(userData.has("isUserEligibleForFreeTrial"))
         assertEquals(isEligibleForTrial, userData.getBoolean("isUserEligibleForFreeTrial"))
+
+        if (freeScanEntryPoint == null) {
+            assertFalse(userData.has("freeScanEntryPoint"))
+        } else {
+            assertEquals(freeScanEntryPoint, userData.getString("freeScanEntryPoint"))
+        }
 
         assertTrue(callbackData.params.has("version"))
         assertEquals(
