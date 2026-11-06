@@ -12,6 +12,13 @@ tags:
       - openLink:
           link: duck://https://duckduckgo.com?q=why%20use%20duckduckgo
 
+      # On a cold start the omnibar shows the full URL until the SERP loads and replaces it with the query.
+      - extendedWaitUntil:
+          visible:
+            id: "omnibarTextInput|inputField"
+            text: "why use duckduckgo"
+          timeout: 10000
+
       - copyTextFrom:
           id: "omnibarTextInput|inputField"
 
