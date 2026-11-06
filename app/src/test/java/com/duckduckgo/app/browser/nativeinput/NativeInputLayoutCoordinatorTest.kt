@@ -299,6 +299,25 @@ class NativeInputLayoutCoordinatorTest {
     }
 
     @Test
+    fun whenWidgetIsRemovedRightAfterTabIsReattachedThenAutocompleteStaysAtBasePadding() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
+        idle()
+        pager.removeAllViews()
+        idle()
+
+        pager.addView(tab.root)
+        tab.root.removeView(tab.widget)
+        coordinator.onWidgetRemoved()
+        idle()
+
+        assertEquals(0, tab.autoCompleteList.paddingBottom)
+    }
+
+    @Test
     fun whenLayoutFixDisabledThenSwitchingTabsReturnsBrowserContentToBasePadding() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)

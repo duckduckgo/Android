@@ -192,7 +192,7 @@ class NativeInputLayoutCoordinator(
             override fun onViewAttachedToWindow(v: View) {
                 if (inputWidgetFixEnabled) {
                     addListeners()
-                    v.post { applyForWidgetPosition() }
+                    v.post { if (v.isAttachedToWindow) applyForWidgetPosition() }
                 }
             }
 
@@ -438,7 +438,7 @@ class NativeInputLayoutCoordinator(
             override fun onViewAttachedToWindow(v: View) {
                 if (inputWidgetFixEnabled) {
                     addListeners()
-                    v.post { applyOffset() }
+                    v.post { if (v.isAttachedToWindow) applyOffset() }
                 }
             }
 
