@@ -24,9 +24,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.brokensite.impl'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     lint {
         baseline = file("lint-baseline.xml")
     }
@@ -85,6 +82,4 @@ dependencies {
     testImplementation AndroidX.core
     testImplementation CashApp.turbine
     testImplementation project(path: ':common-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

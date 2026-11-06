@@ -35,9 +35,6 @@ android {
         }
     }
     namespace 'com.duckduckgo.mobile.android.vpn'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -132,6 +129,4 @@ dependencies {
     testImplementation project(':vpn-api-test')
     testImplementation project(':feature-toggles-test')
     testImplementation project(':data-store-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

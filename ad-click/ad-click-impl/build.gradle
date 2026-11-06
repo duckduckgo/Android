@@ -28,9 +28,6 @@ android {
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     namespace 'com.duckduckgo.adclick.impl'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -91,6 +88,4 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

@@ -32,9 +32,6 @@ android {
             includeAndroidResources = true
         }
     }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -65,6 +62,4 @@ dependencies {
     }
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

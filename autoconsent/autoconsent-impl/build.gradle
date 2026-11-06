@@ -28,9 +28,6 @@ android {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -89,8 +86,6 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
     testImplementation AndroidX.room.testing
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {

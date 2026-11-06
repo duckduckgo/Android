@@ -91,8 +91,6 @@ dependencies {
     }
     testImplementation AndroidX.lifecycle.runtime.testing
     testImplementation AndroidX.archCore.testing
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -105,9 +103,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }
 
