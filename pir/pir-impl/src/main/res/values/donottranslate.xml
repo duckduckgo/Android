@@ -58,9 +58,9 @@
     <string name="pirOnboardingStepItem5Description">It can take a while for sites to update, but your personal dashboard makes it easy to keep tabs on progress of ongoing automated removals in real time and see where any manual follow ups may be needed.</string>
 
     <!-- PIR notification permission prompt -->
-    <string name="pirNotificationPermissionPromptTitle">Get Notified When Your Scan Is Done</string>
-    <string name="pirNotificationPermissionPromptMessage">Scans run in the background and can take a while. Allow notifications and we’ll let you know as soon as your results are ready.</string>
-    <string name="pirNotificationPermissionPromptSettingsMessage">Notifications are turned off for DuckDuckGo. Turn them on in Settings and we’ll let you know as soon as your results are ready.</string>
+    <string name="pirNotificationPermissionPromptTitle">Get Notified About Your Scan?</string>
+    <string name="pirNotificationPermissionPromptMessage">Scans can take a while. If you allow notifications, we’ll let you know when your results are ready.</string>
+    <string name="pirNotificationPermissionPromptSettingsMessage">Scans can take a while. If you turn on notifications in Settings, we’ll let you know when your results are ready.</string>
     <string name="pirNotificationPermissionPromptAllow">Allow Notifications</string>
     <string name="pirNotificationPermissionPromptOpenSettings">Open Settings</string>
     <string name="pirNotificationPermissionPromptNotNow">Not Now</string>
