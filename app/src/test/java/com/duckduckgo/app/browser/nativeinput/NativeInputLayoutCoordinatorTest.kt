@@ -45,6 +45,7 @@ class NativeInputLayoutCoordinatorTest {
     private val coordinator = NativeInputLayoutCoordinator(
         rootView = mock(),
         omnibarState = mock(),
+        inputWidgetFixEnabled = true,
     )
 
     @Test
@@ -89,7 +90,7 @@ class NativeInputLayoutCoordinatorTest {
             addView(ntp)
             addView(widget)
         }
-        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
         coordinator.configureContentOffset(widget, isBottom = false)
 
         coordinator.setImeAnimating(true)
@@ -118,7 +119,7 @@ class NativeInputLayoutCoordinatorTest {
             addView(widget, FrameLayout.LayoutParams(MATCH_PARENT, CARD_TOP_MARGIN_PX + CARD_HEIGHT_PX, Gravity.BOTTOM))
         }
         activity.setContentView(root)
-        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
 
         coordinator.configureContentOffset(widget, isBottom = true)
         shadowOf(Looper.getMainLooper()).idle()
@@ -138,7 +139,7 @@ class NativeInputLayoutCoordinatorTest {
             View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
         )
         root.layout(0, 0, 1000, 1000)
-        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
         coordinator.applyForcedBottomTranslation(widget, isBottom = true)
         assertEquals(600f, widget.translationY)
 
@@ -161,7 +162,7 @@ class NativeInputLayoutCoordinatorTest {
         activity.setContentView(root)
         root.layout(0, 0, 1000, 1000)
         widget.layout(0, 0, 1000, 400)
-        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
         coordinator.applyForcedBottomTranslation(widget, isBottom = true)
         assertEquals(600f, widget.translationY)
 
