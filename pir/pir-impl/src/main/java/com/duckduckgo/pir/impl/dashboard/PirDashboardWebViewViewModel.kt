@@ -171,7 +171,8 @@ class PirDashboardWebViewViewModel @Inject constructor(
         showScanNotificationIfRunning()
     }
 
-    fun onResumed() {
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
         if (!awaitingReturnFromNotificationSettings) return
         awaitingReturnFromNotificationSettings = false
 

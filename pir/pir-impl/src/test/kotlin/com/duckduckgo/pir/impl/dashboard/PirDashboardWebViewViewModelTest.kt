@@ -524,7 +524,7 @@ class PirDashboardWebViewViewModelTest {
         advanceUntilIdle()
         givenNotifications(permissionGranted = true, canShow = true)
 
-        testee.onResumed()
+        testee.onResume(mock())
 
         verify(pirPixelSender).reportNotificationPermissionGranted(PirNotificationPromptType.OPEN_SETTINGS)
     }
@@ -535,7 +535,7 @@ class PirDashboardWebViewViewModelTest {
         advanceUntilIdle()
         givenNotifications(permissionGranted = true, canShow = false)
 
-        testee.onResumed()
+        testee.onResume(mock())
 
         verify(pirPixelSender, never()).reportNotificationPermissionGranted(any())
     }
@@ -562,7 +562,7 @@ class PirDashboardWebViewViewModelTest {
         advanceUntilIdle()
         givenNotifications(permissionGranted = true, canShow = true)
 
-        testee.onResumed()
+        testee.onResume(mock())
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter).showScanNotificationIfRunning()
@@ -574,7 +574,7 @@ class PirDashboardWebViewViewModelTest {
         advanceUntilIdle()
         givenNotifications(permissionGranted = true, canShow = false)
 
-        testee.onResumed()
+        testee.onResume(mock())
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
@@ -584,7 +584,7 @@ class PirDashboardWebViewViewModelTest {
     fun `test resuming without going to settings does not show the scan notification`() = runTest {
         givenNotifications(permissionGranted = true, canShow = true)
 
-        testee.onResumed()
+        testee.onResume(mock())
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
@@ -595,9 +595,9 @@ class PirDashboardWebViewViewModelTest {
         testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
         advanceUntilIdle()
 
-        testee.onResumed()
+        testee.onResume(mock())
         givenNotifications(permissionGranted = true, canShow = true)
-        testee.onResumed()
+        testee.onResume(mock())
         advanceUntilIdle()
 
         verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()

@@ -126,11 +126,6 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         )
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.onResumed()
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         viewModel.resolvedFreeScanEntryPoint?.let { outState.putString(KEY_FREE_SCAN_ENTRY_POINT, it.name) }
