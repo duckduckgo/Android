@@ -44,7 +44,10 @@ interface RemoteMessagingRepository {
 
     suspend fun clearMessageImage(surface: Surface)
 
-    suspend fun getCardItemImageFilePath(itemId: String): String?
+    suspend fun getItemImageFilePath(
+        message: RemoteMessage,
+        itemId: String,
+    ): String?
 }
 
 class AppRemoteMessagingRepository(
@@ -143,7 +146,10 @@ class AppRemoteMessagingRepository(
         remoteMessageImageStore.clearStoredImageFile(surface)
     }
 
-    override suspend fun getCardItemImageFilePath(itemId: String): String? {
-        return remoteMessageImageStore.getCardItemImageFilePath(itemId)
+    override suspend fun getItemImageFilePath(
+        message: RemoteMessage,
+        itemId: String,
+    ): String? {
+        return remoteMessageImageStore.getItemImageFilePath(message, itemId)
     }
 }

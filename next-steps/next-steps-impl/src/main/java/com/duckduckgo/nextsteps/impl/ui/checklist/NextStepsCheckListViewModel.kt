@@ -71,6 +71,8 @@ class NextStepsCheckListViewModel @Inject constructor(
         data class ListItem(
             val item: CardItem.ListItem,
             val completed: Boolean,
+            /** Local file path of the item image downloaded with the message, or null to load [CardItem.ListItem.imageUrl]. */
+            val imageFilePath: String? = null,
         )
     }
 
@@ -199,7 +201,13 @@ class NextStepsCheckListViewModel @Inject constructor(
         }
         startCompletionAnimationIfDue(settledListItems)
         val listItems = supportedItems
-            .map { ViewState.ListItem(item = it, completed = it.id in completedIds && it.id != animatingCompletionItemId) }
+            .map {
+                ViewState.ListItem(
+                    item = it,
+                    completed = it.id in completedIds && it.id != animatingCompletionItemId,
+                    imageFilePath = if (it.imageUrl.isNullOrEmpty()) null else remoteMessageModel.getItemImageFile(this, it.id),
+                )
+            }
             .sortedItems()
         if (listItems.isNotEmpty() && shownMessageId != id) {
             shownMessageId = id

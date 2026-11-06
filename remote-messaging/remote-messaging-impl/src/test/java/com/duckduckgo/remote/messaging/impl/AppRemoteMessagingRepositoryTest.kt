@@ -476,20 +476,22 @@ class AppRemoteMessagingRepositoryTest {
     }
 
     @Test
-    fun whenGetCardItemImageFilePathThenReturnImagePathFromImageStore() = runTest {
-        whenever(remoteMessageImageStore.getCardItemImageFilePath("item1")).thenReturn("/path/to/item1.png")
+    fun whenGetItemImageFilePathThenReturnImagePathFromImageStore() = runTest {
+        val message = RemoteMessage("id", Small("", ""), emptyList(), emptyList(), emptyList())
+        whenever(remoteMessageImageStore.getItemImageFilePath(message, "item1")).thenReturn("/path/to/item1.png")
 
-        val result = testee.getCardItemImageFilePath("item1")
+        val result = testee.getItemImageFilePath(message, "item1")
 
         assertEquals("/path/to/item1.png", result)
-        verify(remoteMessageImageStore).getCardItemImageFilePath("item1")
+        verify(remoteMessageImageStore).getItemImageFilePath(message, "item1")
     }
 
     @Test
-    fun whenGetCardItemImageFilePathReturnNullWhenStoreReturnsNull() = runTest {
-        whenever(remoteMessageImageStore.getCardItemImageFilePath("item1")).thenReturn(null)
+    fun whenGetItemImageFilePathReturnNullWhenStoreReturnsNull() = runTest {
+        val message = RemoteMessage("id", Small("", ""), emptyList(), emptyList(), emptyList())
+        whenever(remoteMessageImageStore.getItemImageFilePath(message, "item1")).thenReturn(null)
 
-        val result = testee.getCardItemImageFilePath("item1")
+        val result = testee.getItemImageFilePath(message, "item1")
 
         assertNull(result)
     }
