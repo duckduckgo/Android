@@ -36,13 +36,6 @@
       "short_fix": "Make it unable to fail, or return a sealed result."
     },
     {
-      "id": "M6",
-      "name": "Within the size ceiling",
-      "why": "The module has more than 80 public declarations: it covers several responsibilities, and every consumer depends on more than it uses.",
-      "fix": "Split it by who calls it, grouped by shared callers.",
-      "short_fix": "Split the module by who calls it."
-    },
-    {
       "id": "M7",
       "name": "No untyped or positional types",
       "why": "`Any`, `Pair` or `Triple` is in a public signature. `Any` turns type errors into runtime crashes; `Pair` and `Triple` drop the names of what's returned.",
