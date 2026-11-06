@@ -73,8 +73,12 @@ class SyncPasswordsImportPromotionPlugin @Inject constructor(
     @Volatile
     private var promoActionStyle = ActionStyle.Buttons
 
+    @Volatile
+    private var useUpdatedCopy = false
+
     override suspend fun isEligible(data: ImportResult): Boolean {
         promoActionStyle = if (promotion.shouldUseToggle()) ActionStyle.Toggle else ActionStyle.Buttons
+        useUpdatedCopy = promotion.shouldUseUpdatedCopy()
         return promotion.canShowPromotion(data.successCount)
     }
 
@@ -85,6 +89,7 @@ class SyncPasswordsImportPromotionPlugin @Inject constructor(
         return SyncPasswordsImportPromotionView(context).apply {
             layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             this.callback = callback
+            useUpdatedCopy = this@SyncPasswordsImportPromotionPlugin.useUpdatedCopy
             actionStyle = promoActionStyle
         }
     }
@@ -105,16 +110,17 @@ class SyncPasswordsImportPromotionView @JvmOverloads constructor(
 
     var callback: Callback? = null
 
+    internal var useUpdatedCopy: Boolean = false
+        set(value) {
+            field = value
+            updateTitle()
+        }
+
     internal var actionStyle: ActionStyle
         get() = binding.promoMessage.actionStyle
         set(value) {
             binding.promoMessage.actionStyle = value
-            binding.promoMessage.title = context.getString(
-                when (value) {
-                    ActionStyle.Buttons -> R.string.sync_passwords_import_promo_title
-                    ActionStyle.Toggle -> R.string.sync_passwords_import_promo_title_toggle
-                },
-            )
+            updateTitle()
         }
 
     private val binding: ViewSyncPasswordsImportPromotionBinding by viewBinding()
@@ -146,6 +152,16 @@ class SyncPasswordsImportPromotionView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         job.cancel()
+    }
+
+    private fun updateTitle() {
+        binding.promoMessage.title = context.getString(
+            when {
+                actionStyle == ActionStyle.Toggle -> R.string.sync_passwords_import_promo_title_toggle
+                useUpdatedCopy -> R.string.sync_passwords_import_promo_title_label
+                else -> R.string.sync_passwords_import_promo_title
+            },
+        )
     }
 
     private fun processCommand(command: Command) {

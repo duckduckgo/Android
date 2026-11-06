@@ -28,6 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:promoHeaderImage="@drawable/laptop_ddginstall_96"
+        app:promoMessageText="@string/sync_bookmarks_multi_device_promo_message"
+        app:promoPrimaryButtonIcon="@drawable/ic_qr2_16"
         app:promoPrimaryButtonText="@string/sync_bookmarks_multi_device_promo_primary_button"
         app:promoSecondaryButtonText="@string/sync_bookmarks_multi_device_promo_secondary_button"
         app:promoShowCloseButton="true"

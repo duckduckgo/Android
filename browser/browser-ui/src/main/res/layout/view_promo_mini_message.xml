@@ -90,10 +90,12 @@
                 tools:text="Secondary"
                 tools:visibility="visible" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/primaryButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:iconGravity="textStart"
+                app:iconSize="16dp"
                 android:visibility="gone"
                 tools:text="Primary"
                 tools:visibility="visible" />
