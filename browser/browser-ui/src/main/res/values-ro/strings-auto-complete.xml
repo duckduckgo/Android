@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Anulare</string>
     <string name="autocompleteRemoveItemRemove">Elimină</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Comută la fila %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Întreabă Duck.ai</string>
 </resources>

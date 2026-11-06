@@ -26,7 +26,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp">
+        app:layout_constraintWidth_max="@dimen/nextStepsCardMaxWidth">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -50,8 +50,8 @@
 
             <ImageView
                 android:id="@+id/closeButton"
-                android:layout_width="@dimen/nextStepsCloseButtonSize"
-                android:layout_height="@dimen/nextStepsCloseButtonSize"
+                android:layout_width="@dimen/nextStepsCheckListItemIconSize"
+                android:layout_height="@dimen/nextStepsCheckListItemIconSize"
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:background="@drawable/background_next_steps_close_button"
                 android:contentDescription="@string/closeButtonContentDescription"

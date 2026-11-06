@@ -417,7 +417,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.CloseAndSelectTab("abc"), commandCaptor.lastValue)
     }
 
     @Test
@@ -441,7 +441,7 @@ class TabSwitcherViewModelTest {
     fun whenExistingRegularTabSelectedThenEntryPointNotReported() = runTest {
         testee.onTabSelected("abc")
 
-        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any())
+        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any(), any())
     }
 
     @Test

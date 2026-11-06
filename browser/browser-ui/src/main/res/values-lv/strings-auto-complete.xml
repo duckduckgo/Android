@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Atcelt</string>
     <string name="autocompleteRemoveItemRemove">Noņemt</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Pārslēgties uz cilni · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Pajautā Duck.ai</string>
 </resources>

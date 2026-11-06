@@ -29,6 +29,7 @@ import com.duckduckgo.nextsteps.impl.NextStepsCompletionChecker
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
 import com.duckduckgo.nextsteps.impl.NextStepsTelemetry
 import com.duckduckgo.nextsteps.impl.isNextStepsForNewTabPage
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
@@ -66,6 +67,8 @@ class NextStepsStackedCardsViewModel @Inject constructor(
         val message: RemoteMessage? = null,
         val title: String = "",
         val items: List<CardItem.ListItem> = emptyList(),
+        /** Local image file path by item id, for the items whose image was downloaded with the message. */
+        val imageFilePaths: Map<String, String> = emptyMap(),
     )
 
     sealed class Command {
@@ -114,6 +117,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
                     message = message,
                     title = content?.titleText.orEmpty(),
                     items = items,
+                    imageFilePaths = if (message == null) emptyMap() else imageFilePaths(message, items),
                 )
                 if (message != null && items.isEmpty()) {
                     dismissMessage(message)
@@ -155,7 +159,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
         } ?: return
         pendingCompletion = PendingCompletion(item.id)
         viewModelScope.launch {
-            telemetry.onCtaClicked(item.id)
+            telemetry.onCtaClicked(Variant.STACKED_CARDS, item.id)
             command.send(nextCommand)
         }
     }
@@ -168,7 +172,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
         val dismissedId = _viewState.value.items.firstOrNull()?.id ?: return
         val remaining = removeFrontCard()
         viewModelScope.launch {
-            telemetry.onCardDismissed(dismissedId)
+            telemetry.onItemDismissed(dismissedId)
             withContext(dispatchers.io()) { itemsStore.addDismissedItemId(dismissedId) }
             onFrontCardRemoved(remaining)
         }
@@ -209,25 +213,34 @@ class NextStepsStackedCardsViewModel @Inject constructor(
         val onScreen = _viewState.value.items
         val isNewMessage = _viewState.value.message?.id != message.id
         return if (onScreen.isEmpty() || isNewMessage) {
-            loadItems(message, remaining)
+            loadItems(message, remaining, completedIds)
         } else {
             refreshOnScreenItems(message, onScreen, remaining, completedIds)
         }
     }
 
+    private suspend fun imageFilePaths(
+        message: RemoteMessage,
+        items: List<CardItem.ListItem>,
+    ): Map<String, String> = items
+        .filter { !it.imageUrl.isNullOrEmpty() }
+        .mapNotNull { item -> remoteMessageModel.getItemImageFile(message, item.id)?.let { item.id to it } }
+        .toMap()
+
     private suspend fun refreshCompletedItemIds(items: List<CardItem.ListItem>): Set<String> =
-        completionChecker.refresh(items, onNewlyCompleted = telemetry::onCardsCompleted)
+        completionChecker.refresh(items) { telemetry.onItemsCompleted(Variant.STACKED_CARDS, it) }
 
     private suspend fun loadItems(
         message: RemoteMessage,
         remaining: List<CardItem.ListItem>,
+        completedIds: Set<String>,
     ): List<CardItem.ListItem> = withContext(dispatchers.io()) {
         if (remaining.isEmpty()) return@withContext emptyList()
         val visible = remaining.sortedByOrder(itemsStore.itemOrder()).rotatedIfDue()
         itemsStore.saveItemOrder(visible.map { it.id })
         if (visible.isNotEmpty()) {
             countImpressionForRotationAndRmf(message, visible.first().id)
-            telemetry.onFrontCardShown(message.id, visible.first().id, visible.ids())
+            telemetry.onFrontCardShown(message.id, visible.first().id, visible.ids(), completedIds)
         }
         visible
     }
@@ -278,7 +291,7 @@ class NextStepsStackedCardsViewModel @Inject constructor(
     private fun dismissMessage(message: RemoteMessage) {
         viewModelScope.launch {
             if (itemsStore.markMessageDismissed(message.id)) {
-                telemetry.onAllCardsDone()
+                telemetry.onAllItemsDone()
                 remoteMessageModel.onMessageDismissed(message)
             }
         }

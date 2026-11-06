@@ -25,4 +25,5 @@ data class PageContextAttachment(
     val title: String,
     val url: String,
     val tabId: String?,
+    val mimeType: String = "",
 )

@@ -18,12 +18,21 @@ package com.duckduckgo.nextsteps.impl.ui.checklist
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.widget.WidgetType
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.nextsteps.api.NextStepCompletionCheck
 import com.duckduckgo.nextsteps.impl.NextStepsCompletionChecker
 import com.duckduckgo.nextsteps.impl.NextStepsItemsStore
 import com.duckduckgo.nextsteps.impl.RealNextStepsItemsStore
+import com.duckduckgo.nextsteps.impl.RealNextStepsTelemetry
+import com.duckduckgo.nextsteps.impl.RealNextStepsTelemetryStore
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Days
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.ALREADY_COMPLETE
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.COMPLETED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.FINISHED_ELSEWHERE
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant.CHECK_LIST
 import com.duckduckgo.nextsteps.impl.ui.checklist.NextStepsCheckListViewModel.Command
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
@@ -50,6 +59,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
 
 class NextStepsCheckListViewModelTest {
 
@@ -66,6 +76,17 @@ class NextStepsCheckListViewModelTest {
     private val syncCheck = FakeCompletionCheck(syncItem.id)
     private val completionChecks = FakePluginPoint(listOf(defaultBrowserCheck, addWidgetCheck, syncCheck))
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
+    private val pixels: NextStepsPixels = mock()
+    private val clock: CurrentTimeProvider = mock {
+        whenever(it.localDateTimeNow()).thenReturn(LocalDateTime.of(2026, 10, 21, 12, 0))
+    }
+    private val telemetry = RealNextStepsTelemetry(
+        RealNextStepsTelemetryStore(FakeSharedPreferencesProvider()),
+        pixels,
+        mock(),
+        clock,
+        coroutineRule.testDispatcherProvider,
+    )
 
     private lateinit var testee: NextStepsCheckListViewModel
     private val commands = mutableListOf<Command>()
@@ -78,6 +99,7 @@ class NextStepsCheckListViewModelTest {
             itemsStore = itemsStore,
             completionChecker = NextStepsCompletionChecker(itemsStore, completionChecks, coroutineRule.testDispatcherProvider),
             defaultRoleBrowserDialog = defaultRoleBrowserDialog,
+            telemetry = telemetry,
         )
         testee.commands().onEach { commands.add(it) }.launchIn(coroutineRule.testScope)
         testee.onViewAttached()
@@ -385,15 +407,177 @@ class NextStepsCheckListViewModelTest {
     }
 
     @Test
-    fun `when every item is already completed then the section stays visible`() = runTest {
-        defaultBrowserCheck.completed = true
-        addWidgetCheck.completed = true
+    fun `when the section renders then its items count one impression and resuming does not add another`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        testee.onItemClicked(addWidgetItem.id)
+        advanceUntilIdle()
+
+        verify(pixels, times(1)).sectionShownUnique("android_complete_your_setup", CHECK_LIST)
+        verify(pixels).itemCtaClicked(CHECK_LIST, addWidgetItem.id, DAY_0, "1")
+    }
+
+    @Test
+    fun `when the view is attached again then its items count another impression`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onViewDetached()
+        testee.onViewAttached()
+        advanceUntilIdle()
+
+        testee.onItemClicked(addWidgetItem.id)
+        advanceUntilIdle()
+
+        verify(pixels, times(1)).sectionShownUnique(any(), any())
+        verify(pixels).itemCtaClicked(CHECK_LIST, addWidgetItem.id, DAY_0, "2")
+    }
+
+    @Test
+    fun `when the clicked item completes then it is reported as completed`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onItemClicked(syncItem.id)
+        advanceUntilIdle()
+
         syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        verify(pixels).itemRemoved(CHECK_LIST, syncItem.id, DAY_0, COMPLETED, "1")
+    }
+
+    @Test
+    fun `when an item completes without being clicked then it is reported as finished elsewhere`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
 
+        addWidgetCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        verify(pixels).itemRemoved(CHECK_LIST, addWidgetItem.id, DAY_0, FINISHED_ELSEWHERE, "1")
+    }
+
+    @Test
+    fun `when an item was completed before the first render then it is reported as already complete`() = runTest {
+        defaultBrowserCheck.completed = true
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        verify(pixels).itemRemoved(CHECK_LIST, defaultBrowserItem.id, DAY_0, ALREADY_COMPLETE, "0")
+    }
+
+    @Test
+    fun `when the completed section is dismissed then all items done is reported once with the completion breakdown`() = runTest {
+        defaultBrowserCheck.completed = true
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onItemClicked(syncItem.id)
+        advanceUntilIdle()
+        syncCheck.completed = true
+        addWidgetCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        testee.onSectionDismissed()
+        testee.onSectionDismissed()
+        advanceUntilIdle()
+
+        verify(pixels, times(1)).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "all_items_done",
+            completed = 1,
+            dismissed = null,
+            finishedElsewhere = 1,
+            alreadyComplete = 1,
+        )
+        verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when the section is dismissed with items still open then user dismissed is reported with the completions on screen`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onItemClicked(syncItem.id)
+        advanceUntilIdle()
+        syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        testee.onSectionDismissed()
+        advanceUntilIdle()
+
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "user_dismissed",
+            completed = 1,
+            dismissed = null,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
+    }
+
+    @Test
+    fun `when every item is already completed when the page renders then the section is dismissed without being shown`() = runTest {
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+        syncCheck.completed = true
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        advanceUntilIdle()
+
+        assertNull(testee.viewState.value.message)
+        assertTrue(testee.viewState.value.listItems.isEmpty())
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
+        verify(remoteMessageModel, never()).onMessageShown(any())
+    }
+
+    @Test
+    fun `when the section was completed on a page then the next page dismisses it as all items done`() = runTest {
+        val message = aMessage(content = nextStepsContent())
+        activeMessage.value = message
+        advanceUntilIdle()
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+        syncCheck.completed = true
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        testee.onViewDetached()
+        testee.onViewAttached()
+        advanceUntilIdle()
+
+        assertNull(testee.viewState.value.message)
+        verify(remoteMessageModel, times(1)).onMessageShown(any())
+        verify(remoteMessageModel, times(1)).onMessageDismissed(message)
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "all_items_done",
+            completed = 0,
+            dismissed = null,
+            finishedElsewhere = 3,
+            alreadyComplete = 0,
+        )
+    }
+
+    @Test
+    fun `when the section still has open items then the next page shows it again`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+
+        testee.onViewDetached()
+        testee.onViewAttached()
+        advanceUntilIdle()
+
         assertEquals(3, testee.viewState.value.listItems.size)
-        assertTrue(testee.viewState.value.listItems.all { it.completed })
         verify(remoteMessageModel, never()).onMessageDismissed(any())
     }
 
@@ -459,6 +643,28 @@ class NextStepsCheckListViewModelTest {
         override suspend fun isComplete(): Boolean = completed
     }
 
+    @Test
+    fun `when an item image was downloaded with the message then its local path is in the state`() = runTest {
+        val itemsWithImages = listOf(defaultBrowserItem.copy(imageUrl = "https://img/1.png"), addWidgetItem.copy(imageUrl = "https://img/2.png"))
+        val message = aMessage(content = nextStepsContent(itemsWithImages))
+        whenever(remoteMessageModel.getItemImageFile(message, defaultBrowserItem.id)).thenReturn("/images/1.png")
+        whenever(remoteMessageModel.getItemImageFile(message, addWidgetItem.id)).thenReturn(null)
+        activeMessage.value = message
+        advanceUntilIdle()
+
+        val listItems = testee.viewState.value.listItems
+        assertEquals("/images/1.png", listItems.first { it.item.id == defaultBrowserItem.id }.imageFilePath)
+        assertNull(listItems.first { it.item.id == addWidgetItem.id }.imageFilePath)
+    }
+
+    @Test
+    fun `when an item has no image url then no local image is looked up`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        verify(remoteMessageModel, never()).getItemImageFile(any(), any())
+    }
+
     private fun nextStepsContent(items: List<CardItem> = listOf(defaultBrowserItem, addWidgetItem, syncItem)) = Content.ActionableItems(
         titleText = "Complete your setup",
         listItems = items,
@@ -476,6 +682,7 @@ class NextStepsCheckListViewModelTest {
     )
 
     private companion object {
+        val DAY_0 = Days(activeDay = "0", calendarDay = "0")
         val defaultBrowserItem = CardItem.ListItem(
             id = "setup_default_browser",
             type = CardItemType.ONE_ACTION_ITEM,

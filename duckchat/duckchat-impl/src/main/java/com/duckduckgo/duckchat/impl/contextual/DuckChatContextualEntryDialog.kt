@@ -46,6 +46,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.DialogContextualDuckAiEntryBinding
@@ -217,7 +218,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun renderViewState(state: DuckChatContextualEntryViewModel.ViewState) {
         val context = state.attachedContext
         if (context != null) {
-            binding.entryNativeInputCard.widget.setPageContext(context.title, context.url)
+            binding.entryNativeInputCard.widget.setPageContext(context.title, context.url, context.mimeType)
         } else {
             binding.entryNativeInputCard.widget.clearPageContext()
         }
@@ -272,7 +273,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureQuickAction() {
         binding.entryPromptQuickAction.setOnClickListener {
             if (viewModel.viewState.value.attachedContext == null) return@setOnClickListener
-            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(R.string.duckAIContextualPromptSummarize), null, null, null, null, null))
+            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(summarizePromptResource()), null, null, null, null, null))
         }
     }
 
@@ -306,7 +307,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached ->
-                        viewModel.onPageContextReceived(command.pageContext)
+                        if (command.tabId == tabId) viewModel.onPageContextReceived(command.pageContext)
 
                     is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished ->
                         // The dialog may have opened while the page was still loading, so the initial
@@ -348,7 +349,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             onAskAboutPage = { viewModel.onAttachContextRequested() },
             onPageContextRemoved = { viewModel.onContextRemoved() },
             onVoiceChatRequested = {
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
                 dismiss()
             },
             onVoiceSearchRequested = {
@@ -366,14 +367,22 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     ) {
         if (query.isBlank()) return
         if (isDuckAiResult) {
-            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null))
+            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null), voice = true)
         } else {
             startActivity(browserNav.openInNewTab(requireContext(), query))
             dismiss()
         }
     }
 
+    private fun summarizePromptResource(): Int =
+        if (duckChatFeature.pdfPageContext().isEnabled() && viewModel.viewState.value.attachedContext?.mimeType == PDF_MIME_TYPE) {
+            R.string.duckAIContextualPromptSummarizeDocument
+        } else {
+            R.string.duckAIContextualPromptSummarize
+        }
+
     private fun updateQuickActionVisibility() {
+        binding.entryPromptQuickAction.setText(summarizePromptResource())
         // Summarize acts on the attached page, and suggestions take its place when present.
         val show = viewModel.viewState.value.attachedContext != null && !binding.entrySuggestionsView.hasContent()
         binding.entryPromptQuickAction.visibility = if (show) View.VISIBLE else View.GONE

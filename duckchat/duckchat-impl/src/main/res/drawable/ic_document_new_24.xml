@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M9 22C6.23858 22 4 19.7614 4 17V7C4 4.23858 6.23858 2 9 2H12.6198C13.3823 2 14.1136 2.3029 14.6527 2.84207L19.1579 7.34727C19.6971 7.88644 20 8.61771 20 9.3802V11.0239C20 11.5007 19.5074 11.8238 19.0465 11.7012C18.7377 11.619 18.5 11.3489 18.5 11.0293V10L15.75 10C13.6789 10 12 8.32107 12 6.25V3.5H9C7.067 3.5 5.5 5.067 5.5 7V17C5.5 18.933 7.067 20.5 9 20.5H11.954C12.1698 20.5 12.3679 20.6174 12.4866 20.7976C12.7932 21.2627 12.4896 22 11.9326 22H9ZM13.5 3.81865V6.25C13.5 7.49264 14.5074 8.5 15.75 8.5L18.1813 8.5C18.1548 8.46818 18.1268 8.43746 18.0973 8.40793L13.5921 3.90273C13.5625 3.87321 13.5318 3.84516 13.5 3.81865Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M22 17.4998C22 19.985 19.9853 21.9998 17.5 21.9998C15.0147 21.9998 13 19.985 13 17.4998C13 15.0145 15.0147 12.9998 17.5 12.9998C19.9853 12.9998 22 15.0145 22 17.4998ZM18.25 15.2498C18.25 14.9736 18.0261 14.7498 17.75 14.7498H17.25C16.9739 14.7498 16.75 14.9736 16.75 15.2498V16.7498H15.25C14.9739 16.7498 14.75 16.9736 14.75 17.2498V17.7498C14.75 18.0259 14.9739 18.2498 15.25 18.2498H16.75V19.7498C16.75 20.0259 16.9739 20.2498 17.25 20.2498H17.75C18.0261 20.2498 18.25 20.0259 18.25 19.7498V18.2498H19.75C20.0261 18.2498 20.25 18.0259 20.25 17.7498V17.2498C20.25 16.9736 20.0261 16.7498 19.75 16.7498H18.25V15.2498Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
+</vector>

@@ -25,6 +25,7 @@ import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.SyncStateMonitor
+import com.duckduckgo.sync.impl.promotion.FakeSyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
@@ -61,6 +62,10 @@ class SetupSyncBookmarkAddedPromoRadiusTest {
         toggles.radius().setRawStoredState(State(enable = radiusEnabled))
         val syncPromotions = mock<SyncPromotions>()
         whenever(syncPromotions.canShowBookmarkAddedDialogPromotion()).thenReturn(true)
+        val setUpPromotion = mock<SyncBookmarkAddedSetUpPromotion>()
+        whenever(setUpPromotion.canShowPromotion()).thenReturn(false)
+        val multiDevicePromotion = mock<SyncBookmarkAddedMultiDevicePromotion>()
+        whenever(multiDevicePromotion.canShowPromotion()).thenReturn(false)
         val syncStateMonitor = mock<SyncStateMonitor>()
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
 
@@ -79,9 +84,12 @@ class SetupSyncBookmarkAddedPromoRadiusTest {
                     dispatchers = coroutineTestRule.testDispatcherProvider,
                     activity = activity,
                     syncPromotions = syncPromotions,
+                    promotionDataStore = FakeSyncPromotionDataStore(),
                     syncStateMonitor = syncStateMonitor,
                     syncPixels = mock(),
                     appBrandDesignUpdateToggles = toggles,
+                    setUpPromotion = setUpPromotion,
+                    multiDevicePromotion = multiDevicePromotion,
                 )
                 val ripple = checkNotNull(promo.getView()).background as RippleDrawable
                 val mask = ripple.findDrawableByLayerId(android.R.id.mask) as GradientDrawable

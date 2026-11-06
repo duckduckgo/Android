@@ -37,16 +37,31 @@
         android:importantForAccessibility="no"
         app:srcCompat="@drawable/document_color_24" />
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/fileName"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_1"
-        android:ellipsize="middle"
-        android:maxWidth="120dp"
-        android:maxLines="1"
-        app:textType="primary"
-        app:typography="body2" />
+        android:orientation="vertical">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/fileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:maxWidth="120dp"
+            android:maxLines="1"
+            app:textType="primary"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/fileSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:visibility="gone"
+            app:textType="secondary"
+            app:typography="caption" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/fileRemove"

@@ -38,6 +38,7 @@ import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECT
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
+import com.duckduckgo.lint.NonSerializableActivityParamsDetector.Companion.NON_SERIALIZABLE_ACTIVITY_PARAMS
 import com.duckduckgo.lint.NoPostValueOnSingleLiveEventDetector.Companion.NO_POST_VALUE_ON_SINGLE_LIVE_EVENT
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector
 import com.duckduckgo.lint.NoNewAppDatabaseTableDetector.Companion.NO_NEW_APP_DATABASE_TABLE
@@ -115,6 +116,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             MISSING_CONTRIBUTES_TO_ON_MODULE,
             MISSING_HAS_MEMBER_INJECTIONS,
             MISSING_EXPLICIT_RETURN_TYPE,
+            NON_SERIALIZABLE_ACTIVITY_PARAMS,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,

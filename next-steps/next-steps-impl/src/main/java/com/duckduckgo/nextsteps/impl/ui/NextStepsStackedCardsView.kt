@@ -17,6 +17,7 @@ package com.duckduckgo.nextsteps.impl.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.widget.FrameLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
@@ -25,7 +26,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -78,6 +78,10 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
         binding.backCard.closeButton.isEnabled = false
         binding.backCard.primaryAction.isEnabled = false
         binding.backCard.root.isClickable = false
+
+        val itemTitleTextSize = resources.getDimension(R.dimen.nextStepsItemTitleTextSize)
+        binding.frontCard.itemTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemTitleTextSize)
+        binding.backCard.itemTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemTitleTextSize)
     }
 
     override fun onAttachedToWindow() {
@@ -131,12 +135,12 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
             binding.stack.gone()
             return
         }
-        binding.frontCard.bind(viewState.title, frontItem)
+        binding.frontCard.bind(viewState.title, frontItem, viewState.imageFilePaths[frontItem.id])
         resetStackTransforms()
 
         val backItem = viewState.items.getOrNull(1)
         if (backItem != null) {
-            binding.backCard.bind(viewState.title, backItem)
+            binding.backCard.bind(viewState.title, backItem, viewState.imageFilePaths[backItem.id])
             binding.backCard.root.show()
         } else {
             binding.backCard.root.gone()
@@ -205,21 +209,13 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     private fun ViewNextStepsCardBinding.bind(
         title: String,
         item: CardItem.ListItem,
+        imageFilePath: String?,
     ) {
         sectionTitle.text = title
         itemTitle.text = item.titleText
         itemDescription.text = item.descriptionText
         primaryAction.text = item.primaryActionText
-        if (item.imageUrl.isNullOrEmpty()) {
-            Glide.with(itemImage).clear(itemImage)
-            itemImage.gone()
-        } else {
-            itemImage.show()
-            Glide.with(itemImage)
-                .load(item.imageUrl)
-                .fitCenter()
-                .into(itemImage)
-        }
+        itemImage.loadNextStepsItemImage(item.imageUrl, imageFilePath)
     }
 
     companion object {

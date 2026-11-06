@@ -19,11 +19,11 @@ package com.duckduckgo.duckchat.internal
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.duckchat.impl.promo.PromoCampaignRepository
-import com.duckduckgo.duckchat.impl.promo.PromoRecord
-import com.duckduckgo.duckchat.impl.promo.PromoRecordCorruptedException
-import com.duckduckgo.duckchat.impl.promo.PromoRecordStorageException
-import com.duckduckgo.duckchat.impl.promo.PromoTerms
+import com.duckduckgo.duckchat.impl.promo.data.PromoCampaignRepository
+import com.duckduckgo.duckchat.impl.promo.data.PromoRecord
+import com.duckduckgo.duckchat.impl.promo.data.PromoRecordCorruptedException
+import com.duckduckgo.duckchat.impl.promo.data.PromoRecordStorageException
+import com.duckduckgo.duckchat.impl.promo.data.PromoTerms
 import com.duckduckgo.duckchat.internal.DuckAiPromoCampaignDevViewModel.Command
 import com.duckduckgo.duckchat.internal.DuckAiPromoCampaignDevViewModel.ViewState
 import kotlinx.coroutines.flow.MutableStateFlow

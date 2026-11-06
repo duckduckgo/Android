@@ -55,6 +55,10 @@ class RealPrivacyConfigPersisterTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealPrivacyConfigPersister
+    private var bypass = false
+    private val versionCheckOverride = object : PrivacyConfigVersionCheckOverride {
+        override suspend fun skipVersionCheck() = bypass
+    }
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
 
     private lateinit var db: PrivacyConfigDatabase
@@ -87,6 +91,7 @@ class RealPrivacyConfigPersisterTest {
                 db,
                 sharedPreferences,
                 persisterPluginPoint,
+                versionCheckOverride,
             )
     }
 
@@ -171,6 +176,7 @@ class RealPrivacyConfigPersisterTest {
                     db,
                     sharedPreferences,
                     persisterPluginPoint,
+                    versionCheckOverride,
                 )
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
@@ -258,6 +264,27 @@ class RealPrivacyConfigPersisterTest {
             assertEquals(1, callback.persistCallCount)
         }
 
+    @Test
+    fun bypassReplacesOlderConfigAndFeatureContents() = runTest {
+        assertBypassReplacesContents(100)
+    }
+
+    @Test
+    fun bypassReplacesEqualConfigAndFeatureContents() = runTest {
+        assertBypassReplacesContents(2)
+    }
+
+    private suspend fun assertBypassReplacesContents(storedVersion: Long) {
+        privacyRepository.insert(PrivacyConfig(version = storedVersion, readme = "old", eTag = "old-etag", timestamp = "old-time"))
+        bypass = true
+        testee.persistPrivacyConfig(getJsonPrivacyConfig(), "new-etag")
+        assertEquals(2L, privacyRepository.get()!!.version)
+        assertEquals("new-etag", privacyRepository.get()!!.eTag)
+        val plugin = pluginPoint.getPlugins().first() as FakePrivacyFeaturePlugin
+        assertEquals("enabled", JSONObject(plugin.contents!!).getString("state"))
+        assertEquals(1, unprotectedTemporaryRepository.exceptions.size)
+    }
+
     private fun getJsonPrivacyConfig(): JsonPrivacyConfig {
         return JsonPrivacyConfig(
             version = 2,
@@ -277,12 +304,14 @@ class RealPrivacyConfigPersisterTest {
 
     private class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
         var count = 0
+        var contents: String? = null
 
         override fun store(
             featureName: String,
             jsonString: String,
         ): Boolean {
             count++
+            contents = jsonString
             return true
         }
 

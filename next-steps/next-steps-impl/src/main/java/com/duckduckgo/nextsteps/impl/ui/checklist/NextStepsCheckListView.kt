@@ -35,7 +35,6 @@ import androidx.transition.Transition
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
-import com.bumptech.glide.Glide
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -50,6 +49,7 @@ import com.duckduckgo.nextsteps.impl.databinding.ViewNextStepsCheckListItemBindi
 import com.duckduckgo.nextsteps.impl.ui.NextStepsActionLauncher
 import com.duckduckgo.nextsteps.impl.ui.checklist.NextStepsCheckListViewModel.Command
 import com.duckduckgo.nextsteps.impl.ui.checklist.NextStepsCheckListViewModel.ViewState
+import com.duckduckgo.nextsteps.impl.ui.loadNextStepsItemImage
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -179,19 +179,7 @@ class NextStepsCheckListView @JvmOverloads constructor(
             actionButton.show()
             itemRow.setOnClickListener { viewModel.onItemClicked(listItem.item.id) }
         }
-        val imageUrl = listItem.item.imageUrl
-        if (imageUrl.isNullOrEmpty()) {
-            Glide.with(itemImage).clear(itemImage)
-            itemImage.tag = null
-            itemImage.gone()
-        } else if (itemImage.tag != imageUrl) {
-            itemImage.tag = imageUrl
-            itemImage.show()
-            Glide.with(itemImage)
-                .load(imageUrl)
-                .fitCenter()
-                .into(itemImage)
-        }
+        itemImage.loadNextStepsItemImage(listItem.item.imageUrl, listItem.imageFilePath)
     }
 
     private fun animateItemCompletion(

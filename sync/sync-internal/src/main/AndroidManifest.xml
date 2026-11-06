@@ -29,5 +29,11 @@
             android:label="@string/sync_v2_pairing_debug_activity_label"
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.SyncInternalSettingsActivity" />
+        <activity
+            android:name=".ui.SyncPromotionDebugActivity"
+            android:exported="false"
+            android:label="@string/sync_promotion_debug_activity_label"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.SyncInternalSettingsActivity" />
     </application>
 </manifest>

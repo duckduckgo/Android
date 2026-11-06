@@ -53,6 +53,9 @@ abstract class TabsDao {
     @Query("select count(*) from tabs")
     abstract fun flowTabCount(): Flow<Int>
 
+    @Query("select tabId from tabs")
+    abstract fun flowAllTabIds(): Flow<List<String>>
+
     @Query("select * from tabs where tabId = :tabId")
     abstract fun tab(tabId: String): TabEntity?
 

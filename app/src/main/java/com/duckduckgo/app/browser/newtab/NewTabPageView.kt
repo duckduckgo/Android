@@ -147,8 +147,10 @@ class NewTabPageView @JvmOverloads constructor(
     lateinit var viewModelFactory: NewTabPageViewModelFactory
 
     private val viewModel: NewTabPageViewModel by lazy {
-        val providerFactory = NewTabPageViewModelProviderFactory(viewModelFactory, showDaxLogo = showLogo)
-        ViewModelProvider(owner = findViewTreeViewModelStoreOwner()!!, factory = providerFactory)[NewTabPageViewModel::class.java]
+        val owner = findViewTreeViewModelStoreOwner()!!
+        val tabNextStepsState = ViewModelProvider(owner)[TabNextStepsState::class.java]
+        val providerFactory = NewTabPageViewModelProviderFactory(viewModelFactory, showDaxLogo = showLogo, tabNextStepsState)
+        ViewModelProvider(owner = owner, factory = providerFactory)[NewTabPageViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()

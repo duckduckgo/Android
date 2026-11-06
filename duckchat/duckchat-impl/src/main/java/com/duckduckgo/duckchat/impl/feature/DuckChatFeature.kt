@@ -29,6 +29,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "aiChat",
 )
 interface DuckChatFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun pdfPageContext(): Toggle
+
     /**
      * @return `true` when the remote config has the global "aiChat" feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -320,4 +323,14 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiPromoCampaigns(): Toggle
+
+    /**
+     * @return `true` when Duck.ai promo cards are supported. Exposed to Duck.ai as `supportsPromoCards`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPromoCards(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun newChatHints(): Toggle
 }

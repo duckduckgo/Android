@@ -67,6 +67,7 @@ class RealPrivacyConfigPersister @Inject constructor(
     private val database: PrivacyConfigDatabase,
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
     private val privacyConfigCallbackPlugin: PluginPoint<PrivacyConfigCallbackPlugin>,
+    private val versionCheckOverride: PrivacyConfigVersionCheckOverride,
 ) : PrivacyConfigPersister {
 
     override suspend fun persistPrivacyConfig(
@@ -79,7 +80,8 @@ class RealPrivacyConfigPersister @Inject constructor(
         val currentPluginHashCode = privacyFeaturePluginPoint.signature()
         val previousPluginHashCode = persisterPreferences.getSignature()
 
-        val shouldPersist = newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)
+        val shouldPersist = versionCheckOverride.skipVersionCheck() ||
+            newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)
 
         logcat(VERBOSE) {
             """

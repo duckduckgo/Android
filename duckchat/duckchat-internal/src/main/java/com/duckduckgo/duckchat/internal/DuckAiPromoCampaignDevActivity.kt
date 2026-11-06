@@ -28,8 +28,8 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.impl.promo.PromoRecord
-import com.duckduckgo.duckchat.impl.promo.PromoTerms
+import com.duckduckgo.duckchat.impl.promo.data.PromoRecord
+import com.duckduckgo.duckchat.impl.promo.data.PromoTerms
 import com.duckduckgo.duckchat.internal.DuckAiPromoCampaignDevViewModel.Command
 import com.duckduckgo.duckchat.internal.DuckAiPromoCampaignDevViewModel.ViewState
 import com.duckduckgo.duckchat.internal.databinding.ActivityDuckAiPromoCampaignDevBinding

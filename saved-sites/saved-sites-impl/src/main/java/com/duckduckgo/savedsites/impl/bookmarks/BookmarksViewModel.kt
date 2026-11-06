@@ -70,6 +70,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -130,12 +131,15 @@ class BookmarksViewModel @Inject constructor(
 
     data class HiddenBookmarksIds(val items: List<String> = emptyList())
 
-    private val _itemsToDisplay = MutableStateFlow<List<BookmarksItemTypes>>(emptyList())
+    private val _itemsToDisplay = MutableStateFlow<List<BookmarksItemTypes>?>(null)
     val itemsToDisplay = _itemsToDisplay.asStateFlow()
 
     init {
         viewState.value = ViewState()
         viewModelScope.launch(dispatcherProvider.io()) {
+            // We sync only after the first local load because the sync's queries share the database connection and would delay the list.
+            // Whatever the sync changes still reaches the list through the saved sites flow.
+            _itemsToDisplay.firstOrNull { it != null }
             syncEngine.triggerSync(FEATURE_READ)
         }
         pixel.fire(SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)

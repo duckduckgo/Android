@@ -23,6 +23,8 @@ import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewModel.Command.ReevalutePromo
@@ -36,6 +38,7 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class SyncPasswordsPromotionViewModel @Inject constructor(
     private val syncPromotions: SyncPromotions,
+    private val promotionDataStore: SyncPromotionDataStore,
     private val pixel: Pixel,
 ) : ViewModel() {
 
@@ -69,6 +72,7 @@ class SyncPasswordsPromotionViewModel @Inject constructor(
         if (!promoDisplayedPixelSent) {
             promoDisplayedPixelSent = true
             pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, sourceMap())
+            viewModelScope.launch { promotionDataStore.recordPromoImpression(PasswordsScreen) }
         }
     }
 

@@ -63,6 +63,8 @@ jobs:
     with:
       commit: ${{ needs.resolve-hotfix-sha.outputs.commit_sha }}
       create_asana_tasks: false
+      fail_fast: true
+      maestro_priority: high
     secrets: inherit
 
   finish:
@@ -79,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Asana task when any orchestrator step failed
-        uses: duckduckgo/native-github-asana-sync@v2.7.1
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}

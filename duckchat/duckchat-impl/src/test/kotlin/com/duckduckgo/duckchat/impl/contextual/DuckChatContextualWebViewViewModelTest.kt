@@ -20,8 +20,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.PageContextTrigger
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -31,9 +33,11 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
 import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.promo.messaging.PromoCampaignJSHelper
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -41,6 +45,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -55,6 +60,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -78,6 +84,8 @@ class DuckChatContextualWebViewViewModelTest {
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
+    private val pdfPageContextResolver: PdfPageContextResolver = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val duckChatFeature: DuckChatFeature = mock()
     private val termsConsent: DuckAiTermsConsent = mock()
@@ -87,6 +95,8 @@ class DuckChatContextualWebViewViewModelTest {
     private val contextualEntryPromptStore: ContextualEntryPromptStore = mock()
     private val textSelectionRepository: TextSelectionRepository = mock()
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
+    private val promoRecordEvents = MutableSharedFlow<SubscriptionEventData>()
+    private val promoCampaignJSHelper: PromoCampaignJSHelper = mock()
 
     private val serializedPageData =
         """
@@ -104,12 +114,94 @@ class DuckChatContextualWebViewViewModelTest {
         whenever(duckChatFeature.contextualFireButton()).thenReturn(contextualFireButtonToggle)
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
+        whenever(promoCampaignJSHelper.promoRecordEvents).thenReturn(promoRecordEvents)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(textSelectionRepository.selections(any())).thenReturn(MutableStateFlow(emptyList()))
         whenever(duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(
             SubscriptionEventData(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, "submitNewChatAction", JSONObject()),
         )
         testee = buildViewModel()
+    }
+
+    private fun pdfResult(data: String? = null) = PdfPageContextResolver.Result.Pdf(
+        DuckAiPdfMetadata(
+            "document.pdf",
+            "https://example.com/document.pdf",
+            DuckAiPdfMetadata.Availability.AVAILABLE,
+        ),
+        data,
+    )
+
+    @Test
+    fun `removing PDF during manual attachment prevents sending bytes`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(
+            pdfPageContextResolver.resolve(
+                "tab-1",
+                pdf,
+                true,
+                PageContextTrigger.USER_REQUEST,
+            ),
+        ).doSuspendableAnswer { pending.await() }
+        testee.onPageContextReceived("tab-1", pdf)
+        testee.subscriptionEventDataFlow.test {
+            awaitItem()
+            testee.addPageContext()
+            testee.removePageContext()
+            pending.complete(pdfResult("JVBERi0="))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `failed PDF submission restores prompt for retry`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        testee.onPageContextReceived("tab-1", pdf)
+        testee.addPageContext()
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        testee.onPageContextReceived("tab-1", pdf)
+        testee.commands.test {
+            testee.onPromptSent("Explain this document")
+            val command = awaitItem() as DuckChatContextualWebViewViewModel.Command.ChangeSheetState
+            assertEquals("Explain this document", command.prefillNativeInput)
+        }
+    }
+
+    @Test
+    fun `PDF metadata with automatic attachment off is pushed without bytes`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        whenever(
+            pdfPageContextResolver.resolve(
+                "tab-1",
+                pdf,
+                false,
+                PageContextTrigger.AUTO,
+            ),
+        ).thenReturn(pdfResult())
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            val context = awaitItem().params.getJSONObject("pageContext")
+            assertEquals("document.pdf", context.getString("title"))
+            assertFalse(context.has("data"))
+            assertFalse(context.getBoolean("attached"))
+        }
+        assertFalse(testee.viewState.value.showContext)
+        assertEquals("application/pdf", testee.viewState.value.contextMimeType)
+    }
+
+    @Test
+    fun `oversized PDF removes a previously attached web page`() = runTest {
+        testee.onPageContextReceived("tab-1", serializedPageData)
+        val pdf = """{"title":"large.pdf","url":"https://example.com/large.pdf","mimeType":"application/pdf","attachable":false}"""
+        testee.onPageContextReceived("tab-1", pdf)
+        assertFalse(testee.viewState.value.showContext)
+        assertEquals("large.pdf", testee.viewState.value.contextTitle)
+        testee.addPageContext()
+        assertFalse(testee.viewState.value.showContext)
     }
 
     @Test
@@ -122,6 +214,7 @@ class DuckChatContextualWebViewViewModelTest {
             assertTrue(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.LoadUrl)
             cancelAndIgnoreRemainingEvents()
         }
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", false, null)
         assertEquals("tab-1", testee.viewState.value.tabId)
         verify(duckChatPixels).reportContextualSheetOpened()
     }
@@ -267,6 +360,32 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `dictated entry prompt retains voice attribution when sheet opens`() = runTest {
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null, voice = true))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null, voice = true)
+    }
+
+    @Test
+    fun `dictated entry prompt retains voice attribution when sheet reopens`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null, voice = true))
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null, voice = true)
+    }
+
+    @Test
     fun `onSheetOpened reports the sheet opened even for an entry-dialog hand-off`() = runTest {
         val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
         whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null))
@@ -276,6 +395,7 @@ class DuckChatContextualWebViewViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(duckChatPixels).reportContextualSheetOpened()
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", true, null)
     }
 
     @Test
@@ -298,6 +418,8 @@ class DuckChatContextualWebViewViewModelTest {
 
         verify(duckChatPixels).reportContextualSheetSessionRestored()
         verify(duckChatPixels).reportContextualSheetOpened()
+        verify(entryWideEvent).onContextualSheetOpened("tab-1", false, null)
+        verify(entryWideEvent).onContextualSheetUrlResolved("tab-1", chatUrl)
     }
 
     @Test
@@ -557,6 +679,7 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels, never()).reportContextualSheetDismissed()
+        verify(entryWideEvent, never()).onContextualSheetClosed(any())
     }
 
     @Test
@@ -572,6 +695,7 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels).reportContextualSheetDismissed()
+        verify(entryWideEvent).onContextualSheetClosed("tab-1")
     }
 
     @Test
@@ -798,7 +922,19 @@ class DuckChatContextualWebViewViewModelTest {
         verify(termsConsent).carry(any(), eq(BrowserMode.REGULAR))
     }
 
+    @Test
+    fun `when the promo record changes then its event is sent to the web app`() = runTest {
+        val event = SubscriptionEventData(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, "submitAIChatBonusRecord", JSONObject())
+
+        testee.subscriptionEventDataFlow.test {
+            promoRecordEvents.emit(event)
+
+            assertEquals(event, awaitItem())
+        }
+    }
+
     private fun buildViewModel() = DuckChatContextualWebViewViewModel(
+        pdfPageContextResolver = pdfPageContextResolver,
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
         duckChatInternal = duckChatInternal,
@@ -815,6 +951,8 @@ class DuckChatContextualWebViewViewModelTest {
         textSelectionRepository = textSelectionRepository,
         termsConsent = termsConsent,
         browserMode = BrowserMode.REGULAR,
+        entryWideEvent = entryWideEvent,
+        promoCampaignJSHelper = promoCampaignJSHelper,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
@@ -823,12 +961,13 @@ class DuckChatContextualWebViewViewModelTest {
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat(entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
-        override fun openDuckChatWithAutoPrompt(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun openDuckChatWithAutoPrompt(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint, voice: Boolean) = Unit
         override fun openDuckChatWithPrefill(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
         override fun reportDuckChatEntry(
             entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint,
             opensNewTab: Boolean,
             hasPrompt: Boolean,
+            voice: Boolean,
         ) = Unit
         override fun getDuckChatUrl(
             query: String,
@@ -911,5 +1050,104 @@ class DuckChatContextualWebViewViewModelTest {
         var nowMs: Long = 0L
 
         override fun currentTimeMillis(): Long = nowMs
+    }
+
+    @Test
+    fun `PDF entry handoff retains document when requested page metadata arrives during encoding`() = runTest {
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val prompt = NativeInputPrompt("Summarize this document", null, null, null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = pdf))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.USER_REQUEST)).doSuspendableAnswer { pending.await() }
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onWebAppReady()
+            testee.onPageContextReceived("tab-1", pdf)
+            assertEquals("submitAIChatPageContext", awaitItem().subscriptionName)
+            pending.complete(pdfResult("JVBERi0="))
+            val event = awaitItem()
+            assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+            assertTrue(event.params.has("pageContext"))
+            assertEquals("JVBERi0=", event.params.getJSONObject("pageContext").getString("data"))
+        }
+    }
+
+    @Test
+    fun `removing PDF during submission sends prompt without document`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.USER_REQUEST)).doSuspendableAnswer { pending.await() }
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            awaitItem()
+            testee.onPromptSent("Explain this document")
+            testee.removePageContext()
+            pending.complete(pdfResult("JVBERi0="))
+            val event = awaitItem()
+            assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+            assertFalse(event.params.has("pageContext"))
+            assertEquals("Explain this document", event.params.getJSONObject("query").getString("prompt"))
+        }
+    }
+
+    @Test
+    fun `closing sheet during PDF submission discards old prompt`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.USER_REQUEST)).doSuspendableAnswer { pending.await() }
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            awaitItem()
+            testee.onPromptSent("Explain this document")
+            testee.onSheetClosed()
+            pending.complete(pdfResult("JVBERi0="))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `request tokens are invalidated by removal and reset but permit a later explicit attach`() = runTest {
+        val beforeRemoval = testee.capturePageContextRequest()
+        testee.removePageContext()
+        assertFalse(testee.isPageContextRequestCurrent(beforeRemoval))
+        val afterRemoval = testee.capturePageContextRequest()
+        assertTrue(testee.isPageContextRequestCurrent(afterRemoval))
+        testee.onContextualFireConfirmed()
+        assertFalse(testee.isPageContextRequestCurrent(afterRemoval))
+    }
+
+    @Test
+    fun `removing PDF during automatic attachment prevents sending bytes`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.AUTO)).doSuspendableAnswer { pending.await() }
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            testee.removePageContext()
+            pending.complete(pdfResult("JVBERi0="))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `reset during automatic PDF attachment prevents sending old document`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val pdf = """{"title":"document.pdf","url":"https://example.com/document.pdf","mimeType":"application/pdf","attachable":true}"""
+        val pending = kotlinx.coroutines.CompletableDeferred<PdfPageContextResolver.Result?>()
+        whenever(pdfPageContextResolver.resolve("tab-1", pdf, true, PageContextTrigger.AUTO)).doSuspendableAnswer { pending.await() }
+        testee.subscriptionEventDataFlow.test {
+            testee.onPageContextReceived("tab-1", pdf)
+            testee.onContextualFireConfirmed()
+            assertEquals("submitNewChatAction", awaitItem().subscriptionName)
+            pending.complete(pdfResult("JVBERi0="))
+            expectNoEvents()
+        }
     }
 }

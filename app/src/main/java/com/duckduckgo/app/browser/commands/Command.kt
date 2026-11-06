@@ -46,6 +46,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -390,7 +391,9 @@ sealed class Command {
     // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(
         val data: JsCallbackData,
-    ) : Command()
+    ) : Command() {
+        override fun toString(): String = "SendResponseToJs"
+    }
 
     data class SendResponseToDuckPlayer(
         val data: JsCallbackData,
@@ -529,10 +532,14 @@ sealed class Command {
         @StringRes val text: Int,
     ) : Command()
 
+    data class PdfPageContextReceived(val tabId: String, val metadata: DuckAiPdfMetadata) : Command()
+
     data class PageContextReceived(
         val tabId: String,
         val pageContext: String,
-    ) : Command()
+    ) : Command() {
+        override fun toString(): String = "PageContextReceived"
+    }
 
     data class ShowToast(@param:StringRes val textResId: Int) : Command()
 

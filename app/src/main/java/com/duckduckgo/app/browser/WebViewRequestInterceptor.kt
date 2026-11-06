@@ -176,10 +176,11 @@ class WebViewRequestInterceptor(
             val newUri = url?.let { httpsUpgrader.upgrade(url) }
 
             withContext(dispatchers.main()) {
+                // Must run before loadUrl: the cancelled http request's callbacks must see the upgrade
+                webViewClientListener?.upgradedToHttps()
                 webView.loadUrl(newUri.toString(), getHeaders(request))
             }
 
-            webViewClientListener?.upgradedToHttps()
             appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementUpgradeCount() }
             return WebResourceResponse(null, null, null)
         }

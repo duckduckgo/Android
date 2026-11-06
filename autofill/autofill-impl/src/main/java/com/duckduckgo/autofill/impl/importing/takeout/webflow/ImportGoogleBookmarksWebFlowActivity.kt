@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
@@ -88,6 +89,7 @@ class ImportGoogleBookmarksWebFlowActivity :
         configureToolbar()
         configureEdgeToEdgeInsets()
         configureResultListeners()
+        configureBackHandler()
         observeViewModel()
     }
 
@@ -212,6 +214,10 @@ class ImportGoogleBookmarksWebFlowActivity :
         supportFragmentManager.setFragmentResultListener(ImportFinishedFragment.RESULT_KEY_DONE, this) { _, _ ->
             viewModel.onResultScreenDoneClicked()
         }
+    }
+
+    private fun configureBackHandler() {
+        onBackPressedDispatcher.addCallback(this) { viewModel.onBackPressed() }
     }
 
     private fun exitWithResult(result: ImportGoogleBookmarkResult) {

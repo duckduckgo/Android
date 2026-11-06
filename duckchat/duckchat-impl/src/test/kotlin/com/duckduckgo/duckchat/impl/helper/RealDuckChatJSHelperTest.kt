@@ -20,12 +20,14 @@ import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
@@ -42,6 +44,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -53,6 +56,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -78,6 +82,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -141,8 +146,13 @@ class RealDuckChatJSHelperTest {
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock {
         on { isDuckDuckGoQueryUrl(SERP_URL) } doReturn true
     }
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
+    private val tabSessions: DuckAiTabSessionRepository = mock()
+
+    private val pdfPageContextResolver: PdfPageContextResolver = mock()
 
     private val testee = RealDuckChatJSHelper(
+        pdfPageContextResolver = pdfPageContextResolver,
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
@@ -162,6 +172,7 @@ class RealDuckChatJSHelperTest {
         editPromptSessionStore = mockEditPromptSessionStore,
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
         duckAiSessionCallback = mockDuckAiSessionCallback,
+        entryWideEvent = lazy { entryWideEvent },
         regularChatStore = mockRegularChatStore,
         fireChatStore = mockFireChatStore,
         duckAiChatHistoryFeature = fakeChatHistoryFeature,
@@ -169,6 +180,7 @@ class RealDuckChatJSHelperTest {
         chatStateStore = chatStateStore,
         responseWaitWideEvent = mockResponseWaitWideEvent,
         duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+        tabSessions = tabSessions,
     )
 
     init {
@@ -374,6 +386,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -414,6 +427,36 @@ class RealDuckChatJSHelperTest {
         )
 
         assertFalse(result!!.params.getBoolean("supportsBonusOffer"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCardsEnabledThenSupportsPromoCardsIsTrue() = runTest {
+        mockDuckChatFeature.duckAiPromoCards().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsPromoCards"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndPromoCardsDisabledThenSupportsPromoCardsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiPromoCards().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsPromoCards"))
     }
 
     @Test
@@ -633,6 +676,92 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun `manual PDF attachment reports frontend attachment pixel`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(true), any())).thenReturn(pdfContextResult("JVBERi0="))
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "userAction"),
+            tabId = "tab-1",
+        )!!
+
+        val context = response.params.getJSONObject("pageContext")
+        assertEquals("JVBERi0=", context.getString("data"))
+        assertTrue(context.getBoolean("attached"))
+        verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
+    }
+
+    @Test
+    fun `manual PDF response without bytes does not report attached`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(true), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "userAction"),
+            tabId = "tab-1",
+        )!!
+
+        assertFalse(response.params.getJSONObject("pageContext").getBoolean("attached"))
+        verify(mockDuckChatPixels, never()).reportContextualPageContextManuallyAttachedFrontend()
+    }
+
+    @Test
+    fun `PDF initialization with auto attachment off sends unattached metadata`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(false), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "init"),
+            tabId = "tab-1",
+        )!!
+
+        val context = response.params.getJSONObject("pageContext")
+        assertTrue(context.getBoolean("attachable"))
+        assertFalse(context.getBoolean("attached"))
+        assertFalse(context.has("data"))
+        verify(pdfPageContextResolver).resolve(eq("tab-1"), anyOrNull(), eq(false), any())
+    }
+
+    @Test
+    fun `PDF initialization after removal does not read bytes when auto attachment is on`() = runTest {
+        whenever(pdfPageContextResolver.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        whenever(pdfPageContextResolver.resolve(eq("tab-1"), anyOrNull(), eq(false), any())).thenReturn(pdfContextResult())
+
+        val response = testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            METHOD_GET_PAGE_CONTEXT,
+            "id",
+            JSONObject().put("reason", "init"),
+            tabId = "tab-1",
+            allowAutomaticPageContextAttachment = false,
+        )!!
+
+        assertFalse(response.params.getJSONObject("pageContext").getBoolean("attached"))
+        verify(pdfPageContextResolver).resolve(eq("tab-1"), anyOrNull(), eq(false), any())
+        verify(pdfPageContextResolver, never()).resolve(eq("tab-1"), anyOrNull(), eq(true), any())
+    }
+
+    private fun pdfContextResult(data: String? = null) = PdfPageContextResolver.Result.Pdf(
+        DuckAiPdfMetadata(
+            "document.pdf",
+            "https://example.com/document.pdf",
+            DuckAiPdfMetadata.Availability.AVAILABLE,
+        ),
+        data,
+    )
+
+    @Test
     fun whenGetPageContextUserActionThenReturnsContextRegardlessOfAutoFlag() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val tabId = "tab-1"
@@ -850,6 +979,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -953,6 +1083,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1118,6 +1249,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1223,6 +1355,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1274,6 +1407,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1325,6 +1459,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1946,6 +2081,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -1994,6 +2130,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -2042,6 +2179,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -2091,6 +2229,7 @@ class RealDuckChatJSHelperTest {
             put("supportsSubscription", false)
             put("supportsHomePageChatSuggestions", false)
             put("supportsBonusOffer", false)
+            put("supportsPromoCards", false)
             put("installType", "new")
             put("installAge", 0)
         }
@@ -2173,6 +2312,37 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenPageReportsPromptThenPromptPixelAndReturnSessionUseStoredEntrySource() = runTest {
+        whenever(tabSessions.getEntryPointSource("tab")).thenReturn("onboarding_completion_promo")
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt", "source" to "untrusted-page-source")),
+            mode = Mode.FULL,
+            tabId = "tab",
+        )
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT, source = "onboarding_completion_promo")
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted("onboarding_completion_promo")
+    }
+
+    @Test
+    fun whenContextualPageReportsPromptThenReturnSessionReceivesContextualSource() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt")),
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab",
+        )
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted("contextual_chat")
+    }
+
+    @Test
     fun whenReportMetricWithFirstSubmittedPromptThenNotifiesAiPromptSubmittedOnly() = runTest {
         val data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt"))
 
@@ -2204,7 +2374,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenReportMetricWithSubmittedPromptInContextualModeThenPromptSubmittedNotReported() = runTest {
+    fun whenReportMetricWithSubmittedPromptInContextualModeThenOnlyEntryPromptIsReported() = runTest {
         val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
 
         testee.processJsCallbackMessage(
@@ -2216,6 +2386,22 @@ class RealDuckChatJSHelperTest {
             tabId = "tab-1",
         )
 
+        verify(mockDuckAiSessionCallback, never()).onPromptSubmitted(any())
+        verify(entryWideEvent).onPromptSubmitted("tab-1")
+    }
+
+    @Test
+    fun whenFirstPromptMetricInContextualModeThenEntryPromptIsReported() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt")),
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verify(entryWideEvent).onPromptSubmitted("tab-1")
         verify(mockDuckAiSessionCallback, never()).onPromptSubmitted(any())
     }
 

@@ -39,6 +39,7 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':credential-exchange-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':browser-ui')
     implementation project(path: ':browser-mode-api')
     implementation project(path: ':prompts-coordinator-api')
     implementation project(path: ':statistics-api')

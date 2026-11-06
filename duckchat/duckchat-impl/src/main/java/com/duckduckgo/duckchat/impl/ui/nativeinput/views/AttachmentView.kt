@@ -43,6 +43,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -52,6 +53,8 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.Job
@@ -72,6 +75,8 @@ class AttachmentView(
 
     @Inject lateinit var faviconManager: FaviconManager
 
+    @Inject lateinit var newChatHintCommands: NewChatHintCommands
+
     var host: NativeInputHost? = null
     var isEditMode: Boolean = false
 
@@ -83,7 +88,9 @@ class AttachmentView(
     private var supportsUpload: Boolean = false
     private var nativeInputStateJob: Job? = null
     private var attachmentStateJob: Job? = null
+    private var attachmentRequestJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
+    private var hasAttachmentsOrError: Boolean = false
     private var popupWindow: PopupWindow? = null
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
@@ -106,14 +113,22 @@ class AttachmentView(
         viewModel = vm
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
+        attachmentRequestJob?.cancel()
+        attachmentRequestJob = newChatHintCommands.commandsFor { host?.tabId() }
+            .onEach { command ->
+                if (!isEditMode && !isContextual) openAttachment(command)
+            }.launchIn(scope)
         attachmentStateJob?.cancel()
         attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
         }
-        nativeInputStateJob = nativeInputStateProvider.state
+        val editTabId = host?.takeIf { it.isEditSurface() }?.tabId()
+        val nativeInputState = editTabId?.let { nativeInputStateProvider.stateForTab(it) } ?: nativeInputStateProvider.state
+        nativeInputStateJob = nativeInputState
             .onEach { state ->
                 lastNativeInputState = state
                 updateButtonVisibility()
+                updateContainerVisibility(container)
             }
             .launchIn(scope)
     }
@@ -202,7 +217,7 @@ class AttachmentView(
     private fun buildLimitErrorView(parent: LinearLayout): TextView {
         return TextView(context).apply {
             setPadding(12.toPx(), 4.toPx(), 12.toPx(), 4.toPx())
-            setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
+            setTextColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorDestructive))
             textSize = 13f
             setTypeface(typeface, Typeface.BOLD)
             visibility = GONE
@@ -224,10 +239,15 @@ class AttachmentView(
                 ?: state.textSelectionLimitError,
             isEditMode = isEditMode,
         )
-        val notStreaming = lastNativeInputState?.isChatStreaming != true
-        container.isVisible = (state.hasAttachments || errorMessage != null) && notStreaming
+        hasAttachmentsOrError = state.hasAttachments || errorMessage != null
+        updateContainerVisibility(container)
         updateLimitError(errorMessage)
         notifyStateChanged(state)
+    }
+
+    private fun updateContainerVisibility(container: FrameLayout) {
+        val isDuckAi = isEditMode || isContextual || lastNativeInputState?.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI
+        container.isVisible = hasAttachmentsOrError && isDuckAi && lastNativeInputState?.isChatStreaming != true
     }
 
     private fun syncImages(imagesView: ImageAttachmentsContainerView, state: AttachmentViewModel.AttachmentState) {
@@ -249,6 +269,7 @@ class AttachmentView(
         (stateFileIds - containerFileIds).forEach { id ->
             state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
         }
+        filesView.updateOversizedFiles(if (isEditMode) emptySet() else state.oversizedFileIds)
     }
 
     private fun syncTextSelections(state: AttachmentViewModel.AttachmentState) {
@@ -313,8 +334,24 @@ class AttachmentView(
         nativeInputStateJob = null
         attachmentStateJob?.cancel()
         attachmentStateJob = null
+        attachmentRequestJob?.cancel()
+        attachmentRequestJob = null
         lastNativeInputState = null
         dismissPopup()
+    }
+
+    private fun openAttachment(request: NewChatHintCommand) {
+        when (request) {
+            is NewChatHintCommand.OpenDocuments -> {
+                host?.showAttachmentChooser(true)
+                host?.requestFilePicker(buildFilePickerCallback(), request.mimeTypes)
+            }
+            is NewChatHintCommand.OpenPhoto -> {
+                host?.showAttachmentChooser(true)
+                host?.requestFilePicker(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
+            }
+            is NewChatHintCommand.CreateImage -> Unit
+        }
     }
 
     private fun showPopupMenu() {

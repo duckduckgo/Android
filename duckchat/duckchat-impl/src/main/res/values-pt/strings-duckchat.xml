@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Abrir Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Saiba mais</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Pergunta ao Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Queres acesso mais fácil\nao chat privado com IA?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Pesquisar ou inserir endereço</string>
@@ -394,6 +391,7 @@
         <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hora</item>
         <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d horas</item>
     </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Resume este documento</string>
 
     <!-- Duck.ai ToS consent submit button -->
     <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Perguntar</string>

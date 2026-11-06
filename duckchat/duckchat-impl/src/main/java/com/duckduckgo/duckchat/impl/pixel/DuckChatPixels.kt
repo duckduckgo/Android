@@ -159,6 +159,7 @@ interface DuckChatPixels {
         hasPrompt: Boolean,
         duckAiEnabled: Boolean,
         inputScreenEnabled: Boolean,
+        voice: Boolean = false,
     )
     fun reportContextualSheetOpened()
     fun reportContextualSheetDismissed()
@@ -367,6 +368,7 @@ class RealDuckChatPixels @Inject constructor(
         hasPrompt: Boolean,
         duckAiEnabled: Boolean,
         inputScreenEnabled: Boolean,
+        voice: Boolean,
     ) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT,
@@ -377,6 +379,7 @@ class RealDuckChatPixels @Inject constructor(
                 DuckChatPixelParameters.INPUT_SCREEN_ENABLED to inputScreenEnabled.toString(),
                 DuckChatPixelParameters.OPENS_NEW_TAB to opensNewTab.toString(),
                 DuckChatPixelParameters.HAS_PROMPT to hasPrompt.toString(),
+                DuckChatPixelParameters.VOICE to voice.toString(),
             ),
         )
     }
@@ -1748,6 +1751,7 @@ object DuckChatPixelParameters {
     const val INPUT_SCREEN_ENABLED = "input_screen_enabled"
     const val OPENS_NEW_TAB = "opens_new_tab"
     const val HAS_PROMPT = "has_prompt"
+    const val VOICE = "voice"
     const val WAS_USED_BEFORE = "was_used_before"
     const val SUGGESTION_ID = "suggestionId"
     const val SELECTION_COUNT = "selection_count"
@@ -1917,6 +1921,12 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHAT_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            "m_aichat_page_context_extraction_success_c" to PixelParameter.removeAtb(),
+            "m_aichat_page_context_extraction_success_d" to PixelParameter.removeAtb(),
+            "m_aichat_page_context_extraction_failed_c" to PixelParameter.removeAtb(),
+            "m_aichat_page_context_extraction_failed_d" to PixelParameter.removeAtb(),
+            "m_aichat_page_context_extraction_prevented_c" to PixelParameter.removeAtb(),
+            "m_aichat_page_context_extraction_prevented_d" to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_EMPTY_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_EMPTY_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_TITLE_COUNT.pixelName to PixelParameter.removeAtb(),

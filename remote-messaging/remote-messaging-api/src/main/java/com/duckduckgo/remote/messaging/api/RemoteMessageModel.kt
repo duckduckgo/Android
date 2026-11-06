@@ -38,5 +38,14 @@ interface RemoteMessageModel {
 
     suspend fun clearMessageImage(surface: Surface)
 
+    /**
+     * Returns the local file path of the image stored for the list item [itemId] of [remoteMessage], or null when
+     * the message has no per-item images or the image was not downloaded.
+     */
+    suspend fun getItemImageFile(
+        remoteMessage: RemoteMessage,
+        itemId: String,
+    ): String?
+
     suspend fun isMessageDismissed(id: String): Boolean
 }

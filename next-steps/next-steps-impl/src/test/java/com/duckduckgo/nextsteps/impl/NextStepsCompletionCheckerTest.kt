@@ -26,6 +26,7 @@ import com.duckduckgo.remote.messaging.api.Content
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -78,6 +79,38 @@ class NextStepsCompletionCheckerTest {
 
         assertTrue(reported.isEmpty())
         assertTrue(completedIds.isEmpty())
+    }
+
+    @Test
+    fun `when an item is still open then items remain`() = runTest {
+        defaultBrowserCheck.completed = true
+
+        assertTrue(testee.hasRemainingItems(items, dismissedIds = emptySet()))
+    }
+
+    @Test
+    fun `when every item is complete then no items remain and nothing is recorded`() = runTest {
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+
+        assertFalse(testee.hasRemainingItems(items, dismissedIds = emptySet()))
+        assertTrue(itemsStore.completedItemIds().isEmpty())
+    }
+
+    @Test
+    fun `when the open items are dismissed or recorded as complete then no items remain`() = runTest {
+        itemsStore.addCompletedItemIds(setOf(defaultBrowserItem.id))
+
+        assertFalse(testee.hasRemainingItems(items, dismissedIds = setOf(addWidgetItem.id)))
+    }
+
+    @Test
+    fun `when only unsupported items are open then no items remain`() = runTest {
+        defaultBrowserCheck.completed = true
+        addWidgetCheck.completed = true
+        val unsupported = defaultBrowserItem.copy(id = "unsupported")
+
+        assertFalse(testee.hasRemainingItems(items + unsupported, dismissedIds = emptySet()))
     }
 
     private class FakePluginPoint(private val plugins: List<NextStepCompletionCheck>) : PluginPoint<NextStepCompletionCheck> {

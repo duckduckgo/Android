@@ -367,24 +367,39 @@ class DuckChatContextualWebViewFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        logcat { "JS Helper: process $featureName $method $id $data" }
+                        logcat { "JS Helper: process $featureName $method" }
                         when (featureName) {
                             RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     if (!viewModel.handleJSCall(method)) {
+                                        val (contextRequest, pageContext, allowAutomaticAttachment) = withContext(dispatcherProvider.main()) {
+                                            Triple(
+                                                viewModel.capturePageContextRequest(),
+                                                viewModel.currentPageContext,
+                                                !viewModel.viewState.value.userRemovedContext,
+                                            )
+                                        }
                                         duckChatJSHelper.processJsCallbackMessage(
                                             featureName,
                                             method,
                                             id,
                                             data,
                                             Mode.CONTEXTUAL,
-                                            viewModel.currentPageContext,
-                                            viewModel.viewState.value.tabId,
+                                            pageContext,
+                                            contextRequest.tabId,
                                             browserMode,
+                                            allowAutomaticPageContextAttachment = allowAutomaticAttachment,
                                         )?.let { response ->
-                                            logcat { "JS Helper: response $response" }
+                                            logcat { "JS Helper: response ready" }
                                             withContext(dispatcherProvider.main()) {
-                                                contentScopeScripts.onResponse(response)
+                                                val currentResponse = if (method == RealDuckChatJSHelper.METHOD_GET_PAGE_CONTEXT &&
+                                                    !viewModel.isPageContextRequestCurrent(contextRequest)
+                                                ) {
+                                                    response.copy(params = JSONObject().put("pageContext", JSONObject.NULL))
+                                                } else {
+                                                    response
+                                                }
+                                                contentScopeScripts.onResponse(currentResponse)
                                             }
                                             // once Duck.ai is fully loaded we attach the latest context if needed
                                             if (method == RealDuckChatJSHelper.METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) {
@@ -481,7 +496,7 @@ class DuckChatContextualWebViewFragment :
             onPageContextRemoved = { viewModel.removePageContext() },
             onVoiceChatRequested = {
                 viewModel.onContextualClose()
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
             },
             onVoiceSearchRequested = {
                 activity?.hideKeyboard()
@@ -621,7 +636,9 @@ class DuckChatContextualWebViewFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
-                        viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                        if (command.tabId == viewModel.viewState.value.tabId) {
+                            viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                        }
                     }
 
                     DuckChatContextualSharedViewModel.Command.ReloadChat -> {
@@ -659,6 +676,7 @@ class DuckChatContextualWebViewFragment :
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
             binding.contextualNativeInputCard.widget.setPageContext(
                 title = viewState.contextTitle,
+                mimeType = viewState.contextMimeType,
                 url = viewState.contextUrl,
             )
         } else {

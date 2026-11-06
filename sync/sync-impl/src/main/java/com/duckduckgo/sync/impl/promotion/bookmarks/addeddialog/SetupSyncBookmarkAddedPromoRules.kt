@@ -62,7 +62,9 @@ class RealSetupSyncBookmarkAddedPromoRules @Inject constructor(
             logcat { "Sync-promo: determined if canShowPromo for ${javaClass.simpleName}: $it" }
         }
     }
-    private fun isPromoFeatureEnabled() = syncPromotionFeature.bookmarkAddedDialog().isEnabled() && syncPromotionFeature.self().isEnabled()
+    private fun isPromoFeatureEnabled() = syncPromotionFeature.bookmarkAddedDialog().isEnabled() &&
+        syncPromotionFeature.self().isEnabled() &&
+        !syncPromotionFeature.leveragePromosRedesign().isEnabled()
     private fun isSyncFeatureEnabled() = syncState.isFeatureEnabled()
     private fun isUserSyncingAlready() = syncState.isUserSignedInOnDevice()
 }

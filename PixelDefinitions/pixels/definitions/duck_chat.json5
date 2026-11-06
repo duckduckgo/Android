@@ -469,13 +469,18 @@
         ]
     },
     "m_aichat_entry_point": {
-        "description": "Fires when an active user action enters Duck.ai, with the initiating surface and navigation context.",
+        "description": "Fires when a user enters Duck.ai, including opening the app onto a Duck.ai tab or swiping onto one, with the initiating surface and navigation context.",
         "owners": ["YoussefKeyrouz"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction", "startup"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": [
             "appVersion",
             "duckAiEntrySource",
+            {
+                "key": "voice",
+                "type": "boolean",
+                "description": "Whether voice was used to start this entry, including dictated prompts."
+            },
             { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
             {
                 "key": "input_screen_enabled",

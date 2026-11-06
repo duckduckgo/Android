@@ -19,6 +19,7 @@ package com.duckduckgo.app.anr
 import android.os.Debug
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
@@ -38,11 +39,12 @@ class AnrSupervisor @Inject constructor(
     private val anrSupervisorRunnable: AnrSupervisorRunnable,
 ) : BrowserLifecycleObserver {
 
-    private val executor = Executors.newSingleThreadExecutor()
+    @VisibleForTesting
+    internal val executor = Executors.newSingleThreadExecutor()
 
     override fun onOpen(isFreshLaunch: Boolean) {
         synchronized(anrSupervisorRunnable) {
-            if (!Debug.isDebuggerConnected() && anrSupervisorRunnable.isStopped) {
+            if (!Debug.isDebuggerConnected() && anrSupervisorRunnable.claimRunOnOpen()) {
                 executor.execute(anrSupervisorRunnable)
             }
         }
@@ -64,6 +66,7 @@ class AnrSupervisorRunnable @Inject constructor(
     private val customTabDetector: CustomTabDetector,
     private val appBuildConfig: AppBuildConfig,
     anrsDatabase: AnrsDatabase,
+    anrSupervisorFeature: AnrSupervisorFeature,
 ) : Runnable {
 
     private val anrDao = anrsDatabase.arnDao()
@@ -72,41 +75,65 @@ class AnrSupervisorRunnable @Inject constructor(
     // stop flag
     private var stopped = AtomicBoolean(true)
 
+    // Guarded by this. Only used with the non-blocking lifecycle.
+    private var running = false
+
+    // Read once so a remote config change can't switch lifecycle semantics under a running watcher.
+    private val nonBlockingLifecycle by lazy { anrSupervisorFeature.self().isEnabled() }
+
     val isStopped
         get() = stopped.get()
 
+    /** Called under this runnable's lock; re-arms a live run, or claims a new one and returns true so the caller starts it. */
+    fun claimRunOnOpen(): Boolean {
+        if (!nonBlockingLifecycle) return isStopped
+        // Re-arm a run that is still alive (e.g. in its stop grace period) instead of queueing a second one.
+        unstop()
+        if (running) return false
+        running = true
+        return true
+    }
+
     override fun run() {
         Thread.currentThread().name = ANR_WATCHER_THREAD_NAME
+        if (nonBlockingLifecycle) runNonBlocking() else runLegacy()
+    }
 
+    private fun runNonBlocking() {
+        var exitDecided = false
+        try {
+            while (!Thread.interrupted()) {
+                checkForAnr()
+                exitDecided = exitAfterStopGracePeriod()
+                if (exitDecided) break
+                Thread.sleep(ANR_CHALLENGE_PERIOD_MILLIS)
+            }
+        } catch (e: InterruptedException) {
+            logcat { "AnrSupervisor interrupted" }
+        } finally {
+            // A decided exit already cleared running under the lock; clearing it again could undo a run onOpen has since started.
+            if (!exitDecided) synchronized(this) { running = false }
+        }
+        logcat { "AnrSupervisor stopped" }
+    }
+
+    // Sleeps without holding the lock, which AnrSupervisor.onOpen takes on the main thread.
+    private fun exitAfterStopGracePeriod(): Boolean {
+        if (!stopped.get()) return false
+        Thread.sleep(STOP_GRACE_PERIOD_MILLIS)
+        synchronized(this) {
+            if (!stopped.get()) return false
+            running = false
+            return true
+        }
+    }
+
+    private fun runLegacy() {
         unstop()
 
         while (!Thread.interrupted()) {
             try {
-                logcat { "AnrSupervisor checking for ANRs..." }
-
-                val callback = Callback()
-                synchronized(callback) {
-                    handler.post(callback)
-                    callback.wait(ANR_THRESHOLD_MILLIS)
-
-                    if (callback.isCalled) {
-                        logcat { "UI Thread responded within ${ANR_THRESHOLD_MILLIS}ms" }
-                    } else {
-                        val e = AnrException(handler.looper.thread)
-                        logcat { "In custom tab: ${customTabDetector.isCustomTab()}. ANR Detected: ${e.threadStateMap}." }
-
-                        anrDao.insert(
-                            e.asAnrData(
-                                webView = webViewVersionProvider.getFullVersion(),
-                                customTab = customTabDetector.isCustomTab(),
-                                appVersion = appBuildConfig.versionName,
-                            ).asAnrEntity(),
-                        )
-
-                        // wait until thread responds again
-                        callback.wait()
-                    }
-                }
+                checkForAnr()
                 checkStopped()
                 Thread.sleep(ANR_CHALLENGE_PERIOD_MILLIS)
             } catch (e: InterruptedException) {
@@ -128,11 +155,40 @@ class AnrSupervisorRunnable @Inject constructor(
         stopped.set(false)
     }
 
+    @Throws(InterruptedException::class)
+    private fun checkForAnr() {
+        logcat { "AnrSupervisor checking for ANRs..." }
+
+        val callback = Callback()
+        synchronized(callback) {
+            handler.post(callback)
+            callback.wait(ANR_THRESHOLD_MILLIS)
+
+            if (callback.isCalled) {
+                logcat { "UI Thread responded within ${ANR_THRESHOLD_MILLIS}ms" }
+            } else {
+                val e = AnrException(handler.looper.thread)
+                logcat { "In custom tab: ${customTabDetector.isCustomTab()}. ANR Detected: ${e.threadStateMap}." }
+
+                anrDao.insert(
+                    e.asAnrData(
+                        webView = webViewVersionProvider.getFullVersion(),
+                        customTab = customTabDetector.isCustomTab(),
+                        appVersion = appBuildConfig.versionName,
+                    ).asAnrEntity(),
+                )
+
+                // wait until thread responds again
+                callback.wait()
+            }
+        }
+    }
+
     @Synchronized
     @Throws(InterruptedException::class)
     private fun checkStopped() {
         if (stopped.get()) {
-            Thread.sleep(2_000)
+            Thread.sleep(STOP_GRACE_PERIOD_MILLIS)
             if (stopped.get()) {
                 throw InterruptedException()
             }
@@ -143,6 +199,7 @@ class AnrSupervisorRunnable @Inject constructor(
         private const val ANR_WATCHER_THREAD_NAME = "ANR_WATCHER_THREAD_NAME"
         private const val ANR_CHALLENGE_PERIOD_MILLIS = 5_000L
         private const val ANR_THRESHOLD_MILLIS = 2_000L
+        private const val STOP_GRACE_PERIOD_MILLIS = 2_000L
     }
 }
 

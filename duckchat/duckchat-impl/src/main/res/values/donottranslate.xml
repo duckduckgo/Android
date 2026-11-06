@@ -45,4 +45,7 @@
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
 
+    <string name="newChatHintDocuments">Analyze files</string>
+    <string name="newChatHintPhoto">Ask about photo</string>
+    <string name="newChatHintImage">Create an image</string>
 </resources>

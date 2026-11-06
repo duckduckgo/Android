@@ -117,11 +117,25 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
     }
 
     fun onResultScreenDoneClicked() {
-        val result = when (val viewMode = viewState.value.viewMode) {
-            is ViewMode.Success -> ImportGoogleBookmarkResult.Success(viewMode.importedCount)
-            is ViewMode.Error -> ImportGoogleBookmarkResult.Error(viewMode.reason)
-            is ViewMode.WebFlowLoading, is ViewMode.WebFlow, is ViewMode.WaitingForExport -> return
+        resultScreenOutcome()?.let(::exit)
+    }
+
+    fun onBackPressed() {
+        val result = resultScreenOutcome() ?: run {
+            // the web flow handles back itself once its view exists, so we only get here before it does
+            importJourney.cancelled(STAGE_WEB_FLOW_NOT_STARTED)
+            ImportGoogleBookmarkResult.UserCancelled(STAGE_WEB_FLOW_NOT_STARTED)
         }
+        exit(result)
+    }
+
+    private fun resultScreenOutcome(): ImportGoogleBookmarkResult? = when (val viewMode = viewState.value.viewMode) {
+        is ViewMode.Success -> ImportGoogleBookmarkResult.Success(viewMode.importedCount)
+        is ViewMode.Error -> ImportGoogleBookmarkResult.Error(viewMode.reason)
+        is ViewMode.WebFlowLoading, is ViewMode.WebFlow, is ViewMode.WaitingForExport -> null
+    }
+
+    private fun exit(result: ImportGoogleBookmarkResult) {
         viewModelScope.launch { _commands.send(Exit(result)) }
     }
 
@@ -166,5 +180,7 @@ class ImportGoogleBookmarksViewModel @AssistedInject constructor(
 
     companion object {
         val PROMO_TIMEOUT = 1.seconds
+
+        private const val STAGE_WEB_FLOW_NOT_STARTED = "uninitialized"
     }
 }

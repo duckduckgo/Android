@@ -4,6 +4,108 @@ Internal-only module with dev tools for testing the remote privacy config integr
 
 > **Note:** Patches only work in `internal` builds (`installInternalDebug` / `installInternalRelease`). They are silently ignored in `play` and `fdroid` builds.
 
+## Load a privacy config with adb
+
+The manifest receiver is available only in the `internal` flavor and requires
+`android.permission.DUMP`. Send an explicit broadcast from `adb shell`. The package
+name depends on the build:
+
+| Build | Package |
+|---|---|
+| `internalDebug` | `com.duckduckgo.mobile.android.debug` |
+| `internalRelease` | `com.duckduckgo.mobile.android` |
+
+```bash
+adb shell am broadcast --include-stopped-packages \
+  -a com.duckduckgo.privacy.config.internal.SET_URL \
+  -p com.duckduckgo.mobile.android.debug \
+  --es url http://10.0.2.2:8080/android-config.json
+```
+
+`10.0.2.2` is the Android emulator's alias for the host. On a physical device, or if you
+prefer `localhost`, forward the port instead:
+
+```bash
+adb reverse tcp:8080 tcp:8080
+adb shell am broadcast --include-stopped-packages \
+  -a com.duckduckgo.privacy.config.internal.SET_URL \
+  -p com.duckduckgo.mobile.android.debug \
+  --es url http://localhost:8080/android-config.json
+```
+
+Use `--include-stopped-packages` when the app has been force-stopped or has never
+been launched.
+
+### URL validation
+
+A URL is accepted only if all of these hold:
+
+- the scheme is `http` or `https`, lower-case only (`HTTP://` is rejected);
+- it has a host;
+- the port, if given, is valid (0-65535);
+- it contains no whitespace.
+
+An invalid URL logs `CONFIG_OVERRIDE_FAILED action=set_url reason=invalid_url` and
+leaves settings unchanged.
+
+### Processing
+
+The receiver handles the command itself, in the background (`goAsync`), so the process
+stays alive until the command finishes. Commands are serialized. A valid
+SET_URL enables the developer URL override, then downloads. Developer Settings loads,
+SET_URL, and RESET bypass the version/signature gate only for that operation, allowing
+an equal or older config to replace stored config. Independent refreshes keep normal
+version checks. Failed downloads do not pre-clear stored metadata or feature data.
+There is no command retry, polling, or new periodic work; the existing hourly worker
+is unchanged. The selected URL settings are persistent: they remain until a RESET or
+a manual Developer Settings change, including across app restarts. This version policy
+does not bypass HTTP caches.
+
+Serve `generated/v6/android-config.json` from `duckduckgo/privacy-configuration`
+(after running `node index.js`) with `Cache-Control: no-store` so subsequent commands
+fetch your latest file.
+
+Clear the override and load the default config:
+
+```bash
+adb shell am broadcast --include-stopped-packages \
+  -a com.duckduckgo.privacy.config.internal.RESET \
+  -p com.duckduckgo.mobile.android.debug
+```
+
+### Result lines
+
+Each command logs exactly one result line under the tag `PrivacyConfigOverride`, on both
+`internalDebug` and `internalRelease`:
+
+```bash
+adb logcat -s PrivacyConfigOverride:I
+```
+
+```text
+CONFIG_OVERRIDE_APPLIED version=<version> etag=<etag> source=<override URL>
+CONFIG_OVERRIDE_RESET version=<version> etag=<etag>
+CONFIG_OVERRIDE_FAILED action=set_url|reset reason=invalid_url|download_failed source=<failing URL>
+```
+
+- `APPLIED`: a SET_URL whose download succeeded, with the version and ETag now stored.
+- `RESET`: a RESET whose production download succeeded.
+- `FAILED`: either command failed. `source` is its last field. For `set_url` it is the URL
+  as passed, or, for `invalid_url`, the raw `url` extra with all whitespace removed (empty
+  if missing). For `reset` it is the production config URL the RESET download used.
+
+The broadcast returns before the command finishes; the result line means it finished.
+Loads from the hourly refresh or from Developer Settings log no line. The ETag is empty
+if the server omits it. A failed SET_URL download keeps the selected override for the
+next command or manual load.
+
+### Observed background download failures on some Android 17 images
+
+On some Android 17 images, background commands before the app's first foreground
+launch may fail with `reason=download_failed`, including RESET against production.
+Opening the app once before sending the command is a workaround. Treat this as an
+image-specific observation; a universal firewall cause has not been verified.
+
 ## Local remote config patches
 
 Patches are JSON files in [JSON Patch format](https://jsonpatch.com/) applied at runtime after the remote config is fetched, overriding values from the server. Multiple patches are applied in the order listed — if two patches modify the same path, the last one wins; a failing patch is skipped without aborting the rest.
