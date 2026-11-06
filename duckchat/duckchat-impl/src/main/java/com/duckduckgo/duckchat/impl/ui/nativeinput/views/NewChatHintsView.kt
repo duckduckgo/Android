@@ -89,7 +89,16 @@ class NewChatHintsView @JvmOverloads constructor(
     }
 
     // The host fades the hints out with the input while they stay VISIBLE; invisible chips must not take taps.
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean = alpha > 0f && super.dispatchTouchEvent(event)
+    // The tab pager intercepts horizontal drags before the scroll view claims them, so claim them up front while the row overflows.
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (alpha <= 0f) return false
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && content.overflowsHorizontally()) {
+            parent?.requestDisallowInterceptTouchEvent(true)
+        }
+        return super.dispatchTouchEvent(event)
+    }
+
+    private fun HorizontalScrollView.overflowsHorizontally() = canScrollHorizontally(-1) || canScrollHorizontally(1)
 
     override fun onDetachedFromWindow() {
         stateJob?.cancel()
