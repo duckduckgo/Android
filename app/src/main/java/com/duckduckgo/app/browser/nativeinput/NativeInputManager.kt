@@ -307,7 +307,11 @@ class RealNativeInputManager @Inject constructor(
     ) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
-        this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController, nativeInputLayoutFixKillSwitch)
+        this.layoutCoordinator = NativeInputLayoutCoordinator(
+            rootView,
+            this.omnibarController,
+            inputWidgetFixEnabled = nativeInputLayoutFixKillSwitch.self().isEnabled(),
+        )
         duckChat.observeNativeChatInputEnabled()
             .onEach { isEnabled ->
                 val wasEnabled = isNativeChatInputEnabled
@@ -505,8 +509,8 @@ class RealNativeInputManager @Inject constructor(
                 },
                 onComplete = {
                     // Reset content under the still-suspended reflow and keep isWidgetAnimating true
-                    // until removeWidget's detach: clearing the animating flag here lets layout
-                    // listeners re-apply the exit-end inset during the fade and race the detach reset,
+                    // until removeWidget calls onWidgetRemoved: clearing the animating flag here lets layout
+                    // listeners re-apply the exit-end inset during the fade and race that reset,
                     // which is what left intermittent leftover space under the omnibar.
                     layoutCoordinator.resetContentOffsetToBase()
                     onHide(widgetView)

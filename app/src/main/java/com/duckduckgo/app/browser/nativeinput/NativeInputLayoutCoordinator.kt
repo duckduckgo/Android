@@ -30,7 +30,7 @@ import com.duckduckgo.app.browser.R
 class NativeInputLayoutCoordinator(
     private val rootView: ViewGroup,
     private val omnibarState: OmnibarState,
-    private val nativeInputLayoutFixKillSwitch: NativeInputLayoutFixKillSwitch,
+    private val inputWidgetFixEnabled: Boolean,
 ) {
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
 
@@ -190,7 +190,7 @@ class NativeInputLayoutCoordinator(
         addListeners()
         val attachListener = object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
-                if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+                if (inputWidgetFixEnabled) {
                     addListeners()
                     v.post { applyForWidgetPosition() }
                 }
@@ -198,7 +198,7 @@ class NativeInputLayoutCoordinator(
 
             override fun onViewDetachedFromWindow(v: View) {
                 removeListeners()
-                if (!nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+                if (!inputWidgetFixEnabled) {
                     clearAutocompleteLayoutResources?.invoke()
                 }
             }
@@ -425,7 +425,7 @@ class NativeInputLayoutCoordinator(
         addListeners()
         val attachListener = object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
-                if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+                if (inputWidgetFixEnabled) {
                     addListeners()
                     v.post { applyOffset() }
                 }
@@ -433,7 +433,7 @@ class NativeInputLayoutCoordinator(
 
             override fun onViewDetachedFromWindow(v: View) {
                 removeListeners()
-                if (!nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+                if (!inputWidgetFixEnabled) {
                     clearContentOffsetResources?.invoke()
                 }
             }
@@ -480,7 +480,7 @@ class NativeInputLayoutCoordinator(
      * [configureContentOffset] set up for it.
      */
     fun onWidgetRemoved() {
-        if (nativeInputLayoutFixKillSwitch.self().isEnabled()) {
+        if (inputWidgetFixEnabled) {
             clearAutocompleteLayoutResources?.invoke()
             clearContentOffsetResources?.invoke()
         }
