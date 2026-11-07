@@ -51,6 +51,7 @@ import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRequestEntry
 import com.duckduckgo.savedsites.impl.sync.store.RealSavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
+import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
@@ -218,6 +219,25 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes.bookmarks.updates[3].id == "bookmark3")
         assertTrue(changes.bookmarks.updates[4].id == "bookmark4")
         assertTrue(changes.bookmarks.updates[5].id == "bookmarks_root")
+    }
+
+    @Test
+    fun whenFolderRelationsContainCycleThenGetChangesTerminatesAndListsEachFolderOnce() {
+        val folderA = aFolder("folderA", "Folder A", SavedSitesNames.BOOKMARKS_ROOT)
+        val folderB = aFolder("folderB", "Folder B", folderA.id)
+        repository.insert(folderA)
+        repository.insert(folderB)
+        repository.insert(bookmark3.copy(parentId = folderB.id))
+        // folderB now also contains folderA, forming a loop in the relations table
+        savedSitesRelationsDao.insert(Relation(folderId = folderB.id, entityId = folderA.id))
+
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        val updatedIds = changes.bookmarks.updates.map { it.id }
+        assertEquals(1, updatedIds.count { it == folderA.id })
+        assertEquals(1, updatedIds.count { it == folderB.id })
+        assertTrue(updatedIds.contains(bookmark3.id))
     }
 
     @Test
