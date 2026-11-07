@@ -30,7 +30,7 @@ import com.duckduckgo.app.browser.R
 class NativeInputLayoutCoordinator(
     private val rootView: ViewGroup,
     private val omnibarState: OmnibarState,
-    private val inputWidgetFixEnabled: Boolean,
+    private val recalculateContentPaddingOnTabSwitch: Boolean,
 ) {
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
 
@@ -190,14 +190,14 @@ class NativeInputLayoutCoordinator(
         addListeners()
         val attachListener = object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
-                if (inputWidgetFixEnabled) {
+                if (recalculateContentPaddingOnTabSwitch) {
                     addListeners()
                     v.post { if (v.isAttachedToWindow) applyForWidgetPosition() }
                 }
             }
 
             override fun onViewDetachedFromWindow(v: View) {
-                if (inputWidgetFixEnabled) {
+                if (recalculateContentPaddingOnTabSwitch) {
                     removeListeners()
                 } else {
                     clearAutocompleteLayoutResources?.invoke()
@@ -412,15 +412,15 @@ class NativeInputLayoutCoordinator(
 
         // In order to avoid leaking the globalLayoutListener, keep a reference to the observer
         // that we used to register the listener on and unregister from it on detach.
-        // With the fix enabled, it's only registered while the NTP content is attached. A detached
-        // view returns a temporary observer, so registering then and again when the widget
-        // re-attaches would leave a copy that's never removed from the temporary observer.
+        // When recalculating on tab switch, it's only registered while the NTP content is attached.
+        // A detached view returns a temporary observer, so registering then and again when the
+        // widget re-attaches would leave a copy that's never removed from the temporary observer.
         var ntpObserver: ViewTreeObserver? = null
 
         fun addListeners() {
             widgetView.addOnLayoutChangeListener(layoutListener)
             rootView.addOnLayoutChangeListener(layoutListener)
-            if (newTabContent != null && (!inputWidgetFixEnabled || newTabContent.isAttachedToWindow)) {
+            if (newTabContent != null && (!recalculateContentPaddingOnTabSwitch || newTabContent.isAttachedToWindow)) {
                 ntpObserver = newTabContent.viewTreeObserver.also {
                     it.addOnGlobalLayoutListener(globalLayoutListener)
                 }
@@ -435,14 +435,14 @@ class NativeInputLayoutCoordinator(
         addListeners()
         val attachListener = object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
-                if (inputWidgetFixEnabled) {
+                if (recalculateContentPaddingOnTabSwitch) {
                     addListeners()
                     v.post { if (v.isAttachedToWindow) applyOffset() }
                 }
             }
 
             override fun onViewDetachedFromWindow(v: View) {
-                if (inputWidgetFixEnabled) {
+                if (recalculateContentPaddingOnTabSwitch) {
                     removeListeners()
                 } else {
                     clearContentOffsetResources?.invoke()
@@ -493,7 +493,7 @@ class NativeInputLayoutCoordinator(
      * [configureContentOffset] set up for it.
      */
     fun onWidgetRemoved() {
-        if (inputWidgetFixEnabled) {
+        if (recalculateContentPaddingOnTabSwitch) {
             clearAutocompleteLayoutResources?.invoke()
             clearContentOffsetResources?.invoke()
         }

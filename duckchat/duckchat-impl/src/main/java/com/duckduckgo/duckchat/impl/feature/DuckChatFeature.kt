@@ -333,4 +333,11 @@ interface DuckChatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun newChatHints(): Toggle
+
+    /**
+     * @return `true` when the native input recalculates the content padding each time its tab is re-attached.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeInputRecalculateContentPaddingOnTabSwitch(): Toggle
 }

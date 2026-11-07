@@ -47,7 +47,7 @@ class NativeInputLayoutCoordinatorTest {
     private val coordinator = NativeInputLayoutCoordinator(
         rootView = mock(),
         omnibarState = mock(),
-        inputWidgetFixEnabled = true,
+        recalculateContentPaddingOnTabSwitch = true,
     )
 
     @Test
@@ -92,7 +92,7 @@ class NativeInputLayoutCoordinatorTest {
             addView(ntp)
             addView(widget)
         }
-        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.configureContentOffset(widget, isBottom = false)
 
         coordinator.setImeAnimating(true)
@@ -121,7 +121,7 @@ class NativeInputLayoutCoordinatorTest {
             addView(widget, FrameLayout.LayoutParams(MATCH_PARENT, CARD_TOP_MARGIN_PX + CARD_HEIGHT_PX, Gravity.BOTTOM))
         }
         activity.setContentView(root)
-        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), recalculateContentPaddingOnTabSwitch = true)
 
         coordinator.configureContentOffset(widget, isBottom = true)
         shadowOf(Looper.getMainLooper()).idle()
@@ -141,7 +141,7 @@ class NativeInputLayoutCoordinatorTest {
             View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
         )
         root.layout(0, 0, 1000, 1000)
-        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.applyForcedBottomTranslation(widget, isBottom = true)
         assertEquals(600f, widget.translationY)
 
@@ -164,7 +164,7 @@ class NativeInputLayoutCoordinatorTest {
         activity.setContentView(root)
         root.layout(0, 0, 1000, 1000)
         widget.layout(0, 0, 1000, 400)
-        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.applyForcedBottomTranslation(widget, isBottom = true)
         assertEquals(600f, widget.translationY)
 
@@ -194,7 +194,7 @@ class NativeInputLayoutCoordinatorTest {
             addView(widget, CoordinatorLayout.LayoutParams(MATCH_PARENT, CARD_TOP_MARGIN_PX + CARD_HEIGHT_PX).apply { gravity = Gravity.BOTTOM })
         }
         activity.setContentView(root)
-        val coordinator = NativeInputLayoutCoordinator(root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(root, mock(), recalculateContentPaddingOnTabSwitch = true)
 
         coordinator.configureNewChatHints(widget, hints)
         root.addView(hints)
@@ -209,7 +209,7 @@ class NativeInputLayoutCoordinatorTest {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.configureContentOffset(tab.widget, isBottom = true)
         idle()
         switchAwayAndBack(pager, tab)
@@ -225,7 +225,7 @@ class NativeInputLayoutCoordinatorTest {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.configureContentOffset(tab.widget, isBottom = true)
         idle()
 
@@ -240,7 +240,7 @@ class NativeInputLayoutCoordinatorTest {
     fun whenWidgetConfiguredWhileTabWasDetachedIsRemovedThenItNoLongerDrivesBrowserContent() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.configureContentOffset(tab.widget, isBottom = true)
         pager.addView(tab.root)
         idle()
@@ -259,7 +259,7 @@ class NativeInputLayoutCoordinatorTest {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.configureContentOffset(tab.widget, isBottom = true)
         idle()
         pager.removeAllViews()
@@ -278,7 +278,7 @@ class NativeInputLayoutCoordinatorTest {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
         idle()
         switchAwayAndBack(pager, tab)
@@ -294,7 +294,7 @@ class NativeInputLayoutCoordinatorTest {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
         idle()
 
@@ -310,7 +310,7 @@ class NativeInputLayoutCoordinatorTest {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = true)
         coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
         idle()
         pager.removeAllViews()
@@ -325,11 +325,11 @@ class NativeInputLayoutCoordinatorTest {
     }
 
     @Test
-    fun whenLayoutFixDisabledThenSwitchingTabsReturnsBrowserContentToBasePadding() {
+    fun whenPaddingRecalculationDisabledThenSwitchingTabsReturnsBrowserContentToBasePadding() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = false)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = false)
         coordinator.configureContentOffset(tab.widget, isBottom = true)
         idle()
 
@@ -339,11 +339,11 @@ class NativeInputLayoutCoordinatorTest {
     }
 
     @Test
-    fun whenLayoutFixDisabledThenSwitchingTabsReturnsAutocompleteToBasePadding() {
+    fun whenPaddingRecalculationDisabledThenSwitchingTabsReturnsAutocompleteToBasePadding() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = false)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = false)
         coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
         idle()
 
@@ -353,11 +353,11 @@ class NativeInputLayoutCoordinatorTest {
     }
 
     @Test
-    fun whenLayoutFixDisabledThenOnWidgetRemovedLeavesLayoutToDetach() {
+    fun whenPaddingRecalculationDisabledThenOnWidgetRemovedLeavesLayoutToDetach() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
-        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = false)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = false)
         coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
         coordinator.configureContentOffset(tab.widget, isBottom = true)
         idle()

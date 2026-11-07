@@ -57,6 +57,7 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NewChatHintsRenderer
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -114,9 +115,7 @@ class RealNativeInputManagerTest {
     }
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
-    private val nativeInputRecalculateContentPaddingOnTabSwitchFeature = FakeFeatureToggleFactory.create(
-        NativeInputRecalculateContentPaddingOnTabSwitchFeature::class.java,
-    )
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val layoutResources: Resources = spy(context.resources)
@@ -152,7 +151,7 @@ class RealNativeInputManagerTest {
             edgeToEdgeHandler,
             duckAiChatStore,
             newChatHintsRenderer,
-            nativeInputRecalculateContentPaddingOnTabSwitchFeature,
+            duckChatFeature,
         )
     }
 
@@ -890,7 +889,7 @@ class RealNativeInputManagerTest {
 
     @Test
     fun whenTabViewIsDetachedThenAutocompleteKeepsClearingWidget() {
-        val tab = givenBottomWidgetOverAutocomplete(layoutFixEnabled = true)
+        val tab = givenBottomWidgetOverAutocomplete(recalculateContentPaddingOnTabSwitch = true)
 
         tab.pager.removeView(tab.root)
 
@@ -898,8 +897,8 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenLayoutFixDisabledAndTabViewIsDetachedThenAutocompleteReturnsToBasePadding() {
-        val tab = givenBottomWidgetOverAutocomplete(layoutFixEnabled = false)
+    fun whenPaddingRecalculationDisabledAndTabViewIsDetachedThenAutocompleteReturnsToBasePadding() {
+        val tab = givenBottomWidgetOverAutocomplete(recalculateContentPaddingOnTabSwitch = false)
 
         tab.pager.removeView(tab.root)
 
@@ -908,7 +907,7 @@ class RealNativeInputManagerTest {
 
     @Test
     fun whenWidgetIsRemovedThenAutocompleteReturnsToBasePadding() {
-        val tab = givenBottomWidgetOverAutocomplete(layoutFixEnabled = true)
+        val tab = givenBottomWidgetOverAutocomplete(recalculateContentPaddingOnTabSwitch = true)
 
         inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
 
@@ -920,8 +919,8 @@ class RealNativeInputManagerTest {
         val paddingWhileShown = autoCompleteList.paddingBottom.also { check(it > 0) }
     }
 
-    private fun givenBottomWidgetOverAutocomplete(layoutFixEnabled: Boolean): TabWithAutocomplete {
-        nativeInputRecalculateContentPaddingOnTabSwitchFeature.self().setRawStoredState(State(enable = layoutFixEnabled))
+    private fun givenBottomWidgetOverAutocomplete(recalculateContentPaddingOnTabSwitch: Boolean): TabWithAutocomplete {
+        duckChatFeature.nativeInputRecalculateContentPaddingOnTabSwitch().setRawStoredState(State(enable = recalculateContentPaddingOnTabSwitch))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
         whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))

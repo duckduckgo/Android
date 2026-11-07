@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NewChatHintsRenderer
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -79,7 +80,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
         object : NewChatHintsRenderer {
             override suspend fun create(context: Context, tabId: String): View = View(context)
         },
-        FakeFeatureToggleFactory.create(NativeInputRecalculateContentPaddingOnTabSwitchFeature::class.java),
+        FakeFeatureToggleFactory.create(DuckChatFeature::class.java),
     )
 
     private val rootView = object : FrameLayout(activity) {
