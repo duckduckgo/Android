@@ -116,7 +116,7 @@ class RealNativeInputManagerTest {
     }
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
-    private val nativeInputLayoutFixKillSwitch = FakeFeatureToggleFactory.create(NativeInputLayoutFixKillSwitch::class.java)
+    private val nativeInputRecalculateContentPaddingOnTabSwitchFeature = FakeFeatureToggleFactory.create(NativeInputRecalculateContentPaddingOnTabSwitchFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val layoutResources: Resources = spy(context.resources)
@@ -152,7 +152,7 @@ class RealNativeInputManagerTest {
             edgeToEdgeHandler,
             duckAiChatStore,
             newChatHintsRenderer,
-            nativeInputLayoutFixKillSwitch,
+            nativeInputRecalculateContentPaddingOnTabSwitchFeature,
         )
     }
 
@@ -921,7 +921,7 @@ class RealNativeInputManagerTest {
     }
 
     private fun givenBottomWidgetOverAutocomplete(layoutFixEnabled: Boolean): TabWithAutocomplete {
-        nativeInputLayoutFixKillSwitch.self().setRawStoredState(State(enable = layoutFixEnabled))
+        nativeInputRecalculateContentPaddingOnTabSwitchFeature.self().setRawStoredState(State(enable = layoutFixEnabled))
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
         whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
         whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))

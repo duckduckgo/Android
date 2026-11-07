@@ -217,7 +217,7 @@ class RealNativeInputManager @Inject constructor(
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
     private val newChatHintsRenderer: NewChatHintsRenderer,
-    private val nativeInputLayoutFixKillSwitch: NativeInputLayoutFixKillSwitch,
+    private val nativeInputRecalculateContentPaddingOnTabSwitchFeature: NativeInputRecalculateContentPaddingOnTabSwitchFeature,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -310,7 +310,7 @@ class RealNativeInputManager @Inject constructor(
         this.layoutCoordinator = NativeInputLayoutCoordinator(
             rootView,
             this.omnibarController,
-            inputWidgetFixEnabled = nativeInputLayoutFixKillSwitch.self().isEnabled(),
+            inputWidgetFixEnabled = nativeInputRecalculateContentPaddingOnTabSwitchFeature.self().isEnabled(),
         )
         duckChat.observeNativeChatInputEnabled()
             .onEach { isEnabled ->

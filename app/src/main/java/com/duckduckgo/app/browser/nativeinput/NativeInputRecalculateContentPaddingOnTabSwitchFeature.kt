@@ -21,11 +21,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
+/**
+ * Controls whether the tab recalculates the content's padding on attach,
+ * or keeps the old behavior of doing it on instantiation only.
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "nativeInputLayoutFixKillSwitch",
+    featureName = "nativeInputRecalculateContentPaddingOnTabSwitchFeature",
 )
-interface NativeInputLayoutFixKillSwitch {
+interface NativeInputRecalculateContentPaddingOnTabSwitchFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 }
