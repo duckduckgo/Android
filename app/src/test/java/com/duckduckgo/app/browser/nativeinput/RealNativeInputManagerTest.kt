@@ -116,7 +116,9 @@ class RealNativeInputManagerTest {
     }
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
-    private val nativeInputRecalculateContentPaddingOnTabSwitchFeature = FakeFeatureToggleFactory.create(NativeInputRecalculateContentPaddingOnTabSwitchFeature::class.java)
+    private val nativeInputRecalculateContentPaddingOnTabSwitchFeature = FakeFeatureToggleFactory.create(
+        NativeInputRecalculateContentPaddingOnTabSwitchFeature::class.java,
+    )
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val layoutResources: Resources = spy(context.resources)
