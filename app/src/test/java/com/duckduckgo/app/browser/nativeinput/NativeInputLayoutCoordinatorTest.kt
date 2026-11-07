@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.R
 import org.junit.Assert.assertEquals
@@ -254,20 +255,22 @@ class NativeInputLayoutCoordinatorTest {
     }
 
     @Test
-    fun whenWidgetIsRemovedThenItNoLongerDrivesBrowserContent() {
+    fun whenWidgetIsRemovedWhileTabIsPagedOutThenBrowserContentReturnsToBasePadding() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
         val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
         coordinator.configureContentOffset(tab.widget, isBottom = true)
         idle()
+        pager.removeAllViews()
+        idle()
 
         tab.root.removeView(tab.widget)
         coordinator.onWidgetRemoved()
-        tab.browserLayout.setPadding(0, 0, 0, OTHER_SESSION_PADDING_PX)
-        pager.viewTreeObserver.dispatchOnGlobalLayout()
+        pager.addView(tab.root)
+        idle()
 
-        assertEquals(OTHER_SESSION_PADDING_PX, tab.browserLayout.paddingBottom)
+        assertEquals(0, tab.browserLayout.paddingBottom)
     }
 
     @Test
