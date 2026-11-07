@@ -204,17 +204,19 @@ class NativeInputLayoutCoordinatorTest {
     }
 
     @Test
-    fun whenTabViewIsReattachedThenBrowserContentKeepsClearingWidget() {
+    fun whenWidgetResizesAfterTabIsReattachedThenBrowserContentPaddingFollows() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
         val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
         coordinator.configureContentOffset(tab.widget, isBottom = true)
         idle()
-
         switchAwayAndBack(pager, tab)
 
-        assertEquals(WIDGET_HEIGHT_PX, tab.browserLayout.paddingBottom)
+        tab.widget.updateLayoutParams { height = RESIZED_WIDGET_HEIGHT_PX }
+        idle()
+
+        assertEquals(RESIZED_WIDGET_HEIGHT_PX, tab.browserLayout.paddingBottom)
     }
 
     @Test
@@ -269,17 +271,19 @@ class NativeInputLayoutCoordinatorTest {
     }
 
     @Test
-    fun whenTabViewIsReattachedThenAutocompleteKeepsClearingWidget() {
+    fun whenWidgetResizesAfterTabIsReattachedThenAutocompletePaddingFollows() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
         pager.addView(tab.root)
         val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), inputWidgetFixEnabled = true)
         coordinator.configureAutocompleteLayout(tab.widget, isBottom = true)
         idle()
-
         switchAwayAndBack(pager, tab)
 
-        assertEquals(WIDGET_HEIGHT_PX, tab.autoCompleteList.paddingBottom)
+        tab.widget.updateLayoutParams { height = RESIZED_WIDGET_HEIGHT_PX }
+        idle()
+
+        assertEquals(RESIZED_WIDGET_HEIGHT_PX, tab.autoCompleteList.paddingBottom)
     }
 
     @Test
@@ -395,6 +399,7 @@ class NativeInputLayoutCoordinatorTest {
         private const val CARD_HEIGHT_PX = 60
         private const val HINTS_SPACING_PX = 8
         private const val WIDGET_HEIGHT_PX = 80
+        private const val RESIZED_WIDGET_HEIGHT_PX = 120
         private const val OTHER_SESSION_PADDING_PX = 123
     }
 }
