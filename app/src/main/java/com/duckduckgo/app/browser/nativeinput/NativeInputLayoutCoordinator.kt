@@ -239,9 +239,8 @@ class NativeInputLayoutCoordinator(
         resetContentOffset?.invoke()
         clearNtpScrollArtifacts()
 
-        val newTabContent =
-            rootView.findViewById<View?>(R.id.newTabPage)
-                ?: rootView.findViewById(R.id.includeNewBrowserTab)
+        val newTabContent: View? = rootView.findViewById<View?>(R.id.newTabPage)
+            ?: rootView.findViewById(R.id.includeNewBrowserTab)
         // newTabPage has no XML padding — any top/bottom here is from a prior offset session. Zero it
         // so the snapshot can't inherit a dirty baseline. Leave browserLayout alone: its bottom padding
         // is owned by BottomOmnibarBrowserContainerLayoutBehavior.
@@ -421,7 +420,7 @@ class NativeInputLayoutCoordinator(
         fun addListeners() {
             widgetView.addOnLayoutChangeListener(layoutListener)
             rootView.addOnLayoutChangeListener(layoutListener)
-            if (!inputWidgetFixEnabled || newTabContent.isAttachedToWindow) {
+            if (newTabContent != null && (!inputWidgetFixEnabled || newTabContent.isAttachedToWindow)) {
                 ntpObserver = newTabContent.viewTreeObserver.also {
                     it.addOnGlobalLayoutListener(globalLayoutListener)
                 }
