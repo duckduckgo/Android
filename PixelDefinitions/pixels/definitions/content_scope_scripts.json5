@@ -1,9 +1,43 @@
 {
     "m_content_scope_scripts_inbound_queue_full": {
-        "description": "The bounded queue of inbound contentScopeScripts JS messages was full, so a message was dropped without being routed to a handler. Reported once per overflow episode, at most once per day, and indicates the optimizeContentScopeMessaging kill-switch may need to be pulled.",
+        "description": "One feature's bounded queue of inbound contentScopeScripts JS messages was full, so a message was dropped without being routed to a handler, and answered with an error if the page expected a reply. Reported once per overflow episode, at most once per day, and indicates the optimizeContentScopeMessaging kill-switch may need to be pulled. The parameters tell a flood (messages arriving faster than they are handled) apart from a stall (the consumer stuck on one message).",
         "owners": ["anikiki"],
-        "triggers": ["other"],
+        "triggers": ["exception"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "feature",
+                "type": "string",
+                "description": "The feature whose queue overflowed, or other for features not listed here.",
+                "enum": [
+                    "aiChat",
+                    "breakageReporting",
+                    "browserUiLock",
+                    "duckAiNativeStorage",
+                    "duckPlayer",
+                    "internalFeedback",
+                    "pageContext",
+                    "serp",
+                    "serpSettings",
+                    "subscriptions",
+                    "webCompat",
+                    "webEvents",
+                    "other"
+                ]
+            },
+            {
+                "key": "handling_stage",
+                "type": "string",
+                "description": "Where the in-progress message was: waiting for the sending document's url on the main thread, or inside its handler.",
+                "enum": ["url", "handler", "none"]
+            },
+            {
+                "key": "handling_time",
+                "type": "string",
+                "description": "How long the in-progress message had been in progress when the queue overflowed, bucketed.",
+                "enum": ["under_1s", "1s_to_10s", "10s_to_60s", "over_60s", "none"]
+            }
+        ]
     }
 }
