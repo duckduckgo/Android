@@ -217,6 +217,7 @@ class RealNativeInputManager @Inject constructor(
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
     private val newChatHintsRenderer: NewChatHintsRenderer,
+    private val nativeInputRecalculateContentPaddingOnTabSwitchFeature: NativeInputRecalculateContentPaddingOnTabSwitchFeature,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -306,7 +307,11 @@ class RealNativeInputManager @Inject constructor(
     ) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
-        this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
+        this.layoutCoordinator = NativeInputLayoutCoordinator(
+            rootView,
+            this.omnibarController,
+            recalculateContentPaddingOnTabSwitch = nativeInputRecalculateContentPaddingOnTabSwitchFeature.self().isEnabled(),
+        )
         duckChat.observeNativeChatInputEnabled()
             .onEach { isEnabled ->
                 val wasEnabled = isNativeChatInputEnabled
@@ -504,8 +509,8 @@ class RealNativeInputManager @Inject constructor(
                 },
                 onComplete = {
                     // Reset content under the still-suspended reflow and keep isWidgetAnimating true
-                    // until removeWidget's detach: clearing the animating flag here lets layout
-                    // listeners re-apply the exit-end inset during the fade and race the detach reset,
+                    // until removeWidget calls onWidgetRemoved: clearing the animating flag here lets layout
+                    // listeners re-apply the exit-end inset during the fade and race that reset,
                     // which is what left intermittent leftover space under the omnibar.
                     layoutCoordinator.resetContentOffsetToBase()
                     onHide(widgetView)
@@ -1014,6 +1019,7 @@ class RealNativeInputManager @Inject constructor(
         var removed = false
         rootView.findViewById<View?>(R.id.inputModeRoot)?.let {
             rootView.removeView(it)
+            layoutCoordinator.onWidgetRemoved()
             removed = true
         }
         rootView.findViewById<View?>(R.id.inputModeWidgetNavLayout)?.let {

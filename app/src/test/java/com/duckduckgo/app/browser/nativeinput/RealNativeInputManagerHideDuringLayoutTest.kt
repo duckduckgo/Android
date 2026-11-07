@@ -79,6 +79,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
         object : NewChatHintsRenderer {
             override suspend fun create(context: Context, tabId: String): View = View(context)
         },
+        FakeFeatureToggleFactory.create(NativeInputRecalculateContentPaddingOnTabSwitchFeature::class.java),
     )
 
     private val rootView = object : FrameLayout(activity) {
