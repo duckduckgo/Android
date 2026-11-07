@@ -72,7 +72,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NewChatHintsRenderer
 import com.duckduckgo.duckchat.api.toChatIdOrNull
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -218,7 +217,7 @@ class RealNativeInputManager @Inject constructor(
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
     private val newChatHintsRenderer: NewChatHintsRenderer,
-    private val duckChatFeature: DuckChatFeature,
+    private val nativeInputRecalculateContentPaddingOnTabSwitchFeature: NativeInputRecalculateContentPaddingOnTabSwitchFeature,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -311,7 +310,7 @@ class RealNativeInputManager @Inject constructor(
         this.layoutCoordinator = NativeInputLayoutCoordinator(
             rootView,
             this.omnibarController,
-            recalculateContentPaddingOnTabSwitch = duckChatFeature.nativeInputRecalculateContentPaddingOnTabSwitch().isEnabled(),
+            recalculateContentPaddingOnTabSwitch = nativeInputRecalculateContentPaddingOnTabSwitchFeature.self().isEnabled(),
         )
         duckChat.observeNativeChatInputEnabled()
             .onEach { isEnabled ->
