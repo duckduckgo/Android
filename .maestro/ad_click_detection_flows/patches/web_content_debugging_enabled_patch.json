@@ -1,0 +1,16 @@
+[
+  {
+    "op": "add",
+    "path": "/features/InternalWebContentDebuggingFlag",
+    "value": {
+      "state": "enabled",
+      "minSupportedVersion": 0,
+      "features": {
+        "webContentDebugging": {
+          "state": "enabled",
+          "minSupportedVersion": 0
+        }
+      }
+    }
+  }
+]
