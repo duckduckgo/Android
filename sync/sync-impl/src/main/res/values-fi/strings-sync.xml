@@ -480,9 +480,54 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Käytä salasanojasi mobiililaitteella ja tietokoneella.</string>
+    <string name="sync_passwords_import_promo_title_label">Käytä salasanojasi mobiililaitteella ja tietokoneella.</string>
     <string name="sync_passwords_import_promo_primary_button">Ota käyttöön Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_title_toggle">Synkronoi ja varmuuskopioi salasanasi mobiililaitteella ja tietokoneella.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Käytä kirjanmerkkejäsi mobiililaitteella ja tietokoneella.</string>
+    <string name="sync_bookmarks_import_promo_title_label">Käytä kirjanmerkkejäsi mobiililaitteella ja tietokoneella.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Ota käyttöön Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Synkronoi ja varmuuskopioi kirjanmerkkisi mobiililaitteella ja tietokoneella.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Synkronoi ja varmuuskopioi kirjanmerkkisi</string>
+    <string name="sync_bookmarks_promo_message">Päästä päähän salattu. Kukaan ei voi nähdä kirjanmerkkejäsi, emme edes me.</string>
+    <string name="sync_bookmarks_promo_primary_button">Ota käyttöön Sync &amp; Backup</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Synkronoidaanko kirjanmerkit myös työpöytäsovelluksesi kanssa?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Yhdistä</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Hanki sovellus</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Synkronoi ja varmuuskopioi kirjanmerkit</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Lisää vaihtoehtoja</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Piilota</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Ota käyttöön Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Synkronointi työpöytäsovelluksen kanssa</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Lisää vaihtoehtoja</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Piilota</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Synkronointi pöytäkoneen kanssa</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Hanki työpöytäsovellus</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Synkronoidaan työpöytäsovelluksesi!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Synkronointi pöytäkoneen kanssa</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Minulla ei ole työpöytäsovellusta</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Synkronoi ja varmuuskopioi salasanasi</string>
+    <string name="sync_passwords_promo_message">Päästä päähän -salaus tarkoittaa, että sinun lisäksesi kukaan muu ei näe salasanojasi, emme edes me.</string>
+    <string name="sync_passwords_promo_primary_button">Ota käyttöön Sync &amp; Backup</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Synkronoitko salasanat myös työpöytäsovelluksesi kanssa?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Yhdistä</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Hanki sovellus</string>
+
 </resources>
