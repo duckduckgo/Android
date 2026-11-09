@@ -850,12 +850,13 @@ class BrowserTabFragment :
                         } else {
                             null
                         },
+                        animated = true,
                     )
                 }
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
                 viewModel.onNewFireTabFromChatMenuSelected()
-                browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE)
+                browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE, animated = true)
             }
         }
     }
@@ -2719,9 +2720,9 @@ class BrowserTabFragment :
                 }
 
                 if (swipingTabsFeature.isEnabled) {
-                    browserActivity?.launchNewTab(it.query, it.sourceTabId)
+                    browserActivity?.launchNewTab(it.query, it.sourceTabId, animated = true)
                 } else {
-                    browserActivity?.openInNewTab(it.query, it.sourceTabId)
+                    browserActivity?.openInNewTab(it.query, it.sourceTabId, animated = true)
                 }
             }
 
@@ -2732,7 +2733,7 @@ class BrowserTabFragment :
                 }
                 binding.autoCompleteSuggestionsList.gone()
                 nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
-                browserActivity?.launchNewTab(it.query, it.sourceTabId, browserMode = BrowserMode.FIRE)
+                browserActivity?.launchNewTab(it.query, it.sourceTabId, browserMode = BrowserMode.FIRE, animated = true)
             }
 
             is Command.OpenMessageInNewTab -> {
@@ -2753,7 +2754,7 @@ class BrowserTabFragment :
             }
 
             is Command.LaunchNewTab -> {
-                browserActivity?.launchNewTab()
+                browserActivity?.launchNewTab(animated = true)
             }
 
             is Command.NavigateBackInCustomTab -> {
