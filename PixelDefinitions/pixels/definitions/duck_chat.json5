@@ -1933,7 +1933,7 @@
         "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
     },
     "aichat_contextual_address_bar_menu_skipped": {
-        "description": "Fired when the user taps the address bar Duck.ai button while the tab already has a chat in progress, so the menu is skipped and that chat reopens",
+        "description": "Fired when the address bar Duck.ai button skips the menu because the tab already has a chat in progress",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["user_interaction"],
         "suffixes": ["first_daily_count", "form_factor"],
