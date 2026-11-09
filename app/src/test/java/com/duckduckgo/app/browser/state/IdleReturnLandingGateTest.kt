@@ -57,4 +57,13 @@ class IdleReturnLandingGateTest {
 
         assertEquals(State.AwaitingTab("ntp"), gate.state)
     }
+
+    @Test
+    fun whenResolvedWithNullAfterResolvingTabAwaitingHatchThenKeepsAwaitingHatch() {
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+        gate.resolve(null)
+
+        assertEquals(State.AwaitingTab("ntp", awaitHatch = true), gate.state)
+    }
 }

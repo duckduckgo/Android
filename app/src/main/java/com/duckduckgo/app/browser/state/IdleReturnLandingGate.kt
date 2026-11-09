@@ -31,7 +31,7 @@ class IdleReturnLandingGate @Inject constructor() {
     sealed interface State {
         data object Open : State
         data object Pending : State
-        data class AwaitingTab(val tabId: String) : State
+        data class AwaitingTab(val tabId: String, val awaitHatch: Boolean = false) : State
     }
 
     private val _state = AtomicReference<State>(State.Open)
@@ -46,8 +46,8 @@ class IdleReturnLandingGate @Inject constructor() {
      * opened (e.g. the first frame gave up waiting) a late landing can't hold a later frame, and a repeated
      * resolve(null) leaves an awaited tab in place.
      */
-    fun resolve(tabId: String? = null) {
-        _state.compareAndSet(State.Pending, tabId?.let { State.AwaitingTab(it) } ?: State.Open)
+    fun resolve(tabId: String? = null, awaitHatch: Boolean = false) {
+        _state.compareAndSet(State.Pending, tabId?.let { State.AwaitingTab(it, awaitHatch) } ?: State.Open)
     }
 
     fun open() {

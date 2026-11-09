@@ -3919,8 +3919,8 @@ class BrowserTabFragment :
                     }
                 }
 
-                override fun onHatchRendered(visible: Boolean) {
-                    // no-op
+                override fun onIdleReturnSettled() {
+                    browserActivity?.onIdleReturnHatchSettled(tabId)
                 }
 
                 override fun onTabClosed(

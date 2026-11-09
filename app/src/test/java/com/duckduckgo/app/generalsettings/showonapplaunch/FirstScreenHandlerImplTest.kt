@@ -242,7 +242,7 @@ class FirstScreenHandlerImplTest {
     }
 
     @Test
-    fun whenIdleReturnAddsLandingTabThenLandingGateAwaitsThatTab() = runTest {
+    fun whenIdleReturnAddsNtpLandingTabThenLandingGateAwaitsThatTabAndItsHatch() = runTest {
         givenIdleReturn()
         whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
             .thenReturn(ShowOnAppLaunchResult(destinationUrl = null, treatment = AfterIdleTreatment.NTP, landingTabId = "ntp"))
@@ -250,7 +250,31 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        assertEquals(IdleReturnLandingGate.State.AwaitingTab("ntp"), idleReturnLandingGate.state)
+        assertEquals(IdleReturnLandingGate.State.AwaitingTab("ntp", awaitHatch = true), idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenIdleReturnLandsOnSpecificPageThenLandingGateAwaitsThatTabWithoutHatch() = runTest {
+        givenIdleReturn()
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .thenReturn(ShowOnAppLaunchResult(destinationUrl = "https://example.com", treatment = null, landingTabId = "page"))
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(IdleReturnLandingGate.State.AwaitingTab("page", awaitHatch = false), idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenFreshIdleLaunchRestoresNtpThenLandingGateAwaitsItsHatch() = runTest {
+        givenIdleReturn()
+        liveSelectedTab.value = TabEntity(tabId = "restored", url = null)
+        whenever(tabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "restored", url = null))
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(IdleReturnLandingGate.State.AwaitingTab("restored", awaitHatch = true), idleReturnLandingGate.state)
     }
 
     @Test
