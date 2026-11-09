@@ -8,14 +8,31 @@ androidWebViewHierarchy: devtools
 #
 # The retry wraps only this case, so a flaky case doesn't rerun the whole group.
 # Each attempt relaunches without clearing state, to get back to the browser even if the
-# previous attempt stopped inside the privacy dashboard, then fires: fire clears tabs and
-# ad click attribution, so every attempt starts from the same state.
+# previous attempt stopped inside the privacy dashboard, then fires: attribution is kept per
+# tab and the relaunch reuses the last tab, so fire is what keeps cases from sharing it.
 - retry:
     maxRetries: 3
     commands:
       - launchApp:
           stopApp: true
-      - runFlow: ../../shared/browser_screen/click_on_fire_button.yaml
+      # A relaunch reopens the last tab with the address bar in edit mode, where the fire
+      # button is the input widget's, which click_on_fire_button.yaml doesn't look for.
+      - runFlow:
+          when:
+            visible:
+              id: "com.duckduckgo.mobile.android:id/inputModeWidgetNavFire"
+          commands:
+            - tapOn:
+                id: "com.duckduckgo.mobile.android:id/inputModeWidgetNavFire"
+      - runFlow:
+          when:
+            notVisible:
+              id: "com.duckduckgo.mobile.android:id/inputModeWidgetNavFire"
+          commands:
+            - runFlow: ../../shared/browser_screen/click_on_fire_button.yaml
+      # Fail here rather than carry the previous case's attribution into this one.
+      - assertVisible:
+          text: "Delete Tabs and Data|Delete All"
       - runFlow: ../../shared/browser_screen/confirm_fire_dialog.yaml
       - tapOn:
           id: "omnibarTextInput|inputField"
