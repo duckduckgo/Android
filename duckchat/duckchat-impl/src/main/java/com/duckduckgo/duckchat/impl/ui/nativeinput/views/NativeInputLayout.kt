@@ -77,6 +77,7 @@ class NativeInputLayout @JvmOverloads constructor(
         useCompatPadding = surface == Surface.OMNIBAR_TOP
         val background = if (surface == Surface.OMNIBAR_TOP) CommonR.attr.daxColorSurface else CommonR.attr.daxColorWindow
         setCardBackgroundColor(context.getColorFromAttr(background))
+        strokeColor = context.getColorFromAttr(CommonR.attr.daxColorLines)
         when (surface) {
             Surface.OMNIBAR_TOP, Surface.OMNIBAR_BOTTOM -> radius = 24f.toPx()
             // The sheet's card floats with margins on all sides, so all four corners are rounded.
@@ -106,6 +107,9 @@ class NativeInputLayout @JvmOverloads constructor(
         // Only the top browser search-only omnibar takes the wide-omnibar shape; isBottom is part of this
         // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
         val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
+        // The bottom card's shallow elevation leaves its edges bleeding into the Duck.ai page, so it gets a hairline outline.
+        val isBottomDuckAi = state.isBottom && state.inputContext == NativeInputState.InputContext.DUCK_AI
+        strokeWidth = if (isBottomDuckAi) resources.getDimensionPixelSize(CommonR.dimen.horizontalDividerHeight) else 0
         if (state.isBottom) {
             val radius = when {
                 !isBrowserSearchOnly -> CommonR.dimen.extraLargeShapeCornerRadius
