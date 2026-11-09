@@ -64,6 +64,7 @@ jobs:
     with:
       commit: ${{ inputs.commit }}
       create_asana_tasks: ${{ inputs.create_asana_tasks }}
+      maestro_priority: ${{ inputs.maestro_priority }}
     secrets: inherit
 
   instrumentation_tests:
