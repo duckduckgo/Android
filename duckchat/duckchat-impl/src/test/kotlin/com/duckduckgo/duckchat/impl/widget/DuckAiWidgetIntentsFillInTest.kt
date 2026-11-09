@@ -20,7 +20,9 @@ import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -38,20 +40,24 @@ class DuckAiWidgetIntentsFillInTest {
     // Mirrors BrowserActivity.intent(): the URL and every launch extra are always written, even when empty.
     private val nav: BrowserNav = mock<BrowserNav>().also {
         whenever(it.openDuckChat(any(), any(), any(), anyOrNull(), any())).thenAnswer { call ->
+            val fromWidget = call.getArgument<DuckChatLaunchOrigin>(4) == DuckChatLaunchOrigin.HOME_SCREEN_WIDGET
             Intent()
                 .putExtra("DUCK_CHAT_URL", call.getArgument<String>(2))
-                .putExtra("NATIVE_INPUT_LAUNCH_ACTION_EXTRA", call.getArgument<Any?>(3)?.toString())
+                .putExtra("LAUNCH_REQUIRES_REGULAR_MODE", fromWidget)
+                .putExtra("DUCK_CHAT_ENTRY_POINT_EXTRA", if (fromWidget) "WIDGET_DUCK_AI" else null)
         }
     }
     private val intents = DuckAiWidgetIntents(nav, fakeGlobalActivityStarter())
 
     @Test
-    fun whenChatRowFillInIsAppliedToTemplateThenChatUrlWins() {
+    fun whenChatRowFillInIsAppliedToTemplateThenChatUrlAndWidgetLaunchExtrasWin() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val template = shadowOf(intents.chatClickTemplate(context, 1, newChatUrl)).savedIntent
 
         template.fillIn(intents.chatFillInIntent(context, chatUrl), 0)
 
         assertEquals(chatUrl, template.getStringExtra("DUCK_CHAT_URL"))
+        assertTrue(template.getBooleanExtra("LAUNCH_REQUIRES_REGULAR_MODE", false))
+        assertEquals("WIDGET_DUCK_AI", template.getStringExtra("DUCK_CHAT_ENTRY_POINT_EXTRA"))
     }
 }
