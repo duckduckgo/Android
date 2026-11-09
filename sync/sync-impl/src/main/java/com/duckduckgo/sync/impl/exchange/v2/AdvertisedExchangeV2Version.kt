@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
@@ -34,13 +33,7 @@ interface AdvertisedExchangeV2Version {
 }
 
 @ContributesBinding(AppScope::class)
-class RealAdvertisedExchangeV2Version @Inject constructor(
-    private val syncFeature: SyncFeature,
-) : AdvertisedExchangeV2Version {
+class RealAdvertisedExchangeV2Version @Inject constructor() : AdvertisedExchangeV2Version {
 
-    override fun resolve(): ExchangeProtocolVersion.V2 = if (syncFeature.canUseExchangeV2Point1().isEnabled()) {
-        ExchangeProtocolVersion.V2_1
-    } else {
-        ExchangeProtocolVersion.V2_0
-    }
+    override fun resolve(): ExchangeProtocolVersion.V2 = ExchangeProtocolVersion.V2_1
 }
