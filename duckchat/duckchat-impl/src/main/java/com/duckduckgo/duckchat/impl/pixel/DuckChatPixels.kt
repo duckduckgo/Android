@@ -203,11 +203,12 @@ interface DuckChatPixels {
     fun reportContextualFireButtonTapped()
     fun reportContextualFireButtonConfirmed()
 
-    fun reportContextualAddressBarMenuShown()
-    fun reportContextualAddressBarMenuNewChatSelected()
+    fun reportContextualAddressBarMenuShown(pageType: DuckChatPixelPageType)
+    fun reportContextualAddressBarMenuSkipped(pageType: DuckChatPixelPageType)
+    fun reportContextualAddressBarMenuNewChatSelected(pageType: DuckChatPixelPageType)
     fun reportContextualAddressBarMenuAskAboutPageSelected()
     fun reportContextualAddressBarMenuAskAboutSearchSelected()
-    fun reportContextualAddressBarMenuAllChatsSelected()
+    fun reportContextualAddressBarMenuAllChatsSelected(pageType: DuckChatPixelPageType)
     fun reportContextualFloatingInputShown()
     fun reportContextualFloatingInputDismissedWithoutSubmission()
     fun reportContextualFloatingInputPromotedToSheet()
@@ -813,17 +814,27 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
-    override fun reportContextualAddressBarMenuShown() {
+    override fun reportContextualAddressBarMenuShown(pageType: DuckChatPixelPageType) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY, type = Pixel.PixelType.Daily())
+            val params = mapOf(DuckChatPixelParameters.PROMPT_PAGE_TYPE to pageType.value)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT, params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
         }
     }
 
-    override fun reportContextualAddressBarMenuNewChatSelected() {
+    override fun reportContextualAddressBarMenuSkipped(pageType: DuckChatPixelPageType) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+            val params = mapOf(DuckChatPixelParameters.PROMPT_PAGE_TYPE to pageType.value)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_COUNT, params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_DAILY, params, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualAddressBarMenuNewChatSelected(pageType: DuckChatPixelPageType) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val params = mapOf(DuckChatPixelParameters.PROMPT_PAGE_TYPE to pageType.value)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT, params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
         }
     }
 
@@ -841,10 +852,11 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
-    override fun reportContextualAddressBarMenuAllChatsSelected() {
+    override fun reportContextualAddressBarMenuAllChatsSelected(pageType: DuckChatPixelPageType) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+            val params = mapOf(DuckChatPixelParameters.PROMPT_PAGE_TYPE to pageType.value)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT, params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
         }
     }
 
@@ -1592,6 +1604,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_COUNT("m_aichat_contextual_fire_button_confirmed_count"),
     DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT("aichat_contextual_address_bar_menu_shown_count"),
     DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY("aichat_contextual_address_bar_menu_shown_daily"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_COUNT("aichat_contextual_address_bar_menu_skipped_count"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_DAILY("aichat_contextual_address_bar_menu_skipped_daily"),
     DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT("aichat_contextual_address_bar_menu_new_chat_selected_count"),
     DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY("aichat_contextual_address_bar_menu_new_chat_selected_daily"),
     DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_COUNT("aichat_contextual_address_bar_menu_ask_about_page_selected_count"),
@@ -1757,7 +1771,10 @@ object DuckChatPixelParameters {
     const val SELECTION_COUNT = "selection_count"
     const val PAGE_TYPE = "pageType"
 
-    /** What the user was looking at when a prompt was submitted. Distinct from [PAGE_TYPE], which classifies contextual suggestions. */
+    /**
+     * What the user was looking at when a prompt was submitted or the address bar Duck.ai menu was used.
+     * Distinct from [PAGE_TYPE], which classifies contextual suggestions.
+     */
     const val PROMPT_PAGE_TYPE = "page_type"
     const val FIRST_PROMPT_NEW_INSTALL = "first_prompt_new_install"
     const val IS_SMART = "isSmart"
@@ -1991,12 +2008,16 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_SEARCH_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_SEARCH_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_OPEN_DUCKAI_MENU_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_OPEN_DUCKAI_MENU_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),

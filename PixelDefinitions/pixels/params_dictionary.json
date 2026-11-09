@@ -97,6 +97,12 @@
         "description": "What the user was looking at when the prompt was submitted.",
         "enum": ["ntp", "serp", "website", "duck_ai", "contextual"]
     },
+    "duckAiAddressBarMenuPageType": {
+        "key": "page_type",
+        "type": "string",
+        "description": "What the user was looking at when they tapped the address bar Duck.ai button: New Tab page, DuckDuckGo search results or any other web page.",
+        "enum": ["ntp", "serp", "website"]
+    },
     "duckAiEntrySource": {
         "key": "source",
         "type": "string",
