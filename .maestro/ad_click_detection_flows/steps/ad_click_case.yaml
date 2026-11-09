@@ -17,6 +17,14 @@ androidWebViewHierarchy: devtools
           stopApp: true
       # A relaunch reopens the last tab with the address bar in edit mode, where the fire
       # button is the input widget's, which click_on_fire_button.yaml doesn't look for.
+      # The fallback goes first: the fire sheet hides that button, and the fallback's
+      # hideKeyboard would dismiss the sheet.
+      - runFlow:
+          when:
+            notVisible:
+              id: "com.duckduckgo.mobile.android:id/inputModeWidgetNavFire"
+          commands:
+            - runFlow: ../../shared/browser_screen/click_on_fire_button.yaml
       - runFlow:
           when:
             visible:
@@ -24,12 +32,6 @@ androidWebViewHierarchy: devtools
           commands:
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/inputModeWidgetNavFire"
-      - runFlow:
-          when:
-            notVisible:
-              id: "com.duckduckgo.mobile.android:id/inputModeWidgetNavFire"
-          commands:
-            - runFlow: ../../shared/browser_screen/click_on_fire_button.yaml
       # Fail here rather than carry the previous case's attribution into this one.
       - assertVisible:
           text: "Delete Tabs and Data|Delete All"
