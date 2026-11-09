@@ -19,7 +19,9 @@ package com.duckduckgo.app.browser.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
+import com.duckduckgo.app.browser.mode.SelectedTextSearch
+import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -49,7 +51,7 @@ class AppBrowserNavTest {
 
     @Test
     fun whenOpenDuckChatWithImageGenerationThenIntentForcesImageGeneration() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchAction = NativeInputLaunchAction.IMAGE_GENERATION)
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchAction = DuckChatLaunchAction.ImageGeneration)
 
         assertTrue(intent.getBooleanExtra("OPEN_DUCK_CHAT_EXTRA", false))
         assertEquals(DUCK_AI_URL, intent.getStringExtra("DUCK_CHAT_URL"))
@@ -61,6 +63,44 @@ class AppBrowserNavTest {
         val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL)
 
         assertFalse(intent.getBooleanExtra("DUCK_CHAT_FORCE_IMAGE_GENERATION", false))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithContextualChatThenIntentCarriesContextualFlagAndSelection() {
+        val intent = testee.openDuckChat(
+            context,
+            duckChatUrl = DUCK_AI_URL,
+            launchAction = DuckChatLaunchAction.ContextualChat("selected"),
+        )
+
+        assertTrue(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
+        assertEquals("selected", intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
+        assertFalse(intent.getBooleanExtra("DUCK_CHAT_FORCE_IMAGE_GENERATION", false))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithContextualChatWithoutSelectionThenIntentHasNoSelection() {
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchAction = DuckChatLaunchAction.ContextualChat(null))
+
+        assertTrue(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
+        assertNull(intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithTextSelectionThenIntentIsNotContextualAndCarriesSelectionFromSelectedTextSource() {
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchAction = DuckChatLaunchAction.TextSelection("selected"))
+
+        assertFalse(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
+        assertEquals("selected", intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
+        assertEquals(SelectedTextSearch.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithoutLaunchActionThenIntentIsNotContextualAndHasNoSelection() {
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL)
+
+        assertFalse(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
+        assertNull(intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
     }
 
     private companion object {

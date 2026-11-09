@@ -22,7 +22,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -56,21 +57,20 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         context: Context,
         hasSessionActive: Boolean,
         duckChatUrl: String,
-        launchAction: NativeInputLaunchAction?,
-        autoFocusInput: Boolean,
-        forceLaunchContextual: Boolean,
-        textSelection: String?,
+        launchAction: DuckChatLaunchAction?,
+        launchOrigin: DuckChatLaunchOrigin,
     ): Intent {
-        val isExternal = textSelection != null && !forceLaunchContextual
+        val contextual = launchAction as? DuckChatLaunchAction.ContextualChat
+        val externalSelection = launchAction as? DuckChatLaunchAction.TextSelection
         return BrowserActivity.intent(
             context = context,
-            launchSource = if (isExternal) SelectedTextSearch else InAppNavigation,
+            launchSource = if (externalSelection != null) SelectedTextSearch else InAppNavigation,
             openDuckChat = true,
-            duckChatContextual = forceLaunchContextual,
+            duckChatContextual = contextual != null,
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
-            duckChatForceImageGeneration = launchAction == NativeInputLaunchAction.IMAGE_GENERATION,
-            duckChatTextSelection = textSelection,
+            duckChatForceImageGeneration = launchAction == DuckChatLaunchAction.ImageGeneration,
+            duckChatTextSelection = contextual?.textSelection ?: externalSelection?.text,
         )
     }
 
