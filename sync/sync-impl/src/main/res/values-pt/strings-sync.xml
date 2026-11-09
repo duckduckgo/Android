@@ -493,8 +493,8 @@
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_promo_title">Sincroniza e faz uma cópia de segurança dos teus favoritos</string>
-    <string name="sync_bookmarks_promo_message">Encriptado de ponta a ponta. Ninguém pode ver os teus favoritos, nem mesmo nós.</string>
+    <string name="sync_bookmarks_promo_title">Sincroniza e faz uma cópia de segurança dos teus marcadores</string>
+    <string name="sync_bookmarks_promo_message">Encriptado de ponta a ponta. Ninguém pode ver os teus marcadores, nem mesmo nós.</string>
     <string name="sync_bookmarks_promo_primary_button">Ativar Sync &amp; Backup</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
@@ -504,7 +504,7 @@
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Obter aplicação</string>
 
     <!-- Sync promo in bookmark added dialog -->
-    <string name="sync_bookmark_added_set_up_promo_title">Sincroniza e faz uma cópia de segurança dos favoritos</string>
+    <string name="sync_bookmark_added_set_up_promo_title">Sincroniza e faz uma cópia de segurança dos marcadores</string>
     <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Mais opções</string>
     <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Ocultar</string>
     <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Ativar Sync &amp; Backup</string>
@@ -526,7 +526,7 @@
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_title">Também sincronizas as palavras-passe com a aplicação para computador?</string>
+    <string name="sync_passwords_multi_device_promo_title">Sincronizar também as palavras-passe com a aplicação para computador?</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Ligar</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Obter aplicação</string>
 

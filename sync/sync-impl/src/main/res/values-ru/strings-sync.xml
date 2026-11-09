@@ -520,7 +520,7 @@
     <string name="sync_bookmark_added_multi_device_sheet_secondary_button">У меня нет приложения для компьютера</string>
 
     <!-- Sync promo on passwords screen -->
-    <string name="sync_passwords_promo_title">Синхронизация и резервное копирование паролей</string>
+    <string name="sync_passwords_promo_title">Скачать приложение для компьютера</string>
     <string name="sync_passwords_promo_message">Сквозное шифрование означает, что твои пароли видны только тебе, даже мы не можем их увидеть.</string>
     <string name="sync_passwords_promo_primary_button">Включить Sync &amp; Backup</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
