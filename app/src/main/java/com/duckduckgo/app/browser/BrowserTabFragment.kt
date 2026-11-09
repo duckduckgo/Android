@@ -68,6 +68,7 @@ import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
@@ -2253,7 +2254,14 @@ class BrowserTabFragment :
 
     // The platform keeps only the first call, so later tabs and content changes are no-ops.
     private fun reportFullyDrawnIfSelected() {
+        if (isFullyDrawnReported()) return
         if (viewModel.liveSelectedTab.value?.tabId == tabId) activity?.reportFullyDrawn()
+    }
+
+    private fun isFullyDrawnReported(): Boolean = (activity as? ComponentActivity)?.fullyDrawnReporter?.isFullyDrawnReported == true
+
+    private fun onPageCommitVisible(url: String) {
+        if (url.isNotEmpty() && url != "about:blank") reportFullyDrawnIfSelected()
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -2299,19 +2307,6 @@ class BrowserTabFragment :
         hidePdf()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
         browserNavigationBarIntegration.configureBrowserViewMode()
-        val visibleWebView = webView
-        if (visibleWebView != null) {
-            visibleWebView.postVisualStateCallback(
-                0L,
-                object : WebView.VisualStateCallback() {
-                    override fun onComplete(requestId: Long) {
-                        if (webView === visibleWebView) reportFullyDrawnIfSelected()
-                    }
-                },
-            )
-        } else {
-            binding.browserLayout.doOnPreDraw { reportFullyDrawnIfSelected() }
-        }
     }
 
     private fun showPdfDownloadTooltip() {
@@ -3101,6 +3096,7 @@ class BrowserTabFragment :
 
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
+            is Command.PageCommitVisible -> onPageCommitVisible(it.url)
             is Command.EnableDuckAIFullScreen -> {
                 setWebViewZoomSupported(false)
                 showDuckAI(it.browserViewState)
@@ -6536,7 +6532,9 @@ class BrowserTabFragment :
                                 LayoutParams.MATCH_PARENT,
                             ),
                         )
-                        newBrowserTab.newTabContainerLayout.doOnPreDraw { reportFullyDrawnIfSelected() }
+                        if (!isFullyDrawnReported()) {
+                            newBrowserTab.newTabContainerLayout.doOnPreDraw { reportFullyDrawnIfSelected() }
+                        }
                     }
                 }.launchIn(viewLifecycleOwner.lifecycleScope)
         }

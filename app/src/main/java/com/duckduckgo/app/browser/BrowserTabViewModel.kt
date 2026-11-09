@@ -2866,6 +2866,7 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String,
     ) {
+        command.value = Command.PageCommitVisible(url)
         if (keepErrorPage()) {
             if (errorPagePendingDismissal) resetBrowserError()
         }

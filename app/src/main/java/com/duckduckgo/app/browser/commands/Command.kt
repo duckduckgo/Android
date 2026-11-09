@@ -517,6 +517,8 @@ sealed class Command {
     ) : Command()
     data object PageStarted : Command()
 
+    data class PageCommitVisible(val url: String) : Command()
+
     data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
     data class DuckAIFullScreenDisabled(val url: String) : Command()
 
