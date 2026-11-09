@@ -1,0 +1,76 @@
+appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
+name: "Tracker allowed after ad click: Ad click detection"
+tags:
+  - adClickTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+- runFlow:
+    label: "5 - y.js heuristic ad domain provided, but empty u3 not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-5"
+      AD_ID: "ad-id-5"
+      EXPECT: "allowed"
+
+- runFlow:
+    label: "6 - m.js heuristic ad domain provided, but empty dsl not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-6"
+      AD_ID: "ad-id-6"
+      EXPECT: "allowed"
+
+- runFlow:
+    label: "7 - y.js bing-provided ad domain provided u3 not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-6"
+      AD_ID: "ad-id-7"
+      EXPECT: "allowed"
+
+- runFlow:
+    label: "8 - m.js bing-provided ad domain provided dsl not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-8"
+      AD_ID: "ad-id-8"
+      EXPECT: "allowed"
+
+- runFlow:
+    label: "11 - y.js bing-provided ad domain provided but it's not a domain i.e., abcedf u3 not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-11"
+      AD_ID: "ad-id-11"
+      EXPECT: "allowed"
+
+- runFlow:
+    label: "12 - m.js bing-provided ad domain provided but it's not a domain i.e., abcedf dsl not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-12"
+      AD_ID: "ad-id-12"
+      EXPECT: "allowed"
+
+- runFlow:
+    label: "13 - y.js bing-provided ad domain provided but it's a subdomain of advertiser i.e., foo.www.search-company-site u3 not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-13"
+      AD_ID: "ad-id-13"
+      EXPECT: "allowed"
+
+- runFlow:
+    label: "14 - m.js bing-provided ad domain provided but it's a subdomain of advertiser i.e., foo.www.search-company-site dsl not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-14"
+      AD_ID: "ad-id-14"
+      EXPECT: "allowed"

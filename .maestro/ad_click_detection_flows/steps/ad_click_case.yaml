@@ -1,0 +1,38 @@
+appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
+---
+# One ad click detection case. Env:
+#   ANCHOR: fragment the page scrolls to (usually the same as AD_ID)
+#   AD_ID:  id of the ad to tap
+#   EXPECT: "blocked" or "allowed"
+#
+# The retry wraps only this case, so a flaky case doesn't rerun the whole group.
+# Each attempt relaunches without clearing state, to get back to the browser even if the
+# previous attempt stopped inside the privacy dashboard, then fires: fire clears tabs and
+# ad click attribution, so every attempt starts from the same state.
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          stopApp: true
+      - runFlow: ../../shared/browser_screen/click_on_fire_button.yaml
+      - runFlow: ../../shared/browser_screen/confirm_fire_dialog.yaml
+      - tapOn:
+          id: "omnibarTextInput|inputField"
+      - inputText: "https://www.search-company.site/#${ANCHOR}"
+      - pressKey: Enter
+      - assertVisible:
+          id: ${AD_ID}
+      - tapOn:
+          id: ${AD_ID}
+      - assertVisible:
+          text: "Publisher site"
+      - runFlow: ../../shared/browser_screen/click_on_privacy_shield.yaml
+      - runFlow:
+          when:
+            true: ${EXPECT == 'blocked'}
+          file: assert_blocked.yaml
+      - runFlow:
+          when:
+            true: ${EXPECT == 'allowed'}
+          file: assert_allowed.yaml
