@@ -81,12 +81,12 @@ class TabPagerAdapter(
             BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal, launchingAppPackage).apply {
                 this.messageFromPreviousTab = pendingMessage.message
                 this.inputModeTarget = inputModeTarget
-                this.nativeInputLaunchOptions = nativeInputLaunch
+                this.nativeInputLaunch = nativeInputLaunch
             }
         } else {
             BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal, launchingAppPackage).apply {
                 this.inputModeTarget = inputModeTarget
-                this.nativeInputLaunchOptions = nativeInputLaunch
+                this.nativeInputLaunch = nativeInputLaunch
             }
         }
     }
