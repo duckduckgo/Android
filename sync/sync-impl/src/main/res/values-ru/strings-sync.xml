@@ -514,13 +514,13 @@
     <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Другие параметры</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Скрыть</string>
     <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Синхронизировать с компьютером</string>
-    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Наше приложение для компьютера</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Скачать приложение для компьютера</string>
     <string name="sync_bookmark_added_multi_device_sheet_title">Давайте синхронизируем приложение для компьютера!</string>
     <string name="sync_bookmark_added_multi_device_sheet_primary_button">Синхронизировать с компьютером</string>
     <string name="sync_bookmark_added_multi_device_sheet_secondary_button">У меня нет приложения для компьютера</string>
 
     <!-- Sync promo on passwords screen -->
-    <string name="sync_passwords_promo_title">Скачать приложение для компьютера</string>
+    <string name="sync_passwords_promo_title">Синхронизация и резервное копирование паролей</string>
     <string name="sync_passwords_promo_message">Сквозное шифрование означает, что твои пароли видны только тебе, даже мы не можем их увидеть.</string>
     <string name="sync_passwords_promo_primary_button">Включить Sync &amp; Backup</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
