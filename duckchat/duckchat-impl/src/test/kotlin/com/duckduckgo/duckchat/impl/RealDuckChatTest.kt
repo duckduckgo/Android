@@ -27,7 +27,7 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -165,7 +165,7 @@ class RealDuckChatTest {
         )
         coroutineRule.testScope.advanceUntilIdle()
 
-        whenever(mockBrowserNav.openDuckChat(any(), any(), any(), anyOrNull(), any(), any(), anyOrNull())).thenReturn(mockIntent)
+        whenever(mockBrowserNav.openDuckChat(any(), any(), any(), anyOrNull(), any())).thenReturn(mockIntent)
         whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
     }
 
@@ -1998,7 +1998,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(NativeInputLaunchAction.IMAGE_GENERATION), any(), any(), anyOrNull())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunchAction.ImageGeneration), any())
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2014,7 +2014,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager).selectModel(capable)
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(NativeInputLaunchAction.IMAGE_GENERATION), any(), any(), anyOrNull())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunchAction.ImageGeneration), any())
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2030,7 +2030,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), isNull(), any(), any(), anyOrNull())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), isNull(), any())
         verify(mockContext).startActivity(mockIntent)
     }
 
