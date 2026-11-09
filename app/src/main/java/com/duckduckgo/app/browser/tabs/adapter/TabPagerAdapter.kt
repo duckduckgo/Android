@@ -141,6 +141,8 @@ class TabPagerAdapter(
         }
     }
 
+    fun getPositionOfTab(tabId: String): Int = tabs.indexOfFirst { it.tabId == tabId }
+
     fun getTabIdAtPosition(position: Int): String? {
         return if (position >= 0 && position < tabs.size) {
             tabs[position].tabId
