@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.subscription.onboarding.experiment
 
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -37,16 +38,21 @@ class SubscriptionOnboardingExperimentMetricsTest {
     private val inventory: FeatureTogglesInventory = mock()
     private val freeTrialToggle: Toggle = mock {
         on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "subscriptionOnboardingFreeTrialsOct2026")
+        onBlocking { isEnrolled() } doReturn true
     }
     private val paidToggle: Toggle = mock {
         on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "subscriptionOnboardingPaidSubsOct2026")
+        onBlocking { isEnrolled() } doReturn true
     }
     private lateinit var testee: SubscriptionOnboardingExperimentMetrics
 
     @Before
     fun setup() {
         fakeMetricsPixelExtension.register()
-        testee = RealSubscriptionOnboardingExperimentMetrics(inventory = inventory)
+        testee = RealSubscriptionOnboardingExperimentMetrics(
+            inventory = inventory,
+            sharedPreferencesProvider = FakeSharedPreferencesProvider(),
+        )
     }
 
     @Test
@@ -79,5 +85,43 @@ class SubscriptionOnboardingExperimentMetricsTest {
         testee.fireVpnActivated()
 
         assertTrue(fakeMetricsPixelExtension.sentMetrics.isEmpty())
+    }
+
+    @Test
+    fun whenVpnActivatedAgainThenNoMetricSentTwice() = runTest {
+        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(freeTrialToggle))
+
+        testee.fireVpnActivated()
+        testee.fireVpnActivated()
+
+        assertEquals(2, fakeMetricsPixelExtension.sentMetrics.size)
+    }
+
+    @Test
+    fun whenNotEnrolledThenNoMetricSent() = runTest {
+        val notEnrolledToggle: Toggle = mock {
+            on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "subscriptionOnboardingFreeTrialsOct2026")
+            onBlocking { isEnrolled() } doReturn false
+        }
+        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(notEnrolledToggle))
+
+        testee.fireVpnActivated()
+
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.isEmpty())
+    }
+
+    @Test
+    fun whenVpnActivatedBeforeEnrollmentThenMetricSentOnceEnrolled() = runTest {
+        val notEnrolledToggle: Toggle = mock {
+            on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "subscriptionOnboardingFreeTrialsOct2026")
+            onBlocking { isEnrolled() } doReturn false
+        }
+        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(notEnrolledToggle))
+        testee.fireVpnActivated()
+
+        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(freeTrialToggle))
+        testee.fireVpnActivated()
+
+        assertEquals(2, fakeMetricsPixelExtension.sentMetrics.size)
     }
 }
