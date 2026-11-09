@@ -27,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
+import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.MessageCta.Message
@@ -56,13 +57,16 @@ import javax.inject.Inject
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
 class SyncPasswordsPromotion @Inject constructor(
     private val syncPromotions: SyncPromotions,
+    private val setUpPromotion: SyncPasswordsSetUpPromotion,
 ) : PasswordsScreenPromotionPlugin {
 
     override suspend fun getView(context: Context, numberSavedPasswords: Int): View? {
-        return if (syncPromotions.canShowPasswordsPromotion(numberSavedPasswords)) {
-            SyncPasswordsPromotionView(context)
-        } else {
-            null
+        return when {
+            setUpPromotion.canShowPromotion(numberSavedPasswords) -> SyncPasswordsSetUpPromotionView(context).apply {
+                actionStyle = if (setUpPromotion.shouldUseToggle()) ActionStyle.Toggle else ActionStyle.Buttons
+            }
+            syncPromotions.canShowPasswordsPromotion(numberSavedPasswords) -> SyncPasswordsPromotionView(context)
+            else -> null
         }
     }
 }
@@ -122,7 +126,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswords.value))
+            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswords))
             context.startActivity(intent)
         }
     }

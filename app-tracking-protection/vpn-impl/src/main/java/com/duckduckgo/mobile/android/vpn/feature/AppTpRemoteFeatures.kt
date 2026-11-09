@@ -64,6 +64,13 @@ interface AppTpRemoteFeatures {
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun setSearchDomains(): Toggle // kill switch
 
+    // Restart the VPN by swapping the tunnel under the running service instead of tearing the network stack down
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun restartInPlace(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun restartWideEvent(): Toggle
+
     @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment001(): Toggle
 

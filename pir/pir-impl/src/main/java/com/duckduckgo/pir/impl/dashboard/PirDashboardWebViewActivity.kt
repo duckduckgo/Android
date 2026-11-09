@@ -16,12 +16,17 @@
 
 package com.duckduckgo.pir.impl.dashboard
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -29,6 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -38,15 +44,21 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendResponseToJs
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirDashboardFreeScanEntryPointHolder
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
 import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
+import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -55,7 +67,9 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirDashboardWebViewScreen::class, screenName = "pir.main")
+@ContributeToActivityStarter(PirDashboardWebViewScreen::class)
+@ContributeToActivityStarter(PirFreemiumDashboardScreens.FromEntryPoint::class)
+@ContributeToActivityStarter(PirFreemiumDashboardScreens.FromRemoteMessage::class, screenName = "pir.main")
 class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -77,9 +91,16 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var freeScanEntryPointHolder: PirDashboardFreeScanEntryPointHolder
+
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
 
     private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
+
+    private val notificationPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
+        viewModel.onNotificationPermissionResult(granted = granted)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +109,8 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         setupCloseToolbarIfNeeded()
         configureEdgeToEdgeInsets()
 
+        // set before the web view loads, so the handshake always waits on this visit's entry point
+        freeScanEntryPointHolder.freeScanEntryPoint = viewModel.freeScanEntryPoint
         setupWebView()
         observeCommands()
 
@@ -99,7 +122,27 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         viewModel.onLaunched(
             isRestored = savedInstanceState != null || launchedFromRecents,
             fromFreemiumScanCompleteNotification = intent.getBooleanExtra(EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION, false),
+            freemiumLaunch = freemiumLaunch(savedInstanceState),
         )
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.resolvedFreeScanEntryPoint?.let { outState.putString(KEY_FREE_SCAN_ENTRY_POINT, it.name) }
+    }
+
+    /**
+     * After process death the ViewModel is new, so a restored dashboard uses the entry point it saved rather than resolving
+     * the launch again: a scan that finished in the meantime would otherwise turn a free scan banner visit into a results one.
+     */
+    private fun freemiumLaunch(savedInstanceState: Bundle?): PirFreemiumDashboardScreens? {
+        if (savedInstanceState == null) {
+            return intent.getActivityParams(PirFreemiumDashboardScreens::class.java)
+        }
+
+        return savedInstanceState.getString(KEY_FREE_SCAN_ENTRY_POINT)
+            ?.let { name -> PirFreeScanEntryPoint.entries.firstOrNull { it.name == name } }
+            ?.let { PirFreemiumDashboardScreens.FromEntryPoint(it) }
     }
 
     override fun onDestroy() {
@@ -213,7 +256,67 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
                 this,
                 SubscriptionPurchase(origin = command.origin, featurePage = command.featurePage),
             )
+
+            Command.CheckNotificationPermission -> checkNotificationPermission()
+            is Command.ShowNotificationPermissionPrompt -> showNotificationPermissionPrompt(command.promptType)
+            Command.RequestNotificationPermission -> requestNotificationPermission()
+            Command.OpenNotificationSettings -> openNotificationSettings()
         }
+    }
+
+    private fun checkNotificationPermission() {
+        viewModel.onNotificationPermissionStateComputed(shouldShowRationale = shouldShowNotificationPermissionRationale())
+    }
+
+    private fun shouldShowNotificationPermissionRationale(): Boolean = Build.VERSION.SDK_INT >= 33 &&
+        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
+
+    private fun showNotificationPermissionPrompt(promptType: PirNotificationPromptType) {
+        val (messageRes, positiveButtonRes) = when (promptType) {
+            PirNotificationPromptType.REQUEST_PERMISSION ->
+                R.string.pirNotificationPermissionPromptMessage to R.string.pirNotificationPermissionPromptAllow
+            PirNotificationPromptType.OPEN_SETTINGS ->
+                R.string.pirNotificationPermissionPromptSettingsMessage to R.string.pirNotificationPermissionPromptOpenSettings
+        }
+
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.pirNotificationPermissionPromptTitle)
+            .setMessage(messageRes)
+            .setPositiveButton(positiveButtonRes)
+            .setNegativeButton(R.string.pirNotificationPermissionPromptNotNow)
+            .setCancellable(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onDialogShown() {
+                        viewModel.onNotificationPermissionPromptShown(promptType)
+                    }
+
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onNotificationPermissionPromptAccepted(promptType)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onNotificationPermissionPromptDismissed(promptType)
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onNotificationPermissionPromptDismissed(promptType)
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun openNotificationSettings() {
+        val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        startActivity(settingsIntent)
     }
 
     private fun sendJsEvent(event: SubscriptionEventData) {
@@ -227,5 +330,6 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_SHOW_CLOSE_BUTTON = "extra_show_close_button"
         const val EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION = "extra_from_freemium_scan_complete_notification"
+        private const val KEY_FREE_SCAN_ENTRY_POINT = "key_free_scan_entry_point"
     }
 }

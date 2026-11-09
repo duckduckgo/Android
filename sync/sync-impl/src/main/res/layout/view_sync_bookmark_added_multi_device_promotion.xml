@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/promoCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/keyline_2"
+    android:layout_marginTop="@dimen/keyline_2"
+    android:layout_marginBottom="@dimen/keyline_3"
+    android:background="@drawable/sync_bookmark_added_set_up_promotion_background"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingVertical="@dimen/oneLineItemVerticalPadding"
+    tools:ignore="Overdraw">
+
+    <ImageView
+        android:id="@+id/promoIcon"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:importantForAccessibility="no"
+        android:padding="@dimen/keyline_2"
+        app:srcCompat="@drawable/ic_sync_24" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/promoTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_1"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/oneLineItemHeight"
+        android:text="@string/sync_bookmark_added_multi_device_promo_title"
+        app:typography="body1" />
+
+    <ImageView
+        android:id="@+id/overflowIcon"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="@dimen/keyline_2"
+        android:contentDescription="@string/sync_bookmark_added_multi_device_promo_more_options"
+        app:srcCompat="@drawable/ic_menu_vertical_24" />
+
+</LinearLayout>

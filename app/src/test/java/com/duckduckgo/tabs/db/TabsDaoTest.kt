@@ -26,6 +26,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -606,5 +608,18 @@ class TabsDaoTest {
         this.observeForever(observer)
         this.removeObserver(observer)
         return value
+    }
+
+    @Test
+    fun allTabIdsIncludeUndoableTabsAndReflectImplicitDeletions() = runBlocking {
+        val first = TabEntity("first", deletable = true)
+        val second = TabEntity("second")
+        testee.insertTab(first)
+        testee.insertTab(second)
+        assertEquals(setOf("first", "second"), testee.flowAllTabIds().first().toSet())
+        testee.markTabAsDeletable(second)
+        assertEquals(listOf("second"), testee.flowAllTabIds().first())
+        testee.deleteAllTabs()
+        assertTrue(testee.flowAllTabIds().first().isEmpty())
     }
 }

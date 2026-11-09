@@ -631,6 +631,7 @@ class RealSubscriptionsManager @Inject constructor(
                 platform = confirmationResponse.subscription.platform,
                 activeOffers = confirmationResponse.subscription.activeOffers.map { it.type.toActiveOfferType() },
                 pendingPlans = pendingPlans,
+                planCountry = confirmationResponse.subscription.planCountry,
             )
 
             authRepository.setSubscription(subscription)
@@ -916,6 +917,7 @@ class RealSubscriptionsManager @Inject constructor(
                 platform = subscription.platform,
                 activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
                 pendingPlans = pendingPlans,
+                planCountry = subscription.planCountry,
             ),
         )
 

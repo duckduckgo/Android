@@ -30,6 +30,7 @@ import androidx.core.view.plusAssign
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
@@ -69,6 +70,7 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDe
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSetupSyncDeepLink
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSyncWithDesktop
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffThisDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
@@ -140,20 +142,24 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var authPromptRenderer: AuthPromptRenderer
 
+    private val startSyncFlowParams
+        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)
+
     private val launchSource
-        get() = SyncLaunchSource.from(
-            intent.getActivityParams(SyncActivityStartSyncFlow::class.java)?.source
-                ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source,
-        )
+        get() = startSyncFlowParams?.source
+            ?: SyncLaunchSource.from(intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source)
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
 
     private val shouldDeepLinkStartSync
-        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java) != null
+        get() = startSyncFlowParams != null
 
     private val isAnotherDeviceSync
         get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
+
+    private val isMultiDevicePromotion
+        get() = launchSource in SyncActivityViewModel.MULTI_DEVICE_PROMOTIONS
 
     private val backUpNewAccountLauncher = registerForActivityResult(
         SyncThisDeviceContract(),
@@ -316,6 +322,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureDataExpirationNotice()
         configureDataDeletionItem()
         configureTurnOffSyncResultListener()
+        configureSyncWithDesktopResultListener()
 
         observeViewModel()
         authPromptRenderer.bind(viewModel.authPrompts)
@@ -327,8 +334,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 shouldDeepLinkStartSync -> {
                     // The Sync flow opens only after a background check, so we hide the settings to stop them from flashing until it does.
                     // We can't rely solely on the view state for that, because it arrives asynchronously and misses the first frame.
-                    binding.root.isInvisible = true
-                    viewModel.processSourceDeepLink(launchSource)
+                    // Multi-device promotions keep the settings visible, because their flows start from the settings of a syncing user.
+                    binding.root.isInvisible = !isMultiDevicePromotion
+                    when (startSyncFlowParams?.start) {
+                        SyncFlowStart.AskSyncWithDesktop -> viewModel.processSyncWithDesktopDeepLink(launchSource)
+                        else -> viewModel.processSourceDeepLink(launchSource)
+                    }
                 }
                 isAnotherDeviceSync -> viewModel.onSyncWithAnotherDevice()
             }
@@ -430,6 +441,10 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is AskSetupSyncDeepLink -> {
                 askSetupSyncDeepLink(command.syncBarcodeUrl)
+            }
+
+            is AskSyncWithDesktop -> {
+                lifecycleScope.launch { withStarted { askSyncWithDesktop() } }
             }
 
             is AskTurnOffSync -> {
@@ -722,6 +737,21 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureSyncWithDesktopResultListener() {
+        supportFragmentManager.setFragmentResultListener(SyncWithDesktopBottomSheetDialog.REQUEST_KEY, this) { _, bundle ->
+            val choice = BundleCompat.getSerializable(
+                bundle,
+                SyncWithDesktopBottomSheetDialog.RESULT_KEY_CHOICE,
+                SyncWithDesktopBottomSheetDialog.Choice::class.java,
+            )
+            when (choice) {
+                SyncWithDesktopBottomSheetDialog.Choice.SyncWithDesktop -> viewModel.onSyncWithDesktopSelected()
+                SyncWithDesktopBottomSheetDialog.Choice.NoDesktopApp -> viewModel.onNoDesktopAppSelected()
+                null -> Unit
+            }
+        }
+    }
+
     private fun configureDataDeletionItem() {
         val color = ColorStateList.valueOf(getColorFromAttr(CommonR.attr.daxColorDestructive))
         binding.includeEnabledView.deleteAccountItem.apply {
@@ -801,6 +831,14 @@ class SyncActivity : DuckDuckGoActivity() {
             )
             .setCancellable(true)
             .show()
+    }
+
+    private fun askSyncWithDesktop() {
+        if (supportFragmentManager.findFragmentByTag(SyncWithDesktopBottomSheetDialog.TAG) != null) return
+
+        SyncWithDesktopBottomSheetDialog
+            .newInstance()
+            .show(supportFragmentManager, SyncWithDesktopBottomSheetDialog.TAG)
     }
 
     private fun askTurnOffSync(command: AskTurnOffSync) {

@@ -20,11 +20,13 @@ import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels
-import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.ALREADY_COMPLETE
-import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.COMPLETED
-import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.DISMISSED
-import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.CardRemovalReason.FINISHED_ELSEWHERE
 import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Days
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.ALREADY_COMPLETE
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.COMPLETED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.DISMISSED
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.RemovalReason.FINISHED_ELSEWHERE
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant.CHECK_LIST
+import com.duckduckgo.nextsteps.impl.pixels.NextStepsPixels.Variant.STACKED_CARDS
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.test.runTest
@@ -33,6 +35,7 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -53,10 +56,11 @@ class RealNextStepsTelemetryTest {
     }
     private val telemetryStore = RealNextStepsTelemetryStore(preferences)
     private val pixels: NextStepsPixels = mock()
+    private val metrics: NextStepsExperimentMetrics = mock()
     private val clock: CurrentTimeProvider = mock()
     private val firstDay = LocalDate.of(2026, 10, 21)
     private var today = firstDay
-    private val testee = RealNextStepsTelemetry(telemetryStore, pixels, clock, coroutineRule.testDispatcherProvider)
+    private val testee = RealNextStepsTelemetry(telemetryStore, pixels, metrics, clock, coroutineRule.testDispatcherProvider)
 
     init {
         whenever(clock.localDateTimeNow()).thenAnswer { today.atStartOfDay() }
@@ -68,18 +72,18 @@ class RealNextStepsTelemetryTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
         testee.onActiveMessageChanged(null)
         testee.onFrontCardShown("message2", B, setOf(B))
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
         restored.onFrontCardShown("message2", B, setOf(B))
 
-        verify(pixels, times(1)).sectionShownUnique("message")
-        verify(pixels, times(1)).sectionShownUnique("message2")
+        verify(pixels, times(1)).sectionShownUnique("message", STACKED_CARDS)
+        verify(pixels, times(1)).sectionShownUnique("message2", STACKED_CARDS)
     }
 
     @Test
     fun `first impression marks the message displayed and seeds every card in the stack with zero`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
 
-        verify(pixels).sectionShownUnique("message")
+        verify(pixels).sectionShownUnique("message", STACKED_CARDS)
         val state = telemetryStore.state()
         assertEquals("message", state.displayedMessageId)
         assertEquals(firstDay.toEpochDay(), state.firstRenderDay)
@@ -91,55 +95,55 @@ class RealNextStepsTelemetryTest {
     @Test
     fun `completion sends the card's day count immediately and never again`() = runTest {
         repeat(2) { testee.onFrontCardShown("message", A, setOf(A, B)) }
-        testee.onCtaClicked(A)
+        testee.onCtaClicked(STACKED_CARDS, A)
 
-        testee.onCardsCompleted(setOf(A))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
 
-        verify(pixels).cardRemoved(A, DAY_0, COMPLETED, "2")
-        verify(pixels).cardDailyImpressions(A, DAY_0, "2")
+        verify(pixels).itemRemoved(STACKED_CARDS, A, DAY_0, COMPLETED, "2")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "2")
         assertEquals(mapOf(B to 0), telemetryStore.state().dayCounts)
 
         today = today.plusDays(1)
         testee.onFrontCardShown("message", B, setOf(B))
-        verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "2")
-        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "2")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
     }
 
     @Test
     fun `completion without a CTA tap is reported as finished elsewhere`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
 
-        testee.onCardsCompleted(setOf(A))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
 
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardRemoved(A, DAY_0, FINISHED_ELSEWHERE, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels).itemRemoved(STACKED_CARDS, A, DAY_0, FINISHED_ELSEWHERE, "1")
     }
 
     @Test
     fun `a card in the stack that was never in front is reported as finished elsewhere`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
 
-        testee.onCardsCompleted(setOf(B))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(B))
 
-        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
-        verify(pixels).cardRemoved(B, DAY_0, FINISHED_ELSEWHERE, "0")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
+        verify(pixels).itemRemoved(STACKED_CARDS, B, DAY_0, FINISHED_ELSEWHERE, "0")
     }
 
     @Test
     fun `a card already complete at first evaluation is reported once across tabs`() = runTest {
-        testee.onCardsCompleted(setOf(A))
-        testee.onCardsCompleted(setOf(A))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
 
-        verify(pixels, times(1)).cardRemoved(A, DAY_0, ALREADY_COMPLETE, "0")
+        verify(pixels, times(1)).itemRemoved(STACKED_CARDS, A, DAY_0, ALREADY_COMPLETE, "0")
     }
 
     @Test
     fun `completion of a dismissed card sends nothing`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
-        testee.onCardDismissed(A)
+        testee.onItemDismissed(A)
         clearInvocations(pixels)
 
-        testee.onCardsCompleted(setOf(A))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
 
         verifyNoInteractions(pixels)
     }
@@ -150,85 +154,154 @@ class RealNextStepsTelemetryTest {
         testee.onActiveMessageChanged(null)
         clearInvocations(pixels)
 
-        testee.onCardsCompleted(setOf(B))
-        testee.onCardsCompleted(setOf(B))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(B))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(B))
 
-        verify(pixels, times(1)).cardRemoved(B, DAY_0, ALREADY_COMPLETE, "0")
+        verify(pixels, times(1)).itemRemoved(STACKED_CARDS, B, DAY_0, ALREADY_COMPLETE, "0")
         verifyNoMoreInteractions(pixels)
     }
 
     @Test
     fun `only the last tapped CTA is reported as completed`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
-        testee.onCtaClicked(A)
-        testee.onCtaClicked(B)
+        testee.onCtaClicked(STACKED_CARDS, A)
+        testee.onCtaClicked(STACKED_CARDS, B)
 
-        testee.onCardsCompleted(setOf(A, B))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A, B))
 
-        verify(pixels).cardRemoved(A, DAY_0, FINISHED_ELSEWHERE, "1")
-        verify(pixels).cardRemoved(B, DAY_0, COMPLETED, "0")
-        assertNull(telemetryStore.state().ctaClickedCardId)
+        verify(pixels).itemRemoved(STACKED_CARDS, A, DAY_0, FINISHED_ELSEWHERE, "1")
+        verify(pixels).itemRemoved(STACKED_CARDS, B, DAY_0, COMPLETED, "0")
+        assertNull(telemetryStore.state().ctaClickedItemId)
     }
 
     @Test
     fun `a second completion report of the same card sends nothing`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A))
-        testee.onCtaClicked(A)
+        testee.onCtaClicked(STACKED_CARDS, A)
 
-        val reports = (1..2).map { async { testee.onCardsCompleted(setOf(A)) } }
+        val reports = (1..2).map { async { testee.onItemsCompleted(STACKED_CARDS, setOf(A)) } }
         reports.awaitAll()
 
-        verify(pixels, times(1)).cardRemoved(A, DAY_0, COMPLETED, "1")
-        verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
-        assertEquals(1, telemetryStore.state().completedCards)
+        verify(pixels, times(1)).itemRemoved(STACKED_CARDS, A, DAY_0, COMPLETED, "1")
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        assertEquals(1, telemetryStore.state().completedItems)
     }
 
     @Test
     fun `dismissing a card sends its day count and clears its CTA attribution`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
-        testee.onCtaClicked(A)
+        testee.onCtaClicked(STACKED_CARDS, A)
 
-        testee.onCardDismissed(A)
+        testee.onItemDismissed(A)
 
-        verify(pixels).cardRemoved(A, DAY_0, DISMISSED, "1")
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        assertNull(telemetryStore.state().ctaClickedCardId)
+        verify(pixels).itemRemoved(STACKED_CARDS, A, DAY_0, DISMISSED, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        assertNull(telemetryStore.state().ctaClickedItemId)
         assertEquals(mapOf(B to 0), telemetryStore.state().dayCounts)
     }
 
     @Test
     fun `all cards done sends the remaining day counts and the summary then resets`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B, C))
-        testee.onCtaClicked(A)
-        testee.onCardsCompleted(setOf(A))
-        testee.onCardDismissed(B)
-        testee.onCardsCompleted(setOf(C))
+        testee.onCtaClicked(STACKED_CARDS, A)
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
+        testee.onItemDismissed(B)
+        testee.onItemsCompleted(STACKED_CARDS, setOf(C))
 
-        testee.onAllCardsDone()
+        testee.onAllItemsDone()
         testee.onActiveMessageChanged(null)
 
-        verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 2, dismissed = 1)
-        verify(pixels, times(1)).cardsDismissed(any(), any(), any(), any())
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "all_items_done",
+            completed = 1,
+            dismissed = 1,
+            finishedElsewhere = 1,
+            alreadyComplete = 0,
+        )
+        verify(pixels, times(1)).sectionEnded(any(), any(), any(), any(), anyOrNull(), any(), any())
         val state = telemetryStore.state()
         assertNull(state.displayedMessageId)
         assertEquals(emptyMap<String, Int>(), state.dayCounts)
-        assertEquals(0, state.completedCards)
-        assertEquals(0, state.dismissedCards)
+        assertEquals(0, state.completedItems)
+        assertEquals(0, state.dismissedItems)
         assertNull(state.firstRenderDay)
     }
 
     @Test
-    fun `cards completed before the first impression are reported as already complete and not counted in the summary`() = runTest {
-        testee.onCardsCompleted(setOf(A, B))
-        verify(pixels).cardRemoved(A, DAY_0, ALREADY_COMPLETE, "0")
-        verify(pixels).cardRemoved(B, DAY_0, ALREADY_COMPLETE, "0")
+    fun `cards completed before the first impression are reported as already complete and counted apart from completions`() = runTest {
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A, B))
+        verify(pixels).itemRemoved(STACKED_CARDS, A, DAY_0, ALREADY_COMPLETE, "0")
+        verify(pixels).itemRemoved(STACKED_CARDS, B, DAY_0, ALREADY_COMPLETE, "0")
         verifyNoMoreInteractions(pixels)
 
-        testee.onFrontCardShown("message", C, setOf(C))
-        testee.onCardDismissed(C)
-        testee.onAllCardsDone()
+        testee.onFrontCardShown("message", C, setOf(C), completedItemIds = setOf(A, B))
+        testee.onItemDismissed(C)
+        testee.onAllItemsDone()
 
-        verify(pixels).cardsDismissed(DAY_0, "all_cards_done", completed = 0, dismissed = 1)
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "all_items_done",
+            completed = 0,
+            dismissed = 1,
+            finishedElsewhere = 0,
+            alreadyComplete = 2,
+        )
+    }
+
+    @Test
+    fun `a later section counts items completed during an earlier one as already complete without reporting them again`() = runTest {
+        testee.onCheckListShown("old", setOf(A, B, C))
+        testee.onItemsCompleted(CHECK_LIST, setOf(A))
+        testee.onSectionDismissed()
+
+        testee.onCheckListShown("new", setOf(B, C), completedItemIds = setOf(A))
+        testee.onSectionDismissed()
+
+        verify(pixels, times(1)).itemRemoved(any(), any(), any(), any(), any())
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "user_dismissed",
+            completed = 0,
+            dismissed = null,
+            finishedElsewhere = 1,
+            alreadyComplete = 0,
+        )
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "user_dismissed",
+            completed = 0,
+            dismissed = null,
+            finishedElsewhere = 0,
+            alreadyComplete = 1,
+        )
+    }
+
+    @Test
+    fun `the summary breaks completions down into CTA completions and those finished elsewhere`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B, C))
+        testee.onCtaClicked(STACKED_CARDS, A)
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A, B))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(C))
+
+        testee.onAllItemsDone()
+
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "all_items_done",
+            completed = 1,
+            dismissed = 0,
+            finishedElsewhere = 2,
+            alreadyComplete = 0,
+        )
+        val state = telemetryStore.state()
+        assertEquals(0, state.finishedElsewhereItems)
+        assertEquals(0, state.alreadyCompleteItems)
     }
 
     @Test
@@ -238,11 +311,11 @@ class RealNextStepsTelemetryTest {
 
         testee.onFrontCardShown("message", B, setOf(A, B, C))
 
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
-        verify(pixels).cardDailyImpressions(C, DAY_0, "0")
-        testee.onCtaClicked(B)
-        verify(pixels).cardCtaClicked(B, Days(activeDay = "1", calendarDay = "1"), "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, C, DAY_0, "0")
+        testee.onCtaClicked(STACKED_CARDS, B)
+        verify(pixels).itemCtaClicked(STACKED_CARDS, B, Days(activeDay = "1", calendarDay = "1"), "1")
         assertEquals(mapOf(A to 0, B to 1, C to 0), telemetryStore.state().dayCounts)
     }
 
@@ -253,17 +326,17 @@ class RealNextStepsTelemetryTest {
 
         testee.onAppResumed()
 
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
         assertEquals(null, telemetryStore.state().openDay)
         assertEquals(1, telemetryStore.state().activeDays)
 
         testee.onFrontCardShown("message", A, setOf(A, B))
 
-        testee.onCtaClicked(A)
-        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "1"), "2")
-        verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels, times(1)).cardDailyImpressions(B, DAY_0, "0")
+        testee.onCtaClicked(STACKED_CARDS, A)
+        verify(pixels).itemCtaClicked(STACKED_CARDS, A, Days(activeDay = "1", calendarDay = "1"), "2")
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
         assertEquals(mapOf(A to 1, B to 0), telemetryStore.state().dayCounts)
     }
 
@@ -278,7 +351,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onAppResumed()
 
-        verify(pixels, times(2)).cardDailyImpressions(any(), any(), any())
+        verify(pixels, times(2)).itemDailyImpressions(any(), any(), any(), any())
         assertEquals(1, telemetryStore.state().activeDays)
     }
 
@@ -290,7 +363,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onAppResumed()
 
-        verify(pixels, times(2)).cardDailyImpressions(any(), any(), any())
+        verify(pixels, times(2)).itemDailyImpressions(any(), any(), any(), any())
         assertEquals(today.toEpochDay(), telemetryStore.state().openDay)
         assertEquals(mapOf(A to 1, B to 0), telemetryStore.state().dayCounts)
     }
@@ -302,7 +375,7 @@ class RealNextStepsTelemetryTest {
 
         testee.onAppResumed()
 
-        verify(pixels, never()).cardDailyImpressions(any(), any(), any())
+        verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
         assertEquals(firstDay.toEpochDay(), telemetryStore.state().openDay)
     }
 
@@ -312,14 +385,22 @@ class RealNextStepsTelemetryTest {
         today = today.plusDays(1)
         testee.onAppResumed()
 
-        testee.onCardsCompleted(setOf(A))
-        testee.onCardDismissed(B)
-        testee.onAllCardsDone()
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
+        testee.onItemDismissed(B)
+        testee.onAllItemsDone()
 
-        verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels, times(1)).cardDailyImpressions(B, DAY_0, "0")
-        verify(pixels, times(2)).cardDailyImpressions(any(), any(), any())
-        verify(pixels).cardsDismissed(Days(activeDay = "0", calendarDay = "1"), "all_cards_done", completed = 1, dismissed = 1)
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
+        verify(pixels, times(2)).itemDailyImpressions(any(), any(), any(), any())
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            Days(activeDay = "0", calendarDay = "1"),
+            "all_items_done",
+            completed = 0,
+            dismissed = 1,
+            finishedElsewhere = 1,
+            alreadyComplete = 0,
+        )
     }
 
     @Test
@@ -329,21 +410,21 @@ class RealNextStepsTelemetryTest {
 
         testee.onFrontCardShown("message", A, setOf(A))
 
-        testee.onCtaClicked(A)
-        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "3"), "2")
+        testee.onCtaClicked(STACKED_CARDS, A)
+        verify(pixels).itemCtaClicked(STACKED_CARDS, A, Days(activeDay = "1", calendarDay = "3"), "2")
         assertEquals(2, telemetryStore.state().activeDays)
     }
 
     @Test
     fun `completion on a later day keeps the day count on the day it was counted`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A))
-        testee.onCtaClicked(A)
+        testee.onCtaClicked(STACKED_CARDS, A)
         today = today.plusDays(1)
 
-        testee.onCardsCompleted(setOf(A))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
 
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardRemoved(A, Days(activeDay = "0", calendarDay = "1"), COMPLETED, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels).itemRemoved(STACKED_CARDS, A, Days(activeDay = "0", calendarDay = "1"), COMPLETED, "1")
     }
 
     @Test
@@ -353,9 +434,17 @@ class RealNextStepsTelemetryTest {
         testee.onActiveMessageChanged(null)
         testee.onActiveMessageChanged(null)
 
-        verify(pixels, times(1)).cardsDismissed(DAY_0, "auto", completed = 0, dismissed = 0)
-        verify(pixels, times(1)).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels, times(1)).cardDailyImpressions(B, DAY_0, "0")
+        verify(pixels, times(1)).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "auto",
+            completed = 0,
+            dismissed = 0,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels, times(1)).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
         assertNull(telemetryStore.state().displayedMessageId)
     }
 
@@ -365,7 +454,15 @@ class RealNextStepsTelemetryTest {
 
         testee.onActiveMessageChanged("other_message")
 
-        verify(pixels).cardsDismissed(DAY_0, "auto", completed = 0, dismissed = 0)
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "auto",
+            completed = 0,
+            dismissed = 0,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
     }
 
     @Test
@@ -389,8 +486,8 @@ class RealNextStepsTelemetryTest {
     @Test
     fun `after the user ends the carousel the message leaving the slot sends nothing more`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A))
-        testee.onCardDismissed(A)
-        testee.onAllCardsDone()
+        testee.onItemDismissed(A)
+        testee.onAllItemsDone()
         clearInvocations(pixels)
 
         testee.onActiveMessageChanged(null)
@@ -405,29 +502,45 @@ class RealNextStepsTelemetryTest {
 
         testee.onFrontCardShown("new", B, setOf(A, B))
 
-        verify(pixels).cardsDismissed(Days(activeDay = "0", calendarDay = "4-7"), "auto", completed = 0, dismissed = 0)
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
-        testee.onCtaClicked(B)
-        verify(pixels).cardCtaClicked(B, DAY_0, "1")
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            Days(activeDay = "0", calendarDay = "4-7"),
+            "auto",
+            completed = 0,
+            dismissed = 0,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
+        testee.onCtaClicked(STACKED_CARDS, B)
+        verify(pixels).itemCtaClicked(STACKED_CARDS, B, DAY_0, "1")
         assertEquals(today.toEpochDay(), telemetryStore.state().firstRenderDay)
         assertEquals("new", telemetryStore.state().displayedMessageId)
-        verify(pixels).sectionShownUnique("new")
+        verify(pixels).sectionShownUnique("new", STACKED_CARDS)
     }
 
     @Test
     fun `state survives a restart`() = runTest {
         testee.onFrontCardShown("message", A, setOf(A, B))
-        testee.onCtaClicked(A)
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        testee.onCtaClicked(STACKED_CARDS, A)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
 
-        restored.onCardsCompleted(setOf(A))
+        restored.onItemsCompleted(STACKED_CARDS, setOf(A))
         restored.onActiveMessageChanged(null)
 
-        verify(pixels).cardRemoved(A, DAY_0, COMPLETED, "1")
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
-        verify(pixels).cardsDismissed(DAY_0, "auto", completed = 1, dismissed = 0)
+        verify(pixels).itemRemoved(STACKED_CARDS, A, DAY_0, COMPLETED, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "auto",
+            completed = 1,
+            dismissed = 0,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
     }
 
     @Test
@@ -440,9 +553,9 @@ class RealNextStepsTelemetryTest {
 
         testee.onFrontCardShown("message", A, setOf(A))
 
-        testee.onCtaClicked(A)
-        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "1"), "3-4")
-        verify(pixels, never()).cardDailyImpressions(any(), any(), any())
+        testee.onCtaClicked(STACKED_CARDS, A)
+        verify(pixels).itemCtaClicked(STACKED_CARDS, A, Days(activeDay = "1", calendarDay = "1"), "3-4")
+        verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
         assertEquals(firstDay.plusDays(2).toEpochDay(), telemetryStore.state().openDay)
         assertEquals(mapOf(A to 2), telemetryStore.state().dayCounts)
     }
@@ -456,8 +569,8 @@ class RealNextStepsTelemetryTest {
         )) {
             clearInvocations(pixels)
             today = firstDay.plusDays(offset)
-            testee.onCtaClicked(A)
-            verify(pixels).cardCtaClicked(A, Days(activeDay = "0", calendarDay = expected), "1")
+            testee.onCtaClicked(STACKED_CARDS, A)
+            verify(pixels).itemCtaClicked(STACKED_CARDS, A, Days(activeDay = "0", calendarDay = expected), "1")
         }
     }
 
@@ -468,9 +581,9 @@ class RealNextStepsTelemetryTest {
             telemetryStore.save(NextStepsTelemetryState(firstRenderDay = firstDay.toEpochDay(), activeDays = activeDays))
             clearInvocations(pixels)
 
-            testee.onCtaClicked(A)
+            testee.onCtaClicked(STACKED_CARDS, A)
 
-            verify(pixels).cardCtaClicked(A, Days(activeDay = expected, calendarDay = "0"), "0")
+            verify(pixels).itemCtaClicked(STACKED_CARDS, A, Days(activeDay = expected, calendarDay = "0"), "0")
         }
     }
 
@@ -482,6 +595,7 @@ class RealNextStepsTelemetryTest {
                     firstRenderDay = firstDay.toEpochDay(),
                     activeDays = 1,
                     displayedMessageId = "message",
+                    displayedVariant = STACKED_CARDS,
                     openDay = firstDay.toEpochDay(),
                     dayCounts = mapOf(A to count),
                 ),
@@ -490,15 +604,15 @@ class RealNextStepsTelemetryTest {
 
             testee.onActiveMessageChanged(null)
 
-            verify(pixels).cardDailyImpressions(A, DAY_0, expected)
+            verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, expected)
         }
     }
 
     @Test
     fun `an event before any impression reports day zero`() = runTest {
-        testee.onCtaClicked(A)
+        testee.onCtaClicked(STACKED_CARDS, A)
 
-        verify(pixels).cardCtaClicked(A, DAY_0, "0")
+        verify(pixels).itemCtaClicked(STACKED_CARDS, A, DAY_0, "0")
     }
 
     @Test
@@ -508,8 +622,8 @@ class RealNextStepsTelemetryTest {
 
         testee.onActiveMessageChanged(null)
 
-        verify(pixels, times(1)).cardDailyImpressions(any(), any(), any())
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
+        verify(pixels, times(1)).itemDailyImpressions(any(), any(), any(), any())
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
     }
 
     @Test
@@ -518,12 +632,12 @@ class RealNextStepsTelemetryTest {
         today = today.plusDays(1)
         testee.onFrontCardShown("message", A, setOf(A, B))
 
-        testee.onCtaClicked(A)
-        testee.onCardsCompleted(setOf(A))
+        testee.onCtaClicked(STACKED_CARDS, A)
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
 
-        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "1"), "3-4")
-        verify(pixels).cardRemoved(A, Days(activeDay = "1", calendarDay = "1"), COMPLETED, "3-4")
-        verify(pixels).cardDailyImpressions(A, Days(activeDay = "1", calendarDay = "1"), "1")
+        verify(pixels).itemCtaClicked(STACKED_CARDS, A, Days(activeDay = "1", calendarDay = "1"), "3-4")
+        verify(pixels).itemRemoved(STACKED_CARDS, A, Days(activeDay = "1", calendarDay = "1"), COMPLETED, "3-4")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, Days(activeDay = "1", calendarDay = "1"), "1")
     }
 
     @Test
@@ -531,11 +645,11 @@ class RealNextStepsTelemetryTest {
         testee.onFrontCardShown("old", A, setOf(A, B))
 
         testee.onFrontCardShown("new", B, setOf(A, B))
-        testee.onCtaClicked(B)
+        testee.onCtaClicked(STACKED_CARDS, B)
 
-        verify(pixels).cardCtaClicked(B, DAY_0, "1")
-        verify(pixels).cardDailyImpressions(A, DAY_0, "1")
-        verify(pixels).cardDailyImpressions(B, DAY_0, "0")
+        verify(pixels).itemCtaClicked(STACKED_CARDS, B, DAY_0, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, B, DAY_0, "0")
         assertEquals(1, telemetryStore.state().activeDays)
         assertEquals(mapOf(A to 0, B to 1), telemetryStore.state().dayCounts)
     }
@@ -544,43 +658,51 @@ class RealNextStepsTelemetryTest {
     fun `a new carousel after ending and restarting on the same day starts at day zero`() = runTest {
         testee.onFrontCardShown("old", A, setOf(A))
         testee.onActiveMessageChanged(null)
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
 
         restored.onFrontCardShown("new", A, setOf(A))
-        restored.onCtaClicked(A)
+        restored.onCtaClicked(STACKED_CARDS, A)
 
-        verify(pixels).cardCtaClicked(A, DAY_0, "2")
+        verify(pixels).itemCtaClicked(STACKED_CARDS, A, DAY_0, "2")
         assertEquals(1, telemetryStore.state().activeDays)
         assertEquals(mapOf(A to 1), telemetryStore.state().dayCounts)
     }
 
     @Test
     fun `ending a carousel resets days and reports the new section across a restart`() = runTest {
-        testee.onCardsCompleted(setOf(C))
-        testee.onFrontCardShown("old", A, setOf(A))
+        testee.onItemsCompleted(STACKED_CARDS, setOf(C))
+        testee.onFrontCardShown("old", A, setOf(A), completedItemIds = setOf(C))
         today = today.plusDays(2)
         testee.onFrontCardShown("old", A, setOf(A))
-        testee.onAllCardsDone()
+        testee.onAllItemsDone()
 
-        verify(pixels).cardsDismissed(Days(activeDay = "1", calendarDay = "2"), "all_cards_done", completed = 0, dismissed = 0)
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            Days(activeDay = "1", calendarDay = "2"),
+            "all_items_done",
+            completed = 0,
+            dismissed = 0,
+            finishedElsewhere = 0,
+            alreadyComplete = 1,
+        )
         assertEquals(0, telemetryStore.state().activeDays)
         assertNull(telemetryStore.state().firstRenderDay)
-        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, clock, coroutineRule.testDispatcherProvider)
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
         clearInvocations(pixels)
         today = today.plusDays(3)
 
-        restored.onCardsCompleted(setOf(B, C))
-        verify(pixels).cardRemoved(B, DAY_0, ALREADY_COMPLETE, "0")
+        restored.onItemsCompleted(STACKED_CARDS, setOf(B, C))
+        verify(pixels).itemRemoved(STACKED_CARDS, B, DAY_0, ALREADY_COMPLETE, "0")
         verifyNoMoreInteractions(pixels)
         restored.onFrontCardShown("new", A, setOf(A))
-        restored.onCtaClicked(A)
+        restored.onCtaClicked(STACKED_CARDS, A)
 
-        verify(pixels).sectionShownUnique("new")
-        verify(pixels).cardCtaClicked(A, DAY_0, "3-4")
+        verify(pixels).sectionShownUnique("new", STACKED_CARDS)
+        verify(pixels).itemCtaClicked(STACKED_CARDS, A, DAY_0, "3-4")
         today = today.plusDays(2)
         restored.onFrontCardShown("new", A, setOf(A))
-        restored.onCtaClicked(A)
-        verify(pixels).cardCtaClicked(A, Days(activeDay = "1", calendarDay = "2"), "3-4")
+        restored.onCtaClicked(STACKED_CARDS, A)
+        verify(pixels).itemCtaClicked(STACKED_CARDS, A, Days(activeDay = "1", calendarDay = "2"), "3-4")
     }
 
     @Test
@@ -590,9 +712,9 @@ class RealNextStepsTelemetryTest {
         today = today.plusDays(1)
         testee.onFrontCardShown("new", A, setOf(A))
 
-        testee.onCardDismissed(A)
+        testee.onItemDismissed(A)
 
-        verify(pixels).cardRemoved(A, DAY_0, DISMISSED, "2")
+        verify(pixels).itemRemoved(STACKED_CARDS, A, DAY_0, DISMISSED, "2")
     }
 
     @Test
@@ -601,10 +723,171 @@ class RealNextStepsTelemetryTest {
             telemetryStore.save(NextStepsTelemetryState(firstRenderDay = firstDay.toEpochDay(), activeDays = 1, totalImpressions = mapOf(A to count)))
             clearInvocations(pixels)
 
-            testee.onCtaClicked(A)
+            testee.onCtaClicked(STACKED_CARDS, A)
 
-            verify(pixels).cardCtaClicked(A, DAY_0, expected)
+            verify(pixels).itemCtaClicked(STACKED_CARDS, A, DAY_0, expected)
         }
+    }
+
+    @Test
+    fun `a check list render counts an impression for every open item and sends no daily counts`() = runTest {
+        testee.onCheckListShown("message", setOf(A, B))
+        today = today.plusDays(1)
+        testee.onAppResumed()
+        testee.onCheckListShown("message", setOf(A, B))
+
+        testee.onCtaClicked(CHECK_LIST, A)
+        testee.onSectionDismissed()
+
+        verify(pixels).sectionShownUnique("message", CHECK_LIST)
+        verify(pixels).itemCtaClicked(CHECK_LIST, A, Days(activeDay = "1", calendarDay = "1"), "2")
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            Days(activeDay = "1", calendarDay = "1"),
+            "user_dismissed",
+            completed = 0,
+            dismissed = null,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
+        verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
+        assertNull(telemetryStore.state().displayedVariant)
+    }
+
+    @Test
+    fun `check list completions carry their reason and count in the summary`() = runTest {
+        testee.onCheckListShown("message", setOf(A, B, C))
+        testee.onCtaClicked(CHECK_LIST, A)
+
+        testee.onItemsCompleted(CHECK_LIST, setOf(A, B))
+        testee.onSectionDismissed()
+
+        verify(pixels).itemRemoved(CHECK_LIST, A, DAY_0, COMPLETED, "1")
+        verify(pixels).itemRemoved(CHECK_LIST, B, DAY_0, FINISHED_ELSEWHERE, "1")
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "user_dismissed",
+            completed = 1,
+            dismissed = null,
+            finishedElsewhere = 1,
+            alreadyComplete = 0,
+        )
+        verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `an item already complete before the check list renders is reported with the check list variant`() = runTest {
+        testee.onItemsCompleted(CHECK_LIST, setOf(A))
+        testee.onCheckListShown("message", setOf(B), completedItemIds = setOf(A))
+        testee.onSectionDismissed()
+
+        verify(pixels).itemRemoved(CHECK_LIST, A, DAY_0, ALREADY_COMPLETE, "0")
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "user_dismissed",
+            completed = 0,
+            dismissed = null,
+            finishedElsewhere = 0,
+            alreadyComplete = 1,
+        )
+    }
+
+    @Test
+    fun `the message leaving the slot ends the check list with reason auto across a restart`() = runTest {
+        testee.onCheckListShown("message", setOf(A, B))
+        val restored = RealNextStepsTelemetry(RealNextStepsTelemetryStore(preferences), pixels, metrics, clock, coroutineRule.testDispatcherProvider)
+
+        restored.onActiveMessageChanged(null)
+
+        verify(pixels).sectionEnded(
+            CHECK_LIST,
+            DAY_0,
+            "auto",
+            completed = 0,
+            dismissed = null,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
+        verify(pixels, never()).itemDailyImpressions(any(), any(), any(), any())
+        assertNull(telemetryStore.state().displayedMessageId)
+    }
+
+    @Test
+    fun `state saved without a variant is reported as stacked cards`() = runTest {
+        telemetryStore.save(
+            NextStepsTelemetryState(
+                firstRenderDay = firstDay.toEpochDay(),
+                activeDays = 1,
+                displayedMessageId = "message",
+                openDay = firstDay.toEpochDay(),
+                dayCounts = mapOf(A to 1),
+            ),
+        )
+
+        testee.onActiveMessageChanged(null)
+
+        verify(pixels).itemDailyImpressions(STACKED_CARDS, A, DAY_0, "1")
+        verify(pixels).sectionEnded(
+            STACKED_CARDS,
+            DAY_0,
+            "auto",
+            completed = 0,
+            dismissed = 0,
+            finishedElsewhere = 0,
+            alreadyComplete = 0,
+        )
+    }
+
+    @Test
+    fun `a stacked cards render reports only the front card as shown to the experiment metrics`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A, B))
+
+        verify(metrics, never()).onSectionShown()
+        verify(metrics).onItemShown(A)
+        verify(metrics, never()).onItemShown(B)
+    }
+
+    @Test
+    fun `a check list render reports only the section as shown to the experiment metrics`() = runTest {
+        testee.onCheckListShown("message", setOf(A, B), completedItemIds = setOf(C))
+
+        verify(metrics).onSectionShown()
+        verify(metrics, never()).onItemShown(any())
+    }
+
+    @Test
+    fun `a cta tap is reported to the experiment metrics`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A))
+
+        testee.onCtaClicked(STACKED_CARDS, A)
+
+        verify(metrics).onItemCtaClicked(A)
+    }
+
+    @Test
+    fun `only cta completions are reported as completed to the experiment metrics`() = runTest {
+        testee.onItemsCompleted(STACKED_CARDS, setOf(C))
+        testee.onFrontCardShown("message", A, setOf(A, B))
+        testee.onCtaClicked(STACKED_CARDS, A)
+
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A, B))
+
+        verify(metrics).onItemCompleted(A)
+        verify(metrics, never()).onItemCompleted(B)
+        verify(metrics, never()).onItemCompleted(C)
+    }
+
+    @Test
+    fun `a dismissed card is not reported as completed to the experiment metrics`() = runTest {
+        testee.onFrontCardShown("message", A, setOf(A))
+        testee.onCtaClicked(STACKED_CARDS, A)
+
+        testee.onItemDismissed(A)
+        testee.onItemsCompleted(STACKED_CARDS, setOf(A))
+
+        verify(metrics, never()).onItemCompleted(any())
     }
 
     private companion object {

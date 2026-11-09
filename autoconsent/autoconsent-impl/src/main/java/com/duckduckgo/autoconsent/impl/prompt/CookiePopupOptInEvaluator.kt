@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.AppInstallTimeProvider
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -55,6 +56,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val settingsRepository: AutoconsentSettingsRepository,
     private val currentTimeProvider: CurrentTimeProvider,
     private val appInstallTimeProvider: AppInstallTimeProvider,
+    private val nextSteps: NextSteps,
 ) : ModalEvaluator {
 
     override val priority: Int = 7
@@ -74,6 +76,11 @@ class CookiePopupOptInEvaluator @Inject constructor(
         }
 
         if (daysSinceInstall() < MIN_DAYS_SINCE_INSTALL) {
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
+        // The prompt would take the screen from the Next Steps section, so it waits until the section ends.
+        if (nextSteps.isSectionActive()) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 

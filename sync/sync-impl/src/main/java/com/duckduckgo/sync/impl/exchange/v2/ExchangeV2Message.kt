@@ -61,7 +61,8 @@ sealed interface ExchangeV2Message {
      *  minimum requirement on the receiver — that is `envelope.version`. It lets the peer adjust
      *  its capabilities, and is the input to capability negotiation.
      */
-    data class Hello(
+    @ConsistentCopyVisibility
+    data class Hello private constructor(
         override val rawJson: String,
         val channelId: String,
         val publicKey: String,
@@ -118,7 +119,8 @@ sealed interface ExchangeV2Message {
      * @param name Human-readable device name shown to the peer.
      * @param kind Device kind, "ddg" or "3party"; drives cross-kind role election.
      */
-    data class RecoveryCodeAvailable(
+    @ConsistentCopyVisibility
+    data class RecoveryCodeAvailable private constructor(
         override val rawJson: String,
         val userId: String,
         val name: String,
@@ -175,7 +177,8 @@ sealed interface ExchangeV2Message {
      * @param name Human-readable device name shown to the peer.
      * @param kind Device kind, "ddg" or "3party"; drives cross-kind role election.
      */
-    data class RecoveryCodeRequest(
+    @ConsistentCopyVisibility
+    data class RecoveryCodeRequest private constructor(
         override val rawJson: String,
         val name: String,
         val kind: String,
@@ -220,7 +223,8 @@ sealed interface ExchangeV2Message {
      *
      * Since 2.0.
      */
-    data class RecoveryCodeAwaitingConfirmation(
+    @ConsistentCopyVisibility
+    data class RecoveryCodeAwaitingConfirmation private constructor(
         override val rawJson: String,
     ) : ExchangeV2Message {
         override val messageType get() = TYPE
@@ -243,7 +247,8 @@ sealed interface ExchangeV2Message {
      *
      * Since 2.0.
      */
-    data class RecoveryCodeConfirmed(
+    @ConsistentCopyVisibility
+    data class RecoveryCodeConfirmed private constructor(
         override val rawJson: String,
     ) : ExchangeV2Message {
         override val messageType get() = TYPE
@@ -264,7 +269,8 @@ sealed interface ExchangeV2Message {
      *
      * Since 2.0.
      */
-    data class RecoveryCodeDenied(
+    @ConsistentCopyVisibility
+    data class RecoveryCodeDenied private constructor(
         override val rawJson: String,
     ) : ExchangeV2Message {
         override val messageType get() = TYPE
@@ -285,7 +291,8 @@ sealed interface ExchangeV2Message {
      *
      * Since 2.0.
      */
-    data class RecoveryCodeUnavailable(
+    @ConsistentCopyVisibility
+    data class RecoveryCodeUnavailable private constructor(
         override val rawJson: String,
     ) : ExchangeV2Message {
         override val messageType get() = TYPE
@@ -308,7 +315,8 @@ sealed interface ExchangeV2Message {
      *
      * @param recoveryCode base64url-encoded recovery code payload.
      */
-    data class RecoveryCodeResponse(
+    @ConsistentCopyVisibility
+    data class RecoveryCodeResponse private constructor(
         override val rawJson: String,
         val recoveryCode: String,
     ) : ExchangeV2Message {
@@ -340,7 +348,8 @@ sealed interface ExchangeV2Message {
      *
      * Since 2.1.
      */
-    data class RecoveryCodeDone(
+    @ConsistentCopyVisibility
+    data class RecoveryCodeDone private constructor(
         override val rawJson: String,
         val reason: Reason,
     ) : ExchangeV2Message {
@@ -406,7 +415,8 @@ sealed interface ExchangeV2Message {
      *
      * Since 2.1.
      */
-    data class Bye(
+    @ConsistentCopyVisibility
+    data class Bye private constructor(
         override val rawJson: String,
         val reason: Reason,
     ) : ExchangeV2Message {
@@ -469,7 +479,8 @@ sealed interface ExchangeV2Message {
      *
      * Not tied to a protocol version. Any unrecognized type from any version parses as this.
      */
-    data class Unknown(
+    @ConsistentCopyVisibility
+    data class Unknown private constructor(
         override val rawJson: String,
         override val messageType: String,
     ) : ExchangeV2Message {

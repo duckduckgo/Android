@@ -53,6 +53,7 @@ class NativeInputLayoutCoordinator(
     /** Restores content targets to the padding snapshotted in [configureContentOffset]. */
     private var resetContentOffset: (() -> Unit)? = null
     private var reapplyAutocompleteOffset: (() -> Unit)? = null
+    private var clearForcedBottomTranslationListeners: (() -> Unit)? = null
 
     // The content-reflow LayoutTransition is suspended while a per-frame content-offset drive is running
     // (nav bar slide or widget exit) so that drive is the only thing moving the content. Captured on suspend.
@@ -81,6 +82,45 @@ class NativeInputLayoutCoordinator(
         ).apply {
             gravity = Gravity.TOP
         }
+    }
+
+    fun configureNewChatHints(widgetView: View, hintsView: View) {
+        val spacing = rootView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        hintsView.layoutParams = CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            gravity = Gravity.BOTTOM
+        }
+        // The input root is raised and opaque; matching its Z keeps the chips (added later) drawn on top of it.
+        hintsView.elevation = widgetView.elevation
+        hintsView.translationZ = widgetView.translationZ
+        val card = widgetView.findViewById<View>(R.id.inputModeWidgetCard)
+        val preDrawListener = ViewTreeObserver.OnPreDrawListener {
+            if (!hintsView.isVisible) return@OnPreDrawListener true
+            val targetBottom = widgetView.top + widgetView.translationY + card.topWithin(widgetView) - spacing
+            hintsView.translationY = targetBottom - hintsView.bottom
+            hintsView.alpha = if (card.isShown) widgetView.alpha * card.alpha else 0f
+            true
+        }
+        var observer: ViewTreeObserver? = null
+        hintsView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                observer = v.viewTreeObserver.also { it.addOnPreDrawListener(preDrawListener) }
+            }
+
+            override fun onViewDetachedFromWindow(v: View) {
+                observer?.takeIf { it.isAlive }?.removeOnPreDrawListener(preDrawListener)
+                observer = null
+            }
+        })
+    }
+
+    private fun View.topWithin(ancestor: View): Float {
+        var offset = 0f
+        var view: View = this
+        while (view !== ancestor) {
+            offset += view.top + view.translationY
+            view = view.parent as? View ?: break
+        }
+        return offset
     }
 
     fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
@@ -500,6 +540,8 @@ class NativeInputLayoutCoordinator(
     }
 
     fun applyForcedBottomTranslation(widgetView: View, isBottom: Boolean) {
+        clearForcedBottomTranslationListeners?.invoke()
+        clearForcedBottomTranslationListeners = null
         val shouldForce = isBottom && !omnibarState.isOmnibarBottom()
         if (!shouldForce) {
             // Only reset bottom-anchored widgets. A top-anchored widget's translationY is owned by the
@@ -526,19 +568,28 @@ class NativeInputLayoutCoordinator(
         // Both views matter: the root resizes when the keyboard hides, and the host is re-laid out a
         // frame later. Listening to the root alone measured the gap against the host's pre-resize
         // bottom and left the input parked below the screen.
-        rootView.addOnLayoutChangeListener(layoutListener)
-        widgetView.addOnLayoutChangeListener(layoutListener)
-        widgetView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = Unit
+        if (widgetView.isAttachedToWindow) {
+            rootView.addOnLayoutChangeListener(layoutListener)
+            widgetView.addOnLayoutChangeListener(layoutListener)
+        }
+        val attachListener = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                rootView.addOnLayoutChangeListener(layoutListener)
+                v.addOnLayoutChangeListener(layoutListener)
+                applyOffset()
+            }
 
-                override fun onViewDetachedFromWindow(v: View) {
-                    rootView.removeOnLayoutChangeListener(layoutListener)
-                    v.removeOnLayoutChangeListener(layoutListener)
-                    v.removeOnAttachStateChangeListener(this)
-                }
-            },
-        )
+            override fun onViewDetachedFromWindow(v: View) {
+                rootView.removeOnLayoutChangeListener(layoutListener)
+                v.removeOnLayoutChangeListener(layoutListener)
+            }
+        }
+        widgetView.addOnAttachStateChangeListener(attachListener)
+        clearForcedBottomTranslationListeners = {
+            rootView.removeOnLayoutChangeListener(layoutListener)
+            widgetView.removeOnLayoutChangeListener(layoutListener)
+            widgetView.removeOnAttachStateChangeListener(attachListener)
+        }
     }
 }
 

@@ -17,6 +17,11 @@
 <resources>
     <string name="activityPirDashboard" translatable="false">PIR</string>
     <string name="pirFeatureName" translatable="false">Personal Information Removal</string>
+    <string name="pirWindowsButton" translatable="false">Windows</string>
+    <string name="pirMacOsButton" translatable="false">Mac</string>
+    <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
+    <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
+    <string name="pirStorageUnavailableDialogButton">Got It</string>
     <string name="pirNotificationMessageInProgress">Your scan is in progress…</string>
     <string name="pirNotificationTitleComplete">Scan complete!</string>
     <string name="pirNotificationMessageComplete">DuckDuckGo has started the process to remove records matching your personal info online. See what we found…</string>
@@ -51,4 +56,12 @@
     <string name="pirOnboardingStepItem4Description">We hunt down your personal info on data broker sites that are trying to sell it, and we work to get your details removed by submitting removal requests for you.</string>
     <string name="pirOnboardingStepItem5Title">You monitor removal progress in real time</string>
     <string name="pirOnboardingStepItem5Description">It can take a while for sites to update, but your personal dashboard makes it easy to keep tabs on progress of ongoing automated removals in real time and see where any manual follow ups may be needed.</string>
+
+    <!-- PIR notification permission prompt -->
+    <string name="pirNotificationPermissionPromptTitle">Get Notified About Your Scan?</string>
+    <string name="pirNotificationPermissionPromptMessage">Scans can take a while. If you allow notifications, we’ll let you know when your results are ready.</string>
+    <string name="pirNotificationPermissionPromptSettingsMessage">Scans can take a while. If you turn on notifications in Settings, we’ll let you know when your results are ready.</string>
+    <string name="pirNotificationPermissionPromptAllow">Allow Notifications</string>
+    <string name="pirNotificationPermissionPromptOpenSettings">Open Settings</string>
+    <string name="pirNotificationPermissionPromptNotNow">Not Now</string>
 </resources>

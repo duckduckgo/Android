@@ -227,6 +227,7 @@ class TabSwitcherViewModelTest {
     }
 
     private fun initializeMockTabEntitesData() {
+        runBlocking { whenever(mockTabRepository.getTabs()).thenReturn(tabList) }
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(tabList))
         whenever(mockTabRepository.liveSelectedTab).thenReturn(liveData { tabList.first() })
         whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(tabList.first()))
@@ -416,7 +417,7 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.CloseAndSelectTab("abc"), commandCaptor.lastValue)
     }
 
     @Test
@@ -440,7 +441,7 @@ class TabSwitcherViewModelTest {
     fun whenExistingRegularTabSelectedThenEntryPointNotReported() = runTest {
         testee.onTabSelected("abc")
 
-        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any())
+        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any(), any())
     }
 
     @Test
@@ -1024,6 +1025,64 @@ class TabSwitcherViewModelTest {
         testee.onDuckAiNewChatSelected()
 
         verify(mockPixel, never()).fire(eq(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB), any(), any(), any())
+    }
+
+    @Test
+    fun whenNewChatRequestedAndEmptyChatExistsThenSelectItAndClose() = runTest {
+        val url = "https://duck.ai/"
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("empty", url = url)))
+        whenever(duckChatMock.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
+
+        testee.onDuckAiNewChatSelected()
+
+        verify(mockTabRepository).select("empty")
+        verify(mockTabRepository, never()).add(any(), any())
+        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any(), any())
+        verify(mockCommandObserver).onChanged(Command.Close)
+    }
+
+    @Test
+    fun whenDirectDuckAiButtonClickedAndEmptyChatExistsThenSelectIt() = runTest {
+        givenDuckAiChatsMenuEnabled(false)
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        val testee = createViewModel()
+        testee.command.observeForever(mockCommandObserver)
+        val url = "https://duck.ai/?chatID="
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("empty", url = url)))
+        whenever(duckChatMock.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
+
+        testee.onDuckAIButtonClicked()
+
+        verify(mockTabRepository).select("empty")
+        verify(mockTabRepository, never()).add(any(), any())
+    }
+
+    @Test
+    fun whenNewChatRequestedAndCurrentChatIsEmptyThenPreferCurrentChat() = runTest {
+        val current = TabEntity("current", url = "https://duck.ai/")
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("other", url = current.url), current))
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(current)
+        whenever(duckChatMock.isDuckChatUrl(Uri.parse(current.url))).thenReturn(true)
+
+        testee.onDuckAiNewChatSelected()
+
+        verify(mockTabRepository).select("current")
+        verify(mockTabRepository, never()).add(any(), any())
+    }
+
+    @Test
+    fun whenNewChatRequestedAndOnlyConversationAndWebTabsExistThenCreateChat() = runTest {
+        val url = "https://duck.ai/?chatID=conversation"
+        whenever(mockTabRepository.getTabs()).thenReturn(
+            listOf(TabEntity("web", url = "https://example.com"), TabEntity("chat", url = url)),
+        )
+        whenever(duckChatMock.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn("https://duck.ai/")
+
+        testee.onDuckAiNewChatSelected()
+
+        verify(mockTabRepository).add("https://duck.ai/", true)
+        verify(mockTabRepository, never()).select(any())
     }
 
     @Test

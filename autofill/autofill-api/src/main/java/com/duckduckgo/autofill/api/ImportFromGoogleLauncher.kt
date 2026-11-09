@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.api
 
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
+import java.io.Serializable
 
 /**
  * Launches the flow for importing data from Google.
@@ -36,14 +37,32 @@ interface ImportFromGoogleLauncher {
      * Start the bookmark import flow. If the flow is unsupported, nothing is launched and
      * [ImportFromGoogleResult.Unavailable] is delivered to the registered callback.
      *
+     * @param params How the flow is started.
      * @param launcher The launcher returned when registering [bookmarksImportContract].
      */
-    suspend fun launchBookmarksImport(launcher: ActivityResultLauncher<BookmarksImportRequest>)
+    suspend fun launchBookmarksImport(
+        params: BookmarksImportParams,
+        launcher: ActivityResultLauncher<BookmarksImportRequest>,
+    )
+
+    /**
+     * How the bookmark import flow is started.
+     *
+     * @param launchSource A Pixel tag for where the flow is started from.
+     */
+    data class BookmarksImportParams(
+        val launchSource: String,
+    ) : Serializable
 
     /**
      * Input of [bookmarksImportContract]. Only [launchBookmarksImport] creates it.
      */
-    interface BookmarksImportRequest
+    interface BookmarksImportRequest {
+        /**
+         * How the flow is started, as passed to [launchBookmarksImport].
+         */
+        val params: BookmarksImportParams
+    }
 
     sealed interface ImportFromGoogleResult {
         data class Success(val bookmarksImported: Int) : ImportFromGoogleResult

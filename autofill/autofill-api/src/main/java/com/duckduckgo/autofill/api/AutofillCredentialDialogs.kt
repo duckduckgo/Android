@@ -273,4 +273,5 @@ enum class AutofillImportLaunchSource(val value: String) : Parcelable {
     Unknown("unknown"),
     MainAppSettings("settings"),
     Onboarding("onboarding"),
+    BookmarksImportPromo("bookmarks_import_promo"),
 }

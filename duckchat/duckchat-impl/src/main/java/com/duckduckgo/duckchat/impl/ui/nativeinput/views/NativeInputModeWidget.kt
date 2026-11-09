@@ -144,9 +144,9 @@ interface NativeInputWidget {
     var onCustomizeResponsesClicked: (() -> Unit)?
     val isModelMenuVisible: Boolean
 
-    /**
-     * The entry point that will be reported when Duck.ai is opened or a prompt is submitted
-     */
+    var duckAiEntryPointResolver: ((DuckChatEntryPoint) -> DuckChatEntryPoint)?
+
+    /** The entry point reported when Duck.ai is opened or a prompt is submitted. */
     var nextDuckAiEntryPoint: DuckChatEntryPoint
 
     fun onBackPressed()
@@ -187,7 +187,7 @@ interface NativeInputWidget {
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
-    fun setPageContext(title: String, url: String)
+    fun setPageContext(title: String, url: String, mimeType: String = "")
     fun clearPageContext()
     fun getPageContext(): PageContextAttachment?
     fun setContextualAttachmentActions(
@@ -435,7 +435,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
     var onChatSent: ((String) -> Unit)? = null
+    override var duckAiEntryPointResolver: ((DuckChatEntryPoint) -> DuckChatEntryPoint)? = null
     override var nextDuckAiEntryPoint: DuckChatEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+        get() = duckAiEntryPointResolver?.invoke(field) ?: field
     override var onSearchSelected: ((animate: Boolean) -> Unit)? = null
     override var onChatSelected: ((animate: Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
@@ -1474,8 +1476,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentViewModel?.getFileAttachmentsJson()
 
-    override fun setPageContext(title: String, url: String) {
-        val attachment = PageContextAttachment(title = title, url = url, tabId = activeTabId)
+    override fun setPageContext(title: String, url: String, mimeType: String) {
+        val attachment = PageContextAttachment(title = title, url = url, tabId = activeTabId, mimeType = mimeType)
         pendingPageContext = attachment
         attachmentViewModel?.setPageContext(attachment)
     }

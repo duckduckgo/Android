@@ -17,35 +17,68 @@
 package com.duckduckgo.sync.impl.promotion.bookmarks
 
 import android.content.Context
+import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import androidx.core.view.doOnAttach
+import android.widget.FrameLayout
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.Callback
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.Companion.PRIORITY_KEY_SYNC_PROMO
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin.ImportResult
+import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
+import com.duckduckgo.codegen.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.codegen.annotations.PriorityKey
-import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.promotion.widget.PromoMessageView
+import com.duckduckgo.sync.impl.databinding.ViewSyncBookmarksImportPromotionBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixelName
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksImport
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksImportPromotionViewModel.Command
+import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksImportPromotionViewModel.Command.LaunchSyncSetup
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoMap(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)
 class SyncBookmarksImportPromotionPlugin @Inject constructor(
     private val promotion: BookmarksImportSyncPromotion,
-    private val globalActivityStarter: GlobalActivityStarter,
 ) : BookmarksImportScreenPromotionPlugin {
 
+    @Volatile
+    private var promoActionStyle = ActionStyle.Buttons
+
+    @Volatile
+    private var useUpdatedCopy = false
+
     override suspend fun isEligible(data: ImportResult): Boolean {
+        promoActionStyle = if (promotion.shouldUseToggle()) ActionStyle.Toggle else ActionStyle.Buttons
+        useUpdatedCopy = promotion.shouldUseUpdatedCopy()
         return promotion.canShowPromotion(data.successCount)
     }
 
@@ -53,20 +86,128 @@ class SyncBookmarksImportPromotionPlugin @Inject constructor(
         context: Context,
         callback: Callback,
     ): View {
-        return PromoMessageView(context).apply {
+        return SyncBookmarksImportPromotionView(context).apply {
             layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-            headerImage = R.drawable.desktop_mobile_sync_96
-            title = context.getString(R.string.sync_bookmarks_import_promo_title)
-            primaryButtonText = context.getString(R.string.sync_bookmarks_import_promo_primary_button)
-            showCloseButton = false
-            showElevation = false
-            cardColor = context.getColorFromAttr(CommonR.attr.daxColorSurface)
-            doOnAttach { promotion.onPromotionDisplayed() }
-            onPrimaryButtonClicked {
-                promotion.onPromotionConfirmed()
-                globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksImport.value))
-                callback.dismissHost()
-            }
+            this.callback = callback
+            useUpdatedCopy = this@SyncBookmarksImportPromotionPlugin.useUpdatedCopy
+            actionStyle = promoActionStyle
         }
+    }
+}
+
+@InjectWith(ViewScope::class)
+class SyncBookmarksImportPromotionView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0,
+) : FrameLayout(context, attrs, defStyle) {
+
+    @Inject
+    lateinit var viewModelFactory: ViewViewModelFactory
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    var callback: Callback? = null
+
+    internal var useUpdatedCopy: Boolean = false
+        set(value) {
+            field = value
+            updateTitle()
+        }
+
+    internal var actionStyle: ActionStyle
+        get() = binding.promoMessage.actionStyle
+        set(value) {
+            binding.promoMessage.actionStyle = value
+            updateTitle()
+        }
+
+    private val binding: ViewSyncBookmarksImportPromotionBinding by viewBinding()
+
+    private val viewModel: SyncBookmarksImportPromotionViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SyncBookmarksImportPromotionViewModel::class.java]
+    }
+
+    private var job: ConflatedJob = ConflatedJob()
+
+    init {
+        binding.promoMessage.apply {
+            onPrimaryButtonClicked { viewModel.setUpSync() }
+            onToggleClicked { viewModel.setUpSync() }
+        }
+    }
+
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+
+        job += viewModel.commands
+            .onEach { processCommand(it) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        viewModel.recordImpression()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        job.cancel()
+    }
+
+    private fun updateTitle() {
+        binding.promoMessage.title = context.getString(
+            when {
+                actionStyle == ActionStyle.Toggle -> R.string.sync_bookmarks_import_promo_title_toggle
+                useUpdatedCopy -> R.string.sync_bookmarks_import_promo_title_label
+                else -> R.string.sync_bookmarks_import_promo_title
+            },
+        )
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            LaunchSyncSetup -> launchSyncSetup()
+        }
+    }
+
+    private fun launchSyncSetup() {
+        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksImport))
+        callback?.dismissHost()
+    }
+}
+
+@ContributesViewModel(ViewScope::class)
+class SyncBookmarksImportPromotionViewModel @Inject constructor(
+    private val promotionDataStore: SyncPromotionDataStore,
+    private val pixel: Pixel,
+) : ViewModel() {
+    private val _commands = Channel<Command>()
+
+    val commands = _commands.receiveAsFlow()
+
+    private var actionJob: Job? = null
+
+    fun recordImpression() {
+        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, pixelParams())
+        viewModelScope.launch { promotionDataStore.recordPromoImpression(BookmarksImport) }
+    }
+
+    fun setUpSync() {
+        if (actionJob?.isActive == true) return
+
+        actionJob = viewModelScope.launch {
+            pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, pixelParams())
+            _commands.send(LaunchSyncSetup)
+        }
+    }
+
+    private fun pixelParams() = mapOf(SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE to PIXEL_SOURCE)
+
+    sealed interface Command {
+        data object LaunchSyncSetup : Command
+    }
+
+    private companion object {
+        const val PIXEL_SOURCE = "bookmarks_import"
     }
 }

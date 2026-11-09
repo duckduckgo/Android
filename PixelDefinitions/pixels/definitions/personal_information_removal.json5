@@ -282,6 +282,33 @@
             }
         ]
     },
+    "m_dbp_optoutjob_removed-identifier-found": {
+        "description": "Fired when a scan marks a stored profile as removed although the same scan found a profile with the same identifier, because the profile's name or profile URL changed.",
+        "owners": ["landomen"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker on which the profile was found",
+                "type": "string"
+            },
+            {
+                "key": "changed_field",
+                "description": "Which part of the stored profile no longer matched the profile found with the same identifier",
+                "type": "string",
+                "enum": ["name", "profile_url", "name_and_profile_url"]
+            },
+            {
+                "key": "optout_status",
+                "description": "Status of the opt-out job before it was marked removed",
+                "type": "string",
+                "enum": ["not_executed", "pending_email_confirmation", "requested", "error"]
+            }
+        ],
+        "expires": "2027-01-31"
+    },
     "m_dbp_engagement_dau": {
         "description": "Pixel for PIR daily active users.",
         "owners": ["karlenDimla", "landomen"],
@@ -2214,6 +2241,13 @@
             }
         ]
     },
+    "m_privacy-pro_app-settings_personal-information-removal_click": {
+        "description": "The user tapped 'Personal Information Removal' (DuckDuckGo Subscription) in the app-wide Settings.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_dbp_freemium_notification_sent_first_scan_complete": {
         "description": "Fired when the Freemium PIR scan-complete notification is posted after a free user's scan finishes, at most once per profile save.",
         "owners": ["landomen"],
@@ -2242,6 +2276,34 @@
         "triggers": ["impression"],
         "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_dbp_notification_permission_prompt_shown": {
+        "description": "Fired when the dialog explaining why PIR needs notifications permission is shown.",
+        "owners": ["landomen"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "pirNotificationPromptType"]
+    },
+    "m_dbp_notification_permission_prompt_accepted": {
+        "description": "Fired when the user taps the positive button on the PIR notification permission dialog.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "pirNotificationPromptType"]
+    },
+    "m_dbp_notification_permission_prompt_dismissed": {
+        "description": "Fired when the user taps the negative button on the PIR notification permission dialog or dismisses it with back or an outside tap.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "pirNotificationPromptType"]
+    },
+    "m_dbp_notification_permission_granted": {
+        "description": "Fired when notifications are turned on from the PIR notification permission dialog.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "pirNotificationPromptType"]
     },
     "wide_pir-initial-scan": {
         "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",

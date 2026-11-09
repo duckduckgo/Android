@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.app.Activity
+import android.content.res.Resources
 import android.os.Looper
 import android.view.Gravity
 import android.view.View
@@ -30,9 +31,13 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
+import com.duckduckgo.mobile.android.R as CommonR
 
 @RunWith(AndroidJUnit4::class)
 class NativeInputLayoutCoordinatorTest {
@@ -121,9 +126,85 @@ class NativeInputLayoutCoordinatorTest {
         assertEquals(CARD_TOP_MARGIN_PX + CARD_HEIGHT_PX, browserLayout.paddingBottom)
     }
 
+    @Test
+    fun whenWidgetReattachesThenForcedBottomTranslationFollowsRootSize() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val widget = View(activity)
+        val params = FrameLayout.LayoutParams(MATCH_PARENT, 400, Gravity.TOP)
+        val root = FrameLayout(activity).apply { addView(widget, params) }
+        activity.setContentView(root)
+        root.measure(
+            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+        )
+        root.layout(0, 0, 1000, 1000)
+        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        coordinator.applyForcedBottomTranslation(widget, isBottom = true)
+        assertEquals(600f, widget.translationY)
+
+        root.removeView(widget)
+        root.addView(widget, params)
+        root.measure(
+            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(600, View.MeasureSpec.EXACTLY),
+        )
+        root.layout(0, 0, 1000, 600)
+
+        assertEquals(200f, widget.translationY)
+    }
+
+    @Test
+    fun whenForcedBottomIsDisabledThenReattachingDoesNotOverrideTopTranslation() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val widget = View(activity)
+        val root = FrameLayout(activity).apply { addView(widget) }
+        activity.setContentView(root)
+        root.layout(0, 0, 1000, 1000)
+        widget.layout(0, 0, 1000, 400)
+        val coordinator = NativeInputLayoutCoordinator(root, mock())
+        coordinator.applyForcedBottomTranslation(widget, isBottom = true)
+        assertEquals(600f, widget.translationY)
+
+        root.removeView(widget)
+        coordinator.applyForcedBottomTranslation(widget, isBottom = false)
+        widget.translationY = -NAV_BAR_HEIGHT_PX.toFloat()
+        root.addView(widget)
+        root.layout(0, 0, 1000, 600)
+        widget.layout(0, 0, 1000, 300)
+
+        assertEquals(-NAV_BAR_HEIGHT_PX.toFloat(), widget.translationY)
+    }
+
+    @Test
+    fun whenNewChatHintsConfiguredThenTheySitKeyline2AboveTheCardNotTheWidgetRoot() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val card = View(activity).apply { id = R.id.inputModeWidgetCard }
+        val widget = FrameLayout(activity).apply {
+            addView(card, FrameLayout.LayoutParams(MATCH_PARENT, CARD_HEIGHT_PX).apply { topMargin = CARD_TOP_MARGIN_PX })
+        }
+        val hints = View(activity)
+        val resources: Resources = spy(activity.resources)
+        doReturn(HINTS_SPACING_PX).whenever(resources).getDimensionPixelSize(CommonR.dimen.keyline_2)
+        val root = object : CoordinatorLayout(activity) {
+            override fun getResources(): Resources = resources
+        }.apply {
+            addView(widget, CoordinatorLayout.LayoutParams(MATCH_PARENT, CARD_TOP_MARGIN_PX + CARD_HEIGHT_PX).apply { gravity = Gravity.BOTTOM })
+        }
+        activity.setContentView(root)
+        val coordinator = NativeInputLayoutCoordinator(root, mock())
+
+        coordinator.configureNewChatHints(widget, hints)
+        root.addView(hints)
+        shadowOf(Looper.getMainLooper()).idle()
+        root.viewTreeObserver.dispatchOnPreDraw()
+
+        assertEquals(widget.top + card.top - HINTS_SPACING_PX, (hints.bottom + hints.translationY).toInt())
+    }
+
     private companion object {
         private const val NAV_BAR_HEIGHT_PX = 56
         private const val CARD_TOP_MARGIN_PX = 20
         private const val CARD_HEIGHT_PX = 60
+        private const val HINTS_SPACING_PX = 8
     }
 }

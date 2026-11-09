@@ -21,11 +21,11 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.impl.promo.PromoCampaignRepository
-import com.duckduckgo.duckchat.impl.promo.PromoRecord
-import com.duckduckgo.duckchat.impl.promo.PromoRecordCorruptedException
-import com.duckduckgo.duckchat.impl.promo.PromoRecordStorageException
-import com.duckduckgo.duckchat.impl.promo.PromoTerms
+import com.duckduckgo.duckchat.impl.promo.data.PromoCampaignRepository
+import com.duckduckgo.duckchat.impl.promo.data.PromoRecord
+import com.duckduckgo.duckchat.impl.promo.data.PromoRecordCorruptedException
+import com.duckduckgo.duckchat.impl.promo.data.PromoRecordStorageException
+import com.duckduckgo.duckchat.impl.promo.data.PromoTerms
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow

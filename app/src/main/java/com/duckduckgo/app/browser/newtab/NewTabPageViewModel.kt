@@ -71,6 +71,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalCoroutinesApi::class)
 class NewTabPageViewModel @AssistedInject constructor(
     @Assisted private val showDaxLogo: Boolean,
+    @Assisted private val tabNextStepsState: TabNextStepsState,
     private val dispatchers: DispatcherProvider,
     private val remoteMessagingModel: RemoteMessageModel,
     private val afterIdleMessageTriggerProvider: AfterIdleMessageTriggerProvider,
@@ -154,21 +155,23 @@ class NewTabPageViewModel @AssistedInject constructor(
         super.onStart(owner)
 
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.getFavorites()
-                .combine(
-                    afterIdleMessageTriggerProvider.activeTrigger()
-                        .flatMapLatest { trigger ->
-                            remoteMessagingModel.observeActiveMessages(trigger)
-                        }
-                        .map { message ->
-                            if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
-                        },
-                ) { favorites, activeMessage ->
-                    if (favorites.isNotEmpty()) {
-                        syncEngine.triggerSync(FEATURE_READ)
+            combine(
+                savedSitesRepository.getFavorites(),
+                afterIdleMessageTriggerProvider.activeTrigger()
+                    .flatMapLatest { trigger ->
+                        remoteMessagingModel.observeActiveMessages(trigger)
                     }
-                    ViewStateSnapshot(favorites, activeMessage)
+                    .map { message ->
+                        if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
+                    },
+                tabNextStepsState.nextStepsAllowed,
+            ) { favorites, activeMessage, nextStepsAllowed ->
+                if (favorites.isNotEmpty()) {
+                    syncEngine.triggerSync(FEATURE_READ)
                 }
+                val message = activeMessage.takeUnless { !nextStepsAllowed && it?.content is Content.ActionableItems }
+                ViewStateSnapshot(favorites, message)
+            }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
                     // The card shares the NTP prompt surface with modals, so it renders only while
@@ -303,11 +306,12 @@ class NewTabPageViewModel @AssistedInject constructor(
     class NewTabPageViewModelProviderFactory(
         private val assistedFactory: NewTabPageViewModelFactory,
         private val showDaxLogo: Boolean,
+        private val tabNextStepsState: TabNextStepsState,
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return assistedFactory.create(showDaxLogo) as T
+            return assistedFactory.create(showDaxLogo, tabNextStepsState) as T
         }
     }
 
@@ -315,6 +319,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     interface NewTabPageViewModelFactory {
         fun create(
             showDaxLogo: Boolean,
+            tabNextStepsState: TabNextStepsState,
         ): NewTabPageViewModel
     }
 }

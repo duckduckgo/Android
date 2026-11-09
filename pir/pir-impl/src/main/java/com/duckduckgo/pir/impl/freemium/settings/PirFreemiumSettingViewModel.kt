@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
 import com.duckduckgo.pir.impl.freemium.PirFreemium
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState
 import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState
@@ -47,7 +48,7 @@ class PirFreemiumSettingViewModel @Inject constructor(
     data class ViewState(val freemiumState: PirFreemiumState = PirFreemiumState.NOT_ELIGIBLE)
 
     sealed class Command {
-        data object OpenPirDashboard : Command()
+        data class OpenPirDashboard(val entryPoint: PirFreeScanEntryPoint) : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -72,13 +73,13 @@ class PirFreemiumSettingViewModel @Inject constructor(
     }
 
     fun onEntryPointClicked() {
-        val ctaState = when (_viewState.value.freemiumState) {
+        val (ctaState, entryPoint) = when (_viewState.value.freemiumState) {
             PirFreemiumState.NOT_ELIGIBLE -> return
-            PirFreemiumState.ELIGIBLE -> PirFreemiumCtaState.START_FREE_SCAN
-            PirFreemiumState.USED -> PirFreemiumCtaState.VIEW_SCAN_RESULTS
+            PirFreemiumState.ELIGIBLE -> PirFreemiumCtaState.START_FREE_SCAN to PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN
+            PirFreemiumState.USED -> PirFreemiumCtaState.VIEW_SCAN_RESULTS to PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN
         }
 
         pixelSender.reportFreemiumSettingsEntryPointClicked(ctaState)
-        viewModelScope.launch { command.send(Command.OpenPirDashboard) }
+        viewModelScope.launch { command.send(Command.OpenPirDashboard(entryPoint)) }
     }
 }

@@ -644,6 +644,15 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenDictatedPromptThenVoiceIsForwardedWithoutChangingSystemSearchSource() {
+        testee.onDuckAiRequested("dictated prompt", DuckChatEntryPoint.SYSTEM_SEARCH, voice = true)
+        testee.onDuckAiRequested("typed prompt", DuckChatEntryPoint.SYSTEM_SEARCH)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt("dictated prompt", DuckChatEntryPoint.SYSTEM_SEARCH, voice = true)
+        verify(mockDuckChat).openDuckChatWithAutoPrompt("typed prompt", DuckChatEntryPoint.SYSTEM_SEARCH, voice = false)
+    }
+
+    @Test
     fun onDuckAiTappedThenDuckChatOpenedWithQuery() {
         val query = "What is DuckDuckGo?"
         testee.onDuckAiRequested(query, DuckChatEntryPoint.SYSTEM_SEARCH)

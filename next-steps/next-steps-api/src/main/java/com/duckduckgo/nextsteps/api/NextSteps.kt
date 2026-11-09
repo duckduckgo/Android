@@ -33,4 +33,10 @@ interface NextSteps {
      * user is not enrolled in a treatment cohort.
      */
     suspend fun provideSectionView(context: Context): View?
+
+    /**
+     * True while this user is in a treatment cohort and a next steps message holds the New Tab Page slot, whether or not it
+     * has rendered yet. Turns false once the section ends: every item done, the user dismissed it, or the message expired.
+     */
+    suspend fun isSectionActive(): Boolean
 }

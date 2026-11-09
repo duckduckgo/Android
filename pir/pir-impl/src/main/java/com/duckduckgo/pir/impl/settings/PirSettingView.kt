@@ -1,0 +1,143 @@
+/*
+ * Copyright (c) 2023 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.pir.impl.settings
+
+import android.content.Context
+import android.util.AttributeSet
+import android.widget.FrameLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
+import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.api.PirScreens.PirDesktopScreen
+import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.databinding.ViewPirSettingsBinding
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.Command
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.Command.OpenPirDashboard
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.Command.OpenPirDesktop
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Disabled
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Enabled
+import com.duckduckgo.pir.impl.settings.PirSettingViewModel.ViewState.PirState.Hidden
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
+
+@InjectWith(ViewScope::class)
+class PirSettingView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0,
+) : FrameLayout(context, attrs, defStyle) {
+
+    @Inject
+    lateinit var viewModelFactory: ViewViewModelFactory
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
+    private val binding: ViewPirSettingsBinding by viewBinding()
+
+    private val viewModel: PirSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PirSettingViewModel::class.java]
+    }
+
+    private var job: ConflatedJob = ConflatedJob()
+    private val conflatedStateJob = ConflatedJob()
+
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
+
+        job += viewModel.commands()
+            .onEach { processCommands(it) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        conflatedStateJob += viewModel.viewState
+            .onEach { renderView(it) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
+        job.cancel()
+        conflatedStateJob.cancel()
+    }
+
+    private fun renderView(viewState: ViewState) {
+        with(binding.pirSettings) {
+            when (viewState.pirState) {
+                is Enabled -> {
+                    isVisible = true
+                    setStatus(isOn = viewState.pirState.isOn)
+                    setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.identity_blocked_pir_color_24)
+                    isClickable = true
+                    binding.pirSettings.setClickListener { viewModel.onPir(viewState.pirState.type) }
+                }
+
+                is Disabled -> {
+                    isVisible = true
+                    isClickable = false
+                    setStatus(isOn = false)
+                    binding.pirSettings.setClickListener(null)
+                    setLeadingIconResource(R.drawable.identity_blocked_pir_grayscale_color_24)
+                }
+
+                Hidden -> isGone = true
+            }
+        }
+    }
+
+    private fun processCommands(command: Command) {
+        when (command) {
+            is OpenPirDesktop -> {
+                globalActivityStarter.start(context, PirDesktopScreen)
+            }
+
+            OpenPirDashboard -> {
+                globalActivityStarter.start(context, PirDashboardWebViewScreen)
+            }
+
+            Command.ShowPirUnavailableDialog -> {
+                TextAlertDialogBuilder(context)
+                    .setTitle(R.string.pirStorageUnavailableDialogTitle)
+                    .setMessage(R.string.pirStorageUnavailableDialogMessage)
+                    .setPositiveButton(R.string.pirStorageUnavailableDialogButton, GHOST)
+                    .show()
+            }
+        }
+    }
+}

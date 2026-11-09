@@ -415,6 +415,18 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun subscriptionWithdrawal(): Toggle
 
+    /**
+     * When enabled, Stripe subscribers see Stripe products on the plans page and plan changes are redirected to Stripe
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun stripeTierOptions(): Toggle
+
+    /**
+     * When enabled, Stripe products are fetched for the subscription's country
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun stripeTierOptionsByCountry(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
