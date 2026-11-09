@@ -19,10 +19,13 @@ package com.duckduckgo.app.browser.navigation
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.DuckAiWidget
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.DuckChatLaunch
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -55,21 +58,27 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
     override fun openDuckChat(
         context: Context,
         hasSessionActive: Boolean,
-        duckChatUrl: String?,
-        launch: DuckChatLaunch,
+        duckChatUrl: String,
+        launchAction: DuckChatLaunchAction?,
+        launchOrigin: DuckChatLaunchOrigin,
     ): Intent {
-        val contextual = launch as? DuckChatLaunch.ContextualChat
-        val externalSelection = launch as? DuckChatLaunch.TextSelection
+        val contextual = launchAction as? DuckChatLaunchAction.ContextualChat
+        val externalSelection = launchAction as? DuckChatLaunchAction.TextSelection
+        val launchSource = when {
+            launchOrigin == DuckChatLaunchOrigin.HOME_SCREEN_WIDGET -> DuckAiWidget
+            externalSelection != null -> SelectedTextSearch
+            else -> InAppNavigation
+        }
         return BrowserActivity.intent(
             context = context,
-            launchSource = if (externalSelection != null) SelectedTextSearch else InAppNavigation,
-            openDuckChat = launch !is DuckChatLaunch.ChatHistory,
+            launchSource = launchSource,
+            openDuckChat = true,
             duckChatContextual = contextual != null,
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
-            duckChatForceImageGeneration = launch is DuckChatLaunch.ImageGeneration,
-            openDuckChatHistory = launch is DuckChatLaunch.ChatHistory,
+            duckChatForceImageGeneration = launchAction == DuckChatLaunchAction.ImageGeneration,
             duckChatTextSelection = contextual?.textSelection ?: externalSelection?.text,
+            nativeInputLaunch = NativeInputLaunch.from(launchAction),
         )
     }
 

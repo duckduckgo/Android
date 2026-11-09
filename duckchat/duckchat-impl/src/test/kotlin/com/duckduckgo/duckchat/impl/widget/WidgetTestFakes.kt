@@ -18,7 +18,8 @@ package com.duckduckgo.duckchat.impl.widget
 
 import android.content.Intent
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import org.junit.Assert.assertEquals
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -27,15 +28,15 @@ import org.mockito.kotlin.whenever
 
 private const val EXTRA_URL = "url"
 private const val EXTRA_ACTION = "action"
-private const val EXTRA_AUTO_FOCUS = "autoFocus"
+private const val EXTRA_ORIGIN = "origin"
 
 /** A [BrowserNav] whose widget launch intents expose their arguments as extras, so tests can assert on them. */
 internal fun fakeBrowserNav(): BrowserNav = mock<BrowserNav>().also { nav ->
-    whenever(nav.openDuckChat(any(), any(), any(), anyOrNull(), any(), any(), anyOrNull())).thenAnswer {
+    whenever(nav.openDuckChat(any(), any(), any(), anyOrNull(), any())).thenAnswer {
         Intent()
             .putExtra(EXTRA_URL, it.getArgument<String>(2))
-            .putExtra(EXTRA_ACTION, it.getArgument<NativeInputLaunchAction?>(3)?.name)
-            .putExtra(EXTRA_AUTO_FOCUS, it.getArgument<Boolean>(4))
+            .putExtra(EXTRA_ACTION, it.getArgument<DuckChatLaunchAction?>(3)?.let { action -> action::class.simpleName })
+            .putExtra(EXTRA_ORIGIN, it.getArgument<DuckChatLaunchOrigin>(4).name)
     }
 }
 
@@ -44,10 +45,9 @@ internal fun fakeDuckAiWidgetIntents(): DuckAiWidgetIntents = DuckAiWidgetIntent
 internal fun assertLaunch(
     intent: Intent,
     url: String? = null,
-    action: NativeInputLaunchAction? = null,
-    autoFocus: Boolean = false,
+    action: DuckChatLaunchAction? = null,
 ) {
     assertEquals(url, intent.getStringExtra(EXTRA_URL))
-    assertEquals(action?.name, intent.getStringExtra(EXTRA_ACTION))
-    assertEquals(autoFocus, intent.getBooleanExtra(EXTRA_AUTO_FOCUS, false))
+    assertEquals(action?.let { it::class.simpleName }, intent.getStringExtra(EXTRA_ACTION))
+    assertEquals(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET.name, intent.getStringExtra(EXTRA_ORIGIN))
 }

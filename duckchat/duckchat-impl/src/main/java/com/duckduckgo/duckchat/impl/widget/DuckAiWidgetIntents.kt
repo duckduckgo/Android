@@ -20,7 +20,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import javax.inject.Inject
 
 class DuckAiWidgetIntents @Inject constructor(
@@ -31,12 +32,16 @@ class DuckAiWidgetIntents @Inject constructor(
         context: Context,
         requestCode: Int,
         duckChatUrl: String,
-        action: NativeInputLaunchAction? = null,
-        autoFocusInput: Boolean = false,
+        launchAction: DuckChatLaunchAction? = null,
     ): PendingIntent = PendingIntent.getActivity(
         context,
         requestCode,
-        browserNav.openDuckChat(context, duckChatUrl = duckChatUrl, launchAction = action, autoFocusInput = autoFocusInput).asViewIntent(),
+        browserNav.openDuckChat(
+            context,
+            duckChatUrl = duckChatUrl,
+            launchAction = launchAction,
+            launchOrigin = DuckChatLaunchOrigin.HOME_SCREEN_WIDGET,
+        ).asViewIntent(),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 

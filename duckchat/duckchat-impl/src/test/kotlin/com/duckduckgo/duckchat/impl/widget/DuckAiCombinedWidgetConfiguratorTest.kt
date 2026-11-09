@@ -20,7 +20,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.widget.RemoteViews
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -56,16 +56,16 @@ class DuckAiCombinedWidgetConfiguratorTest {
     )
 
     @Test
-    fun whenPromptBarTappedThenLaunchesNewFocusedChat() = runTest {
+    fun whenPromptBarTappedThenLaunchesNewChatFromWidget() = runTest {
         stubDuckAi(enabled = true)
 
         val launched = populateAndCaptureClickIntent(R.id.promptBarContainer)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, autoFocus = true)
+        assertLaunch(launched, url = NEW_CHAT_URL)
     }
 
     @Test
-    fun whenVoiceActionTappedThenLaunchesVoiceChatUrlWithoutAutoFocus() = runTest {
+    fun whenVoiceActionTappedThenLaunchesVoiceChatUrl() = runTest {
         stubDuckAi(enabled = true)
 
         val launched = populateAndCaptureClickIntent(R.id.actionVoice)
@@ -74,21 +74,21 @@ class DuckAiCombinedWidgetConfiguratorTest {
     }
 
     @Test
-    fun whenCreateImageTappedThenLaunchesImageGenerationWithAutoFocus() = runTest {
+    fun whenCreateImageTappedThenLaunchesImageGeneration() = runTest {
         stubDuckAi(enabled = true)
 
         val launched = populateAndCaptureClickIntent(R.id.actionCreateImage)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, action = NativeInputLaunchAction.IMAGE_GENERATION, autoFocus = true)
+        assertLaunch(launched, url = NEW_CHAT_URL, action = DuckChatLaunchAction.ImageGeneration)
     }
 
     @Test
-    fun whenTakePhotoTappedThenLaunchesCameraCaptureWithoutAutoFocus() = runTest {
+    fun whenTakePhotoTappedThenLaunchesCameraCapture() = runTest {
         stubDuckAi(enabled = true)
 
         val launched = populateAndCaptureClickIntent(R.id.actionTakePhoto)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, action = NativeInputLaunchAction.CAMERA_CAPTURE)
+        assertLaunch(launched, url = NEW_CHAT_URL, action = DuckChatLaunchAction.CameraCapture)
     }
 
     @Test

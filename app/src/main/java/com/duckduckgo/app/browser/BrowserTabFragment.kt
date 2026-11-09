@@ -161,7 +161,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.nativeinput.NativeInputCallbacks
-import com.duckduckgo.app.browser.nativeinput.NativeInputLaunchOptions
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
@@ -240,7 +240,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -734,7 +734,7 @@ class BrowserTabFragment :
 
     // One-shot native input instructions for this tab's first Duck.ai show (e.g. from a home-screen widget).
     // Not persisted, for the same reason as inputModeTarget.
-    var nativeInputLaunchOptions: NativeInputLaunchOptions? = null
+    var nativeInputLaunch: NativeInputLaunch? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
 
@@ -1377,8 +1377,7 @@ class BrowserTabFragment :
 
     private fun showNativeInput(
         query: String = "",
-        launchAction: NativeInputLaunchAction? = null,
-        autoFocusInput: Boolean = false,
+        launchAction: DuckChatLaunchAction? = null,
         textSelection: String? = null,
     ) {
         nativeInputManager.showNativeInput(
@@ -1390,7 +1389,6 @@ class BrowserTabFragment :
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
             launchAction = launchAction,
-            autoFocusInput = autoFocusInput,
             textSelection = textSelection,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
@@ -2470,10 +2468,9 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
-        val launchOptions = nativeInputLaunchOptions.also { nativeInputLaunchOptions = null }
+        val pendingLaunch = nativeInputLaunch.also { nativeInputLaunch = null }
         showNativeInput(
-            launchAction = if (forceImageGeneration) NativeInputLaunchAction.IMAGE_GENERATION else launchOptions?.action,
-            autoFocusInput = launchOptions?.autoFocus == true,
+            launchAction = if (forceImageGeneration) DuckChatLaunchAction.ImageGeneration else pendingLaunch?.toLaunchAction(),
             textSelection = browserActivity?.consumePendingDuckChatTextSelection(),
         )
     }

@@ -715,7 +715,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         if (isDuckAiMode && launch is DuckChatLaunch.ImageGeneration) {
             nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
         }
-        nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = tool.rawValue) }
     }
 
     private fun replayPendingState(tabId: String) {

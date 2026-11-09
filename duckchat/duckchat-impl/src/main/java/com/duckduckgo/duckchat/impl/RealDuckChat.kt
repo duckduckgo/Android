@@ -838,7 +838,7 @@ class RealDuckChat @Inject constructor(
     private fun openDuckChatUrl(
         url: String,
         forceNewSession: Boolean = false,
-        launchAction: NativeInputLaunchAction? = null,
+        launchAction: DuckChatLaunchAction? = null,
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =

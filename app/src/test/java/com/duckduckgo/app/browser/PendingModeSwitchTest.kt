@@ -18,9 +18,8 @@ package com.duckduckgo.app.browser
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.nativeinput.NativeInputLaunchOptions
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.duckchat.api.InputMode
 import org.junit.Assert.assertEquals
@@ -48,7 +47,7 @@ class PendingModeSwitchTest {
     }
 
     @Test
-    fun whenOpenNewTabWithNativeInputLaunchEncodedThenItRoundTripsExactly() {
+    fun whenOpenNewTabWithImageGenerationLaunchEncodedThenItRoundTripsExactly() {
         val original = PendingModeSwitch(
             targetMode = BrowserMode.REGULAR,
             action = PendingAction.OpenNewTab(
@@ -56,7 +55,7 @@ class PendingModeSwitchTest {
                 sourceTabId = null,
                 skipHome = false,
                 isExternal = false,
-                nativeInputLaunch = NativeInputLaunchOptions(NativeInputLaunchAction.WEB_SEARCH, autoFocus = true),
+                nativeInputLaunch = NativeInputLaunch.IMAGE_GENERATION,
             ),
             source = BrowserModeSwitchSource.NEW_TAB,
         )
@@ -73,7 +72,7 @@ class PendingModeSwitchTest {
                 sourceTabId = null,
                 skipHome = false,
                 isExternal = false,
-                nativeInputLaunch = NativeInputLaunchOptions(NativeInputLaunchAction.CAMERA_CAPTURE, autoFocus = false),
+                nativeInputLaunch = NativeInputLaunch.CAMERA_CAPTURE,
             ),
             source = BrowserModeSwitchSource.NEW_TAB,
         )

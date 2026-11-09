@@ -17,7 +17,7 @@ package com.duckduckgo.duckchat.impl.widget
 
 import android.content.Context
 import android.widget.RemoteViews
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -57,7 +57,7 @@ class DuckAiCombinedWidgetConfigurator @Inject constructor(
 
             remoteViews.setOnClickPendingIntent(
                 R.id.promptBarContainer,
-                intents.launchDuckAi(context, DuckAiCombinedWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl, autoFocusInput = true),
+                intents.launchDuckAi(context, DuckAiCombinedWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl),
             )
             remoteViews.setOnClickPendingIntent(
                 R.id.actionVoice,
@@ -69,8 +69,7 @@ class DuckAiCombinedWidgetConfigurator @Inject constructor(
                     context,
                     DuckAiCombinedWidgetTarget.CREATE_IMAGE.requestCode,
                     state.newChatUrl,
-                    NativeInputLaunchAction.IMAGE_GENERATION,
-                    autoFocusInput = true,
+                    DuckChatLaunchAction.ImageGeneration,
                 ),
             )
             remoteViews.setOnClickPendingIntent(
@@ -79,7 +78,7 @@ class DuckAiCombinedWidgetConfigurator @Inject constructor(
                     context,
                     DuckAiCombinedWidgetTarget.TAKE_PHOTO.requestCode,
                     state.newChatUrl,
-                    NativeInputLaunchAction.CAMERA_CAPTURE,
+                    DuckChatLaunchAction.CameraCapture,
                 ),
             )
         }
