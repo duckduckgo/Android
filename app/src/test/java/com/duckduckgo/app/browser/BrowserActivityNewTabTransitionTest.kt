@@ -223,8 +223,6 @@ class BrowserActivityNewTabTransitionTest {
         assertRegistered()
     }
 
-    // Conditions shared by every entry point.
-
     @Test
     fun newTabDoesNotGrowInWithTransitionsOff() {
         setField("newTabTransitionConfig", null)
@@ -264,8 +262,6 @@ class BrowserActivityNewTabTransitionTest {
         assertTabOpened()
         assertNotRegistered()
     }
-
-    // A picture that's ready after the tab list already has the new tab, with swiping on.
 
     @Test
     fun hiddenTabIsCoveredWhenItsPictureArrives() {
