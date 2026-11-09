@@ -33,6 +33,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsEligibility
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import kotlin.random.Random
@@ -51,8 +53,9 @@ class NewChatHintsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val commands: NewChatHintCommands,
     private val tabRepository: TabRepository,
+    private val usage: NewChatHintsUsage,
     eligibility: NewChatHintsEligibility,
-    browserMode: BrowserMode,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     private val eligible: StateFlow<Boolean?> = eligibility.observeEligible(browserMode).stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -69,10 +72,12 @@ class NewChatHintsViewModel @Inject constructor(
             val showHints = selectedTab?.tabId == tabId && isEligible && input.isNewChat() && input.isDraftEmpty()
             if (showHints) order.filter { capableModel(it, models) != null } else emptyList()
         }.distinctUntilChanged()
+            .onEach { hints -> if (hints.isNotEmpty() && browserMode == BrowserMode.REGULAR) usage.onHintsDisplayed(tabId) }
     }
 
     suspend fun onHintTapped(hint: NewChatHint, tabId: String) {
         if (isHandlingTap) return
+        if (browserMode == BrowserMode.REGULAR) usage.onHintTapped(tabId)
         isHandlingTap = true
         try {
             sendCommand(hint, tabId)

@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsEligibility
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,6 +56,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -76,12 +79,14 @@ class NewChatHintsViewModelTest {
     private val models = MutableStateFlow(ModelState(models = listOf(model())))
     private val modelManager: DuckAiModelManager = mock { on { modelState } doReturn models }
     private val duckChat: DuckChatInternal = mock { on { isImageUploadEnabled() } doReturn true }
+    private val usage: NewChatHintsUsage = mock()
     private fun viewModel(
         provider: NativeInputStateProvider = stateStore,
         eligibility: NewChatHintsEligibility = object : NewChatHintsEligibility {
             override fun observeEligible(browserMode: BrowserMode) = eligible
         },
-    ) = NewChatHintsViewModel(provider, modelManager, duckChat, commands, tabRepository, eligibility, BrowserMode.REGULAR)
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+    ) = NewChatHintsViewModel(provider, modelManager, duckChat, commands, tabRepository, usage, eligibility, browserMode)
 
     @Before
     fun setUp() {
@@ -376,6 +381,45 @@ class NewChatHintsViewModelTest {
         runCurrent()
 
         assertTrue(deliveries.all { (target, selected) -> target == selected })
+    }
+
+    @Test
+    fun whenHintsAreShownInRegularModeThenUsageIsTold() = runTest {
+        viewModel().viewState("tab").first()
+
+        verify(usage).onHintsDisplayed("tab")
+    }
+
+    @Test
+    fun whenNoHintsAreShownThenUsageIsNotTold() = runTest {
+        eligible.value = false
+
+        viewModel().viewState("tab").first()
+
+        verify(usage, never()).onHintsDisplayed(any())
+    }
+
+    @Test
+    fun whenHintsAreShownInFireModeThenUsageIsNotTold() = runTest {
+        viewModel(browserMode = BrowserMode.FIRE).viewState("tab").first()
+
+        verify(usage, never()).onHintsDisplayed(any())
+    }
+
+    @Test
+    fun whenAHintIsTappedThenUsageIsToldEvenIfNoCommandIsSent() = runTest {
+        eligible.value = false
+
+        viewModel().onHintTapped(NewChatHint.PHOTO, "tab")
+
+        verify(usage).onHintTapped("tab")
+    }
+
+    @Test
+    fun whenAHintIsTappedInFireModeThenUsageIsNotTold() = runTest {
+        viewModel(browserMode = BrowserMode.FIRE).onHintTapped(NewChatHint.PHOTO, "tab")
+
+        verify(usage, never()).onHintTapped(any())
     }
 
     private fun model() = AIChatModel(
