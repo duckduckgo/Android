@@ -20,9 +20,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
-import com.duckduckgo.app.browser.nativeinput.NativeInputLaunchOptions
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
-import com.duckduckgo.app.tabs.NativeInputLaunchAction
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.duckchat.api.InputMode
 
@@ -44,7 +43,7 @@ internal sealed class PendingAction {
         val isExternal: Boolean,
         val inputModeTarget: InputMode? = null,
         val launchingAppPackage: String? = null,
-        val nativeInputLaunch: NativeInputLaunchOptions? = null,
+        val nativeInputLaunch: NativeInputLaunch? = null,
     ) : PendingAction()
     data class OpenExistingTab(val tabId: String) : PendingAction()
 }
@@ -71,10 +70,7 @@ internal fun PendingModeSwitch.toBundle(): Bundle {
             bundle.putBoolean(KEY_IS_EXTERNAL, pendingAction.isExternal)
             bundle.putString(KEY_INPUT_MODE_TARGET, pendingAction.inputModeTarget?.name)
             bundle.putString(KEY_LAUNCHING_APP_PACKAGE, pendingAction.launchingAppPackage)
-            pendingAction.nativeInputLaunch?.let {
-                bundle.putString(KEY_LAUNCH_ACTION, it.action?.name)
-                bundle.putBoolean(KEY_LAUNCH_AUTO_FOCUS, it.autoFocus)
-            }
+            bundle.putString(KEY_LAUNCH_ACTION, pendingAction.nativeInputLaunch?.name)
         }
         is PendingAction.OpenExistingTab -> {
             bundle.putString(KEY_ACTION, ACTION_OPEN_EXISTING_TAB)
@@ -99,7 +95,7 @@ internal fun Bundle.toPendingModeSwitch(): PendingModeSwitch? {
             isExternal = getBoolean(KEY_IS_EXTERNAL),
             inputModeTarget = getString(KEY_INPUT_MODE_TARGET)?.let { runCatching { InputMode.valueOf(it) }.getOrNull() },
             launchingAppPackage = getString(KEY_LAUNCHING_APP_PACKAGE),
-            nativeInputLaunch = toNativeInputLaunch(),
+            nativeInputLaunch = NativeInputLaunch.fromName(getString(KEY_LAUNCH_ACTION)),
         )
         ACTION_OPEN_EXISTING_TAB -> PendingAction.OpenExistingTab(
             tabId = getString(KEY_EXISTING_TAB_ID) ?: return null,
@@ -120,14 +116,7 @@ private const val KEY_IS_EXTERNAL = "pendingModeSwitchIsExternal"
 private const val KEY_INPUT_MODE_TARGET = "pendingModeSwitchInputModeTarget"
 private const val KEY_LAUNCHING_APP_PACKAGE = "pendingModeSwitchLaunchingAppPackage"
 private const val KEY_LAUNCH_ACTION = "pendingModeSwitchLaunchAction"
-private const val KEY_LAUNCH_AUTO_FOCUS = "pendingModeSwitchLaunchAutoFocus"
 private const val KEY_EXISTING_TAB_ID = "pendingModeSwitchExistingTabId"
 private const val ACTION_PROCESS_INTENT = "processIntent"
 private const val ACTION_OPEN_NEW_TAB = "openNewTab"
 private const val ACTION_OPEN_EXISTING_TAB = "openExistingTab"
-
-private fun Bundle.toNativeInputLaunch(): NativeInputLaunchOptions? {
-    val action = getString(KEY_LAUNCH_ACTION)?.let { runCatching { NativeInputLaunchAction.valueOf(it) }.getOrNull() }
-    val autoFocus = getBoolean(KEY_LAUNCH_AUTO_FOCUS)
-    return if (action == null && !autoFocus) null else NativeInputLaunchOptions(action, autoFocus)
-}
