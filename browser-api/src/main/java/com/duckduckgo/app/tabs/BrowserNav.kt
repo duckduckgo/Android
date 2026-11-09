@@ -36,19 +36,15 @@ interface BrowserNav {
     /**
      * Returns an Intent that opens Duck.ai full screen in a new tab.
      *
-     * @param launchAction what the tab's native input does the first time it shows, if anything.
-     * @param autoFocusInput when true, the native input takes focus and raises the keyboard.
-     * @param forceLaunchContextual when true, opens the contextual Duck.ai flow instead of a full screen tab.
-     * @param textSelection selected page text to attach to the contextual chat, if any.
+     * @param launchAction what happens once Duck.ai opens, if anything.
+     * @param launchOrigin where the launch comes from. External origins such as the home-screen widget open in regular mode.
      */
     fun openDuckChat(
         context: Context,
         hasSessionActive: Boolean = false,
         duckChatUrl: String,
-        launchAction: NativeInputLaunchAction? = null,
-        autoFocusInput: Boolean = false,
-        forceLaunchContextual: Boolean = false,
-        textSelection: String? = null,
+        launchAction: DuckChatLaunchAction? = null,
+        launchOrigin: DuckChatLaunchOrigin = DuckChatLaunchOrigin.IN_APP,
     ): Intent
     fun closeDuckChat(context: Context): Intent
 

@@ -16,9 +16,17 @@
 
 package com.duckduckgo.app.tabs
 
-/** What a Duck.ai tab's native input does the first time it shows. */
-enum class NativeInputLaunchAction {
-    WEB_SEARCH,
-    IMAGE_GENERATION,
-    CAMERA_CAPTURE,
+/**
+ * Where a Duck.ai launch comes from.
+ */
+enum class DuckChatLaunchOrigin {
+    /**
+     * The launch comes from inside the app.
+     */
+    IN_APP,
+
+    /**
+     * The launch comes from the Duck.ai home-screen widget. It always opens in regular mode.
+     */
+    HOME_SCREEN_WIDGET,
 }
