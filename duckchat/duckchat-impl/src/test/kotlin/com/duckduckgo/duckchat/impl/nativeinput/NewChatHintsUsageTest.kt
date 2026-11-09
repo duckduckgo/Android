@@ -121,6 +121,17 @@ class NewChatHintsUsageTest {
     }
 
     @Test
+    fun whenTheTabLeavesTheNewChatBeforePromptingThenThePromptDoesNotCount() = runTest {
+        repeat(HIDE_AFTER_IGNORED_CHATS - 1) { ignoreHints() }
+
+        testee.onHintsDisplayed(TAB)
+        testee.onLeftNewChat(TAB)
+        testee.onPromptSubmitted(TAB, isNewChat = true)
+
+        assertFalse(testee.isExhausted.first())
+    }
+
+    @Test
     fun whenPromptedOutsideANewChatThenItDoesNotCountAndClearsTheDisplay() = runTest {
         repeat(HIDE_AFTER_IGNORED_CHATS - 1) { ignoreHints() }
 
@@ -132,12 +143,13 @@ class NewChatHintsUsageTest {
     }
 
     @Test
-    fun whenPromptedOutsideANewChatAfterATapThenTheCountIsKept() = runTest {
+    fun whenTheTabLeavesTheNewChatAfterATapThenTheCountIsKept() = runTest {
         repeat(HIDE_AFTER_IGNORED_CHATS - 1) { ignoreHints() }
 
         testee.onHintsDisplayed(TAB)
         testee.onHintTapped(TAB)
-        testee.onPromptSubmitted(TAB, isNewChat = false)
+        testee.onLeftNewChat(TAB)
+        testee.onPromptSubmitted(TAB, isNewChat = true)
         ignoreHints()
 
         assertTrue(testee.isExhausted.first())

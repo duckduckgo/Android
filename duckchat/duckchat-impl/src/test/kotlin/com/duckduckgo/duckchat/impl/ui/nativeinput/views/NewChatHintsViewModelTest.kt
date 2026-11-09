@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -26,6 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -38,6 +40,9 @@ import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsEligibility
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -52,7 +57,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
@@ -61,36 +68,55 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+@RunWith(AndroidJUnit4::class)
 class NewChatHintsViewModelTest {
     @get:Rule val coroutineRule = CoroutineTestRule()
 
     private val eligible = MutableStateFlow(true)
     private val commands = NewChatHintCommands()
     private val selectedTab = MutableStateFlow<TabEntity?>(TabEntity("tab"))
-    private val tabRepository: TabRepository = mock { on { flowSelectedTab } doReturn selectedTab }
+    private val tabs = MutableStateFlow(listOf(TabEntity("tab", url = NEW_CHAT_URL)))
+    private val tabRepository: TabRepository = mock {
+        on { flowSelectedTab } doReturn selectedTab
+        on { flowTabs } doReturn tabs
+    }
     private val repositories: BrowserModeDataProvider<TabRepository> = mock {
         on { forMode(BrowserMode.REGULAR) } doReturn tabRepository
     }
     private val mode: BrowserModeStateHolder = mock {
         on { currentMode } doReturn MutableStateFlow(BrowserMode.REGULAR)
     }
-    private val stateStore = RealNativeInputStateStore(lazy { repositories }, mode, mock(), ChatStateStore())
+    private val chatStateStore = ChatStateStore()
+    private val stateStore = RealNativeInputStateStore(lazy { repositories }, mode, mock(), chatStateStore)
     private val input = stateStore.stateForTab("tab")
     private val models = MutableStateFlow(ModelState(models = listOf(model())))
     private val modelManager: DuckAiModelManager = mock { on { modelState } doReturn models }
-    private val duckChat: DuckChatInternal = mock { on { isImageUploadEnabled() } doReturn true }
+    private val duckChat: DuckChatInternal = mock {
+        on { isImageUploadEnabled() } doReturn true
+        on { isDuckChatUrl(any()) } doReturn true
+    }
     private val usage: NewChatHintsUsage = mock()
+    private val activeVoiceSessions = MutableStateFlow(emptySet<String>())
+    private val voiceSessions: VoiceSessionStateManager = mock { on { activeVoiceSessions } doReturn activeVoiceSessions }
+    private val chats = MutableStateFlow(emptyList<DuckAiChat>())
+    private val voiceChat = DuckAiChat(chatId = "voice-chat", title = "", model = "voice-mode", lastEdit = "", pinned = false, isVoice = true)
+    private val chatStore: DuckAiChatStore = mock {
+        onBlocking { getChatById(any()) } doAnswer { invocation -> chats.value.firstOrNull { it.chatId == invocation.getArgument(0) } }
+    }
     private fun viewModel(
         provider: NativeInputStateProvider = stateStore,
         eligibility: NewChatHintsEligibility = object : NewChatHintsEligibility {
             override fun observeEligible(browserMode: BrowserMode) = eligible
         },
         browserMode: BrowserMode = BrowserMode.REGULAR,
-    ) = NewChatHintsViewModel(provider, modelManager, duckChat, commands, tabRepository, usage, eligibility, browserMode)
+    ) = NewChatHintsViewModel(
+        provider, modelManager, duckChat, commands, tabRepository, usage, eligibility, browserMode, chatStateStore, voiceSessions, chatStore,
+    )
 
     @Before
     fun setUp() {
         stateStore.publish("tab", NativeInputState.zero().copy(inputContext = InputContext.DUCK_AI))
+        chatStateStore.update("tab", ChatState.READY)
     }
 
     @Test
@@ -213,6 +239,7 @@ class NewChatHintsViewModelTest {
         val orders = (1..20).map { index ->
             val tabId = "tab-$index"
             stateStore.publish(tabId, NativeInputState.zero().copy(inputContext = InputContext.DUCK_AI))
+            chatStateStore.update(tabId, ChatState.READY)
             selectedTab.value = TabEntity(tabId)
             viewModel().viewState(tabId).first()
         }
@@ -422,9 +449,193 @@ class NewChatHintsViewModelTest {
         verify(usage, never()).onHintTapped(any())
     }
 
+    @Test
+    fun whenThePageHasNotReportedReadyThenHintsStayHiddenUntilItDoes() = runTest {
+        chatStateStore.update("tab", ChatState.HIDE)
+        viewModel().viewState("tab").test {
+            assertTrue(awaitItem().isEmpty())
+            chatStateStore.update("tab", ChatState.READY)
+            assertTrue(awaitItem().isNotEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTheTabIsInVoiceModeThenHintsAreHiddenAndTapsSendNothing() = runTest {
+        openUrl(VOICE_MODE_URL)
+        assertTrue(viewModel().viewState("tab").first().isEmpty())
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenTheFrontendDropsTheVoiceModeParamThenHintsStayHiddenUntilTheChatHasAnId() = runTest {
+        openUrl(VOICE_MODE_URL)
+        viewModel().viewState("tab").test {
+            assertTrue(awaitItem().isEmpty())
+            openUrl(NEW_CHAT_URL)
+            expectNoEvents()
+            openUrl("https://duck.ai/?chatID=text-chat")
+            openUrl(NEW_CHAT_URL)
+            assertTrue(awaitItem().isNotEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTheFrontendDropsTheVoiceModeParamThenTapsSendNothing() = runTest {
+        openUrl(VOICE_MODE_URL)
+        val testee = viewModel()
+        testee.viewState("tab").test {
+            assertTrue(awaitItem().isEmpty())
+            openUrl(NEW_CHAT_URL)
+            commands.commandsFor { "tab" }.test {
+                testee.onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+                expectNoEvents()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAVoiceChatFinishesThenHintsStayHiddenWhileTheInputReturnsBeforeTheChatId() = runTest {
+        chats.value = listOf(voiceChat)
+        openUrl(VOICE_MODE_URL)
+        viewModel().viewState("tab").test {
+            assertTrue(awaitItem().isEmpty())
+            openUrl(NEW_CHAT_URL)
+            chatStateStore.update("tab", ChatState.HIDE)
+            chatStateStore.update("tab", ChatState.SHOW)
+            openUrl("https://duck.ai/?chatID=voice-chat")
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVoiceIsCancelledBeforeAChatIsCreatedThenHintsReturn() = runTest {
+        openUrl(VOICE_MODE_URL)
+        viewModel().viewState("tab").test {
+            assertTrue(awaitItem().isEmpty())
+            openUrl(NEW_CHAT_URL)
+            chatStateStore.update("tab", ChatState.HIDE)
+            chatStateStore.update("tab", ChatState.READY)
+            chatStateStore.update("tab", ChatState.SHOW)
+            assertTrue(awaitItem().isNotEmpty())
+            chatStateStore.update("tab", ChatState.READY)
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenThePageIsSendingAHandedOverPromptThenHintsAreHidden() = runTest {
+        openUrl("https://duck.ai/chat?prompt=1")
+
+        assertTrue(viewModel().viewState("tab").first().isEmpty())
+    }
+
+    @Test
+    fun whenAResponseIsInFlightThenHintsAreHidden() = runTest {
+        listOf(ChatState.START_STREAM_NEW_PROMPT, ChatState.LOADING, ChatState.STREAMING, ChatState.ERROR).forEach { state ->
+            chatStateStore.update("tab", state)
+            assertTrue(viewModel().viewState("tab").first().isEmpty())
+        }
+    }
+
+    @Test
+    fun whenAVoiceSessionIsActiveThenHintsHideUntilItEnds() = runTest {
+        viewModel().viewState("tab").test {
+            val initial = awaitItem()
+            activeVoiceSessions.value = setOf("tab")
+            assertTrue(awaitItem().isEmpty())
+            activeVoiceSessions.value = emptySet()
+            assertEquals(initial, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTheTabShowsAVoiceChatThenHintsAreHidden() = runTest {
+        openUrl("https://duck.ai/?chatID=voice-chat")
+        chats.value = listOf(voiceChat)
+
+        assertTrue(viewModel().viewState("tab").first().isEmpty())
+    }
+
+    @Test
+    fun whenTheTabStopsBeingANewChatThenUsageDropsItsInteraction() = runTest {
+        viewModel().viewState("tab").test {
+            awaitItem()
+            stateStore.update("tab") { it.copy(chatId = "chat") }
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(usage).onLeftNewChat("tab")
+    }
+
+    @Test
+    fun whenTheFrontendHidesAndShowsTheInputOnTheSamePageThenUsageKeepsItsInteraction() = runTest {
+        viewModel().viewState("tab").test {
+            awaitItem()
+            chatStateStore.update("tab", ChatState.HIDE)
+            assertTrue(awaitItem().isEmpty())
+            chatStateStore.update("tab", ChatState.SHOW)
+            assertTrue(awaitItem().isNotEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(usage, never()).onLeftNewChat(any())
+    }
+
+    @Test
+    fun whenTheViewAttachesToATabThatIsNotANewChatThenUsageKeepsItsInteraction() = runTest {
+        chatStateStore.update("tab", ChatState.HIDE)
+
+        viewModel().viewState("tab").first()
+
+        verify(usage, never()).onLeftNewChat(any())
+    }
+
+    @Test
+    fun whenTypingInANewChatThenUsageKeepsItsInteraction() = runTest {
+        viewModel().viewState("tab").test {
+            awaitItem()
+            stateStore.update("tab") { it.copy(hasText = true) }
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(usage, never()).onLeftNewChat(any())
+    }
+
+    @Test
+    fun whenTheTabStopsBeingANewChatInFireModeThenUsageIsNotTold() = runTest {
+        viewModel(browserMode = BrowserMode.FIRE).viewState("tab").test {
+            awaitItem()
+            stateStore.update("tab") { it.copy(chatId = "chat") }
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(usage, never()).onLeftNewChat(any())
+    }
+
+    private fun openUrl(url: String) {
+        tabs.value = listOf(TabEntity("tab", url = url))
+    }
+
     private fun model() = AIChatModel(
         id = "model", name = "Model", displayName = "Model", shortName = "Model",
         accessTier = emptyList(), isAccessible = true, supportsImageUpload = true,
         supportedFileTypes = listOf("application/pdf"), supportedTools = listOf(Tool.IMAGE_GENERATION),
     )
+
+    private companion object {
+        const val NEW_CHAT_URL = "https://duck.ai/chat?duckai=5"
+        const val VOICE_MODE_URL = "https://duck.ai/?mode=voice-mode"
+    }
 }
