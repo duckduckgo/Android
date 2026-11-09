@@ -19,6 +19,7 @@ package com.duckduckgo.adblocking.impl.sponsorblock
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -43,6 +44,10 @@ interface SponsorBlock {
      * or the lookup fails.
      */
     suspend fun getSegments(videoId: String): List<SponsorBlockSegment>
+
+    fun modeFlow(): Flow<SponsorBlockMode>
+
+    suspend fun setMode(mode: SponsorBlockMode)
 }
 
 @ContributesBinding(AppScope::class)
@@ -70,6 +75,12 @@ class RealSponsorBlock @Inject constructor(
             logcat(WARN) { "SponsorBlock: segments lookup failed: ${e.javaClass.simpleName}" }
             emptyList()
         }
+    }
+
+    override fun modeFlow(): Flow<SponsorBlockMode> = userPreferences.modeFlow()
+
+    override suspend fun setMode(mode: SponsorBlockMode) {
+        userPreferences.setMode(mode)
     }
 
     private fun isEnabled(): Boolean = sponsorBlockFeature.mvpEnabled().isEnabled()

@@ -33,9 +33,9 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlock
 import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockFeature
 import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockUserPreferences
 import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
@@ -65,7 +65,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
     duckPlayer: DuckPlayer,
     duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider,
     sponsorBlockFeature: SponsorBlockFeature,
-    private val sponsorBlockUserPreferences: SponsorBlockUserPreferences,
+    private val sponsorBlock: SponsorBlock,
 ) : ViewModel() {
 
     init {
@@ -97,7 +97,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     private val sponsorBlockModeFlow: Flow<SponsorBlockMode?> = combine(
         sponsorBlockFeature.mvpEnabled().enabled(),
-        sponsorBlockUserPreferences.modeFlow(),
+        sponsorBlock.modeFlow(),
     ) { mvpEnabled, mode -> mode.takeIf { mvpEnabled } }
 
     val viewState: StateFlow<ViewState> = combine(
@@ -161,13 +161,13 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     fun onSponsorBlockModeClicked() {
         viewModelScope.launch {
-            commandChannel.send(ShowSponsorBlockModeDialog(sponsorBlockUserPreferences.modeFlow().first()))
+            commandChannel.send(ShowSponsorBlockModeDialog(sponsorBlock.modeFlow().first()))
         }
     }
 
     fun onSponsorBlockModeSelected(mode: SponsorBlockMode) {
         viewModelScope.launch {
-            sponsorBlockUserPreferences.setMode(mode)
+            sponsorBlock.setMode(mode)
         }
     }
 

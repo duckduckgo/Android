@@ -31,9 +31,11 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlock
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockConfig
 import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockFeature
 import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockUserPreferences
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockSegment
 import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -81,7 +83,7 @@ class AdBlockingSettingsViewModelTest {
         .ioDispatcher(coroutineRule.testDispatcher)
         .build()
         .create(SponsorBlockFeature::class.java)
-    private val sponsorBlockUserPreferences = FakeSponsorBlockUserPreferences()
+    private val sponsorBlock = FakeSponsorBlock()
 
     private fun createViewModel(
         duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
@@ -98,7 +100,7 @@ class AdBlockingSettingsViewModelTest {
             duckPlayer,
             duckPlayerSettingsPlacementProvider,
             sponsorBlockFeature,
-            sponsorBlockUserPreferences,
+            sponsorBlock,
         )
     }
 
@@ -310,7 +312,7 @@ class AdBlockingSettingsViewModelTest {
     fun whenSponsorBlockEnabledThenShowsStoredSponsorBlockMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
         setSponsorBlockEnabled(true)
-        sponsorBlockUserPreferences.mode.value = SponsorBlockMode.ALWAYS_SKIP
+        sponsorBlock.mode.value = SponsorBlockMode.ALWAYS_SKIP
 
         createViewModel().viewState.test {
             assertEquals(SponsorBlockMode.ALWAYS_SKIP, expectMostRecentItem().sponsorBlockMode)
@@ -320,7 +322,7 @@ class AdBlockingSettingsViewModelTest {
     @Test
     fun whenSponsorBlockModeClickedThenShowsDialogWithCurrentMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        sponsorBlockUserPreferences.mode.value = SponsorBlockMode.OFF
+        sponsorBlock.mode.value = SponsorBlockMode.OFF
         val viewModel = createViewModel()
 
         viewModel.commands.test {
@@ -335,14 +337,15 @@ class AdBlockingSettingsViewModelTest {
 
         createViewModel().onSponsorBlockModeSelected(SponsorBlockMode.ALWAYS_SKIP)
 
-        assertEquals(SponsorBlockMode.ALWAYS_SKIP, sponsorBlockUserPreferences.mode.value)
+        assertEquals(SponsorBlockMode.ALWAYS_SKIP, sponsorBlock.mode.value)
     }
 
-    private class FakeSponsorBlockUserPreferences : SponsorBlockUserPreferences {
+    private class FakeSponsorBlock : SponsorBlock {
         val mode = MutableStateFlow(SponsorBlockMode.ALWAYS_ASK)
 
+        override fun config(): SponsorBlockConfig = throw UnsupportedOperationException()
+        override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> = throw UnsupportedOperationException()
         override fun modeFlow(): Flow<SponsorBlockMode> = mode
-        override fun cachedMode(): SponsorBlockMode = mode.value
         override suspend fun setMode(mode: SponsorBlockMode) {
             this.mode.value = mode
         }
