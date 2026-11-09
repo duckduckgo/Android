@@ -22,14 +22,9 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace "com.duckduckgo.promptscoordinator.api"
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
