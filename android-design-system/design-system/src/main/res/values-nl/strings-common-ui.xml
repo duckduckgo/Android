@@ -33,6 +33,7 @@
     <string name="undo">Ongedaan maken</string>
     <string name="cancel">Annuleren</string>
     <string name="done">Klaar</string>
+    <string name="search">Zoeken</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Altijd aan</string>

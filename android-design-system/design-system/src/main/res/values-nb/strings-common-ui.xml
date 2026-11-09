@@ -33,6 +33,7 @@
     <string name="undo">Angre</string>
     <string name="cancel">Avbryt</string>
     <string name="done">Ferdig</string>
+    <string name="search">Søk</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Alltid på</string>

@@ -33,6 +33,7 @@
     <string name="undo">Zrušiť zmenu</string>
     <string name="cancel">Zrušiť</string>
     <string name="done">Hotovo</string>
+    <string name="search">Vyhľadávať</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Vždy zapnuté</string>

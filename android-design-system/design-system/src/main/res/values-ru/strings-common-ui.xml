@@ -33,6 +33,7 @@
     <string name="undo">Отменить</string>
     <string name="cancel">Отменить</string>
     <string name="done">Готово</string>
+    <string name="search">Поиск</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Всегда включено</string>

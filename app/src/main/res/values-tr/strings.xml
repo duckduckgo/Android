@@ -25,7 +25,6 @@
     <string name="no">Hayır</string>
     <string name="open">Aç</string>
     <string name="cancel">Vazgeç</string>
-    <string name="search">Arama yap</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Sohbet silindi</string>
