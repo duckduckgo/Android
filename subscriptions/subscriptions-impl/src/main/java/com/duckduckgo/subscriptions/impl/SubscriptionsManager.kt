@@ -55,6 +55,7 @@ import com.duckduckgo.subscriptions.impl.auth.ResponseErrorCode
 import com.duckduckgo.subscriptions.impl.auth.TokenPair
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationException
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
+import com.duckduckgo.subscriptions.impl.billing.BillingFlowType
 import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
@@ -346,9 +347,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private var experimentsAssigned = PurchaseExperiments()
 
-    private var isPlanSwitchPending: Boolean = false
-
-    private var isCancellationUndoPending: Boolean = false
+    private var pendingBillingFlow = BillingFlowType.PURCHASE
 
     override suspend fun isSignedIn(): Boolean {
         return isSignedInV1() || isSignedInV2()
@@ -393,15 +392,11 @@ class RealSubscriptionsManager @Inject constructor(
             playBillingManager.purchaseState.collect {
                 when (it) {
                     is PurchaseState.Purchased -> {
-                        subscriptionPurchaseWideEvent.onBillingFlowPurchaseSuccess()
-                        subscriptionSwitchWideEvent.onPlayBillingSwitchSuccess()
+                        reportBillingFlowPurchased(pendingBillingFlow)
                         checkPurchase(it.packageName, it.purchaseToken)
                     }
                     is PurchaseState.Canceled -> {
-                        isPlanSwitchPending = false
-                        isCancellationUndoPending = false
-                        subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
-                        subscriptionSwitchWideEvent.onUserCancelled()
+                        reportBillingFlowCancelled(consumePendingBillingFlow())
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
                         if (removeExpiredSubscriptionOnCancelledPurchase) {
                             if (subscriptionStatus().isExpired()) {
@@ -412,10 +407,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     is PurchaseState.Failure -> {
-                        isPlanSwitchPending = false
-                        isCancellationUndoPending = false
-                        subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(it.errorType)
-                        subscriptionSwitchWideEvent.onSwitchFailed(it.errorType)
+                        reportBillingFlowFailed(consumePendingBillingFlow(), it.errorType)
                         _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
                     }
 
@@ -506,8 +498,7 @@ class RealSubscriptionsManager @Inject constructor(
 
             subscriptionSwitchWideEvent.onTargetPlanRetrieved()
 
-            isPlanSwitchPending = true
-            isCancellationUndoPending = false
+            pendingBillingFlow = BillingFlowType.PLAN_SWITCH
 
             // Launch Google Play billing flow for subscription update
             logcat { "Subs: Launching subscription update flow for plan: $planId" }
@@ -526,7 +517,7 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             val error = extractError(e)
             logcat(ERROR) { "Subs: Failed to switch subscription plan: $error" }
-            isPlanSwitchPending = false
+            pendingBillingFlow = BillingFlowType.PURCHASE
             _currentPurchaseState.emit(CurrentPurchase.Failure("Failed to switch subscription plan: $error"))
             subscriptionSwitchWideEvent.onSwitchFailed(javaClass.simpleName)
         }
@@ -558,21 +549,19 @@ class RealSubscriptionsManager @Inject constructor(
             }
 
             pendingOnboardingEnrollmentIsFreeTrial = null
-            isPlanSwitchPending = false
-            isCancellationUndoPending = true
+            pendingBillingFlow = BillingFlowType.CANCELLATION_UNDO
 
             withContext(dispatcherProvider.main()) {
-                playBillingManager.launchBillingFlow(
+                playBillingManager.launchCancellationUndoFlow(
                     activity = activity,
                     planId = subscription.productId,
                     externalId = account.externalId,
-                    offerId = null,
                 )
             }
             UndoCancellationResult.Launched
         } catch (e: Exception) {
             logcat(ERROR) { "Subs: Failed to undo cancellation: ${extractError(e)}" }
-            isCancellationUndoPending = false
+            pendingBillingFlow = BillingFlowType.PURCHASE
             UndoCancellationResult.NotEligible
         }
     }
@@ -706,28 +695,21 @@ class RealSubscriptionsManager @Inject constructor(
 
             if (subscription.isActive()) {
                 val isFreeTrial = subscription.activeOffers.contains(ActiveOfferType.TRIAL)
-                val isPlanSwitch = isPlanSwitchPending
-                isPlanSwitchPending = false
-                val isCancellationUndo = isCancellationUndoPending
-                isCancellationUndoPending = false
-                when {
-                    isPlanSwitch -> pixelSender.reportSubscriptionSwitch()
-                    isCancellationUndo -> Unit
-                    else -> {
-                        pixelSender.reportPurchaseSuccess(isFreeTrial)
-                        pixelSender.reportSubscriptionActivated()
-                    }
-                }
+                val billingFlow = consumePendingBillingFlow()
+                val isCancellationUndo = billingFlow == BillingFlowType.CANCELLATION_UNDO
+                reportBillingFlowConfirmed(billingFlow, isFreeTrial)
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(
-                    CurrentPurchase.Success(isFreeTrial, isPlanSwitch = isPlanSwitch, isCancellationUndo = isCancellationUndo),
+                    CurrentPurchase.Success(
+                        isFreeTrial = isFreeTrial,
+                        isPlanSwitch = billingFlow == BillingFlowType.PLAN_SWITCH,
+                        isCancellationUndo = isCancellationUndo,
+                    ),
                 )
                 if (!isCancellationUndo) {
                     authRepository.registerLocalPurchasedAt()
                 }
 
-                subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
-                subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
                 if (isFreeTrial && !isCancellationUndo) {
                     freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
                     if (subscriptionsFeature.value.vpnReminderNotification().isEnabled()) {
@@ -751,7 +733,7 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseToken: String,
     ): ConfirmationBody {
         val body = ConfirmationBody(packageName = packageName, purchaseToken = purchaseToken)
-        if (isCancellationUndoPending) return body
+        if (pendingBillingFlow == BillingFlowType.CANCELLATION_UNDO) return body
         return try {
             if (subscriptionsFeature.value.subscriptionConcurrentExperiments().isEnabled()) {
                 body.copy(experiments = buildExperimentsToReport())
@@ -799,12 +781,64 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun handlePurchaseFailed() {
-        isPlanSwitchPending = false
-        isCancellationUndoPending = false
-        authRepository.purchaseToWaitingStatus()
-        pixelSender.reportPurchaseFailureBackend()
+        val billingFlow = consumePendingBillingFlow()
+        // The subscription is still active, so keep its status
+        if (billingFlow != BillingFlowType.CANCELLATION_UNDO) {
+            authRepository.purchaseToWaitingStatus()
+        }
+        if (billingFlow == BillingFlowType.PURCHASE) {
+            pixelSender.reportPurchaseFailureBackend()
+        }
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
         _subscriptionStatus.emit(authRepository.getStatus())
+    }
+
+    private fun consumePendingBillingFlow(): BillingFlowType =
+        pendingBillingFlow.also { pendingBillingFlow = BillingFlowType.PURCHASE }
+
+    private suspend fun reportBillingFlowPurchased(billingFlow: BillingFlowType) {
+        when (billingFlow) {
+            BillingFlowType.PURCHASE -> subscriptionPurchaseWideEvent.onBillingFlowPurchaseSuccess()
+            BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onPlayBillingSwitchSuccess()
+            BillingFlowType.CANCELLATION_UNDO -> Unit
+        }
+    }
+
+    private suspend fun reportBillingFlowCancelled(billingFlow: BillingFlowType) {
+        when (billingFlow) {
+            BillingFlowType.PURCHASE -> subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
+            BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onUserCancelled()
+            BillingFlowType.CANCELLATION_UNDO -> Unit
+        }
+    }
+
+    private suspend fun reportBillingFlowFailed(
+        billingFlow: BillingFlowType,
+        error: String,
+    ) {
+        when (billingFlow) {
+            BillingFlowType.PURCHASE -> subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(error)
+            BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onSwitchFailed(error)
+            BillingFlowType.CANCELLATION_UNDO -> Unit
+        }
+    }
+
+    private suspend fun reportBillingFlowConfirmed(
+        billingFlow: BillingFlowType,
+        isFreeTrial: Boolean,
+    ) {
+        when (billingFlow) {
+            BillingFlowType.PURCHASE -> {
+                pixelSender.reportPurchaseSuccess(isFreeTrial)
+                pixelSender.reportSubscriptionActivated()
+                subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
+            }
+            BillingFlowType.PLAN_SWITCH -> {
+                pixelSender.reportSubscriptionSwitch()
+                subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
+            }
+            BillingFlowType.CANCELLATION_UNDO -> Unit
+        }
     }
 
     override suspend fun subscriptionStatus(): SubscriptionStatus {
@@ -1236,8 +1270,7 @@ class RealSubscriptionsManager @Inject constructor(
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
 
-            isPlanSwitchPending = false
-            isCancellationUndoPending = false
+            pendingBillingFlow = BillingFlowType.PURCHASE
             pendingOnboardingEnrollmentIsFreeTrial = offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
 
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted(

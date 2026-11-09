@@ -86,6 +86,15 @@ interface PlayBillingManager {
     )
 
     /**
+     * Launches the billing flow to buy the current plan again, without purchase metrics
+     */
+    suspend fun launchCancellationUndoFlow(
+        activity: Activity,
+        planId: String,
+        externalId: String,
+    )
+
+    /**
      * Launches the subscription update flow
      *
      * It is safe to call this method without specifying dispatcher as it's handled internally
@@ -128,6 +137,7 @@ class RealPlayBillingManager @Inject constructor(
     private val connectionMutex = Mutex()
     private var connectionJob: Job? = null
     private var billingFlowInProgress = false
+    private var currentFlowType = BillingFlowType.PURCHASE
 
     // PurchaseState
     private val _purchaseState = MutableSharedFlow<PurchaseState>()
@@ -213,7 +223,22 @@ class RealPlayBillingManager @Inject constructor(
         planId: String,
         externalId: String,
         offerId: String?,
+    ) = launchPurchaseFlow(activity, planId, externalId, offerId, BillingFlowType.PURCHASE)
+
+    override suspend fun launchCancellationUndoFlow(
+        activity: Activity,
+        planId: String,
+        externalId: String,
+    ) = launchPurchaseFlow(activity, planId, externalId, offerId = null, BillingFlowType.CANCELLATION_UNDO)
+
+    private suspend fun launchPurchaseFlow(
+        activity: Activity,
+        planId: String,
+        externalId: String,
+        offerId: String?,
+        flowType: BillingFlowType,
     ) = withContext(dispatcherProvider.io()) {
+        currentFlowType = flowType
         if (!billingClient.ready) {
             logcat { "Service not ready" }
             connect()
@@ -234,18 +259,20 @@ class RealPlayBillingManager @Inject constructor(
                 productDetails == null -> BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND
                 else -> BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND
             }
-            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
-                error = error,
-                failureContext = BillingFlowInitFailureContext(
-                    reason = reason,
-                    requestedProductId = subscriptionProduct,
-                    requestedPlanId = planId,
-                    requestedOfferId = offerId,
-                    loadedProductIds = products.map { it.productId },
-                    billingClientReady = billingClient.ready,
-                    lastLoadProductsOutcome = lastLoadProductsOutcome,
-                ),
-            )
+            if (flowType == BillingFlowType.PURCHASE) {
+                subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                    error = error,
+                    failureContext = BillingFlowInitFailureContext(
+                        reason = reason,
+                        requestedProductId = subscriptionProduct,
+                        requestedPlanId = planId,
+                        requestedOfferId = offerId,
+                        loadedProductIds = products.map { it.productId },
+                        billingClientReady = billingClient.ready,
+                        lastLoadProductsOutcome = lastLoadProductsOutcome,
+                    ),
+                )
+            }
             _purchaseState.emit(PurchaseState.Failure(error))
             return@withContext
         }
@@ -259,14 +286,18 @@ class RealPlayBillingManager @Inject constructor(
 
         when (launchBillingFlowResult) {
             LaunchBillingFlowResult.Success -> {
-                subscriptionPurchaseWideEvent.onBillingFlowInitSuccess()
+                if (flowType == BillingFlowType.PURCHASE) {
+                    subscriptionPurchaseWideEvent.onBillingFlowInitSuccess()
+                }
                 _purchaseState.emit(InProgress)
                 billingFlowInProgress = true
             }
 
             is LaunchBillingFlowResult.Failure -> {
                 val error = "Billing error: ${launchBillingFlowResult.error.name}"
-                subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error)
+                if (flowType == BillingFlowType.PURCHASE) {
+                    subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error)
+                }
                 _purchaseState.emit(PurchaseState.Failure(error))
             }
         }
@@ -280,6 +311,7 @@ class RealPlayBillingManager @Inject constructor(
         oldPurchaseToken: String,
         replacementMode: SubscriptionReplacementMode,
     ) = withContext(dispatcherProvider.io()) {
+        currentFlowType = BillingFlowType.PLAN_SWITCH
         if (!billingClient.ready) {
             logcat { "Service not ready" }
             connect()
@@ -336,6 +368,8 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     private fun onPurchasesUpdated(result: PurchasesUpdateResult) {
+        val flowType = currentFlowType
+        currentFlowType = BillingFlowType.PURCHASE
         coroutineScope.launch {
             when (result) {
                 is PurchasePresent -> {
@@ -354,7 +388,9 @@ class RealPlayBillingManager @Inject constructor(
                 }
 
                 is PurchasesUpdateResult.Failure -> {
-                    pixelSender.reportPurchaseFailureStore(result.errorType)
+                    if (flowType == BillingFlowType.PURCHASE) {
+                        pixelSender.reportPurchaseFailureStore(result.errorType)
+                    }
                     _purchaseState.emit(PurchaseState.Failure(result.errorType))
                 }
             }
@@ -460,4 +496,13 @@ sealed class PurchaseState {
 
     data object Canceled : PurchaseState()
     data class Failure(val errorType: String) : PurchaseState()
+}
+
+/**
+ * The kind of billing flow, so each one only reports its own metrics
+ */
+enum class BillingFlowType {
+    PURCHASE,
+    PLAN_SWITCH,
+    CANCELLATION_UNDO,
 }

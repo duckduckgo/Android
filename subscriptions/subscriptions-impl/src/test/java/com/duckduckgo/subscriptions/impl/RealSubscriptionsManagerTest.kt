@@ -2955,6 +2955,56 @@ class RealSubscriptionsManagerTest {
             verify(pixelSender).reportSubscriptionSwitch()
             verify(pixelSender, never()).reportPurchaseSuccess(any())
             verify(pixelSender, never()).reportSubscriptionActivated()
+            verify(subscriptionSwitchWideEvent).onPlayBillingSwitchSuccess()
+            verify(subscriptionSwitchWideEvent).onSwitchConfirmationSuccess()
+            verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseSuccess()
+            verify(subscriptionPurchaseWideEvent, never()).onPurchaseConfirmationSuccess()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanFailsThenDoesNotReportPurchaseWideEvent() = runTest {
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Failure("error"))
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(subscriptionSwitchWideEvent).onSwitchFailed("error")
+            verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseFailure(any())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanCancelledThenDoesNotReportPurchaseWideEvent() = runTest {
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+
+            verify(subscriptionSwitchWideEvent).onUserCancelled()
+            verify(subscriptionPurchaseWideEvent, never()).onPurchaseCancelledByUser()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanConfirmFailsThenDoesNotReportPurchaseFailure() = runTest {
+        givenConfirmPurchaseFails()
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+
+            verify(pixelSender, never()).reportPurchaseFailureBackend()
 
             cancelAndConsumeRemainingEvents()
         }
@@ -2969,7 +3019,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any())
     }
 
     @Test
@@ -2982,7 +3032,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any())
     }
 
     @Test
@@ -2995,7 +3045,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any())
     }
 
     @Test
@@ -3008,7 +3058,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any())
     }
 
     @Test
@@ -3021,7 +3071,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any())
     }
 
     @Test
@@ -3034,7 +3084,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any())
     }
 
     @Test
@@ -3047,12 +3097,12 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.Launched, result)
-        verify(playBillingManager).launchBillingFlow(
+        verify(playBillingManager).launchCancellationUndoFlow(
             activity = any(),
             planId = eq(MONTHLY_PLAN_US),
             externalId = eq("1234"),
-            offerId = isNull(),
         )
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -3078,6 +3128,10 @@ class RealSubscriptionsManagerTest {
             verify(pixelSender, never()).reportPurchaseSuccess(any())
             verify(pixelSender, never()).reportSubscriptionActivated()
             verify(pixelSender, never()).reportSubscriptionSwitch()
+            verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseSuccess()
+            verify(subscriptionPurchaseWideEvent, never()).onPurchaseConfirmationSuccess()
+            verify(subscriptionSwitchWideEvent, never()).onPlayBillingSwitchSuccess()
+            verify(subscriptionSwitchWideEvent, never()).onSwitchConfirmationSuccess()
             assertEquals(localPurchasedAt, authRepository.getLocalPurchasedAt())
 
             cancelAndConsumeRemainingEvents()
@@ -3110,6 +3164,77 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenUndoCancellationFailsThenDoesNotReportPurchaseOrSwitchWideEvents() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Failure("error"))
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseFailure(any())
+            verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUndoCancellationCancelledThenDoesNotReportPurchaseOrSwitchWideEvents() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+
+            verify(subscriptionPurchaseWideEvent, never()).onPurchaseCancelledByUser()
+            verify(subscriptionSwitchWideEvent, never()).onUserCancelled()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUndoCancellationConfirmFailsThenKeepsStatusAndDoesNotReportPurchaseFailure() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+        givenConfirmPurchaseFails()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+
+            assertEquals(NOT_AUTO_RENEWABLE, authRepository.getSubscription()?.status)
+            verify(pixelSender, never()).reportPurchaseFailureBackend()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenPurchaseConfirmedThenDoesNotReportSwitch() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
@@ -3132,6 +3257,10 @@ class RealSubscriptionsManagerTest {
             verify(pixelSender, never()).reportSubscriptionSwitch()
             verify(pixelSender).reportPurchaseSuccess(isFreeTrial = false)
             verify(pixelSender).reportSubscriptionActivated()
+            verify(subscriptionPurchaseWideEvent).onBillingFlowPurchaseSuccess()
+            verify(subscriptionPurchaseWideEvent).onPurchaseConfirmationSuccess()
+            verify(subscriptionSwitchWideEvent, never()).onPlayBillingSwitchSuccess()
+            verify(subscriptionSwitchWideEvent, never()).onSwitchConfirmationSuccess()
 
             cancelAndConsumeRemainingEvents()
         }
@@ -3314,6 +3443,28 @@ class RealSubscriptionsManagerTest {
     @SuppressLint("DenyListedApi")
     private fun givenUndoSubscriptionCancellationEnabled(value: Boolean) {
         subscriptionsFeature.undoSubscriptionCancellation().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    private suspend fun givenPlanSwitchStarted(): MutableSharedFlow<PurchaseState> {
+        givenUserIsSignedIn()
+        givenActiveSubscription(productId = MONTHLY_PLAN_US)
+        givenPurchaseStored()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(Account("test@test.com", "1234"))
+        authRepository.setFeatures(MONTHLY_PRO_PLAN_US, setOf(NETP))
+        givenAllowProTierPurchase(true)
+        givenPlansAvailable(MONTHLY_PRO_PLAN_US)
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = MONTHLY_PRO_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+        )
+        return purchaseStateFlow
     }
 
     private suspend fun givenCancelledGoogleSubscription(
