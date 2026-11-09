@@ -48,7 +48,7 @@ kotlin {
 
 androidComponents {
     beforeVariants(selector().all()) { variant ->
-        variant.enable = variant.buildType in ["release", "nonMinifiedRelease", "benchmarkRelease"]
+        variant.enable = variant.buildType in ["release", "nonMinifiedRelease"]
     }
 }
 
