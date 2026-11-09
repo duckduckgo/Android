@@ -33,9 +33,13 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockFeature
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockUserPreferences
 import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
+import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.ShowSponsorBlockModeDialog
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
@@ -45,6 +49,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -59,6 +64,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     duckPlayer: DuckPlayer,
     duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider,
+    sponsorBlockFeature: SponsorBlockFeature,
+    private val sponsorBlockUserPreferences: SponsorBlockUserPreferences,
 ) : ViewModel() {
 
     init {
@@ -73,6 +80,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
         val duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
         val isContingencyMode: Boolean = false,
         val duckPlayerSection: DuckPlayerSection = DuckPlayerSection.None,
+        val sponsorBlockMode: SponsorBlockMode? = null,
     )
 
     sealed interface DuckPlayerSection {
@@ -84,14 +92,21 @@ class AdBlockingSettingsViewModel @Inject constructor(
     sealed class Command {
         data class OpenLearnMore(val url: String) : Command()
         data object OpenDuckPlayerSettings : Command()
+        data class ShowSponsorBlockModeDialog(val mode: SponsorBlockMode) : Command()
     }
+
+    private val sponsorBlockModeFlow: Flow<SponsorBlockMode?> = combine(
+        sponsorBlockFeature.mvpEnabled().enabled(),
+        sponsorBlockUserPreferences.modeFlow(),
+    ) { mvpEnabled, mode -> mode.takeIf { mvpEnabled } }
 
     val viewState: StateFlow<ViewState> = combine(
         statusChecker.observeState(),
         duckPlayer.observeUserPreferences(),
         feature.enableContingencyMode().enabled(),
         duckPlayerSettingsPlacementProvider.placementFlow(),
-    ) { state, duckPlayerPreferences, contingencyModeOn, duckPlayerSettingsPlacement ->
+        sponsorBlockModeFlow,
+    ) { state, duckPlayerPreferences, contingencyModeOn, duckPlayerSettingsPlacement, sponsorBlockMode ->
         ViewState(
             isEnabled = state is AdBlockingState.Enabled,
             disabledUntilRelaunch = state is AdBlockingState.Disabled.UntilRelaunch,
@@ -104,6 +119,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
                 DuckPlayerSettingsPlacement.Standalone -> DuckPlayerSection.Link
                 DuckPlayerSettingsPlacement.Hidden -> DuckPlayerSection.None
             },
+            sponsorBlockMode = sponsorBlockMode,
         )
     }
         .stateIn(
@@ -140,6 +156,18 @@ class AdBlockingSettingsViewModel @Inject constructor(
     fun onDuckPlayerClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenDuckPlayerSettings)
+        }
+    }
+
+    fun onSponsorBlockModeClicked() {
+        viewModelScope.launch {
+            commandChannel.send(ShowSponsorBlockModeDialog(sponsorBlockUserPreferences.modeFlow().first()))
+        }
+    }
+
+    fun onSponsorBlockModeSelected(mode: SponsorBlockMode) {
+        viewModelScope.launch {
+            sponsorBlockUserPreferences.setMode(mode)
         }
     }
 

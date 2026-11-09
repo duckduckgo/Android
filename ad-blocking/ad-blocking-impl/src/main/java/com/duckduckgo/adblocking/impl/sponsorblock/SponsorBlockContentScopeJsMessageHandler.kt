@@ -95,6 +95,7 @@ private const val CONFIG_CONTRACT_VERSION = 1
 internal fun SponsorBlockConfig.toJson(): JSONObject {
     val mode = when (skipMode) {
         SponsorBlockSkipMode.MANUAL -> "manual"
+        SponsorBlockSkipMode.AUTO -> "auto"
     }
     return JSONObject().put("enabled", enabled).put("skipMode", mode).put("version", CONFIG_CONTRACT_VERSION)
 }

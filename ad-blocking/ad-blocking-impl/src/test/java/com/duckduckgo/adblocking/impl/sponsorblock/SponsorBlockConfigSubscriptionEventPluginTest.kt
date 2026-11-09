@@ -45,6 +45,13 @@ class SponsorBlockConfigSubscriptionEventPluginTest {
     }
 
     @Test
+    fun whenAutoSkipModeThenSendsAuto() {
+        whenever(sponsorBlock.config()).thenReturn(SponsorBlockConfig(enabled = true, skipMode = SponsorBlockSkipMode.AUTO))
+
+        assertEquals("auto", plugin.getSubscriptionEventData().params.getString("skipMode"))
+    }
+
+    @Test
     fun whenDisabledThenSendsNotEnabled() {
         whenever(sponsorBlock.config()).thenReturn(SponsorBlockConfig(enabled = false, skipMode = SponsorBlockSkipMode.MANUAL))
 

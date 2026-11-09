@@ -19,12 +19,14 @@ package com.duckduckgo.adblocking.impl.sponsorblock
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
 enum class SponsorBlockSkipMode {
     MANUAL,
+    AUTO,
 }
 
 data class SponsorBlockConfig(
@@ -33,11 +35,12 @@ data class SponsorBlockConfig(
 )
 
 interface SponsorBlock {
+    /** Built from the cached user mode, so it can lag a mode change made just after launch; [getSegments] reads it from storage. */
     fun config(): SponsorBlockConfig
 
     /**
-     * Segments for [videoId], sorted by start. Empty when SponsorBlock is disabled, [videoId] is blank, or the lookup
-     * fails.
+     * Segments for [videoId], sorted by start. Empty when SponsorBlock is disabled or turned off by the user, [videoId] is blank,
+     * or the lookup fails.
      */
     suspend fun getSegments(videoId: String): List<SponsorBlockSegment>
 }
@@ -46,13 +49,19 @@ interface SponsorBlock {
 class RealSponsorBlock @Inject constructor(
     private val sponsorBlockFeature: SponsorBlockFeature,
     private val segmentsProvider: SponsorBlockSegmentsProvider,
+    private val userPreferences: SponsorBlockUserPreferences,
 ) : SponsorBlock {
 
-    // TODO: send the user's SponsorBlock settings (on/off, skip mode) once they exist; skipMode is fixed to manual for now.
-    override fun config(): SponsorBlockConfig = SponsorBlockConfig(enabled = isEnabled(), skipMode = SponsorBlockSkipMode.MANUAL)
+    override fun config(): SponsorBlockConfig {
+        val mode = userPreferences.cachedMode()
+        return SponsorBlockConfig(
+            enabled = isEnabled() && mode != SponsorBlockMode.OFF,
+            skipMode = if (mode == SponsorBlockMode.ALWAYS_SKIP) SponsorBlockSkipMode.AUTO else SponsorBlockSkipMode.MANUAL,
+        )
+    }
 
     override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
-        if (videoId.isBlank() || !isEnabled()) return emptyList()
+        if (videoId.isBlank() || !isEnabled() || userPreferences.modeFlow().first() == SponsorBlockMode.OFF) return emptyList()
         return try {
             segmentsProvider.getSegments(videoId).sortedBy { it.start }
         } catch (e: CancellationException) {

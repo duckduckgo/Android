@@ -21,6 +21,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -35,7 +37,8 @@ class RealSponsorBlockTest {
 
     private val feature = FakeFeatureToggleFactory.create(SponsorBlockFeature::class.java)
     private val segmentsProvider = FakeSegmentsProvider()
-    private val sponsorBlock = RealSponsorBlock(feature, segmentsProvider)
+    private val userPreferences = FakeUserPreferences()
+    private val sponsorBlock = RealSponsorBlock(feature, segmentsProvider, userPreferences)
 
     @Before
     fun setup() {
@@ -52,6 +55,28 @@ class RealSponsorBlockTest {
         setEnabled(false)
 
         assertFalse(sponsorBlock.config().enabled)
+    }
+
+    @Test
+    fun whenModeIsAlwaysSkipThenConfigIsEnabledWithAutoSkipMode() {
+        userPreferences.mode.value = SponsorBlockMode.ALWAYS_SKIP
+
+        assertEquals(SponsorBlockConfig(enabled = true, skipMode = SponsorBlockSkipMode.AUTO), sponsorBlock.config())
+    }
+
+    @Test
+    fun whenModeIsOffThenConfigIsNotEnabled() {
+        userPreferences.mode.value = SponsorBlockMode.OFF
+
+        assertFalse(sponsorBlock.config().enabled)
+    }
+
+    @Test
+    fun whenModeIsOffThenGetSegmentsReturnsEmptyWithoutLookup() = runTest {
+        userPreferences.mode.value = SponsorBlockMode.OFF
+
+        assertTrue(sponsorBlock.getSegments(VALID_ID).isEmpty())
+        assertTrue(segmentsProvider.requestedIds.isEmpty())
     }
 
     @Test
@@ -97,6 +122,16 @@ class RealSponsorBlockTest {
     private fun setEnabled(enabled: Boolean) {
         feature.self().setRawStoredState(State(enable = true))
         feature.mvpEnabled().setRawStoredState(State(enable = enabled))
+    }
+
+    private class FakeUserPreferences : SponsorBlockUserPreferences {
+        val mode = MutableStateFlow(SponsorBlockMode.ALWAYS_ASK)
+
+        override fun modeFlow(): Flow<SponsorBlockMode> = mode
+        override fun cachedMode(): SponsorBlockMode = mode.value
+        override suspend fun setMode(mode: SponsorBlockMode) {
+            this.mode.value = mode
+        }
     }
 
     private class FakeSegmentsProvider : SponsorBlockSegmentsProvider {
