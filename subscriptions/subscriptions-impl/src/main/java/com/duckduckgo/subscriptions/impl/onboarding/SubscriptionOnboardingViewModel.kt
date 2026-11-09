@@ -83,6 +83,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private var pendingHandoff: (() -> Unit)? = null
     private val handoffJob = ConflatedJob()
     private var lastShownStepId: String? = null
+    private val outcomeReportedStepIds = mutableSetOf<String>()
     private var freeTrial: Boolean? = null
 
     fun start() {
@@ -153,6 +154,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private suspend fun fireStepShown(stepId: String) {
         if (stepId == lastShownStepId) return
         lastShownStepId = stepId
+        outcomeReportedStepIds.remove(stepId)
         Step.fromStepId(stepId)?.let { pixelSender.reportOnboardingStepShown(it, isFreeTrial()) }
     }
 
@@ -161,6 +163,8 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         outcome: SubscriptionOnboardingStepOutcome,
     ) {
         val step = Step.fromStepId(stepId)?.takeIf { it.supportsOutcome } ?: return
+        // One outcome per impression, so repeated taps don't inflate the counts.
+        if (!outcomeReportedStepIds.add(stepId)) return
         when (outcome) {
             SubscriptionOnboardingStepOutcome.COMPLETED -> pixelSender.reportOnboardingStepCompleted(step, isFreeTrial())
             SubscriptionOnboardingStepOutcome.SKIPPED -> pixelSender.reportOnboardingStepSkipped(step, isFreeTrial())

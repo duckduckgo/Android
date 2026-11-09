@@ -52,6 +52,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -257,6 +258,55 @@ class SubscriptionOnboardingViewModelTest {
     }
 
     @Test
+    fun whenStepFinishedTwiceOnSameImpressionThenReportsOutcomePixelOnce() = runTest {
+        orchestrator.stateFlow.value = inProgressState(stepPlugin = stepPluginMock(stepId = "itr"))
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        controller.onStepFinished("itr", COMPLETED)
+        controller.onStepFinished("itr", COMPLETED)
+        advanceUntilIdle()
+
+        verify(pixelSender, times(1)).reportOnboardingStepCompleted(Step.IDTR, false)
+    }
+
+    @Test
+    fun whenStepSkippedThenCompletedOnSameImpressionThenReportsOnlyFirstOutcome() = runTest {
+        orchestrator.stateFlow.value = inProgressState(stepPlugin = stepPluginMock(stepId = "duck_ai"))
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        controller.onStepFinished("duck_ai", SKIPPED)
+        controller.onStepFinished("duck_ai", COMPLETED)
+        advanceUntilIdle()
+
+        verify(pixelSender).reportOnboardingStepSkipped(Step.DUCK_AI, false)
+        verify(pixelSender, never()).reportOnboardingStepCompleted(eq(Step.DUCK_AI), any())
+    }
+
+    @Test
+    fun whenStepShownAgainThenReportsOutcomePixelAgain() = runTest {
+        val stepPlugins = listOf(stepPluginMock(stepId = "vpn"), stepPluginMock(stepId = "itr"))
+        orchestrator.stateFlow.value = inProgressState(stepPlugins = stepPlugins, currentStepIndex = 0)
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+        controller.onStepFinished("vpn", SKIPPED)
+        advanceUntilIdle()
+
+        orchestrator.stateFlow.value = inProgressState(stepPlugins = stepPlugins, currentStepIndex = 1)
+        advanceUntilIdle()
+        orchestrator.stateFlow.value = inProgressState(stepPlugins = stepPlugins, currentStepIndex = 0)
+        advanceUntilIdle()
+        controller.onStepFinished("vpn", SKIPPED)
+        advanceUntilIdle()
+
+        verify(pixelSender, times(2)).reportOnboardingStepSkipped(Step.VPN, false)
+    }
+
+    @Test
     fun whenStepFinishedWithHandoffThenHandoffStateIsSet() = runTest {
         orchestrator.stateFlow.value = inProgressState()
         val testee = createViewModel()
@@ -394,21 +444,23 @@ class SubscriptionOnboardingViewModelTest {
     private fun inProgressState(
         canGoBack: Boolean = false,
         stepPlugin: SubscriptionOnboardingStepPlugin = stepPluginMock(),
+        stepPlugins: List<SubscriptionOnboardingStepPlugin> = listOf(stepPlugin),
+        currentStepIndex: Int = 0,
     ): InProgress {
         val plan = LinearOnboardingPlan(
             id = SUBSCRIPTION_ONBOARDING_PLAN_ID,
-            steps = listOf(
+            steps = stepPlugins.map { plugin ->
                 SubscriptionOnboardingActivityStep(
-                    id = "welcome",
+                    id = plugin.stepId,
                     transition = { LinearOnboardingTransition.Stay },
-                    stepPlugin = stepPlugin,
-                ),
-            ),
+                    stepPlugin = plugin,
+                )
+            },
         )
         return InProgress(
             rootPlanId = SUBSCRIPTION_ONBOARDING_PLAN_ID,
             currentPlan = plan,
-            currentStepIndex = 0,
+            currentStepIndex = currentStepIndex,
             canGoBack = canGoBack,
         )
     }
