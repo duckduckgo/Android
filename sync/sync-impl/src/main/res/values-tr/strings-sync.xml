@@ -480,9 +480,54 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Parolalarına mobilde ve Masaüstünde eriş.</string>
+    <string name="sync_passwords_import_promo_title_label">Şifrelerinize mobil ve masaüstü cihazlarda erişin.</string>
     <string name="sync_passwords_import_promo_primary_button">Sync &amp; Backup\'ı aç</string>
+    <string name="sync_passwords_import_promo_title_toggle">Şifrelerinizi mobil ve masaüstü cihazlarda senkronize edin ve yedekleyin.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Yer işaretlerine Mobilde ve Masaüstünde eriş.</string>
+    <string name="sync_bookmarks_import_promo_title_label">Yer işaretlerinize mobil ve masaüstü cihazlarda erişin.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Sync &amp; Backup\'ı aç</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Yer işaretlerinizi mobil ve masaüstü cihazlarda senkronize edin ve yedekleyin.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Yer İşaretlerinizi Senkronize Edin ve Yedekleyin</string>
+    <string name="sync_bookmarks_promo_message">Uçtan uca şifrelenmiş. Yer işaretlerinizi kimse göremez. Biz bile.</string>
+    <string name="sync_bookmarks_promo_primary_button">Sync &amp; Backup\'ı aç</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Yer işaretleriniz masaüstü uygulamanızla da senkronize edilsin mi?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Bağlan</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Uygulamayı İndir</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Sync &amp; Back Up Yer İşaretleri</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Diğer seçenekler</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Gizle</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Sync &amp; Backup\'ı aç</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Masaüstü Uygulamasıyla Senkronize Et</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Diğer seçenekler</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Gizle</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Masaüstü ile Senkronize Et</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Masaüstü Uygulamasını İndir</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Masaüstü Uygulamanı senkronize edelim!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Masaüstü ile Senkronize Et</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Masaüstü Uygulamam Yok</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Şifreleri Senkronize Et ve Yedekle</string>
+    <string name="sync_passwords_promo_message">Uçtan uca şifreleme, şifrelerinizi sizden başka hiç kimsenin, hatta bizim bile göremeyeceğimiz anlamına gelir.</string>
+    <string name="sync_passwords_promo_primary_button">Sync &amp; Backup\'ı aç</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Şifreler masaüstü uygulamanızla da senkronize edilsin mi?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Bağlan</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Uygulamayı İndir</string>
+
 </resources>
