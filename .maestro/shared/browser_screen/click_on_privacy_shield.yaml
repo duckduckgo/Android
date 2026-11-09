@@ -18,5 +18,9 @@ appId: com.duckduckgo.mobile.android
       commands:
           - assertVisible:
                 id: "shieldIcon"
+          # A page that blocks trackers plays the trackers, cookies and ad blocking animations over the omnibar for a few seconds.
+          # A tap during them lands on the address bar instead of the shield, and the dashboard never opens.
+          - waitForAnimationToEnd:
+                timeout: 10000
           - tapOn:
                 id: "shieldIconPulseAnimationContainer"
