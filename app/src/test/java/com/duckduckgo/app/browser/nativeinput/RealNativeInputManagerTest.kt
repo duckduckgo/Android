@@ -57,7 +57,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
@@ -111,7 +110,6 @@ class RealNativeInputManagerTest {
         override suspend fun create(context: Context, tabId: String): View = View(context)
     }
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
-    private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val layoutResources: Resources = spy(context.resources)
@@ -131,7 +129,6 @@ class RealNativeInputManagerTest {
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
         whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(MutableStateFlow(false))
-        nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = true))
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -142,7 +139,6 @@ class RealNativeInputManagerTest {
             duckChatInputModeState,
             pixel,
             nativeInputStateBugKillSwitch,
-            nativeInputUrlClearingFeature,
             nativeInputEventListener,
             edgeToEdgeHandler,
             duckAiChatStore,
@@ -1014,15 +1010,6 @@ class RealNativeInputManagerTest {
         input.switchToDuckAi()
 
         assertEquals("", input.text)
-    }
-
-    @Test
-    fun whenUrlClearingKillSwitchDisabledThenInputNotCleared() {
-        nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = false))
-        val input = givenUrlCachingBound(text = URL)
-        input.switchToDuckAi()
-
-        assertEquals(URL, input.text)
     }
 
     @Test
