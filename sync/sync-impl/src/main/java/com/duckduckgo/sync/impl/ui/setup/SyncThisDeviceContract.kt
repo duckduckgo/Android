@@ -39,7 +39,6 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
             context = context,
             launchSource = input.launchSource,
             isAuthRequired = input.isAuthRequired,
-            isImprovedSyncFlow = input.isImprovedSyncFlow,
         )
     }
 
@@ -65,7 +64,6 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
     data class Input(
         val launchSource: SyncLaunchSource,
         val isAuthRequired: Boolean,
-        val isImprovedSyncFlow: Boolean,
     )
 
     sealed interface Output {

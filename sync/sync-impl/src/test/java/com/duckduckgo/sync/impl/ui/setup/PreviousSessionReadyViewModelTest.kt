@@ -55,11 +55,8 @@ class PreviousSessionReadyViewModelTest {
     private val syncPixels = mock<SyncPixels>()
     private val syncSetupWideEvent = mock<SyncSetupWideEvent>()
 
-    private val testee = createTestee(isAuthRequired = true)
-
-    private fun createTestee(isAuthRequired: Boolean) = PreviousSessionReadyViewModel(
+    private val testee = PreviousSessionReadyViewModel(
         "sync_backup",
-        isAuthRequired,
         syncAutoRestoreManager,
         deviceAuthenticator,
         syncPixels,
@@ -166,36 +163,6 @@ class PreviousSessionReadyViewModelTest {
     }
 
     @Test
-    fun `when auth is not required and resume is clicked then the user is not asked to authenticate`() = runTest {
-        whenever(syncAutoRestoreManager.retrieveRecoveryPayload()).thenReturn(restorePayload)
-        val testee = createTestee(isAuthRequired = false)
-
-        testee.commands.test {
-            testee.onResumeClicked()
-            skipItems(2)
-
-            assertTrue(deviceAuthenticator.requests.isEmpty())
-
-            cancel()
-        }
-    }
-
-    @Test
-    fun `when auth is not required and continue setup is clicked then the user is not asked to authenticate`() = runTest {
-        val testee = createTestee(isAuthRequired = false)
-
-        testee.commands.test {
-            testee.onContinueSetupClicked()
-            skipItems(2)
-
-            assertTrue(deviceAuthenticator.requests.isEmpty())
-            verify(syncSetupWideEvent, never()).onUserAuthSuccess()
-
-            cancel()
-        }
-    }
-
-    @Test
     fun `when the user dismisses verification on resume then the restore does not start`() = runTest {
         deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
 
@@ -289,7 +256,6 @@ class PreviousSessionReadyViewModelTest {
 
         testee.onContinueSetupClicked()
 
-        verify(syncSetupWideEvent, never()).onUserAuthCancelled()
         verify(syncSetupWideEvent, never()).onUserAuthSuccess()
     }
 
@@ -301,7 +267,6 @@ class PreviousSessionReadyViewModelTest {
             testee.onContinueSetupClicked()
             skipItems(1)
 
-            verify(syncSetupWideEvent, never()).onUserAuthCancelled()
             verify(syncSetupWideEvent, never()).onUserAuthSuccess()
 
             cancel()
@@ -324,8 +289,6 @@ class PreviousSessionReadyViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.EnrollmentClosed
 
         testee.onContinueSetupClicked()
-
-        verify(syncSetupWideEvent, never()).onEnrollDeviceAuthDialogShown()
     }
 }
 

@@ -142,6 +142,6 @@
         android:layout_marginBottom="@dimen/keyline_4"
         app:leadingIcon="@drawable/ic_trash_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_simplified_settings_delete_account_item" />
+        app:primaryText="@string/sync_simplified_settings_turn_off_item" />
 
 </LinearLayout>
