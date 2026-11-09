@@ -38,6 +38,7 @@ data class SponsorBlockSegment(
     val category: String,
     val actionType: String,
     val videoDuration: Double? = null,
+    val uuid: String,
 )
 
 interface SponsorBlockSegmentsProvider {
@@ -108,13 +109,14 @@ class RealSponsorBlockSegmentsProvider @Inject constructor(
         val start = range[0] ?: return null
         val end = range[1] ?: return null
         if (!start.isFinite() || !end.isFinite() || start < 0 || end <= start) return null
-        if (category.isNullOrBlank() || actionType.isNullOrBlank()) return null
+        if (category.isNullOrBlank() || actionType.isNullOrBlank() || uuid.isNullOrBlank()) return null
         return SponsorBlockSegment(
             start = start,
             end = end,
             category = category,
             actionType = actionType,
             videoDuration = videoDuration?.takeIf { it.isFinite() && it > 0 },
+            uuid = uuid,
         )
     }
 

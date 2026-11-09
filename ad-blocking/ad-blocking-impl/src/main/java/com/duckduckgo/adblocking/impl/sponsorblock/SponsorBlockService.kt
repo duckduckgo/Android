@@ -18,6 +18,7 @@ package com.duckduckgo.adblocking.impl.sponsorblock
 
 import android.annotation.SuppressLint
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.moshi.Json
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
@@ -48,6 +49,7 @@ data class SegmentResponse(
     val category: String?,
     val actionType: String?,
     val videoDuration: Double?,
+    @field:Json(name = "UUID") val uuid: String?,
 )
 
 @BindingContainer

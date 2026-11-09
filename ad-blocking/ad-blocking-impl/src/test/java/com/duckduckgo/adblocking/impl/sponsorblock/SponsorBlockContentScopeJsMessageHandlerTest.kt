@@ -85,8 +85,8 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
     @Test
     fun whenGetSegmentsThenPassesVideoIdAndSerializesSegments() {
         sponsorBlock.segments = listOf(
-            SponsorBlockSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip"),
-            SponsorBlockSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", videoDuration = 300.5),
+            SponsorBlockSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip", uuid = "uuid-1"),
+            SponsorBlockSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", videoDuration = 300.5, uuid = "uuid-2"),
         )
 
         val segments = send("getSegments", JSONObject().put("videoID", VIDEO_ID)).getJSONArray("segments")
@@ -98,6 +98,7 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
             assertEquals(15.0, getDouble("end"), 0.0)
             assertEquals("sponsor", getString("category"))
             assertEquals("skip", getString("actionType"))
+            assertEquals("uuid-1", getString("uuid"))
             assertFalse(has("videoDuration"))
         }
         assertEquals(300.5, segments.getJSONObject(1).getDouble("videoDuration"), 0.0)
