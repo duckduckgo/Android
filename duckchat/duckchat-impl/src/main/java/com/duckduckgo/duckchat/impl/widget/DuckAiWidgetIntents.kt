@@ -59,13 +59,13 @@ class DuckAiWidgetIntents @Inject constructor(
         return PendingIntent.getActivity(
             context,
             requestCode,
-            browserNav.openDuckChat(context, duckChatUrl = newChatUrl).replaceExtras(null).asViewIntent(),
+            openDuckChat(context, newChatUrl).replaceExtras(null).asViewIntent(),
             PendingIntent.FLAG_UPDATE_CURRENT or mutability,
         )
     }
 
     fun chatFillInIntent(context: Context, chatUrl: String): Intent =
-        Intent().putExtras(browserNav.openDuckChat(context, duckChatUrl = chatUrl).extras!!)
+        Intent().putExtras(openDuckChat(context, chatUrl).extras!!)
 
     private fun openDuckChat(context: Context, duckChatUrl: String, launchAction: DuckChatLaunchAction? = null): Intent =
         browserNav.openDuckChat(
