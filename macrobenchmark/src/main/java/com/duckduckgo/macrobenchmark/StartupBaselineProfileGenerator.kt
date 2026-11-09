@@ -28,8 +28,6 @@ import org.junit.runner.RunWith
 
 /**
  * Generates the app Baseline Profile through `:app:generateBaselineProfile`.
- *
- * The cold launch is also written to the startup profile used by R8 for DEX layout.
  */
 @RunWith(AndroidJUnit4::class)
 class StartupBaselineProfileGenerator {
@@ -51,7 +49,6 @@ class StartupBaselineProfileGenerator {
         packageName = TARGET_PACKAGE,
         stableIterations = 3,
         maxIterations = 10,
-        includeInStartupProfile = true,
     ) {
         pressHome()
         startActivityAndWait()

@@ -217,7 +217,6 @@ android {
 baselineProfile {
     automaticGenerationDuringBuild = false
     saveInSrc = true
-    dexLayoutOptimization = true
     mergeIntoMain = true
 }
 
