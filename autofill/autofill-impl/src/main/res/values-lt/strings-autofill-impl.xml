@@ -336,4 +336,12 @@
     <string name="importBookmarksRedesignResultTitle">Baigta importuoti!</string>
     <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importuota žymelių: <b>%1$d</b>]]></string>
 
+    <!-- Passwords import promo on the bookmarks import result screen -->
+    <string name="passwords_import_promo_in_bookmarks_import_title">Perkelk savo slaptažodžius iš „Google“ į „DuckDuckGo“.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_button">Importuoti slaptažodžius iš „Google“</string>
+
+    <!-- Bookmarks import promo on the passwords import result screen -->
+    <string name="bookmarks_import_promo_in_passwords_import_title">Perkelk savo žymes iš „Google“ į „DuckDuckGo“.</string>
+    <string name="bookmarks_import_promo_in_passwords_import_button">Importuoti žymes iš „Google“</string>
+
 </resources>

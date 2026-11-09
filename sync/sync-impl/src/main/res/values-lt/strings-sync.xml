@@ -480,9 +480,54 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Pasiek savo slaptažodžius mobiliajame įrenginyje ir kompiuteryje.</string>
+    <string name="sync_passwords_import_promo_title_label">Pasiek savo slaptažodžius mobiliajame įrenginyje ir kompiuteryje.</string>
     <string name="sync_passwords_import_promo_primary_button">Įjunk „Sync &amp; Backup“</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sinchronizuok savo slaptažodžius ir kurk atsargines jų kopijas mobiliajame įrenginyje ir kompiuteryje.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Pasiek savo žymeles mobiliajame įrenginyje ir kompiuteryje.</string>
+    <string name="sync_bookmarks_import_promo_title_label">Pasiek savo žymes mobiliajame įrenginyje ir kompiuteryje.</string>
     <string name="sync_bookmarks_import_promo_primary_button">Įjunk „Sync &amp; Backup“</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sinchronizuok savo žymes ir kurk atsargines jų kopijas mobiliajame įrenginyje ir kompiuteryje.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Sinchronizuoti žymes ir kurti jų atsargines kopijas</string>
+    <string name="sync_bookmarks_promo_message">Naudojamas ištisinis šifravimas. Niekas negali matyti tavo žymių, net ir mes.</string>
+    <string name="sync_bookmarks_promo_primary_button">Įjungti „Sync &amp; Backup“</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Sinchronizuoti žymes ir su kompiuterio programa?</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Prijungti</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Gauti programą</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Sinchronizuoti žymes ir kurti jų atsargines kopijas</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Daugiau parinkčių</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Slėpti</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Įjungti „Sync &amp; Backup“</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Sinchronizuoti su kompiuterio programa</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Daugiau parinkčių</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Slėpti</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Sinchronizuoti su kompiuteriu</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Gauti kompiuterio programą</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Sinchronizuokime jūsų kompiuterio programą!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Sinchronizuoti su kompiuteriu</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Neturiu kompiuterio programos</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Sinchronizuoti slaptažodžius ir kurti jų atsargines kopijas</string>
+    <string name="sync_passwords_promo_message">Ištisinis šifravimas (angl. „end-to-end encryption“) reiškia, kad niekas, išskyrus jus, negali pamatyti jūsų slaptažodžių, net mes.</string>
+    <string name="sync_passwords_promo_primary_button">Įjungti „Sync &amp; Backup“</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Sinchronizuoti slaptažodžius ir su kompiuterio programa?</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Prijungti</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Gauti programą</string>
+
 </resources>
