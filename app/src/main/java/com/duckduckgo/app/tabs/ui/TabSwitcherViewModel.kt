@@ -24,6 +24,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.tabs.transition.NewTabMotion
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionConfigProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
@@ -123,6 +125,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val fireTabsPromos: FireTabsPromos,
     private val remoteMessageModel: RemoteMessageModel,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
+    private val newTabTransitionConfigProvider: NewTabTransitionConfigProvider,
 ) : ViewModel() {
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
@@ -262,26 +265,41 @@ class TabSwitcherViewModel @Inject constructor(
         data object DismissSnackbar : Command()
         data object SwitchToRegularModeAndClose : Command()
         data object ShowDuckAiChatsMenu : Command()
+
+        /**
+         * Closes the tab manager and shows [tabId], growing it in with [motion].
+         *
+         * [requestId] is the id of the tap that opened the tab. When [motion] is null, the tab shows without the transition.
+         */
+        data class CloseToNewTab(
+            val requestId: Long,
+            val tabId: String,
+            val motion: NewTabMotion?,
+        ) : Command()
     }
 
-    fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
+    fun onNewTabRequested(
+        fromOverflowMenu: Boolean = false,
+        newTabRequestId: Long? = null,
+    ) = viewModelScope.launch {
         tabRepository.getSelectedTab()?.tabId?.let { tabId ->
             duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
         }
-        if (swipingTabsFeature.isEnabled) {
-            val newTab = tabs.firstOrNull { tabItem ->
+        val reusedTab = if (swipingTabsFeature.isEnabled) {
+            tabs.firstOrNull { tabItem ->
                 tabItem.isNewTabPage && !tabItem.hasSourceTab
             }
-            if (newTab != null) {
-                tabRepository.select(tabId = newTab.id)
-            } else {
-                tabRepository.add()
-            }
+        } else {
+            null
+        }
+        val tabId = if (reusedTab != null) {
+            tabRepository.select(tabId = reusedTab.id)
+            reusedTab.id
         } else {
             tabRepository.add()
         }
 
-        command.value = Command.Close
+        closeToTab(tabId, newTabRequestId, reused = reusedTab != null)
         val browserModeParam = mapOf(Pixel.PixelParameter.BROWSER_MODE to currentMode.value.name.lowercase())
         if (fromOverflowMenu) {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_NEW_TAB_PRESSED, browserModeParam)
@@ -683,7 +701,7 @@ class TabSwitcherViewModel @Inject constructor(
         return@withContext null
     }
 
-    fun onDuckAIButtonClicked() {
+    fun onDuckAIButtonClicked(newTabRequestId: Long? = null) {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
@@ -691,16 +709,16 @@ class TabSwitcherViewModel @Inject constructor(
             if (_viewState.value.isDuckAiChatsMenuEnabled) {
                 command.value = Command.ShowDuckAiChatsMenu
             } else {
-                openNewDuckAiChat()
+                openNewDuckAiChat(newTabRequestId)
             }
         }
     }
 
-    fun onDuckAiNewChatSelected() {
-        viewModelScope.launch { openNewDuckAiChat() }
+    fun onDuckAiNewChatSelected(newTabRequestId: Long? = null) {
+        viewModelScope.launch { openNewDuckAiChat(newTabRequestId) }
     }
 
-    private suspend fun openNewDuckAiChat() {
+    private suspend fun openNewDuckAiChat(newTabRequestId: Long?) {
         val repository = tabRepository
         val currentTabId = repository.getSelectedTab()?.tabId
         val emptyChats = repository.getTabs().filter { tab ->
@@ -709,19 +727,36 @@ class TabSwitcherViewModel @Inject constructor(
         val emptyChat = emptyChats.firstOrNull { it.tabId == currentTabId } ?: emptyChats.firstOrNull()
         if (emptyChat != null) {
             repository.select(emptyChat.tabId)
+            closeToTab(emptyChat.tabId, newTabRequestId, reused = true)
         } else {
             val url = duckChat.getDuckChatUrl("", false)
             duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
-            repository.add(url, true)
+            closeToTab(repository.add(url, true), newTabRequestId)
         }
-        command.value = Command.Close
     }
 
-    fun onDuckAiChatSelected(chatUrl: String) {
+    fun onDuckAiChatSelected(
+        chatUrl: String,
+        newTabRequestId: Long? = null,
+    ) {
         viewModelScope.launch {
             duckChat.reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
-            tabRepository.add(chatUrl, true)
-            command.value = Command.Close
+            closeToTab(tabRepository.add(chatUrl, true), newTabRequestId)
+        }
+    }
+
+    private suspend fun closeToTab(
+        tabId: String,
+        newTabRequestId: Long?,
+        reused: Boolean = false,
+    ) {
+        val config = newTabRequestId?.let { newTabTransitionConfigProvider.enabledConfig() }
+        command.value = when {
+            newTabRequestId == null || config == null -> Command.Close
+            // A reused tab isn't new, so it opens without the transition. Still tagged with the request, so an older operation
+            // can't close the tab manager on a newer tap's behalf.
+            reused -> Command.CloseToNewTab(newTabRequestId, tabId, motion = null)
+            else -> Command.CloseToNewTab(newTabRequestId, tabId, config.motionFor(config.tabManagerOrigin))
         }
     }
 

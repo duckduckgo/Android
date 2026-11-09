@@ -19,6 +19,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
@@ -27,6 +28,9 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionConfig
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionConfigProvider
+import com.duckduckgo.app.browser.tabs.transition.RealPendingNewTabTransitions
 import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
@@ -83,6 +87,8 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -180,6 +186,7 @@ class TabSwitcherViewModelTest {
 
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
+    private val newTabTransitionConfigProvider: NewTabTransitionConfigProvider = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
 
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -265,6 +272,7 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
+            newTabTransitionConfigProvider,
         )
     }
 
@@ -382,6 +390,131 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository, never()).select(any())
         verify(mockTabRepository).add()
     }
+
+    @Test
+    fun whenNewTabRequestedAndTransitionsEnabledThenCloseToNewTabWithNewTabId() = runTest {
+        givenNewTabTransitionsEnabled()
+
+        testee.onNewTabRequested(newTabRequestId = 7L)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(7L, "TAB_ID", tabManagerMotion()), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenNewTabRequestedWithoutRequestIdThenClose() = runTest {
+        givenNewTabTransitionsEnabled()
+
+        testee.onNewTabRequested()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenNewTabRequestedWithSwipingAndBlankTabThenCloseToItWithoutMotion() = runTest {
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+        tabList = listOf(
+            TabEntity("1", url = "https://cnn.com", position = 1),
+            TabEntity("EMPTY_TAB", url = "", sourceTabId = null, position = 0),
+        )
+        initializeMockTabEntitesData()
+        initializeViewModel()
+        prepareSelectionMode()
+        givenNewTabTransitionsEnabled()
+
+        testee.onNewTabRequested(newTabRequestId = 7L)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(7L, "EMPTY_TAB", motion = null), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenNewTabRequestedAndTransitionsDisabledThenClose() = runTest {
+        testee.onNewTabRequested(newTabRequestId = 7L)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenDuckAiNewChatSelectedAndTransitionsEnabledThenCloseToNewTab() = runTest {
+        givenNewTabTransitionsEnabled()
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn("https://duck.ai/")
+        whenever(mockTabRepository.add("https://duck.ai/", true)).thenReturn("CHAT_TAB_ID")
+
+        testee.onDuckAiNewChatSelected(newTabRequestId = 7L)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(7L, "CHAT_TAB_ID", tabManagerMotion()), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenDuckAiChatSelectedAndTransitionsEnabledThenCloseToNewTab() = runTest {
+        givenNewTabTransitionsEnabled()
+        val chatUrl = "https://duck.ai/?chatID=chat-1"
+        whenever(mockTabRepository.add(chatUrl, true)).thenReturn("CHAT_TAB_ID")
+
+        testee.onDuckAiChatSelected(chatUrl, newTabRequestId = 7L)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(7L, "CHAT_TAB_ID", tabManagerMotion()), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenDuckAiButtonOpensChatStraightAwayAndTransitionsEnabledThenCloseToNewTab() = runTest {
+        givenDuckAiChatsMenuEnabled(false)
+        givenNewTabTransitionsEnabled()
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn("https://duck.ai/")
+        whenever(mockTabRepository.add("https://duck.ai/", true)).thenReturn("CHAT_TAB_ID")
+        val testee = createViewModel()
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.onDuckAIButtonClicked(newTabRequestId = 7L)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(7L, "CHAT_TAB_ID", tabManagerMotion()), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenTabManagerIsRecreatedDuringNewTabRequestThenOnlyTheRecreatedTabManagersRequestGrows() = runTest {
+        val earlierConfig = CompletableDeferred<NewTabTransitionConfig?>()
+        val recreatedConfig = CompletableDeferred<NewTabTransitionConfig?>()
+        val configs = ArrayDeque(listOf(earlierConfig, recreatedConfig))
+        whenever(newTabTransitionConfigProvider.enabledConfig()).doSuspendableAnswer { configs.removeFirst().await() }
+        whenever(mockTabRepository.add()).thenReturn("EARLIER_TAB", "RECREATED_TAB")
+        val pendingTransitions = RealPendingNewTabTransitions(mock(), coroutinesTestRule.testScope, coroutinesTestRule.testDispatcherProvider)
+        val earlierScope = TestScope(coroutinesTestRule.testDispatcher + Job())
+        val earlier = TabSwitcherNewTabTransition(earlierScope, pendingTransitions) { CompletableDeferred(mock<Bitmap>()) }.apply { enabled = true }
+        val recreated = TabSwitcherNewTabTransition(TestScope(coroutinesTestRule.testDispatcher + Job()), pendingTransitions) {
+            CompletableDeferred(mock<Bitmap>())
+        }.apply { enabled = true }
+        var tabManager = earlier
+        val finishes = mutableListOf<Pair<String, Boolean>>()
+        testee.command.observeForever { command ->
+            if (command is Command.CloseToNewTab) {
+                tabManager.closeToNewTab(command.requestId, command.tabId, command.motion) { finishes += command.tabId to it }
+            }
+        }
+
+        testee.onNewTabRequested(newTabRequestId = earlier.onNewTabTap())
+        earlierScope.cancel()
+        tabManager = recreated
+        testee.onNewTabRequested(newTabRequestId = recreated.onNewTabTap())
+        earlierConfig.complete(NewTabTransitionConfig.DEFAULT)
+        recreatedConfig.complete(NewTabTransitionConfig.DEFAULT)
+
+        assertEquals("RECREATED_TAB", pendingTransitions.tabManagerTabId())
+        assertEquals(listOf("RECREATED_TAB" to true), finishes)
+    }
+
+    private suspend fun givenNewTabTransitionsEnabled() {
+        whenever(newTabTransitionConfigProvider.enabledConfig()).thenReturn(NewTabTransitionConfig.DEFAULT)
+    }
+
+    private fun tabManagerMotion() = NewTabTransitionConfig.DEFAULT.let { it.motionFor(it.tabManagerOrigin) }
 
     @Test
     fun whenOtherTabsClosedThenCommandSentAndPixelSent() = runTest {
@@ -1039,6 +1172,20 @@ class TabSwitcherViewModelTest {
         verify(mockTabRepository, never()).add(any(), any())
         verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any(), any())
         verify(mockCommandObserver).onChanged(Command.Close)
+    }
+
+    @Test
+    fun whenNewChatRequestedAndEmptyChatExistsAndTransitionsEnabledThenCloseToItWithoutMotion() = runTest {
+        givenNewTabTransitionsEnabled()
+        val url = "https://duck.ai/"
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("empty", url = url)))
+        whenever(duckChatMock.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
+
+        testee.onDuckAiNewChatSelected(newTabRequestId = 7L)
+
+        verify(mockTabRepository).select("empty")
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.CloseToNewTab(7L, "empty", motion = null), commandCaptor.lastValue)
     }
 
     @Test
@@ -2427,6 +2574,7 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
+            newTabTransitionConfigProvider,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2474,6 +2622,7 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
+            newTabTransitionConfigProvider,
         )
 
         assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
@@ -2550,6 +2699,7 @@ class TabSwitcherViewModelTest {
             fireTabsPromos,
             remoteMessageModel,
             tabManagerFeatureFlags,
+            newTabTransitionConfigProvider,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE, BrowserModeSwitchSource.TAB_SWITCHER_TOGGLE)
