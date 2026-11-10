@@ -504,8 +504,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
 
             launch {
-                viewModel.selectedTabIndex.collectLatest {
-                    onMoveToTabRequested(it)
+                viewModel.lastAccessedTabFlow.collectLatest {
+                    tabManager.onTabAccessed(it)
+                }
+            }
+
+            launch {
+                if (viewModel.isSelectedTabDebounceRemoved) {
+                    viewModel.tabIdToMoveTo.collectLatest { onMoveToTabRequested(it) }
+                } else {
+                    viewModel.selectedTabIndex.collectLatest { onMoveToTabRequested(it) }
                 }
             }
         }
@@ -1775,6 +1783,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun onMoveToTabRequested(index: Int) {
         tabPager.post {
+            tabPagerAdapter.currentTabIndex = index
+            tabPager.setCurrentItem(index, false)
+        }
+    }
+
+    private fun onMoveToTabRequested(tabId: String) {
+        tabPager.post {
+            // Resolved at post time because the adapter may already hold a newer tab list than the one the selection was combined with.
+            val index = tabPagerAdapter.getPositionOfTab(tabId).takeIf { it != -1 } ?: return@post
             tabPagerAdapter.currentTabIndex = index
             tabPager.setCurrentItem(index, false)
         }

@@ -56,7 +56,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -117,6 +121,7 @@ class BrowserViewModelTest {
     private var browserMode = BrowserMode.REGULAR
 
     private val selectedTabFlow = MutableSharedFlow<TabEntity?>(replay = 1)
+    private val tabsFlow = MutableSharedFlow<List<TabEntity>>(replay = 1)
 
     private lateinit var testee: BrowserViewModel
 
@@ -134,6 +139,7 @@ class BrowserViewModelTest {
 
         doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
         whenever(mockTabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
+        whenever(mockTabRepository.flowTabs).thenReturn(tabsFlow)
 
         configureSkipUrlConversionInNewTabState(enabled = true)
         fakeAndroidBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = true))
@@ -182,6 +188,106 @@ class BrowserViewModelTest {
         testee.onOpenInNewTabRequested(query = "https://example.com")
 
         verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
+    }
+
+    @Test
+    fun whenSelectedTabDebounceRemovedThenTabIdToMoveToEmittedImmediately() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
+        initTestee()
+        val emitted = mutableListOf<String>()
+        backgroundScope.launch { testee.tabIdToMoveTo.toList(emitted) }
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0), TabEntity(tabId = "t2", position = 1)))
+        selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
+        runCurrent()
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+
+        assertEquals(listOf("t1", "t2"), emitted)
+    }
+
+    @Test
+    fun whenSelectedTabDebounceKeptThenSelectedTabIndexOnlyEmitsLastSelectedTab() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = false))
+        initTestee()
+        val emitted = mutableListOf<Int>()
+        backgroundScope.launch { testee.selectedTabIndex.toList(emitted) }
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0), TabEntity(tabId = "t2", position = 1)))
+        selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
+        runCurrent()
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+        assertEquals(emptyList<Int>(), emitted)
+
+        advanceTimeBy(101)
+        assertEquals(listOf(1), emitted)
+    }
+
+    @Test
+    fun whenSelectedTabDebounceRemovedThenSelectedTabFlowEmitsImmediately() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
+        initTestee()
+        val emitted = mutableListOf<String>()
+        backgroundScope.launch { testee.selectedTabFlow.toList(emitted) }
+
+        selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
+        runCurrent()
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+
+        assertEquals(listOf("t1", "t2"), emitted)
+    }
+
+    @Test
+    fun whenSelectedTabDebounceRemovedThenLastAccessedTabFlowIsStillDebounced() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
+        initTestee()
+        val emitted = mutableListOf<String>()
+        backgroundScope.launch { testee.lastAccessedTabFlow.toList(emitted) }
+
+        selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
+        runCurrent()
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+        assertEquals(emptyList<String>(), emitted)
+
+        advanceTimeBy(101)
+        assertEquals(listOf("t2"), emitted)
+    }
+
+    @Test
+    fun whenSelectedTabIsRemovedFromTabsThenTabIdToMoveToEmitsNothing() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
+        initTestee()
+        val emitted = mutableListOf<String>()
+        backgroundScope.launch { testee.tabIdToMoveTo.toList(emitted) }
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0), TabEntity(tabId = "t2", position = 1)))
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+        assertEquals(listOf("t2"), emitted)
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0)))
+        runCurrent()
+        assertEquals(listOf("t2"), emitted)
+    }
+
+    @Test
+    fun whenSelectedTabIsNotInTabsYetThenTabIdToMoveToWaitsForTabs() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
+        initTestee()
+        val emitted = mutableListOf<String>()
+        backgroundScope.launch { testee.tabIdToMoveTo.toList(emitted) }
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0)))
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+        assertEquals(emptyList<String>(), emitted)
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0), TabEntity(tabId = "t2", position = 1)))
+        runCurrent()
+        assertEquals(listOf("t2"), emitted)
     }
 
     // --- selectedTab flow → NtpAfterIdleManager.onNtpShown ---
