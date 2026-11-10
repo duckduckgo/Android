@@ -123,7 +123,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             assertTrue(tabs.size == 1)
             assertTrue(tabs.last().url == "")
         }
-        assertEquals(ShowOnAppLaunchResult(destinationUrl = null, treatment = null), result)
+        assertEquals(ShowOnAppLaunchResult(destinationUrl = null, treatment = null, landingTabId = "1"), result)
     }
 
     @Test
@@ -139,7 +139,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             assertTrue(tabs.size == 1)
             assertTrue(tabs.last().url == "")
         }
-        assertEquals(ShowOnAppLaunchResult(destinationUrl = null, treatment = null), result)
+        assertEquals(ShowOnAppLaunchResult(destinationUrl = null, treatment = null, landingTabId = "1"), result)
     }
 
     @Test
@@ -156,7 +156,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
             assertTrue(tabs.isEmpty())
         }
-        assertEquals(ShowOnAppLaunchResult(destinationUrl = null, treatment = null), result)
+        assertEquals(ShowOnAppLaunchResult(destinationUrl = null, treatment = null, landingTabId = null), result)
     }
 
     @Test
@@ -173,7 +173,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
             assertTrue(tabs.isEmpty())
         }
-        assertEquals(ShowOnAppLaunchResult(destinationUrl = null, treatment = null), result)
+        assertEquals(ShowOnAppLaunchResult(destinationUrl = null, treatment = null, landingTabId = null), result)
     }
 
     @Test
@@ -191,7 +191,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             assertTrue(tabs.size == 1)
             assertTrue(tabs.last().url == url)
         }
-        assertEquals(ShowOnAppLaunchResult(destinationUrl = url, treatment = null), result)
+        assertEquals(ShowOnAppLaunchResult(destinationUrl = url, treatment = null, landingTabId = "1"), result)
     }
 
     @Test
@@ -208,7 +208,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
             assertTrue(fakeDataStore.showOnAppLaunchTabId == tab.first().tabId)
         }
-        assertEquals(ShowOnAppLaunchResult(destinationUrl = url, treatment = null), result)
+        assertEquals(ShowOnAppLaunchResult(destinationUrl = url, treatment = null, landingTabId = "1"), result)
     }
 
     @Test
@@ -226,7 +226,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
             assertTrue(fakeDataStore.showOnAppLaunchTabId == existingTabId)
         }
-        assertEquals(ShowOnAppLaunchResult(destinationUrl = url, treatment = null), result)
+        assertEquals(ShowOnAppLaunchResult(destinationUrl = url, treatment = null, landingTabId = existingTabId), result)
     }
 
     @Test
@@ -857,6 +857,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             ShowOnAppLaunchResult(
                 destinationUrl = null,
                 treatment = AfterIdleTreatment.NTP,
+                landingTabId = "1",
             ),
             result,
         )
@@ -898,6 +899,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             ShowOnAppLaunchResult(
                 destinationUrl = "https://example.com/",
                 treatment = null,
+                landingTabId = "1",
             ),
             result,
         )
@@ -915,6 +917,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             ShowOnAppLaunchResult(
                 destinationUrl = null,
                 treatment = null,
+                landingTabId = "1",
             ),
             result,
         )

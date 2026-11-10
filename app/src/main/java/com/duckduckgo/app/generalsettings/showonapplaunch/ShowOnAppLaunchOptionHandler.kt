@@ -47,6 +47,7 @@ enum class AfterIdleTreatment {
 data class ShowOnAppLaunchResult(
     val destinationUrl: String?,
     val treatment: AfterIdleTreatment?,
+    val landingTabId: String? = null,
 )
 
 interface ShowOnAppLaunchOptionHandler {
@@ -124,11 +125,9 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
             null
         }
 
-        if (shouldAddNewTab) {
-            tabRepository.add()
-        }
+        val landingTabId = if (shouldAddNewTab) tabRepository.add() else null
         // An existing NTP keeps its prior classification; triggering here would leak treatment to the next NTP.
-        return ShowOnAppLaunchResult(destinationUrl = null, treatment = treatment)
+        return ShowOnAppLaunchResult(destinationUrl = null, treatment = treatment, landingTabId = landingTabId)
     }
 
     private suspend fun handleSpecificPage(
@@ -143,10 +142,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         if (afterIdle) {
             notifyAutofillIdleReturn("specific_page")
         }
-        return ShowOnAppLaunchResult(
-            destinationUrl = handleSpecificPageOption(option),
-            treatment = null,
-        )
+        return handleSpecificPageOption(option)
     }
 
     override suspend fun handleResolvedUrlStorage(
@@ -167,7 +163,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         }
     }
 
-    private suspend fun handleSpecificPageOption(option: SpecificPage): String {
+    private suspend fun handleSpecificPageOption(option: SpecificPage): ShowOnAppLaunchResult {
         val tabRepository = tabRepositoryProvider.forMode(BrowserMode.REGULAR)
         val urls = listOfNotNull(option.url, option.resolvedUrl).map { stripIfHttpOrHttps(it.toUri()) }
 
@@ -178,11 +174,11 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         return if (existingTab != null) {
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchTabId(existingTab.tabId)
             tabRepository.select(existingTab.tabId)
-            existingTab.url ?: option.url
+            ShowOnAppLaunchResult(destinationUrl = existingTab.url ?: option.url, treatment = null, landingTabId = existingTab.tabId)
         } else {
             val tabId = tabRepository.add(url = option.url)
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchTabId(tabId)
-            option.url
+            ShowOnAppLaunchResult(destinationUrl = option.url, treatment = null, landingTabId = tabId)
         }
     }
 
