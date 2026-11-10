@@ -1,0 +1,151 @@
+name: Code review assistant
+
+# Runs android-factory:code-review-assistant on one PR without a reviewer.
+# This repo is public, so nothing the review reads or writes reaches the log,
+# the step summary or an artifact: the output goes to the records branch of
+# duckduckgo/claude-skills-factory-android, which is internal.
+
+on:
+  push:
+    branches: [feature/david/code_review_assistant_workflow]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number to review
+        required: true
+        type: number
+      plugin_ref:
+        description: Branch, tag or SHA of duckduckgo/claude-skills-factory-android
+        required: false
+        default: main
+        type: string
+      model:
+        description: Model for the review's main session
+        required: false
+        default: sonnet
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: code-review-assistant-${{ inputs.pr || 10422 }}
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PR: ${{ inputs.pr || 10422 }}
+      PLUGIN_REF: ${{ inputs.plugin_ref || 'feature/david/code-review-ci-mode' }}
+      MODEL: ${{ inputs.model || 'sonnet' }}
+      WORK: /tmp/code-review-assistant/pr-${{ inputs.pr || 10422 }}
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ inputs.pr || 10422 }}/head
+          persist-credentials: false
+
+      # The deploy key is used only by checkouts and the push, never in the
+      # review step, and persist-credentials keeps it out of the clones' config.
+      - name: Check out the review plugin
+        uses: actions/checkout@v4
+        with:
+          repository: duckduckgo/claude-skills-factory-android
+          ref: ${{ inputs.plugin_ref || 'feature/david/code-review-ci-mode' }}
+          ssh-key: ${{ secrets.CODE_REVIEW_RECORDS_KEY }}
+          path: .review-plugin
+          persist-credentials: false
+
+      - name: Check out the review records
+        uses: actions/checkout@v4
+        with:
+          repository: duckduckgo/claude-skills-factory-android
+          ref: records
+          ssh-key: ${{ secrets.CODE_REVIEW_RECORDS_KEY }}
+          path: .review-records
+          persist-credentials: false
+
+      - name: Move the plugin and records out of the Android checkout
+        run: |
+          mkdir -p "$WORK"
+          mv .review-plugin "$RUNNER_TEMP/review-plugin"
+          mv .review-records "$WORK/records"
+          git -C "$WORK/records" config user.name "github-actions[bot]"
+          git -C "$WORK/records" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code@2.1.319
+
+      # Output goes to a file, never the log, because the transcript holds the
+      # internal skill and records.
+      - name: Review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          claude -p "/android-factory:code-review-assistant ${PR} ci" \
+            --plugin-dir "$RUNNER_TEMP/review-plugin" \
+            --model "$MODEL" \
+            --max-turns 100 \
+            --setting-sources project \
+            --strict-mcp-config \
+            --permission-mode dontAsk \
+            --allowedTools Bash Read Grep Glob Write Edit Agent TodoWrite Skill \
+            --output-format stream-json --verbose \
+            > "$RUNNER_TEMP/review-transcript.jsonl" 2> "$RUNNER_TEMP/review-transcript.err" \
+            || echo "::warning::claude exited with status $?"
+          if [ ! -s "$WORK/review.md" ]; then
+            echo "::error::The review ended without writing review.md"
+            exit 1
+          fi
+
+      - name: Push the records
+        if: always()
+        env:
+          KEY: ${{ secrets.CODE_REVIEW_RECORDS_KEY }}
+        run: |
+          if [ ! -d "$WORK/records/.git" ]; then
+            echo "No records clone to push"
+            exit 0
+          fi
+          cd "$WORK/records"
+          if [ -s "$WORK/review.md" ]; then
+            mkdir -p records/ci
+            cp "$WORK/review.md" "records/ci/pr-${PR}.md"
+            if [ -f "$WORK/findings.json" ]; then cp "$WORK/findings.json" "records/ci/pr-${PR}.json"; fi
+            git add records/ci
+            git commit -q -m "Add CI review of duckduckgo/Android#${PR}"
+          fi
+          if [ -z "$(git log --oneline origin/records..HEAD)" ]; then
+            echo "Nothing to push"
+            exit 0
+          fi
+          key_file="$RUNNER_TEMP/review-records-key"
+          trap 'rm -f "$key_file"' EXIT
+          (umask 077 && printf '%s\n' "$KEY" > "$key_file")
+          export GIT_SSH_COMMAND="ssh -i $key_file -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          git remote set-url origin git@github.com:duckduckgo/claude-skills-factory-android.git
+          for attempt in 1 2 3; do
+            if git pull -q --rebase origin records && git push -q origin HEAD:records; then
+              echo "RECORDS_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed"
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -s "$WORK/review.md" ]; then status="finished"; else status="failed"; fi
+          {
+            echo "Review of #${PR} ${status}, plugin at \`${PLUGIN_REF}\`, model \`${MODEL}\`."
+            if [ -n "${RECORDS_SHA:-}" ]; then
+              echo ""
+              echo "Output and metrics: https://github.com/duckduckgo/claude-skills-factory-android/commit/${RECORDS_SHA}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
