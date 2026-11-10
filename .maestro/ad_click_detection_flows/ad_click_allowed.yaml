@@ -47,7 +47,7 @@ tags:
     label: "11 - y.js bing-provided ad domain provided but it's not a domain i.e., abcedf u3 not needed"
     file: steps/ad_click_case.yaml
     env:
-      ANCHOR: "ad-id-11"
+      ANCHOR: "ad-id-10"
       AD_ID: "ad-id-11"
       EXPECT: "allowed"
 
