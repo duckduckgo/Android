@@ -51,7 +51,6 @@ class BadUrlErrorPageWideEventTest {
     val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
 
     private val wideEventClient: WideEventClient = mock()
-    private val badUrlErrorPageWideEventFeature = FakeFeatureToggleFactory.create(BadUrlErrorPageWideEventFeature::class.java)
     private val suggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
     private val regularTabRepository: TabRepository = mock()
     private val fireTabRepository: TabRepository = mock()
@@ -61,7 +60,6 @@ class BadUrlErrorPageWideEventTest {
 
     @Before
     fun setup() = runTest {
-        badUrlErrorPageWideEventFeature.self().setRawStoredState(Toggle.State(enable = true))
         suggestRedirectFeature.self().setRawStoredState(Toggle.State(enable = true))
         suggestRedirectFeature.suggestRedirect().setRawStoredState(Toggle.State(enable = true))
 
@@ -110,7 +108,6 @@ class BadUrlErrorPageWideEventTest {
 
         testee = RealBadUrlErrorPageWideEvent(
             wideEventClient = wideEventClient,
-            badUrlErrorPageWideEventFeature = lazy { badUrlErrorPageWideEventFeature },
             suggestRedirectFeature = suggestRedirectFeature,
             regularTabRepository = regularTabRepository,
             fireTabRepository = fireTabRepository,
@@ -120,23 +117,6 @@ class BadUrlErrorPageWideEventTest {
     }
 
     //region Wide event Feature Flag tests
-    @Test
-    fun `when wide event feature disabled, then error page displayed does not start flow`() = runTest {
-        badUrlErrorPageWideEventFeature.self().setRawStoredState(Toggle.State(enable = false))
-
-        testee.onBadUrlErrorPageDisplayed(TAB_ID)
-        advanceUntilIdle()
-
-        verify(wideEventClient, never()).flowStart(
-            any(),
-            anyOrNull(),
-            any(),
-            any(),
-            any(),
-            any(),
-        )
-    }
-
     @Test
     fun `when suggest redirect feature disabled, then error page displayed does not start flow`() = runTest {
         suggestRedirectFeature.suggestRedirect().setRawStoredState(Toggle.State(enable = false))
@@ -158,7 +138,7 @@ class BadUrlErrorPageWideEventTest {
     fun `when feature disabled mid-flow, then active flows still finish`() = runTest {
         testee.onBadUrlErrorPageDisplayed(TAB_ID)
         advanceUntilIdle()
-        badUrlErrorPageWideEventFeature.self().setRawStoredState(Toggle.State(enable = false))
+        suggestRedirectFeature.suggestRedirect().setRawStoredState(Toggle.State(enable = false))
 
         testee.onBadUrlErrorPageExited(TAB_ID)
         advanceUntilIdle()
@@ -175,7 +155,7 @@ class BadUrlErrorPageWideEventTest {
         testee.onBadUrlErrorPageDisplayed(TAB_ID)
         testee.onRedirectClicked(TAB_ID)
         advanceUntilIdle()
-        badUrlErrorPageWideEventFeature.self().setRawStoredState(Toggle.State(enable = false))
+        suggestRedirectFeature.suggestRedirect().setRawStoredState(Toggle.State(enable = false))
 
         testee.onBadUrlErrorPageDisplayed(TAB_ID)
         advanceUntilIdle()
