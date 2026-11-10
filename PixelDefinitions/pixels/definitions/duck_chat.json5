@@ -2127,16 +2127,16 @@
             }
         ]
     },
-    "m_duck_ai_combined_widget_added": {
-        "description": "Triggered when the Duck.ai combined (prompt bar and actions) home-screen widget is added",
-        "owners": ["gpaligot"],
+    "m_aichat_widget_added": {
+        "description": "Triggered when the Duck.ai home-screen widget is added",
+        "owners": ["GerardPaligot"],
         "triggers": ["user_interaction"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_duck_ai_combined_widget_deleted": {
-        "description": "Triggered when the Duck.ai combined (prompt bar and actions) home-screen widget is removed",
-        "owners": ["gpaligot"],
+    "m_aichat_widget_deleted": {
+        "description": "Triggered when the Duck.ai home-screen widget is removed",
+        "owners": ["GerardPaligot"],
         "triggers": ["user_interaction"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
