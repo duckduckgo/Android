@@ -10669,7 +10669,14 @@ class BrowserTabViewModelTest {
     fun whenPageCommitVisibleThenPageCommitVisibleCommandIsIssued() {
         testee.onPageCommitVisible(WebViewNavigationState(mockStack, 50), NEW_SITE)
 
-        assertCommandIssued<Command.PageCommitVisible> { assertEquals(NEW_SITE, url) }
+        assertCommandIssued<Command.PageCommitVisible>()
+    }
+
+    @Test
+    fun whenPageCommitVisibleOnAboutBlankThenNoPageCommitVisibleCommand() {
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 50), "about:blank")
+
+        assertCommandNotIssued<Command.PageCommitVisible>()
     }
 
     @Test

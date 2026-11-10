@@ -2260,10 +2260,6 @@ class BrowserTabFragment :
 
     private fun isFullyDrawnReported(): Boolean = (activity as? ComponentActivity)?.fullyDrawnReporter?.isFullyDrawnReported == true
 
-    private fun onPageCommitVisible(url: String) {
-        if (url.isNotEmpty() && url != "about:blank") reportFullyDrawnIfSelected()
-    }
-
     private fun fragmentIsVisible(): Boolean {
         // using isHidden rather than isVisible, as isVisible will incorrectly return false when windowToken is not yet initialized.
         // changes on isHidden will be received in onHiddenChanged
@@ -3096,7 +3092,7 @@ class BrowserTabFragment :
 
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
-            is Command.PageCommitVisible -> onPageCommitVisible(it.url)
+            is Command.PageCommitVisible -> reportFullyDrawnIfSelected()
             is Command.EnableDuckAIFullScreen -> {
                 setWebViewZoomSupported(false)
                 showDuckAI(it.browserViewState)
