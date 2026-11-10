@@ -123,10 +123,12 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.mobile.android.R
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -156,7 +158,7 @@ internal fun dialogActionLayout(
 )
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoroutinesApi::class)
 internal fun DaxOnboardingDialogCore(
     contentKey: String,
     title: AnnotatedString,
@@ -233,13 +235,13 @@ internal fun DaxOnboardingDialogCore(
             hasHeader = { latestHeaderImage != null },
             morphEnteredShell = morphEnteredShell@{
                 if (replacingEnteredShell) {
-                    val target = snapshotFlow { cardSizeTracker.lastSize }.filterNotNull().firstOrNull() ?: return@morphEnteredShell
+                    val sizes = snapshotFlow { cardSizeTracker.lastSize }.filterNotNull()
                     if (cardSizeTracker.bounded) {
-                        shell.cardSize.animateTo(target, boundsTween(boundsAnimationDuration))
+                        // A host can raise the available height after the replacement is first measured, so the morph retargets.
+                        sizes.mapLatest { shell.cardSize.animateTo(it, boundsTween(boundsAnimationDuration)) }.first()
                     } else {
-                        shell.cardSize.snapTo(target)
+                        shell.cardSize.snapTo(sizes.first())
                     }
-                    cardSizeTracker.lastSize?.takeIf { it != target }?.let { shell.cardSize.snapTo(it) }
                     cardSizeTracker.hasMeasured = true
                 }
             },
