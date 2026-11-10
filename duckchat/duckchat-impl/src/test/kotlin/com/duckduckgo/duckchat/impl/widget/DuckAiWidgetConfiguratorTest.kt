@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.BlendMode
 import android.util.SizeF
 import android.util.Xml
 import android.view.View
@@ -444,8 +445,10 @@ class DuckAiWidgetConfiguratorTest {
     private fun verifyBackgroundTint(viewId: Int, color: Int?) {
         if (color != null) {
             verify(remoteViews).setColorStateList(viewId, BACKGROUND_TINT, color)
+            verify(remoteViews).setBlendMode(viewId, BACKGROUND_TINT_BLEND_MODE, BlendMode.SRC)
         } else {
             verify(remoteViews).setColorStateList(viewId, BACKGROUND_TINT, null as ColorStateList?)
+            verify(remoteViews).setBlendMode(viewId, BACKGROUND_TINT_BLEND_MODE, null)
         }
     }
 
@@ -457,7 +460,7 @@ class DuckAiWidgetConfiguratorTest {
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
-        assertTrue(mockingDetails(remoteViews).invocations.none { it.method.name == "setColorStateList" })
+        assertTrue(mockingDetails(remoteViews).invocations.none { it.method.name == "setColorStateList" || it.method.name == "setBlendMode" })
     }
 
     @Test
@@ -469,6 +472,7 @@ class DuckAiWidgetConfiguratorTest {
             activity.getColor(R.color.duckAiWidgetDynamicContainerColor),
             row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList?.defaultColor,
         )
+        assertEquals(BlendMode.SRC, row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintBlendMode)
         assertEquals(
             activity.getColor(R.color.duckAiWidgetDynamicOnContainerColor),
             row.findViewById<ImageView>(R.id.chatsItemIcon).imageTintList?.defaultColor,
@@ -482,6 +486,7 @@ class DuckAiWidgetConfiguratorTest {
         val row = populateAndApplyFirstChatRow(dynamicColors = false)
 
         assertNull(row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList)
+        assertNull(row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintBlendMode)
         assertEquals(
             activity.getColor(R.color.duckAiWidgetOnContainerColor),
             row.findViewById<ImageView>(R.id.chatsItemIcon).imageTintList?.defaultColor,
@@ -693,6 +698,7 @@ class DuckAiWidgetConfiguratorTest {
         const val APP_WIDGET_ID = 7
         const val COMPACT_HEIGHT_DP = 142f
         const val BACKGROUND_TINT = "setBackgroundTintList"
+        const val BACKGROUND_TINT_BLEND_MODE = "setBackgroundTintBlendMode"
         const val IMAGE_TINT = "setImageTintList"
         const val TEXT_COLOR = "setTextColor"
         const val CHAT_URL = "https://duck.ai/?chatID=abc"
