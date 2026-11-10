@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetContingencyMessageBinding
 import com.duckduckgo.common.ui.setRoundCorners
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -37,6 +38,14 @@ class ContingencyMessageBottomSheetFragment : BottomSheetDialogFragment() {
         val binding = BottomSheetContingencyMessageBinding.inflate(inflater, container, false)
         binding.contingencyMessageCloseButton.setOnClickListener { dismiss() }
         binding.contingencyMessagePrimaryButton.setOnClickListener { dismiss() }
+        binding.root.applyRebrandBottomSheetSpacing(
+            header = binding.contingencyMessageIcon,
+            title = binding.contingencyMessageTitle,
+            messages = listOf(binding.contingencyMessageContent),
+            buttons = binding.contingencyMessagePrimaryButton,
+            close = binding.contingencyMessageCloseButton,
+            content = binding.root.getChildAt(0) as ViewGroup,
+        )
         return binding.root
     }
 

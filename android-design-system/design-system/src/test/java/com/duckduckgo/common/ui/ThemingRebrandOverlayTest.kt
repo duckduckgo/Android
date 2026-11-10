@@ -57,6 +57,7 @@ private const val TOGGLE_RADIUS = "radius"
 private const val TOGGLE_BADGES = "badges"
 private const val TOGGLE_INFO_PANELS = "infoPanels"
 private const val TOGGLE_DIALOG_SPACING = "dialogSpacing"
+private const val TOGGLE_BOTTOM_SHEETS = "bottomSheets"
 private const val EXTRA_FIRE_THEME = "fireTheme"
 
 private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT) : ThemingDataStore {
@@ -69,12 +70,14 @@ private fun configuredToggles(enabled: Set<String>): AppBrandDesignUpdateToggles
     val badgesToggle = enabledToggle(TOGGLE_BADGES in enabled)
     val infoPanelsToggle = enabledToggle(TOGGLE_INFO_PANELS in enabled)
     val dialogSpacingToggle = enabledToggle(TOGGLE_DIALOG_SPACING in enabled)
+    val bottomSheetsToggle = enabledToggle(TOGGLE_BOTTOM_SHEETS in enabled)
     return mock<AppBrandDesignUpdateToggles>().also { toggles ->
         whenever(toggles.theme()).thenReturn(themeToggle)
         whenever(toggles.radius()).thenReturn(radiusToggle)
         whenever(toggles.badges()).thenReturn(badgesToggle)
         whenever(toggles.infoPanels()).thenReturn(infoPanelsToggle)
         whenever(toggles.dialogSpacing()).thenReturn(dialogSpacingToggle)
+        whenever(toggles.bottomSheets()).thenReturn(bottomSheetsToggle)
     }
 }
 
@@ -442,6 +445,7 @@ class ThemingRebrandOverlayTest {
         val activity = toggleAwareActivity(TOGGLE_DIALOG_SPACING)
 
         assertTrue(activity.isRebrandAreaEnabled(R.attr.daxRebrandDialogSpacing))
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandBottomSheets))
     }
 
     @Test
@@ -449,6 +453,21 @@ class ThemingRebrandOverlayTest {
         val activity = toggleAwareActivity(null)
 
         assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandDialogSpacing))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityBottomSheetsToggleIsEnabledThenBottomSheetsOverlayIsApplied() {
+        val activity = toggleAwareActivity(TOGGLE_BOTTOM_SHEETS)
+
+        assertTrue(activity.isRebrandAreaEnabled(R.attr.daxRebrandBottomSheets))
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandDialogSpacing))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityBottomSheetsToggleIsDisabledThenBottomSheetsOverlayIsNotApplied() {
+        val activity = toggleAwareActivity(null)
+
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandBottomSheets))
     }
 
     @Test

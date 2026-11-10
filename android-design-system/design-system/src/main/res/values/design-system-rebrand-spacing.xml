@@ -17,11 +17,19 @@
 
 <resources>
 
+    <dimen name="rebrandSheetTabletSide">64dp</dimen>
+
     <!-- True when the dialog spacing brand design update is on. Absent from the base themes, so it resolves to false. -->
     <attr name="daxRebrandDialogSpacing" format="boolean" />
 
     <style name="ThemeOverlay.Rebrand.DialogSpacing" parent="">
         <item name="daxRebrandDialogSpacing">true</item>
+    </style>
+
+    <attr name="daxRebrandBottomSheets" format="boolean" />
+
+    <style name="ThemeOverlay.Rebrand.BottomSheets" parent="">
+        <item name="daxRebrandBottomSheets">true</item>
     </style>
 
     <!-- Blank margin the Material radio drawable (a 32dp box around a 20dp circle) keeps on each side of its circle. -->

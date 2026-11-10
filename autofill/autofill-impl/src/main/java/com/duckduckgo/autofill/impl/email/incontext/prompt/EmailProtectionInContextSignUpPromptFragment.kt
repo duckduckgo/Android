@@ -35,6 +35,7 @@ import com.duckduckgo.autofill.impl.email.incontext.prompt.EmailProtectionInCont
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
@@ -86,6 +87,15 @@ class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment()
         val binding = DialogEmailProtectionInContextSignUpBinding.inflate(inflater, container, false)
         configureViews(binding)
         observeViewModel()
+        binding.dialogRootView.applyRebrandBottomSheetSpacing(
+            header = binding.siteDetailsContainer,
+            title = binding.dialogTitle,
+            messages = listOf(binding.onboardingSubtitle),
+            buttons = binding.protectMyEmailButton,
+            secondary = listOf(binding.doNotShowAgainButton),
+            close = binding.closeButton,
+            content = binding.autofillDialogContentContainer,
+        )
         binding.dialogRootView.applyBottomSystemBarInsetPadding()
         return binding.root
     }
