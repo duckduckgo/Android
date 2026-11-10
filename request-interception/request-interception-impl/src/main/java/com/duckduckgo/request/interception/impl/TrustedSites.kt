@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.model
+package com.duckduckgo.request.interception.impl
 
 import android.net.Uri
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.AppUrl
 
-class TrustedSites {
+internal class TrustedSites {
 
     companion object {
 
