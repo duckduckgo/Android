@@ -191,12 +191,13 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenSelectedTabDebounceRemovedThenSelectedTabEmittedImmediately() = runTest {
+    fun whenSelectedTabDebounceRemovedThenTabIdToMoveToEmittedImmediately() = runTest {
         swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
         initTestee()
         val emitted = mutableListOf<String>()
-        backgroundScope.launch { testee.selectedTabFlow.toList(emitted) }
+        backgroundScope.launch { testee.tabIdToMoveTo.toList(emitted) }
 
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0), TabEntity(tabId = "t2", position = 1)))
         selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
         runCurrent()
         selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
@@ -206,8 +207,26 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenSelectedTabDebounceKeptThenOnlyLastSelectedTabEmitted() = runTest {
+    fun whenSelectedTabDebounceKeptThenTabIdToMoveToOnlyEmitsLastSelectedTab() = runTest {
         swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = false))
+        initTestee()
+        val emitted = mutableListOf<String>()
+        backgroundScope.launch { testee.tabIdToMoveTo.toList(emitted) }
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0), TabEntity(tabId = "t2", position = 1)))
+        selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
+        runCurrent()
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+        assertEquals(emptyList<String>(), emitted)
+
+        advanceTimeBy(101)
+        assertEquals(listOf("t2"), emitted)
+    }
+
+    @Test
+    fun whenSelectedTabDebounceRemovedThenSelectedTabFlowIsStillDebounced() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
         initTestee()
         val emitted = mutableListOf<String>()
         backgroundScope.launch { testee.selectedTabFlow.toList(emitted) }

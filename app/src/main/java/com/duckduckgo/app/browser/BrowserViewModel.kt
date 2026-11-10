@@ -196,27 +196,25 @@ class BrowserViewModel @Inject constructor(
     // Read once so the flows below and the activity's collector can't disagree if remote config changes mid-session.
     val isSelectedTabDebounceRemoved: Boolean = swipingTabsFeature.removeSelectedTabDebounceEnabled()
 
-    val selectedTabFlow: Flow<String> =
+    private val distinctSelectedTabFlow: Flow<String> =
         tabRepository.flowSelectedTab
             .mapNotNull { tab -> tab?.tabId }
             .distinctUntilChanged()
-            .let {
-                if (isSelectedTabDebounceRemoved) {
-                    it
-                } else {
-                    it.debounce(100.milliseconds)
-                }
-            }
+
+    // Stays debounced so selections that only last a moment don't update the tab's last access.
+    val selectedTabFlow: Flow<String> = distinctSelectedTabFlow.debounce(100.milliseconds)
+
+    private val pagerSelectedTabFlow: Flow<String> = if (isSelectedTabDebounceRemoved) distinctSelectedTabFlow else selectedTabFlow
 
     val tabsFlow: Flow<List<TabModel>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome, tab.sourceTabId) } }
         .distinctUntilChanged()
 
-    val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
+    val selectedTabIndex: Flow<Int> = combine(tabsFlow, pagerSelectedTabFlow) { tabs, selectedTab ->
         tabs.indexOfFirst { it.tabId == selectedTab }
     }.filterNot { it == -1 }
 
-    val tabIdToMoveTo: Flow<String> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
+    val tabIdToMoveTo: Flow<String> = combine(tabsFlow, pagerSelectedTabFlow) { tabs, selectedTab ->
         selectedTab.takeIf { tabs.any { it.tabId == selectedTab } }
     }.filterNotNull()
 
