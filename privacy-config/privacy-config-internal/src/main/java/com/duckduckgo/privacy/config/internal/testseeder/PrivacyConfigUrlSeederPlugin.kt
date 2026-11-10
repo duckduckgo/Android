@@ -25,6 +25,8 @@ import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.testseeder.api.TestSeederKey
 import com.duckduckgo.testseeder.api.TestSeederPlugin
 import dev.zacsweers.metro.ContributesIntoSet
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 import java.net.URI
 import javax.inject.Inject
 
@@ -49,6 +51,13 @@ class PrivacyConfigUrlSeederPlugin @Inject constructor(
         store.remotePrivacyConfigUrl = url
         store.useCustomPrivacyConfigUrl = true
 
+        // LocalPrivacyConfigObserver persists the bundled config asynchronously at launch. Its version is far higher
+        // than any test config's, so if it lands after the reset below it replaces the custom config.
+        val bundledConfigLoaded = withTimeoutOrNull(BUNDLED_CONFIG_TIMEOUT_MS) {
+            while (privacyConfigRepository.get() == null) delay(BUNDLED_CONFIG_POLL_MS)
+        } != null
+        check(bundledConfigLoaded) { "PrivacyConfigUrlSeederPlugin: bundled privacy config not loaded after ${BUNDLED_CONFIG_TIMEOUT_MS}ms" }
+
         // The persister only stores a config newer than the current one; resetting the version, as the
         // dev settings "Load" button does, makes it accept the custom config whatever its version.
         privacyConfigRepository.insert(PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = ""))
@@ -56,5 +65,10 @@ class PrivacyConfigUrlSeederPlugin @Inject constructor(
         check(result is ConfigDownloadResult.Success) {
             "PrivacyConfigUrlSeederPlugin: download from '$url' failed: ${(result as? ConfigDownloadResult.Error)?.error}"
         }
+    }
+
+    private companion object {
+        const val BUNDLED_CONFIG_TIMEOUT_MS = 10_000L
+        const val BUNDLED_CONFIG_POLL_MS = 100L
     }
 }

@@ -29,8 +29,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -44,6 +47,7 @@ class PrivacyConfigUrlSeederPluginTest {
 
     @Test
     fun whenValidUrlThenStoresOverrideAndDownloadsAfterVersionReset() = runTest {
+        whenever(repository.get()).thenReturn(BUNDLED_CONFIG)
         whenever(downloader.download()).thenReturn(ConfigDownloadResult.Success)
 
         plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, " $URL ")
@@ -58,11 +62,38 @@ class PrivacyConfigUrlSeederPluginTest {
 
     @Test
     fun whenDownloadFailsThenThrows() {
+        whenever(repository.get()).thenReturn(BUNDLED_CONFIG)
         runTest { whenever(downloader.download()).thenReturn(ConfigDownloadResult.Error("boom")) }
 
         assertThrows(IllegalStateException::class.java) {
             runTest { plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, URL) }
         }
+    }
+
+    @Test
+    fun whenBundledConfigNotLoadedYetThenWaitsBeforeVersionReset() = runTest {
+        whenever(repository.get()).thenReturn(null, null, BUNDLED_CONFIG)
+        whenever(downloader.download()).thenReturn(ConfigDownloadResult.Success)
+
+        plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, URL)
+
+        inOrder(repository, downloader).run {
+            verify(repository, times(3)).get()
+            verify(repository).insert(PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = ""))
+            verify(downloader).download()
+        }
+    }
+
+    @Test
+    fun whenBundledConfigNeverLoadsThenThrowsWithoutResettingVersion() {
+        whenever(repository.get()).thenReturn(null)
+
+        assertThrows(IllegalStateException::class.java) {
+            runTest { plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, URL) }
+        }
+
+        verify(repository, never()).insert(any())
+        verifyNoInteractions(downloader)
     }
 
     @Test
@@ -86,5 +117,6 @@ class PrivacyConfigUrlSeederPluginTest {
 
     private companion object {
         const val URL = "https://privacy-test-pages.site/content-scope-scripts/infra/config/conditional-matching-experiments.json"
+        val BUNDLED_CONFIG = PrivacyConfig(version = 1_000L, readme = "", eTag = "", timestamp = "")
     }
 }
