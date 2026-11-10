@@ -121,7 +121,6 @@ interface BadUrlErrorPageWideEvent {
 @SingleIn(AppScope::class)
 class RealBadUrlErrorPageWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val badUrlErrorPageWideEventFeature: Lazy<BadUrlErrorPageWideEventFeature>,
     private val suggestRedirectFeature: SuggestRedirectOnUnresolvedErrorFeature,
     @param:RegularMode private val regularTabRepository: TabRepository,
     @param:FireMode private val fireTabRepository: TabRepository,
@@ -360,8 +359,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
 
     private suspend fun isRecordingEnabled(): Boolean = withContext(dispatchers.io()) {
         // Suggest redirect feature conditions to be removed once we remove its feature flag
-        badUrlErrorPageWideEventFeature.value.self().isEnabled() &&
-            suggestRedirectFeature.self().isEnabled() &&
+        suggestRedirectFeature.self().isEnabled() &&
             suggestRedirectFeature.suggestRedirect().isEnabled()
     }
 
