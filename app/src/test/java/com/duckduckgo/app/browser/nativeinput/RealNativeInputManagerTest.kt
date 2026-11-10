@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.DuckChatLaunchAction
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -634,7 +635,7 @@ class RealNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner,
             tabs = mock<LiveData<List<TabEntity>>>(),
             currentTabUrl = url,
-            forceImageGeneration = forceImageGeneration,
+            launchAction = if (forceImageGeneration) DuckChatLaunchAction.ImageGeneration else null,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
@@ -700,7 +701,7 @@ class RealNativeInputManagerTest {
         )
 
         assertTrue(inspectedBeforeConfiguration)
-        verify(widgetDelegate).configure(tabId = "tab", isDuckAiMode = true, isBottom = true, forceImageGeneration = false)
+        verify(widgetDelegate).configure(tabId = "tab", isDuckAiMode = true, isBottom = true, launchAction = null)
     }
 
     @Test
@@ -1325,7 +1326,6 @@ class RealNativeInputManagerTest {
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),
-            forceImageGeneration = false,
         )
         return widget
     }
@@ -1339,7 +1339,6 @@ class RealNativeInputManagerTest {
             currentTabUrl = emptyFlow(),
             query = "",
             callbacks = mock<NativeInputCallbacks>(),
-            forceImageGeneration = false,
         )
     }
 
