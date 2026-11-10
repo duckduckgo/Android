@@ -61,6 +61,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
