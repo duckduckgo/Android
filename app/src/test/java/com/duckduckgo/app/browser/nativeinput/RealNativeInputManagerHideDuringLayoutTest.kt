@@ -124,7 +124,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),
-            forceImageGeneration = false,
+            launchAction = null,
         )
         assertEquals("floating submit container attached to content frame", 2, content.childCount)
 
