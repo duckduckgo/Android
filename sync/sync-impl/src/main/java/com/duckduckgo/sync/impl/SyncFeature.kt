@@ -157,6 +157,18 @@ interface SyncFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun refreshConnectedDevicesOnSync(): Toggle
+
+    /**
+     * Kill switch for everything that reads the account audit log.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun loginAuditLog(): Toggle
+
+    /**
+     * Gates the new-login banner and system notification. No effect unless [loginAuditLog] is also enabled.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun loginNotification(): Toggle
 }
 
 /**
