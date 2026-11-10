@@ -7373,6 +7373,30 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCustomTabHasNoSessionAndAppLinkResolvesToReferrerAppWithoutGestureThenAppLinkNotOpened() {
+        delegateAppLinksHandlerToRealImplementation()
+        val appLink = appLinkResolvingTo("com.example.origin")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.origin")
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+
+        assertCommandNotIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenNeverSettingAndTrustedCallerFlagsOnAndNoSessionAndAppLinkResolvesToReferrerAppWithoutGestureThenAppLinkNotOpened() {
+        delegateAppLinksHandlerToRealImplementation(appLinksEnabled = false)
+        setAppLinksSettingNever()
+        setTrustedCallerFlags(enabled = true)
+        val appLink = appLinkResolvingTo("com.example.origin")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.origin")
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+
+        assertCommandNotIssued<Command.OpenAppLink>()
+    }
+
+    @Test
     fun whenCustomTabHasNoSessionAndGesturedAppLinkResolvesToReferrerAppInAskModeThenAppLinkOpenedWithoutPrompt() {
         delegateAppLinksHandlerToRealImplementation()
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
