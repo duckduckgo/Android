@@ -17,6 +17,7 @@ package com.duckduckgo.duckchat.impl.widget
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.BlendMode
 import android.os.Build
 import android.util.SizeF
 import android.util.TypedValue
@@ -224,6 +225,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
 
     // Always set on SDK 31+: the launcher reapplies RemoteViews onto the views it already inflated, so omitting a tint
     // would leave the previous one in place. A null background colour clears the tint, restoring the drawable's own colour.
+    // SRC makes the tint replace the translucent drawable colours instead of inheriting their alpha (default SRC_IN).
     @RequiresApi(31)
     private fun applyColors(remoteViews: RemoteViews, colors: WidgetColors) {
         remoteViews.tint(R.id.duckAiWidgetContainer, colors.background)
@@ -257,8 +259,10 @@ class DuckAiWidgetConfigurator @Inject constructor(
     private fun RemoteViews.tint(viewId: Int, @ColorRes color: Int?) {
         if (color != null) {
             setColorStateList(viewId, "setBackgroundTintList", color)
+            setBlendMode(viewId, "setBackgroundTintBlendMode", BlendMode.SRC)
         } else {
             setColorStateList(viewId, "setBackgroundTintList", null as ColorStateList?)
+            setBlendMode(viewId, "setBackgroundTintBlendMode", null)
         }
     }
 
