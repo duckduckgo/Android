@@ -6,8 +6,6 @@ name: Code review assistant
 # duckduckgo/claude-skills-factory-android, which is internal.
 
 on:
-  push:
-    branches: [feature/david/code_review_assistant_workflow]
   workflow_dispatch:
     inputs:
       pr:
@@ -30,22 +28,22 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: code-review-assistant-${{ inputs.pr || 10422 }}
+  group: code-review-assistant-${{ inputs.pr }}
 
 jobs:
   review:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      PR: ${{ inputs.pr || 10422 }}
-      PLUGIN_REF: ${{ inputs.plugin_ref || 'feature/david/code-review-ci-mode' }}
-      MODEL: ${{ inputs.model || 'sonnet' }}
-      WORK: /tmp/code-review-assistant/pr-${{ inputs.pr || 10422 }}
+      PR: ${{ inputs.pr }}
+      PLUGIN_REF: ${{ inputs.plugin_ref }}
+      MODEL: ${{ inputs.model }}
+      WORK: /tmp/code-review-assistant/pr-${{ inputs.pr }}
     steps:
       - name: Check out the pull request
         uses: actions/checkout@v4
         with:
-          ref: refs/pull/${{ inputs.pr || 10422 }}/head
+          ref: refs/pull/${{ inputs.pr }}/head
           persist-credentials: false
 
       # The deploy key is used only by checkouts and the push, never in the
@@ -54,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: duckduckgo/claude-skills-factory-android
-          ref: ${{ inputs.plugin_ref || 'feature/david/code-review-ci-mode' }}
+          ref: ${{ inputs.plugin_ref }}
           ssh-key: ${{ secrets.CODE_REVIEW_RECORDS_KEY }}
           path: .review-plugin
           persist-credentials: false
@@ -116,6 +114,7 @@ jobs:
             mkdir -p records/ci
             cp "$WORK/review.md" "records/ci/pr-${PR}.md"
             if [ -f "$WORK/findings.json" ]; then cp "$WORK/findings.json" "records/ci/pr-${PR}.json"; fi
+            if [ -f "$WORK/candidates.json" ]; then cp "$WORK/candidates.json" "records/ci/pr-${PR}.candidates.json"; fi
             git add records/ci
             git commit -q -m "Add CI review of duckduckgo/Android#${PR}"
           fi
