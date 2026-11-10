@@ -68,16 +68,16 @@
             android:foregroundServiceType="microphone" />
 
         <receiver
-            android:name=".widget.DuckAiCombinedWidget"
+            android:name=".widget.DuckAiWidgetProvider"
             android:enabled="false"
             android:exported="false"
-            android:label="@string/duckAiCombinedWidgetLabel">
+            android:label="@string/duckAiWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/duck_ai_combined_widget_info" />
+                android:resource="@xml/duck_ai_widget_info" />
         </receiver>
     </application>
 </manifest>

@@ -18,15 +18,15 @@
 
 <!-- previewImage is a placeholder pending a design asset for the widget picker. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/duck_ai_combined_widget_daynight"
+    android:initialLayout="@layout/duck_ai_widget_daynight"
     android:minWidth="250dp"
     android:minHeight="130dp"
     android:minResizeWidth="180dp"
     android:minResizeHeight="130dp"
     android:targetCellWidth="4"
     android:targetCellHeight="2"
-    android:previewImage="@drawable/duck_ai_combined_widget_preview"
-    android:description="@string/duckAiCombinedWidgetDescription"
+    android:previewImage="@drawable/duck_ai_widget_preview"
+    android:description="@string/duckAiWidgetDescription"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen" />

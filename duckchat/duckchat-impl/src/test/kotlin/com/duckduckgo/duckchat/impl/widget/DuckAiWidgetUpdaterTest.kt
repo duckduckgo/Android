@@ -41,7 +41,7 @@ class DuckAiWidgetUpdaterTest {
         testee.onPrivacyConfigDownloaded()
 
         val intent = shadowOf(context).broadcastIntents.single()
-        assertEquals(DuckAiCombinedWidget::class.java.name, intent.component?.className)
+        assertEquals(DuckAiWidgetProvider::class.java.name, intent.component?.className)
         assertEquals(AppWidgetManager.ACTION_APPWIDGET_UPDATE, intent.action)
         assertEquals(listOf(widgetId), intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)?.toList())
     }
@@ -54,7 +54,7 @@ class DuckAiWidgetUpdaterTest {
     }
 
     private fun createWidget(widgetId: Int = WIDGET_ID): Int {
-        val provider = ComponentName(context, DuckAiCombinedWidget::class.java)
+        val provider = ComponentName(context, DuckAiWidgetProvider::class.java)
         val manager = AppWidgetManager.getInstance(context)
         shadowOf(manager).addInstalledProvider(AppWidgetProviderInfo().apply { this.provider = provider })
         manager.bindAppWidgetIdIfAllowed(widgetId, provider)

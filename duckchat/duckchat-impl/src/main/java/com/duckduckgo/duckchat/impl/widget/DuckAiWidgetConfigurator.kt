@@ -26,14 +26,14 @@ import logcat.logcat
 import javax.inject.Inject
 
 /** Request codes of the widget's tap targets; each target needs its own so their [android.app.PendingIntent]s stay distinct. */
-enum class DuckAiCombinedWidgetTarget(val requestCode: Int) {
+enum class DuckAiWidgetTarget(val requestCode: Int) {
     PROMPT_BAR(1591),
     VOICE(1592),
     CREATE_IMAGE(1593),
     TAKE_PHOTO(1594),
 }
 
-class DuckAiCombinedWidgetConfigurator @Inject constructor(
+class DuckAiWidgetConfigurator @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val intents: DuckAiWidgetIntents,
     private val dispatcherProvider: DispatcherProvider,
@@ -51,23 +51,23 @@ class DuckAiCombinedWidgetConfigurator @Inject constructor(
 
         withContext(dispatcherProvider.main()) {
             if (state == null) {
-                logcat { "DuckAiCombinedWidget Duck.ai disabled, click targets not wired" }
+                logcat { "DuckAiWidgetProvider Duck.ai disabled, click targets not wired" }
                 return@withContext
             }
 
             remoteViews.setOnClickPendingIntent(
                 R.id.promptBarContainer,
-                intents.launchDuckAi(context, DuckAiCombinedWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl),
+                intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl),
             )
             remoteViews.setOnClickPendingIntent(
                 R.id.actionVoice,
-                intents.launchDuckAi(context, DuckAiCombinedWidgetTarget.VOICE.requestCode, state.voiceUrl),
+                intents.launchDuckAi(context, DuckAiWidgetTarget.VOICE.requestCode, state.voiceUrl),
             )
             remoteViews.setOnClickPendingIntent(
                 R.id.actionCreateImage,
                 intents.launchDuckAi(
                     context,
-                    DuckAiCombinedWidgetTarget.CREATE_IMAGE.requestCode,
+                    DuckAiWidgetTarget.CREATE_IMAGE.requestCode,
                     state.newChatUrl,
                     DuckChatLaunchAction.ImageGeneration,
                 ),
@@ -76,7 +76,7 @@ class DuckAiCombinedWidgetConfigurator @Inject constructor(
                 R.id.actionTakePhoto,
                 intents.launchDuckAi(
                     context,
-                    DuckAiCombinedWidgetTarget.TAKE_PHOTO.requestCode,
+                    DuckAiWidgetTarget.TAKE_PHOTO.requestCode,
                     state.newChatUrl,
                     DuckChatLaunchAction.CameraCapture,
                 ),

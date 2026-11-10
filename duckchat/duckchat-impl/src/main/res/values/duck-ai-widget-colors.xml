@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <color name="duckAiCombinedWidgetBackgroundColor">@color/searchWidgetBackgroundColor</color>
-    <color name="duckAiCombinedWidgetSearchBarColor">@color/searchWidgetSearchBarBackgroundColor</color>
-    <color name="duckAiCombinedWidgetContainerColor">@color/black9</color>
-    <color name="duckAiCombinedWidgetHintColor">@color/searchWidgetSearchBarHintColor</color>
-    <color name="duckAiCombinedWidgetOnContainerColor">@color/searchWidgetSearchBarTrailingIconColor</color>
+    <color name="duckAiWidgetBackgroundColor">@color/searchWidgetBackgroundColor</color>
+    <color name="duckAiWidgetSearchBarColor">@color/searchWidgetSearchBarBackgroundColor</color>
+    <color name="duckAiWidgetContainerColor">@color/black9</color>
+    <color name="duckAiWidgetHintColor">@color/searchWidgetSearchBarHintColor</color>
+    <color name="duckAiWidgetOnContainerColor">@color/searchWidgetSearchBarTrailingIconColor</color>
 </resources>

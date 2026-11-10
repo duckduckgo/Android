@@ -80,7 +80,7 @@
 
     <issue
         id="UnsafeImplicitIntentLaunch"
-        message="The intent action `android.appwidget.action.APPWIDGET_UPDATE (used to send a broadcast)` matches the intent filter of a non-exported component `com.duckduckgo.duckchat.impl.widget.DuckAiCombinedWidget` from a manifest. If you are trying to invoke this specific component via the action then you should make the intent explicit by calling `Intent.set{Component,Class,ClassName}`."
+        message="The intent action `android.appwidget.action.APPWIDGET_UPDATE (used to send a broadcast)` matches the intent filter of a non-exported component `com.duckduckgo.duckchat.impl.widget.DuckAiWidgetProvider` from a manifest. If you are trying to invoke this specific component via the action then you should make the intent explicit by calling `Intent.set{Component,Class,ClassName}`."
         errorLine1="        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)"
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -91,7 +91,7 @@
 
     <issue
         id="UnsafeImplicitIntentLaunch"
-        message="The intent action `android.appwidget.action.APPWIDGET_UPDATE (used to send a broadcast)` matches the intent filter of a non-exported component `com.duckduckgo.duckchat.impl.widget.DuckAiCombinedWidget` from a manifest. If you are trying to invoke this specific component via the action then you should make the intent explicit by calling `Intent.set{Component,Class,ClassName}`."
+        message="The intent action `android.appwidget.action.APPWIDGET_UPDATE (used to send a broadcast)` matches the intent filter of a non-exported component `com.duckduckgo.duckchat.impl.widget.DuckAiWidgetProvider` from a manifest. If you are trying to invoke this specific component via the action then you should make the intent explicit by calling `Intent.set{Component,Class,ClassName}`."
         errorLine1="        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)"
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
