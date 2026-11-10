@@ -86,6 +86,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.applinks.DuckDuckGoAppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
@@ -7360,6 +7361,227 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCustomTabHasNoSessionAndAppLinkResolvesToDifferentAppThanReferrerThenAppLinkNotOpenedWithoutGesture() {
+        delegateAppLinksHandlerToRealImplementation()
+        val appLink = appLinkResolvingTo("com.example.other")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.origin")
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+
+        assertCommandNotIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenCustomTabHasNoSessionAndGesturedAppLinkResolvesToReferrerAppInAskModeThenAppLinkOpenedWithoutPrompt() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        val appLink = appLinkResolvingTo("com.example.origin")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.origin")
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenCustomTabHasSessionAndGesturedAppLinkResolvesToClientAppInAskModeThenAppLinkOpenedWithoutPrompt() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        val appLink = appLinkResolvingTo("com.example.origin")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenNeverSettingAndTrustedCallerFlagsOnAndNoSessionAndGesturedAppLinkResolvesToReferrerAppThenAppLinkOpened() {
+        delegateAppLinksHandlerToRealImplementation(appLinksEnabled = false)
+        setAppLinksSettingNever()
+        setTrustedCallerFlags(enabled = true)
+        val appLink = appLinkResolvingTo("com.example.origin")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.origin")
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenNeverSettingAndTrustedCallerFlagsOffAndNoSessionAndGesturedAppLinkResolvesToReferrerAppThenAppLinkNotOpened() {
+        delegateAppLinksHandlerToRealImplementation(appLinksEnabled = false)
+        setAppLinksSettingNever()
+        setTrustedCallerFlags(enabled = false)
+        val appLink = appLinkResolvingTo("com.example.origin")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.origin")
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandNotIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenAskSettingAndTrustedCallerFlagsOffAndNoSessionAndGesturedAppLinkResolvesToReferrerAppThenLegacyPathOpensAppLinkWithoutPrompt() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        setTrustedCallerFlags(enabled = false)
+        val appLink = appLinkResolvingTo("com.example.origin")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.origin")
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenCustomTabHasSessionAndAppLinkResolvesToClientAppThenAppLinkOpenedWithoutGesture() {
+        delegateAppLinksHandlerToRealImplementation()
+        val appLink = appLinkResolvingTo("com.example.origin")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenCustomTabHasSessionAndAppLinkResolvesToDifferentAppThanClientThenAppLinkNotOpenedWithoutGesture() {
+        delegateAppLinksHandlerToRealImplementation()
+        val appLink = appLinkResolvingTo("com.example.other")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+
+        assertCommandNotIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenCustomTabAndAskSettingAndGesturedAppLinkResolvesToDifferentAppThanClientThenPromptShownAndAppNotOpened() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        val appLink = appLinkResolvingTo("com.google.android.youtube")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.ShowAppLinkPrompt>()
+        assertCommandNotIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenCustomTabAndNeverSettingAndGesturedAppLinkResolvesToDifferentAppThanClientThenAppLinkNotOpenedAndNoPrompt() {
+        delegateAppLinksHandlerToRealImplementation(appLinksEnabled = false)
+        setAppLinksSettingNever()
+        val appLink = appLinkResolvingTo("com.google.android.youtube")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandNotIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenCustomTabAndAlwaysSettingAndGesturedAppLinkResolvesToDifferentAppThanClientThenAppLinkOpened() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        val appLink = appLinkResolvingTo("com.google.android.youtube")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenCustomTabAndAskSettingAndAppLinkResolvesToDifferentAppThanClientWithoutGestureThenAppLinkNotOpenedAndNoPrompt() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        val appLink = appLinkResolvingTo("com.google.android.youtube")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+
+        assertCommandNotIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenAskSettingAndTrustedCallerFlagsOffAndGesturedAppLinkResolvesToDifferentAppThanClientThenLegacyPathOpensAppLinkWithoutPrompt() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        setTrustedCallerFlags(enabled = false)
+        val appLink = appLinkResolvingTo("com.google.android.youtube")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenNeverSettingAndTrustedCallerFlagsOffAndGesturedAppLinkResolvesToDifferentAppThanClientThenLegacyPathDoesNotOpenAppLink() {
+        delegateAppLinksHandlerToRealImplementation(appLinksEnabled = false)
+        setAppLinksSettingNever()
+        setTrustedCallerFlags(enabled = false)
+        val appLink = appLinkResolvingTo("com.google.android.youtube")
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.origin", referrerPackage = null)
+
+        testee.handleAppLink(appLink, isForMainFrame = true, hasGesture = true)
+
+        assertCommandNotIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    private fun setAppLinksSettingNever() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(false)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
+    }
+
+    private fun setTrustedCallerFlags(enabled: Boolean) {
+        val state = State(enable = enabled)
+        fakeCustomTabsFeature.handleTrustedCallers().setRawStoredState(state)
+        fakeCustomTabsFeature.handleTrustedCallersNonHttpLinks().setRawStoredState(state)
+        fakeCustomTabsFeature.handleTrustedCallersWhenAppLinksDisabled().setRawStoredState(state)
+        fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(state)
+    }
+
+    private fun appLinkResolvingTo(packageName: String) =
+        SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl, appIntent = Intent().setPackage(packageName))
+
+    private fun delegateAppLinksHandlerToRealImplementation(appLinksEnabled: Boolean = true) {
+        val appLinksFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+        appLinksFeature.customTabEndlessLoopFix().setRawStoredState(State(enable = true))
+        val real = DuckDuckGoAppLinksHandler(appLinksFeature)
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(appLinksEnabled)
+        whenever(mockAppLinksHandler.isTrustedCaller(any(), anyOrNull())).thenAnswer {
+            real.isTrustedCaller(it.arguments[0] as SpecialUrlDetector.UrlType.AppLink, it.arguments[1] as String?)
+        }
+        whenever(mockAppLinksHandler.handleAppLink(any(), any(), any(), anyOrNull(), any(), any(), any(), any())).thenAnswer {
+            @Suppress("UNCHECKED_CAST")
+            real.handleAppLink(
+                it.arguments[0] as Boolean,
+                it.arguments[1] as SpecialUrlDetector.UrlType.AppLink,
+                it.arguments[2] as Boolean,
+                it.arguments[3] as String?,
+                it.arguments[4] as Boolean,
+                it.arguments[5] as Boolean,
+                it.arguments[6] as Boolean,
+                it.arguments[7] as () -> Unit,
+            )
+        }
+    }
+
+    @Test
     fun whenHandleAppLinkCalledInCustomTabThenVerifiedClientPackageForwardedToHandlerNotReferrer() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.app")
@@ -7755,6 +7977,19 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.HandleNonHttpAppLink> {
             assertEquals("com.example.app", this.trustedCallerPackage)
         }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledWithNeverAndOnlyReferrerAndAllTrustedCallerFlagsOffThenNavigateToFallback() {
+        setAppLinksSettingNever()
+        setTrustedCallerFlags(enabled = false)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.app")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
+
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+
+        assertCommandNotIssued<Command.HandleNonHttpAppLink>()
+        assertCommandIssued<NavigationCommand.Navigate> { assertEquals(exampleUrl, url) }
     }
 
     @Test
