@@ -30,10 +30,14 @@ import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +47,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.mockingDetails
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -57,6 +62,7 @@ class DuckAiWidgetConfiguratorTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val duckChat: DuckChatInternal = mock()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val chatStore: DuckAiChatStore = mock()
     private val widgetPreferences: DuckAiWidgetPreferences = mock<DuckAiWidgetPreferences> {
         onBlocking { showRecentChats(any()) } doReturn true
@@ -67,6 +73,7 @@ class DuckAiWidgetConfiguratorTest {
 
     private val testee = DuckAiWidgetConfigurator(
         duckChat = duckChat,
+        duckChatFeature = duckChatFeature,
         chats = DuckAiChatsWidgetChats(stringContext, chatStore),
         widgetPreferences = widgetPreferences,
         intents = fakeDuckAiWidgetIntents(),
@@ -310,6 +317,94 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     @Test
+    @Config(sdk = [34])
+    fun whenDynamicColorsFlagOffThenNoColorSettersApplied() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = false)
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = false))
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
+
+        verify(remoteViews, never()).setColorStateList(any(), any(), any<Int>())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDynamicColorsFlagOnThenWidgetViewsTintedWithDynamicColorResources() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = false)
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = true))
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
+
+        verify(remoteViews).setColorStateList(R.id.duckAiWidgetContainer, BACKGROUND_TINT, R.color.duckAiWidgetDynamicBackgroundColor)
+        verify(remoteViews).setColorStateList(R.id.promptBarContainer, BACKGROUND_TINT, R.color.duckAiWidgetDynamicSearchBarColor)
+        listOf(R.id.actionVoice, R.id.actionCreateImage, R.id.actionTakePhoto).forEach {
+            verify(remoteViews).setColorStateList(it, BACKGROUND_TINT, R.color.duckAiWidgetDynamicContainerColor)
+        }
+        listOf(R.id.iconVoice, R.id.iconImage, R.id.iconPhoto).forEach {
+            verify(remoteViews).setColorStateList(it, IMAGE_TINT, R.color.duckAiWidgetDynamicOnContainerColor)
+        }
+        listOf(R.id.labelVoice, R.id.labelCreateImage, R.id.labelTakePhoto).forEach {
+            verify(remoteViews).setColorStateList(it, TEXT_COLOR, R.color.duckAiWidgetDynamicOnContainerColor)
+        }
+        listOf(R.id.promptBarHint, R.id.chatsMessageEmpty, R.id.chatsMessageUnavailable).forEach {
+            verify(remoteViews).setColorStateList(it, TEXT_COLOR, R.color.duckAiWidgetDynamicHintColor)
+        }
+        verify(remoteViews).setColorStateList(R.id.chatsViewAll, TEXT_COLOR, R.color.duckAiWidgetDynamicTextColor)
+        listOf(R.id.dividerTop, R.id.dividerBottom).forEach {
+            verify(remoteViews).setColorStateList(it, BACKGROUND_TINT, R.color.duckAiWidgetDynamicDividerColor)
+        }
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun whenDynamicColorsFlagOnOnApi30ThenNoColorSettersApplied() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = false)
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = true))
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
+
+        assertTrue(mockingDetails(remoteViews).invocations.none { it.method.name == "setColorStateList" })
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDynamicColorsFlagOnThenChatRowsTintedWithDynamicColors() = runTest {
+        val row = populateAndApplyFirstChatRow(dynamicColors = true)
+
+        assertEquals(
+            activity.getColor(R.color.duckAiWidgetDynamicContainerColor),
+            row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList?.defaultColor,
+        )
+        assertEquals(
+            activity.getColor(R.color.duckAiWidgetDynamicOnContainerColor),
+            row.findViewById<ImageView>(R.id.chatsItemIcon).imageTintList?.defaultColor,
+        )
+        assertEquals(activity.getColor(R.color.duckAiWidgetDynamicTextColor), row.findViewById<TextView>(R.id.chatsItemTitle).currentTextColor)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDynamicColorsFlagOffThenChatRowsKeepStaticColors() = runTest {
+        val row = populateAndApplyFirstChatRow(dynamicColors = false)
+
+        assertNull(row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList)
+        assertEquals(activity.getColor(R.color.duckAiWidgetTextColor), row.findViewById<TextView>(R.id.chatsItemTitle).currentTextColor)
+    }
+
+    private suspend fun populateAndApplyFirstChatRow(dynamicColors: Boolean): View {
+        stubDuckAi(enabled = true, historyAvailable = true)
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = dynamicColors))
+        whenever(chatStore.getChats()).thenReturn(listOf(chat("a")))
+        whenever(duckChat.buildChatUrl(any())).thenReturn(CHAT_URL)
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
+
+        val captor = argumentCaptor<RemoteViews.RemoteCollectionItems>()
+        verify(remoteViews).setRemoteAdapter(eq(R.id.chatsList), captor.capture())
+        return captor.firstValue.getItemView(0).apply(activity, FrameLayout(activity))
+    }
+
+    @Test
     fun whenHeightBelowThresholdThenChatsHiddenAndNotWired() = runTest {
         stubDuckAi(enabled = true, historyAvailable = true)
 
@@ -374,6 +469,24 @@ class DuckAiWidgetConfiguratorTest {
             listOf(R.id.promptBarContainer, R.id.actionVoice, R.id.actionCreateImage, R.id.actionTakePhoto).forEach { id ->
                 assertTrue(root.findViewById<View>(id).hasOnClickListeners())
             }
+        }
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDynamicColorsFlagOnThenEverySizeMapVariantIsTinted() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = true))
+
+        val variants = sizedVariantsByKey(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 50))
+
+        assertEquals(4, variants.size)
+        val expectedBackground = activity.getColorStateList(R.color.duckAiWidgetDynamicBackgroundColor)
+        val expectedLabel = activity.getColorStateList(R.color.duckAiWidgetDynamicOnContainerColor)
+        variants.values.forEach { variant ->
+            val root = variant.apply(activity, FrameLayout(activity))
+            assertEquals(expectedBackground, root.findViewById<View>(R.id.duckAiWidgetContainer).backgroundTintList)
+            labelIds.forEach { assertEquals(expectedLabel, root.findViewById<TextView>(it).textColors) }
         }
     }
 
@@ -489,5 +602,9 @@ class DuckAiWidgetConfiguratorTest {
 
     private companion object {
         const val APP_WIDGET_ID = 7
+        const val BACKGROUND_TINT = "setBackgroundTintList"
+        const val IMAGE_TINT = "setImageTintList"
+        const val TEXT_COLOR = "setTextColor"
+        const val CHAT_URL = "https://duck.ai/?chatID=abc"
     }
 }
