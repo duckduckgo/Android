@@ -242,6 +242,23 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenSelectedTabIsRemovedFromTabsThenTabIdToMoveToEmitsNothing() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
+        initTestee()
+        val emitted = mutableListOf<String>()
+        backgroundScope.launch { testee.tabIdToMoveTo.toList(emitted) }
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0), TabEntity(tabId = "t2", position = 1)))
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+        assertEquals(listOf("t2"), emitted)
+
+        tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0)))
+        runCurrent()
+        assertEquals(listOf("t2"), emitted)
+    }
+
+    @Test
     fun whenSelectedTabIsNotInTabsYetThenTabIdToMoveToWaitsForTabs() = runTest {
         swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
         initTestee()
