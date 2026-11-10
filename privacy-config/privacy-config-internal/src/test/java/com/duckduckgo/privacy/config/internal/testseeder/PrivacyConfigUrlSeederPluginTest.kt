@@ -67,7 +67,7 @@ class PrivacyConfigUrlSeederPluginTest {
 
     @Test
     fun whenUrlIsInvalidThenThrowsWithoutTouchingConfig() {
-        listOf("", "not a url", "ftp://example.com/config.json", "https://").forEach { value ->
+        listOf("", "not a url", "ftp://example.com/config.json", "https://", "https:///config.json").forEach { value ->
             assertThrows(IllegalArgumentException::class.java) {
                 runTest { plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, value) }
             }
