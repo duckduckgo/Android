@@ -20,10 +20,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetAdBlockingDisabledBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.duckduckgo.mobile.android.R as CommonR
@@ -43,6 +45,15 @@ class AdBlockingDisabledBottomSheetDialog(
     private var defaultSheetHeight: Int? = null
 
     init {
+        binding.root.applyRebrandBottomSheetSpacing(
+            header = binding.adBlockingDisabledIcon,
+            title = binding.adBlockingDisabledTitle,
+            messages = listOf(binding.adBlockingDisabledContent),
+            buttons = binding.adBlockingDisabledPrimaryButton,
+            secondary = listOf(binding.adBlockingDisabledSecondaryButton),
+            close = binding.adBlockingDisabledCloseButton,
+            content = binding.root.getChildAt(0) as ViewGroup,
+        )
         setContentView(binding.root)
 
         binding.root.applyBottomSystemBarInsetPadding()

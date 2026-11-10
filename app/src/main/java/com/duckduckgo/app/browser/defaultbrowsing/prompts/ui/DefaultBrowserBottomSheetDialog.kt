@@ -20,10 +20,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getString
 import com.duckduckgo.app.browser.databinding.BottomSheetDefaultBrowserBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.ui.view.getDimensionFromAttr
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.R
@@ -47,6 +49,15 @@ class DefaultBrowserBottomSheetDialog(
     var eventListener: EventListener? = null
 
     init {
+        binding.root.applyRebrandBottomSheetSpacing(
+            header = binding.sheetIllustration,
+            title = binding.defaultBrowserBottomSheetDialogTitle,
+            messages = listOf(binding.defaultBrowserBottomSheetDialogSubTitle),
+            buttons = binding.defaultBrowserBottomSheetDialogPrimaryButton,
+            secondary = listOf(binding.defaultBrowserBottomSheetDialogGhostButton),
+            close = binding.defaultBrowserBottomSheetDialogCloseButton,
+            content = binding.root.getChildAt(0) as ViewGroup,
+        )
         setContentView(binding.root)
         // We need the dialog to always be expanded and not draggable because the content takes up a lot of vertical space and requires a scroll view,
         // especially in landscape aspect-ratios. If the dialog started as collapsed, the drag would interfere with internal scroll.

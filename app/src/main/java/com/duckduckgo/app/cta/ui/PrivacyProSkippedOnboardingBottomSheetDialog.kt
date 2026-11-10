@@ -20,11 +20,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getString
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetPrivacyProSkippedOnboardingBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.ui.view.getDimensionFromAttr
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
@@ -50,6 +52,15 @@ class PrivacyProSkippedOnboardingBottomSheetDialog(
     var eventListener: EventListener? = null
 
     init {
+        binding.root.applyRebrandBottomSheetSpacing(
+            header = binding.sheetIllustration,
+            title = binding.privacyProSkippedOnboardingTitle,
+            messages = listOf(binding.privacyProSkippedOnboardingSubTitle),
+            buttons = binding.privacyProSkippedOnboardingPrimaryButton,
+            secondary = listOf(binding.privacyProSkippedOnboardingGhostButton),
+            close = binding.privacyProSkippedOnboardingCloseButton,
+            content = binding.root.getChildAt(0) as ViewGroup,
+        )
         setContentView(binding.root)
         binding.root.applyBottomSystemBarInsetPadding()
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED

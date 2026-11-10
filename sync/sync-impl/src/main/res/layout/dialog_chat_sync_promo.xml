@@ -41,6 +41,7 @@
             tools:ignore="ContentDescription" />
 
         <ImageView
+            android:id="@+id/sheetIllustration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -49,6 +50,7 @@
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sheetTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -59,6 +61,7 @@
             app:typography="h1" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sheetMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"

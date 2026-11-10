@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.ui.credential.selecting
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -31,6 +32,7 @@ import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRec
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem.CredentialSecondaryType
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem.GroupHeading
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem.VerticalSpacing
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 
 class CredentialsPickerRecyclerAdapter(
     val lifecycleOwner: LifecycleOwner,
@@ -71,6 +73,12 @@ class CredentialsPickerRecyclerAdapter(
 
             ITEM_VIEW_TYPE_VERTICAL_SPACING -> {
                 val binding = ItemRowAutofillCredentialsPickerVerticalSpacingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                if (parent.context.isRebrandAreaEnabled(com.duckduckgo.mobile.android.R.attr.daxRebrandBottomSheets)) {
+                    binding.root.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                        topMargin = 0
+                        bottomMargin = 0
+                    }
+                }
                 VerticalSpacingViewHolder(binding)
             }
 

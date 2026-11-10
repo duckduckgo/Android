@@ -48,6 +48,7 @@ import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRec
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
@@ -116,6 +117,13 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         val binding = ContentAutofillSelectCredentialsTooltipBinding.inflate(inflater, container, false)
         configureViews(binding)
+        binding.root.applyRebrandBottomSheetSpacing(
+            header = binding.appIcon,
+            title = binding.useLoginTitle,
+            buttons = binding.availableCredentialsRecycler,
+            close = binding.closeButton,
+            content = binding.autofillDialogContentContainer,
+        )
         binding.root.applyBottomSystemBarInsetPadding()
         return binding.root
     }

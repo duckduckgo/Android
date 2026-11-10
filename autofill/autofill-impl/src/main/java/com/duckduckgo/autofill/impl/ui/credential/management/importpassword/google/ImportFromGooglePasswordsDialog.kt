@@ -69,6 +69,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewState
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
@@ -168,6 +169,80 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     ): View {
         _binding = ContentImportFromGooglePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
+        with(binding.legacy) {
+            legacyContent.applyRebrandBottomSheetSpacing(
+                header = preflow.topIllustrationAnimated,
+                title = preflow.dialogTitle,
+                messages = listOf(preflow.onboardingSubtitle),
+                buttons = preflow.importGcmButton,
+                secondary = listOf(preflow.declineButton),
+                close = closeButton,
+                sections = listOf(preflow.root, postflow.root, postflow.importFinished.root, postflow.importInProgress.root),
+            )
+            legacyContent.applyRebrandBottomSheetSpacing(
+                header = postflow.appIcon,
+                title = postflow.dialogTitle,
+                messages = listOf(postflow.inProgressFinishedViewSwitcher),
+                buttons = postflow.importFinished.primaryCtaButton,
+                close = closeButton,
+                sections = listOf(preflow.root, postflow.root, postflow.importFinished.root, postflow.importInProgress.root),
+            )
+        }
+        with(binding.preImport) {
+            root.applyRebrandBottomSheetSpacing(
+                header = preImportIcon,
+                title = preImportTitle,
+                messages = listOf(preImportSubtitle),
+                buttons = preImportButtons,
+                close = binding.redesignCloseButton,
+                sections = listOf(preImportTitle.parent as ViewGroup, preImportButtons),
+            )
+        }
+        with(binding.browserPromoPreImport) {
+            root.applyRebrandBottomSheetSpacing(
+                header = browserPromoIllustration,
+                title = browserPromoTitle,
+                messages = listOf(browserPromoSubtitle),
+                buttons = browserPromoButtons,
+                secondary = listOf(browserPromoDeclineButton),
+                close = binding.redesignCloseButton,
+                sections = listOf(browserPromoTitle.parent as ViewGroup, browserPromoButtons),
+            )
+        }
+        with(binding.importing) {
+            root.applyRebrandBottomSheetSpacing(
+                header = importingIcon,
+                title = importingTitle,
+                fullHeight = true,
+                messages = listOf(importingSkeleton),
+                buttons = importingButtons,
+                secondary = listOf(importingCancelButton),
+                close = binding.redesignCloseButton,
+                sections = listOf(importingTitle.parent as ViewGroup, importingButtons),
+            )
+        }
+        with(binding.importSuccess) {
+            root.applyRebrandBottomSheetSpacing(
+                header = successIcon,
+                title = successTitle,
+                fullHeight = true,
+                messages = listOf(successResults),
+                buttons = successButtons,
+                secondary = listOf(successDoneSecondaryButton),
+                close = binding.redesignCloseButton,
+                sections = listOf(successTitle.parent as ViewGroup, successButtons),
+            )
+        }
+        with(binding.importError) {
+            root.applyRebrandBottomSheetSpacing(
+                header = errorIcon,
+                title = errorTitle,
+                fullHeight = true,
+                buttons = errorButtons,
+                close = binding.redesignCloseButton,
+                sections = listOf(errorTitle.parent as ViewGroup, errorButtons),
+            )
+        }
         binding.legacy.legacyContent.applyBottomSystemBarInsetPadding()
         binding.redesign.applyBottomSystemBarInsetPadding()
         observeViewModel()

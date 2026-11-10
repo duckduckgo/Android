@@ -27,6 +27,7 @@ import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
@@ -76,6 +77,14 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
         if (savedInstanceState == null) {
             pixel.fire(SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_SHOWN)
         }
+        binding.dialogRootView.applyRebrandBottomSheetSpacing(
+            header = binding.appIcon,
+            title = binding.dialogTitle,
+            messages = listOf(binding.onboardingSubtitle),
+            buttons = binding.importButton,
+            secondary = listOf(binding.selectFileButton),
+            close = binding.closeButton,
+        )
         binding.dialogRootView.applyBottomSystemBarInsetPadding()
         return binding.root
     }

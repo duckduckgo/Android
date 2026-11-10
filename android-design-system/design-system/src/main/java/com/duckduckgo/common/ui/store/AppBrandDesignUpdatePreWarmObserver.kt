@@ -50,6 +50,7 @@ class AppBrandDesignUpdatePreWarmObserver @Inject constructor(
             toggles.pictograms().isEnabled()
             toggles.badges().isEnabled()
             toggles.dialogSpacing().isEnabled()
+            toggles.bottomSheets().isEnabled()
         }
     }
 }
