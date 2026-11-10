@@ -504,7 +504,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
 
             launch {
-                if (swipingTabsFeature.removeSelectedTabDebounceEnabled()) {
+                if (viewModel.isSelectedTabDebounceRemoved) {
                     viewModel.tabIdToMoveTo.collectLatest { onMoveToTabRequested(it) }
                 } else {
                     viewModel.selectedTabIndex.collectLatest { onMoveToTabRequested(it) }

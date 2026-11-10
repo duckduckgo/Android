@@ -193,12 +193,15 @@ class BrowserViewModel @Inject constructor(
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
+    // Read once so the flows below and the activity's collector can't disagree if remote config changes mid-session.
+    val isSelectedTabDebounceRemoved: Boolean = swipingTabsFeature.removeSelectedTabDebounceEnabled()
+
     val selectedTabFlow: Flow<String> =
         tabRepository.flowSelectedTab
             .mapNotNull { tab -> tab?.tabId }
             .distinctUntilChanged()
             .let {
-                if (swipingTabsFeature.removeSelectedTabDebounceEnabled()) {
+                if (isSelectedTabDebounceRemoved) {
                     it
                 } else {
                     it.debounce(100.milliseconds)
