@@ -127,7 +127,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
@@ -238,9 +238,9 @@ internal fun DaxOnboardingDialogCore(
                     val sizes = snapshotFlow { cardSizeTracker.lastSize }.filterNotNull()
                     if (cardSizeTracker.bounded) {
                         // A host can raise the available height after the replacement is first measured, so the morph retargets.
-                        sizes.mapLatest { shell.cardSize.animateTo(it, boundsTween(boundsAnimationDuration)) }.first()
+                        sizes.mapLatest { shell.cardSize.animateTo(it, boundsTween(boundsAnimationDuration)) }.firstOrNull()
                     } else {
-                        shell.cardSize.snapTo(sizes.first())
+                        sizes.firstOrNull()?.let { shell.cardSize.snapTo(it) }
                     }
                     cardSizeTracker.hasMeasured = true
                 }
