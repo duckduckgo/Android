@@ -77,6 +77,18 @@ jobs:
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code@2.1.319
 
+      # PR text reaches the agent, so it must start with no way to write to
+      # the factory repo.
+      - name: Check no write credential reaches the review
+        run: |
+          leaks=$(grep -rlE --exclude="*.sh" --exclude-dir=review-plugin "PRIVATE KEY|x-access-token|extraheader" \
+            "$RUNNER_TEMP" "$HOME/.ssh" "$HOME/.gitconfig" .git/config \
+            "$RUNNER_TEMP/review-plugin/.git/config" "$WORK/records/.git/config" 2>/dev/null || true)
+          if [ -n "$leaks" ]; then
+            echo "::error::Credentials left where the review can read them: $leaks"
+            exit 1
+          fi
+
       # Output goes to a file, never the log, because the transcript holds the
       # internal skill and records.
       - name: Review
