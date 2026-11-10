@@ -16,6 +16,7 @@
 package com.duckduckgo.duckchat.impl.widget
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Build
 import android.util.SizeF
 import android.util.TypedValue
@@ -222,7 +223,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
     }
 
     // Always set on SDK 31+: the launcher reapplies RemoteViews onto the views it already inflated, so omitting a tint
-    // would leave the previous one in place.
+    // would leave the previous one in place. A null background colour clears the tint, restoring the drawable's own colour.
     @RequiresApi(31)
     private fun applyColors(remoteViews: RemoteViews, colors: WidgetColors) {
         remoteViews.tint(R.id.duckAiWidgetContainer, colors.background)
@@ -253,7 +254,13 @@ class DuckAiWidgetConfigurator @Inject constructor(
     }
 
     @RequiresApi(31)
-    private fun RemoteViews.tint(viewId: Int, @ColorRes color: Int) = setColorStateList(viewId, "setBackgroundTintList", color)
+    private fun RemoteViews.tint(viewId: Int, @ColorRes color: Int?) {
+        if (color != null) {
+            setColorStateList(viewId, "setBackgroundTintList", color)
+        } else {
+            setColorStateList(viewId, "setBackgroundTintList", null as ColorStateList?)
+        }
+    }
 
     @RequiresApi(31)
     private fun RemoteViews.tintImage(viewId: Int, @ColorRes color: Int) = setColorStateList(viewId, "setImageTintList", color)
@@ -388,10 +395,10 @@ class DuckAiWidgetConfigurator @Inject constructor(
     )
 
     private enum class WidgetColors(
-        @ColorRes val background: Int,
-        @ColorRes val searchBar: Int,
-        @ColorRes val container: Int,
-        @ColorRes val divider: Int,
+        @ColorRes val background: Int?,
+        @ColorRes val searchBar: Int?,
+        @ColorRes val container: Int?,
+        @ColorRes val divider: Int?,
         @ColorRes val hint: Int,
         @ColorRes val text: Int,
         @ColorRes val onContainer: Int,
@@ -406,10 +413,10 @@ class DuckAiWidgetConfigurator @Inject constructor(
             R.color.duckAiWidgetDynamicOnContainerColor,
         ),
         STATIC(
-            R.color.duckAiWidgetBackgroundColor,
-            R.color.duckAiWidgetSearchBarColor,
-            R.color.duckAiWidgetContainerColor,
-            R.color.duckAiWidgetDividerColor,
+            null,
+            null,
+            null,
+            null,
             R.color.duckAiWidgetHintColor,
             R.color.duckAiWidgetTextColor,
             R.color.duckAiWidgetOnContainerColor,

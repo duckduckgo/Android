@@ -19,6 +19,7 @@ import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.util.SizeF
 import android.view.View
 import android.widget.FrameLayout
@@ -37,6 +38,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -317,20 +319,20 @@ class DuckAiWidgetConfiguratorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenDynamicColorsFlagOffThenWidgetViewsTintedWithStaticColorResources() = runTest {
+    fun whenDynamicColorsFlagOffThenWidgetBackgroundTintsClearedAndForegroundsStatic() = runTest {
         stubDuckAi(enabled = true, historyAvailable = false)
         duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = false))
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
         verifyWidgetTints(
-            background = R.color.duckAiWidgetBackgroundColor,
-            searchBar = R.color.duckAiWidgetSearchBarColor,
-            container = R.color.duckAiWidgetContainerColor,
+            background = null,
+            searchBar = null,
+            container = null,
             onContainer = R.color.duckAiWidgetOnContainerColor,
             hint = R.color.duckAiWidgetHintColor,
             text = R.color.duckAiWidgetTextColor,
-            divider = R.color.duckAiWidgetDividerColor,
+            divider = null,
         )
     }
 
@@ -354,18 +356,18 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     private fun verifyWidgetTints(
-        background: Int,
-        searchBar: Int,
-        container: Int,
+        background: Int?,
+        searchBar: Int?,
+        container: Int?,
         onContainer: Int,
         hint: Int,
         text: Int,
-        divider: Int,
+        divider: Int?,
     ) {
-        verify(remoteViews).setColorStateList(R.id.duckAiWidgetContainer, BACKGROUND_TINT, background)
-        verify(remoteViews).setColorStateList(R.id.promptBarContainer, BACKGROUND_TINT, searchBar)
+        verifyBackgroundTint(R.id.duckAiWidgetContainer, background)
+        verifyBackgroundTint(R.id.promptBarContainer, searchBar)
         listOf(R.id.actionVoice, R.id.actionCreateImage, R.id.actionTakePhoto).forEach {
-            verify(remoteViews).setColorStateList(it, BACKGROUND_TINT, container)
+            verifyBackgroundTint(it, container)
         }
         listOf(R.id.iconVoice, R.id.iconImage, R.id.iconPhoto).forEach {
             verify(remoteViews).setColorStateList(it, IMAGE_TINT, onContainer)
@@ -378,7 +380,15 @@ class DuckAiWidgetConfiguratorTest {
         }
         verify(remoteViews).setColorStateList(R.id.chatsViewAll, TEXT_COLOR, text)
         listOf(R.id.dividerTop, R.id.dividerBottom).forEach {
-            verify(remoteViews).setColorStateList(it, BACKGROUND_TINT, divider)
+            verifyBackgroundTint(it, divider)
+        }
+    }
+
+    private fun verifyBackgroundTint(viewId: Int, color: Int?) {
+        if (color != null) {
+            verify(remoteViews).setColorStateList(viewId, BACKGROUND_TINT, color)
+        } else {
+            verify(remoteViews).setColorStateList(viewId, BACKGROUND_TINT, null as ColorStateList?)
         }
     }
 
@@ -411,13 +421,10 @@ class DuckAiWidgetConfiguratorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenDynamicColorsFlagOffThenChatRowsTintedWithStaticColors() = runTest {
+    fun whenDynamicColorsFlagOffThenChatRowsBackgroundTintClearedAndForegroundsStatic() = runTest {
         val row = populateAndApplyFirstChatRow(dynamicColors = false)
 
-        assertEquals(
-            activity.getColor(R.color.duckAiWidgetContainerColor),
-            row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList?.defaultColor,
-        )
+        assertNull(row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList)
         assertEquals(
             activity.getColor(R.color.duckAiWidgetOnContainerColor),
             row.findViewById<ImageView>(R.id.chatsItemIcon).imageTintList?.defaultColor,
