@@ -233,7 +233,6 @@ import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectEvaluator
-import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectOnUnresolvedErrorFeature
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
@@ -626,7 +625,6 @@ class BrowserTabViewModel @Inject constructor(
     private val adBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider,
     private val newTabPageModalPresenterRegistry: NewTabPageModalPresenterRegistry,
     private val newTabPageModalTrigger: NewTabPageModalTrigger,
-    private val suggestRedirectOnUnresolvedErrorFeature: SuggestRedirectOnUnresolvedErrorFeature,
     private val suggestRedirectEvaluator: SuggestRedirectEvaluator,
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
     private val customErrorPagesFeature: CustomErrorPagesFeature,
@@ -5011,10 +5009,7 @@ class BrowserTabViewModel @Inject constructor(
             OMITTED -> badUrlErrorPageWideEvent.onOmittedErrorReceived(tabId)
             LOADING, TIMEOUT -> Unit
         }
-        if (errorType == BAD_URL &&
-            suggestRedirectOnUnresolvedErrorFeature.self().isEnabled() &&
-            suggestRedirectOnUnresolvedErrorFeature.suggestRedirect().isEnabled()
-        ) {
+        if (errorType == BAD_URL) {
             suggestRedirectJob += viewModelScope.launch {
                 suggestRedirectEvaluator.suggestRedirect(url)?.let { suggestion ->
                     badUrlErrorPageWideEvent.onRedirectSuggested(tabId)

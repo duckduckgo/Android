@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.errorpage
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
-import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectOnUnresolvedErrorFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
@@ -41,7 +40,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -121,7 +119,6 @@ interface BadUrlErrorPageWideEvent {
 @SingleIn(AppScope::class)
 class RealBadUrlErrorPageWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val suggestRedirectFeature: SuggestRedirectOnUnresolvedErrorFeature,
     @param:RegularMode private val regularTabRepository: TabRepository,
     @param:FireMode private val fireTabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
@@ -159,11 +156,6 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
                     // The clicked redirect landed on another BAD_URL page: the redirect failed,
                     // and the freshly shown error page starts a flow of its own.
                     failFlow(tabId, FailureReason.NEW_HOSTNAME_RESOLUTION_FAILED)
-                }
-                // The feature flag only gates starting new flows. Flows already in flight always resolve,
-                // here and in every other callback, so no stale state survives a mid-journey flag change.
-                if (!isRecordingEnabled()) {
-                    return@launch
                 }
                 startFlow(tabId)
             }
@@ -355,12 +347,6 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
     private fun stopClosedTabsObserverJob() {
         closedTabsObserverJob?.cancel()
         closedTabsObserverJob = null
-    }
-
-    private suspend fun isRecordingEnabled(): Boolean = withContext(dispatchers.io()) {
-        // Suggest redirect feature conditions to be removed once we remove its feature flag
-        suggestRedirectFeature.self().isEnabled() &&
-            suggestRedirectFeature.suggestRedirect().isEnabled()
     }
 
     private class FlowState(val flowId: Long) {
