@@ -1,16 +1,31 @@
 name: Code review assistant
 
-# Runs android-factory:code-review-assistant on one PR without a reviewer.
+# Runs android-factory:code-review-assistant without a reviewer: on a sample of
+# new PRs (shadow mode, nothing is posted), on demand, and once a day to
+# reconcile earlier reviews with the comments on merged PRs.
 # This repo is public, so nothing the review reads or writes reaches the log,
 # the step summary or an artifact: the output goes to the records branch of
 # duckduckgo/claude-skills-factory-android, which is internal.
 
 on:
+  pull_request:
+    types: [opened, ready_for_review]
+    paths-ignore:
+      - "**/res/values*/**"
+      - "**/*.md"
+  schedule:
+    - cron: "17 6 * * *"
   workflow_dispatch:
     inputs:
+      mode:
+        description: Review one PR, or reconcile earlier reviews with merged PRs
+        required: true
+        default: review
+        type: choice
+        options: [review, reconcile]
       pr:
         description: Pull request number to review
-        required: true
+        required: false
         type: number
       plugin_ref:
         description: Branch, tag or SHA of duckduckgo/claude-skills-factory-android
@@ -18,7 +33,7 @@ on:
         default: main
         type: string
       model:
-        description: Model for the review's main session
+        description: Model for the main session
         required: false
         default: sonnet
         type: string
@@ -28,31 +43,73 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: code-review-assistant-${{ inputs.pr }}
+  group: code-review-assistant-${{ github.event.pull_request.number || inputs.pr || 'reconcile' }}
 
 jobs:
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.pick.outputs.run }}
+      mode: ${{ steps.pick.outputs.mode }}
+      pr: ${{ steps.pick.outputs.pr }}
+    steps:
+      # CODE_REVIEW_SAMPLE reviews one new PR in N by number; 0 turns automatic
+      # reviews off without touching reconcile or manual runs.
+      - id: pick
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_MODE: ${{ inputs.mode }}
+          INPUT_PR: ${{ inputs.pr }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          SAMPLE: ${{ vars.CODE_REVIEW_SAMPLE || '4' }}
+        run: |
+          run=true
+          case "$EVENT" in
+            schedule) mode=reconcile; pr="" ;;
+            workflow_dispatch) mode="$INPUT_MODE"; pr="$INPUT_PR" ;;
+            pull_request)
+              mode=review; pr="$PR_NUMBER"
+              if [ "$DRAFT" = true ] || [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ] \
+                || [ "$AUTHOR" = daxmobile ] || [[ "$AUTHOR" == *"[bot]" ]] \
+                || [ "$SAMPLE" -eq 0 ] || [ $((pr % SAMPLE)) -ne 0 ]; then
+                run=false
+              fi
+              ;;
+          esac
+          if [ "$mode" = review ] && [ -z "$pr" ]; then
+            echo "::error::A review needs a PR number"
+            exit 1
+          fi
+          { echo "run=$run"; echo "mode=$mode"; echo "pr=$pr"; } >> "$GITHUB_OUTPUT"
+
   review:
+    needs: select
+    if: needs.select.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      PR: ${{ inputs.pr }}
-      PLUGIN_REF: ${{ inputs.plugin_ref }}
-      MODEL: ${{ inputs.model }}
-      WORK: /tmp/code-review-assistant/pr-${{ inputs.pr }}
+      MODE: ${{ needs.select.outputs.mode }}
+      PR: ${{ needs.select.outputs.pr }}
+      PLUGIN_REF: ${{ inputs.plugin_ref || 'main' }}
+      MODEL: ${{ inputs.model || 'sonnet' }}
+      WORK: /tmp/code-review-assistant/${{ needs.select.outputs.mode == 'review' && format('pr-{0}', needs.select.outputs.pr) || 'reconcile' }}
     steps:
-      - name: Check out the pull request
+      - name: Check out the pull request, or develop to reconcile
         uses: actions/checkout@v4
         with:
-          ref: refs/pull/${{ inputs.pr }}/head
+          ref: ${{ needs.select.outputs.mode == 'review' && format('refs/pull/{0}/head', needs.select.outputs.pr) || '' }}
           persist-credentials: false
 
       # The deploy key is used only by checkouts and the push, never in the
-      # review step, and persist-credentials keeps it out of the clones' config.
+      # agent's step, and persist-credentials keeps it out of the clones' config.
       - name: Check out the review plugin
         uses: actions/checkout@v4
         with:
           repository: duckduckgo/claude-skills-factory-android
-          ref: ${{ inputs.plugin_ref }}
+          ref: ${{ inputs.plugin_ref || 'main' }}
           ssh-key: ${{ secrets.CODE_REVIEW_RECORDS_KEY }}
           path: .review-plugin
           persist-credentials: false
@@ -79,24 +136,25 @@ jobs:
 
       # PR text reaches the agent, so it must start with no way to write to
       # the factory repo.
-      - name: Check no write credential reaches the review
+      - name: Check no write credential reaches the agent
         run: |
           leaks=$(grep -rlE --exclude="*.sh" --exclude-dir=review-plugin "PRIVATE KEY|x-access-token|extraheader" \
             "$RUNNER_TEMP" "$HOME/.ssh" "$HOME/.gitconfig" .git/config \
             "$RUNNER_TEMP/review-plugin/.git/config" "$WORK/records/.git/config" 2>/dev/null || true)
           if [ -n "$leaks" ]; then
-            echo "::error::Credentials left where the review can read them: $leaks"
+            echo "::error::Credentials left where the agent can read them: $leaks"
             exit 1
           fi
 
       # Output goes to a file, never the log, because the transcript holds the
       # internal skill and records.
-      - name: Review
+      - name: Run the skill
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          claude -p "/android-factory:code-review-assistant ${PR} ci" \
+          if [ "$MODE" = review ]; then request="${PR} ci"; else request="reconcile ci"; fi
+          claude -p "/android-factory:code-review-assistant ${request}" \
             --plugin-dir "$RUNNER_TEMP/review-plugin" \
             --model "$MODEL" \
             --max-turns 100 \
@@ -105,9 +163,9 @@ jobs:
             --permission-mode dontAsk \
             --allowedTools Bash Read Grep Glob Write Edit Agent TodoWrite Skill \
             --output-format stream-json --verbose \
-            > "$RUNNER_TEMP/review-transcript.jsonl" 2> "$RUNNER_TEMP/review-transcript.err" \
+            > "$RUNNER_TEMP/transcript.jsonl" 2> "$RUNNER_TEMP/transcript.err" \
             || echo "::warning::claude exited with status $?"
-          if [ ! -s "$WORK/review.md" ]; then
+          if [ "$MODE" = review ] && [ ! -s "$WORK/review.md" ]; then
             echo "::error::The review ended without writing review.md"
             exit 1
           fi
@@ -152,9 +210,14 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          if [ -s "$WORK/review.md" ]; then status="finished"; else status="failed"; fi
+          if [ "$MODE" = review ]; then
+            if [ -s "$WORK/review.md" ]; then status="finished"; else status="failed"; fi
+            line="Review of #${PR} ${status}"
+          else
+            line="Reconcile ${{ job.status }}"
+          fi
           {
-            echo "Review of #${PR} ${status}, plugin at \`${PLUGIN_REF}\`, model \`${MODEL}\`."
+            echo "${line}, plugin at \`${PLUGIN_REF}\`, model \`${MODEL}\`."
             if [ -n "${RECORDS_SHA:-}" ]; then
               echo ""
               echo "Output and metrics: https://github.com/duckduckgo/claude-skills-factory-android/commit/${RECORDS_SHA}"
