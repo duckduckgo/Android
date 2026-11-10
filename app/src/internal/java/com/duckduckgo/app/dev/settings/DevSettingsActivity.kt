@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangePrivacyConfigUrl
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.CustomTabs
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.NewTabTransitions
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Notifications
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.OpenUASelector
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Tabs
@@ -41,6 +42,7 @@ import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActi
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
 import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
+import com.duckduckgo.app.dev.settings.tabs.NewTabTransitionDevSettingsActivity
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -110,6 +112,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
         binding.tabs.setOnClickListener { viewModel.tabsClicked() }
+        binding.newTabTransitions.setOnClickListener { viewModel.newTabTransitionsClicked() }
     }
 
     private fun observeViewModel() {
@@ -138,6 +141,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             is CustomTabs -> showCustomTabs()
             Notifications -> showNotifications()
             Tabs -> showTabs()
+            NewTabTransitions -> showNewTabTransitions()
             is Command.Toast -> showToast(it.message)
         }
     }
@@ -174,6 +178,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun showTabs() {
         startActivity(DevTabsActivity.intent(this))
+    }
+
+    private fun showNewTabTransitions() {
+        startActivity(NewTabTransitionDevSettingsActivity.intent(this))
     }
 
     private fun showToast(message: String) {
