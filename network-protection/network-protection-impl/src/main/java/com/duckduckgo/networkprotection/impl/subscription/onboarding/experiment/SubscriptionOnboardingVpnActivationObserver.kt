@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-// Runs for both cohorts, so control has a VPN baseline too.
 @ContributesIntoSet(AppScope::class)
 class SubscriptionOnboardingVpnActivationObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
