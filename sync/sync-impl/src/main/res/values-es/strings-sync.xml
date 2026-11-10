@@ -481,25 +481,26 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Accede a tus contraseñas desde el móvil y el ordenador.</string>
     <string name="sync_passwords_import_promo_title_label">Accede a tus contraseñas desde el móvil y el ordenador.</string>
-    <string name="sync_passwords_import_promo_primary_button">Activar Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Iniciar sincronización</string>
     <string name="sync_passwords_import_promo_title_toggle">Sync &amp; Backup tus contraseñas entre el móvil y el ordenador.</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Accede a tus marcadores en el móvil y el escritorio.</string>
     <string name="sync_bookmarks_import_promo_title_label">Accede a tus marcadores en el móvil y el escritorio.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Activar Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Iniciar sincronización</string>
     <string name="sync_bookmarks_import_promo_title_toggle">Sync &amp; Backup tus marcadores en el móvil y el escritorio.</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Sincroniza y haz copias de seguridad de tus marcadores</string>
     <string name="sync_bookmarks_promo_message">Encriptado de extremo a extremo. Nadie puede ver tus marcadores, ni siquiera nosotros.</string>
-    <string name="sync_bookmarks_promo_primary_button">Activar Sync &amp; Backup</string>
+    <string name="sync_bookmarks_promo_primary_button_label">Iniciar sincronización</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_multi_device_promo_title">¿Sincronizar también los marcadores con la aplicación de escritorio?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">Sync &amp; Backup está activado en este dispositivo.</string>
     <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Conectar</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Obtener app</string>
 
@@ -507,7 +508,7 @@
     <string name="sync_bookmark_added_set_up_promo_title">Sincroniza y haz copias de seguridad de los marcadores</string>
     <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Más opciones</string>
     <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Ocultar</string>
-    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Activar Sync &amp; Backup</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Iniciar sincronización</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Sincronizar con la aplicación de escritorio</string>
@@ -522,11 +523,12 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Sincroniza y haz copias de seguridad de tus contraseñas</string>
     <string name="sync_passwords_promo_message">La encriptación de extremo a extremo significa que nadie más que tú puede ver tus contraseñas, ni siquiera nosotros.</string>
-    <string name="sync_passwords_promo_primary_button">Activar Sync &amp; Backup</string>
+    <string name="sync_passwords_promo_primary_button_label">Iniciar sincronización</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
     <string name="sync_passwords_multi_device_promo_title">¿Sincronizar también las contraseñas con la aplicación de escritorio?</string>
+    <string name="sync_passwords_multi_device_promo_message">Sync &amp; Backup está activado en este dispositivo.</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Conectar</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Obtener app</string>
 
