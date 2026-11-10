@@ -118,7 +118,6 @@ class AttachmentView(
             .onEach { command ->
                 if (!isEditMode && !isContextual) openAttachment(command)
             }.launchIn(scope)
-        host?.attachmentCommandsCollecting(true)
         attachmentStateJob?.cancel()
         attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
@@ -329,11 +328,6 @@ class AttachmentView(
         )
     }
 
-    private fun openCamera() {
-        host?.showAttachmentChooser(true)
-        host?.requestCameraCapture(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
-    }
-
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         nativeInputStateJob?.cancel()
@@ -342,7 +336,6 @@ class AttachmentView(
         attachmentStateJob = null
         attachmentRequestJob?.cancel()
         attachmentRequestJob = null
-        host?.attachmentCommandsCollecting(false)
         lastNativeInputState = null
         dismissPopup()
     }
@@ -357,7 +350,6 @@ class AttachmentView(
                 host?.showAttachmentChooser(true)
                 host?.requestFilePicker(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
             }
-            is NewChatHintCommand.OpenCamera -> openCamera()
             is NewChatHintCommand.CreateImage -> Unit
         }
     }
@@ -396,7 +388,8 @@ class AttachmentView(
                 titleRes = R.string.attachmentTakePhoto,
             ) {
                 popup.dismiss()
-                openCamera()
+                host?.showAttachmentChooser(true)
+                host?.requestCameraCapture(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
             }
 
             addMenuItem(

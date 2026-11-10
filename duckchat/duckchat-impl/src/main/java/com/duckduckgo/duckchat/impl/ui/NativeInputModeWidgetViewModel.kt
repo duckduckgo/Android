@@ -62,8 +62,6 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
-import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
-import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
@@ -98,7 +96,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -145,7 +142,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val newChatHintsPixels: NewChatHintsPixels,
     private val newChatDetector: NewChatDetector,
     private val tabRepository: TabRepository,
-    private val newChatHintCommands: NewChatHintCommands,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -178,9 +174,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
     val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
-
-    private val attachmentCommandsCollecting = MutableStateFlow(false)
-    private var cameraLaunchJob: Job? = null
 
     private val _modelPickerEnabled = MutableStateFlow(true)
     val modelPickerEnabled: StateFlow<Boolean> = _modelPickerEnabled.asStateFlow()
@@ -699,10 +692,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun setAttachmentCommandsCollecting(collecting: Boolean) {
-        attachmentCommandsCollecting.value = collecting
-    }
-
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launchAction: DuckChatLaunchAction? = null) {
         activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
@@ -726,13 +715,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         // The image-capable model was already selected when the launch was requested.
         if (isDuckAiMode && launchAction == DuckChatLaunchAction.ImageGeneration) {
             nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
-        }
-        if (isDuckAiMode && launchAction == DuckChatLaunchAction.CameraCapture) {
-            cameraLaunchJob?.cancel()
-            cameraLaunchJob = viewModelScope.launch {
-                attachmentCommandsCollecting.first { it }
-                newChatHintCommands.send(NewChatHintCommand.OpenCamera(tabId))
-            }
         }
     }
 

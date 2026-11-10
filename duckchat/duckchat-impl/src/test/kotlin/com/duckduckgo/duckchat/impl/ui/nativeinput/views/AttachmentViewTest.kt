@@ -34,14 +34,12 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
-import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel.AttachmentState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -167,51 +165,7 @@ class AttachmentViewTest {
         assertTrue(container.isVisible)
     }
 
-    @Test
-    fun whenCameraCommandIsSentForItsTabThenCameraOpens() = runTest {
-        val commands = NewChatHintCommands()
-        whenever(host.tabId()).thenReturn("tab")
-        attach(commands = commands)
-
-        commands.send(NewChatHintCommand.OpenCamera("tab"))
-
-        verify(host).showAttachmentChooser(true)
-        verify(host).requestCameraCapture(any())
-    }
-
-    @Test
-    fun whenCameraCommandIsSentForAnotherTabThenCameraDoesNotOpen() = runTest {
-        val commands = NewChatHintCommands()
-        whenever(host.tabId()).thenReturn("tab")
-        attach(commands = commands)
-
-        commands.send(NewChatHintCommand.OpenCamera("other"))
-
-        verify(host, never()).requestCameraCapture(any())
-    }
-
-    @Test
-    fun whenCameraCommandWasSentBeforeAttachingThenCameraDoesNotOpenOnAttach() = runTest {
-        val commands = NewChatHintCommands()
-        whenever(host.tabId()).thenReturn("tab")
-        commands.send(NewChatHintCommand.OpenCamera("tab"))
-
-        attach(commands = commands)
-
-        verify(host, never()).requestCameraCapture(any())
-    }
-
-    @Test
-    fun whenAttachedThenHostIsToldCommandsAreCollectedAndWhenDetachedThatTheyAreNot() {
-        attach()
-        verify(host).attachmentCommandsCollecting(true)
-
-        shadowOf(view).callOnDetachedFromWindow()
-
-        verify(host).attachmentCommandsCollecting(false)
-    }
-
-    private fun attach(isEdit: Boolean = false, commands: NewChatHintCommands = NewChatHintCommands()) {
+    private fun attach(isEdit: Boolean = false) {
         val provider: NativeInputStateProvider = mock()
         whenever(provider.state).thenReturn(inputState)
         whenever(provider.stateForTab("edit:session")).thenReturn(editState)
@@ -230,7 +184,7 @@ class AttachmentViewTest {
             viewModelFactory = factory
             nativeInputStateProvider = provider
             faviconManager = mock()
-            newChatHintCommands = commands
+            newChatHintCommands = NewChatHintCommands()
         }
         root.addView(FrameLayout(activity).apply { addView(view) })
         shadowOf(view).callOnAttachedToWindow()

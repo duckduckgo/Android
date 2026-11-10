@@ -62,8 +62,6 @@ import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
-import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
-import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
@@ -164,7 +162,6 @@ class NativeInputModeWidgetViewModelTest {
     private val newChatHintsUsage: NewChatHintsUsage = mock()
     private val newChatHintsPixels: NewChatHintsPixels = mock()
     private val newChatDetector: NewChatDetector = mock { on { observe(any()) } doReturn emptyFlow() }
-    private val newChatHintCommands = NewChatHintCommands()
     private val realNativeInputStateStore = RealNativeInputStateStore(
         lazy { tabRepositoryProvider },
         browserModeStateHolder,
@@ -282,7 +279,6 @@ class NativeInputModeWidgetViewModelTest {
             newChatHintsPixels = newChatHintsPixels,
             newChatDetector = newChatDetector,
             tabRepository = tabRepository,
-            newChatHintCommands = newChatHintCommands,
         )
     }
 
@@ -523,64 +519,6 @@ class NativeInputModeWidgetViewModelTest {
             Tool.IMAGE_GENERATION.rawValue,
             nativeInputStateProvider.stateForTab("tab-1").value.selectedTool,
         )
-    }
-
-    @Test
-    fun whenConfigureDuckAiModeAndCameraCaptureActionThenNoToolSelected() = runTest {
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
-
-        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
-    }
-
-    @Test
-    fun whenCameraCaptureLaunchAndAttachmentCommandsCollectingThenOpenCameraIsSentForTab() = runTest {
-        val received = mutableListOf<NewChatHintCommand>()
-        val job = launch(coroutineRule.testDispatcher) { newChatHintCommands.commandsFor { "tab-1" }.collect { received.add(it) } }
-        testee.setAttachmentCommandsCollecting(true)
-
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
-
-        assertEquals(listOf<NewChatHintCommand>(NewChatHintCommand.OpenCamera("tab-1")), received)
-        job.cancel()
-    }
-
-    @Test
-    fun whenCameraCaptureLaunchBeforeAttachmentCommandsCollectingThenOpenCameraIsSentOnceTheyAttach() = runTest {
-        val received = mutableListOf<NewChatHintCommand>()
-        val job = launch(coroutineRule.testDispatcher) { newChatHintCommands.commandsFor { "tab-1" }.collect { received.add(it) } }
-
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
-        assertTrue(received.isEmpty())
-        testee.setAttachmentCommandsCollecting(true)
-
-        assertEquals(listOf<NewChatHintCommand>(NewChatHintCommand.OpenCamera("tab-1")), received)
-        job.cancel()
-    }
-
-    @Test
-    fun whenCameraCaptureLaunchThenLaterConfigureDoesNotReopenCamera() = runTest {
-        val received = mutableListOf<NewChatHintCommand>()
-        val job = launch(coroutineRule.testDispatcher) { newChatHintCommands.commandsFor { "tab-1" }.collect { received.add(it) } }
-        testee.setAttachmentCommandsCollecting(true)
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
-
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = null)
-        testee.setAttachmentCommandsCollecting(true)
-
-        assertEquals(1, received.size)
-        job.cancel()
-    }
-
-    @Test
-    fun whenConfigureBrowserModeAndCameraCaptureActionThenNoOpenCameraIsSent() = runTest {
-        val received = mutableListOf<NewChatHintCommand>()
-        val job = launch(coroutineRule.testDispatcher) { newChatHintCommands.commandsFor { "tab-1" }.collect { received.add(it) } }
-        testee.setAttachmentCommandsCollecting(true)
-
-        testee.configure(tabId = "tab-1", isDuckAiMode = false, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
-
-        assertTrue(received.isEmpty())
-        job.cancel()
     }
 
     @Test
