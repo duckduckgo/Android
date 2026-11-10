@@ -118,4 +118,24 @@ class IdleReturnLandingGateTest {
 
         assertFalse((gate.state as State.AwaitingTab).isReady)
     }
+
+    @Test
+    fun whenHoldResetsWithoutOpenThenEarlierHatchSettlesAreForgotten() {
+        gate.hold()
+        gate.onHatchSettled("ntp")
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+
+        assertFalse((gate.state as State.AwaitingTab).isReady)
+    }
+
+    @Test
+    fun whenResolvedAgainAfterHatchSettledThenStaysReady() {
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+        gate.onHatchSettled("ntp")
+        gate.resolve(null)
+
+        assertTrue((gate.state as State.AwaitingTab).isReady)
+    }
 }

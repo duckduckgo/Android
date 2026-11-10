@@ -54,8 +54,11 @@ class IdleReturnLandingGate @Inject constructor() {
      * resolve(null) leaves an awaited tab in place.
      */
     fun resolve(tabId: String? = null, awaitHatch: Boolean = false) {
-        val resolved = _state.compareAndSet(State.Pending, tabId?.let { State.AwaitingTab(it, awaitHatch) } ?: State.Open)
-        if (resolved && tabId != null && tabId in settledHatchTabIds) markHatchSettled(tabId)
+        val resolved = tabId?.let { State.AwaitingTab(it, awaitHatch) } ?: State.Open
+        if (_state.compareAndSet(State.Pending, resolved) && resolved is State.AwaitingTab && resolved.tabId in settledHatchTabIds) {
+            // Compared by identity, so a resolve delayed past a later hold() can't mark that return's hatch settled.
+            _state.compareAndSet(resolved, resolved.copy(hatchSettled = true))
+        }
     }
 
     fun onHatchSettled(tabId: String) {
