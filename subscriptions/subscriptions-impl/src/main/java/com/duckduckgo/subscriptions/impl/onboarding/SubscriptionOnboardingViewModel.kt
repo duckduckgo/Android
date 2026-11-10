@@ -16,8 +16,10 @@
 
 package com.duckduckgo.subscriptions.impl.onboarding
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
@@ -30,11 +32,13 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.Closed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionOnboardingStepPixels.Step
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -58,6 +62,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private val handoffState: SubscriptionOnboardingHandoffState,
     private val pixelSender: SubscriptionPixelSender,
     private val subscriptionsManager: SubscriptionsManager,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
     sealed interface Command {
@@ -89,12 +94,13 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         if (started) return
         started = true
 
-        viewModelScope.launch { orchestrator.startPlan(planProvider.buildPlan()) }
-
-        orchestrator.state
-            .forPlan(SUBSCRIPTION_ONBOARDING_PLAN_ID)
-            .onEach { handleState(it) }
-            .launchIn(viewModelScope)
+        viewModelScope.launch {
+            orchestrator.startPlan(planProvider.buildPlan())
+            // Listen only after starting, so the end state of a previous run isn't replayed.
+            orchestrator.state
+                .forPlan(SUBSCRIPTION_ONBOARDING_PLAN_ID)
+                .collect { handleState(it) }
+        }
 
         controller.events
             .onEach { handleControllerEvent(it) }
@@ -183,6 +189,16 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private fun cancelHandoff() {
         pendingHandoff = null
         handoffJob.cancel()
+    }
+
+    @VisibleForTesting
+    public override fun onCleared() {
+        super.onCleared()
+        val state = orchestrator.state.value
+        if (state is LinearOnboardingState.InProgress && state.rootPlanId == SUBSCRIPTION_ONBOARDING_PLAN_ID) {
+            // The orchestrator outlives this screen, so end the run or the next entry resumes it.
+            appCoroutineScope.launch { orchestrator.onEvent(Closed) }
+        }
     }
 
     companion object {
