@@ -157,6 +157,32 @@ class DaxOnboardingDialogRenderingTest {
     }
 
     @Test
+    fun replacementMorphFollowsAvailableHeightThatGrowsMidMorphWithoutJumping() {
+        state.availableHeightPx = 150
+        showDialog()
+        val small = cardBounds().height
+        compose.runOnIdle {
+            animate.value = true
+            contentKey.value = "second"
+            contentHeight.value = 300.dp
+        }
+        frames()
+        compose.runOnIdle { state.availableHeightPx = 2_000 }
+
+        var previous = cardBounds().height
+        var largestStep = 0f
+        repeat(90) {
+            frames(count = 1)
+            val height = cardBounds().height
+            largestStep = maxOf(largestStep, height - previous)
+            previous = height
+        }
+        val growth = previous - small
+        assertTrue("The card must reach the taller content, grew $growth", growth > 200f)
+        assertTrue("The card must not jump, largest frame step was $largestStep of $growth", largestStep < growth / 3)
+    }
+
+    @Test
     fun firstMountAndSameKeyIntroChangesSnapBoundsAndDisabledAnimationSnapsSettledChanges() {
         animate.value = true
         contentHeight.value = 160.dp
