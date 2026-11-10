@@ -426,13 +426,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             null
         }
 
-    private var attachmentView: AttachmentView? = null
-
-    // A camera-capture launch can arrive right after the widget attaches, before the AttachmentView
-    // plugin (loaded asynchronously via viewModel.plugins) exists. Replayed once when the plugin view is added,
-    // scoped to the tab it was requested for so a since-changed tab doesn't inherit it.
-    private var pendingCameraCaptureTabId: String? = null
-
     val inputField: EditText
     private val inputModeWidgetBack: View
     private val inputModeWidgetUnifiedBack: View
@@ -722,11 +715,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
                         container.addView(pluginView)
-                        if (pluginView is AttachmentView) {
-                            attachmentView = pluginView
-                            if (shouldReplayPendingCameraCapture(pendingCameraCaptureTabId, activeTabId)) pluginView.triggerCameraCapture()
-                            pendingCameraCaptureTabId = null
-                        }
                         if (plugin.containerId != R.id.startChatContainer) {
                             container.isVisible = isChatTabSelected() && !isEditWidget
                         }
@@ -747,15 +735,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun onWindowVisibilityChanged(visibility: Int) {
         super.onWindowVisibilityChanged(visibility)
         if (visibility == VISIBLE) viewModel.onInputWindowShown() else viewModel.onInputWindowHidden()
-    }
-
-    private fun launchCameraCapture() {
-        val view = attachmentView
-        if (view != null) {
-            view.triggerCameraCapture()
-            return
-        }
-        pendingCameraCaptureTabId = activeTabId
     }
 
     override fun onDetachedFromWindow() {
@@ -1577,7 +1556,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             viewModel.configure(tabId, isDuckAiMode, isBottom, launchAction)
             publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
-            if (isDuckAiMode && launchAction == DuckChatLaunchAction.CameraCapture) launchCameraCapture()
         }
     }
 
@@ -2163,17 +2141,6 @@ internal fun hasPendingAdoptedAttachments(
     pendingImages: List<SubmittedImage>,
     pendingFiles: List<SubmittedFile>,
 ): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty()
-
-/**
- * Whether a pending camera-capture request — made before the [AttachmentView]
- * plugin existed — should still be replayed now that it exists. False when there was no pending
- * request, or when the tab has changed since it was requested. Derived purely from the two tab ids so
- * it is unit-testable without Robolectric.
- */
-internal fun shouldReplayPendingCameraCapture(
-    pendingCameraCaptureTabId: String?,
-    activeTabId: String?,
-): Boolean = pendingCameraCaptureTabId != null && pendingCameraCaptureTabId == activeTabId
 
 /**
  * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on
