@@ -18,12 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
-    <string name="sync_flows_disabled"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
-    <string name="sync_flows_disabled_new_version"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj DuckDuckGo do najnowszej wersji.</string>
-    <string name="sync_create_account_disabled"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj DuckDuckGo do najnowszej wersji.</string>
-    <string name="sync_disabled_authenticated_user"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj DuckDuckGo do najnowszej wersji.</string>
     <string name="sync_paused_notification"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
     <string name="sync_error_notification"><b>Błąd synchronizacji</b>\nFunkcja Sync &amp; Backup jest tymczasowo niedostępna.</string>
     <string name="sync_error_warning"><b>Błąd synchronizacji</b>\nFunkcja Sync &amp; Backup jest tymczasowo niedostępna.</string>
@@ -31,94 +25,12 @@
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronizacja i kopia zapasowa</string>
-    <string name="sync_setup_begin_syncing">Rozpocznij synchronizację</string>
-    <string name="sync_setup_with_another_device_cta_title">Synchronizuj z innym urządzeniem</string>
-    <string name="sync_setup_with_another_device_cta_subtitle">Bezpiecznie synchronizuj zakładki i hasła między swoimi urządzeniami.</string>
-    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Bezpiecznie synchronizuj zakładki, hasła i czaty Duck.ai między urządzeniami.</string>
-    <string name="sync_off_hint">Twoje dane są kompleksowo szyfrowane, a DuckDuckGo nie ma dostępu do klucza szyfrowania.</string>
-    <string name="sync_setup_single_device_title">Konfiguracja na jednym urządzeniu</string>
-    <string name="sync_setup_other_options_title">Inne opcje</string>
-    <string name="sync_setup_single_recover_data_cta_title">Odzyskaj zsynchronizowane dane</string>
-    <string name="sync_setup_single_sync_this_device_cta_title">Synchronizuj i twórz kopie zapasowe tego urządzenia</string>
-
-    <string name="sync_off_encrypted_hint">Twoje dane są kompleksowo szyfrowane, a DuckDuckGo nie ma dostępu do klucza odszyfrowania.</string>
-
-    <!-- Setup screen -->
-    <string name="sync_enable_sync_title">Konfigurowanie synchronizacji i kopii zapasowej!</string>
-    <string name="sync_enable_sync_content">Twoje zakładki i hasła są przygotowywane do synchronizacji. To powinno zająć tylko chwilę.</string>
-    <string name="sync_enable_sync_content_with_ai_chat">Twoje zakładki, hasła i czaty Duck.ai są przygotowywane do synchronizacji. To powinno zająć tylko chwilę.</string>
-    <string name="sync_enable_options">Opcje</string>
-    <string name="sync_enable_option_favicons_title">Pobierz ikony zakładek</string>
-    <string name="sync_enable_option_favicons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
-    <string name="sync_enable_connecting">Łączenie...</string>
-    <string name="sync_intro_enable_title">Synchronizuj i twórz kopie zapasowe tego urządzenia</string>
-    <string name="sync_intro_enable_content">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek i haseł, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.</string>
-    <string name="sync_intro_enable_content_with_ai_chat">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek, haseł i czatów Duck.ai, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.</string>
-    <string name="sync_intro_enable_footer">Możesz później przeprowadzić synchronizację z innymi urządzeniami.</string>
-    <string name="sync_intro_enable_cta">Włącz synchronizację i kopię zapasową</string>
-    <!-- Recover Synced Data Intro Screen -->
-    <string name="sync_recover_synced_data_title">Odzyskaj zsynchronizowane dane</string>
-    <string name="sync_recover_synced_data_content">Będziesz potrzebować kodu odzyskiwania otrzymanego podczas konfigurowania funkcji Sync &amp; Backup. Możliwe, że został on zapisany jako plik PDF na urządzeniu, które było używane.</string>
-    <string name="sync_recover_synced_data_cta">Odzyskaj zsynchronizowane dane</string>
-
-    <!-- Recover data screen -->
-    <string name="login_screen_title">Zeskanuj kod QR</string>
-    <string name="login_screen_enter_code_cta">Wprowadź kod ręcznie</string>
-    <string name="login_screen_barcode_hint">Skieruj aparat na kod QR, aby zsynchronizować</string>
-    <string name="login_screen_cant_scan_label">Nie możesz skanować?</string>
-    <string name="login_screen_cant_scan_button_text">Skopiuj kod tekstowy</string>
-
-
-    <!-- Connect screen -->
-    <string name="connect_screen_title">Zeskanuj kod QR</string>
-    <string name="connect_screen_scan_qr_hint">Otwórz aplikację DuckDuckGo na innym urządzeniu i wybierz kolejno <b>Ustawienia &gt; Synchronizacja i kopia zapasowa &gt; Synchronizuj z innym urządzeniem</b>.</string>
-    <string name="connect_screen_enter_code_cta">Wprowadź kod ręcznie</string>
-    <string name="connect_screen_connect_qr_hint_title">Możesz też skanować za pomocą DuckDuckGo na innym urządzeniu</string>
-    <string name="connect_screen_connect_qr_hint_content">Otwórz DuckDuckGo na innym urządzeniu i zeskanuj ten kod, aby zsynchronizować.</string>
-    <string name="connect_screen_share_code">Skopiuj kod</string>
-
-    <!-- Enter Code screen -->
-    <string name="enter_code_screen_title">Wprowadź kod ręcznie</string>
-    <string name="sync_enter_code_hint">Wybierz kolejno <b>Ustawienia &gt; Synchronizacja i kopia zapasowa &gt; Synchronizuj z innym urządzeniem</b> i wybierz opcję <b>Wyświetl kod tekstowy</b> w aplikacji DuckDuckGo na innym zsynchronizowanym urządzeniu, a następnie wklej tutaj kod, aby zsynchronizować to urządzenie.</string>
-    <string name="sync_enter_code_verifying">Weryfikacja kodu</string>
-    <string name="sync_enter_code_invalid">⚠️ Nieprawidłowy kod</string>
-    <string name="sync_enter_code_paste">Wklej kod</string>
 
     <!-- Recovery PDF screen -->
-    <string name="sync_recovery_code_title">Zapisz kod odzyskiwania</string>
-    <string name="sync_save_recovery_code_item_hint">Jeśli utracisz dostęp do swoich urządzeń, będziesz potrzebować tego kodu, aby odzyskać zsynchronizowane dane.</string>
-    <string name="sync_recovery_code_skip_button">Dalej</string>
-    <string name="sync_recovery_code_primary_button">Zapisz jako PDF</string>
-    <string name="sync_recovery_code_secondary_button">Skopiuj kod</string>
     <string name="sync_code_box_description">Każdy, kto ma dostęp do tego kodu, może uzyskać dostęp do zsynchronizowanych danych, więc przechowuj go w bezpiecznym miejscu.</string>
 
     <!-- Device synced screen -->
-    <string name="sync_connected_device_title">Twoje dane są synchronizowane!</string>
-    <string name="sync_connected_device_primary_button">Gotowe</string>
 
-    <string name="show_qr_screen_title">Pokaż kod QR</string>
-
-    <string name="show_code_screen_title">Kod</string>
-    <string name="enter_code_screen_cta">Wprowadź kod tekstowy</string>
-    <string name="sync_login_device_hint">Zeskanuj kod QR na PDF odzyskiwania lub innym zsynchronizowanym urządzeniu, aby odzyskać dane.</string>
-
-    <string name="synced_devices_section_title">Zsynchronizowane urządzenia</string>
-    <string name="sync_new_device_section_title">Synchronizuj nowe urządzenie</string>
-    <string name="sync_new_device_hint">Wybierz kolejno Ustawienia › Synchronizacja i kopia zapasowa w przeglądarce DuckDuckGo na innym urządzeniu i zeskanuj kod, aby natychmiast połączyć.</string>
-    <string name="sync_show_text_code_item">Pokaż kod tekstowy</string>
-    <string name="sync_show_qr_code_item">Zeskanuj kod QR</string>
-    <string name="sync_save_recovery_code_item">Zapisz PDF odzyskiwania</string>
-    <string name="sync_delete_account_item">Wyłącz i usuń dane serwera...</string>
-    <string name="sync_disable_sync_item">Wyłącz synchronizację i kopię zapasową…</string>
-    <string name="sync_enable_sync_next_button">Dalej</string>
-    <string name="sync_recovery_code_content">Jeśli utracisz dostęp do swoich urządzeń, będziesz potrzebować tego kodu, aby odzyskać zsynchronizowane dane.</string>
-    <string name="sync_recovery_code_hint">Każdy, kto ma dostęp do tego kodu, może uzyskać dostęp do zsynchronizowanych danych, więc przechowuj go w bezpiecznym miejscu.</string>
-
-    <string name="turn_off_sync_dialog_title">Wyłączyć synchronizację?</string>
-    <string name="turn_off_sync_dialog_content">To urządzenie nie będzie już mieć dostępu do zsynchronizowanych danych</string>
-    <string name="turn_off_sync_dialog_primary_button">Wyłącz</string>
-    <string name="turn_off_sync_dialog_secondary_button">Anuluj</string>
-    <string name="sync_permission_required_store_recovery_code">Zapisywanie pliku PDF do odzyskiwania wymaga uprawnienia do pamięci</string>
     <string name="sync_share_title">Udostępnij…</string>
     <string name="sync_pdf_title">Kod odzyskiwania synchronizacji</string>
     <string name="sync_pdf_description">Kod odzyskiwania pozwala na synchronizację haseł, danych automatycznego uzupełniania oraz czatów Duck.ai na wielu urządzeniach oraz na odzyskanie zsynchronizowanych danych, jeśli stracisz dostęp do urządzenia.</string>
@@ -128,34 +40,15 @@
     <string name="sync_instructions_step2">Wybierz „Sync With Another Device” i zeskanuj kod QR lub wprowadź kod tekstowy.</string>
     <string name="sync_instructions_step3">Synchronizacja zostanie aktywowana i ponownie będziesz mieć dostęp do wszystkich swoich danych.</string>
     <string name="sync_pdf_retention_notice">Jeśli nie korzystasz z przeglądarki DuckDuckGo dłużej niż 18 miesięcy z włączoną funkcją Sync &amp; Backup, Twoje dane zostaną usunięte z serwera i nie będzie można ich przywrócić.</string>
-    <string name="remove_device_dialog_title">Usunąć urządzenie?</string>
-    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s” nie będzie już mieć dostępu do zsynchronizowanych danych.</string>
-    <string name="remove_device_dialog_primary_button">Usuń</string>
-    <string name="remove_device_dialog_secondary_button">Anuluj</string>
-    <string name="edit_device_dialog_title">Edytuj</string>
     <string name="edit_device_dialog_hint">Nazwa urządzenia</string>
-    <string name="edit_device_dialog_primary_button">OK</string>
-    <string name="edit_device_dialog_secondary_button">Anuluj</string>
-    <string name="sync_device_this_device_hint">To urządzenie</string>
-    <string name="sync_device_menu_option_edit">Edytuj</string>
-    <string name="sync_device_menu_option_remove">Usuń urządzenie</string>
-    <string name="sync_show_code_copy">Skopiuj kod</string>
-    <string name="sync_show_code_copy_hint">Użyj tego kodu po wybraniu opcji „Wprowadź kod ręcznie” podczas konfiguracji synchronizacji na drugim urządzeniu</string>
     <string name="sync_code_copied_message">Skopiowano kod odzyskiwania</string>
-    <string name="sync_camera_permission_required">Wymagane jest uprawnienie do aparatu</string>
-    <string name="sync_camera_unavailable">Aparat niedostępny</string>
-    <string name="sync_camera_permission_required_description">Przejdź do ustawień urządzenia i zezwól tej aplikacji na dostęp do aparatu.</string>
-    <string name="sync_go_to_settings">Przejdź do ustawień</string>
     <string name="sync_general_error">Wystąpił błąd</string>
     <string name="sync_notification_channel_name">Synchronizacja</string>
-    <string name="sync_notify_me_title">Powiadomienia są wyłączone</string>
-    <string name="sync_notify_me_description">Otrzymuj powiadomienia po wystąpieniu błędu synchronizacji i kopii zapasowej.</string>
 
     <!-- setup errors -->
     <string name="sync_turn_off_error">Nie można wyłączyć synchronizacji i kopii zapasowych.</string>
     <string name="sync_edit_device_error">Nie można zaktualizować nazwy urządzenia.</string>
     <string name="sync_remove_device_error">Nie można usunąć tego urządzenia z synchronizacji i kopii zapasowej.</string>
-    <string name="sync_delete_data_error">Nie można usunąć danych z serwera.</string>
     <string name="sync_login_authenticated_device_error">"Aby sparować te urządzenia, wyłącz synchronizację i kopię zapasową na jednym urządzeniu, a następnie dotknij opcji „Synchronizuj z innym urządzeniem” na drugim urządzeniu."</string>
     <string name="sync_connect_generic_error">Nie można połączyć się z serwerem.</string>
     <string name="sync_connect_login_error">Nie można zsynchronizować z innym urządzeniem.</string>
@@ -170,15 +63,6 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Odblokuj urządzenie, aby uzyskać dostęp do synchronizacji i kopii zapasowej.</string>
     <string name="sync_biometric_prompt_title">Synchronizacja i kopia zapasowa zablokowane</string>
-    <string name="sync_require_device_passcode_dialog_title">Zabezpiecz urządzenie, aby korzystać z Sync &amp; Backup</string>
-    <string name="sync_require_device_passcode_dialog_body">Aby używać funkcji Sync &amp; Backup, należy korzystać z blokady urządzenia z wzorem, kodem PIN lub danymi biometrycznymi.</string>
-    <string name="sync_require_device_passcode_dialog_action">Przejdź do ustawień</string>
-
-    <!-- Sync Settings -->
-    <string name="sync_delete_server_data_dialog_title">Usunąć dane serwera?</string>
-    <string name="sync_delete_server_data_dialog_content">Twoja kopia zapasowa zostanie usunięta z serwera. Wszystkie urządzenia zostaną odłączone od synchronizacji, ale nic nie zostanie usunięte z żadnego urządzenia.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Usuń dane serwera</string>
-    <string name="sync_delete_server_data_dialog_secondary_button">Anuluj</string>
 
     <!-- Sync feature promo -->
     <string name="syncPromoTitlePasswords">Synchronizuj i twórz kopie zapasowe haseł</string>
@@ -205,15 +89,6 @@
     <string name="sync_dialog_switch_account_secondary_button">Anuluj</string>
     <string name="sync_dialog_switch_account_description">To urządzenie jest już synchronizowane, czy na pewno chcesz je synchronizować z inną kopią zapasową lub urządzeniem? Przełączenie nie usunie żadnych danych już zsynchronizowanych z tym urządzeniem.</string>
 
-    <!-- Deep link sync setup -->
-    <string name="sync_setup_deep_link_confirmation_dialog_title">Synchronizować nowe urządzenie?</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” będzie mieć dostęp do zsynchronizowanych danych DuckDuckGo.</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Synchronizuj teraz</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Anuluj</string>
-
-    <string name="deep_link_auth_prompt_title">Konfigurowanie funkcji Sync &amp; Backup</string>
-    <string name="deep_link_auth_prompt_message">Odblokuj urządzenie, aby skonfigurować funkcję Sync &amp; Backup</string>
-
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Synchronizuj zakładki pomiędzy urządzeniami</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Ukryj</string>
@@ -222,26 +97,6 @@
     <string name="getDesktopBrowserSettingItemTitle">Pobierz przeglądarkę komputerową</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo dla komputerów Mac i Windows</string>
 
-    <!-- Sync Settings Recovery Section -->
-    <string name="sync_settings_recovery_section_header">Odzyskiwanie</string>
-    <string name="sync_settings_download_recovery_code_item">Pobierz kod odzyskiwania jako PDF</string>
-    <string name="sync_settings_download_recovery_code_item_hint">Zapisz ten kod w bezpiecznym miejscu, aby móc za jego pomocą odzyskać dane, jeśli stracisz dostęp do tego urządzenia.</string>
-    <string name="sync_settings_data_expiration">Danych Sync &amp; Backup nie można odzyskać po 18 miesiącach braku aktywności. <annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
-
-    <!-- Previous Session Ready Screen -->
-    <string name="sync_previous_session_ready_title">Przywrócić dane Sync &amp; Backup z poprzedniej instalacji?</string>
-    <string name="sync_previous_session_ready_body">Przywróć, aby odzyskać poprzednie zakładki, hasła i inne dane w DuckDuckGo.</string>
-    <string name="sync_previous_session_ready_resume_cta">Przywróć Sync &amp; Backup</string>
-    <string name="sync_previous_session_ready_continue_cta">Skonfiguruj nową synchronizację</string>
-
-    <!-- Recover Data Screen -->
-    <string name="sync_recover_data_title">Łatwo odzyskaj dane</string>
-    <string name="sync_recover_data_content">Użyj tego kodu, aby przywrócić dane w przypadku utraty dostępu do tego urządzenia. Danych Sync &amp; Backup nie można odzyskać po 18 miesiącach braku aktywności.</string>
-    <string name="sync_recover_data_recovery_code_label">Kod odzyskiwania</string>
-    <string name="sync_recover_data_download_pdf">Pobierz jako PDF</string>
-    <string name="sync_restore_on_reinstall_title">Przywróć po ponownej instalacji aplikacji</string>
-    <string name="sync_restore_on_reinstall_description">Jeśli ponownie zainstalujesz aplikację DuckDuckGo, zapytamy, czy chcesz przywrócić dane na tym urządzeniu.</string>
-
     <!-- Chat sync promo -->
     <string name="sync_chat_promo_banner_title">Uzyskaj dostęp do czatów na wielu urządzeniach za pomocą funkcji Sync &amp; Backup.</string>
     <string name="sync_chat_promo_banner_cta_title">Synchronizuj z innym urządzeniem</string>
@@ -249,15 +104,6 @@
     <string name="sync_chat_bottom_sheet_description">Znajdź kod QR w aplikacji DuckDuckGo na innym urządzeniu, przechodząc do Ustawienia › Sync &amp; Backup › Synchronizuj z innym urządzeniem.</string>
     <string name="sync_chat_bottom_sheet_positive">Zeskanuj kod QR</string>
     <string name="sync_chat_bottom_sheet_negative">Nie teraz</string>
-
-    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
-    <string name="sync_v2_joiner_confirmation_title">Zsynchronizować Twoje dane?</string>
-    <string name="sync_v2_joiner_confirmation_positive">Synchronizuj teraz</string>
-    <string name="sync_v2_joiner_confirmation_negative">Anuluj</string>
-
-    <string name="sync_v2_host_confirmation_title">Zsynchronizować Twoje dane?</string>
-    <string name="sync_v2_host_confirmation_positive">Synchronizuj teraz</string>
-    <string name="sync_v2_host_confirmation_negative">Anuluj</string>
 
     <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
     <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">„%1$s” będzie mieć dostęp do zsynchronizowanych haseł DuckDuckGo, danych automatycznego uzupełniania i czatów Duck.ai.</string>
@@ -305,7 +151,6 @@
     <string name="sync_simplified_settings_download_recovery_code_item">Pobierz kod odzyskiwania</string>
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Zapisz ten kod w bezpiecznym miejscu, aby móc za jego pomocą odzyskać dane, jeśli stracisz dostęp do tego urządzenia.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Danych Sync &amp; Backup nie można odzyskać po 18 miesiącach braku aktywności. <annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
-    <string name="sync_simplified_settings_delete_account_item">Wyłącz i usuń dane serwera</string>
     <string name="sync_simplified_settings_turn_off_item">Wyłącz Sync &amp; Backup</string>
     <string name="sync_simplified_settings_storage_permission_message">Zapisywanie pliku PDF do odzyskiwania wymaga uprawnienia do pamięci</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
@@ -317,10 +162,6 @@
     <string name="sync_simplified_settings_get_desktop_browser_item">Pobierz przeglądarkę komputerową</string>
 
     <!-- Sync settings screen: delete server data dialog -->
-    <string name="sync_simplified_settings_delete_server_data_dialog_title">Wyłączyć Sync &amp; Backup i usunąć dane z serwera?</string>
-    <string name="sync_simplified_settings_delete_server_data_dialog_body">Wszystkie urządzenia korzystające z Sync &amp; Backup zostaną odłączone, a zsynchronizowane dane usunięte z serwera.</string>
-    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Usuń dane serwera</string>
-    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Anuluj</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Tej czynności nie można cofnąć.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Wszystkie urządzenia korzystające z Sync &amp; Backup zostaną odłączone, a zsynchronizowane dane – usunięte z serwera.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Usuń trwale</string>
@@ -348,8 +189,6 @@
     <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Przejdź do ustawień</string>
 
     <!-- Sync This Device screen -->
-    <string name="sync_simplified_setup_header_headline">Zsynchronizuj to urządzenie z komputerem znajdującym się w pobliżu.</string>
-    <string name="sync_simplified_setup_header_body">Pomożemy Ci zsynchronizować urządzenia.</string>
     <string name="sync_simplified_setup_header_headline_v2">Czy masz w pobliżu inne urządzenie? Synchronizuj swoje urządzenia.</string>
     <string name="sync_simplified_setup_header_body_v2">Nie masz teraz pod ręką innego urządzenia? Zsynchronizuj tylko to urządzenie, a z innym zsynchronizujesz je później.</string>
     <string name="sync_simplified_setup_primary_button">Synchronizuj z innym urządzeniem</string>
@@ -375,12 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Zeskanuj kod QR, aby zsynchronizować</string>
     <string name="sync_simplified_scanner_camera_header_body">Otwórz <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo na komputer</annotation></b>\n<annotation type="gap">\n</annotation>i przejdź do <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizuj z innym urządzeniem</annotation></string>
-    <string name="sync_simplified_scanner_camera_primary_button">Jestem gotowy(-a) do skanowania</string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Rozumiem</string>
-    <string name="sync_simplified_scanner_camera_invalid_code_message">Niestety, zeskanowany kod jest nieprawidłowy.</string>
-    <string name="sync_simplified_scanner_no_permission_headline">Wymagane jest uprawnienie do aparatu</string>
-    <string name="sync_simplified_scanner_no_permission_body">Przejdź do ustawień urządzenia i zezwól tej aplikacji na dostęp do aparatu.</string>
-    <string name="sync_simplified_scanner_no_permission_primary_button">Przejdź do ustawień</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo potrzebuje dostępu do Twojego aparatu.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Do zeskanowania kodu QR wymagany jest dostęp do aparatu.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button_v2">Zmień uprawnienia</string>
@@ -436,8 +270,6 @@
     <string name="sync_simplified_edit_device_edit_name_item">Edytuj nazwę</string>
     <string name="sync_simplified_edit_device_remove_item">Usuń urządzenie</string>
     <string name="sync_simplified_edit_device_sync_this_device_item">Synchronizuj to urządzenie</string>
-    <string name="sync_simplified_edit_device_remove_notice_this_device">To urządzenie nie będzie już mieć dostępu do zsynchronizowanych danych, jeśli je usuniesz.</string>
-    <string name="sync_simplified_edit_device_remove_notice_another_device">To urządzenie nie będzie już mieć dostępu do zsynchronizowanych danych, jeśli ta opcja zostanie wyłączona.</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Urządzenie %1$s nie będzie już mieć dostępu do zsynchronizowanych danych na innych urządzeniach, jeśli ta opcja zostanie wyłączona.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Urządzenie %1$s nie będzie już mieć dostępu do zsynchronizowanych danych na innych urządzeniach.</string>
 
@@ -447,18 +279,10 @@
     <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Anuluj</string>
 
     <!-- Edit Device screen: remove device dialog -->
-    <string name="sync_simplified_edit_device_remove_dialog_title">Usunąć urządzenie?</string>
-    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” nie będzie już w stanie uzyskać dostępu do zsynchronizowanych danych.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Usuń</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Anuluj</string>
     <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Usunąć urządzenie %1$s z Sync &amp; Backup?</string>
     <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Urządzenie %1$s nie będzie już mieć dostępu do zsynchronizowanych danych. Zakładki, dane autouzupełniania i czaty Duck.ai pozostaną na Twoich urządzeniach.</string>
-
-    <!-- Edit Device screen: turn off sync dialog -->
-    <string name="sync_simplified_edit_device_turn_off_dialog_title">Wyłączyć Sync &amp; Backup?</string>
-    <string name="sync_simplified_edit_device_turn_off_dialog_body">To urządzenie nie będzie już mieć dostępu do zsynchronizowanych danych na innych urządzeniach.</string>
-    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Wyłącz</string>
-    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Anuluj</string>
 
     <!-- Error dialog, shared across Simplified Sync screens -->
     <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
@@ -531,5 +355,4 @@
     <string name="sync_passwords_multi_device_promo_message">Sync &amp; Backup jest włączone na tym urządzeniu.</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Połącz</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Pobierz aplikację</string>
-
 </resources>
