@@ -481,25 +481,26 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Uzyskaj dostęp do swoich haseł na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="sync_passwords_import_promo_title_label">Uzyskaj dostęp do swoich haseł na urządzeniach mobilnych i komputerach stacjonarnych.</string>
-    <string name="sync_passwords_import_promo_primary_button">Włącz Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Rozpocznij synchronizację</string>
     <string name="sync_passwords_import_promo_title_toggle">Synchronizuj i twórz kopie zapasowe swoich haseł na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Korzystaj z zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="sync_bookmarks_import_promo_title_label">Uzyskaj dostęp do swoich zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Włącz Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Rozpocznij synchronizację</string>
     <string name="sync_bookmarks_import_promo_title_toggle">Synchronizuj i twórz kopie zapasowe swoich zakładek na urządzeniach mobilnych i komputerach stacjonarnych.</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Synchronizuj i twórz kopie zapasowe zakładek</string>
     <string name="sync_bookmarks_promo_message">Szyfrowane kompleksowo. Nikt nie może zobaczyć Twoich zakładek, nawet my.</string>
-    <string name="sync_bookmarks_promo_primary_button">Włącz Sync &amp; Backup</string>
+    <string name="sync_bookmarks_promo_primary_button_label">Rozpocznij synchronizację</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_multi_device_promo_title">Czy chcesz też synchronizować zakładki z aplikacją komputerową?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">Sync &amp; Backup jest włączone na tym urządzeniu.</string>
     <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Połącz</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Pobierz aplikację</string>
 
@@ -507,7 +508,7 @@
     <string name="sync_bookmark_added_set_up_promo_title">Synchronizuj i twórz kopie zapasowe zakładek</string>
     <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Więcej opcji</string>
     <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Ukryj</string>
-    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Włącz Sync &amp; Backup</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Rozpocznij synchronizację</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Synchronizuj z aplikacją komputerową</string>
@@ -522,11 +523,12 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Synchronizuj i twórz kopie zapasowe haseł</string>
     <string name="sync_passwords_promo_message">Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my.</string>
-    <string name="sync_passwords_promo_primary_button">Włącz Sync &amp; Backup</string>
+    <string name="sync_passwords_promo_primary_button_label">Rozpocznij synchronizację</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
     <string name="sync_passwords_multi_device_promo_title">Czy chcesz też synchronizować hasła z aplikacją komputerową?</string>
+    <string name="sync_passwords_multi_device_promo_message">Sync &amp; Backup jest włączone na tym urządzeniu.</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Połącz</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Pobierz aplikację</string>
 
