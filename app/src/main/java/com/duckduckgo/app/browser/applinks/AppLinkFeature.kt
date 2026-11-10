@@ -36,4 +36,11 @@ interface AppLinkFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun gesturedPostNavigation(): Toggle
+
+    /**
+     * When enabled, the app that opened a regular (non Custom Tab) tab through a VIEW intent is a trusted caller,
+     * so a user-initiated link back to it launches it directly.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun plainTabTrustedCaller(): Toggle
 }
