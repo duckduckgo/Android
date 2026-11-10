@@ -504,6 +504,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
 
             launch {
+                viewModel.lastAccessedTabFlow.collectLatest {
+                    tabManager.onTabAccessed(it)
+                }
+            }
+
+            launch {
                 if (viewModel.isSelectedTabDebounceRemoved) {
                     viewModel.tabIdToMoveTo.collectLatest { onMoveToTabRequested(it) }
                 } else {

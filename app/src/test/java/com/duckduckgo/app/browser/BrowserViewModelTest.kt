@@ -225,11 +225,26 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenSelectedTabDebounceRemovedThenSelectedTabFlowIsStillDebounced() = runTest {
+    fun whenSelectedTabDebounceRemovedThenSelectedTabFlowEmitsImmediately() = runTest {
         swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
         initTestee()
         val emitted = mutableListOf<String>()
         backgroundScope.launch { testee.selectedTabFlow.toList(emitted) }
+
+        selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
+        runCurrent()
+        selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
+        runCurrent()
+
+        assertEquals(listOf("t1", "t2"), emitted)
+    }
+
+    @Test
+    fun whenSelectedTabDebounceRemovedThenLastAccessedTabFlowIsStillDebounced() = runTest {
+        swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = true))
+        initTestee()
+        val emitted = mutableListOf<String>()
+        backgroundScope.launch { testee.lastAccessedTabFlow.toList(emitted) }
 
         selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
         runCurrent()

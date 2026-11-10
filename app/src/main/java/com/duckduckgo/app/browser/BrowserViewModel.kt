@@ -202,19 +202,19 @@ class BrowserViewModel @Inject constructor(
             .distinctUntilChanged()
 
     // Stays debounced so selections that only last a moment don't update the tab's last access.
-    val selectedTabFlow: Flow<String> = distinctSelectedTabFlow.debounce(100.milliseconds)
+    val lastAccessedTabFlow: Flow<String> = distinctSelectedTabFlow.debounce(100.milliseconds)
 
-    private val pagerSelectedTabFlow: Flow<String> = if (isSelectedTabDebounceRemoved) distinctSelectedTabFlow else selectedTabFlow
+    val selectedTabFlow: Flow<String> = if (isSelectedTabDebounceRemoved) distinctSelectedTabFlow else lastAccessedTabFlow
 
     val tabsFlow: Flow<List<TabModel>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome, tab.sourceTabId) } }
         .distinctUntilChanged()
 
-    val selectedTabIndex: Flow<Int> = combine(tabsFlow, pagerSelectedTabFlow) { tabs, selectedTab ->
+    val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         tabs.indexOfFirst { it.tabId == selectedTab }
     }.filterNot { it == -1 }
 
-    val tabIdToMoveTo: Flow<String> = combine(tabsFlow, pagerSelectedTabFlow) { tabs, selectedTab ->
+    val tabIdToMoveTo: Flow<String> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         selectedTab.takeIf { tabs.any { it.tabId == selectedTab } }
     }.filterNotNull()
 
