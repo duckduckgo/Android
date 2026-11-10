@@ -118,9 +118,6 @@ class AttachmentView(
             .onEach { command ->
                 if (!isEditMode && !isContextual) openAttachment(command)
             }.launchIn(scope)
-        newChatHintCommands.takePending(host?.tabId())?.let { command ->
-            if (!isEditMode && !isContextual) openAttachment(command)
-        }
         attachmentStateJob?.cancel()
         attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }

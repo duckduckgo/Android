@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel.AttachmentState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -167,22 +168,33 @@ class AttachmentViewTest {
     }
 
     @Test
-    fun whenCameraCommandWasSentBeforeAttachingThenCameraOpensOnAttach() {
+    fun whenCameraCommandIsSentForItsTabThenCameraOpens() = runTest {
         val commands = NewChatHintCommands()
         whenever(host.tabId()).thenReturn("tab")
-        commands.sendWhenAttached(NewChatHintCommand.OpenCamera("tab"))
-
         attach(commands = commands)
+
+        commands.send(NewChatHintCommand.OpenCamera("tab"))
 
         verify(host).showAttachmentChooser(true)
         verify(host).requestCameraCapture(any())
     }
 
     @Test
-    fun whenCameraCommandWasSentForAnotherTabThenCameraDoesNotOpen() {
+    fun whenCameraCommandIsSentForAnotherTabThenCameraDoesNotOpen() = runTest {
         val commands = NewChatHintCommands()
         whenever(host.tabId()).thenReturn("tab")
-        commands.sendWhenAttached(NewChatHintCommand.OpenCamera("other"))
+        attach(commands = commands)
+
+        commands.send(NewChatHintCommand.OpenCamera("other"))
+
+        verify(host, never()).requestCameraCapture(any())
+    }
+
+    @Test
+    fun whenCameraCommandWasSentBeforeAttachingThenCameraDoesNotOpenOnAttach() = runTest {
+        val commands = NewChatHintCommands()
+        whenever(host.tabId()).thenReturn("tab")
+        commands.send(NewChatHintCommand.OpenCamera("tab"))
 
         attach(commands = commands)
 

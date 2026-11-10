@@ -533,17 +533,54 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenConfigureDuckAiModeAndCameraCaptureActionThenOpenCameraIsPendingForTab() = runTest {
+    fun whenCameraCaptureLaunchAndPluginViewsAttachedThenOpenCameraIsSentForTab() = runTest {
+        val received = mutableListOf<NewChatHintCommand>()
+        val job = launch(coroutineRule.testDispatcher) { newChatHintCommands.commandsFor { "tab-1" }.collect { received.add(it) } }
+        testee.onPluginViewsAttached()
+
         testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
 
-        assertEquals(NewChatHintCommand.OpenCamera("tab-1"), newChatHintCommands.takePending("tab-1"))
+        assertEquals(listOf<NewChatHintCommand>(NewChatHintCommand.OpenCamera("tab-1")), received)
+        job.cancel()
     }
 
     @Test
-    fun whenConfigureBrowserModeAndCameraCaptureActionThenNoOpenCameraIsPending() = runTest {
+    fun whenCameraCaptureLaunchBeforePluginViewsAttachedThenOpenCameraIsSentOnceTheyAttach() = runTest {
+        val received = mutableListOf<NewChatHintCommand>()
+        val job = launch(coroutineRule.testDispatcher) { newChatHintCommands.commandsFor { "tab-1" }.collect { received.add(it) } }
+
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
+        assertTrue(received.isEmpty())
+        testee.onPluginViewsAttached()
+
+        assertEquals(listOf<NewChatHintCommand>(NewChatHintCommand.OpenCamera("tab-1")), received)
+        job.cancel()
+    }
+
+    @Test
+    fun whenCameraCaptureLaunchThenLaterConfigureDoesNotReopenCamera() = runTest {
+        val received = mutableListOf<NewChatHintCommand>()
+        val job = launch(coroutineRule.testDispatcher) { newChatHintCommands.commandsFor { "tab-1" }.collect { received.add(it) } }
+        testee.onPluginViewsAttached()
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
+
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = null)
+        testee.onPluginViewsAttached()
+
+        assertEquals(1, received.size)
+        job.cancel()
+    }
+
+    @Test
+    fun whenConfigureBrowserModeAndCameraCaptureActionThenNoOpenCameraIsSent() = runTest {
+        val received = mutableListOf<NewChatHintCommand>()
+        val job = launch(coroutineRule.testDispatcher) { newChatHintCommands.commandsFor { "tab-1" }.collect { received.add(it) } }
+        testee.onPluginViewsAttached()
+
         testee.configure(tabId = "tab-1", isDuckAiMode = false, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
 
-        assertNull(newChatHintCommands.takePending("tab-1"))
+        assertTrue(received.isEmpty())
+        job.cancel()
     }
 
     @Test

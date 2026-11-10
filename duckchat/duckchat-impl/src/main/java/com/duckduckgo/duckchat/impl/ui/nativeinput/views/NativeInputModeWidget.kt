@@ -719,6 +719,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                             container.isVisible = isChatTabSelected() && !isEditWidget
                         }
                     }
+                    viewModel.onPluginViewsAttached()
                 }
             }
         }

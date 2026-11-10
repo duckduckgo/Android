@@ -16,8 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput
 
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class NewChatHintCommandsTest {
@@ -25,26 +28,35 @@ class NewChatHintCommandsTest {
     private val testee = NewChatHintCommands()
 
     @Test
-    fun whenCommandIsSentWhenAttachedThenItIsTakenOnceForItsTab() {
-        testee.sendWhenAttached(NewChatHintCommand.OpenCamera("tab"))
+    fun whenCommandIsSentThenSubscriberForItsTabReceivesIt() = runTest(UnconfinedTestDispatcher()) {
+        val received = mutableListOf<NewChatHintCommand>()
+        val job = launch { testee.commandsFor { "tab" }.collect { received.add(it) } }
 
-        assertEquals(NewChatHintCommand.OpenCamera("tab"), testee.takePending("tab"))
-        assertNull(testee.takePending("tab"))
+        testee.send(NewChatHintCommand.OpenCamera("tab"))
+
+        assertEquals(listOf<NewChatHintCommand>(NewChatHintCommand.OpenCamera("tab")), received)
+        job.cancel()
     }
 
     @Test
-    fun whenCommandIsPendingForAnotherTabThenNothingIsTaken() {
-        testee.sendWhenAttached(NewChatHintCommand.OpenCamera("tab"))
+    fun whenCommandIsSentForAnotherTabThenSubscriberDoesNotReceiveIt() = runTest(UnconfinedTestDispatcher()) {
+        val received = mutableListOf<NewChatHintCommand>()
+        val job = launch { testee.commandsFor { "tab" }.collect { received.add(it) } }
 
-        assertNull(testee.takePending("other"))
-        assertNull(testee.takePending(null))
+        testee.send(NewChatHintCommand.OpenCamera("other"))
+
+        assertTrue(received.isEmpty())
+        job.cancel()
     }
 
     @Test
-    fun whenCommandIsSentWhenAttachedTwiceForATabThenTheLatestWins() {
-        testee.sendWhenAttached(NewChatHintCommand.OpenPhoto("tab"))
-        testee.sendWhenAttached(NewChatHintCommand.OpenCamera("tab"))
+    fun whenCommandIsSentBeforeSubscribingThenItIsNotReplayed() = runTest(UnconfinedTestDispatcher()) {
+        testee.send(NewChatHintCommand.OpenCamera("tab"))
+        val received = mutableListOf<NewChatHintCommand>()
 
-        assertEquals(NewChatHintCommand.OpenCamera("tab"), testee.takePending("tab"))
+        val job = launch { testee.commandsFor { "tab" }.collect { received.add(it) } }
+
+        assertTrue(received.isEmpty())
+        job.cancel()
     }
 }
