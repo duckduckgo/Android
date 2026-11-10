@@ -112,10 +112,6 @@ class DuckAiWidgetLayoutTest {
         assertEquals(current("searchWidgetSearchBarTrailingIconColor"), widgetColor("OnContainer"))
     }
 
-    private fun assertDynamicColors(vararg expected: Pair<String, Int>) {
-        expected.forEach { (name, systemColor) -> assertEquals(name, activity.getColor(systemColor), widgetColor(name)) }
-    }
-
     @Test
     @Config(sdk = [30])
     fun whenApi30ThenColorsMatchCurrentLightColors() = assertFallbackColors(container = "black9", divider = "black12")
@@ -126,7 +122,23 @@ class DuckAiWidgetLayoutTest {
 
     @Test
     @Config(sdk = [34], qualifiers = "notnight")
-    fun whenApi34ThenColorsUseLightSystemPalette() = assertDynamicColors(
+    fun whenApi34ThenStaticColorsMatchCurrentLightColors() = assertFallbackColors(container = "black9", divider = "black12")
+
+    @Test
+    @Config(sdk = [34], qualifiers = "night")
+    fun whenApi34NightThenStaticColorsMatchCurrentDarkColors() = assertFallbackColors(container = "white9", divider = "white12")
+
+    private fun assertDynamicColors(vararg expected: Pair<String, Int>) {
+        expected.forEach { (name, systemColor) -> assertEquals(name, activity.getColor(systemColor), dynamicColor(name)) }
+    }
+
+    private fun dynamicColor(name: String) = activity.getColor(
+        activity.resources.getIdentifier("duckAiWidgetDynamic${name}Color", "color", activity.packageName),
+    )
+
+    @Test
+    @Config(sdk = [34], qualifiers = "notnight")
+    fun whenApi34ThenDynamicColorsUseLightSystemPalette() = assertDynamicColors(
         "Background" to android.R.color.system_neutral2_100,
         "SearchBar" to android.R.color.system_neutral1_0,
         "Container" to android.R.color.system_accent2_200,
@@ -138,7 +150,7 @@ class DuckAiWidgetLayoutTest {
 
     @Test
     @Config(sdk = [34], qualifiers = "night")
-    fun whenApi34NightThenColorsUseDarkSystemPalette() = assertDynamicColors(
+    fun whenApi34NightThenDynamicColorsUseDarkSystemPalette() = assertDynamicColors(
         "Background" to android.R.color.system_neutral1_900,
         "SearchBar" to android.R.color.system_neutral2_700,
         "Container" to android.R.color.system_accent2_700,

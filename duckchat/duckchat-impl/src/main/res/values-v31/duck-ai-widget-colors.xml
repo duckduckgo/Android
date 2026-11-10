@@ -15,11 +15,11 @@
   ~ limitations under the License.
   -->
 <resources>
-    <color name="duckAiWidgetBackgroundColor">@android:color/system_neutral2_100</color>
-    <color name="duckAiWidgetSearchBarColor">@android:color/system_neutral1_0</color>
-    <color name="duckAiWidgetContainerColor">@android:color/system_accent2_200</color>
-    <color name="duckAiWidgetDividerColor">@android:color/system_neutral2_200</color>
-    <color name="duckAiWidgetHintColor">@android:color/system_neutral2_700</color>
-    <color name="duckAiWidgetTextColor">@android:color/system_neutral1_900</color>
-    <color name="duckAiWidgetOnContainerColor">@android:color/system_accent2_900</color>
+    <color name="duckAiWidgetDynamicBackgroundColor">@android:color/system_neutral2_100</color>
+    <color name="duckAiWidgetDynamicSearchBarColor">@android:color/system_neutral1_0</color>
+    <color name="duckAiWidgetDynamicContainerColor">@android:color/system_accent2_200</color>
+    <color name="duckAiWidgetDynamicDividerColor">@android:color/system_neutral2_200</color>
+    <color name="duckAiWidgetDynamicHintColor">@android:color/system_neutral2_700</color>
+    <color name="duckAiWidgetDynamicTextColor">@android:color/system_neutral1_900</color>
+    <color name="duckAiWidgetDynamicOnContainerColor">@android:color/system_accent2_900</color>
 </resources>
