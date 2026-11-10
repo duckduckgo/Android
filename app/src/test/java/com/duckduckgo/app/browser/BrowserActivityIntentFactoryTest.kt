@@ -20,7 +20,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.InAppNavigation
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,5 +44,19 @@ class BrowserActivityIntentFactoryTest {
         val intent = BrowserActivity.intent(context, launchSource = InAppNavigation)
 
         assertFalse(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, true))
+    }
+
+    @Test
+    fun whenLaunchingAppPackageProvidedThenIntentCarriesIt() {
+        val intent = BrowserActivity.intent(context, launchSource = ExternalUrl, launchingAppPackage = "com.example.origin")
+
+        assertEquals("com.example.origin", intent.getStringExtra(BrowserActivity.LAUNCHING_APP_PACKAGE_EXTRA))
+    }
+
+    @Test
+    fun whenNoLaunchingAppPackageThenIntentDoesNotCarryOne() {
+        val intent = BrowserActivity.intent(context, launchSource = ExternalUrl)
+
+        assertNull(intent.getStringExtra(BrowserActivity.LAUNCHING_APP_PACKAGE_EXTRA))
     }
 }

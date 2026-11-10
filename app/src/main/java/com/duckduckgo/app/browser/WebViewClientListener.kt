@@ -93,7 +93,10 @@ interface WebViewClientListener {
         hasGesture: Boolean,
     ): Boolean
 
-    fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
+    fun handleNonHttpAppLink(
+        nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink,
+        hasGesture: Boolean,
+    ): Boolean
 
     fun handleCloakedAmpLink(initialUrl: String)
 

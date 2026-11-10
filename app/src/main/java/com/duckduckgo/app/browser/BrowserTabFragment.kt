@@ -523,6 +523,7 @@ class BrowserTabFragment :
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
     private val customTabClientPackage get() = requireArguments().getString(CLIENT_PACKAGE_ARG)
     private val customTabReferrerPackage get() = requireArguments().getString(REFERRER_PACKAGE_ARG)
+    private val launchingAppPackage get() = requireArguments().getString(LAUNCHING_APP_PACKAGE_ARG)
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
@@ -1234,6 +1235,7 @@ class BrowserTabFragment :
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen, customTabClientPackage, customTabReferrerPackage)
+            viewModel.setLaunchingAppPackage(launchingAppPackage)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
@@ -5603,6 +5605,7 @@ class BrowserTabFragment :
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val CLIENT_PACKAGE_ARG = "CLIENT_PACKAGE_ARG"
         private const val REFERRER_PACKAGE_ARG = "REFERRER_PACKAGE_ARG"
+        private const val LAUNCHING_APP_PACKAGE_ARG = "LAUNCHING_APP_PACKAGE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -5995,12 +5998,16 @@ class BrowserTabFragment :
             query: String? = null,
             skipHome: Boolean,
             isExternal: Boolean,
+            launchingAppPackage: String? = null,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             args.putBoolean(SKIP_HOME_ARG, skipHome)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            launchingAppPackage?.let {
+                args.putString(LAUNCHING_APP_PACKAGE_ARG, it)
+            }
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }

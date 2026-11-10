@@ -55,6 +55,7 @@ class PendingModeSwitchTest {
                 skipHome = true,
                 isExternal = true,
                 inputModeTarget = InputMode.SEARCH,
+                launchingAppPackage = "com.example.origin",
             ),
             source = BrowserModeSwitchSource.NEW_TAB,
         )

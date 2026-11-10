@@ -70,18 +70,19 @@ class TabPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         val tab = tabs[position]
         val isExternal = activity.consumeExternalLaunchForTab(tab.tabId)
+        val launchingAppPackage = activity.consumeLaunchingAppForTab(tab.tabId)
         // Check if there's a message specifically for this tab's source tab ID
         val pendingMessage = pendingMessages.remove(tab.sourceTabId)
         pendingMessage?.cleanupJob?.cancel()
         val inputModeTarget = activity.consumeInputModeTargetForTab(tab.tabId)
 
         return if (pendingMessage != null) {
-            BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal).apply {
+            BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal, launchingAppPackage).apply {
                 this.messageFromPreviousTab = pendingMessage.message
                 this.inputModeTarget = inputModeTarget
             }
         } else {
-            BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal).apply {
+            BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal, launchingAppPackage).apply {
                 this.inputModeTarget = inputModeTarget
             }
         }

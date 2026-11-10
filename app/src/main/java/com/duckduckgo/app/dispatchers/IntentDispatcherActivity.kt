@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.dispatchers
 
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsSessionToken
@@ -148,6 +149,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
                 launchSource = if (isExternal) ExternalUrl else InAppNavigation,
                 queryExtra = intentText,
                 isExternal = isExternal,
+                launchingAppPackage = launchingAppPackage(referrer, packageName),
             ),
         )
 
@@ -155,3 +157,10 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         finish()
     }
 }
+
+/**
+ * The app that opened DuckDuckGo, from the android-app:// referrer. Only meaningful in the first activity of the launch,
+ * later hops make DuckDuckGo itself the referrer.
+ */
+internal fun launchingAppPackage(referrer: Uri?, ownPackage: String): String? =
+    referrer?.takeIf { it.scheme == "android-app" }?.host?.takeIf { it.isNotBlank() && it != ownPackage }
