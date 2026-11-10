@@ -65,6 +65,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBotto
 import com.duckduckgo.app.browser.mode.AppShortcutDuckAi
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.mode.DuckAiPinShortcut
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -951,9 +952,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
         )
     }
 
-    private fun startNewTabTransition(): PendingNewTabTransition? {
+    /**
+     * A new tab asked for by an intent grows in only if [fromTabId] is the tab on screen. The browser is paused while it gets
+     * the intent, so STARTED is enough. An intent held back until data clearing finished may come from before the browser was
+     * on screen, so it opens without the transition.
+     */
+    private fun startIntentNewTabTransition(
+        intent: Intent,
+        fromTabId: String?,
+    ): PendingNewTabTransition? {
+        if (intent === lastIntent || !newTabTransitionCoordinator.isShowing(fromTabId)) return null
+        return startNewTabTransition(onScreenFrom = Lifecycle.State.STARTED)
+    }
+
+    private fun startNewTabTransition(onScreenFrom: Lifecycle.State = Lifecycle.State.RESUMED): PendingNewTabTransition? {
         val config = newTabTransitionConfig ?: return null
-        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return null
+        if (!lifecycle.currentState.isAtLeast(onScreenFrom)) return null
         return PendingNewTabTransition(
             picture = lifecycleScope.async { window.capturePicture() },
             motion = config.motionFor(config.browserOrigin),
@@ -1083,7 +1097,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     .getOrNull()
                     ?.let { duckChat.reportDuckChatEntry(it, opensNewTab = true, hasPrompt = false) }
             }
-            launchDuckAi(url = intent.getStringExtra(DUCK_CHAT_URL), sourceTabId = sourceTabId)
+            // Only in-app launches animate, so a widget or another app beside the browser doesn't.
+            val newTabTransition = if (intent.getBooleanExtra(IN_APP_NAVIGATION_EXTRA, false)) {
+                startIntentNewTabTransition(intent, fromTabId = currentTab?.tabId)
+            } else {
+                null
+            }
+            launchDuckAi(url = intent.getStringExtra(DUCK_CHAT_URL), sourceTabId = sourceTabId, newTabTransition = newTabTransition)
             return
         }
 
@@ -1148,8 +1168,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     viewModel.launchFromThirdParty()
                 }
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
-                val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: if (selectedText) currentTab?.tabId else null
+                val requestedSourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
+                val sourceTabId = requestedSourceTabId ?: if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText && sourceTabId == null
+                val newTabTransition = if (!isExternal) startIntentNewTabTransition(intent, fromTabId = requestedSourceTabId) else null
                 if (swipingTabsFeature.isEnabled) {
                     val query =
                         if (isExternal) {
@@ -1157,12 +1179,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         } else {
                             sharedText
                         }
-                    launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome, isExternal = isExternal)
+                    openNewTabInCurrentMode(query, sourceTabId, skipHome, isExternal, newTabTransition = newTabTransition)
                 } else {
                     val landingId = onIntentOpening()
                     lifecycleScope.launch {
                         val tabId = viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome)
                         onIntentLanded(tabId, landingId)
+                        newTabTransition?.let { registerNewTabTransition(tabId, it) }
                         if (isExternal) {
                             externalLaunchTabIds.add(tabId)
                         }
@@ -1348,7 +1371,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var pendingDuckChatTextSelection: String? = null
     fun consumePendingDuckChatTextSelection(): String? = pendingDuckChatTextSelection.also { pendingDuckChatTextSelection = null }
 
-    private fun launchDuckAi(url: String?, sourceTabId: String? = null) {
+    private fun launchDuckAi(
+        url: String?,
+        sourceTabId: String? = null,
+        newTabTransition: PendingNewTabTransition? = null,
+    ) {
         isDuckChatVisible = true
         // The tab to return to when this Duck.ai tab is closed.
         // Use to the current tab if no explicit tab id is passed.
@@ -1356,14 +1383,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val returnTabId = sourceTabId ?: currentTab?.tabId
         val fullScreenUrl = url ?: duckChat.getDuckChatUrl("", false)
         if (swipingTabsFeature.isEnabled) {
-            launchNewTab(query = fullScreenUrl, skipHome = false, sourceTabId = returnTabId)
+            openNewTabInCurrentMode(fullScreenUrl, returnTabId, skipHome = false, isExternal = false, newTabTransition = newTabTransition)
         } else {
             val landingId = onIntentOpening()
             lifecycleScope.launch {
-                onIntentLanded(
-                    viewModel.onOpenInNewTabRequested(query = fullScreenUrl, sourceTabId = returnTabId, skipHome = false),
-                    landingId,
-                )
+                val tabId = viewModel.onOpenInNewTabRequested(query = fullScreenUrl, sourceTabId = returnTabId, skipHome = false)
+                onIntentLanded(tabId, landingId)
+                newTabTransition?.let { registerNewTabTransition(tabId, it) }
             }
         }
     }
@@ -1599,6 +1625,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, duckChatForceImageGeneration)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
+            intent.putExtra(IN_APP_NAVIGATION_EXTRA, launchSource == InAppNavigation)
             intent.putExtra(LAUNCH_SOURCE_PIXEL_VALUE, launchSource.toPixelLaunchSourceValue())
             return intent
         }
@@ -1621,6 +1648,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
          * Stamped by entry points that must reach BrowserActivity in [BrowserMode.REGULAR].
          */
         const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
+        private const val IN_APP_NAVIGATION_EXTRA = "IN_APP_NAVIGATION_EXTRA"
 
         /**
          * The [BrowserLaunchSource], pre-mapped to its [LaunchSourceValues] pixel string. Read by

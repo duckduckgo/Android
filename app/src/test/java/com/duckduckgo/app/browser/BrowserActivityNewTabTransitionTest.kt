@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Looper
@@ -30,6 +31,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
+import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
+import com.duckduckgo.app.browser.navigation.AppBrowserNav
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
@@ -389,16 +393,122 @@ class BrowserActivityNewTabTransitionTest {
         verify(player).play(eq(binding.fragmentContainer), any(), any(), any())
     }
 
+    @Test
+    fun duckAiChatGrowsIn() {
+        processIntentWhileOnScreen(duckAiIntent())
+        assertRegistered()
+    }
+
+    @Test
+    fun duckAiChatGrowsInWithSwipingOff() {
+        swiping = false
+        processIntentWhileOnScreen(duckAiIntent())
+        assertRegistered()
+    }
+
+    @Test
+    fun duckAiChatFromAWidgetDoesNotGrowIn() {
+        processIntentWhileOnScreen(BrowserActivity.intent(host, SearchWidgetDuckAi, openDuckChat = true, duckChatUrl = URL))
+        assertTabOpened()
+        assertNotRegistered()
+    }
+
+    @Test
+    fun duckAiOnTextSelectedInAnotherAppDoesNotGrowIn() {
+        processIntentWhileOnScreen(duckAiIntent(textSelection = "selected"))
+        assertTabOpened()
+        assertNotRegistered()
+    }
+
+    @Test
+    fun duckAiChatOpenedFromAnotherScreenDoesNotGrowIn() {
+        // Chat history in full screen: the browser was stopped behind it and restarts to get the intent.
+        controller.pause().stop()
+        runCatching { BrowserActivity::class.java.getDeclaredMethod("onStop").apply { isAccessible = true }.invoke(browser) }
+        controller.restart().start()
+        processIntent(duckAiIntent())
+        assertTabOpened()
+        assertNotRegistered()
+    }
+
+    @Test
+    fun duckAiChatHeldBackByDataClearingDoesNotGrowIn() {
+        val intent = duckAiIntent()
+        setField("lastIntent", intent)
+        processIntentWhileOnScreen(intent)
+        assertTabOpened()
+        assertNotRegistered()
+    }
+
+    @Test
+    fun linkOpenedInNewTabByIntentGrowsIn() {
+        processIntentWhileOnScreen(AppBrowserNav().openInNewTab(host, URL, SOURCE))
+        assertRegistered()
+    }
+
+    @Test
+    fun linkOpenedInNewTabByIntentGrowsInWithSwipingOff() {
+        swiping = false
+        processIntentWhileOnScreen(AppBrowserNav().openInNewTab(host, URL, SOURCE))
+        assertRegistered()
+    }
+
+    @Test
+    fun linkOpenedInNewTabByIntentFromATabNotOnScreenDoesNotGrowIn() {
+        processIntentWhileOnScreen(AppBrowserNav().openInNewTab(host, URL, OTHER))
+        assertTabOpened()
+        assertNotRegistered()
+    }
+
+    @Test
+    fun linkFromAnotherAppDoesNotGrowIn() {
+        processIntentWhileOnScreen(BrowserActivity.intent(host, InAppNavigation, queryExtra = URL, sourceTabId = SOURCE, isExternal = true))
+        assertTabOpened()
+        assertNotRegistered()
+    }
+
     private fun assertRegistered() {
         verify(pending).register(eq(ADDED), any())
     }
 
     private fun assertTabOpened() {
-        verifyBlocking(tabManager) { openNewTab(anyOrNull(), anyOrNull(), any()) }
+        if (swiping) {
+            verifyBlocking(tabManager) { openNewTab(anyOrNull(), anyOrNull(), any()) }
+        } else {
+            verifyBlocking(viewModel) { onOpenInNewTabRequested(any(), anyOrNull(), any()) }
+        }
     }
 
     private fun assertNotRegistered() {
         verify(pending, never()).register(any(), any())
+    }
+
+    private fun duckAiIntent(textSelection: String? = null): Intent = AppBrowserNav().openDuckChat(
+        context = host,
+        hasSessionActive = false,
+        duckChatUrl = URL,
+        forceImageGeneration = false,
+        forceLaunchContextual = false,
+        textSelection = textSelection,
+    )
+
+    // The browser on screen is paused while it gets an intent.
+    private fun processIntentWhileOnScreen(intent: Intent) {
+        controller.pause()
+        processIntent(intent)
+    }
+
+    private fun processIntent(intent: Intent) {
+        val sourceTab: BrowserTabFragment = mock { on { tabId } doReturn SOURCE }
+        browser.emailProtectionLinkVerifier = mock()
+        browser.syncUrlIdentifier = mock()
+        browser.duckChat = mock()
+        browser.duckAiEntryCallback = lazyOf(mock())
+        browser.omnibarEntryConverter = mock { on { convertQueryToUrl(any(), anyOrNull(), any(), any()) } doReturn URL }
+        whenever(tabManager.getSelectedTabId()).thenReturn(SOURCE)
+        doReturn(mock<FragmentManager> { on { fragments } doReturn listOf(sourceTab) }).whenever(browser).supportFragmentManager
+        setField("currentTabRef", sourceTab)
+        BrowserActivity::class.java.getDeclaredMethod("processIntent", Intent::class.java).apply { isAccessible = true }.invoke(browser, intent)
     }
 
     private fun register(tabId: String): Registration {
