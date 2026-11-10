@@ -63,7 +63,7 @@ object DaxOnboardingDialogDefaults {
     val TitleBodySpacing: Dp = 20.dp
     val HeaderContentSpacing: Dp = 20.dp
 
-    val ContentToPrimaryCtaSpacing: Dp = 24.dp
+    val ContentToPrimaryCtaSpacing: Dp = 20.dp
     val DismissSize: Dp = 32.dp
     val DismissOffset: Dp = 4.dp
     val TailBandHeight: Dp = DaxSpeechBubbleShape.TailHeight + StrokeWidth
@@ -93,6 +93,8 @@ object DaxOnboardingDialogDefaults {
     internal val TypingCadence: Duration = 20.milliseconds
     internal val TypingSettle: Duration = 20.milliseconds
 
+    // Half the gap between the primary CTA's visible height and the 48dp minimum touch target it reserves.
+    internal val PrimaryCtaTouchInset = 4.dp
     internal val LandscapeCtaWidth = 200.dp
     internal val LandscapeTextCtaSpacing = 16.dp
     internal val LandscapeHorizontalPadding = 24.dp
