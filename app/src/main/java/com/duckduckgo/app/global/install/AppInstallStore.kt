@@ -22,9 +22,11 @@ import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -56,6 +58,8 @@ class AppInstallSharedPreferences @Inject constructor(
     private val context: Context,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val deviceMigration: Lazy<DeviceMigration>, // break any possible DI dependency cycle
+    private val defaultBrowserDetector: Lazy<DefaultBrowserDetector>, // break any possible DI dependency cycle
 ) : AppInstallStore {
     override var installTimestamp: Long
         get() = preferences.getLong(KEY_TIMESTAMP_UTC, 0L)
@@ -87,7 +91,30 @@ class AppInstallSharedPreferences @Inject constructor(
 
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+    // The first read on a migrated install pays for the one-time reset below (a default browser lookup and a disk write), on
+    // whichever thread reads first, usually the main thread from DefaultBrowserObserver.onResume. Later reads cost what any
+    // SharedPreferences read does.
+    private val preferences: SharedPreferences by lazy {
+        context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE).also { resetDefaultBrowserHistoryAfterTransfer(it) }
+    }
+
+    /**
+     * After a device transfer the default browser history describes the previous phone, where DuckDuckGo may have been the
+     * default. Read as is, it would look like the user unset DuckDuckGo on this phone. It is reset to this phone's state once,
+     * before any reader sees it, and regardless of the device migration kill switch because it keeps that signal correct.
+     */
+    private fun resetDefaultBrowserHistoryAfterTransfer(preferences: SharedPreferences) = synchronized(RESET_LOCK) {
+        if (deviceMigration.value.isDoneOnThisInstall(DEFAULT_BROWSER_HISTORY_RESET_DONE_KEY)) return@synchronized
+        // Synchronous stand-in for isMigratedInstall(): it is non-null exactly on a migrated install.
+        if (deviceMigration.value.sourceDeviceIsNewInstall() == null) return@synchronized
+
+        val isDefaultBrowser = defaultBrowserDetector.value.isDefaultBrowser()
+        preferences.edit(commit = true) {
+            putBoolean(KEY_DEFAULT_BROWSER, isDefaultBrowser)
+            putBoolean(KEY_WAS_EVER_DEFAULT_BROWSER, isDefaultBrowser)
+        }
+        deviceMigration.value.markDoneOnThisInstall(DEFAULT_BROWSER_HISTORY_RESET_DONE_KEY)
+    }
 
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
@@ -108,5 +135,9 @@ class AppInstallSharedPreferences @Inject constructor(
         const val KEY_WAS_EVER_DEFAULT_BROWSER = "KEY_WAS_EVER_DEFAULT_BROWSER"
         const val KEY_DEFAULT_BROWSER_CHANGED_SURVEY_DONE = "KEY_DEFAULT_BROWSER_CHANGED_SURVEY_DONE"
         private const val ROLE_MANAGER_BROWSER_DIALOG_KEY = "ROLE_MANAGER_BROWSER_DIALOG_KEY"
+        private const val DEFAULT_BROWSER_HISTORY_RESET_DONE_KEY = "app.defaultBrowserHistoryReset"
+
+        // Instances are not shared, so the one-time reset is serialised across all of them.
+        private val RESET_LOCK = Any()
     }
 }
