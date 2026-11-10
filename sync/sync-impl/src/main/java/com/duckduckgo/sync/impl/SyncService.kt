@@ -61,7 +61,7 @@ interface SyncService {
         @Header("Authorization") token: String,
     ): Call<DeviceResponse>
 
-    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/account/audit-log")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL$AUDIT_LOG_PATH")
     fun getAuditLog(
         @Header("Authorization") token: String,
         @Query("after") after: String? = null,
@@ -204,6 +204,7 @@ interface SyncService {
         const val SYNC_DEV_ENVIRONMENT_URL = "https://sync-staging.duckduckgo.com"
 
         const val EXCHANGE_CHANNEL_PATH_PREFIX = "/sync/v2/exchange/"
+        const val AUDIT_LOG_PATH = "/sync/account/audit-log"
     }
 }
 
