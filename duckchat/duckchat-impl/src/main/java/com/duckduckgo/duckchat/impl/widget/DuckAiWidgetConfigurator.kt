@@ -150,12 +150,12 @@ class DuckAiWidgetConfigurator @Inject constructor(
     }
 
     private suspend fun load(): Loaded {
-        val dynamicColors = withContext(dispatcherProvider.io()) { useDynamicColors() }
+        val colors = withContext(dispatcherProvider.io()) { widgetColors() }
         val state = withContext(dispatcherProvider.io()) {
             if (!(duckChatFeature.self().isEnabled() && repository.isDuckChatUserEnabled())) return@withContext null
-            loadState(dynamicColors)
+            loadState(colors)
         }
-        return Loaded(dynamicColors, state)
+        return Loaded(colors, state)
     }
 
     private fun State?.hasChats() = this != null && chats.isNotEmpty()
@@ -168,10 +168,10 @@ class DuckAiWidgetConfigurator @Inject constructor(
         showChats: Boolean,
         showLabels: Boolean,
     ) {
-        val dynamicColors = loaded.dynamicColors
+        val colors = loaded.colors
         val state = loaded.state
         withContext(dispatcherProvider.main()) {
-            if (dynamicColors && Build.VERSION.SDK_INT >= 31) applyDynamicColors(remoteViews)
+            if (colors != null && Build.VERSION.SDK_INT >= 31) applyColors(remoteViews, colors)
             if (Build.VERSION.SDK_INT >= 31) fitCardToContent(remoteViews, !showChats)
             showActionLabels(context, remoteViews, showLabels)
             remoteViews.setViewVisibility(R.id.chatsSection, if (showChats) View.VISIBLE else View.GONE)
@@ -193,7 +193,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
     }
 
     private class Loaded(
-        val dynamicColors: Boolean,
+        val colors: WidgetColors?,
         val state: State?,
     )
 
@@ -216,35 +216,41 @@ class DuckAiWidgetConfigurator @Inject constructor(
     }
 
 
-    private fun useDynamicColors() = Build.VERSION.SDK_INT >= 31 && duckChatFeature.duckAiWidgetDynamicColors().isEnabled()
+    private fun widgetColors(): WidgetColors? = when {
+        Build.VERSION.SDK_INT < 31 -> null
+        duckChatFeature.duckAiWidgetDynamicColors().isEnabled() -> WidgetColors.DYNAMIC
+        else -> WidgetColors.STATIC
+    }
 
+    // Always set on SDK 31+: the launcher reapplies RemoteViews onto the views it already inflated, so omitting a tint
+    // would leave the previous one in place.
     @RequiresApi(31)
-    private fun applyDynamicColors(remoteViews: RemoteViews) {
-        remoteViews.tint(R.id.duckAiWidgetContainer, R.color.duckAiWidgetDynamicBackgroundColor)
-        remoteViews.tint(R.id.promptBarContainer, R.color.duckAiWidgetDynamicSearchBarColor)
+    private fun applyColors(remoteViews: RemoteViews, colors: WidgetColors) {
+        remoteViews.tint(R.id.duckAiWidgetContainer, colors.background)
+        remoteViews.tint(R.id.promptBarContainer, colors.searchBar)
         listOf(R.id.actionVoice, R.id.actionCreateImage, R.id.actionTakePhoto).forEach {
-            remoteViews.tint(it, R.color.duckAiWidgetDynamicContainerColor)
+            remoteViews.tint(it, colors.container)
         }
         listOf(R.id.iconVoice, R.id.iconImage, R.id.iconPhoto).forEach {
-            remoteViews.tintImage(it, R.color.duckAiWidgetDynamicOnContainerColor)
+            remoteViews.tintImage(it, colors.onContainer)
         }
         listOf(R.id.labelVoice, R.id.labelCreateImage, R.id.labelTakePhoto).forEach {
-            remoteViews.tintText(it, R.color.duckAiWidgetDynamicOnContainerColor)
+            remoteViews.tintText(it, colors.onContainer)
         }
         listOf(R.id.promptBarHint, R.id.chatsMessageEmpty).forEach {
-            remoteViews.tintText(it, R.color.duckAiWidgetDynamicHintColor)
+            remoteViews.tintText(it, colors.hint)
         }
-        remoteViews.tintText(R.id.chatsViewAll, R.color.duckAiWidgetDynamicTextColor)
+        remoteViews.tintText(R.id.chatsViewAll, colors.text)
         listOf(R.id.dividerTop, R.id.dividerBottom).forEach {
-            remoteViews.tint(it, R.color.duckAiWidgetDynamicDividerColor)
+            remoteViews.tint(it, colors.divider)
         }
     }
 
     @RequiresApi(31)
-    private fun applyDynamicChatColors(remoteViews: RemoteViews) {
-        remoteViews.tint(R.id.chatsItemIcon, R.color.duckAiWidgetDynamicContainerColor)
-        remoteViews.tintImage(R.id.chatsItemIcon, R.color.duckAiWidgetDynamicOnContainerColor)
-        remoteViews.tintText(R.id.chatsItemTitle, R.color.duckAiWidgetDynamicTextColor)
+    private fun applyChatColors(remoteViews: RemoteViews, colors: WidgetColors) {
+        remoteViews.tint(R.id.chatsItemIcon, colors.container)
+        remoteViews.tintImage(R.id.chatsItemIcon, colors.onContainer)
+        remoteViews.tintText(R.id.chatsItemTitle, colors.text)
     }
 
     @RequiresApi(31)
@@ -256,10 +262,10 @@ class DuckAiWidgetConfigurator @Inject constructor(
     @RequiresApi(31)
     private fun RemoteViews.tintText(viewId: Int, @ColorRes color: Int) = setColorStateList(viewId, "setTextColor", color)
 
-    private suspend fun loadState(dynamicColors: Boolean): State {
+    private suspend fun loadState(colors: WidgetColors?): State {
         val widgetChats = if (duckChat.isChatHistoryAvailable()) runCatching { chats.getChats() }.getOrDefault(emptyList()) else emptyList()
         return State(
-            dynamicColors = dynamicColors,
+            colors = colors,
             chats = widgetChats,
             chatUrls = widgetChats.associate { it.chatId to duckChat.buildChatUrl(it.chatId) },
         )
@@ -315,7 +321,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
         state.chats.forEach {
             items.addItem(
                 it.chatId.hashCode().toLong(),
-                chatView(context, it, state.chatUrls.getValue(it.chatId), state.dynamicColors),
+                chatView(context, it, state.chatUrls.getValue(it.chatId), state.colors),
             )
         }
         RemoteViewsCompat.setRemoteAdapter(context, remoteViews, appWidgetId, R.id.chatsList, items.build())
@@ -329,17 +335,46 @@ class DuckAiWidgetConfigurator @Inject constructor(
         context: Context,
         chat: DuckAiChatsWidgetChat,
         chatUrl: String,
-        dynamicColors: Boolean,
+        colors: WidgetColors?,
     ): RemoteViews = RemoteViews(context.packageName, R.layout.duck_ai_widget_item_chat).apply {
-        if (dynamicColors && Build.VERSION.SDK_INT >= 31) applyDynamicChatColors(this)
+        if (colors != null && Build.VERSION.SDK_INT >= 31) applyChatColors(this, colors)
         setTextViewText(R.id.chatsItemTitle, chat.title)
         setImageViewResource(R.id.chatsItemIcon, chat.type.widgetIconRes(chat.pinned))
         setOnClickFillInIntent(R.id.chatsItemContainer, intents.chatFillInIntent(context, chatUrl))
     }
 
     private class State(
-        val dynamicColors: Boolean,
+        val colors: WidgetColors?,
         val chats: List<DuckAiChatsWidgetChat>,
         val chatUrls: Map<String, String>,
     )
+
+    private enum class WidgetColors(
+        @ColorRes val background: Int,
+        @ColorRes val searchBar: Int,
+        @ColorRes val container: Int,
+        @ColorRes val divider: Int,
+        @ColorRes val hint: Int,
+        @ColorRes val text: Int,
+        @ColorRes val onContainer: Int,
+    ) {
+        DYNAMIC(
+            R.color.duckAiWidgetDynamicBackgroundColor,
+            R.color.duckAiWidgetDynamicSearchBarColor,
+            R.color.duckAiWidgetDynamicContainerColor,
+            R.color.duckAiWidgetDynamicDividerColor,
+            R.color.duckAiWidgetDynamicHintColor,
+            R.color.duckAiWidgetDynamicTextColor,
+            R.color.duckAiWidgetDynamicOnContainerColor,
+        ),
+        STATIC(
+            R.color.duckAiWidgetBackgroundColor,
+            R.color.duckAiWidgetSearchBarColor,
+            R.color.duckAiWidgetContainerColor,
+            R.color.duckAiWidgetDividerColor,
+            R.color.duckAiWidgetHintColor,
+            R.color.duckAiWidgetTextColor,
+            R.color.duckAiWidgetOnContainerColor,
+        ),
+    }
 }
