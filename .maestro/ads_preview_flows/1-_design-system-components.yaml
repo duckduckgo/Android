@@ -75,6 +75,12 @@ tags:
             id: "com.duckduckgo.mobile.android:id/actionBottomSheetButton"
         - assertVisible: "Primary Item"
         - tapOn: "Primary Item"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              id: "com.duckduckgo.mobile.android:id/actionBottomSheetButtonWithTitle"
+            direction: DOWN
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/actionBottomSheetButtonWithTitle"
         - tapOn:
