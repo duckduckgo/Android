@@ -34,10 +34,10 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
-class DuckAiCombinedWidget : AppWidgetProvider() {
+class DuckAiWidgetProvider : AppWidgetProvider() {
 
     @Inject
-    lateinit var duckAiCombinedWidgetConfigurator: DuckAiCombinedWidgetConfigurator
+    lateinit var duckAiWidgetConfigurator: DuckAiWidgetConfigurator
 
     @Inject
     lateinit var pixel: Pixel
@@ -64,7 +64,7 @@ class DuckAiCombinedWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
-        logcat { "DuckAiCombinedWidget onUpdate" }
+        logcat { "DuckAiWidgetProvider onUpdate" }
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
@@ -85,15 +85,15 @@ class DuckAiCombinedWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
     ) {
-        val views = RemoteViews(context.packageName, R.layout.duck_ai_combined_widget_daynight)
+        val views = RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight)
 
         appCoroutineScope.launch {
-            duckAiCombinedWidgetConfigurator.populateRemoteViews(
+            duckAiWidgetConfigurator.populateRemoteViews(
                 context = context,
                 remoteViews = views,
             )
             appWidgetManager.updateAppWidget(appWidgetId, views)
-            logcat { "DuckAiCombinedWidget updateAppWidget completed for widget id = $appWidgetId" }
+            logcat { "DuckAiWidgetProvider updateAppWidget completed for widget id = $appWidgetId" }
         }
     }
 

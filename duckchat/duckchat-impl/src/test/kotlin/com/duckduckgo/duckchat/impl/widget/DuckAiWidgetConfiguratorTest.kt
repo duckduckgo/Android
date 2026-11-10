@@ -40,7 +40,7 @@ import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
 
 @RunWith(AndroidJUnit4::class)
-class DuckAiCombinedWidgetConfiguratorTest {
+class DuckAiWidgetConfiguratorTest {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -49,7 +49,7 @@ class DuckAiCombinedWidgetConfiguratorTest {
     private val remoteViews: RemoteViews = mock()
     private val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
 
-    private val testee = DuckAiCombinedWidgetConfigurator(
+    private val testee = DuckAiWidgetConfigurator(
         duckChat = duckChat,
         intents = fakeDuckAiWidgetIntents(),
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
@@ -102,7 +102,7 @@ class DuckAiCombinedWidgetConfiguratorTest {
 
     @Test
     fun whenAllTargetsBuiltThenRequestCodesAreDistinct() {
-        val requestCodes = DuckAiCombinedWidgetTarget.entries.map { it.requestCode }
+        val requestCodes = DuckAiWidgetTarget.entries.map { it.requestCode }
 
         assertEquals(requestCodes.size, requestCodes.toSet().size)
     }

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2026 DuckDuckGo
   ~
@@ -13,8 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/duckAiCombinedWidgetSearchBarColor" />
-    <corners android:radius="24dp" />
+    <solid android:color="@color/duckAiWidgetBackgroundColor" />
+    <corners android:radius="@dimen/extraLargeShapeCornerRadius" />
 </shape>

@@ -55,7 +55,7 @@ class DuckAiWidgetAvailabilityTest {
         whenever(it.observeDuckChatUserEnabled()).thenReturn(userEnabledFlow)
         runBlocking { whenever(it.isDuckChatUserEnabled()).thenReturn(true) }
     }
-    private val receiver = ComponentName("com.duckduckgo.mobile.android", DuckAiCombinedWidget::class.java.name)
+    private val receiver = ComponentName("com.duckduckgo.mobile.android", DuckAiWidgetProvider::class.java.name)
 
     private val testee = DuckAiWidgetAvailability(
         context = context,

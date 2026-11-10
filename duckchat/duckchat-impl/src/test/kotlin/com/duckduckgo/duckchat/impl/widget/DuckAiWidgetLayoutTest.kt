@@ -32,7 +32,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
-class DuckAiCombinedWidgetLayoutTest {
+class DuckAiWidgetLayoutTest {
 
     private val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
     private val density = activity.resources.displayMetrics.density
@@ -40,7 +40,7 @@ class DuckAiCombinedWidgetLayoutTest {
     private fun dp(value: Int) = (value * density).toInt()
 
     private fun inflateAt320dp(): View {
-        val root = LayoutInflater.from(activity).inflate(R.layout.duck_ai_combined_widget_daynight, FrameLayout(activity), false)
+        val root = LayoutInflater.from(activity).inflate(R.layout.duck_ai_widget_daynight, FrameLayout(activity), false)
         root.measure(MeasureSpec.makeMeasureSpec(dp(320), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(400), MeasureSpec.EXACTLY))
         root.layout(0, 0, root.measuredWidth, root.measuredHeight)
         return root
@@ -93,25 +93,25 @@ class DuckAiCombinedWidgetLayoutTest {
         assertNull(root.findViewById<View>(root.resources.getIdentifier("actionAttachFile", "id", activity.packageName)))
     }
 
-    private fun combined(name: String) = activity.getColor(
-        activity.resources.getIdentifier("duckAiCombinedWidget${name}Color", "color", activity.packageName),
+    private fun widgetColor(name: String) = activity.getColor(
+        activity.resources.getIdentifier("duckAiWidget${name}Color", "color", activity.packageName),
     )
 
     private fun current(name: String) = activity.getColor(activity.resources.getIdentifier(name, "color", activity.packageName))
 
     private fun assertFallbackColors(container: String) {
-        assertEquals(current("searchWidgetBackgroundColor"), combined("Background"))
-        assertEquals(current("searchWidgetSearchBarBackgroundColor"), combined("SearchBar"))
-        assertEquals(current(container), combined("Container"))
-        assertEquals(current("searchWidgetSearchBarHintColor"), combined("Hint"))
-        assertEquals(current("searchWidgetSearchBarTrailingIconColor"), combined("OnContainer"))
+        assertEquals(current("searchWidgetBackgroundColor"), widgetColor("Background"))
+        assertEquals(current("searchWidgetSearchBarBackgroundColor"), widgetColor("SearchBar"))
+        assertEquals(current(container), widgetColor("Container"))
+        assertEquals(current("searchWidgetSearchBarHintColor"), widgetColor("Hint"))
+        assertEquals(current("searchWidgetSearchBarTrailingIconColor"), widgetColor("OnContainer"))
     }
 
     @Test
     @Config(sdk = [30])
-    fun whenApi30ThenCombinedColorsMatchCurrentLightColors() = assertFallbackColors(container = "black9")
+    fun whenApi30ThenColorsMatchCurrentLightColors() = assertFallbackColors(container = "black9")
 
     @Test
     @Config(sdk = [30], qualifiers = "night")
-    fun whenApi30NightThenCombinedColorsMatchCurrentDarkColors() = assertFallbackColors(container = "white9")
+    fun whenApi30NightThenColorsMatchCurrentDarkColors() = assertFallbackColors(container = "white9")
 }

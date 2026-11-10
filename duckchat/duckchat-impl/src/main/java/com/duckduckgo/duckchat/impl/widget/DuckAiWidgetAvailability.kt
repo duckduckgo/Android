@@ -87,7 +87,7 @@ class DuckAiWidgetAvailability @Inject constructor(
 
     private suspend fun sync(userEnabled: Boolean) = mutex.withLock {
         val packageManager = context.packageManager
-        val receiver = ComponentName(context, DuckAiCombinedWidget::class.java)
+        val receiver = ComponentName(context, DuckAiWidgetProvider::class.java)
         val enable = duckChatFeature.duckAiWidget().isEnabled() &&
             duckChatFeature.self().isEnabled() &&
             userEnabled

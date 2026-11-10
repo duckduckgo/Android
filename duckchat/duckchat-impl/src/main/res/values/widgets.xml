@@ -47,7 +47,7 @@
 
     <!-- Same as Widget.DuckDuckGo.SearchWidgetSearchBarContainer minus layout_margin: that attribute outranks any
          local layout_marginStart/End/Top/Bottom, so it must not be inherited by a pill that sets its own margins. -->
-    <style name="Widget.DuckDuckGo.DuckAiCombinedWidgetPromptBar">
+    <style name="Widget.DuckDuckGo.DuckAiWidgetPromptBar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
         <item name="android:orientation">horizontal</item>
