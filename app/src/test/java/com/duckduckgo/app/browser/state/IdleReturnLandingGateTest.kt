@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.state
 
 import com.duckduckgo.app.browser.state.IdleReturnLandingGate.State
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class IdleReturnLandingGateTest {
@@ -56,5 +58,84 @@ class IdleReturnLandingGateTest {
         gate.resolve(null)
 
         assertEquals(State.AwaitingTab("ntp"), gate.state)
+    }
+
+    @Test
+    fun whenResolvedWithNullAfterResolvingTabAwaitingHatchThenKeepsAwaitingHatch() {
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+        gate.resolve(null)
+
+        assertEquals(State.AwaitingTab("ntp", awaitHatch = true), gate.state)
+    }
+
+    @Test
+    fun whenAwaitingHatchThenNotReadyUntilItsHatchSettles() {
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+        assertFalse((gate.state as State.AwaitingTab).isReady)
+
+        gate.onHatchSettled("other")
+        assertFalse((gate.state as State.AwaitingTab).isReady)
+
+        gate.onHatchSettled("ntp")
+        assertTrue((gate.state as State.AwaitingTab).isReady)
+    }
+
+    @Test
+    fun whenHatchSettlesBeforeResolveThenAwaitedTabIsReady() {
+        gate.hold()
+        gate.onHatchSettled("ntp")
+        gate.resolve("ntp", awaitHatch = true)
+
+        assertTrue((gate.state as State.AwaitingTab).isReady)
+    }
+
+    @Test
+    fun whenNotAwaitingHatchThenReady() {
+        gate.hold()
+        gate.resolve("ntp")
+
+        assertTrue((gate.state as State.AwaitingTab).isReady)
+    }
+
+    @Test
+    fun whenOpenedThenEarlierHatchSettlesAreForgotten() {
+        gate.hold()
+        gate.onHatchSettled("ntp")
+        gate.open()
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+
+        assertFalse((gate.state as State.AwaitingTab).isReady)
+    }
+
+    @Test
+    fun whenHatchSettlesWhileOpenThenItIsIgnored() {
+        gate.onHatchSettled("ntp")
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+
+        assertFalse((gate.state as State.AwaitingTab).isReady)
+    }
+
+    @Test
+    fun whenHoldResetsWithoutOpenThenEarlierHatchSettlesAreForgotten() {
+        gate.hold()
+        gate.onHatchSettled("ntp")
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+
+        assertFalse((gate.state as State.AwaitingTab).isReady)
+    }
+
+    @Test
+    fun whenResolvedAgainAfterHatchSettledThenStaysReady() {
+        gate.hold()
+        gate.resolve("ntp", awaitHatch = true)
+        gate.onHatchSettled("ntp")
+        gate.resolve(null)
+
+        assertTrue((gate.state as State.AwaitingTab).isReady)
     }
 }

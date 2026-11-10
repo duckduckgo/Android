@@ -176,13 +176,17 @@ class FirstScreenHandlerImpl @Inject constructor(
                 }
 
                 val result = showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle, currentMode = currentMode)
-                idleReturnLandingGate.resolve(result.landingTabId)
-                return resolveReturnLanding(
-                    result = result,
-                    fallbackTreatment = preAppliedFreshNtpTreatment.takeIf {
-                        currentMode == BrowserMode.REGULAR && result.destinationUrl.isNullOrBlank()
-                    },
+                val fallbackTreatment = preAppliedFreshNtpTreatment.takeIf {
+                    currentMode == BrowserMode.REGULAR && result.destinationUrl.isNullOrBlank()
+                }
+
+                // A restored NTP isn't re-added, but its hatch is still resolving, so the frame waits for it too.
+                val landingTabId = result.landingTabId ?: if (fallbackTreatment != null) tabRepository.getSelectedTab()?.tabId else null
+                idleReturnLandingGate.resolve(
+                    landingTabId,
+                    awaitHatch = result.treatment == AfterIdleTreatment.NTP || fallbackTreatment != null,
                 )
+                return resolveReturnLanding(result = result, fallbackTreatment = fallbackTreatment)
             }
         } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
             if (isVoiceSessionActiveOnCurrentTab()) {

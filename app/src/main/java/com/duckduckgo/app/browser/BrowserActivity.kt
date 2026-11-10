@@ -698,7 +698,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return when (val state = idleReturnLandingGate.state) {
             IdleReturnLandingGate.State.Open -> true
             IdleReturnLandingGate.State.Pending -> false
-            is IdleReturnLandingGate.State.AwaitingTab -> state.tabId == displayedTabId
+            is IdleReturnLandingGate.State.AwaitingTab -> state.tabId == displayedTabId && state.isReady
         }
     }
 
@@ -716,6 +716,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         data object Processing : IntentLanding
         data object Opening : IntentLanding
         data class Landed(val tabId: String?) : IntentLanding
+    }
+
+    fun onIdleReturnHatchSettled(tabId: String) {
+        idleReturnLandingGate.onHatchSettled(tabId)
     }
 
     override fun onResume() {
