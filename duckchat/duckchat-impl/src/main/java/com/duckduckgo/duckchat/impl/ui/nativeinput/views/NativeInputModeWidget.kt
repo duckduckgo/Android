@@ -196,8 +196,8 @@ interface NativeInputWidget {
         onPageContextRemoved: () -> Unit,
     )
     fun storePendingPrompt(query: String)
-    fun setOmnibarPosition(isBottom: Boolean)
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launchAction: DuckChatLaunchAction? = null)
+    fun setOmnibarPosition(isBottom: Boolean)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
     fun setFooterSuppressed(suppressed: Boolean)
@@ -1556,6 +1556,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
             viewModel.configure(tabId, isDuckAiMode, isBottom, launchAction)
             publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
+            if (shouldLaunchCameraCapture(isDuckAiMode, launchAction)) launchCameraCapture()
+        }
+    }
+
+    // Same sink the attach menu's "Take photo" feeds, reached through the ViewModel the attachment plugin shares,
+    // so the launch needs no attachment view to exist yet.
+    private fun launchCameraCapture() {
+        requestCameraCapture { uris ->
+            val images = uris?.toList().orEmpty()
+            if (images.isNotEmpty()) attachmentViewModel?.onImagesPicked(images, AttachmentViewModel.ImageSource.CAMERA)
         }
     }
 
@@ -1953,10 +1963,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onChangeModelSubmitted?.invoke(modelId)
     }
 
-    override fun attachmentCommandsCollecting(collecting: Boolean) {
-        viewModel.setAttachmentCommandsCollecting(collecting)
-    }
-
     override fun requestCameraCapture(callback: ValueCallback<Array<Uri>>) {
         cameraCaptureCallback?.invoke(callback)
     }
@@ -2145,6 +2151,11 @@ internal fun hasPendingAdoptedAttachments(
     pendingImages: List<SubmittedImage>,
     pendingFiles: List<SubmittedFile>,
 ): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty()
+
+internal fun shouldLaunchCameraCapture(
+    isDuckAiMode: Boolean,
+    launchAction: DuckChatLaunchAction?,
+): Boolean = isDuckAiMode && launchAction == DuckChatLaunchAction.CameraCapture
 
 /**
  * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on
