@@ -164,7 +164,6 @@ import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.suggestredirect.RedirectSuggestion
 import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectEvaluator
-import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectOnUnresolvedErrorFeature
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
@@ -772,7 +771,6 @@ class BrowserTabViewModelTest {
     private val fakeNewTabReturnHatchFeature = FakeFeatureToggleFactory.create(NewTabReturnHatchFeature::class.java)
     private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
-    private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
     private val fakeCustomErrorPagesFeature = FakeFeatureToggleFactory.create(CustomErrorPagesFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
@@ -1128,7 +1126,6 @@ class BrowserTabViewModelTest {
                 adBlockingOmnibarAnimationProvider = mockAdBlockingOmnibarAnimationProvider,
                 newTabPageModalPresenterRegistry = NewTabPageModalPresenterRegistry(),
                 newTabPageModalTrigger = mockNewTabPageModalTrigger,
-                suggestRedirectOnUnresolvedErrorFeature = fakeSuggestRedirectFeature,
                 suggestRedirectEvaluator = mockSuggestRedirectEvaluator,
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
@@ -11068,11 +11065,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun givenSuggestRedirectEnabledWhenBadUrlErrorReceivedAndRedirectShouldBeSuggestedThenRedirectSuggestionSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
+    fun whenBadUrlErrorReceivedAndRedirectShouldBeSuggestedThenRedirectSuggestionSetInViewState() = runTest {
         val redirectSuggestion = RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com/path?q=1")
         whenever(mockSuggestRedirectEvaluator.suggestRedirect("http://example.com/path?q=1"))
             .thenReturn(redirectSuggestion)
@@ -11083,22 +11076,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenSuggestRedirectDisabledWhenBadUrlErrorReceivedThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = false))
-        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
-            .thenReturn(RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com"))
-
-        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
-
-        assertNull(browserViewState().redirectSuggestion)
-    }
-
-    @Test
-    fun givenSuggestRedirectEnabledWhenBadUrlErrorReceivedAndRedirectShouldNotBeSuggestedThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
+    fun whenBadUrlErrorReceivedAndRedirectShouldNotBeSuggestedThenRedirectSuggestionNotSetInViewState() = runTest {
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .thenReturn(null)
 
@@ -11108,11 +11086,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenSuggestRedirectEnabledWhenNonBadUrlErrorReceivedThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
+    fun whenNonBadUrlErrorReceivedThenRedirectSuggestionNotSetInViewState() = runTest {
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .thenReturn(RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com"))
 
@@ -11123,10 +11097,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenBrowserErrorResetThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .doSuspendableAnswer {
                 delay(1.seconds)
@@ -11143,10 +11113,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenNewErrorReceivedThenPreviousRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .doSuspendableAnswer {
                 delay(1.seconds)
@@ -11163,10 +11129,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenBrowserErrorRefreshedThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
             delay(1.seconds)
             RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
@@ -11183,10 +11145,6 @@ class BrowserTabViewModelTest {
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenUserSubmittedQueryThenRedirectSuggestionNotSetInViewState() = runTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("http://another-site.com", null)).thenReturn("http://another-site.com")
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
             delay(1.seconds)
             RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
@@ -11203,10 +11161,6 @@ class BrowserTabViewModelTest {
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenUserNavigatesHomeThenRedirectSuggestionNotSetInViewState() =
         runTest {
-            fakeSuggestRedirectFeature.apply {
-                self().setRawStoredState(State(enable = true))
-                suggestRedirect().setRawStoredState(State(enable = true))
-            }
             whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
                 delay(1.seconds)
                 RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
@@ -11223,10 +11177,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenOmittedErrorReceivedThenRedirectSuggestionStillSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
         val redirectSuggestion = RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
             delay(1.seconds)
@@ -11243,10 +11193,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBadUrlErrorReceivedAndNoRedirectSuggestionFoundThenWideEventErrorPageDisplayedWithoutSuggestion() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .thenReturn(null)
 
@@ -11258,22 +11204,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBadUrlErrorReceivedAndSuggestRedirectDisabledThenWideEventErrorPageDisplayedStillReported() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = false))
-
-        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
-
-        // The hook reports every BAD_URL error page, whether to record is gated centrally in the wide event implementation, not here.
-        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageDisplayed("abc")
-        verify(mockBadUrlErrorPageWideEvent, never()).onRedirectSuggested(any())
-    }
-
-    @Test
     fun whenBadUrlErrorReceivedAndRedirectSuggestionFoundThenWideEventRedirectSuggested() = runTest {
-        fakeSuggestRedirectFeature.apply {
-            self().setRawStoredState(State(enable = true))
-            suggestRedirect().setRawStoredState(State(enable = true))
-        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .thenReturn(RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com"))
 
