@@ -118,6 +118,7 @@ class AttachmentView(
             .onEach { command ->
                 if (!isEditMode && !isContextual) openAttachment(command)
             }.launchIn(scope)
+        host?.attachmentCommandsCollecting(true)
         attachmentStateJob?.cancel()
         attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
@@ -341,6 +342,7 @@ class AttachmentView(
         attachmentStateJob = null
         attachmentRequestJob?.cancel()
         attachmentRequestJob = null
+        host?.attachmentCommandsCollecting(false)
         lastNativeInputState = null
         dismissPopup()
     }

@@ -201,6 +201,16 @@ class AttachmentViewTest {
         verify(host, never()).requestCameraCapture(any())
     }
 
+    @Test
+    fun whenAttachedThenHostIsToldCommandsAreCollectedAndWhenDetachedThatTheyAreNot() {
+        attach()
+        verify(host).attachmentCommandsCollecting(true)
+
+        shadowOf(view).callOnDetachedFromWindow()
+
+        verify(host).attachmentCommandsCollecting(false)
+    }
+
     private fun attach(isEdit: Boolean = false, commands: NewChatHintCommands = NewChatHintCommands()) {
         val provider: NativeInputStateProvider = mock()
         whenever(provider.state).thenReturn(inputState)
