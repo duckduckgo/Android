@@ -16,8 +16,8 @@
 
 package com.duckduckgo.privacy.config.internal.testseeder
 
-import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult
+import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalLoader
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -29,10 +29,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -42,28 +40,25 @@ class PrivacyConfigUrlSeederPluginTest {
 
     private val store = FakeDevPrivacyConfigSettingsDataStore()
     private val repository: PrivacyConfigRepository = mock()
-    private val downloader: PrivacyConfigDownloader = mock()
-    private val plugin = PrivacyConfigUrlSeederPlugin(store, repository, downloader)
+    private val loader: PrivacyConfigInternalLoader = mock()
+    private val plugin = PrivacyConfigUrlSeederPlugin(store, repository, loader)
 
     @Test
-    fun whenValidUrlThenStoresOverrideAndDownloadsAfterVersionReset() = runTest {
+    fun whenValidUrlThenStoresOverrideAndForcesLoad() = runTest {
         whenever(repository.get()).thenReturn(BUNDLED_CONFIG)
-        whenever(downloader.download()).thenReturn(ConfigDownloadResult.Success)
+        whenever(loader.load()).thenReturn(ConfigDownloadResult.Success)
 
         plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, " $URL ")
 
         assertEquals(URL, store.remotePrivacyConfigUrl)
         assertTrue(store.useCustomPrivacyConfigUrl)
-        inOrder(repository, downloader).run {
-            verify(repository).insert(PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = ""))
-            verify(downloader).download()
-        }
+        verify(loader).load()
     }
 
     @Test
-    fun whenDownloadFailsThenThrows() {
+    fun whenLoadFailsThenThrows() {
         whenever(repository.get()).thenReturn(BUNDLED_CONFIG)
-        runTest { whenever(downloader.download()).thenReturn(ConfigDownloadResult.Error("boom")) }
+        runTest { whenever(loader.load()).thenReturn(ConfigDownloadResult.Error("boom")) }
 
         assertThrows(IllegalStateException::class.java) {
             runTest { plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, URL) }
@@ -71,29 +66,27 @@ class PrivacyConfigUrlSeederPluginTest {
     }
 
     @Test
-    fun whenBundledConfigNotLoadedYetThenWaitsBeforeVersionReset() = runTest {
+    fun whenBundledConfigNotLoadedYetThenWaitsBeforeLoading() = runTest {
         whenever(repository.get()).thenReturn(null, null, BUNDLED_CONFIG)
-        whenever(downloader.download()).thenReturn(ConfigDownloadResult.Success)
+        whenever(loader.load()).thenReturn(ConfigDownloadResult.Success)
 
         plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, URL)
 
-        inOrder(repository, downloader).run {
+        inOrder(repository, loader).run {
             verify(repository, times(3)).get()
-            verify(repository).insert(PrivacyConfig(version = -1, readme = "", eTag = "", timestamp = ""))
-            verify(downloader).download()
+            verify(loader).load()
         }
     }
 
     @Test
-    fun whenBundledConfigNeverLoadsThenThrowsWithoutResettingVersion() {
+    fun whenBundledConfigNeverLoadsThenThrowsWithoutLoading() {
         whenever(repository.get()).thenReturn(null)
 
         assertThrows(IllegalStateException::class.java) {
             runTest { plugin.apply(TestSeederKey.PRIVACY_CONFIG_URL.key, URL) }
         }
 
-        verify(repository, never()).insert(any())
-        verifyNoInteractions(downloader)
+        verifyNoInteractions(loader)
     }
 
     @Test
@@ -106,7 +99,7 @@ class PrivacyConfigUrlSeederPluginTest {
 
         assertNull(store.remotePrivacyConfigUrl)
         assertFalse(store.useCustomPrivacyConfigUrl)
-        verifyNoInteractions(repository, downloader)
+        verifyNoInteractions(repository, loader)
     }
 
     private class FakeDevPrivacyConfigSettingsDataStore : DevPrivacyConfigSettingsDataStore {
