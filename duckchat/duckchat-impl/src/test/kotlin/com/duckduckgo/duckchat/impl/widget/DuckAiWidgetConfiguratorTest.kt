@@ -37,7 +37,6 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -318,13 +317,21 @@ class DuckAiWidgetConfiguratorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenDynamicColorsFlagOffThenNoColorSettersApplied() = runTest {
+    fun whenDynamicColorsFlagOffThenWidgetViewsTintedWithStaticColorResources() = runTest {
         stubDuckAi(enabled = true, historyAvailable = false)
         duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = false))
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
-        verify(remoteViews, never()).setColorStateList(any(), any(), any<Int>())
+        verifyWidgetTints(
+            background = R.color.duckAiWidgetBackgroundColor,
+            searchBar = R.color.duckAiWidgetSearchBarColor,
+            container = R.color.duckAiWidgetContainerColor,
+            onContainer = R.color.duckAiWidgetOnContainerColor,
+            hint = R.color.duckAiWidgetHintColor,
+            text = R.color.duckAiWidgetTextColor,
+            divider = R.color.duckAiWidgetDividerColor,
+        )
     }
 
     @Test
@@ -335,29 +342,49 @@ class DuckAiWidgetConfiguratorTest {
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
-        verify(remoteViews).setColorStateList(R.id.duckAiWidgetContainer, BACKGROUND_TINT, R.color.duckAiWidgetDynamicBackgroundColor)
-        verify(remoteViews).setColorStateList(R.id.promptBarContainer, BACKGROUND_TINT, R.color.duckAiWidgetDynamicSearchBarColor)
+        verifyWidgetTints(
+            background = R.color.duckAiWidgetDynamicBackgroundColor,
+            searchBar = R.color.duckAiWidgetDynamicSearchBarColor,
+            container = R.color.duckAiWidgetDynamicContainerColor,
+            onContainer = R.color.duckAiWidgetDynamicOnContainerColor,
+            hint = R.color.duckAiWidgetDynamicHintColor,
+            text = R.color.duckAiWidgetDynamicTextColor,
+            divider = R.color.duckAiWidgetDynamicDividerColor,
+        )
+    }
+
+    private fun verifyWidgetTints(
+        background: Int,
+        searchBar: Int,
+        container: Int,
+        onContainer: Int,
+        hint: Int,
+        text: Int,
+        divider: Int,
+    ) {
+        verify(remoteViews).setColorStateList(R.id.duckAiWidgetContainer, BACKGROUND_TINT, background)
+        verify(remoteViews).setColorStateList(R.id.promptBarContainer, BACKGROUND_TINT, searchBar)
         listOf(R.id.actionVoice, R.id.actionCreateImage, R.id.actionTakePhoto).forEach {
-            verify(remoteViews).setColorStateList(it, BACKGROUND_TINT, R.color.duckAiWidgetDynamicContainerColor)
+            verify(remoteViews).setColorStateList(it, BACKGROUND_TINT, container)
         }
         listOf(R.id.iconVoice, R.id.iconImage, R.id.iconPhoto).forEach {
-            verify(remoteViews).setColorStateList(it, IMAGE_TINT, R.color.duckAiWidgetDynamicOnContainerColor)
+            verify(remoteViews).setColorStateList(it, IMAGE_TINT, onContainer)
         }
         listOf(R.id.labelVoice, R.id.labelCreateImage, R.id.labelTakePhoto).forEach {
-            verify(remoteViews).setColorStateList(it, TEXT_COLOR, R.color.duckAiWidgetDynamicOnContainerColor)
+            verify(remoteViews).setColorStateList(it, TEXT_COLOR, onContainer)
         }
         listOf(R.id.promptBarHint, R.id.chatsMessageEmpty, R.id.chatsMessageUnavailable).forEach {
-            verify(remoteViews).setColorStateList(it, TEXT_COLOR, R.color.duckAiWidgetDynamicHintColor)
+            verify(remoteViews).setColorStateList(it, TEXT_COLOR, hint)
         }
-        verify(remoteViews).setColorStateList(R.id.chatsViewAll, TEXT_COLOR, R.color.duckAiWidgetDynamicTextColor)
+        verify(remoteViews).setColorStateList(R.id.chatsViewAll, TEXT_COLOR, text)
         listOf(R.id.dividerTop, R.id.dividerBottom).forEach {
-            verify(remoteViews).setColorStateList(it, BACKGROUND_TINT, R.color.duckAiWidgetDynamicDividerColor)
+            verify(remoteViews).setColorStateList(it, BACKGROUND_TINT, divider)
         }
     }
 
     @Test
     @Config(sdk = [30])
-    fun whenDynamicColorsFlagOnOnApi30ThenNoColorSettersApplied() = runTest {
+    fun whenOnApi30ThenNoColorSettersApplied() = runTest {
         stubDuckAi(enabled = true, historyAvailable = false)
         duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = true))
 
@@ -384,10 +411,17 @@ class DuckAiWidgetConfiguratorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenDynamicColorsFlagOffThenChatRowsKeepStaticColors() = runTest {
+    fun whenDynamicColorsFlagOffThenChatRowsTintedWithStaticColors() = runTest {
         val row = populateAndApplyFirstChatRow(dynamicColors = false)
 
-        assertNull(row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList)
+        assertEquals(
+            activity.getColor(R.color.duckAiWidgetContainerColor),
+            row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList?.defaultColor,
+        )
+        assertEquals(
+            activity.getColor(R.color.duckAiWidgetOnContainerColor),
+            row.findViewById<ImageView>(R.id.chatsItemIcon).imageTintList?.defaultColor,
+        )
         assertEquals(activity.getColor(R.color.duckAiWidgetTextColor), row.findViewById<TextView>(R.id.chatsItemTitle).currentTextColor)
     }
 
