@@ -226,6 +226,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
     // Always set on SDK 31+: the launcher reapplies RemoteViews onto the views it already inflated, so omitting a tint
     // would leave the previous one in place. A null background colour clears the tint, restoring the drawable's own colour.
     // SRC makes the tint replace the translucent drawable colours instead of inheriting their alpha (default SRC_IN).
+    // A null blend mode can't be parcelled, so clearing restores SRC_IN explicitly.
     @RequiresApi(31)
     private fun applyColors(remoteViews: RemoteViews, colors: WidgetColors) {
         remoteViews.tint(R.id.duckAiWidgetContainer, colors.background)
@@ -262,7 +263,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
             setBlendMode(viewId, "setBackgroundTintBlendMode", BlendMode.SRC)
         } else {
             setColorStateList(viewId, "setBackgroundTintList", null as ColorStateList?)
-            setBlendMode(viewId, "setBackgroundTintBlendMode", null)
+            setBlendMode(viewId, "setBackgroundTintBlendMode", BlendMode.SRC_IN)
         }
     }
 

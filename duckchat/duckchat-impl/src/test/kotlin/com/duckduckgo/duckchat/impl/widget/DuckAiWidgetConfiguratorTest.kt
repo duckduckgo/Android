@@ -391,7 +391,7 @@ class DuckAiWidgetConfiguratorTest {
             verify(remoteViews).setBlendMode(viewId, BACKGROUND_TINT_BLEND_MODE, BlendMode.SRC)
         } else {
             verify(remoteViews).setColorStateList(viewId, BACKGROUND_TINT, null as ColorStateList?)
-            verify(remoteViews).setBlendMode(viewId, BACKGROUND_TINT_BLEND_MODE, null)
+            verify(remoteViews).setBlendMode(viewId, BACKGROUND_TINT_BLEND_MODE, BlendMode.SRC_IN)
         }
     }
 
@@ -429,7 +429,7 @@ class DuckAiWidgetConfiguratorTest {
         val row = populateAndApplyFirstChatRow(dynamicColors = false)
 
         assertNull(row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintList)
-        assertNull(row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintBlendMode)
+        assertEquals(BlendMode.SRC_IN, row.findViewById<ImageView>(R.id.chatsItemIcon).backgroundTintBlendMode)
         assertEquals(
             activity.getColor(R.color.duckAiWidgetOnContainerColor),
             row.findViewById<ImageView>(R.id.chatsItemIcon).imageTintList?.defaultColor,
