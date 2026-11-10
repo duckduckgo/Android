@@ -17,21 +17,21 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/duckAiCombinedWidgetContainer"
+    android:id="@+id/duckAiWidgetContainer"
     style="@style/Widget.DuckDuckGo.SearchWidgetContainer"
     android:layout_height="match_parent"
-    android:background="@drawable/duck_ai_combined_widget_background_daynight"
+    android:background="@drawable/duck_ai_widget_background_daynight"
     android:clipChildren="false"
     android:clipToPadding="false"
     tools:ignore="DeprecatedWidgetInXml, InvalidColorAttribute">
 
     <LinearLayout
         android:id="@+id/promptBarContainer"
-        style="@style/Widget.DuckDuckGo.DuckAiCombinedWidgetPromptBar"
+        style="@style/Widget.DuckDuckGo.DuckAiWidgetPromptBar"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginEnd="@dimen/keyline_4"
-        android:background="@drawable/duck_ai_combined_widget_prompt_bar_background_daynight"
+        android:background="@drawable/duck_ai_widget_prompt_bar_background_daynight"
         android:elevation="8dp"
         android:gravity="center_vertical">
 
@@ -49,8 +49,8 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@string/duckAiCombinedWidgetHint"
-            android:textColor="@color/duckAiCombinedWidgetHintColor" />
+            android:text="@string/duckAiWidgetHint"
+            android:textColor="@color/duckAiWidgetHintColor" />
 
     </LinearLayout>
 
@@ -70,7 +70,7 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:background="@drawable/duck_ai_combined_widget_pill_background_daynight"
+            android:background="@drawable/duck_ai_widget_pill_background_daynight"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingStart="@dimen/keyline_2"
@@ -81,7 +81,7 @@
                 android:layout_height="20dp"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
-                android:tint="@color/duckAiCombinedWidgetOnContainerColor"
+                android:tint="@color/duckAiWidgetOnContainerColor"
                 android:src="@drawable/ic_ai_chat_voice_24_daynight"
                 tools:ignore="ContentDescription, UseAppTint" />
 
@@ -92,8 +92,8 @@
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
-                android:text="@string/duckAiCombinedWidgetVoiceAction"
-                android:textColor="@color/duckAiCombinedWidgetOnContainerColor"
+                android:text="@string/duckAiWidgetVoiceAction"
+                android:textColor="@color/duckAiWidgetOnContainerColor"
                 android:textSize="14sp" />
 
         </LinearLayout>
@@ -104,7 +104,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_2"
-            android:background="@drawable/duck_ai_combined_widget_pill_background_daynight"
+            android:background="@drawable/duck_ai_widget_pill_background_daynight"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingStart="@dimen/keyline_2"
@@ -115,7 +115,7 @@
                 android:layout_height="20dp"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
-                android:tint="@color/duckAiCombinedWidgetOnContainerColor"
+                android:tint="@color/duckAiWidgetOnContainerColor"
                 android:src="@drawable/ic_images_24_daynight"
                 tools:ignore="ContentDescription, UseAppTint" />
 
@@ -126,8 +126,8 @@
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
-                android:text="@string/duckAiCombinedWidgetImageAction"
-                android:textColor="@color/duckAiCombinedWidgetOnContainerColor"
+                android:text="@string/duckAiWidgetImageAction"
+                android:textColor="@color/duckAiWidgetOnContainerColor"
                 android:textSize="14sp" />
 
         </LinearLayout>
@@ -138,7 +138,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_2"
-            android:background="@drawable/duck_ai_combined_widget_pill_background_daynight"
+            android:background="@drawable/duck_ai_widget_pill_background_daynight"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingStart="@dimen/keyline_2"
@@ -149,7 +149,7 @@
                 android:layout_height="20dp"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
-                android:tint="@color/duckAiCombinedWidgetOnContainerColor"
+                android:tint="@color/duckAiWidgetOnContainerColor"
                 android:src="@drawable/ic_camera_24_daynight"
                 tools:ignore="ContentDescription, UseAppTint" />
 
@@ -160,8 +160,8 @@
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
-                android:text="@string/duckAiCombinedWidgetCameraAction"
-                android:textColor="@color/duckAiCombinedWidgetOnContainerColor"
+                android:text="@string/duckAiWidgetCameraAction"
+                android:textColor="@color/duckAiWidgetOnContainerColor"
                 android:textSize="14sp" />
 
         </LinearLayout>

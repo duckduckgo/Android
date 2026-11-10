@@ -36,9 +36,9 @@ class DuckAiWidgetUpdater @Inject constructor(
 
     override fun onPrivacyConfigDownloaded() {
         val manager = AppWidgetManager.getInstance(context) ?: return
-        val ids = manager.getAppWidgetIds(ComponentName(context, DuckAiCombinedWidget::class.java))?.takeIf { it.isNotEmpty() } ?: return
+        val ids = manager.getAppWidgetIds(ComponentName(context, DuckAiWidgetProvider::class.java))?.takeIf { it.isNotEmpty() } ?: return
 
-        val intent = Intent(context, DuckAiCombinedWidget::class.java).apply {
+        val intent = Intent(context, DuckAiWidgetProvider::class.java).apply {
             action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
         }
