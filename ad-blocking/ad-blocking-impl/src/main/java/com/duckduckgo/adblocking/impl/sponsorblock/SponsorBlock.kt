@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -66,7 +66,7 @@ class RealSponsorBlock @Inject constructor(
     }
 
     override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
-        if (videoId.isBlank() || !isEnabled() || userPreferences.modeFlow().first() == SponsorBlockMode.OFF) return emptyList()
+        if (videoId.isBlank() || !isEnabled() || userPreferences.modeFlow().firstOrNull() == SponsorBlockMode.OFF) return emptyList()
         return try {
             segmentsProvider.getSegments(videoId).sortedBy { it.start }
         } catch (e: CancellationException) {
