@@ -115,7 +115,7 @@ jobs:
           - name: Ad click detection flows
             test-name: adClickTest
             binary: release
-            api-level: 30
+            api-level: 34
             include-tags: adClickTest
             suite-name: Ad Click (Nightly)
           - name: Privacy Tests
