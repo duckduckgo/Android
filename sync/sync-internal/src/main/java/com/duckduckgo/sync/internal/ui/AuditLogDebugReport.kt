@@ -47,14 +47,14 @@ class AuditLogDebugReport @Inject constructor(
         val entries = decodeResult.entries
         val names = resolver.resolve(entries)
         val skipped = entries.count { it is Skipped }
-        logcat { "Sync-AuditLog: internal fetch got ${entries.size} entries, $skipped skipped" }
-
         val header = buildString {
             append("${entries.size} entries: ${entries.size - skipped} decoded, $skipped skipped. ")
             append("Older entries: ${if (result.page.before != null) "yes" else "no"}")
             decodeResult.keyUnavailableReason?.let { append("\naccount_info key unavailable: $it") }
         }
-        return (listOf(header) + entries.map { describe(it, names[it.id], ownDeviceId) }).joinToString("\n\n")
+        val text = (listOf(header) + entries.map { describe(it, names[it.id], ownDeviceId) }).joinToString("\n\n")
+        logcat { "Sync-AuditLog: internal fetch:\n$text" }
+        return text
     }
 
     private fun describe(entry: DecodedAuditLogEntry, name: ResolvedDeviceName?, ownDeviceId: String?): String = when (entry) {
