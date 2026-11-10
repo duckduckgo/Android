@@ -18,12 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Sync Disabled messages -->
-    <string name="sync_flows_disabled"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
-    <string name="sync_flows_disabled_new_version"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς,η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη σε αυτήν την έκδοση της εφαρμογής. Ενημερώστε το DuckDuckGo στην πιο πρόσφατη έκδοση για να συνεχίσετε.</string>
-    <string name="sync_create_account_disabled"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς,η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη σε αυτήν την έκδοση της εφαρμογής. Ενημερώστε το DuckDuckGo στην πιο πρόσφατη έκδοση για να συνεχίσετε.</string>
-    <string name="sync_disabled_authenticated_user"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας τέθηκαν σε παύση</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας τέθηκαν σε παύση</b>\nΔυστυχώς,η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη σε αυτήν την έκδοση της εφαρμογής. Ενημερώστε το DuckDuckGo στην πιο πρόσφατη έκδοση για να συνεχίσετε.</string>
     <string name="sync_paused_notification"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας τέθηκαν σε παύση</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
     <string name="sync_error_notification"><b>Σφάλμα συγχρονισμού</b>\nΤο Sync &amp; Backup είναι προσωρινά μη διαθέσιμο.</string>
     <string name="sync_error_warning"><b>Σφάλμα συγχρονισμού</b>\nΤο Sync &amp; Backup είναι προσωρινά μη διαθέσιμο.</string>
@@ -31,94 +25,12 @@
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
-    <string name="sync_setup_begin_syncing">Έναρξη συγχρονισμού</string>
-    <string name="sync_setup_with_another_device_cta_title">Συγχρονισμός με άλλη συσκευή</string>
-    <string name="sync_setup_with_another_device_cta_subtitle">Συγχρονίστε με ασφάλεια σελιδοδείκτες και κωδικούς πρόσβασης μεταξύ των συσκευών σας.</string>
-    <string name="sync_setup_with_another_device_cta_subtitle_with_ai_chat">Συγχρονίστε με ασφάλεια σελιδοδείκτες, κωδικούς πρόσβασης και συνομιλίες στο Duck.ai μεταξύ των συσκευών σας.</string>
-    <string name="sync_off_hint">Τα δεδομένα σας είναι κρυπτογραφημένα από άκρο σε άκρο και το DuckDuckGo δεν έχει πρόσβαση στο κλειδί κρυπτογράφησης.</string>
-    <string name="sync_setup_single_device_title">Εγκατάσταση μίας συσκευής</string>
-    <string name="sync_setup_other_options_title">Άλλες επιλογές</string>
-    <string name="sync_setup_single_recover_data_cta_title">Ανάκτηση συγχρονισμένων δεδομένων</string>
-    <string name="sync_setup_single_sync_this_device_cta_title">Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αυτής της συσκευής</string>
-
-    <string name="sync_off_encrypted_hint">Τα δεδομένα σας είναι κρυπτογραφημένα από άκρο σε άκρο και το DuckDuckGo δεν έχει πρόσβαση στο κλειδί αποκρυπτογράφησης.</string>
-
-    <!-- Setup screen -->
-    <string name="sync_enable_sync_title">Ρύθμιση Συγχρονισμού και δημιουργίας αντιγράφων ασφάλειας!</string>
-    <string name="sync_enable_sync_content">Οι σελιδοδείκτες και οι κωδικοί πρόσβασής σας προετοιμάζονται για συγχρονισμό. Αυτό θα πρέπει να διαρκέσει ελάχιστο χρόνο.</string>
-    <string name="sync_enable_sync_content_with_ai_chat">Οι σελιδοδείκτες, οι κωδικοί πρόσβασης και οι συνομιλίες σας στο Duck.ai προετοιμάζονται για συγχρονισμό. Αυτό θα πρέπει να διαρκέσει ελάχιστο χρόνο.</string>
-    <string name="sync_enable_options">Επιλογές</string>
-    <string name="sync_enable_option_favicons_title">Λήψη εικονιδίων σελιδοδείκτη</string>
-    <string name="sync_enable_option_favicons_subtitle">Αυτόματη λήψη εικονιδίων για τους συγχρονισμένους σελιδοδείκτες.</string>
-    <string name="sync_enable_connecting">Σύνδεση...</string>
-    <string name="sync_intro_enable_title">Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αυτής της συσκευής</string>
-    <string name="sync_intro_enable_content">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών και των κωδικών πρόσβασής σας στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo.</string>
-    <string name="sync_intro_enable_content_with_ai_chat">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών, των κωδικών πρόσβασής σας και των συνομιλιών στο Duck.ai στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. \n\n Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo.</string>
-    <string name="sync_intro_enable_footer">Μπορείτε να προβείτε σε συγχρονισμό με τις άλλες συσκευές σας αργότερα.</string>
-    <string name="sync_intro_enable_cta">Ενεργοποίηση συγχρονισμού και δημιουργίας αντιγράφων ασφαλείας</string>
-    <!-- Recover Synced Data Intro Screen -->
-    <string name="sync_recover_synced_data_title">Ανακτήστε τα συγχρονισμένα δεδομένα σας</string>
-    <string name="sync_recover_synced_data_content">Θα χρειαστείτε τον Κωδικό ανάκτησης που λάβατε κατά τη ρύθμιση του Sync &amp; Backup. Ενδέχεται να το έχετε αποθηκεύσει ως PDF στη συσκευή που χρησιμοποιήσατε.</string>
-    <string name="sync_recover_synced_data_cta">Ανάκτηση συγχρονισμένων δεδομένων</string>
-
-    <!-- Recover data screen -->
-    <string name="login_screen_title">Σάρωση κώδικα QR</string>
-    <string name="login_screen_enter_code_cta">Μη αυτόματη εισαγωγή κωδικού</string>
-    <string name="login_screen_barcode_hint">Στρέψτε την κάμερα στον κωδικό QR για συγχρονισμό</string>
-    <string name="login_screen_cant_scan_label">Δεν μπορείτε να πραγματοποιήσετε σάρωση;</string>
-    <string name="login_screen_cant_scan_button_text">Αντιγραφή κωδικού κειμένου</string>
-
-
-    <!-- Connect screen -->
-    <string name="connect_screen_title">Σάρωση κώδικα QR</string>
-    <string name="connect_screen_scan_qr_hint">Ανοίξτε την εφαρμογή DuckDuckGo στην άλλη συσκευή σας και μεταβείτε στις <b>Ρυθμίσεις &gt; Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας &gt; Συγχρονισμός με άλλη συσκευή</b>.</string>
-    <string name="connect_screen_enter_code_cta">Μη αυτόματη εισαγωγή κωδικού</string>
-    <string name="connect_screen_connect_qr_hint_title">Ή πραγματοποιήστε σάρωση με το DuckDuckGo στη συσκευή σας</string>
-    <string name="connect_screen_connect_qr_hint_content">Ανοίξτε το DuckDuckGo στην άλλη συσκευή σας και σαρώστε αυτόν τον κωδικό για συγχρονισμό.</string>
-    <string name="connect_screen_share_code">Αντιγραφή κωδικού</string>
-
-    <!-- Enter Code screen -->
-    <string name="enter_code_screen_title">Μη αυτόματη εισαγωγή κωδικού</string>
-    <string name="sync_enter_code_hint">Μεταβείτε στις <b>Ρυθμίσεις &gt; Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας &gt; Συγχρονισμός με άλλη συσκευή</b> και επιλέξτε <b>Προβολή κωδικού κειμένου</b> στην εφαρμογή DuckDuckGo σε μια άλλη συγχρονισμένη συσκευή και επικολλήστε τον κωδικό εδώ για συγχρονισμό αυτής της συσκευής.</string>
-    <string name="sync_enter_code_verifying">Επαλήθευση κωδικού</string>
-    <string name="sync_enter_code_invalid">⚠️ Μη έγκυρος κωδικός</string>
-    <string name="sync_enter_code_paste">Επικόλληση κωδικού</string>
 
     <!-- Recovery PDF screen -->
-    <string name="sync_recovery_code_title">Αποθήκευση κωδικού ανάκτησης</string>
-    <string name="sync_save_recovery_code_item_hint">Σε περίπτωση που χάσετε την πρόσβαση στις συσκευές σας, θα χρειαστείτε αυτόν τον κωδικό για να ανακτήσετε τα συγχρονισμένα δεδομένα σας.</string>
-    <string name="sync_recovery_code_skip_button">Επόμενο</string>
-    <string name="sync_recovery_code_primary_button">Αποθήκευση ως PDF</string>
-    <string name="sync_recovery_code_secondary_button">Αντιγραφή κωδικού</string>
     <string name="sync_code_box_description">Οποιοσδήποτε με πρόσβαση σε αυτόν τον κωδικό μπορεί να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας. Γι\' αυτό φυλάξτε τον σε ασφαλές μέρος.</string>
 
     <!-- Device synced screen -->
-    <string name="sync_connected_device_title">Τα δεδομένα σας είναι συγχρονισμένα!</string>
-    <string name="sync_connected_device_primary_button">Ολοκληρώθηκε</string>
 
-    <string name="show_qr_screen_title">Εμφάνιση Κωδικού QR</string>
-
-    <string name="show_code_screen_title">Κωδικός</string>
-    <string name="enter_code_screen_cta">Εισαγωγή κωδικού κειμένου</string>
-    <string name="sync_login_device_hint">Σαρώστε τον κωδικό QR στο PDF ανάκτησης ή σε άλλη συγχρονισμένη συσκευή για ανάκτηση των δεδομένων σας.</string>
-
-    <string name="synced_devices_section_title">Συγχρονισμένες συσκευές</string>
-    <string name="sync_new_device_section_title">Συγχρονισμός νέας συσκευής</string>
-    <string name="sync_new_device_hint">Μεταβείτε στις Ρυθμίσεις &gt; Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας στην εφαρμογή DuckDuckGo σε μια διαφορετική συσκευή και σαρώστε για άμεση σύνδεση.</string>
-    <string name="sync_show_text_code_item">Εμφάνιση κωδικού κειμένου</string>
-    <string name="sync_show_qr_code_item">Σάρωση κώδικα QR</string>
-    <string name="sync_save_recovery_code_item">Αποθήκευση ανάκτησης PDF</string>
-    <string name="sync_delete_account_item">Απενεργοποίηση και διαγραφή δεδομένων διακομιστή…</string>
-    <string name="sync_disable_sync_item">Απενεργοποίηση Συγχρονισμού και δημιουργία αντιγράφων ασφάλειας...</string>
-    <string name="sync_enable_sync_next_button">Επόμενο</string>
-    <string name="sync_recovery_code_content">Σε περίπτωση που χάσετε την πρόσβαση στις συσκευές σας, θα χρειαστείτε αυτόν τον κωδικό για να ανακτήσετε τα συγχρονισμένα δεδομένα σας.</string>
-    <string name="sync_recovery_code_hint">Οποιοσδήποτε με πρόσβαση σε αυτόν τον κωδικό μπορεί να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας. Γι\' αυτό φυλάξτε τον σε ασφαλές μέρος.</string>
-
-    <string name="turn_off_sync_dialog_title">Απενεργοποίηση συγχρονισμού;</string>
-    <string name="turn_off_sync_dialog_content">Αυτή η Συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας</string>
-    <string name="turn_off_sync_dialog_primary_button">Απενεργοποίηση</string>
-    <string name="turn_off_sync_dialog_secondary_button">Ακύρωση</string>
-    <string name="sync_permission_required_store_recovery_code">Η αποθήκευση του PDF ανάκτησης απαιτεί άδεια αποθήκευσης</string>
     <string name="sync_share_title">Κοινή χρήση με...</string>
     <string name="sync_pdf_title">Συγχρονισμός κωδικού ανάκτησης</string>
     <string name="sync_pdf_description">Ο κωδικός ανάκτησης σας επιτρέπει να συγχρονίζετε τους κωδικούς πρόσβασής σας, τα δεδομένα αυτόματης συμπλήρωσης και τις συνομιλίες του Duck.ai σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας εάν χάσετε την πρόσβαση σε μια συσκευή.</string>
@@ -128,34 +40,15 @@
     <string name="sync_instructions_step2">Επιλέξτε «Συγχρονισμός με άλλη συσκευή» και σαρώστε τον κωδικό QR ή εισαγάγετε τον κωδικό κειμένου.</string>
     <string name="sync_instructions_step3">Ο Συγχρονισμός θα ενεργοποιηθεί και θα έχετε και πάλι πρόσβαση σε όλα τα δεδομένα σας.</string>
     <string name="sync_pdf_retention_notice">Εάν περάσουν περισσότεροι από 18 μήνες χωρίς να χρησιμοποιήσετε ένα πρόγραμμα περιήγησης DuckDuckGo με ενεργοποιημένο το Sync &amp; Backup, τα δεδομένα σας θα διαγραφούν από τον διακομιστή και δεν θα μπορούν να ανακτηθούν.</string>
-    <string name="remove_device_dialog_title">Αφαίρεση συσκευής;</string>
-    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας.</string>
-    <string name="remove_device_dialog_primary_button">Αφαίρεση</string>
-    <string name="remove_device_dialog_secondary_button">Ακύρωση</string>
-    <string name="edit_device_dialog_title">Επεξεργασία</string>
     <string name="edit_device_dialog_hint">Όνομα συσκευής</string>
-    <string name="edit_device_dialog_primary_button">Εντάξει</string>
-    <string name="edit_device_dialog_secondary_button">Ακύρωση</string>
-    <string name="sync_device_this_device_hint">Αυτή η συσκευή</string>
-    <string name="sync_device_menu_option_edit">Επεξεργασία</string>
-    <string name="sync_device_menu_option_remove">Αφαίρεση συσκευής</string>
-    <string name="sync_show_code_copy">Αντιγραφή κωδικού</string>
-    <string name="sync_show_code_copy_hint">Χρησιμοποιήστε αυτόν τον κωδικό αφού επιλέξετε «Μη αυτόματη εισαγωγή κωδικού» κατά τη διάρκεια της ρύθμισης συγχρονισμού σε μια δεύτερη συσκευή</string>
     <string name="sync_code_copied_message">Αντιγραφή κωδικού ανάκτησης</string>
-    <string name="sync_camera_permission_required">Απαιτείται άδεια κάμερας</string>
-    <string name="sync_camera_unavailable">Μη διαθέσιμη κάμερα</string>
-    <string name="sync_camera_permission_required_description">Μεταβείτε στις ρυθμίσεις της συσκευής σας και παρέχετε σε αυτήν την εφαρμογή άδεια πρόσβασης στην κάμερά σας.</string>
-    <string name="sync_go_to_settings">Μεταβείτε στις Ρυθμίσεις</string>
     <string name="sync_general_error">Κάτι πήγε λάθος</string>
     <string name="sync_notification_channel_name">Συγχρονισμός</string>
-    <string name="sync_notify_me_title">Οι ειδοποιήσεις είναι απενεργοποιημένες</string>
-    <string name="sync_notify_me_description">Ειδοποιηθείτε σε περίπτωση που η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αντιμετωπίσει κάποιο σφάλμα.</string>
 
     <!-- setup errors -->
     <string name="sync_turn_off_error">Δεν είναι δυνατή η απενεργοποίηση της λειτουργίας Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας.</string>
     <string name="sync_edit_device_error">Δεν είναι δυνατή η ενημέρωση του ονόματος της συσκευής.</string>
     <string name="sync_remove_device_error">Δεν είναι δυνατή η κατάργηση αυτής της συσκευής από τη λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας.</string>
-    <string name="sync_delete_data_error">Δεν είναι δυνατή η διαγραφή δεδομένων στον διακομιστή.</string>
     <string name="sync_login_authenticated_device_error">"Για να αντιστοιχίσετε τις συσκευές αυτές, απενεργοποιήστε τη λειτουργία Sync &amp; Backup στη μία συσκευή και έπειτα πατήστε Συγχρονισμός με άλλη συσκευή, στην άλλη συσκευή."</string>
     <string name="sync_connect_generic_error">Δεν είναι δυνατή η σύνδεση με τον διακομιστή.</string>
     <string name="sync_connect_login_error">Δεν είναι δυνατός ο συγχρονισμός με άλλη συσκευή.</string>
@@ -170,15 +63,6 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Ξεκλειδώστε τη συσκευή για πρόσβαση στο Sync &amp; Backup.</string>
     <string name="sync_biometric_prompt_title">Η λειτουργία Sync &amp; Backup κλειδώθηκε</string>
-    <string name="sync_require_device_passcode_dialog_title">Ασφαλίστε τη συσκευή σας για να χρησιμοποιείτε τη λειτουργία Sync &amp; Backup</string>
-    <string name="sync_require_device_passcode_dialog_body">Απαιτείται μοτίβο, PIN ή βιομετρικά στοιχεία κλειδώματος συσκευής για χρήση του Sync &amp; Backup.</string>
-    <string name="sync_require_device_passcode_dialog_action">Μεταβείτε στις Ρυθμίσεις</string>
-
-    <!-- Sync Settings -->
-    <string name="sync_delete_server_data_dialog_title">Διαγραφή δεδομένων διακομιστή;</string>
-    <string name="sync_delete_server_data_dialog_content">Το αντίγραφο ασφαλείας σου θα διαγραφεί από τον διακομιστή. Όλες οι συσκευές θα αποσυνδεθούν από τον συγχρονισμό, αλλά τίποτα δεν θα διαγραφεί από καμία συσκευή.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων διακομιστή</string>
-    <string name="sync_delete_server_data_dialog_secondary_button">Ακύρωση</string>
 
     <!-- Sync feature promo -->
     <string name="syncPromoTitlePasswords">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας των κωδικών πρόσβασής σας</string>
@@ -205,15 +89,6 @@
     <string name="sync_dialog_switch_account_secondary_button">Ακύρωση</string>
     <string name="sync_dialog_switch_account_description">Η συσκευή αυτή είναι ήδη συγχρονισμένη. Θέλετε σίγουρα να τη συγχρονίσετε με ένα διαφορετικό αντίγραφο ασφαλείας ή συσκευή; Η αλλαγή δεν θα αφαιρέσει δεδομένα που έχουν ήδη συγχρονιστεί σε αυτήν τη συσκευή.</string>
 
-    <!-- Deep link sync setup -->
-    <string name="sync_setup_deep_link_confirmation_dialog_title">Συγχρονισμός νέας συσκευής;</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας DuckDuckGo.</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Συγχρόνισε τώρα</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Ακύρωση</string>
-
-    <string name="deep_link_auth_prompt_title">Ρύθμιση της επιλογής Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
-    <string name="deep_link_auth_prompt_message">Ξεκλειδώστε τη συσκευή για να ρυθμίσετε τη λειτουργία Sync &amp; Backup</string>
-
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Συγχρόνισε σελιδοδείκτες σε όλες τις συσκευές</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Αποκρυψη</string>
@@ -222,26 +97,6 @@
     <string name="getDesktopBrowserSettingItemTitle">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo για Mac και Windows</string>
 
-    <!-- Sync Settings Recovery Section -->
-    <string name="sync_settings_recovery_section_header">Ανάκτηση</string>
-    <string name="sync_settings_download_recovery_code_item">Κάντε λήψη του κώδικα ανάκτησης σε μορφή PDF</string>
-    <string name="sync_settings_download_recovery_code_item_hint">Χρησιμοποιήστε αυτόν τον κωδικό για να ανακτήσετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή — κρατήστε τον ασφαλή.</string>
-    <string name="sync_settings_data_expiration">Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
-
-    <!-- Previous Session Ready Screen -->
-    <string name="sync_previous_session_ready_title">Επαναφορά δεδομένων Sync &amp; Backup από προηγούμενη εγκατάσταση;</string>
-    <string name="sync_previous_session_ready_body">Κάντε επαναφορά για να ανακτήσετε προηγούμενους σελιδοδείκτες, κωδικούς πρόσβασης και άλλα δεδομένα σας στο DuckDuckGo.</string>
-    <string name="sync_previous_session_ready_resume_cta">Επαναφορά Sync &amp; Backup</string>
-    <string name="sync_previous_session_ready_continue_cta">Ρύθμιση νέου συγχρονισμού</string>
-
-    <!-- Recover Data Screen -->
-    <string name="sync_recover_data_title">Ανακτήστε τα δεδομένα σας εύκολα</string>
-    <string name="sync_recover_data_content">Χρησιμοποιήστε αυτόν τον κωδικό ώστε να επαναφέρετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή. Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας.</string>
-    <string name="sync_recover_data_recovery_code_label">Κωδικός ανάκτησης</string>
-    <string name="sync_recover_data_download_pdf">Λήψη σε μορφή PDF</string>
-    <string name="sync_restore_on_reinstall_title">Επαναφορά στην Εκ νέου εγκατάσταση εφαρμογής</string>
-    <string name="sync_restore_on_reinstall_description">Εάν εγκαταστήσετε ξανά την εφαρμογή DuckDuckGo, θα σας ρωτήσουμε εάν θέλετε να επαναφέρετε τα δεδομένα σας σε αυτήν τη συσκευή.</string>
-
     <!-- Chat sync promo -->
     <string name="sync_chat_promo_banner_title">Απόκτησε πρόσβαση στις συνομιλίες σου σε όλες τις συσκευές σου χρησιμοποιώντας το Sync &amp; Backup.</string>
     <string name="sync_chat_promo_banner_cta_title">Συγχρονισμός με άλλη συσκευή</string>
@@ -249,15 +104,6 @@
     <string name="sync_chat_bottom_sheet_description">Βρες τον κωδικό QR στην εφαρμογή DuckDuckGo στην άλλη συσκευή σου μεταβαίνοντας στις Ρυθμίσεις › Sync &amp; Backup › Συγχρονισμός με άλλη συσκευή.</string>
     <string name="sync_chat_bottom_sheet_positive">Σάρωση κωδικού QR</string>
     <string name="sync_chat_bottom_sheet_negative">Όχι τώρα</string>
-
-    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
-    <string name="sync_v2_joiner_confirmation_title">Να συγχρονιστούν τα δεδομένα σου;</string>
-    <string name="sync_v2_joiner_confirmation_positive">Συγχρονισμός τώρα</string>
-    <string name="sync_v2_joiner_confirmation_negative">Ακύρωση</string>
-
-    <string name="sync_v2_host_confirmation_title">Να συγχρονιστούν τα δεδομένα σου;</string>
-    <string name="sync_v2_host_confirmation_positive">Συγχρονισμός τώρα</string>
-    <string name="sync_v2_host_confirmation_negative">Ακύρωση</string>
 
     <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
     <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">Το «%1$s» θα έχει πρόσβαση στους συγχρονισμένους κωδικούς πρόσβασης DuckDuckGo, στα δεδομένα αυτόματης συμπλήρωσης και στις συνομιλίες Duck.ai.</string>
@@ -305,7 +151,6 @@
     <string name="sync_simplified_settings_download_recovery_code_item">Λήψη του κωδικού ανάκτησής σας</string>
     <string name="sync_simplified_settings_download_recovery_code_item_hint">Χρησιμοποιήστε αυτόν τον κωδικό για να ανακτήσετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή — κρατήστε τον ασφαλή.</string>
     <string name="sync_simplified_settings_data_expiration_notice">Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
-    <string name="sync_simplified_settings_delete_account_item">Απενεργοποίηση και διαγραφή δεδομένων διακομιστή</string>
     <string name="sync_simplified_settings_turn_off_item">Απενεργοποίηση Sync &amp; Backup</string>
     <string name="sync_simplified_settings_storage_permission_message">Η αποθήκευση του PDF ανάκτησης απαιτεί άδεια αποθήκευσης</string>
     <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
@@ -317,10 +162,6 @@
     <string name="sync_simplified_settings_get_desktop_browser_item">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
 
     <!-- Sync settings screen: delete server data dialog -->
-    <string name="sync_simplified_settings_delete_server_data_dialog_title">Απενεργοποίηση Sync &amp; Backup και διαγραφή δεδομένων διακομιστή;</string>
-    <string name="sync_simplified_settings_delete_server_data_dialog_body">Όλες οι συσκευές που χρησιμοποιούν το Sync &amp; Backup θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σας θα διαγραφούν από τον διακομιστή.</string>
-    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων διακομιστή</string>
-    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Ακύρωση</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_title_v2">Δεν μπορείς να αναιρέσεις αυτήν την ενέργεια.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_body_v2">Όλες οι συσκευές που χρησιμοποιούν το Sync &amp; Backup θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σου θα διαγραφούν από τον διακομιστή.</string>
     <string name="sync_simplified_settings_delete_server_data_dialog_primary_button_v2">Οριστική διαγραφή</string>
@@ -348,8 +189,6 @@
     <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Μεταβείτε στις Ρυθμίσεις</string>
 
     <!-- Sync This Device screen -->
-    <string name="sync_simplified_setup_header_headline">Συγχρονισμός αυτής της συσκευής με κοντινό υπολογιστή.</string>
-    <string name="sync_simplified_setup_header_body">Θα σας βοηθήσουμε να συγχρονίσεις τις συσκευές σας.</string>
     <string name="sync_simplified_setup_header_headline_v2">Έχεις άλλη συσκευή κοντά; Συγχρόνισε τις συσκευές σου.</string>
     <string name="sync_simplified_setup_header_body_v2">Δεν έχεις άλλη συσκευή αυτή τη στιγμή; Συγχρόνισε μόνο αυτή τη συσκευή και συγχρόνισε με άλλη αργότερα.</string>
     <string name="sync_simplified_setup_primary_button">Συγχρονισμός με άλλη συσκευή</string>
@@ -375,12 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Σάρωση κωδικού QR για συγχρονισμό</string>
     <string name="sync_simplified_scanner_camera_header_body">Ανοίξτε το <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo για υπολογιστή</annotation></b>\n<annotation type="gap">\n</annotation>και μεταβείτε στο <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Συγχρονισμός με άλλη συσκευή</annotation></string>
-    <string name="sync_simplified_scanner_camera_primary_button">Είμαι έτοιμος για σάρωση</string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Το κατάλαβα</string>
-    <string name="sync_simplified_scanner_camera_invalid_code_message">Δυστυχώς, ο κωδικός που σαρώθηκε δεν είναι έγκυρος.</string>
-    <string name="sync_simplified_scanner_no_permission_headline">Απαιτείται άδεια κάμερας</string>
-    <string name="sync_simplified_scanner_no_permission_body">Μεταβείτε στις ρυθμίσεις της συσκευής σας και παρέχετε σε αυτήν την εφαρμογή άδεια πρόσβασης στην κάμερά σας.</string>
-    <string name="sync_simplified_scanner_no_permission_primary_button">Μεταβείτε στις Ρυθμίσεις</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">Το DuckDuckGo χρειάζεται πρόσβαση στην κάμερά σου.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Απαιτούνται άδειες πρόσβασης στην κάμερα για τη σάρωση του κωδικού QR.</string>
     <string name="sync_simplified_scanner_no_permission_primary_button_v2">Αλλαγή δικαιωμάτων</string>
@@ -436,8 +270,6 @@
     <string name="sync_simplified_edit_device_edit_name_item">Επεξεργασία ονόματος</string>
     <string name="sync_simplified_edit_device_remove_item">Αφαίρεση συσκευής</string>
     <string name="sync_simplified_edit_device_sync_this_device_item">Συγχρονισμός αυτής της συσκευής</string>
-    <string name="sync_simplified_edit_device_remove_notice_this_device">Αυτή η συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας αν την αφαιρέσετε.</string>
-    <string name="sync_simplified_edit_device_remove_notice_another_device">Αυτή η συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας αν αυτό απενεργοποιηθεί.</string>
     <string name="sync_simplified_edit_device_remove_notice_this_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου σε άλλες συσκευές αν αυτό απενεργοποιηθεί.</string>
     <string name="sync_simplified_edit_device_remove_notice_another_device_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου σε άλλες συσκευές.</string>
 
@@ -447,18 +279,10 @@
     <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Ακύρωση</string>
 
     <!-- Edit Device screen: remove device dialog -->
-    <string name="sync_simplified_edit_device_remove_dialog_title">Αφαίρεση συσκευής;</string>
-    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας.</string>
     <string name="sync_simplified_edit_device_remove_dialog_primary_button">Αφαίρεση</string>
     <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Ακύρωση</string>
     <string name="sync_simplified_edit_device_remove_dialog_title_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Κατάργηση του %1$s από το Sync &amp; Backup;</string>
     <string name="sync_simplified_edit_device_remove_dialog_body_v2" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σου. Οι σελιδοδείκτες, τα δεδομένα αυτόματης συμπλήρωσης και οι συνομιλίες στο Duck.ai θα παραμείνουν στις συσκευές σου.</string>
-
-    <!-- Edit Device screen: turn off sync dialog -->
-    <string name="sync_simplified_edit_device_turn_off_dialog_title">Απενεργοποίηση του Sync &amp; Backup;</string>
-    <string name="sync_simplified_edit_device_turn_off_dialog_body">Αυτή η συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας σε άλλες συσκευές.</string>
-    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Απενεργοποίηση</string>
-    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Ακύρωση</string>
 
     <!-- Error dialog, shared across Simplified Sync screens -->
     <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
@@ -531,5 +355,4 @@
     <string name="sync_passwords_multi_device_promo_message">Το Sync &amp; Backup είναι ενεργοποιημένο σε αυτήν τη συσκευή.</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Σύνδεση</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Λήψη εφαρμογής</string>
-
 </resources>
