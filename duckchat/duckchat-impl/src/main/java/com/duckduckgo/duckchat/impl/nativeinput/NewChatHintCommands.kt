@@ -29,7 +29,6 @@ sealed interface NewChatHintCommand {
     data class OpenDocuments(override val tabId: String, val mimeTypes: List<String>) : NewChatHintCommand
     data class OpenPhoto(override val tabId: String) : NewChatHintCommand
     data class CreateImage(override val tabId: String) : NewChatHintCommand
-    data class OpenCamera(override val tabId: String) : NewChatHintCommand
 }
 
 @SingleIn(AppScope::class)
