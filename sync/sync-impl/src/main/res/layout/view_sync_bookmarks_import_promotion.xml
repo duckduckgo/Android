@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         app:promoCardColor="?attr/daxColorSurface"
         app:promoHeaderImage="@drawable/desktop_mobile_sync_96"
-        app:promoPrimaryButtonText="@string/sync_bookmarks_import_promo_primary_button"
+        app:promoPrimaryButtonText="@string/sync_bookmarks_import_promo_primary_button_label"
         app:promoShowCloseButton="false"
         app:promoShowElevation="false"
         app:promoTitleText="@string/sync_bookmarks_import_promo_title"

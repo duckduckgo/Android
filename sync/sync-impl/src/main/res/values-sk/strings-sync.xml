@@ -481,25 +481,26 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Pristupuj k svojim heslám na mobile aj počítači.</string>
     <string name="sync_passwords_import_promo_title_label">Pristupuj k svojim heslám na mobile aj počítači.</string>
-    <string name="sync_passwords_import_promo_primary_button">Zapni Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Spustiť synchronizáciu</string>
     <string name="sync_passwords_import_promo_title_toggle">Synchronizuj a zálohuj svoje heslá na mobile a počítači pomocou Sync &amp; Backup</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Maj prístup k svojim záložkám na mobile aj v počítači.</string>
     <string name="sync_bookmarks_import_promo_title_label">Maj prístup k svojim záložkám na mobile aj v počítači.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Zapni Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Spustiť synchronizáciu</string>
     <string name="sync_bookmarks_import_promo_title_toggle">Synchronizuj a zálohuj svoje záložky na mobile a počítači pomocou Sync &amp; Backup</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Synchronizuj a zálohuj svoje záložky pomocou Sync &amp; Backup</string>
     <string name="sync_bookmarks_promo_message">Šifrované end-to-end. Nikto nevidí tvoje záložky, dokonca ani my.</string>
-    <string name="sync_bookmarks_promo_primary_button">Zapni Sync &amp; Backup</string>
+    <string name="sync_bookmarks_promo_primary_button_label">Spustiť synchronizáciu</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_multi_device_promo_title">Chceš synchronizovať záložky aj s aplikáciou pre počítač?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">Sync &amp; Backup je povolené na tomto zariadení.</string>
     <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Pripojiť</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Získaj aplikáciu</string>
 
@@ -507,7 +508,7 @@
     <string name="sync_bookmark_added_set_up_promo_title">Synchronizuj a zálohuj záložky pomocou Sync &amp; Backup</string>
     <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Ďalšie možnosti</string>
     <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Skryť</string>
-    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Zapni Sync &amp; Backup</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Spustiť synchronizáciu</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Synchronizuj s aplikáciou pre počítač</string>
@@ -522,11 +523,12 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Synchronizuj a zálohuj svoje heslá pomocou Sync &amp; Backup</string>
     <string name="sync_passwords_promo_message">End-to-end šifrovanie znamená, že tvoje heslá nevidí nikto okrem teba, dokonca ani my.</string>
-    <string name="sync_passwords_promo_primary_button">Zapni Sync &amp; Backup</string>
+    <string name="sync_passwords_promo_primary_button_label">Spustiť synchronizáciu</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
     <string name="sync_passwords_multi_device_promo_title">Chceš synchronizovať heslá aj s aplikáciou pre počítač?</string>
+    <string name="sync_passwords_multi_device_promo_message">Sync &amp; Backup je povolené na tomto zariadení.</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Pripojiť</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Ziskaj aplikáciu</string>
 

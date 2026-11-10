@@ -481,25 +481,26 @@
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Pääse ligi oma paroolidele mobiilis ja arvutis.</string>
     <string name="sync_passwords_import_promo_title_label">Pääse ligi oma paroolidele mobiilis ja arvutis.</string>
-    <string name="sync_passwords_import_promo_primary_button">Lülita Sync &amp; Backup sisse</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Alusta sünkroonimist</string>
     <string name="sync_passwords_import_promo_title_toggle">Sünkrooni ja varunda oma paroole mobiilis ja arvutis.</string>
     <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Pääse oma järjehoidjatele ligi nii mobiilis kui ka arvutis.</string>
     <string name="sync_bookmarks_import_promo_title_label">Pääse oma järjehoidjatele ligi nii mobiilis kui ka arvutis.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Lülita Sync &amp; Backup sisse</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Alusta sünkroonimist</string>
     <string name="sync_bookmarks_import_promo_title_toggle">Sünkrooni ja varunda oma järjehoidjad nii mobiilis kui ka arvutis.</string>
     <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_promo_title">Sünkrooni ja varunda oma järjehoidjad</string>
     <string name="sync_bookmarks_promo_message">Otspunktkrüpteeritud. Keegi ei näe sinu järjehoidjaid, isegi mitte meie.</string>
-    <string name="sync_bookmarks_promo_primary_button">Lülita Sync &amp; Backup sisse</string>
+    <string name="sync_bookmarks_promo_primary_button_label">Alusta sünkroonimist</string>
     <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on bookmarks screen -->
     <string name="sync_bookmarks_multi_device_promo_title">Kas sünkroonida järjehoidjad ka sinu töölauarakendusega?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">Sync &amp; Backup on selles seadmes sisse lülitatud.</string>
     <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Ühenda</string>
     <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Hangi rakendus</string>
 
@@ -507,7 +508,7 @@
     <string name="sync_bookmark_added_set_up_promo_title">Järjehoidjate sünkroonimine ja varundamine</string>
     <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Veel valikuid</string>
     <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Peida</string>
-    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync">Lülita Sync &amp; Backup sisse</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Alusta sünkroonimist</string>
 
     <!-- Multi-device Sync promo in bookmark added dialog -->
     <string name="sync_bookmark_added_multi_device_promo_title">Sünkrooni töölaua rakendusega</string>
@@ -522,11 +523,12 @@
     <!-- Sync promo on passwords screen -->
     <string name="sync_passwords_promo_title">Oma paroolide sünkroonimine ja varundamine</string>
     <string name="sync_passwords_promo_message">Otspunktkrüpteerimine tähendab, et keegi peale sinu ei näe sinu paroole, isegi mitte meie.</string>
-    <string name="sync_passwords_promo_primary_button">Lülita Sync &amp; Backup sisse</string>
+    <string name="sync_passwords_promo_primary_button_label">Alusta sünkroonimist</string>
     <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Multi-device Sync promo on passwords screen -->
     <string name="sync_passwords_multi_device_promo_title">Kas sünkroonida paroolid ka sinu töölauarakendusega?</string>
+    <string name="sync_passwords_multi_device_promo_message">Sync &amp; Backup on selles seadmes sisse lülitatud.</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Ühenda</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Hangi rakendus</string>
 
