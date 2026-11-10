@@ -2,17 +2,6 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
-        id="SimpleDateFormat"
-        message="To get local formatting use `getDateInstance()`, `getDateTimeInstance()`, or `getTimeInstance()`, or use `new SimpleDateFormat(String template, Locale locale)` with for example `Locale.US` for ASCII dates."
-        errorLine1="            putExtra(Intent.EXTRA_TITLE, &quot;wireguard_&quot; + SimpleDateFormat(&quot;yyyyMMdd&quot;).format(Date().time) + &quot;.pcap&quot;)"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/ExportPcapContract.kt"
-            line="31"
-            column="57"/>
-    </issue>
-
-    <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="                this.setRawStoredState(Toggle.State(enable = isChecked))"
@@ -20,17 +9,6 @@
         <location
             file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
             line="200"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="                this.setRawStoredState(Toggle.State(enable = isChecked))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/internal/feature/NetPInternalSettingsActivity.kt"
-            line="218"
             column="17"/>
     </issue>
 

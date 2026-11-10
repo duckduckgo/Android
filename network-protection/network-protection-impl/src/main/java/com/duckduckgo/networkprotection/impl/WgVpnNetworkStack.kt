@@ -172,8 +172,6 @@ class WgVpnNetworkStack @Inject constructor(
             wgConfig!!.toWgUserspaceString().also {
                 logcat { "WgUserspace config: $it" }
             },
-            // pcapConfig = netPDefaultConfigProvider.pcapConfig(),
-            pcapConfig = null,
         )
         return if (result.isFailure) {
             logcat(ERROR) { "Failed to turnOnNative due to ${result.exceptionOrNull()}" }
