@@ -56,7 +56,7 @@ class DuckAiCombinedWidget : AppWidgetProvider() {
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        pixel.fire(DuckChatPixelName.DUCK_AI_COMBINED_WIDGET_ADDED)
+        pixel.fire(DuckChatPixelName.DUCK_AI_WIDGET_ADDED)
     }
 
     override fun onUpdate(
@@ -99,6 +99,6 @@ class DuckAiCombinedWidget : AppWidgetProvider() {
 
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
-        pixel.fire(DuckChatPixelName.DUCK_AI_COMBINED_WIDGET_DELETED)
+        pixel.fire(DuckChatPixelName.DUCK_AI_WIDGET_DELETED)
     }
 }
