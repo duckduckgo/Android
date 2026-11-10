@@ -35,8 +35,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
-internal const val TARGET_PACKAGE = "com.duckduckgo.mobile.android"
-
 /**
  * Page-load benchmark: drives N sequential navigations to a deterministic test page inside a SINGLE
  * measured iteration, producing one Perfetto trace containing N `ddg.pageLoad` async sections
