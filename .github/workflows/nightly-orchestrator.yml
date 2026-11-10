@@ -116,7 +116,7 @@ jobs:
     name: Tag last good commit when successful
     runs-on: ubuntu-latest
     needs: [ resolve-commit, call-release-blocking-checks, build_fdroid_release, call-update-content-scope, call-update-ref-tests]
-    if: ${{ success() }}
+    if: ${{ success() && github.ref == 'refs/heads/develop' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
