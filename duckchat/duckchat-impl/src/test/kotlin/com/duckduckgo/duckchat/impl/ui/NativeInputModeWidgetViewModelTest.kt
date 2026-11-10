@@ -63,6 +63,8 @@ import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
@@ -164,6 +166,7 @@ class NativeInputModeWidgetViewModelTest {
     private val newChatHintsUsage: NewChatHintsUsage = mock()
     private val newChatHintsPixels: NewChatHintsPixels = mock()
     private val newChatDetector: NewChatDetector = mock { on { observe(any()) } doReturn emptyFlow() }
+    private val newChatHintCommands = NewChatHintCommands()
     private val realNativeInputStateStore = RealNativeInputStateStore(
         lazy { tabRepositoryProvider },
         browserModeStateHolder,
@@ -282,6 +285,7 @@ class NativeInputModeWidgetViewModelTest {
             newChatHintsPixels = newChatHintsPixels,
             newChatDetector = newChatDetector,
             tabRepository = tabRepository,
+            newChatHintCommands = newChatHintCommands,
         )
     }
 
@@ -529,6 +533,20 @@ class NativeInputModeWidgetViewModelTest {
         testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
 
         assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
+    fun whenConfigureDuckAiModeAndCameraCaptureActionThenOpenCameraIsPendingForTab() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
+
+        assertEquals(NewChatHintCommand.OpenCamera("tab-1"), newChatHintCommands.takePending("tab-1"))
+    }
+
+    @Test
+    fun whenConfigureBrowserModeAndCameraCaptureActionThenNoOpenCameraIsPending() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = false, isBottom = false, launchAction = DuckChatLaunchAction.CameraCapture)
+
+        assertNull(newChatHintCommands.takePending("tab-1"))
     }
 
     @Test

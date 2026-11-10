@@ -118,6 +118,9 @@ class AttachmentView(
             .onEach { command ->
                 if (!isEditMode && !isContextual) openAttachment(command)
             }.launchIn(scope)
+        newChatHintCommands.takePending(host?.tabId())?.let { command ->
+            if (!isEditMode && !isContextual) openAttachment(command)
+        }
         attachmentStateJob?.cancel()
         attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
@@ -328,9 +331,7 @@ class AttachmentView(
         )
     }
 
-    /** Starts the camera-capture flow directly, bypassing the attach popup menu — used when it's
-     *  triggered externally (e.g. a widget launch action) rather than by the user tapping the attach button. */
-    fun triggerCameraCapture() {
+    private fun openCamera() {
         host?.showAttachmentChooser(true)
         host?.requestCameraCapture(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
     }
@@ -357,6 +358,7 @@ class AttachmentView(
                 host?.showAttachmentChooser(true)
                 host?.requestFilePicker(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
             }
+            is NewChatHintCommand.OpenCamera -> openCamera()
             is NewChatHintCommand.CreateImage -> Unit
         }
     }
@@ -395,8 +397,7 @@ class AttachmentView(
                 titleRes = R.string.attachmentTakePhoto,
             ) {
                 popup.dismiss()
-                host?.showAttachmentChooser(true)
-                host?.requestCameraCapture(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
+                openCamera()
             }
 
             addMenuItem(

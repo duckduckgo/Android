@@ -21,6 +21,7 @@ import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 sealed interface NewChatHintCommand {
@@ -29,6 +30,7 @@ sealed interface NewChatHintCommand {
     data class OpenDocuments(override val tabId: String, val mimeTypes: List<String>) : NewChatHintCommand
     data class OpenPhoto(override val tabId: String) : NewChatHintCommand
     data class CreateImage(override val tabId: String) : NewChatHintCommand
+    data class OpenCamera(override val tabId: String) : NewChatHintCommand
 }
 
 @SingleIn(AppScope::class)
@@ -37,7 +39,19 @@ class NewChatHintCommands @Inject constructor() {
 
     fun commandsFor(tabId: () -> String?): Flow<NewChatHintCommand> = commands.filter { it.tabId == tabId() }
 
+    private val pendingUntilAttached = ConcurrentHashMap<String, NewChatHintCommand>()
+
     suspend fun send(command: NewChatHintCommand) {
         commands.emit(command)
     }
+
+    /**
+     * Keeps a command for its tab until the view that handles it attaches and calls [takePending], for callers
+     * that run before that view exists. The latest command per tab wins.
+     */
+    fun sendWhenAttached(command: NewChatHintCommand) {
+        pendingUntilAttached[command.tabId] = command
+    }
+
+    fun takePending(tabId: String?): NewChatHintCommand? = tabId?.let { pendingUntilAttached.remove(it) }
 }
