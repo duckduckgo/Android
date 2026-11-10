@@ -719,7 +719,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                             container.isVisible = isChatTabSelected() && !isEditWidget
                         }
                     }
-                    viewModel.onPluginViewsAttached()
                 }
             }
         }
@@ -1952,6 +1951,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun changeModelSubmitted(modelId: String) {
         onChangeModelSubmitted?.invoke(modelId)
+    }
+
+    override fun attachmentCommandsCollecting(collecting: Boolean) {
+        viewModel.setAttachmentCommandsCollecting(collecting)
     }
 
     override fun requestCameraCapture(callback: ValueCallback<Array<Uri>>) {

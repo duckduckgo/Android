@@ -88,6 +88,9 @@ interface NativeInputHost {
     /** The user picked a model during the FE model-change recovery flow. */
     fun changeModelSubmitted(modelId: String)
 
+    /** Whether the attachment control is currently collecting its hint commands. */
+    fun attachmentCommandsCollecting(collecting: Boolean)
+
     /** Ask the host to run the camera capture flow; the activity owns the result plumbing. */
     fun requestCameraCapture(callback: ValueCallback<Array<Uri>>)
 
