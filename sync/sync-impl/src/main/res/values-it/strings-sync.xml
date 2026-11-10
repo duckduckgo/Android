@@ -480,9 +480,56 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Accedi alle tue password da mobile e desktop.</string>
-    <string name="sync_passwords_import_promo_primary_button">Attiva Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_title_label">Accedi alle tue password da mobile e desktop.</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Avvia la sincronizzazione</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sync &amp; Backup delle tue password su mobile e desktop.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Accedi ai tuoi segnalibri da mobile e desktop.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Attiva Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_title_label">Accedi ai tuoi segnalibri da mobile e desktop.</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Avvia la sincronizzazione</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sync &amp; Backup dei tuoi segnalibri su mobile e desktop.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Sincronizza ed esegui il backup dei tuoi segnalibri</string>
+    <string name="sync_bookmarks_promo_message">Crittografato end-to-end. Nessuno può vedere i tuoi segnalibri, nemmeno noi.</string>
+    <string name="sync_bookmarks_promo_primary_button_label">Avvia la sincronizzazione</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Sincronizzare i segnalibri anche con la tua app desktop?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">Sync &amp; Backup è attivo su questo dispositivo.</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Connettiti</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Scarica l\'app</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Sincronizza ed esegui il backup dei segnalibri</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Altre opzioni</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Nascondi</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Avvia la sincronizzazione</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Sincronizzazione con l\'app desktop</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Altre opzioni</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Nascondi</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Sincronizzazione con il desktop</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Scarica l\'app per desktop</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Sincronizziamo la tua app desktop!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Sincronizzazione con il desktop</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Non ho l’app desktop</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Sincronizza e fai il backup delle password</string>
+    <string name="sync_passwords_promo_message">Con la crittografia end-to-end, nessuno a parte te può vedere le tue password, nemmeno noi.</string>
+    <string name="sync_passwords_promo_primary_button_label">Avvia la sincronizzazione</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Sincronizzare le password anche con la tua app desktop?</string>
+    <string name="sync_passwords_multi_device_promo_message">Sync &amp; Backup è attivo su questo dispositivo.</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Connettiti</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Scarica l\'app</string>
+
 </resources>

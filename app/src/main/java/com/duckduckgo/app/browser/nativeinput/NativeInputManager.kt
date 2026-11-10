@@ -212,7 +212,6 @@ class RealNativeInputManager @Inject constructor(
     private val duckChatInputModeState: DuckChatInputModeState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
-    private val nativeInputUrlClearingFeature: NativeInputUrlClearingFeature,
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
     private val duckAiChatStore: DuckAiChatStore,
@@ -1274,7 +1273,7 @@ class RealNativeInputManager @Inject constructor(
     }
 
     internal fun bindUrlCaching(widgetView: View) {
-        if (!nativeInputUrlClearingFeature.self().isEnabled() || omnibarController.isDuckAiMode()) return
+        if (omnibarController.isDuckAiMode()) return
         val widget = widgetFrom(widgetView) ?: return
         val text = widget.text
 

@@ -33,6 +33,7 @@
     <string name="undo">Kumoa</string>
     <string name="cancel">Peruuta</string>
     <string name="done">Valmis</string>
+    <string name="search">Hae</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Aina käytössä</string>

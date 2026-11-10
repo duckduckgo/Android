@@ -480,9 +480,56 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Férj hozzá a jelszavaidhoz mobilon és asztali gépen.</string>
-    <string name="sync_passwords_import_promo_primary_button">Sync &amp; Backup bekapcsolása</string>
+    <string name="sync_passwords_import_promo_title_label">Férj hozzá a jelszavaidhoz mobilon és asztali gépen.</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Szinkronizálás indítása</string>
+    <string name="sync_passwords_import_promo_title_toggle">A Sync &amp; Backup segítségével szinkronizáld a jelszavaidat mobilon és asztali gépen.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Férj hozzá a könyvjelzőidhez mobilon és asztali gépen.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Sync &amp; Backup bekapcsolása</string>
+    <string name="sync_bookmarks_import_promo_title_label">Férj hozzá a könyvjelzőidhez mobilon és asztali gépen.</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Szinkronizálás indítása</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">A Sync &amp; Backup segítségével szinkronizáld a könyvjelzőidet mobilon és asztali gépen.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Könyvjelzők szinkronizálása és biztonsági mentése</string>
+    <string name="sync_bookmarks_promo_message">Végpontok közötti titkosítás. Senki sem láthatja a könyvjelzőidet, még mi sem.</string>
+    <string name="sync_bookmarks_promo_primary_button_label">Szinkronizálás indítása</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">A könyvjelzőket is szinkronizálod az asztali alkalmazással?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">A Sync &amp; Backup engedélyezve van ezen az eszközön.</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Csatlakozás</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Alkalmazás letöltése</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Könyvjelzők szinkronizálása és biztonsági mentése</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">További lehetőségek</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Elrejtés</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Szinkronizálás indítása</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Szinkronizálás az asztali alkalmazással</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">További lehetőségek</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Elrejtés</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Szinkronizálás asztali böngészővel</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Asztali alkalmazás letöltése</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Szinkronizáljuk az asztali alkalmazásodat!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Szinkronizálás asztali böngészővel</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Nincs asztali alkalmazásom</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Jelszavak szinkronizálása és biztonsági mentése</string>
+    <string name="sync_passwords_promo_message">A végpontok közötti titkosítás azt jelenti, hogy rajtad kívül senki sem láthatja a jelszavaidat, még mi sem.</string>
+    <string name="sync_passwords_promo_primary_button_label">Szinkronizálás indítása</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">A jelszavakat az asztali alkalmazással is szinkronizálod?</string>
+    <string name="sync_passwords_multi_device_promo_message">A Sync &amp; Backup engedélyezve van ezen az eszközön.</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Csatlakozás</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Alkalmazás letöltése</string>
+
 </resources>

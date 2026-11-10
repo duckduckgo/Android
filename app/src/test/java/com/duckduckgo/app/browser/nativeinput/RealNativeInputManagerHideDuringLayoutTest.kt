@@ -31,7 +31,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NewChatHintsRenderer
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,7 +71,6 @@ class RealNativeInputManagerHideDuringLayoutTest {
         duckChatInputModeState,
         mock<Pixel>(),
         FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java),
-        FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java).also { it.self().setRawStoredState(State(enable = true)) },
         mock<NativeInputEventListener>(),
         EdgeToEdgeHandler(),
         mock<DuckAiChatStore>(),

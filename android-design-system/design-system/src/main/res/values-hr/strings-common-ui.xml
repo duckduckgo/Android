@@ -33,6 +33,7 @@
     <string name="undo">Poništi</string>
     <string name="cancel">Odustani</string>
     <string name="done">Gotovo</string>
+    <string name="search">Pretraga</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Uvijek uključeno</string>

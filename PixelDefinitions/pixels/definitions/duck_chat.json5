@@ -1930,14 +1930,21 @@
         "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
+    },
+    "aichat_contextual_address_bar_menu_skipped": {
+        "description": "Fired when the address bar Duck.ai button skips the menu because the tab already has a chat in progress",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
     },
     "aichat_contextual_address_bar_menu_new_chat_selected": {
         "description": "Fired when the user selects New Chat in the address bar Duck.ai menu",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
     },
     "aichat_contextual_address_bar_menu_ask_about_page_selected": {
         "description": "Fired when the user selects Ask About Page in the address bar Duck.ai menu",
@@ -1958,7 +1965,7 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
     },
     "aichat_contextual_open_duckai_menu_tapped": {
         "description": "Fired when the user selects Open Duck.ai in the contextual sheet chats menu",

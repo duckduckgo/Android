@@ -31,6 +31,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Options
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.ProductJson
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.SubscriptionTierOptionsJson
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.TierFeatureJson
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import dev.zacsweers.metro.ContributesBinding
 import org.json.JSONObject
 import javax.inject.Inject
@@ -46,7 +47,12 @@ interface StripePlansHandler {
     suspend fun getTierOptions(): SubscriptionTierOptionsJson
 
     /** Returns the event that tells the plans page to send the user to Stripe, or null if there is no access token. */
-    suspend fun getRedirectEvent(): SubscriptionEventData?
+    suspend fun getRedirectEvent(
+        subscription: Subscription,
+        planId: String,
+        change: String?,
+        origin: String?,
+    ): SubscriptionEventData?
 
     /** Refreshes the local subscription data after the user changed plan on Stripe. */
     suspend fun onPlanChangeCompleted()
@@ -57,7 +63,10 @@ class RealStripePlansHandler @Inject constructor(
     private val subscriptionsFeature: SubscriptionsFeature,
     private val subscriptionsManager: SubscriptionsManager,
     private val stripeTierOptionsProvider: StripeTierOptionsProvider,
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
 ) : StripePlansHandler {
+
+    private var tierProducts: List<StripeTierProduct> = emptyList()
 
     override fun shouldHandle(subscription: Subscription?): Boolean {
         return subscriptionsFeature.stripeTierOptions().isEnabled() &&
@@ -68,7 +77,13 @@ class RealStripePlansHandler @Inject constructor(
 
     override suspend fun getTierOptions(): SubscriptionTierOptionsJson {
         val includeProTier = subscriptionsFeature.allowProTierPurchase().isEnabled()
-        val products = stripeTierOptionsProvider.getTierProducts(includeProTier).map { product ->
+        val country = if (subscriptionsFeature.stripeTierOptionsByCountry().isEnabled()) {
+            subscriptionsManager.getSubscription()?.planCountry
+        } else {
+            null
+        }
+        tierProducts = stripeTierOptionsProvider.getTierProducts(includeProTier, country)
+        val products = tierProducts.map { product ->
             ProductJson(
                 tier = product.tier,
                 features = product.features.map { TierFeatureJson(product = it.product, name = it.name) },
@@ -84,8 +99,20 @@ class RealStripePlansHandler @Inject constructor(
         return SubscriptionTierOptionsJson(platform = STRIPE_PLATFORM, products = products)
     }
 
-    override suspend fun getRedirectEvent(): SubscriptionEventData? {
-        val accessToken = (subscriptionsManager.getAccessToken() as? AccessTokenResult.Success)?.accessToken ?: return null
+    override suspend fun getRedirectEvent(
+        subscription: Subscription,
+        planId: String,
+        change: String?,
+        origin: String?,
+    ): SubscriptionEventData? {
+        onSwitchFlowStarted(subscription, planId, change, origin)
+
+        val accessToken = (subscriptionsManager.getAccessToken() as? AccessTokenResult.Success)?.accessToken
+        if (accessToken == null) {
+            subscriptionSwitchWideEvent.onStripeRedirectFailure()
+            return null
+        }
+        subscriptionSwitchWideEvent.onStripeRedirected()
         return SubscriptionEventData(
             featureName = PURCHASE_COMPLETED_FEATURE_NAME,
             subscriptionName = PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
@@ -96,9 +123,33 @@ class RealStripePlansHandler @Inject constructor(
     }
 
     override suspend fun onPlanChangeCompleted() {
+        subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
         // Entitlements can change with the new plan, so the tokens are refreshed along with the subscription
         runCatching { subscriptionsManager.refreshAccessToken(force = true) }
         runCatching { subscriptionsManager.refreshSubscriptionData() }
+    }
+
+    private suspend fun onSwitchFlowStarted(
+        subscription: Subscription,
+        planId: String,
+        change: String?,
+        origin: String?,
+    ) {
+        // Stripe plan IDs aren't in the Play plan lists, so use the plans page products
+        val currentProduct = tierProducts.find { product -> product.options.any { it.id == subscription.productId } }
+        val targetProduct = tierProducts.find { product -> product.options.any { it.id == planId } }
+        val targetOption = targetProduct?.options?.find { it.id == planId }
+
+        subscriptionSwitchWideEvent.onStripeSwitchFlowStarted(
+            context = origin,
+            fromPlan = subscription.productId,
+            toPlan = planId,
+            fromTier = currentProduct?.tier,
+            toTier = targetProduct?.tier,
+            fromBillingPeriod = subscription.billingPeriod,
+            toBillingPeriod = targetOption?.recurrence,
+            change = change,
+        )
     }
 
     companion object {

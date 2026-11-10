@@ -25,7 +25,6 @@
     <string name="no">Ne</string>
     <string name="open">Atviras</string>
     <string name="cancel">Atšaukti</string>
-    <string name="search">Paieška</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Pokalbis ištrintas</string>

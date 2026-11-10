@@ -35,17 +35,12 @@ dependencies {
     implementation project(':broken-site-api')
 
     testImplementation Testing.junit4
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 android {
     sourceSets {
         test.assets.srcDirs += files("$projectDir/schemas")
     }
     namespace 'com.duckduckgo.brokensite.store'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     room {
         schemaDirectory("$projectDir/schemas")
     }

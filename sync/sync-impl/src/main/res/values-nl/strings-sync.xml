@@ -480,9 +480,56 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Krijg toegang tot je wachtwoorden op mobiel en desktop.</string>
-    <string name="sync_passwords_import_promo_primary_button">Sync &amp; Backup inschakelen</string>
+    <string name="sync_passwords_import_promo_title_label">Krijg toegang tot je wachtwoorden op mobiel en desktop.</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Synchronisatie starten</string>
+    <string name="sync_passwords_import_promo_title_toggle">Synchroniseer &amp; maak een back-up van je wachtwoorden op mobiel en desktop.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Krijg toegang tot je bladwijzers op mobiel en desktop.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Sync &amp; Backup inschakelen</string>
+    <string name="sync_bookmarks_import_promo_title_label">Krijg toegang tot je bladwijzers op mobiel en desktop.</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Synchronisatie starten</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sync &amp; back-up je bladwijzers op mobiel en desktop.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Synchroniseer en back-up je bladwijzers</string>
+    <string name="sync_bookmarks_promo_message">End-to-end versleuteld. Niemand kan je bladwijzers zien, zelfs wij niet.</string>
+    <string name="sync_bookmarks_promo_primary_button_label">Synchronisatie starten</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Wil je bladwijzers ook synchroniseren met je desktop-app?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">Sync &amp; Backup is ingeschakeld op dit apparaat.</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Verbinden</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Download de app</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Synchroniseer en maak een back-up van bladwijzers</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Meer opties</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Verbergen</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Synchronisatie starten</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Synchroniseren met de desktop-app</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Meer opties</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Verbergen</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Synchroniseren met de desktop</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Desktop-app downloaden</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Laten we je desktop-app synchroniseren!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Synchroniseren met de desktop</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Ik heb de desktop-app niet</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Synchroniseer en maak een back-up van je wachtwoorden</string>
+    <string name="sync_passwords_promo_message">Dankzij end-to-end versleuteling kan niemand behalve jij je wachtwoorden zien, zelfs wij niet.</string>
+    <string name="sync_passwords_promo_primary_button_label">Synchronisatie starten</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Ook wachtwoorden synchroniseren met je desktop-app?</string>
+    <string name="sync_passwords_multi_device_promo_message">Sync &amp; Backup is ingeschakeld op dit apparaat.</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Verbinden</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Download de app</string>
+
 </resources>

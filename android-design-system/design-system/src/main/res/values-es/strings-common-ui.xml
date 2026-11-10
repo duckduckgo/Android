@@ -33,6 +33,7 @@
     <string name="undo">Deshacer</string>
     <string name="cancel">Cancelar</string>
     <string name="done">Hecho</string>
+    <string name="search">Buscar</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Siempre activado</string>

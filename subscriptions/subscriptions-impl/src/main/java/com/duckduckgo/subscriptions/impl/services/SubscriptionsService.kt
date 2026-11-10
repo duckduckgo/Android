@@ -46,8 +46,9 @@ interface SubscriptionsService {
 
     @GET("https://subscriptions.duckduckgo.com/api/v2/products")
     suspend fun tierProducts(
-        @Query("region") region: String,
         @Query("platform") platform: String,
+        @Query("region") region: String? = null,
+        @Query("country") country: String? = null,
     ): TierProductsResponse
 
     @AuthRequired
@@ -70,6 +71,7 @@ data class SubscriptionResponse(
     val status: String,
     val activeOffers: List<ActiveOfferResponse>,
     val pendingPlans: List<PendingPlanResponse> = emptyList(),
+    val planCountry: String? = null,
 )
 
 data class PendingPlanResponse(

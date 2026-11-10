@@ -97,6 +97,12 @@
         "description": "What the user was looking at when the prompt was submitted.",
         "enum": ["ntp", "serp", "website", "duck_ai", "contextual"]
     },
+    "duckAiAddressBarMenuPageType": {
+        "key": "page_type",
+        "type": "string",
+        "description": "What the user was looking at when they tapped the address bar Duck.ai button: New Tab page, DuckDuckGo search results or any other web page.",
+        "enum": ["ntp", "serp", "website"]
+    },
     "duckAiEntrySource": {
         "key": "source",
         "type": "string",
@@ -332,6 +338,12 @@
         "key": "free_scan",
         "type": "boolean",
         "description": "Whether the user is a free (freemium) PIR user."
+    },
+    "pirNotificationPromptType": {
+        "key": "prompt_type",
+        "type": "string",
+        "description": "Which PIR notification permission dialog this refers to: request_permission (accepting launches the system permission request) or open_settings (accepting opens the app's notification settings).",
+        "enum": ["request_permission", "open_settings"]
     },
     "duckAiSubscriptionFunnelOrigin": {
         "key": "origin",

@@ -25,7 +25,6 @@
     <string name="no">Ei</string>
     <string name="open">Avaa</string>
     <string name="cancel">Peruuta</string>
-    <string name="search">Hae</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Keskustelu poistettu</string>

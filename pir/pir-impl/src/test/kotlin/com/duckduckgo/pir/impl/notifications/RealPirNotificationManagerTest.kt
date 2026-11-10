@@ -22,6 +22,7 @@ import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -42,7 +43,9 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 class RealPirNotificationManagerTest {
@@ -204,6 +207,85 @@ class RealPirNotificationManagerTest {
         val notification = testee.createScanStatusNotification(title = "title", message = "message")
 
         assertTapReplacesAnOpenDashboard(notification)
+    }
+
+    @Test
+    fun whenPermissionGrantedThenHasNotificationPermission() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        assertTrue(testee.hasNotificationPermission())
+    }
+
+    @Test
+    fun whenPermissionDeniedThenHasNoNotificationPermission() {
+        shadowOf(application).denyPermissions(POST_NOTIFICATIONS)
+
+        assertFalse(testee.hasNotificationPermission())
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid13ThenHasNotificationPermissionWithoutTheRuntimePermission() {
+        assertTrue(testee.hasNotificationPermission())
+    }
+
+    @Test
+    fun whenPermissionAppAndPirChannelAllowItThenNotificationsCanBeShown() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+        givenAppNotificationsEnabled(true)
+        givenPirChannelImportance(NotificationManagerCompat.IMPORTANCE_DEFAULT)
+
+        assertTrue(testee.canShowNotifications())
+    }
+
+    @Test
+    fun whenPirChannelDoesNotExistYetThenNotificationsCanBeShown() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+        givenAppNotificationsEnabled(true)
+
+        assertTrue(testee.canShowNotifications())
+    }
+
+    @Test
+    fun whenPirChannelIsBlockedThenNotificationsCannotBeShown() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+        givenAppNotificationsEnabled(true)
+        givenPirChannelImportance(NotificationManagerCompat.IMPORTANCE_NONE)
+
+        assertFalse(testee.canShowNotifications())
+    }
+
+    @Test
+    fun whenAppNotificationsAreOffThenNotificationsCannotBeShown() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+        givenAppNotificationsEnabled(false)
+
+        assertFalse(testee.canShowNotifications())
+    }
+
+    @Test
+    fun whenPermissionDeniedThenNotificationsCannotBeShown() {
+        shadowOf(application).denyPermissions(POST_NOTIFICATIONS)
+        givenAppNotificationsEnabled(true)
+
+        assertFalse(testee.canShowNotifications())
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid13AndAppNotificationsAreOffThenNotificationsCannotBeShown() {
+        givenAppNotificationsEnabled(false)
+
+        assertFalse(testee.canShowNotifications())
+    }
+
+    private fun givenAppNotificationsEnabled(enabled: Boolean) {
+        whenever(mockNotificationManagerCompat.areNotificationsEnabled()).thenReturn(enabled)
+    }
+
+    private fun givenPirChannelImportance(importance: Int) {
+        whenever(mockNotificationManagerCompat.getNotificationChannelCompat(PIR_CHANNEL_ID))
+            .thenReturn(NotificationChannelCompat.Builder(PIR_CHANNEL_ID, importance).build())
     }
 
     private fun assertTapReplacesAnOpenDashboard(notification: Notification) {

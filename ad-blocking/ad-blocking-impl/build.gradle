@@ -29,9 +29,6 @@ android {
             includeAndroidResources = true
         }
     }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -69,8 +66,6 @@ dependencies {
 
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.airbnb.android:lottie:_"
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')

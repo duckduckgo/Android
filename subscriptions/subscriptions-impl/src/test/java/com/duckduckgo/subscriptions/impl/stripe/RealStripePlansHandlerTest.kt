@@ -29,6 +29,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.services.TierFeatureResponse
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -37,7 +38,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -48,8 +54,14 @@ class RealStripePlansHandlerTest {
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val stripeTierOptionsProvider: StripeTierOptionsProvider = mock()
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
 
-    private val handler = RealStripePlansHandler(subscriptionsFeature, subscriptionsManager, stripeTierOptionsProvider)
+    private val handler = RealStripePlansHandler(
+        subscriptionsFeature,
+        subscriptionsManager,
+        stripeTierOptionsProvider,
+        subscriptionSwitchWideEvent,
+    )
 
     @Test
     fun whenFlagEnabledAndActiveStripeSubscriptionThenShouldHandle() {
@@ -88,7 +100,7 @@ class RealStripePlansHandlerTest {
 
     @Test
     fun whenGetTierOptionsThenMapStripeProductsToJson() = runTest {
-        whenever(stripeTierOptionsProvider.getTierProducts(any())).thenReturn(
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(
             listOf(
                 StripeTierProduct(
                     tier = "plus",
@@ -116,18 +128,51 @@ class RealStripePlansHandlerTest {
     @Test
     fun whenGetTierOptionsThenProTierFollowsProFlag() = runTest {
         subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
-        whenever(stripeTierOptionsProvider.getTierProducts(any())).thenReturn(emptyList())
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(emptyList())
 
         handler.getTierOptions()
 
-        verify(stripeTierOptionsProvider).getTierProducts(includeProTier = false)
+        verify(stripeTierOptionsProvider).getTierProducts(includeProTier = false, country = null)
+    }
+
+    @Test
+    fun whenByCountryFlagEnabledThenRequestProductsForPlanCountry() = runTest {
+        givenStripeTierOptionsByCountryEnabled(true)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(platform = "stripe", planCountry = "DE"))
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(emptyList())
+
+        handler.getTierOptions()
+
+        verify(stripeTierOptionsProvider).getTierProducts(any(), eq("DE"))
+    }
+
+    @Test
+    fun whenByCountryFlagEnabledAndNoPlanCountryThenRequestProductsWithoutCountry() = runTest {
+        givenStripeTierOptionsByCountryEnabled(true)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(platform = "stripe"))
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(emptyList())
+
+        handler.getTierOptions()
+
+        verify(stripeTierOptionsProvider).getTierProducts(any(), isNull())
+    }
+
+    @Test
+    fun whenByCountryFlagDisabledThenRequestProductsWithoutCountry() = runTest {
+        givenStripeTierOptionsByCountryEnabled(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(platform = "stripe", planCountry = "DE"))
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(emptyList())
+
+        handler.getTierOptions()
+
+        verify(stripeTierOptionsProvider).getTierProducts(any(), isNull())
     }
 
     @Test
     fun whenAccessTokenAvailableThenRedirectEventCarriesToken() = runTest {
         whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success("accessToken"))
 
-        val event = handler.getRedirectEvent()!!
+        val event = handler.getRedirectEvent(subscription(platform = "stripe"), "stripe-yearly", null, null)!!
 
         assertEquals("useSubscription", event.featureName)
         assertEquals("onPurchaseUpdate", event.subscriptionName)
@@ -139,7 +184,80 @@ class RealStripePlansHandlerTest {
     fun whenNoAccessTokenThenNoRedirectEvent() = runTest {
         whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure("error"))
 
-        assertNull(handler.getRedirectEvent())
+        assertNull(handler.getRedirectEvent(subscription(platform = "stripe"), "stripe-yearly", null, null))
+    }
+
+    @Test
+    fun whenRedirectEventRequestedThenStartWideEventWithTiersAndPeriodsFromPlansPageProducts() = runTest {
+        givenTierProducts()
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success("accessToken"))
+        handler.getTierOptions()
+
+        handler.getRedirectEvent(
+            subscription(platform = "stripe", productId = "stripe-plus-monthly"),
+            planId = "stripe-pro-yearly",
+            change = "upgrade",
+            origin = "origin",
+        )
+
+        verify(subscriptionSwitchWideEvent).onStripeSwitchFlowStarted(
+            context = "origin",
+            fromPlan = "stripe-plus-monthly",
+            toPlan = "stripe-pro-yearly",
+            fromTier = "plus",
+            toTier = "pro",
+            fromBillingPeriod = "Monthly",
+            toBillingPeriod = "yearly",
+            change = "upgrade",
+        )
+    }
+
+    @Test
+    fun whenRedirectEventRequestedWithoutPlansPageProductsThenStartWideEventWithoutTiers() = runTest {
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success("accessToken"))
+
+        handler.getRedirectEvent(subscription(platform = "stripe", productId = "stripe-plus-monthly"), "stripe-pro-yearly", null, null)
+
+        verify(subscriptionSwitchWideEvent).onStripeSwitchFlowStarted(
+            context = null,
+            fromPlan = "stripe-plus-monthly",
+            toPlan = "stripe-pro-yearly",
+            fromTier = null,
+            toTier = null,
+            fromBillingPeriod = "Monthly",
+            toBillingPeriod = null,
+            change = null,
+        )
+    }
+
+    @Test
+    fun whenAccessTokenAvailableThenWideEventRecordsRedirect() = runTest {
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success("accessToken"))
+
+        handler.getRedirectEvent(subscription(platform = "stripe"), "stripe-yearly", null, null)
+
+        verify(subscriptionSwitchWideEvent).onStripeRedirected()
+        verify(subscriptionSwitchWideEvent, never()).onStripeRedirectFailure()
+    }
+
+    @Test
+    fun whenNoAccessTokenThenWideEventRecordsRedirectFailure() = runTest {
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure("error"))
+
+        handler.getRedirectEvent(subscription(platform = "stripe"), "stripe-yearly", null, null)
+
+        verify(subscriptionSwitchWideEvent).onStripeRedirectFailure()
+        verify(subscriptionSwitchWideEvent, never()).onStripeRedirected()
+    }
+
+    @Test
+    fun whenPlanChangeCompletedThenWideEventConfirmsSwitchBeforeRefreshing() = runTest {
+        handler.onPlanChangeCompleted()
+
+        inOrder(subscriptionSwitchWideEvent, subscriptionsManager) {
+            verify(subscriptionSwitchWideEvent).onSwitchConfirmationSuccess()
+            verify(subscriptionsManager).refreshAccessToken(force = true)
+        }
     }
 
     @Test
@@ -163,13 +281,46 @@ class RealStripePlansHandlerTest {
         subscriptionsFeature.stripeTierOptions().setRawStoredState(Toggle.State(enable = enabled))
     }
 
-    private fun subscription(platform: String, status: SubscriptionStatus = AUTO_RENEWABLE) = Subscription(
-        productId = "productId",
+    private fun givenStripeTierOptionsByCountryEnabled(enabled: Boolean) {
+        subscriptionsFeature.stripeTierOptionsByCountry().setRawStoredState(Toggle.State(enable = enabled))
+    }
+
+    private suspend fun givenTierProducts() {
+        whenever(stripeTierOptionsProvider.getTierProducts(any(), anyOrNull())).thenReturn(
+            listOf(
+                StripeTierProduct(
+                    tier = "plus",
+                    features = emptyList(),
+                    options = listOf(
+                        StripeTierOption(id = "stripe-plus-monthly", displayPrice = "$9.99", recurrence = "monthly"),
+                        StripeTierOption(id = "stripe-plus-yearly", displayPrice = "$99.99", recurrence = "yearly"),
+                    ),
+                ),
+                StripeTierProduct(
+                    tier = "pro",
+                    features = emptyList(),
+                    options = listOf(
+                        StripeTierOption(id = "stripe-pro-monthly", displayPrice = "$19.99", recurrence = "monthly"),
+                        StripeTierOption(id = "stripe-pro-yearly", displayPrice = "$199.99", recurrence = "yearly"),
+                    ),
+                ),
+            ),
+        )
+    }
+
+    private fun subscription(
+        platform: String,
+        status: SubscriptionStatus = AUTO_RENEWABLE,
+        planCountry: String? = null,
+        productId: String = "productId",
+    ) = Subscription(
+        productId = productId,
         billingPeriod = "Monthly",
         startedAt = 1234,
         expiresOrRenewsAt = 1701694623000,
         status = status,
         platform = platform,
         activeOffers = listOf(),
+        planCountry = planCountry,
     )
 }

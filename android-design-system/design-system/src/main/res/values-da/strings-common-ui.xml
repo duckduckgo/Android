@@ -33,6 +33,7 @@
     <string name="undo">Fortryd</string>
     <string name="cancel">Annullér</string>
     <string name="done">Færdig</string>
+    <string name="search">Søg</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Altid aktiv</string>

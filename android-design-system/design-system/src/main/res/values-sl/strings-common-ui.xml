@@ -33,6 +33,7 @@
     <string name="undo">Razveljavi</string>
     <string name="cancel">Preklic</string>
     <string name="done">Končano</string>
+    <string name="search">Iskanje</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Vedno vklopljeno</string>

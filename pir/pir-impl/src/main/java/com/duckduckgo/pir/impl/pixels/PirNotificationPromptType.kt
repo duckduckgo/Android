@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.nativeinput
+package com.duckduckgo.pir.impl.pixels
 
-import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "nativeInputUrlClearingFeature",
-)
-interface NativeInputUrlClearingFeature {
-
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun self(): Toggle
+enum class PirNotificationPromptType(val paramValue: String) {
+    REQUEST_PERMISSION("request_permission"),
+    OPEN_SETTINGS("open_settings"),
 }

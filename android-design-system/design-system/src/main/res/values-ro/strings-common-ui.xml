@@ -33,6 +33,7 @@
     <string name="undo">Anulează</string>
     <string name="cancel">Anulează</string>
     <string name="done">Finalizat</string>
+    <string name="search">Căutare</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Întotdeauna activat</string>

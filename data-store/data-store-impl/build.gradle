@@ -63,8 +63,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
     implementation "org.jetbrains.kotlin:kotlin-test:_"
 }
 
@@ -78,9 +76,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }
 

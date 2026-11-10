@@ -26,9 +26,14 @@ import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromEntryPoint
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromRemoteMessage
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
+import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirFreemiumFirstScanResult
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -42,6 +47,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -60,6 +66,8 @@ class PirDashboardWebViewViewModelTest {
     private val subscriptions: Subscriptions = mock()
     private val pirFreemiumDataStore: PirFreemiumDataStore = mock()
     private val subscriptionStatus = MutableStateFlow(SubscriptionStatus.UNKNOWN)
+    private val foregroundScanServiceStarter: PirForegroundScanServiceStarter = mock()
+    private val pirNotificationManager: PirNotificationManager = mock()
 
     private val route = PirPurchaseRoute.NativePurchaseFlow(origin = "funnel_freescan_android", featurePage = "pir")
 
@@ -78,6 +86,8 @@ class PirDashboardWebViewViewModelTest {
             pirFreemiumDataStore = pirFreemiumDataStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
+            foregroundScanServiceStarter = foregroundScanServiceStarter,
+            pirNotificationManager = pirNotificationManager,
         )
     }
 
@@ -347,5 +357,257 @@ class PirDashboardWebViewViewModelTest {
 
         verify(pirPixelSender).reportDashboardOpened(isAuthenticated = true)
         verify(pirInteractionReporter).attemptFirePixel(isAuthenticated = true)
+    }
+
+    @Test
+    fun `test asks the dashboard to check the notification permission when onboarding saves the profile`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            testee.handleJsMessage(
+                featureName = PirDashboardWebConstants.SCRIPT_FEATURE_NAME,
+                method = PirDashboardWebMessages.SAVE_PROFILE.messageName,
+                id = null,
+                data = null,
+            )
+
+            assertEquals(Command.CheckNotificationPermission, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test ignores js messages other than save profile`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            testee.handleJsMessage(
+                featureName = PirDashboardWebConstants.SCRIPT_FEATURE_NAME,
+                method = PirDashboardWebMessages.START_SCAN_AND_OPT_OUT.messageName,
+                id = null,
+                data = null,
+            )
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test does not prompt when PIR notifications can already be shown`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = true)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test prompts to request the permission when the system can still explain it`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = false, canShow = false)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = true)
+
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test prompts to open settings when the system gives no rationale`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = false, canShow = false)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
+
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test prompts to open settings when notifications are off although the permission is granted`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = false)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = false)
+
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.OPEN_SETTINGS), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test does not prompt again when the user denies the request`() = runTest {
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = false, canShow = false)
+
+        testee.commands().test {
+            testee.onNotificationPermissionStateComputed(shouldShowRationale = true)
+            assertEquals(Command.ShowNotificationPermissionPrompt(PirNotificationPromptType.REQUEST_PERMISSION), awaitItem())
+            testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
+
+            testee.onNotificationPermissionResult(granted = false)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test reports the prompt shown pixel`() {
+        testee.onNotificationPermissionPromptShown(PirNotificationPromptType.REQUEST_PERMISSION)
+
+        verify(pirPixelSender).reportNotificationPermissionPromptShown(PirNotificationPromptType.REQUEST_PERMISSION)
+    }
+
+    @Test
+    fun `test accepting the request prompt launches the system request`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
+
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
+            verify(pirPixelSender).reportNotificationPermissionPromptAccepted(PirNotificationPromptType.REQUEST_PERMISSION)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test accepting the settings prompt opens the notification settings`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+
+            assertEquals(Command.OpenNotificationSettings, awaitItem())
+            verify(pirPixelSender).reportNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test dismissing the prompt reports the dismissed pixel without further commands`() = runTest {
+        advanceUntilIdle()
+
+        testee.commands().test {
+            testee.onNotificationPermissionPromptDismissed(PirNotificationPromptType.REQUEST_PERMISSION)
+
+            verify(pirPixelSender).reportNotificationPermissionPromptDismissed(PirNotificationPromptType.REQUEST_PERMISSION)
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test reports the granted pixel only when the permission is granted`() {
+        testee.onNotificationPermissionResult(granted = false)
+        verify(pirPixelSender, never()).reportNotificationPermissionGranted(any())
+
+        testee.onNotificationPermissionResult(granted = true)
+        verify(pirPixelSender).reportNotificationPermissionGranted(PirNotificationPromptType.REQUEST_PERMISSION)
+    }
+
+    @Test
+    fun `test returning from settings with notifications turned on reports the granted pixel for the settings prompt`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = true)
+
+        testee.onResume(mock())
+
+        verify(pirPixelSender).reportNotificationPermissionGranted(PirNotificationPromptType.OPEN_SETTINGS)
+    }
+
+    @Test
+    fun `test returning from settings with notifications still off reports no granted pixel`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = false)
+
+        testee.onResume(mock())
+
+        verify(pirPixelSender, never()).reportNotificationPermissionGranted(any())
+    }
+
+    @Test
+    fun `test granting the permission shows the notification of the running scan`() = runTest {
+        testee.onNotificationPermissionResult(granted = true)
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test denying the permission does not show the scan notification`() = runTest {
+        testee.onNotificationPermissionResult(granted = false)
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test returning from settings with notifications turned on shows the scan notification`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = true)
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test returning from settings with notifications still off does not show the scan notification`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+        givenNotifications(permissionGranted = true, canShow = false)
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test resuming without going to settings does not show the scan notification`() = runTest {
+        givenNotifications(permissionGranted = true, canShow = true)
+
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
+    }
+
+    @Test
+    fun `test only the first resume after settings shows the scan notification`() = runTest {
+        testee.onNotificationPermissionPromptAccepted(PirNotificationPromptType.OPEN_SETTINGS)
+        advanceUntilIdle()
+
+        testee.onResume(mock())
+        givenNotifications(permissionGranted = true, canShow = true)
+        testee.onResume(mock())
+        advanceUntilIdle()
+
+        verify(foregroundScanServiceStarter, never()).showScanNotificationIfRunning()
+    }
+
+    private fun givenNotifications(
+        permissionGranted: Boolean,
+        canShow: Boolean,
+    ) {
+        whenever(pirNotificationManager.hasNotificationPermission()).thenReturn(permissionGranted)
+        whenever(pirNotificationManager.canShowNotifications()).thenReturn(canShow)
     }
 }

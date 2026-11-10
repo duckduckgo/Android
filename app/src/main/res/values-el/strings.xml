@@ -25,7 +25,6 @@
     <string name="no">Όχι</string>
     <string name="open">Άνοιγμα</string>
     <string name="cancel">Ακύρωση</string>
-    <string name="search">Αναζήτηση</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Η συνομιλία διαγράφηκε</string>

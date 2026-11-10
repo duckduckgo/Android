@@ -29,9 +29,9 @@ import javax.inject.Inject
 
 interface StripeTierOptionsProvider {
     /**
-     * Returns the Stripe products to show on the plans page
+     * Returns the Stripe products to show on the plans page for [country], or for the US if [country] is null
      */
-    suspend fun getTierProducts(includeProTier: Boolean): List<StripeTierProduct>
+    suspend fun getTierProducts(includeProTier: Boolean, country: String?): List<StripeTierProduct>
 }
 
 data class StripeTierProduct(
@@ -51,9 +51,13 @@ class RealStripeTierOptionsProvider @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
 ) : StripeTierOptionsProvider {
 
-    override suspend fun getTierProducts(includeProTier: Boolean): List<StripeTierProduct> {
+    override suspend fun getTierProducts(includeProTier: Boolean, country: String?): List<StripeTierProduct> {
         val response = runCatching {
-            subscriptionsService.tierProducts(region = US_REGION, platform = STRIPE_PLATFORM)
+            if (country != null) {
+                subscriptionsService.tierProducts(platform = STRIPE_PLATFORM, country = country)
+            } else {
+                subscriptionsService.tierProducts(platform = STRIPE_PLATFORM, region = US_REGION)
+            }
         }.getOrElse { return emptyList() }
 
         return response.products

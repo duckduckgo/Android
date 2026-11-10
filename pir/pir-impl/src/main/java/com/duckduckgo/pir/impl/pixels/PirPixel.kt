@@ -388,6 +388,22 @@ enum class PirPixel(
         baseName = "m_privacy-pro_app-settings_personal-information-removal_click",
         type = Count,
     ),
+    PIR_NOTIFICATION_PERMISSION_PROMPT_SHOWN(
+        baseName = "m_dbp_notification_permission_prompt_shown",
+        type = Count,
+    ),
+    PIR_NOTIFICATION_PERMISSION_PROMPT_ACCEPTED(
+        baseName = "m_dbp_notification_permission_prompt_accepted",
+        type = Count,
+    ),
+    PIR_NOTIFICATION_PERMISSION_PROMPT_DISMISSED(
+        baseName = "m_dbp_notification_permission_prompt_dismissed",
+        type = Count,
+    ),
+    PIR_NOTIFICATION_PERMISSION_GRANTED(
+        baseName = "m_dbp_notification_permission_granted",
+        type = Count,
+    ),
     ;
 
     constructor(

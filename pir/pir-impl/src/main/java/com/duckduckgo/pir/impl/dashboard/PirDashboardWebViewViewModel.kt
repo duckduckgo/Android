@@ -38,9 +38,13 @@ import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromEntryPoint
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens.FromRemoteMessage
 import com.duckduckgo.pir.impl.dashboard.entrypoint.freeScanOrigin
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.purchase.PirPurchaseRoute.NativePurchaseFlow
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
+import com.duckduckgo.pir.impl.pixels.PirNotificationPromptType
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceStarter
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
@@ -73,9 +77,12 @@ class PirDashboardWebViewViewModel @Inject constructor(
     private val pirFreemiumDataStore: PirFreemiumDataStore,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val foregroundScanServiceStarter: PirForegroundScanServiceStarter,
+    private val pirNotificationManager: PirNotificationManager,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var purchaseFlowOutstanding = false
+    private var awaitingReturnFromNotificationSettings = false
 
     private val command = Channel<Command>(Channel.BUFFERED)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -108,7 +115,78 @@ class PirDashboardWebViewViewModel @Inject constructor(
         id: String?,
         data: JSONObject?,
     ) {
-        // TODO Handle any JS messages that requires UI updates or other user actions
+        // only forwarded once onboarding has saved the profile and started the initial scan
+        if (method == PirDashboardWebMessages.SAVE_PROFILE.messageName) {
+            viewModelScope.launch {
+                command.send(Command.CheckNotificationPermission)
+            }
+        }
+    }
+
+    fun onNotificationPermissionStateComputed(shouldShowRationale: Boolean) {
+        if (pirNotificationManager.canShowNotifications()) return
+
+        // without a rationale the permission is either locked or never asked, which Android doesn't let apps tell apart;
+        // browser onboarding already asks, so it's most likely locked, and settings turns notifications on in both cases
+        val promptType = if (pirNotificationManager.hasNotificationPermission() || !shouldShowRationale) {
+            PirNotificationPromptType.OPEN_SETTINGS
+        } else {
+            PirNotificationPromptType.REQUEST_PERMISSION
+        }
+        showNotificationPermissionPrompt(promptType)
+    }
+
+    private fun showNotificationPermissionPrompt(promptType: PirNotificationPromptType) {
+        viewModelScope.launch {
+            command.send(Command.ShowNotificationPermissionPrompt(promptType))
+        }
+    }
+
+    fun onNotificationPermissionPromptShown(promptType: PirNotificationPromptType) {
+        pirPixelSender.reportNotificationPermissionPromptShown(promptType)
+    }
+
+    fun onNotificationPermissionPromptAccepted(promptType: PirNotificationPromptType) {
+        pirPixelSender.reportNotificationPermissionPromptAccepted(promptType)
+
+        viewModelScope.launch {
+            when (promptType) {
+                PirNotificationPromptType.REQUEST_PERMISSION -> command.send(Command.RequestNotificationPermission)
+                PirNotificationPromptType.OPEN_SETTINGS -> {
+                    awaitingReturnFromNotificationSettings = true
+                    command.send(Command.OpenNotificationSettings)
+                }
+            }
+        }
+    }
+
+    fun onNotificationPermissionPromptDismissed(promptType: PirNotificationPromptType) {
+        pirPixelSender.reportNotificationPermissionPromptDismissed(promptType)
+    }
+
+    fun onNotificationPermissionResult(granted: Boolean) {
+        if (!granted) return
+
+        pirPixelSender.reportNotificationPermissionGranted(PirNotificationPromptType.REQUEST_PERMISSION)
+        showScanNotificationIfRunning()
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        if (!awaitingReturnFromNotificationSettings) return
+        awaitingReturnFromNotificationSettings = false
+
+        if (pirNotificationManager.canShowNotifications()) {
+            pirPixelSender.reportNotificationPermissionGranted(PirNotificationPromptType.OPEN_SETTINGS)
+            showScanNotificationIfRunning()
+        }
+    }
+
+    // the scan started before the permission was granted, so its notification was never shown
+    private fun showScanNotificationIfRunning() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            foregroundScanServiceStarter.showScanNotificationIfRunning()
+        }
     }
 
     fun onSubscriptionPurchaseRequested(route: NativePurchaseFlow) {
@@ -200,5 +278,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
         ) : Command()
 
         data object ReloadWebView : Command()
+        data object CheckNotificationPermission : Command()
+        data class ShowNotificationPermissionPrompt(val promptType: PirNotificationPromptType) : Command()
+        data object RequestNotificationPermission : Command()
+        data object OpenNotificationSettings : Command()
     }
 }

@@ -480,9 +480,56 @@
 
     <!-- Sync promo on passwords import success screen -->
     <string name="sync_passwords_import_promo_title">Do svojih gesel lahko dostopate v mobilni in namizni napravi.</string>
-    <string name="sync_passwords_import_promo_primary_button">Vklopi Sync &amp; Backup</string>
+    <string name="sync_passwords_import_promo_title_label">Dostopajte do gesel v mobilnih in namiznih napravah.</string>
+    <string name="sync_passwords_import_promo_primary_button_label">Začni sinhronizacijo</string>
+    <string name="sync_passwords_import_promo_title_toggle">Sinhronizirajte in varnostno kopirajte gesla v mobilnih in namiznih napravah s funkcijo Sync &amp; Backup.</string>
+    <string name="sync_passwords_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
 
     <!-- Sync promo on bookmarks import success screen -->
     <string name="sync_bookmarks_import_promo_title">Dostopajte do zaznamkov v mobilnih in namiznih napravah.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Vklopi Sync &amp; Backup</string>
+    <string name="sync_bookmarks_import_promo_title_label">Dostopajte do zaznamkov v mobilnih in namiznih napravah.</string>
+    <string name="sync_bookmarks_import_promo_primary_button_label">Začni sinhronizacijo</string>
+    <string name="sync_bookmarks_import_promo_title_toggle">Sinhronizirajte in varnostno kopirajte zaznamke v mobilnih in namiznih napravah.</string>
+    <string name="sync_bookmarks_import_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_promo_title">Sinhronizirajte in varnostno kopirajte svoje zaznamke</string>
+    <string name="sync_bookmarks_promo_message">Celovito šifriranje. Nihče ne more videti vaših zaznamkov, niti mi.</string>
+    <string name="sync_bookmarks_promo_primary_button_label">Začni sinhronizacijo</string>
+    <string name="sync_bookmarks_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on bookmarks screen -->
+    <string name="sync_bookmarks_multi_device_promo_title">Želite sinhronizirati zaznamke tudi z namizno aplikacijo?</string>
+    <string name="sync_bookmarks_multi_device_promo_message">Funkcija Sync &amp; Backup je omogočena v tej napravi.</string>
+    <string name="sync_bookmarks_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Poveži</string>
+    <string name="sync_bookmarks_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Pridobi aplikacijo</string>
+
+    <!-- Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_set_up_promo_title">Sinhronizirajte in varnostno kopirajte zaznamke</string>
+    <string name="sync_bookmark_added_set_up_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Več možnosti</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_hide" instruction="Menu item that hides this promotion">Skrij</string>
+    <string name="sync_bookmark_added_set_up_promo_menu_turn_on_sync_label">Začni sinhronizacijo</string>
+
+    <!-- Multi-device Sync promo in bookmark added dialog -->
+    <string name="sync_bookmark_added_multi_device_promo_title">Sinhronizacija z namizno aplikacijo</string>
+    <string name="sync_bookmark_added_multi_device_promo_more_options" instruction="Accessibility label for a button that opens a menu with more options">Več možnosti</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_hide" instruction="Menu item that hides this promotion">Skrij</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_sync_with_desktop">Sinhronizacija z namizjem</string>
+    <string name="sync_bookmark_added_multi_device_promo_menu_get_desktop_app">Pridobite namizno aplikacijo</string>
+    <string name="sync_bookmark_added_multi_device_sheet_title">Sinhronizirajmo vašo namizno aplikacijo!</string>
+    <string name="sync_bookmark_added_multi_device_sheet_primary_button">Sinhronizacija z namizjem</string>
+    <string name="sync_bookmark_added_multi_device_sheet_secondary_button">Nimam namizne aplikacije</string>
+
+    <!-- Sync promo on passwords screen -->
+    <string name="sync_passwords_promo_title">Sinhronizirajte in varnostno kopirajte svoja gesla</string>
+    <string name="sync_passwords_promo_message">Celovito šifriranje pomeni, da nihče (niti mi) razen vas ne more videti vaših gesel.</string>
+    <string name="sync_passwords_promo_primary_button_label">Začni sinhronizacijo</string>
+    <string name="sync_passwords_promo_toggle" instruction="Label next to a switch that turns on Sync &amp; Backup">Sync &amp; Backup</string>
+
+    <!-- Multi-device Sync promo on passwords screen -->
+    <string name="sync_passwords_multi_device_promo_title">Želite sinhronizirati gesla tudi z namizno aplikacijo?</string>
+    <string name="sync_passwords_multi_device_promo_message">Funkcija Sync &amp; Backup je omogočena v tej napravi.</string>
+    <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Poveži</string>
+    <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Pridobi aplikacijo</string>
+
 </resources>
