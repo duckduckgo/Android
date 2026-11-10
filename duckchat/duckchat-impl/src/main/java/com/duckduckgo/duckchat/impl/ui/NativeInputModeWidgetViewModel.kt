@@ -181,7 +181,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
     val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
 
-    private val pluginViewsAttached = MutableStateFlow(false)
+    private val attachmentCommandsCollecting = MutableStateFlow(false)
     private var cameraLaunchJob: Job? = null
 
     private val _modelPickerEnabled = MutableStateFlow(true)
@@ -707,8 +707,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun onPluginViewsAttached() {
-        pluginViewsAttached.value = true
+    fun setAttachmentCommandsCollecting(collecting: Boolean) {
+        attachmentCommandsCollecting.value = collecting
     }
 
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launchAction: DuckChatLaunchAction? = null) {
@@ -738,7 +738,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         if (isDuckAiMode && launchAction == DuckChatLaunchAction.CameraCapture) {
             cameraLaunchJob?.cancel()
             cameraLaunchJob = viewModelScope.launch {
-                pluginViewsAttached.first { it }
+                attachmentCommandsCollecting.first { it }
                 newChatHintCommands.send(NewChatHintCommand.OpenCamera(tabId))
             }
         }
