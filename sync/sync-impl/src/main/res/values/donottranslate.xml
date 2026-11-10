@@ -15,12 +15,6 @@
   -->
 
 <resources>
-    <!-- Multi-device Sync promo on bookmarks screen -->
-    <string name="sync_bookmarks_multi_device_promo_message">Sync&#160;&amp;&#160;Backup is enabled on this&#160;device.</string>
-
-    <!-- Multi-device Sync promo on passwords screen -->
-    <string name="sync_passwords_multi_device_promo_message">Sync&#160;&amp;&#160;Backup is enabled on this&#160;device.</string>
-
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
 </resources>
