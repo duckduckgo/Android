@@ -1,0 +1,26 @@
+appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
+---
+- assertVisible:
+    id: "View Tracker Companies"
+- tapOn:
+    id: "View Tracker Companies"
+- assertVisible:
+    text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
+- assertVisible:
+    text: "About our Web Tracking Protections"
+- assertVisible:
+    text: ".*Ad Company"
+- assertVisible:
+    text: "convert.ad-company.site"
+- assertVisible:
+    text: "ad-company.site"
+- action: back
+- assertVisible:
+    id: "View Non-Tracker Companies"
+- tapOn:
+    id: "View Non-Tracker Companies"
+- assertVisible:
+    text: "We did not identify any requests from third-party domains."
+- assertVisible:
+    text: "About our Web Tracking Protections"
