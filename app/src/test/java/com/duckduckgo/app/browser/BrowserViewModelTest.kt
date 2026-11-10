@@ -207,21 +207,21 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenSelectedTabDebounceKeptThenTabIdToMoveToOnlyEmitsLastSelectedTab() = runTest {
+    fun whenSelectedTabDebounceKeptThenSelectedTabIndexOnlyEmitsLastSelectedTab() = runTest {
         swipingTabsFeature.removeSelectedTabDebounce().setRawStoredState(State(enable = false))
         initTestee()
-        val emitted = mutableListOf<String>()
-        backgroundScope.launch { testee.tabIdToMoveTo.toList(emitted) }
+        val emitted = mutableListOf<Int>()
+        backgroundScope.launch { testee.selectedTabIndex.toList(emitted) }
 
         tabsFlow.emit(listOf(TabEntity(tabId = "t1", position = 0), TabEntity(tabId = "t2", position = 1)))
         selectedTabFlow.emit(TabEntity(tabId = "t1", position = 0))
         runCurrent()
         selectedTabFlow.emit(TabEntity(tabId = "t2", position = 1))
         runCurrent()
-        assertEquals(emptyList<String>(), emitted)
+        assertEquals(emptyList<Int>(), emitted)
 
         advanceTimeBy(101)
-        assertEquals(listOf("t2"), emitted)
+        assertEquals(listOf(1), emitted)
     }
 
     @Test
