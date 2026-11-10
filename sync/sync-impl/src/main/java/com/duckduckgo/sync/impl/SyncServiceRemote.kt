@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.auditlog.AuditLogResult
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -28,6 +29,7 @@ import logcat.logcat
 import org.json.JSONObject
 import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
 import javax.inject.Inject
 
 interface SyncApi {
@@ -77,6 +79,24 @@ interface SyncApi {
     fun deleteAccount(token: String): Result<Boolean>
 
     fun getDevices(token: String): Result<DeviceEntries>
+
+    /** Newest page of the audit log, with no cursor. Use [limit] 1 to get only a fresh `after` cursor. */
+    fun getAuditLogLatest(
+        token: String,
+        limit: Int? = null,
+    ): AuditLogResult
+
+    /** Entries newer than [cursor], newest first. Empty entries mean nothing new. */
+    fun getAuditLogAfter(
+        token: String,
+        cursor: String,
+    ): AuditLogResult
+
+    /** Entries older than [cursor], newest first. */
+    fun getAuditLogBefore(
+        token: String,
+        cursor: String,
+    ): AuditLogResult
 
     /**
      * Update this device's `name`, `type` and `info`.
@@ -298,6 +318,53 @@ class SyncServiceRemote @Inject constructor(
         return onSuccess(response) {
             val devices = response.body()?.devices ?: return@onSuccess Result.Error(reason = "getDevices: empty body")
             Result.Success(devices)
+        }
+    }
+
+    override fun getAuditLogLatest(
+        token: String,
+        limit: Int?,
+    ): AuditLogResult = fetchAuditLog(token, after = null, before = null, limit = limit)
+
+    override fun getAuditLogAfter(
+        token: String,
+        cursor: String,
+    ): AuditLogResult = fetchAuditLog(token, after = cursor, before = null, limit = null)
+
+    override fun getAuditLogBefore(
+        token: String,
+        cursor: String,
+    ): AuditLogResult = fetchAuditLog(token, after = null, before = cursor, limit = null)
+
+    private fun fetchAuditLog(
+        token: String,
+        after: String?,
+        before: String?,
+        limit: Int?,
+    ): AuditLogResult {
+        val response = runCatching {
+            syncService.getAuditLog(token.asBearerToken(), after = after, before = before, limit = limit).execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-AuditLog: request failed ${throwable.javaClass.simpleName}" }
+            return if (throwable is IOException) AuditLogResult.NetworkError else AuditLogResult.ServerError(statusCode = null)
+        }
+
+        if (response.isSuccessful) {
+            val page: AuditLogPage? = response.body()?.auditLog
+            return page?.let { AuditLogResult.Success(it) } ?: AuditLogResult.ServerError(statusCode = response.code())
+        }
+
+        runCatching { response.errorBody()?.close() }
+        val code = response.code()
+        logcat(INFO) { "Sync-AuditLog: request failed with status $code" }
+        return when (code) {
+            API_CODE.TOO_MANY_REQUESTS_1.code, API_CODE.TOO_MANY_REQUESTS_2.code -> AuditLogResult.RateLimited(code)
+            API_CODE.VALIDATION_ERROR.code -> AuditLogResult.InvalidCursor
+            API_CODE.INVALID_LOGIN_CREDENTIALS.code, HTTP_FORBIDDEN -> {
+                Result.Error(code = code).removeKeysIfInvalid(response.requestAuthToken())
+                AuditLogResult.AuthError(code)
+            }
+            else -> AuditLogResult.ServerError(code)
         }
     }
 
@@ -781,6 +848,10 @@ class SyncServiceRemote @Inject constructor(
 
     private fun String.asBearerToken(): String {
         return "Bearer $this"
+    }
+
+    private companion object {
+        const val HTTP_FORBIDDEN = 403
     }
 
     private class Adapters {

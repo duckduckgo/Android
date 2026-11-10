@@ -40,7 +40,10 @@ class SyncServerUnavailableInterceptor @Inject constructor(
         val isSyncEndpoint = chain.request().url.toString().contains(SyncService.SYNC_PROD_ENVIRONMENT_URL) ||
             chain.request().url.toString().contains(SyncService.SYNC_DEV_ENVIRONMENT_URL)
 
-        if (!isSyncEndpoint) {
+        // The audit log has its own rate limit, so its 418/429 or success says nothing about whether data sync is available.
+        val isAuditLog = chain.request().url.encodedPath == SyncService.AUDIT_LOG_PATH
+
+        if (!isSyncEndpoint || isAuditLog) {
             return chain.proceed(chain.request())
         }
 
