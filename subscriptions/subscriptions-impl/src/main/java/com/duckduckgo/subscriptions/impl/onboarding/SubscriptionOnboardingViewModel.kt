@@ -96,7 +96,6 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 
         viewModelScope.launch {
             orchestrator.startPlan(planProvider.buildPlan())
-            // Listen only after starting, so the end state of a previous run isn't replayed.
             orchestrator.state
                 .forPlan(SUBSCRIPTION_ONBOARDING_PLAN_ID)
                 .collect { handleState(it) }
@@ -196,7 +195,6 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         super.onCleared()
         val state = orchestrator.state.value
         if (state is LinearOnboardingState.InProgress && state.rootPlanId == SUBSCRIPTION_ONBOARDING_PLAN_ID) {
-            // The orchestrator outlives this screen, so end the run or the next entry resumes it.
             appCoroutineScope.launch { orchestrator.onEvent(Closed) }
         }
     }
