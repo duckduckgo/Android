@@ -261,8 +261,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var launchIntentOpensTab = false
     private var intentLanding: IntentLanding? = null
     private var intentLandingId = 0
-    private val settledHatchTabIds = mutableSetOf<String>()
-
     private var currentTab: BrowserTabFragment?
         get() {
             return if (swipingTabsFeature.isEnabled) {
@@ -683,7 +681,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 decorView.removeCallbacks(this)
                 releaseFirstFrameHold = null
                 intentLanding = null
-                settledHatchTabIds.clear()
                 idleReturnLandingGate.open()
             }
         }
@@ -701,8 +698,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return when (val state = idleReturnLandingGate.state) {
             IdleReturnLandingGate.State.Open -> true
             IdleReturnLandingGate.State.Pending -> false
-            is IdleReturnLandingGate.State.AwaitingTab ->
-                state.tabId == displayedTabId && (!state.awaitHatch || state.tabId in settledHatchTabIds)
+            is IdleReturnLandingGate.State.AwaitingTab -> state.tabId == displayedTabId && state.isReady
         }
     }
 
@@ -723,9 +719,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun onIdleReturnHatchSettled(tabId: String) {
-        if (idleReturnLandingGate.state != IdleReturnLandingGate.State.Open) {
-            settledHatchTabIds += tabId
-        }
+        idleReturnLandingGate.onHatchSettled(tabId)
     }
 
     override fun onResume() {
