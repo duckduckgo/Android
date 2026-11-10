@@ -53,6 +53,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
+import com.duckduckgo.app.browser.applinks.AppLinkFeature
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -201,6 +202,8 @@ class BrowserWebViewClientTest {
     private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
     private val mockForceWebViewRecompositeFeature: ForceWebViewRecompositeFeature = mock()
     private val forceRecompositeEnabledFlow = MutableStateFlow(true)
+    private val mockAppLinkFeature: AppLinkFeature = mock()
+    private val gesturedPostNavigationEnabledFlow = MutableStateFlow(true)
 
     @Before
     fun setup() =
@@ -217,6 +220,10 @@ class BrowserWebViewClientTest {
             whenever(forceRecompositeToggle.isEnabled()).thenReturn(true)
             whenever(forceRecompositeToggle.enabled()).thenReturn(forceRecompositeEnabledFlow)
             whenever(mockForceWebViewRecompositeFeature.self()).thenReturn(forceRecompositeToggle)
+            val gesturedPostToggle: Toggle = mock()
+            whenever(gesturedPostToggle.isEnabled()).thenReturn(true)
+            whenever(gesturedPostToggle.enabled()).thenReturn(gesturedPostNavigationEnabledFlow)
+            whenever(mockAppLinkFeature.gesturedPostNavigation()).thenReturn(gesturedPostToggle)
             pageLoadFeature.pageLoadTimeoutWatchdog().setRawStoredState(State(enable = true))
             pageLoadFeature.pageLoadTimeoutError().setRawStoredState(State(enable = true))
             whenever(mockPageLoadTimeoutWatchdog.events).thenReturn(pageLoadTimeouts)
@@ -265,6 +272,7 @@ class BrowserWebViewClientTest {
                     mockPageLoadTimeoutWatchdogFactory,
                     mockPageLoadTimeoutPixels,
                     pageLoadFeature,
+                    mockAppLinkFeature,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -1100,6 +1108,453 @@ class BrowserWebViewClientTest {
         testee.shouldOverrideUrlLoading(webView, webResourceRequest)
 
         verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenPostWithGestureRedirectsToAppLinkThenHasGestureIsTrue() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenPostWithoutGestureRedirectsToAppLinkThenHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = false)
+
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    private fun interceptMainFramePost(
+        hasGesture: Boolean,
+        postUrl: String = EXAMPLE_URL,
+    ) {
+        val post = mock<WebResourceRequest>()
+        whenever(post.url).thenReturn(postUrl.toUri())
+        whenever(post.method).thenReturn("POST")
+        whenever(post.isForMainFrame).thenReturn(true)
+        whenever(post.isRedirect).thenReturn(false)
+        whenever(post.hasGesture()).thenReturn(hasGesture)
+        testee.shouldInterceptRequest(webView, post)
+    }
+
+    @Test
+    fun whenGesturedPostResponseCommittedButPageStartedNotDeliveredThenScriptNavigationToAppLinkHasGestureIsTrue() {
+        val urlType = stubAppLink()
+
+        (webView as TestWebView).webViewUrl = FORM_PAGE_URL
+        interceptMainFramePost(hasGesture = true, postUrl = POST_RESPONSE_URL)
+        (webView as TestWebView).webViewUrl = POST_RESPONSE_URL
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenSelfPostingFormScriptNavigatesToAppLinkBeforePageStartedThenHasGestureIsFalse() {
+        val urlType = stubAppLink()
+
+        (webView as TestWebView).webViewUrl = POST_RESPONSE_URL
+        interceptMainFramePost(hasGesture = true, postUrl = POST_RESPONSE_URL)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostPendingAndWebViewStillOnFormPageThenScriptNavigationToAppLinkHasGestureIsFalse() {
+        val urlType = stubAppLink()
+
+        (webView as TestWebView).webViewUrl = FORM_PAGE_URL
+        interceptMainFramePost(hasGesture = true, postUrl = POST_RESPONSE_URL)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    private fun stubAppLink(): SpecialUrlDetector.UrlType.AppLink {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        return urlType
+    }
+
+    @Test
+    fun whenGesturedPostResponsePageImmediatelyScriptNavigatesToAppLinkThenHasGestureIsTrue() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        (webView as TestWebView).originalUrlOverride = EXAMPLE_URL
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+        testee.onPageFinished(webView, EXAMPLE_URL)
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenPageLoadedWithoutGestureScriptNavigatesToAppLinkThenHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        (webView as TestWebView).originalUrlOverride = POST_RESPONSE_URL
+        testee.onPageStarted(webView, POST_RESPONSE_URL, null)
+
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+        testee.onPageFinished(webView, POST_RESPONSE_URL)
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenPostWithGestureRedirectsThroughIntermediatePageToAppLinkThenHasGestureIsTrue() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(POST_RESPONSE_URL))
+        interceptMainFramePost(hasGesture = true)
+
+        overrideMainFrameRedirect()
+
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenMultiStepLoginPostsWithGestureThenSecondPostRedirectsToAppLinkThenHasGestureIsTrue() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(POST_RESPONSE_URL))
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect()
+        loadLandingPage()
+
+        interceptMainFramePost(hasGesture = true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenGesturedPostLandsOnPageThatAutoSubmitsSecondPostWithoutGestureThenAppLinkHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(POST_RESPONSE_URL))
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect()
+        loadLandingPage()
+
+        interceptMainFramePost(hasGesture = false)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostNavigationToggleDisabledThenPostRedirectToAppLinkHasGestureIsFalse() = runTest {
+        gesturedPostNavigationEnabledFlow.emit(false)
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenSecondAppLinkOverrideFollowsGesturedPostHandoffThenHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect()
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        val inOrder = inOrder(listener)
+        inOrder.verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        inOrder.verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostIsFollowedByNonRedirectWebNavigationThenLaterRedirectToAppLinkHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(POST_RESPONSE_URL))
+        interceptMainFramePost(hasGesture = true)
+
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostNeverStartsResponseThenScriptNavigationToAppLinkHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostIsFollowedByTypedUrlInterceptThenRedirectToAppLinkHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        interceptMainFrameGet(TYPED_URL)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostIsFollowedByPageStartedForOtherUrlThenNonRedirectAppLinkHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        testee.onPageStarted(webView, TYPED_URL, null)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenFormPageFinishesLateBeforeGesturedPostResponseStartsThenRedirectToAppLinkHasGestureIsTrue() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        testee.onPageFinished(webView, FORM_PAGE_URL)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenPrefetchInterceptFollowsGesturedPostThenRedirectToAppLinkHasGestureIsTrue() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        interceptMainFrameGet(TYPED_URL, headers = mapOf("Sec-Purpose" to "prefetch"))
+        overrideMainFrameRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenGesturedPostResponseUrlDiffersOnlyByFragmentThenScriptNavigationToAppLinkHasGestureIsTrue() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        testee.onPageStarted(webView, "$EXAMPLE_URL#section", null)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+    }
+
+    @Test
+    fun whenGesturedPostRedirectsToLandingThatScriptNavigatesToAppLinkBeforePageStartedThenHasGestureIsTrue() {
+        verifyScriptNavigationAfterRedirectHopBeforePageStarted(POST_RESPONSE_URL, expectedGesture = true)
+    }
+
+    @Test
+    fun whenGesturedPostRedirectsToLandingWithFragmentThatScriptNavigatesToAppLinkBeforePageStartedThenHasGestureIsTrue() {
+        verifyScriptNavigationAfterRedirectHopBeforePageStarted("$POST_RESPONSE_URL#done", expectedGesture = true)
+    }
+
+    @Test
+    fun whenGesturedPostResponseIsPendingThenScriptNavigationFromFormPageToAppLinkHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostRedirectLandingFinishedThenLaterScriptNavigationToAppLinkHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(POST_RESPONSE_URL), urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect()
+        loadLandingPage()
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostRedirectsAndPageStartsOnDifferentUrlThenScriptNavigationToAppLinkHasGestureIsFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(POST_RESPONSE_URL), urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect()
+        testee.onPageStarted(webView, "https://other.example.com/", null)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    private fun verifyScriptNavigationAfterRedirectHopBeforePageStarted(
+        redirectTarget: String,
+        expectedGesture: Boolean,
+    ) {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(redirectTarget), urlType)
+
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect(redirectTarget)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = expectedGesture)
+    }
+
+    @Test
+    fun whenGesturedPostRedirectsToNonHttpAppLinkThenLaterScriptNavigationToAppLinkHasGestureIsFalse() {
+        val nonHttp = SpecialUrlDetector.UrlType.NonHttpAppLink("example://callback", Intent(), null)
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(nonHttp)
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect()
+
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(appLink)
+        overrideMainFrameNonRedirect()
+
+        verify(listener).handleNonHttpAppLink(nonHttp)
+        verify(listener).handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenGesturedPostRedirectsToNonHttpAppLinkThenLaterRedirectToAppLinkHasGestureIsFalse() {
+        val nonHttp = SpecialUrlDetector.UrlType.NonHttpAppLink("example://callback", Intent(), null)
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(nonHttp)
+        interceptMainFramePost(hasGesture = true)
+        overrideMainFrameRedirect()
+
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(appLink)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleNonHttpAppLink(nonHttp)
+        verify(listener).handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
+    fun whenRedirectToNonHttpAppLinkHasNoGestureThenHandleNonHttpAppLinkIsStillCalled() {
+        val nonHttp = SpecialUrlDetector.UrlType.NonHttpAppLink("example://callback", Intent(), null)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(nonHttp)
+
+        interceptMainFramePost(hasGesture = false)
+        overrideMainFrameRedirect()
+
+        verify(listener).handleNonHttpAppLink(nonHttp)
+    }
+
+    private fun interceptMainFrameGet(
+        url: String,
+        headers: Map<String, String> = emptyMap(),
+    ) {
+        val get = mock<WebResourceRequest>()
+        whenever(get.url).thenReturn(url.toUri())
+        whenever(get.method).thenReturn("GET")
+        whenever(get.isForMainFrame).thenReturn(true)
+        whenever(get.isRedirect).thenReturn(false)
+        whenever(get.hasGesture()).thenReturn(false)
+        whenever(get.requestHeaders).thenReturn(headers)
+        testee.shouldInterceptRequest(webView, get)
+    }
+
+    private fun overrideMainFrameNonRedirect() {
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+    }
+
+    private fun overrideMainFrameRedirect(target: String = POST_RESPONSE_URL) {
+        whenever(webResourceRequest.url).thenReturn(target.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+    }
+
+    private fun loadLandingPage() {
+        (webView as TestWebView).originalUrlOverride = POST_RESPONSE_URL
+        testee.onPageStarted(webView, POST_RESPONSE_URL, null)
+        testee.onPageFinished(webView, POST_RESPONSE_URL)
     }
 
     @Test
@@ -3165,6 +3620,9 @@ class BrowserWebViewClientTest {
         const val SECOND_URL = "https://www.example.com"
         const val TAB_ID = "test-tab-page-load"
         const val DDG_URL = "https://duckduckgo.com"
+        const val POST_RESPONSE_URL = "https://example.com/landing"
+        const val FORM_PAGE_URL = "https://example.com/form"
+        const val TYPED_URL = "https://typed.example.org/"
         const val EXAMPLE_SERP_URL = "https://duckduckgo.com/?q=test"
         const val DUCK_AI_URL = "https://duck.ai/?q=test"
     }
