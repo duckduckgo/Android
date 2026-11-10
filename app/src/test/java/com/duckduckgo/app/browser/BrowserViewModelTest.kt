@@ -315,15 +315,24 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenShortcutThenSelectByUrlOrNewTab() = runTest {
+    fun whenOpenShortcutForExistingTabThenSelectItAndReturnItsId() = runTest {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
-        testee.onOpenShortcut(url)
-        verify(mockTabRepository).selectByUrlOrNewTab(url)
+        whenever(mockTabRepository.getTabId(url)).thenReturn("existing")
+        assertEquals("existing", testee.onOpenShortcut(url))
+        verify(mockTabRepository).select("existing")
     }
 
     @Test
-    fun whenOpenShortcutThenFirePixel() {
+    fun whenOpenShortcutForNewUrlThenAddTabAndReturnItsId() = runTest {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        whenever(mockTabRepository.add(url = url, skipHome = true)).thenReturn("new")
+        assertEquals("new", testee.onOpenShortcut(url))
+    }
+
+    @Test
+    fun whenOpenShortcutThenFirePixel() = runTest {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
@@ -338,11 +347,20 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenFavoriteThenSelectByUrlOrNewTab() = runTest {
+    fun whenOpenFavoriteForExistingTabThenSelectItAndReturnItsId() = runTest {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
-        testee.onOpenFavoriteFromWidget(url)
-        verify(mockTabRepository).selectByUrlOrNewTab(url)
+        whenever(mockTabRepository.getTabId(url)).thenReturn("existing")
+        assertEquals("existing", testee.onOpenFavoriteFromWidget(url))
+        verify(mockTabRepository).select("existing")
+    }
+
+    @Test
+    fun whenOpenFavoriteForNewUrlThenAddTabAndReturnItsId() = runTest {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        whenever(mockTabRepository.add(url = url, skipHome = true)).thenReturn("new")
+        assertEquals("new", testee.onOpenFavoriteFromWidget(url))
     }
 
     @Test

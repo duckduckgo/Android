@@ -75,6 +75,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -313,10 +314,13 @@ class BrowserViewModel @Inject constructor(
         }
     }
 
-    suspend fun onOpenFavoriteFromWidget(query: String) {
+    suspend fun onOpenFavoriteFromWidget(query: String): String {
         pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
-        tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
+        return selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
     }
+
+    private suspend fun selectByUrlOrNewTab(url: String): String =
+        tabRepository.getTabId(url)?.also { tabRepository.select(it) } ?: tabRepository.add(url = url, skipHome = true)
 
     fun launchFromThirdParty() {
         pixel.fire(
@@ -421,12 +425,9 @@ class BrowserViewModel @Inject constructor(
         launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
     }
 
-    fun onOpenShortcut(url: String) {
-        launch(dispatchers.io()) {
-            tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
-            pixel.fire(AppPixelName.SHORTCUT_OPENED)
-        }
-    }
+    suspend fun onOpenShortcut(url: String): String = async(dispatchers.io()) {
+        selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url)).also { pixel.fire(AppPixelName.SHORTCUT_OPENED) }
+    }.await()
 
     fun onLaunchedFromNotification(pixelName: String) {
         pixel.fire(pixelName)

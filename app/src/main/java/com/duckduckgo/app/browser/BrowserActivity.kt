@@ -259,6 +259,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var currentTabRef: BrowserTabFragment? = null
     private var releaseFirstFrameHold: (() -> Unit)? = null
     private var launchIntentOpensTab = false
+    private var intentLanding: IntentLanding? = null
+    private var intentLandingId = 0
     private var currentTab: BrowserTabFragment?
         get() {
             return if (swipingTabsFeature.isEnabled) {
@@ -678,6 +680,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 decorView.viewTreeObserver.removeOnPreDrawListener(this)
                 decorView.removeCallbacks(this)
                 releaseFirstFrameHold = null
+                intentLanding = null
                 idleReturnLandingGate.open()
             }
         }
@@ -686,10 +689,33 @@ open class BrowserActivity : DuckDuckGoActivity() {
         decorView.postDelayed(releaseFrame, IDLE_RETURN_FIRST_FRAME_TIMEOUT_MS)
     }
 
-    private fun hasRequiredTabLanded(): Boolean = when (val state = idleReturnLandingGate.state) {
-        IdleReturnLandingGate.State.Open -> true
-        IdleReturnLandingGate.State.Pending -> false
-        is IdleReturnLandingGate.State.AwaitingTab -> state.tabId == displayedTabId
+    private fun hasRequiredTabLanded(): Boolean {
+        when (val landing = intentLanding) {
+            null -> Unit
+            IntentLanding.Processing, IntentLanding.Opening -> return false
+            is IntentLanding.Landed -> return landing.tabId == null || landing.tabId == displayedTabId
+        }
+        return when (val state = idleReturnLandingGate.state) {
+            IdleReturnLandingGate.State.Open -> true
+            IdleReturnLandingGate.State.Pending -> false
+            is IdleReturnLandingGate.State.AwaitingTab -> state.tabId == displayedTabId
+        }
+    }
+
+    private fun onIntentOpening(): Int {
+        if (intentLanding != null) intentLanding = IntentLanding.Opening
+        return intentLandingId
+    }
+
+    // A tab opened for an earlier intent can finish after a newer intent has arrived, so it must not become the target.
+    private fun onIntentLanded(tabId: String?, landingId: Int = intentLandingId) {
+        if (intentLanding != null && landingId == intentLandingId) intentLanding = IntentLanding.Landed(tabId)
+    }
+
+    private sealed interface IntentLanding {
+        data object Processing : IntentLanding
+        data object Opening : IntentLanding
+        data class Landed(val tabId: String?) : IntentLanding
     }
 
     override fun onResume() {
@@ -734,7 +760,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         intent.sanitize()
         trackDuckAiLaunchIntent(intent)
         setIntent(intent)
-        launchIntentOpensTab = intent.opensTab()
+        if (releaseFirstFrameHold != null && intent.opensTab()) {
+            // onNewIntent comes after onStart, so the hold is already waiting for the idle landing, which the intent overrides.
+            intentLanding = IntentLanding.Processing
+            intentLandingId++
+        }
         pendingLaunchSource = intent.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
 
         intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
@@ -877,6 +907,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun processIntent(intent: Intent) {
         try {
             processLaunchIntent(intent)
+            if (intentLanding == IntentLanding.Processing) onIntentLanded(displayedTabId)
         } finally {
             duckAiEntryCallback.value.onLaunchIntentHandled()
         }
@@ -963,6 +994,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
         if (existingTabId != null) {
+            onIntentLanded(existingTabId)
             openExistingTab(existingTabId)
             return
         }
@@ -972,7 +1004,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             isDuckChatVisible = false
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 logcat { "Shortcut opened with url $sharedText" }
-                lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
+                val landingId = onIntentOpening()
+                lifecycleScope.launch { onIntentLanded(viewModel.onOpenShortcut(sharedText), landingId) }
             } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
                 logcat { "Favorite clicked from widget $sharedText" }
                 if (duckChat.isDuckChatUrl(sharedText.toUri())) {
@@ -982,7 +1015,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         hasPrompt = hasAutoSubmittedPrompt(sharedText),
                     )
                 }
-                lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
+                val landingId = onIntentOpening()
+                lifecycleScope.launch { onIntentLanded(viewModel.onOpenFavoriteFromWidget(query = sharedText), landingId) }
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
                 logcat(WARN) { "open in current tab requested" }
                 if (currentTab != null) {
@@ -992,7 +1026,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (swipingTabsFeature.isEnabled) {
                         launchNewTab(query = sharedText, skipHome = true)
                     } else {
-                        lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                        val landingId = onIntentOpening()
+                        lifecycleScope.launch { onIntentLanded(viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true), landingId) }
                     }
                 }
             } else {
@@ -1022,8 +1057,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         }
                     launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome, isExternal = isExternal)
                 } else {
+                    val landingId = onIntentOpening()
                     lifecycleScope.launch {
                         val tabId = viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome)
+                        onIntentLanded(tabId, landingId)
                         if (isExternal) {
                             externalLaunchTabIds.add(tabId)
                         }
@@ -1219,7 +1256,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             launchNewTab(query = fullScreenUrl, skipHome = false, sourceTabId = returnTabId)
         } else {
-            lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = fullScreenUrl, sourceTabId = returnTabId, skipHome = false) }
+            val landingId = onIntentOpening()
+            lifecycleScope.launch {
+                onIntentLanded(
+                    viewModel.onOpenInNewTabRequested(query = fullScreenUrl, sourceTabId = returnTabId, skipHome = false),
+                    landingId,
+                )
+            }
         }
     }
 
@@ -1832,9 +1875,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
         inputModeTarget: InputMode? = null,
     ) {
+        val landingId = onIntentOpening()
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
                 val tabId = tabManager.openNewTab(query, sourceTabId, skipHome)
+                onIntentLanded(tabId, landingId)
                 if (isExternal) {
                     externalLaunchTabIds.add(tabId)
                 }
@@ -1845,6 +1890,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             } else {
                 val tabId = viewModel.onNewTabRequested()
+                onIntentLanded(tabId, landingId)
                 if (inputModeTarget != null) {
                     pendingInputModeTargets[tabId] = inputModeTarget
                 }
