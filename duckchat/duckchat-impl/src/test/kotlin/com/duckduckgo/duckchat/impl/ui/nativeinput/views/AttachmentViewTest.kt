@@ -34,6 +34,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel.AttachmentState
@@ -165,7 +166,30 @@ class AttachmentViewTest {
         assertTrue(container.isVisible)
     }
 
-    private fun attach(isEdit: Boolean = false) {
+    @Test
+    fun whenCameraCommandWasSentBeforeAttachingThenCameraOpensOnAttach() {
+        val commands = NewChatHintCommands()
+        whenever(host.tabId()).thenReturn("tab")
+        commands.sendWhenAttached(NewChatHintCommand.OpenCamera("tab"))
+
+        attach(commands = commands)
+
+        verify(host).showAttachmentChooser(true)
+        verify(host).requestCameraCapture(any())
+    }
+
+    @Test
+    fun whenCameraCommandWasSentForAnotherTabThenCameraDoesNotOpen() {
+        val commands = NewChatHintCommands()
+        whenever(host.tabId()).thenReturn("tab")
+        commands.sendWhenAttached(NewChatHintCommand.OpenCamera("other"))
+
+        attach(commands = commands)
+
+        verify(host, never()).requestCameraCapture(any())
+    }
+
+    private fun attach(isEdit: Boolean = false, commands: NewChatHintCommands = NewChatHintCommands()) {
         val provider: NativeInputStateProvider = mock()
         whenever(provider.state).thenReturn(inputState)
         whenever(provider.stateForTab("edit:session")).thenReturn(editState)
@@ -184,7 +208,7 @@ class AttachmentViewTest {
             viewModelFactory = factory
             nativeInputStateProvider = provider
             faviconManager = mock()
-            newChatHintCommands = NewChatHintCommands()
+            newChatHintCommands = commands
         }
         root.addView(FrameLayout(activity).apply { addView(view) })
         shadowOf(view).callOnAttachedToWindow()

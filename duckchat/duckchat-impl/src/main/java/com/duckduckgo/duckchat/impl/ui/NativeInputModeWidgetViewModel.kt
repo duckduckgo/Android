@@ -61,6 +61,8 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
@@ -141,6 +143,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val newChatHintsPixels: NewChatHintsPixels,
     private val newChatDetector: NewChatDetector,
     private val tabRepository: TabRepository,
+    private val newChatHintCommands: NewChatHintCommands,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -714,6 +717,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         // The image-capable model was already selected when the launch was requested.
         if (isDuckAiMode && launch is DuckChatLaunch.ImageGeneration) {
             nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+        }
+        if (isDuckAiMode && launchAction == DuckChatLaunchAction.CameraCapture) {
+            newChatHintCommands.sendWhenAttached(NewChatHintCommand.OpenCamera(tabId))
         }
     }
 
