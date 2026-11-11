@@ -35,7 +35,7 @@ on:
       model:
         description: Model for the main session
         required: false
-        default: sonnet
+        default: opus
         type: string
 
 permissions:
@@ -89,12 +89,12 @@ jobs:
     needs: select
     if: needs.select.outputs.run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       MODE: ${{ needs.select.outputs.mode }}
       PR: ${{ needs.select.outputs.pr }}
       PLUGIN_REF: ${{ inputs.plugin_ref || 'main' }}
-      MODEL: ${{ inputs.model || 'sonnet' }}
+      MODEL: ${{ inputs.model || 'opus' }}
       WORK: /tmp/code-review-assistant/${{ needs.select.outputs.mode == 'review' && format('pr-{0}', needs.select.outputs.pr) || 'reconcile' }}
     steps:
       - name: Check out the pull request, or develop to reconcile
@@ -154,7 +154,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "$MODE" = review ]; then request="${PR} ci"; else request="reconcile ci"; fi
-          claude -p "/android-factory:code-review-assistant ${request}" \
+          # A finished run has been seen to keep the claude process alive, so it gets a
+          # deadline; the records it wrote before then still get pushed.
+          timeout --kill-after=30s 30m claude -p "/android-factory:code-review-assistant ${request}" \
             --plugin-dir "$RUNNER_TEMP/review-plugin" \
             --model "$MODEL" \
             --max-turns 100 \
@@ -165,6 +167,9 @@ jobs:
             --output-format stream-json --verbose \
             > "$RUNNER_TEMP/transcript.jsonl" 2> "$RUNNER_TEMP/transcript.err" \
             || echo "::warning::claude exited with status $?"
+          # Event types and tool names only: the transcript itself must not reach this public log.
+          echo "results: $(jq -c 'select(.type=="result") | .subtype' "$RUNNER_TEMP/transcript.jsonl" | tr '\n' ' ')"
+          echo "last tools: $(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="tool_use") | .name' "$RUNNER_TEMP/transcript.jsonl" | tail -5 | tr '\n' ' ')"
           if [ "$MODE" = review ] && [ ! -s "$WORK/review.md" ]; then
             echo "::error::The review ended without writing review.md"
             exit 1
