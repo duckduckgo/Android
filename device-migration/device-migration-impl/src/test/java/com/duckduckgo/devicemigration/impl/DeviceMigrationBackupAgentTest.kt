@@ -101,9 +101,23 @@ class DeviceMigrationBackupAgentTest {
     }
 
     @Test
-    fun whenTransferNotAllowedThenCloudBackupIsLeftToTheRules() {
-        local.edit().putBoolean(KEY_TRANSFER_ALLOWED, false).commit()
+    fun whenEncryptedDeviceTransferAllowedThenSendsData() {
+        local.edit().putBoolean(KEY_TRANSFER_ALLOWED, true).commit()
 
-        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED))
+        assertFalse(
+            DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_DEVICE_TO_DEVICE_TRANSFER or FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED),
+        )
+    }
+
+    @Test
+    fun whenTransferAllowedThenCloudBackupSendsNothing() {
+        local.edit().putBoolean(KEY_TRANSFER_ALLOWED, true).commit()
+
+        assertTrue(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED))
+    }
+
+    @Test
+    fun whenBackupHasNoTransportFlagsThenSendsNothing() {
+        assertTrue(DeviceMigrationBackupAgent.shouldSendNothing(context, 0))
     }
 }

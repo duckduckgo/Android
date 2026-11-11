@@ -32,9 +32,9 @@ import java.io.File
  * Leaves the definite "this install was restored" signal that [RealDeviceMigration] prefers over its heuristics.
  *
  * The framework runs this agent in restricted mode, with the base Application instead of ours, so there is no DI graph here:
- * only plain Android APIs, and nothing that could fail the user's transfer. Backup itself is left to the default implementation
- * so the XML rules stay the single source of what transfers, except that a device transfer sends nothing while the remote flag
- * is off: the new phone then starts as a fresh install, with nothing to detect and nothing to act on later.
+ * only plain Android APIs, and nothing that could fail the user's transfer. A device transfer is left to the default implementation
+ * so the XML rules decide what it carries, except that it sends nothing while the remote flag is off: the new phone then starts as
+ * a fresh install, with nothing to detect and nothing to act on later. Any other backup sends nothing.
  */
 class DeviceMigrationBackupAgent : BackupAgent() {
 
@@ -72,12 +72,13 @@ class DeviceMigrationBackupAgent : BackupAgent() {
 
     internal companion object {
         /**
-         * Only device transfers are held back; cloud backup already carries no data. A phone that never saved the flag, or whose
-         * file cannot be read, still transfers, matching the flag's default.
+         * Cloud and adb backups send nothing even though the rules already exclude them, so a mistake in the rules cannot upload
+         * user data. Samsung Smart Switch marks its backups as device transfers, so it is not affected. A phone that never saved
+         * the flag, or whose file cannot be read, still transfers, matching the flag's default.
          */
         @SuppressLint("DenyListedApi") // no SharedPreferencesProvider in restricted mode; the app writes this file as plain prefs
         fun shouldSendNothing(context: Context, transportFlags: Int): Boolean {
-            if (transportFlags and FLAG_DEVICE_TO_DEVICE_TRANSFER == 0) return false
+            if (transportFlags and FLAG_DEVICE_TO_DEVICE_TRANSFER == 0) return true
             return try {
                 !context.getSharedPreferences(LOCAL_FILE, Context.MODE_PRIVATE).getBoolean(KEY_TRANSFER_ALLOWED, true)
             } catch (e: Exception) {

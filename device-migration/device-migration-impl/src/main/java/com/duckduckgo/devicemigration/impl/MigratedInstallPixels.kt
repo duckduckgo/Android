@@ -25,6 +25,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_DETECTED_PIXEL_SENT_AT
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_DEFAULT_BROWSER
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SOURCE_SIGNED_IN_TO_SYNC
 import com.duckduckgo.di.scopes.AppScope
@@ -109,7 +110,6 @@ class MigratedInstallPixels @Inject constructor(
 
         const val DETECTED_SENT_KEY = "deviceMigration.detectedPixelSent"
         const val DAY_7_SENT_KEY = "deviceMigration.day7PixelSent"
-        const val KEY_DETECTED_PIXEL_SENT_AT = "detectedPixelSentAt"
         val DAY_7_DELAY_MILLIS = TimeUnit.DAYS.toMillis(7)
     }
 }

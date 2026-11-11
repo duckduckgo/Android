@@ -48,5 +48,6 @@ class DeviceMigrationMarkerStore(
         const val KEY_SOURCE_DEFAULT_BROWSER = "sourceDefaultBrowser"
         const val KEY_RESTORED_FROM_BACKUP = "restoredFromBackup"
         const val KEY_TRANSFER_ALLOWED = "transferAllowed"
+        const val KEY_DETECTED_PIXEL_SENT_AT = "detectedPixelSentAt"
     }
 }
