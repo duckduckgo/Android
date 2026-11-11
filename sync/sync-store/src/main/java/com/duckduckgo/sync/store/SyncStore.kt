@@ -54,6 +54,12 @@ interface SyncStore {
      */
     var connectedDevicesCount: Int
 
+    /** Last `after` cursor from the audit log check. Never store a `before` cursor here. */
+    var auditLogCursor: String?
+
+    /** JSON list of logins by other devices that the user has not seen yet. Its format belongs to the caller. */
+    var auditLogPending: String?
+
     /**
      * Emits [connectedDevicesCount] now and again whenever it changes.
      */
@@ -228,6 +234,22 @@ constructor(
             }
         }
 
+    override var auditLogCursor: String?
+        get() = encryptedPreferences?.getString(KEY_AUDIT_LOG_CURSOR, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_AUDIT_LOG_CURSOR) else putString(KEY_AUDIT_LOG_CURSOR, value)
+            }
+        }
+
+    override var auditLogPending: String?
+        get() = encryptedPreferences?.getString(KEY_AUDIT_LOG_PENDING, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_AUDIT_LOG_PENDING) else putString(KEY_AUDIT_LOG_PENDING, value)
+            }
+        }
+
     override fun connectedDevicesCountFlow(): Flow<Int> {
         val flow = callbackFlow {
             val preferences = encryptedPreferences
@@ -303,5 +325,7 @@ constructor(
         private const val KEY_ACCOUNT_INFO_EXPONENT = "KEY_ACCOUNT_INFO_EXPONENT"
         private const val KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID = "KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID"
         private const val KEY_CONNECTED_DEVICES_COUNT = "KEY_CONNECTED_DEVICES_COUNT"
+        private const val KEY_AUDIT_LOG_CURSOR = "KEY_AUDIT_LOG_CURSOR"
+        private const val KEY_AUDIT_LOG_PENDING = "KEY_AUDIT_LOG_PENDING"
     }
 }

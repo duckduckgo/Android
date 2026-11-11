@@ -203,4 +203,33 @@ class SyncSharedPrefsStoreTest {
         assertNull(store.credentialId)
         assertNull(store.scopedPassword)
     }
+
+    @Test
+    fun whenAuditLogCursorStoredThenValueUpdatedInPrefsStore() {
+        assertNull(store.auditLogCursor)
+        store.auditLogCursor = "cursor"
+        assertEquals("cursor", store.auditLogCursor)
+        store.auditLogCursor = null
+        assertNull(store.auditLogCursor)
+    }
+
+    @Test
+    fun whenAuditLogPendingStoredThenValueUpdatedInPrefsStore() {
+        assertNull(store.auditLogPending)
+        store.auditLogPending = "[]"
+        assertEquals("[]", store.auditLogPending)
+        store.auditLogPending = null
+        assertNull(store.auditLogPending)
+    }
+
+    @Test
+    fun whenClearAllThenAuditLogStateCleared() {
+        store.auditLogCursor = "cursor"
+        store.auditLogPending = "[]"
+
+        store.clearAll()
+
+        assertNull(store.auditLogCursor)
+        assertNull(store.auditLogPending)
+    }
 }
