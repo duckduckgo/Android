@@ -170,6 +170,19 @@ jobs:
             exit 1
           fi
 
+      # Only the daily reconcile rebuilds the page, so review runs never race on it.
+      - name: Rebuild the records dashboard
+        if: env.MODE == 'reconcile'
+        run: |
+          python3 "$RUNNER_TEMP/review-plugin/skills/code-review-assistant/scripts/candidates.py" json \
+            --learnings "$WORK/records/records/learnings" --reconcile "$WORK/records/records/reconcile" \
+            > "$RUNNER_TEMP/candidates.json"
+          cd "$WORK/records"
+          python3 records/dashboard/build.py records records/dashboard/template.html \
+            records/dashboard/index.html "$(git log -1 --format='%h %ci')" "$RUNNER_TEMP/candidates.json"
+          git add records/dashboard/index.html
+          git commit -q -m "Rebuild the records dashboard" || echo "Dashboard unchanged"
+
       - name: Push the records
         if: always()
         env:
