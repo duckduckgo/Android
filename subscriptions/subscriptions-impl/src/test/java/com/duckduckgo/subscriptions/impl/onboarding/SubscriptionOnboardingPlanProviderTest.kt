@@ -20,12 +20,14 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.GoBack
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.Closed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
@@ -73,6 +75,13 @@ class SubscriptionOnboardingPlanProviderTest {
         val step = providerWith(stubPlugin("welcome")).buildPlan().steps.single()
 
         assertEquals(GoBack, step.transition(BackPressed))
+    }
+
+    @Test
+    fun whenClosedThenAbortsPlan() = runTest {
+        val step = providerWith(stubPlugin("welcome")).buildPlan().steps.single()
+
+        assertEquals(AbortPlan, step.transition(Closed))
     }
 
     @Test
