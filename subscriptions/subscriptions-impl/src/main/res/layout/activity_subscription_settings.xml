@@ -152,7 +152,7 @@
                     app:typography="body2"
                     tools:text="Your subscription will expire on October 22, 2026." />
 
-                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                     android:id="@+id/keepSubscriptionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
