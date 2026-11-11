@@ -197,13 +197,16 @@ jobs:
           (umask 077 && printf '%s\n' "$KEY" > "$key_file")
           export GIT_SSH_COMMAND="ssh -i $key_file -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
           git remote set-url origin git@github.com:duckduckgo/claude-skills-factory-android.git
-          for attempt in 1 2 3; do
+          # Parallel runs race for the branch, so a failed attempt is undone and
+          # retried after a random wait rather than in lockstep.
+          for attempt in 1 2 3 4 5; do
             if git pull -q --rebase origin records && git push -q origin HEAD:records; then
               echo "RECORDS_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
               exit 0
             fi
+            git rebase --abort 2>/dev/null || true
             echo "Push attempt ${attempt} failed"
-            sleep $((attempt * 5))
+            sleep $((attempt * 5 + RANDOM % 15))
           done
           exit 1
 
