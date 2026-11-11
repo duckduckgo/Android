@@ -152,6 +152,31 @@ class RealNativeInputOmnibarControllerTest {
     }
 
     @Test
+    fun whenOverlayActiveAndTierUnknownThenTitleAndPillHidden() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        aiTitle.visibility = View.VISIBLE
+        duckAIFreePill.visibility = View.VISIBLE
+
+        testee.hideBackground()
+
+        assertEquals(View.GONE, aiTitle.visibility)
+        assertEquals(View.GONE, duckAIFreePill.visibility)
+    }
+
+    @Test
+    fun whenOverlayActiveAndTierPaidThenTitleShownAndPillHidden() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        aiTitle.visibility = View.GONE
+        duckAIFreePill.visibility = View.VISIBLE
+        testee.updateTierTitle(DuckAiTier.Paid, {}) {}
+
+        testee.hideBackground()
+
+        assertEquals(View.VISIBLE, aiTitle.visibility)
+        assertEquals(View.GONE, duckAIFreePill.visibility)
+    }
+
+    @Test
     fun whenOverlayRestoredThenLaterFreeTierUpdateDoesNotResurrectFreePill() {
         whenever(omnibar.omnibarView).thenReturn(omnibarView)
         testee.updateTierTitle(DuckAiTier.Free, {}) {}
