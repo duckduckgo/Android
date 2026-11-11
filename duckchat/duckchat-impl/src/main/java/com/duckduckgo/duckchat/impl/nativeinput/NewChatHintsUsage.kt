@@ -45,10 +45,9 @@ import javax.inject.Inject
 
 /**
  * Hints hide once the user has started [HIDE_AFTER_IGNORED_CHATS] new chats after seeing them without tapping one;
- * a new chat started after a tap starts over. Prompts outside a new chat only drop the tab's interaction, since hints shown
- * before the user left that chat say nothing about the prompt. Hiding is derived from the count rather than stored,
- * so raising the threshold shows hints again.
- * Callers only record Regular-mode activity, so a Fire session leaves nothing behind.
+ * a new chat started after a tap starts over. Leaving the new chat, or prompting outside one, drops the tab's interaction,
+ * so only a prompt sent from the new chat the hints were shown in counts. Hiding is derived from the count rather than
+ * stored, so raising the threshold shows hints again. Callers only record Regular-mode activity, so a Fire session leaves nothing behind.
  */
 @SingleIn(AppScope::class)
 class NewChatHintsUsage @Inject constructor(
@@ -71,6 +70,10 @@ class NewChatHintsUsage @Inject constructor(
 
     fun onHintTapped(tabId: String) {
         interactions[tabId] = HintInteraction.TAPPED
+    }
+
+    fun onLeftNewChat(tabId: String) {
+        interactions.remove(tabId)
     }
 
     fun onPromptSubmitted(tabId: String, isNewChat: Boolean) {

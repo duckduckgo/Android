@@ -1158,5 +1158,9 @@ class RealDuckChat @Inject constructor(
         private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
         private const val ORIGIN_QUERY_NAME = "origin"
         private const val ORIGIN_VALUE_ADDRESS_BAR_PICKER = "funnel_addressbar_android__aitoggle"
+
+        internal fun isVoiceModeUrl(uri: Uri): Boolean = uri.getQueryParameter(MODE_QUERY_NAME) == VOICE_MODE_QUERY_VALUE
+
+        internal fun isPromptHandoverUrl(uri: Uri): Boolean = uri.getQueryParameter(PROMPT_QUERY_NAME) == PROMPT_QUERY_VALUE
     }
 }
