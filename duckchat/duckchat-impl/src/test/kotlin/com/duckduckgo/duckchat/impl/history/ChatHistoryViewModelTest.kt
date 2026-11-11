@@ -46,6 +46,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -66,7 +67,9 @@ class ChatHistoryViewModelTest {
         whenever(it.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
     }
     private val duckAiModelManager = FakeDuckAiModelManager()
-    private val tabRepository: TabRepository = mock()
+    private val tabRepository: TabRepository = mock {
+        onBlocking { it.getTabs() } doReturn emptyList()
+    }
     private val pixel: Pixel = mock()
 
     // Build the ViewModel lazily so it's created inside the test, not as a field. The rule that
@@ -508,6 +511,66 @@ class ChatHistoryViewModelTest {
         viewModel.onNewChatRequested()
 
         assertEquals(1, duckChat.openDuckChatCalls)
+    }
+
+    @Test
+    fun `onNewChatRequested with an empty chat tab opens that tab instead of a new chat`() = coroutineRule.testScope.runTest {
+        whenever(tabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "empty", url = "https://duck.ai/")))
+
+        viewModel.navigationEvents.test {
+            viewModel.onNewChatRequested()
+
+            assertEquals(ChatHistoryViewModel.NavigationEvent.OpenExistingTab("empty"), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertEquals(0, duckChat.openDuckChatCalls)
+    }
+
+    @Test
+    fun `onNewChatRequested prefers the selected tab when several empty chats exist`() = coroutineRule.testScope.runTest {
+        val selected = TabEntity(tabId = "selected", url = "https://duck.ai/?chatID=")
+        whenever(tabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "other", url = "https://duck.ai/"), selected))
+        whenever(tabRepository.getSelectedTab()).thenReturn(selected)
+
+        viewModel.navigationEvents.test {
+            viewModel.onNewChatRequested()
+
+            assertEquals(ChatHistoryViewModel.NavigationEvent.OpenExistingTab("selected"), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onNewChatRequested with only existing conversations and web tabs opens a new chat`() = runTest {
+        whenever(tabRepository.getTabs()).thenReturn(
+            listOf(TabEntity(tabId = "web", url = "https://example.com"), TabEntity(tabId = "chat", url = "https://duck.ai/?chatID=abc")),
+        )
+
+        viewModel.onNewChatRequested()
+
+        assertEquals(1, duckChat.openDuckChatCalls)
+    }
+
+    @Test
+    fun `onNewChatRequested in fire mode opens a new chat even when a regular empty chat exists`() = runTest {
+        whenever(tabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "empty", url = "https://duck.ai/")))
+
+        createViewModel(BrowserMode.FIRE).onNewChatRequested()
+
+        assertEquals(1, duckChat.openDuckChatCalls)
+    }
+
+    @Test
+    fun `onOpenDuckAiClicked with an empty chat tab opens that tab instead of a new chat`() = coroutineRule.testScope.runTest {
+        whenever(tabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "empty", url = "https://duck.ai/")))
+
+        viewModel.navigationEvents.test {
+            viewModel.onOpenDuckAiClicked()
+
+            assertEquals(ChatHistoryViewModel.NavigationEvent.OpenExistingTab("empty"), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertEquals(0, duckChat.openDuckChatCalls)
     }
 
     @Test

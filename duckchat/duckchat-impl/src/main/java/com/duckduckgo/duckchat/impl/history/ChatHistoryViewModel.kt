@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.history
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -29,6 +30,7 @@ import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
@@ -135,13 +137,33 @@ class ChatHistoryViewModel @Inject constructor(
             DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_COUNT,
             DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_DAILY,
         )
-        duckChat.openDuckChat(DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT)
+        openNewOrEmptyChat()
     }
 
     /** Toolbar "New chat" action. Kept separate from [onOpenDuckAiClicked] so the two surfaces stay independently instrumentable. */
     fun onNewChatRequested() {
         pixel.fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_COUNT, DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY)
-        duckChat.openDuckChat(DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT)
+        openNewOrEmptyChat()
+    }
+
+    /** Fire mode has its own tabs, so only regular mode looks for an empty chat in [tabRepository]. */
+    private fun openNewOrEmptyChat() {
+        viewModelScope.launch {
+            val emptyChatTabId = if (browserMode == BrowserMode.REGULAR) findEmptyChatTabId() else null
+            if (emptyChatTabId != null) {
+                navigationChannel.trySend(NavigationEvent.OpenExistingTab(emptyChatTabId))
+            } else {
+                duckChat.openDuckChat(DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT)
+            }
+        }
+    }
+
+    private suspend fun findEmptyChatTabId(): String? {
+        val emptyChats = tabRepository.getTabs().filter { tab ->
+            tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && it.toChatIdOrNull(duckChat) == null } == true
+        }
+        val selectedTabId = tabRepository.getSelectedTab()?.tabId
+        return (emptyChats.firstOrNull { it.tabId == selectedTabId } ?: emptyChats.firstOrNull())?.tabId
     }
 
     fun onFireIconClicked() {
@@ -401,6 +423,7 @@ class ChatHistoryViewModel @Inject constructor(
 
     sealed interface NavigationEvent {
         data class OpenChat(val url: String, val sourceTabId: String?) : NavigationEvent
+        data class OpenExistingTab(val tabId: String) : NavigationEvent
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
         data class ShowDownloadComplete(val fileName: String) : NavigationEvent
         data class ShowBulkDownloadComplete(val count: Int) : NavigationEvent
