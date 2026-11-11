@@ -1146,6 +1146,7 @@ class WelcomePageViewModelTest {
             pending = false
         }
         override suspend fun sourceDeviceWasDefaultBrowser(): Boolean? = sourceDefaultBrowser
+        override fun previousDeviceHadSync(): Boolean = false
         override suspend fun isMigrationExperienceEnabled(): Boolean = true
         private val done = mutableSetOf<String>()
         override fun isDoneOnThisInstall(key: String): Boolean = key in done

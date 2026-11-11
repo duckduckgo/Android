@@ -144,5 +144,8 @@
     <string name="deviceMigrationAllSetBody1" instruction="Tabs, Duck.ai chats and bookmarks moved from the user's previous phone">Your tabs, chats and bookmarks are all here.</string>
     <string name="deviceMigrationAllSetBody2">Same privacy as always, and AI only when you want it.</string>
     <string name="deviceMigrationAllSetPrimaryCta" instruction="Button that closes the screen and opens the browser">Let’s go!</string>
+    <string name="syncAfterDeviceTransferDaxDialogTitle">Oh before I forget…</string>
+    <string name="syncAfterDeviceTransferDaxDialogDescription"><![CDATA[If you lose this phone, your data doesn’t have to go with it.<br/><br/>Sync and Backup keeps an encrypted copy that only you can access.]]></string>
+    <string name="syncAfterDeviceTransferDaxDialogPrimaryCta" instruction="Button that opens the screen to set up Sync and Backup">Turn on Sync</string>
 
 </resources>

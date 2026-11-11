@@ -159,6 +159,7 @@ class OnboardingDaxDialogTests {
             },
             mock(),
             FakeContextualOnboardingTimeLimit(),
+            FakeSyncAfterDeviceTransferPrompt(),
         )
     }
 

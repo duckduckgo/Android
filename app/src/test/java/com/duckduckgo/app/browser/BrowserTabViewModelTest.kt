@@ -100,6 +100,7 @@ import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchSubscription
+import com.duckduckgo.app.browser.commands.Command.LaunchSyncSetup
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
@@ -199,9 +200,11 @@ import com.duckduckgo.app.cta.ui.DaxSubscriptionBubbleCta
 import com.duckduckgo.app.cta.ui.DaxTrackersBlockedContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBubbleCta
+import com.duckduckgo.app.cta.ui.FakeSyncAfterDeviceTransferPrompt
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecider
+import com.duckduckgo.app.cta.ui.SyncAfterDeviceTransferBubbleCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -642,6 +645,8 @@ class BrowserTabViewModelTest {
 
     private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
 
+    private val fakeSyncAfterDeviceTransferPrompt = FakeSyncAfterDeviceTransferPrompt()
+
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
     private val cameraHardwareChecker: CameraHardwareChecker = mock()
@@ -923,6 +928,7 @@ class BrowserTabViewModelTest {
                     onboardingPixelSender = mockOnboardingPixelSender,
                     contextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit(),
                     contextualCtaSuppressorPlugins = mock(),
+                    syncAfterDeviceTransferPrompt = fakeSyncAfterDeviceTransferPrompt,
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
@@ -5542,6 +5548,70 @@ class BrowserTabViewModelTest {
             testee.refreshCta()
             assertNull(testee.ctaViewState.value!!.cta)
         }
+
+    @Test
+    fun whenSyncSuggestionIsDueThenNewTabTakesItOverInsteadOfItsContent() =
+        runTest {
+            whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+            fakeSyncAfterDeviceTransferPrompt.due = true
+
+            testee.refreshCta()
+
+            assertTrue(testee.ctaViewState.value!!.cta is SyncAfterDeviceTransferBubbleCta)
+        }
+
+    @Test
+    fun whenSyncSuggestionAcceptedThenSyncSetupOpensAndTheSuggestionStays() =
+        runTest {
+            val cta = syncAfterDeviceTransferBubbleCta()
+            fakeSyncAfterDeviceTransferPrompt.due = true
+            setCta(cta)
+
+            testee.onUserClickCtaOkButton(cta)
+            advanceUntilIdle()
+
+            assertCommandIssued<LaunchSyncSetup>()
+            assertFalse(fakeSyncAfterDeviceTransferPrompt.dismissed)
+            assertEquals(cta, testee.ctaViewState.value?.cta)
+        }
+
+    @Test
+    fun whenSyncSuggestionClosedThenItIsDismissedAndTheNewTabPageComesBack() =
+        runTest {
+            val cta = syncAfterDeviceTransferBubbleCta()
+            fakeSyncAfterDeviceTransferPrompt.due = true
+
+            testee.onUserClickCtaDismissButton(cta)
+            advanceUntilIdle()
+
+            assertTrue(fakeSyncAfterDeviceTransferPrompt.dismissed)
+            assertCommandIssued<HideOnboardingDaxBubbleCta> {
+                assertEquals(cta, this.daxBubbleCta)
+            }
+        }
+
+    @Test
+    fun whenSyncSuggestionStopsBeingDueOnTheNewTabPageThenTheBubbleIsHidden() =
+        runTest {
+            whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+            val cta = syncAfterDeviceTransferBubbleCta()
+            setCta(cta)
+            fakeSyncAfterDeviceTransferPrompt.due = false
+
+            testee.refreshCta()
+
+            assertNull(testee.ctaViewState.value?.cta)
+            assertCommandIssued<HideOnboardingDaxBubbleCta> {
+                assertEquals(cta, this.daxBubbleCta)
+            }
+        }
+
+    private fun syncAfterDeviceTransferBubbleCta() = SyncAfterDeviceTransferBubbleCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+    )
 
     @Test
     fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() =

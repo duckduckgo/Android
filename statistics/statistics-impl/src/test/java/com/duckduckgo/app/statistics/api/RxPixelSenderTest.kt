@@ -988,6 +988,7 @@ class RxPixelSenderTest {
         override suspend fun isMigratedInstall() = migrated
         override fun sourceDeviceIsNewInstall(): Boolean? = if (migrated) false else null
         override suspend fun sourceDeviceWasDefaultBrowser(): Boolean? = null
+        override fun previousDeviceHadSync(): Boolean = false
         override suspend fun isMigrationFlowPending() = false
         override suspend fun markMigrationFlowCompleted() = Unit
         override suspend fun isMigrationExperienceEnabled() = true
