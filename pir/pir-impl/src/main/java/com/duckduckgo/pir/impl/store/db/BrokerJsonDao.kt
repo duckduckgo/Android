@@ -37,4 +37,7 @@ interface BrokerJsonDao {
 
     @Query("DELETE from pir_broker_json_etag")
     fun deleteAll()
+
+    @Query("DELETE from pir_broker_json_etag WHERE fileName NOT IN (:fileNames)")
+    fun deleteEtagsExcept(fileNames: Collection<String>)
 }

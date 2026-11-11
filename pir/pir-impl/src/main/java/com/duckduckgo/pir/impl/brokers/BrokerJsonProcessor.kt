@@ -83,8 +83,10 @@ class RealBrokerJsonProcessor @Inject constructor(
         }
 
         val stored = try {
-            val storedVersion = pirRepository.getBrokerForName(broker.name)?.version
-            if (storedVersion == broker.version) {
+            val storedBroker = pirRepository.getBrokerForName(broker.name)
+            val storedVersion = storedBroker?.version
+            // A broker deactivated locally keeps its version, so an unchanged version alone must not block reactivating it.
+            if (storedBroker != null && storedVersion == broker.version && storedBroker.removedAt == (broker.removedAt ?: 0L)) {
                 logcat { "PIR-update: $fileName already at version ${broker.version}, skipping" }
                 return
             }
