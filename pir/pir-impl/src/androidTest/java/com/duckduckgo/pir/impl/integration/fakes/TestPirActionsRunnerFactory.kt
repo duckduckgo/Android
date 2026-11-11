@@ -19,9 +19,11 @@ package com.duckduckgo.pir.impl.integration.fakes
 import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.common.EmailDataResolver
+import com.duckduckgo.pir.impl.common.PirBrokerUserAgentResolver
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.actions.RealPirActionsRunnerStateEngineFactory
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.scripts.RealBrokerActionProcessor
 import kotlinx.coroutines.CoroutineScope
 
@@ -45,6 +47,9 @@ class TestPirActionsRunnerFactory(
         return RealPirActionsRunner(
             dispatcherProvider = dispatcherProvider,
             pirDetachedWebViewProvider = pirDetachedWebViewProvider,
+            brokerUserAgentResolver = object : PirBrokerUserAgentResolver {
+                override suspend fun resolve(broker: Broker): String = broker.userAgent ?: TEST_USER_AGENT
+            },
             brokerActionProcessor = brokerActionProcessor,
             nativeBrokerActionHandler = nativeBrokerActionHandler,
             emailDataResolver = emailDataResolver,
@@ -56,3 +61,5 @@ class TestPirActionsRunnerFactory(
         )
     }
 }
+
+private const val TEST_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"

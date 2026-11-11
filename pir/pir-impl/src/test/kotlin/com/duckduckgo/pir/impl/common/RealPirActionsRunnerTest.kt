@@ -47,6 +47,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -70,6 +71,10 @@ class RealPirActionsRunnerTest {
     private val mockEngineFactory: PirActionsRunnerStateEngineFactory = mock()
     private val mockEngine: PirActionsRunnerStateEngine = mock()
     private val mockWebView: WebView = mock()
+    private val testUserAgent = "test-user-agent"
+    private val mockBrokerUserAgentResolver: PirBrokerUserAgentResolver = mock {
+        onBlocking { resolve(any()) } doReturn testUserAgent
+    }
 
     private val sideEffectFlow = MutableSharedFlow<SideEffect>(extraBufferCapacity = 10)
 
@@ -120,13 +125,14 @@ class RealPirActionsRunnerTest {
     fun setUp() {
         whenever(mockEngine.sideEffect).thenReturn(sideEffectFlow)
         whenever(mockEngineFactory.create(any(), any(), any())).thenReturn(mockEngine)
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
-        whenever(mockPirDetachedWebViewProvider.setupWebView(any(), any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.setupWebView(any(), any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
         testee = RealPirActionsRunner(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             pirDetachedWebViewProvider = mockPirDetachedWebViewProvider,
+            brokerUserAgentResolver = mockBrokerUserAgentResolver,
             brokerActionProcessor = mockBrokerActionProcessor,
             nativeBrokerActionHandler = mockNativeBrokerActionHandler,
             emailDataResolver = mockEmailDataResolver,
@@ -153,11 +159,13 @@ class RealPirActionsRunnerTest {
         verify(mockPirDetachedWebViewProvider).createInstance(
             eq(mockContext),
             eq(testPirScript),
+            eq(testUserAgent),
             any(),
             any(),
             any(),
         )
         verify(mockBrokerActionProcessor).register(mockWebView, testee)
+        verify(mockBrokerUserAgentResolver).resolve(testBroker)
     }
 
     @Test
@@ -237,7 +245,7 @@ class RealPirActionsRunnerTest {
             deferred.await()
         }
 
-        verify(mockPirDetachedWebViewProvider, times(2)).createInstance(any(), any(), any(), any(), any())
+        verify(mockPirDetachedWebViewProvider, times(2)).createInstance(any(), any(), any(), any(), any(), any())
         verify(mockBrokerActionProcessor, times(2)).register(eq(mockWebView), any())
         verify(mockWebView, times(2)).destroy()
     }
@@ -257,6 +265,7 @@ class RealPirActionsRunnerTest {
         verify(mockPirDetachedWebViewProvider).setupWebView(
             eq(mockWebView),
             eq(testPirScript),
+            eq(testUserAgent),
             any(),
             any(),
             any(),
@@ -409,7 +418,7 @@ class RealPirActionsRunnerTest {
         yield()
 
         val callbackCaptor = argumentCaptor<(String?) -> Unit>()
-        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), callbackCaptor.capture(), any(), any())
+        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), any(), callbackCaptor.capture(), any(), any())
         callbackCaptor.firstValue.invoke(loadedUrl)
 
         sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
@@ -432,7 +441,7 @@ class RealPirActionsRunnerTest {
         yield()
 
         val callbackCaptor = argumentCaptor<(String?) -> Unit>()
-        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), callbackCaptor.capture(), any(), any())
+        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), any(), callbackCaptor.capture(), any(), any())
         callbackCaptor.firstValue.invoke(null)
 
         sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
@@ -456,7 +465,7 @@ class RealPirActionsRunnerTest {
         yield()
 
         val callbackCaptor = argumentCaptor<(String?) -> Unit>()
-        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), any(), callbackCaptor.capture(), any())
+        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), any(), any(), callbackCaptor.capture(), any())
         callbackCaptor.firstValue.invoke(failedUrl)
 
         sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
@@ -474,7 +483,7 @@ class RealPirActionsRunnerTest {
     fun whenRenderProcessGoneThenExecuteThrowsPirRendererGoneExceptionWithDidCrash() = runTest {
         val rendererGoneCaptor = argumentCaptor<(Boolean) -> Unit>()
         whenever(
-            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), rendererGoneCaptor.capture()),
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any(), rendererGoneCaptor.capture()),
         ).thenReturn(mockWebView)
 
         var thrown: Throwable? = null
@@ -502,7 +511,7 @@ class RealPirActionsRunnerTest {
     fun whenRendererGoneAfterCompleteExecutionThenIsSafeNoOp() = runTest {
         val rendererGoneCaptor = argumentCaptor<(Boolean) -> Unit>()
         whenever(
-            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), rendererGoneCaptor.capture()),
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any(), rendererGoneCaptor.capture()),
         ).thenReturn(mockWebView)
 
         val deferred = async {
@@ -532,7 +541,7 @@ class RealPirActionsRunnerTest {
         // abort the rest of the queue and report the whole run as renderer-gone.
         val rendererGoneCaptor = argumentCaptor<(Boolean) -> Unit>()
         whenever(
-            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), rendererGoneCaptor.capture()),
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any(), rendererGoneCaptor.capture()),
         ).thenReturn(mockWebView)
 
         val stepA = async {
@@ -564,7 +573,7 @@ class RealPirActionsRunnerTest {
     fun whenStalePageLoadedFromPreviousStepThenIsNotDispatchedToCurrentStep() = runTest {
         val onPageLoadedCaptor = argumentCaptor<(String?) -> Unit>()
         whenever(
-            mockPirDetachedWebViewProvider.createInstance(any(), any(), onPageLoadedCaptor.capture(), any(), any()),
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), onPageLoadedCaptor.capture(), any(), any()),
         ).thenReturn(mockWebView)
 
         val stepA = async {

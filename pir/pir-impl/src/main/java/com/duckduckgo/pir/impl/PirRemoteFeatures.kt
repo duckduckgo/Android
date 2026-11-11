@@ -83,6 +83,13 @@ interface PirRemoteFeatures {
      */
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun notificationPermissionPrompt(): Toggle
+
+    /**
+     * Kill-switch for broker-specific user agents. When disabled, every broker runs with the
+     * default PIR user agent, ignoring the user agent set in its broker JSON.
+     */
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun customWebViewUserAgent(): Toggle
 }
 
 @SingleIn(AppScope::class)
