@@ -21,6 +21,9 @@
     <string name="devSettingsDuckAiUsageWarningsUsageActedOnRecorded">Recorded. Card hidden until the snapshot changes</string>
     <string name="devSettingsDuckAiUsageWarningsResetUsageDismissal">Reset usage notice state</string>
     <string name="devSettingsDuckAiUsageWarningsUsageDismissalReset">Usage notice dismissal and acted-on state reset</string>
+    <string name="devSettingsDuckAiNewChatHintsResetTitle">Reset New Chat Hints</string>
+    <string name="devSettingsDuckAiNewChatHintsResetSubtitle">Clear the count of new chats prompted without tapping a hint</string>
+    <string name="devSettingsDuckAiNewChatHintsResetDone">New chat hints count reset</string>
 
     <string name="devSettingsDuckAiPromoCampaignCapabilityTitle">Promo Campaign</string>
     <string name="devSettingsDuckAiPromoCampaignCapabilitySubtitle">Inspect, seed and modify the promo record</string>

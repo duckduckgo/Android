@@ -58,6 +58,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
@@ -132,6 +133,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     chatStateStore: ChatStateStore,
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
+    private val newChatHintsUsage: NewChatHintsUsage,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -618,15 +620,21 @@ class NativeInputModeWidgetViewModel @Inject constructor(
      * */
     fun onPromptSubmitted() {
         footerPromptSubmissions.value += 1
+        val tabId = activeTabId.value
+        if (tabId != null) newChatHintsUsage.onPromptSubmitted(tabId, isNewChat = isNewDuckAiChat(tabId))
         // A prompt submitted while still in the recovery window means the user sent a prompt after
         // recovering the chat's model — report it before the window is cleared below.
-        val tabId = activeTabId.value
         if (tabId != null && nativeInputStateProvider.stateForTab(tabId).value.modelChangeMode) {
             duckChatPixels.fireSubmitChangeModelPromptSent(currentSurface())
         }
         // Ends the FE recovery model-change window for the active tab.
         endModelChangeMode()
     }
+
+    // Read from this widget's own config so the contextual sheet, which shares the browser tab's id, never passes as the full-screen chat.
+    private fun isNewDuckAiChat(tabId: String): Boolean =
+        widgetConfig.value.inputContext == NativeInputState.InputContext.DUCK_AI &&
+            nativeInputStateProvider.stateForTab(tabId).value.chatId == null
 
     /**
      * Called when the recovery model picker is dismissed without picking a model.

@@ -60,6 +60,7 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
@@ -153,6 +154,7 @@ class NativeInputModeWidgetViewModelTest {
     }
     private val chatStateStore = ChatStateStore()
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
+    private val newChatHintsUsage: NewChatHintsUsage = mock()
     private val realNativeInputStateStore = RealNativeInputStateStore(
         lazy { tabRepositoryProvider },
         browserModeStateHolder,
@@ -266,6 +268,7 @@ class NativeInputModeWidgetViewModelTest {
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
             chatStateStore = chatStateStore,
             responseWaitWideEvent = responseWaitWideEvent,
+            newChatHintsUsage = newChatHintsUsage,
         )
     }
 
@@ -1175,6 +1178,51 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.onPromptSubmitted()
 
         assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenPromptSubmittedInANewDuckAiChatThenNewChatHintsUsageCountsIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = true)
+    }
+
+    @Test
+    fun whenPromptSubmittedInAnExistingChatThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
+    }
+
+    @Test
+    fun whenPromptSubmittedOutsideDuckAiThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
+    }
+
+    @Test
+    fun whenPromptSubmittedFromTheContextualSheetThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
     }
 
     @Test
