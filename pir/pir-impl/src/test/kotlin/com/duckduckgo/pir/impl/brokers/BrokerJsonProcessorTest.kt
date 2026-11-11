@@ -20,6 +20,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.service.androidUserAgent
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.test.runTest
 import okio.Buffer
@@ -69,6 +70,49 @@ class BrokerJsonProcessorTest {
     }
 
     @Test
+    fun whenParseBrokerWithAndroidUserAgentThenReturnsAndroidUserAgent() {
+        val result = testee.parseBroker(
+            brokerJsonSource(
+                "Broker One",
+                "1.0",
+                userAgentJson = """{ "macOS": "mac-ua", "iOS": "", "windows": null, "android": "$ANDROID_UA" }""",
+            ),
+        )
+
+        assertEquals(ANDROID_UA, result!!.androidUserAgent())
+    }
+
+    @Test
+    fun whenParseBrokerWithoutUserAgentThenAndroidUserAgentIsNull() {
+        val result = testee.parseBroker(brokerJsonSource("Broker One", "1.0"))
+
+        assertNull(result!!.androidUserAgent())
+    }
+
+    @Test
+    fun whenParseBrokerWithOnlyOtherPlatformUserAgentsThenAndroidUserAgentIsNull() {
+        val result = testee.parseBroker(
+            brokerJsonSource("Broker One", "1.0", userAgentJson = """{ "macOS": "mac-ua", "iOS": "ios-ua" }"""),
+        )
+
+        assertNull(result!!.androidUserAgent())
+    }
+
+    @Test
+    fun whenParseBrokerWithNullAndroidUserAgentThenAndroidUserAgentIsNull() {
+        val result = testee.parseBroker(brokerJsonSource("Broker One", "1.0", userAgentJson = """{ "android": null }"""))
+
+        assertNull(result!!.androidUserAgent())
+    }
+
+    @Test
+    fun whenParseBrokerWithBlankAndroidUserAgentThenAndroidUserAgentIsNull() {
+        val result = testee.parseBroker(brokerJsonSource("Broker One", "1.0", userAgentJson = """{ "android": "  " }"""))
+
+        assertNull(result!!.androidUserAgent())
+    }
+
+    @Test
     fun whenParseBrokerWithInvalidJsonThenReturnsNull() {
         val result = testee.parseBroker(Buffer().writeUtf8("{ not valid json }"))
 
@@ -96,6 +140,41 @@ class BrokerJsonProcessorTest {
         verify(mockPirRepository, never()).updateBrokerData(any(), any())
         verify(mockPixelSender, never()).reportUpdateBrokerJsonSuccess(any(), any(), anyOrNull())
         verify(mockPixelSender, never()).reportUpdateBrokerJsonFailure(any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenStoredVersionMatchesAndUserAgentAddedThenStores() = runTest {
+        whenever(mockPirRepository.getBrokerForName("Broker One")).thenReturn(storedBroker(version = "1.0"))
+
+        testee.processAndStoreBroker(
+            "broker.json",
+            brokerJsonSource("Broker One", "1.0", userAgentJson = """{ "android": "$ANDROID_UA" }"""),
+        )
+
+        verify(mockPirRepository).updateBrokerData(eq("broker.json"), any())
+    }
+
+    @Test
+    fun whenStoredVersionMatchesAndUserAgentRemovedThenStores() = runTest {
+        whenever(mockPirRepository.getBrokerForName("Broker One"))
+            .thenReturn(storedBroker(version = "1.0", userAgent = ANDROID_UA))
+
+        testee.processAndStoreBroker("broker.json", brokerJsonSource("Broker One", "1.0"))
+
+        verify(mockPirRepository).updateBrokerData(eq("broker.json"), any())
+    }
+
+    @Test
+    fun whenStoredVersionAndUserAgentMatchThenSkipsStore() = runTest {
+        whenever(mockPirRepository.getBrokerForName("Broker One"))
+            .thenReturn(storedBroker(version = "1.0", userAgent = ANDROID_UA))
+
+        testee.processAndStoreBroker(
+            "broker.json",
+            brokerJsonSource("Broker One", "1.0", userAgentJson = """{ "android": "$ANDROID_UA" }"""),
+        )
+
+        verify(mockPirRepository, never()).updateBrokerData(any(), any())
     }
 
     @Test
@@ -208,6 +287,7 @@ class BrokerJsonProcessorTest {
         name: String,
         version: String,
         removedAt: Long? = null,
+        userAgentJson: String? = null,
     ): okio.Source =
         Buffer().writeUtf8(
             """
@@ -220,12 +300,15 @@ class BrokerJsonProcessorTest {
                 "optOutUrl": "https://broker.com/optout",
                 "steps": [],
                 "schedulingConfig": { "retryError": 24, "confirmOptOutScan": 7, "maintenanceScan": 30, "maxAttempts": 3 },
-                "removedAt": ${removedAt ?: "null"}
+                "removedAt": ${removedAt ?: "null"}${userAgentJson?.let { ", \"userAgent\": $it" }.orEmpty()}
             }
             """.trimIndent(),
         )
 
-    private fun storedBroker(version: String) = Broker(
+    private fun storedBroker(
+        version: String,
+        userAgent: String? = null,
+    ) = Broker(
         name = "Broker One",
         fileName = "broker.json",
         url = "https://broker.com",
@@ -233,7 +316,12 @@ class BrokerJsonProcessorTest {
         parent = null,
         addedDatetime = 1000L,
         removedAt = 0L,
+        userAgent = userAgent,
     )
+
+    private companion object {
+        const val ANDROID_UA = "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0"
+    }
 
     // endregion
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.brokers
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.RealBrokerJsonUpdater.Companion.BROKER_JSON_FIELDS_REVISION
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirBrokerEtags
@@ -61,6 +62,7 @@ class RealBrokerJsonUpdaterTest {
         whenever(mockPirRepository.isRepositoryAvailable()).thenReturn(true)
         whenever(mockPirRemoteFeatures.useBundledBrokerJsons()).thenReturn(mockUseBundledBrokerJsonsToggle)
         whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirRepository.getBrokerJsonsProcessedRevision()).thenReturn(BROKER_JSON_FIELDS_REVISION)
 
         testee = RealBrokerJsonUpdater(
             dbpService = mockDbpService,
@@ -381,5 +383,50 @@ class RealBrokerJsonUpdaterTest {
         // Then
         assertTrue(result)
         verify(mockBundledBrokerDataLoader).loadBundledBrokerData()
+    }
+
+    @Test
+    fun whenBrokerJsonsProcessedWithOlderRevisionThenRequestsMainConfigWithoutEtagAndReprocessesAllFiles() = runTest {
+        whenever(mockPirRepository.getBrokerJsonsProcessedRevision()).thenReturn(BROKER_JSON_FIELDS_REVISION - 1)
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn(testNewEtag)
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(3)
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testNewBrokerJsons)
+        whenever(mockDbpService.getMainConfig(null)).thenReturn(Response.success(testMainConfig))
+
+        val result = testee.update()
+
+        assertTrue(result)
+        verify(mockDbpService).getMainConfig(null)
+        verify(mockBrokerDataDownloader).downloadBrokerData(listOf(testFileName1, testFileName2, testFileName3))
+        verify(mockPirRepository).updateMainEtag(testNewEtag)
+        verify(mockPirRepository).setBrokerJsonsProcessedRevision(BROKER_JSON_FIELDS_REVISION)
+    }
+
+    @Test
+    fun whenBrokerJsonsProcessedWithCurrentRevisionThenDoesNotUpdateRevision() = runTest {
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(2)
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testExistingBrokerJsons)
+        whenever(mockDbpService.getMainConfig("old-etag")).thenReturn(Response.success(testMainConfig))
+
+        testee.update()
+
+        verify(mockPirRepository, never()).setBrokerJsonsProcessedRevision(any())
+    }
+
+    @Test
+    fun whenReprocessingAllFilesAndDownloadFailsThenRevisionNotUpdated() = runTest {
+        whenever(mockPirRepository.getBrokerJsonsProcessedRevision()).thenReturn(0)
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn(testNewEtag)
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(3)
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testNewBrokerJsons)
+        whenever(mockDbpService.getMainConfig(null)).thenReturn(Response.success(testMainConfig))
+        whenever(mockBrokerDataDownloader.downloadBrokerData(any())).thenThrow(RuntimeException("network"))
+
+        val result = testee.update()
+
+        assertTrue(result)
+        verify(mockPirRepository, never()).setBrokerJsonsProcessedRevision(any())
+        verify(mockPirRepository, never()).updateMainEtag(testNewEtag)
     }
 }

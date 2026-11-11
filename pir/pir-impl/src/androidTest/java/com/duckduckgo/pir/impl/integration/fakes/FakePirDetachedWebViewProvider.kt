@@ -39,6 +39,7 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
     override fun createInstance(
         context: Context,
         scriptToLoad: String,
+        userAgent: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
@@ -67,6 +68,7 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
     override fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
+        userAgent: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,

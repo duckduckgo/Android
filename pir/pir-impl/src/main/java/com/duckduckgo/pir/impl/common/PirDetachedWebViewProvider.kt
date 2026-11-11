@@ -32,7 +32,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
-import com.duckduckgo.user.agent.api.UserAgentProvider
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -46,6 +45,7 @@ interface PirDetachedWebViewProvider {
      *
      * @param context in which the webview should run - could be service/activity
      * @param scriptToLoad the JS script that is needed for PIR to run.
+     * @param userAgent the user agent the WebView should use for the broker it runs.
      * @param onPageLoaded callback to receive whenever a url has finished loading.
      * @param onPageLoadFailed callback to receive whenever a url has failed to load.
      * @param onRendererGone callback to receive whenever the WebView's renderer process has died.
@@ -53,6 +53,7 @@ interface PirDetachedWebViewProvider {
     fun createInstance(
         context: Context,
         scriptToLoad: String,
+        userAgent: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
@@ -63,6 +64,7 @@ interface PirDetachedWebViewProvider {
      *
      * @param webView in which PIR should run
      * @param scriptToLoad the JS script that is needed for PIR to run.
+     * @param userAgent the user agent the WebView should use for the broker it runs.
      * @param onPageLoaded callback to receive whenever a url has finished loading.
      * @param onPageLoadFailed callback to receive whenever a url has failed to load.
      * @param onRendererGone callback to receive whenever the WebView's renderer process has died.
@@ -70,6 +72,7 @@ interface PirDetachedWebViewProvider {
     fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
+        userAgent: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
@@ -78,7 +81,6 @@ interface PirDetachedWebViewProvider {
 
 @ContributesBinding(AppScope::class)
 class RealPirDetachedWebViewProvider @Inject constructor(
-    private val userAgentProvider: UserAgentProvider,
     private val pirRequestInterceptor: PirRequestInterceptor,
     private val dispatcherProvider: DispatcherProvider,
 ) :
@@ -87,17 +89,19 @@ class RealPirDetachedWebViewProvider @Inject constructor(
     override fun createInstance(
         context: Context,
         scriptToLoad: String,
+        userAgent: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
     ): WebView {
-        return setupWebView(WebView(context), scriptToLoad, onPageLoaded, onPageLoadFailed, onRendererGone)
+        return setupWebView(WebView(context), scriptToLoad, userAgent, onPageLoaded, onPageLoadFailed, onRendererGone)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
+        userAgent: String,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
@@ -202,7 +206,7 @@ class RealPirDetachedWebViewProvider @Inject constructor(
                 }
             }
             settings.apply {
-                userAgentString = userAgentProvider.userAgent()
+                userAgentString = userAgent
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
