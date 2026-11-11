@@ -17,7 +17,7 @@
 package com.duckduckgo.pir.impl.brokers
 
 /**
- * Why a broker JSON was not stored. In every case the previously stored version of the broker is kept.
+ * Why a broker JSON was not stored.
  */
 enum class BrokerJsonUpdateFailureReason(val pixelValue: String) {
     /** The broker JSON itself could not be parsed. */

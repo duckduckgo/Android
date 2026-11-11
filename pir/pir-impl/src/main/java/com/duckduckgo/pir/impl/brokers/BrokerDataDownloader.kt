@@ -53,7 +53,9 @@ class RealBrokerDataDownloader @Inject constructor(
 ) : BrokerDataDownloader {
 
     override suspend fun downloadBrokerData(brokersToUpdate: List<String>): Set<String> = withContext(dispatcherProvider.io()) {
-        if (brokersToUpdate.isEmpty()) return@withContext emptySet()
+        if (brokersToUpdate.isEmpty()) {
+            return@withContext emptySet()
+        }
 
         logcat { "PIR-update: Starting to download broker data" }
         val extractFolder = File(context.filesDir, "unzipped-broker-json")

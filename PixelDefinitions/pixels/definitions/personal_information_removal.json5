@@ -1170,7 +1170,7 @@
         ]
     },
     "m_dbp_update_databrokers_failure": {
-        "description": "Fired when a data broker JSON update has failed or was rejected. The previously stored version of the broker is kept.",
+        "description": "Fired when a data broker JSON update has failed or was rejected.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -1189,7 +1189,7 @@
             },
             {
                 "key": "reason",
-                "description": "Why the data broker JSON was not stored: it could not be parsed (invalid_json), a step has an unknown step type (unsupported_step), a step contains an action type this app version does not support (unsupported_action), a step does not match the expected structure (invalid_step), the scan or opt-out step is missing (missing_step), or it could not be persisted (storage_error)",
+                "description": "Why the data broker JSON was not stored.",
                 "type": "string",
                 "enum": ["invalid_json", "unsupported_step", "unsupported_action", "invalid_step", "missing_step", "storage_error"]
             }
