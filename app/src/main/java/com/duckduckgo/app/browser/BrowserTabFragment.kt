@@ -240,7 +240,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -1377,7 +1377,7 @@ class BrowserTabFragment :
 
     private fun showNativeInput(
         query: String = "",
-        launchAction: DuckChatLaunchAction? = null,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
         textSelection: String? = null,
     ) {
         nativeInputManager.showNativeInput(
@@ -1388,7 +1388,7 @@ class BrowserTabFragment :
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
-            launchAction = launchAction,
+            launch = launch,
             textSelection = textSelection,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
@@ -2470,7 +2470,7 @@ class BrowserTabFragment :
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
         val pendingLaunch = nativeInputLaunch.also { nativeInputLaunch = null }
         showNativeInput(
-            launchAction = if (forceImageGeneration) DuckChatLaunchAction.ImageGeneration else pendingLaunch?.toLaunchAction(),
+            launch = if (forceImageGeneration) DuckChatLaunch.ImageGeneration() else pendingLaunch?.toDuckChatLaunch() ?: DuckChatLaunch.Open(),
             textSelection = browserActivity?.consumePendingDuckChatTextSelection(),
         )
     }

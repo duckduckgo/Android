@@ -20,7 +20,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.widget.RemoteViews
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -79,7 +79,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.actionCreateImage)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, action = DuckChatLaunchAction.ImageGeneration)
+        assertLaunch(launched, url = NEW_CHAT_URL, launch = DuckChatLaunch.ImageGeneration::class)
     }
 
     @Test
@@ -88,7 +88,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.actionTakePhoto)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, action = DuckChatLaunchAction.CameraCapture)
+        assertLaunch(launched, url = NEW_CHAT_URL, launch = DuckChatLaunch.CameraCapture::class)
     }
 
     @Test
