@@ -147,6 +147,8 @@ import com.duckduckgo.duckchat.api.DuckAiEntryCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistoryParams
+import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
@@ -1090,6 +1092,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (launchNewSearch(intent)) {
             logcat(WARN) { "new tab requested" }
             launchNewTab()
+            return
+        }
+
+        if (intent.getBooleanExtra(OPEN_DUCK_CHAT_HISTORY, false)) {
+            globalActivityStarter.start(this, DuckChatHistoryParams(DuckChatHistorySource.WIDGET))
             return
         }
 
