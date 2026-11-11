@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdateFailureReason
 import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_APP_SETTINGS_CLICK
@@ -690,11 +691,13 @@ interface PirPixelSender {
 
     /**
      * @param isFreeScan whether the user has no PIR subscription
+     * @param reason why the broker JSON was not stored
      */
     fun reportUpdateBrokerJsonFailure(
         brokerJsonFileName: String,
         removedAtMs: Long,
         isFreeScan: Boolean?,
+        reason: BrokerJsonUpdateFailureReason,
     )
 
     suspend fun reportDownloadMainConfigBEFailure(
@@ -1615,8 +1618,10 @@ class RealPirPixelSender @Inject constructor(
         brokerJsonFileName: String,
         removedAtMs: Long,
         isFreeScan: Boolean?,
+        reason: BrokerJsonUpdateFailureReason,
     ) {
-        fire(PIR_UPDATE_BROKER_FAILURE, brokerUpdateParams(brokerJsonFileName, removedAtMs, isFreeScan))
+        val params = brokerUpdateParams(brokerJsonFileName, removedAtMs, isFreeScan) + (PARAM_KEY_REASON to reason.pixelValue)
+        fire(PIR_UPDATE_BROKER_FAILURE, params)
     }
 
     override suspend fun reportDownloadMainConfigBEFailure(errorCode: String) {
@@ -1917,6 +1922,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_ERROR_DETAILS = "error_details"
         private const val PARAM_KEY_BROKER_JSON_FILE = "data_broker_json_file"
         private const val PARAM_KEY_REMOVED_AT = "removed_at"
+        private const val PARAM_KEY_REASON = "reason"
         private const val PARAM_KEY_MSG = "message"
         private const val PARAM_KEY_STEP = "stepType"
         private const val PARAM_KEY_DURATION_MS = "duration_in_ms"
