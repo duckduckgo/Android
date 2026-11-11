@@ -1093,6 +1093,43 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
+    fun whenWithdrawalSucceedsThenOnboardingEntryPointHidden() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        whenever(onboardingProgress.completionPercentage()).thenReturn(50)
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1_000L)
+        stubReadySubscription(startedAt = 1_000L, platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            assertNotNull((expectMostRecentItem() as Ready).onboardingEntryPoint)
+            viewModel.onWithdrawalConfirmed()
+            assertNull((expectMostRecentItem() as Ready).onboardingEntryPoint)
+        }
+    }
+
+    @Test
+    fun whenWithdrawalNoLongerEligibleThenOnboardingEntryPointKept() = runTest {
+        whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(true)
+        whenever(onboardingProgress.completionPercentage()).thenReturn(50)
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.NotEligible)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1_000L)
+        stubReadySubscription(startedAt = 1_000L, platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            expectMostRecentItem()
+            viewModel.onWithdrawalConfirmed()
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertNotNull((viewModel.viewState.value as Ready).onboardingEntryPoint)
+    }
+
+    @Test
     fun whenCompletedWithdrawalShownAndAccountSignedOutThenItStaysOnResume() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
