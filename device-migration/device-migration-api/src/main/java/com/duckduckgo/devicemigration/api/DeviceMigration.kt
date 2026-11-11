@@ -42,8 +42,9 @@ interface DeviceMigration {
     suspend fun markMigrationFlowCompleted()
 
     /**
-     * True when the previous phone had Sync set up, or when that is not known yet, so callers never offer to create a new Sync
-     * account that would duplicate the one being restored silently. False when the install is not migrated. Reads from disk.
+     * True when the previous phone's Sync account was found to restore silently, or when that is not known yet, so callers never
+     * offer to set up Sync while it is being restored. False when the install is not migrated, or when nothing was found to
+     * restore, even if the previous phone was signed in. Reads from disk.
      */
     fun previousDeviceHadSync(): Boolean
 

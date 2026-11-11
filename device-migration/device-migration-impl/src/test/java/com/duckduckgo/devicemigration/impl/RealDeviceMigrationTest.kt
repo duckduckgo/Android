@@ -352,10 +352,27 @@ class RealDeviceMigrationTest {
     }
 
     @Test
-    fun whenPreviousPhoneWasSignedInToSyncThenItHadSync() = runTest {
+    fun whenPreviousPhoneSignedInButNothingToRestoreThenHadNoSync() = runTest {
         transferFromPhone(signedInToSync = true)
         assertTrue(testee.isMigratedInstall())
         local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
+
+        assertFalse(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenSyncFoundToRestoreThenHadSync() = runTest {
+        transferFromPhone(signedInToSync = true)
+        assertTrue(testee.isMigratedInstall())
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true).commit()
+
+        assertTrue(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenPreviousPhoneSignedInAndRestoreNotCheckedYetThenCountsAsHadSync() = runTest {
+        transferFromPhone(signedInToSync = true)
+        assertTrue(testee.isMigratedInstall())
 
         assertTrue(testee.previousDeviceHadSync())
     }
