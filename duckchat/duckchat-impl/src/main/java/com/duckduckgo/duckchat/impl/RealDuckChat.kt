@@ -27,7 +27,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -725,10 +725,10 @@ class RealDuckChat @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             // Only force image generation once an image-capable model is selected, otherwise the tool
             // would be unavailable. The new tab this opens consumes the flag when its input configures.
-            val launchAction = if (ensureImageCapableModelSelected()) DuckChatLaunchAction.ImageGeneration else null
+            val launch = if (ensureImageCapableModelSelected()) DuckChatLaunch.ImageGeneration() else DuckChatLaunch.Open()
             withContext(dispatchers.main()) {
                 reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-                openDuckChat(emptyMap(), forceNewSession = true, launchAction = launchAction)
+                openDuckChat(emptyMap(), forceNewSession = true, launch = launch)
             }
         }
     }
@@ -825,7 +825,7 @@ class RealDuckChat @Inject constructor(
     private fun openDuckChat(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
-        launchAction: DuckChatLaunchAction? = null,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
     ) {
         val url = appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink())
         appCoroutineScope.launch(dispatchers.io()) {
@@ -837,7 +837,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
-                openDuckChatSession(url, hasSessionActive, launchAction)
+                openDuckChatSession(url, hasSessionActive, launch)
             }
         }
     }
@@ -845,12 +845,12 @@ class RealDuckChat @Inject constructor(
     private fun openDuckChatSession(
         url: String,
         hasSessionActive: Boolean,
-        launchAction: DuckChatLaunchAction? = null,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
     ) {
         // if a new query was submitted we force a new session
         // we want to lose the context of the previous one if the user wanted a new query from outside Duck.ai
         browserNav
-            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, launchAction = launchAction)
+            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, launch = launch)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
