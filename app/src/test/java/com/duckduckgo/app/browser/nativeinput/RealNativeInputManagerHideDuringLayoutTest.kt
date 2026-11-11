@@ -19,6 +19,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -124,7 +125,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),
-            launchAction = null,
+            launch = DuckChatLaunch.Open(),
         )
         assertEquals("floating submit container attached to content frame", 2, content.childCount)
 

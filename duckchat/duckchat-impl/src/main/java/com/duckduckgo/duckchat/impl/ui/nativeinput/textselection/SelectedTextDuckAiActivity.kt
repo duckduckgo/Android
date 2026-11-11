@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
 import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -48,11 +48,11 @@ class SelectedTextDuckAiActivity : DuckDuckGoActivity() {
                 browserNav.openDuckChat(
                     this,
                     duckChatUrl = duckChatInternal.getDuckChatUrl(query = "", autoPrompt = false),
-                    launchAction =
+                    launch =
                     if (isExternalSelection()) {
-                        DuckChatLaunchAction.TextSelection(selection)
+                        DuckChatLaunch.TextSelection(selection)
                     } else {
-                        DuckChatLaunchAction.ContextualChat(selection)
+                        DuckChatLaunch.ContextualChat(selection)
                     },
                 ),
             )

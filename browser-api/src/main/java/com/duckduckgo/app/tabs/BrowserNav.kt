@@ -36,15 +36,14 @@ interface BrowserNav {
     /**
      * Returns an Intent that opens Duck.ai full screen in a new tab.
      *
-     * @param launchAction what happens once Duck.ai opens, if anything.
-     * @param launchOrigin where the launch comes from. External origins such as the home-screen widget open in regular mode.
+     * @param duckChatUrl the URL to open, or null to start a new chat.
+     * @param launch how Duck.ai is launched and where the launch comes from.
      */
     fun openDuckChat(
         context: Context,
         hasSessionActive: Boolean = false,
-        duckChatUrl: String,
-        launchAction: DuckChatLaunchAction? = null,
-        launchOrigin: DuckChatLaunchOrigin = DuckChatLaunchOrigin.IN_APP,
+        duckChatUrl: String? = null,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
     ): Intent
     fun closeDuckChat(context: Context): Intent
 

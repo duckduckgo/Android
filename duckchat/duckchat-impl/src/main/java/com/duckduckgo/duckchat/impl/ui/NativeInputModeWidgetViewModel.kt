@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -691,7 +691,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launchAction: DuckChatLaunchAction? = null) {
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch = DuckChatLaunch.Open()) {
         activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
@@ -712,7 +712,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         // An "open Duck.ai for image generation" launch preselects image generation on the new tab.
         // The image-capable model was already selected when the launch was requested.
-        if (isDuckAiMode && launchAction == DuckChatLaunchAction.ImageGeneration) {
+        if (isDuckAiMode && launch is DuckChatLaunch.ImageGeneration) {
             nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
         }
     }

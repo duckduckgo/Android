@@ -58,7 +58,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -196,7 +196,7 @@ interface NativeInputWidget {
         onPageContextRemoved: () -> Unit,
     )
     fun storePendingPrompt(query: String)
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launchAction: DuckChatLaunchAction? = null)
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch = DuckChatLaunch.Open())
     fun setOmnibarPosition(isBottom: Boolean)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
@@ -1549,11 +1549,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         (parent as? NativeInputLayout)?.setOmnibarPosition(isBottom)
     }
 
-    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launchAction: DuckChatLaunchAction?) {
+    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch) {
         activeTabId = tabId
         setOmnibarPosition(isBottom)
         doOnAttach {
-            viewModel.configure(tabId, isDuckAiMode, isBottom, launchAction)
+            viewModel.configure(tabId, isDuckAiMode, isBottom, launch)
             publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
         }
