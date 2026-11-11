@@ -781,12 +781,8 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun handlePurchaseFailed() {
-        val billingFlow = consumePendingBillingFlow()
-        // The subscription is still active, so keep its status
-        if (billingFlow != BillingFlowType.CANCELLATION_UNDO) {
+        if (consumePendingBillingFlow() == BillingFlowType.PURCHASE) {
             authRepository.purchaseToWaitingStatus()
-        }
-        if (billingFlow == BillingFlowType.PURCHASE) {
             pixelSender.reportPurchaseFailureBackend()
         }
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
