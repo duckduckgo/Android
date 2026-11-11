@@ -17,6 +17,18 @@ tags:
           id: "omnibarTextInput|inputField"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
+      # A bookmark keeps the title the page had when it was saved, so let the page finish loading first.
+      # The indicator is a native view, so this doesn't depend on reading the WebView's text.
+      - extendedWaitUntil:
+          visible:
+            id: pageLoadingIndicator
+          timeout: 5000
+          optional: true
+      - extendedWaitUntil:
+          notVisible:
+            id: pageLoadingIndicator
+          timeout: 20000
+          optional: true
       - tapOn:
           id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
