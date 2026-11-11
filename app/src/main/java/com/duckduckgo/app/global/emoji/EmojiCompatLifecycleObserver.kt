@@ -29,11 +29,16 @@ import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import logcat.LogPriority.WARN
+import logcat.logcat
 import javax.inject.Inject
 
 /**
  * Replaces emoji2's EmojiCompatInitializer (removed in the manifest) with the same timing: configure at process start,
  * load in the background shortly after the first resume, but with [UnstableProviderEmojiLoader].
+ *
+ * Failed loads are retried with backoff: the provider reports the font as unavailable while it is still downloading it
+ * (common on a fresh install), and a Play Services restart fails an in-flight load instead of killing the app.
  */
 @ContributesIntoSet(
     scope = AppScope::class,
@@ -46,10 +51,11 @@ class EmojiCompatLifecycleObserver @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
+    private val loader by lazy { UnstableProviderEmojiLoader(context) }
     private var loadStarted = false
 
     override fun onCreate(owner: LifecycleOwner) {
-        EmojiCompat.init(UnstableProviderEmojiConfig(UnstableProviderEmojiLoader(context)))
+        EmojiCompat.init(UnstableProviderEmojiConfig(loader))
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -57,7 +63,23 @@ class EmojiCompatLifecycleObserver @Inject constructor(
         loadStarted = true
         appCoroutineScope.launch(dispatchers.io()) {
             delay(LOAD_DELAY_MS)
-            EmojiCompat.get().load()
+            if (!loader.hasProvider()) return@launch
+            loadWithRetry()
+        }
+    }
+
+    // The loader runs synchronously on this thread, so the load state is final when load() returns
+    private suspend fun loadWithRetry() {
+        val emojiCompat = EmojiCompat.get()
+        var retryDelayMs = INITIAL_RETRY_DELAY_MS
+        repeat(MAX_ATTEMPTS) { attempt ->
+            emojiCompat.load()
+            if (emojiCompat.loadState == EmojiCompat.LOAD_STATE_SUCCEEDED) return
+            logcat(WARN) { "EmojiCompat font load attempt ${attempt + 1} failed" }
+            if (attempt < MAX_ATTEMPTS - 1) {
+                delay(retryDelayMs)
+                retryDelayMs *= 2
+            }
         }
     }
 
@@ -70,5 +92,7 @@ class EmojiCompatLifecycleObserver @Inject constructor(
     private companion object {
         // Same delay as EmojiCompatInitializer, to keep the font load off the first frames
         const val LOAD_DELAY_MS = 500L
+        const val MAX_ATTEMPTS = 7
+        const val INITIAL_RETRY_DELAY_MS = 1_000L
     }
 }

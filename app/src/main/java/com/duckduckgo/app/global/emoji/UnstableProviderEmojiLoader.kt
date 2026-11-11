@@ -42,6 +42,10 @@ internal class UnstableProviderEmojiLoader(context: Context) : EmojiCompat.Metad
 
     private val context = context.applicationContext
 
+    private val fontRequest: FontRequest? by lazy { emojiFontRequest() }
+
+    fun hasProvider(): Boolean = fontRequest != null
+
     override fun load(loaderCallback: EmojiCompat.MetadataRepoLoaderCallback) {
         runCatching { loadMetadataRepo() }
             .onSuccess { loaderCallback.onLoaded(it) }
@@ -49,7 +53,7 @@ internal class UnstableProviderEmojiLoader(context: Context) : EmojiCompat.Metad
     }
 
     private fun loadMetadataRepo(): MetadataRepo {
-        val request = emojiFontRequest() ?: error("No system emoji font provider")
+        val request = fontRequest ?: error("No system emoji font provider")
         val result = FontsContractCompat.fetchFonts(context, null, request)
         check(result.statusCode == FontsContractCompat.FontFamilyResult.STATUS_OK) { "fetchFonts status ${result.statusCode}" }
         val font = result.fonts.firstOrNull() ?: error("No emoji font returned")
