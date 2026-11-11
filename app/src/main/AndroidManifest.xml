@@ -72,6 +72,11 @@
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
+            <!-- Replaced by EmojiCompatLifecycleObserver: the default loader holds a stable connection to the
+                 Play Services fonts provider, which gets the app killed when Play Services restarts or updates -->
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                tools:node="remove" />
         </provider>
 
         <provider
