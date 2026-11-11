@@ -31,6 +31,12 @@ interface PirDataStore {
     var interactionMauLastSentMs: Long
     var weeklyStatLastSentMs: Long
     var hasBrokerConfigBeenManuallyUpdated: Boolean
+
+    /**
+     * Revision of the broker JSON fields this client stores, as of the last time every broker JSON was processed.
+     * Lower than the current revision means brokers stored before a newly stored field existed lack that field.
+     */
+    var brokerJsonsProcessedRevision: Int
     var latestBackgroundScanRunInMs: Long
     var featureReceivedMs: Long
 
@@ -152,6 +158,14 @@ internal class RealPirDataStore(
             }
         }
 
+    override var brokerJsonsProcessedRevision: Int
+        get() = preferences.getInt(KEY_BROKER_JSONS_PROCESSED_REVISION, 0)
+        set(value) {
+            preferences.edit {
+                putInt(KEY_BROKER_JSONS_PROCESSED_REVISION, value)
+            }
+        }
+
     override var latestBackgroundScanRunInMs: Long
         get() = preferences.getLong(KEY_LAST_BG_SCAN_RUN, 0L)
         set(value) {
@@ -221,6 +235,7 @@ internal class RealPirDataStore(
     override fun reset() {
         mainConfigEtag = null
         hasBrokerConfigBeenManuallyUpdated = false
+        brokerJsonsProcessedRevision = 0
         featureReceivedMs = 0L
         resetUserData()
     }
@@ -256,6 +271,7 @@ internal class RealPirDataStore(
         private const val KEY_INTERACTION_MAU_LAST_MS = "KEY_INTERACTION_MAU_LAST_MS"
         private const val KEY_WEEKLY_STATS_LAST_SENT_MS = "KEY_WEEKLY_STATS_LAST_SENT_MS"
         private const val KEY_BROKER_CONFIG_MANUALLY_UPDATED = "KEY_BROKER_CONFIG_MANUALLY_UPDATED"
+        private const val KEY_BROKER_JSONS_PROCESSED_REVISION = "KEY_BROKER_JSONS_PROCESSED_REVISION"
         private const val KEY_LAST_BG_SCAN_RUN = "KEY_LAST_BG_SCAN_RUN_MS"
         private const val KEY_FEATURE_RECEIVED_MS = "KEY_FEATURE_RECEIVED_MS"
         private const val KEY_HAS_INITIAL_SCAN_EVER_STARTED = "KEY_HAS_INITIAL_SCAN_EVER_STARTED"

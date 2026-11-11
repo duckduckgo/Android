@@ -102,6 +102,15 @@ interface DbpService {
         val schedulingConfig: PirJsonBrokerSchedulingConfig,
         val removedAt: Long?,
         val mirrorSites: List<PirJsonMirrorSites> = emptyList(),
+        val userAgent: PirJsonBrokerUserAgent? = null,
+    )
+
+    /**
+     * Per-platform user agent overrides for a broker. Only the Android value is read; a missing,
+     * null or empty value means the broker runs with the default PIR user agent.
+     */
+    data class PirJsonBrokerUserAgent(
+        val android: String? = null,
     )
 
     data class PirJsonMirrorSites(
@@ -188,3 +197,6 @@ interface DbpService {
         )
     }
 }
+
+/** The broker's Android user agent override, or null when the broker should use the default PIR user agent. */
+fun DbpService.PirJsonBroker.androidUserAgent(): String? = userAgent?.android?.takeIf { it.isNotBlank() }

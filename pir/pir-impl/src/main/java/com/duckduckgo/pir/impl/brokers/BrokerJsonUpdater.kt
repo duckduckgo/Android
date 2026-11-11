@@ -55,6 +55,8 @@ class RealBrokerJsonUpdater @Inject constructor(
     /**
      * Process:
      * - Main config is requested with current etag. If config is not modified, we don't do anything.
+     * - If the stored broker data predates [BROKER_JSON_FIELDS_REVISION], the main config is requested without an etag and every
+     *   broker json is processed again.
      * - If active brokers AND all json etag did not change, we don't do anything.
      * - If active brokers and/or any json etag has changed, we update the etags db.
      * - If any json etag changed, we download the json zip file.
@@ -96,7 +98,9 @@ class RealBrokerJsonUpdater @Inject constructor(
     private suspend fun runNetworkUpdate(): Boolean {
         return kotlin.runCatching {
             confirmEtagIntegrity()
-            dbpService.getMainConfig(pirRepository.getCurrentMainEtag()).also { response ->
+            val reprocessAllJsons = pirRepository.getBrokerJsonsProcessedRevision() < BROKER_JSON_FIELDS_REVISION
+            val mainEtag = if (reprocessAllJsons) null else pirRepository.getCurrentMainEtag()
+            dbpService.getMainConfig(mainEtag).also { response ->
                 logcat { "PIR-update: Main config result $response." }
                 when {
                     response.code() == 304 -> {
@@ -108,8 +112,11 @@ class RealBrokerJsonUpdater @Inject constructor(
                         response.body()?.let { config ->
                             logcat { "PIR-update: Main config $config." }
                             try {
-                                checkUpdatesFromMainConfig(config)
+                                checkUpdatesFromMainConfig(config, reprocessAllJsons)
                                 pirRepository.updateMainEtag(config.etag)
+                                if (reprocessAllJsons) {
+                                    pirRepository.setBrokerJsonsProcessedRevision(BROKER_JSON_FIELDS_REVISION)
+                                }
                             } catch (e: CancellationException) {
                                 throw e
                             } catch (e: Throwable) {
@@ -148,7 +155,10 @@ class RealBrokerJsonUpdater @Inject constructor(
         }
     }
 
-    private suspend fun checkUpdatesFromMainConfig(pirMainConfig: PirMainConfig) {
+    private suspend fun checkUpdatesFromMainConfig(
+        pirMainConfig: PirMainConfig,
+        reprocessAllJsons: Boolean,
+    ) {
         val existingEtags = pirRepository.getAllLocalBrokerJsons()
         val jsonEtagsFromConfig = pirMainConfig.jsonEtags.current.map {
             BrokerJson(
@@ -157,7 +167,11 @@ class RealBrokerJsonUpdater @Inject constructor(
             )
         }
 
-        val updatedJsons = jsonEtagsFromConfig.toSet() - existingEtags.toSet()
+        val updatedJsons = if (reprocessAllJsons) {
+            jsonEtagsFromConfig.toSet()
+        } else {
+            jsonEtagsFromConfig.toSet() - existingEtags.toSet()
+        }
 
         if (updatedJsons.isNotEmpty()) {
             logcat { "PIR-update: Downloading updated broker json files: $updatedJsons" }
@@ -187,5 +201,16 @@ class RealBrokerJsonUpdater @Inject constructor(
 
             return sanitizedStackTrace
         }.getOrNull()
+    }
+
+    companion object {
+        /**
+         * Broker JSONs are only re-processed when their etag changes, so a field this client starts storing would stay
+         * missing for brokers stored before it. Bump this whenever a newly stored broker JSON field must be picked up
+         * from the current JSONs; the next successful update then re-processes every broker JSON once.
+         *
+         * 1: Android user agent override.
+         */
+        internal const val BROKER_JSON_FIELDS_REVISION = 1
     }
 }

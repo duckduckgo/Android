@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataRequest
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
+import com.duckduckgo.pir.impl.service.androidUserAgent
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
 import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
@@ -240,6 +241,10 @@ interface PirRepository {
     suspend fun setHasBrokerConfigBeenManuallyUpdated(updated: Boolean)
 
     suspend fun hasBrokerConfigBeenManuallyUpdated(): Boolean
+
+    suspend fun getBrokerJsonsProcessedRevision(): Int
+
+    suspend fun setBrokerJsonsProcessedRevision(revision: Int)
 
     suspend fun latestBackgroundScanRunInMs(): Long
 
@@ -465,6 +470,7 @@ class RealPirRepository(
                     parent = broker.parent,
                     addedDatetime = broker.addedDatetime,
                     removedAt = broker.removedAt ?: 0L,
+                    userAgent = broker.androidUserAgent(),
                 ),
                 brokerScan =
                 BrokerScan(
@@ -864,6 +870,16 @@ class RealPirRepository(
         return@withContext pirDataStore.hasBrokerConfigBeenManuallyUpdated
     }
 
+    override suspend fun getBrokerJsonsProcessedRevision(): Int = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.brokerJsonsProcessedRevision
+    }
+
+    override suspend fun setBrokerJsonsProcessedRevision(revision: Int) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.brokerJsonsProcessedRevision = revision
+        }
+    }
+
     override suspend fun latestBackgroundScanRunInMs(): Long = withContext(dispatcherProvider.io()) {
         return@withContext pirDataStore.latestBackgroundScanRunInMs
     }
@@ -982,6 +998,7 @@ class RealPirRepository(
         parent = parent,
         addedDatetime = addedDatetime,
         removedAt = removedAt,
+        userAgent = userAgent,
     )
 
     private suspend fun prepareDatabase(): PirDatabase? {

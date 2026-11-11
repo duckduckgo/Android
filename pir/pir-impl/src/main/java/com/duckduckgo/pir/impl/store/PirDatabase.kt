@@ -56,7 +56,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 18,
+    version = 19,
     entities = [
         BrokerJsonEtag::class,
         BrokerEntity::class,
@@ -83,6 +83,8 @@ import com.squareup.moshi.Types
         AutoMigration(from = 16, to = 17),
         // v18: adds nullable optOutFirstRequestedDate column to OptOutJobRecordEntity
         AutoMigration(from = 17, to = 18, spec = PirDatabaseMigration17To18Spec::class),
+        // v19: adds nullable userAgent column to BrokerEntity
+        AutoMigration(from = 18, to = 19),
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
