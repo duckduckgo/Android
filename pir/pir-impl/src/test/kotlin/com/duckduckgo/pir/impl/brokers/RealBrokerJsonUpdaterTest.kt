@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.brokers
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.RealBrokerJsonUpdater.Companion.BROKER_JSON_FIELDS_REVISION
@@ -56,6 +57,7 @@ class RealBrokerJsonUpdaterTest {
     private val mockPirPixelSender: PirPixelSender = mock()
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
     private val mockUseBundledBrokerJsonsToggle: Toggle = mock()
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
 
     @Before
     fun setUp() = runTest {
@@ -66,6 +68,7 @@ class RealBrokerJsonUpdaterTest {
             invocation.getArgument<List<String>>(0).toSet()
         }
         whenever(mockPirRepository.getBrokerJsonsProcessedRevision()).thenReturn(BROKER_JSON_FIELDS_REVISION)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testNowMs)
 
         testee = RealBrokerJsonUpdater(
             dbpService = mockDbpService,
@@ -75,10 +78,12 @@ class RealBrokerJsonUpdaterTest {
             bundledBrokerDataLoader = mockBundledBrokerDataLoader,
             pixelSender = mockPirPixelSender,
             pirRemoteFeatures = mockPirRemoteFeatures,
+            currentTimeProvider = mockCurrentTimeProvider,
         )
     }
 
     // Test data
+    private val testNowMs = 1_700_000_000_000L
     private val testEtag = "test-etag-123"
     private val testNewEtag = "test-etag-456"
     private val testFileName1 = "broker1.json"
@@ -96,7 +101,7 @@ class RealBrokerJsonUpdaterTest {
     private val testMainConfig = PirMainConfig(
         etag = testNewEtag,
         jsonEtags = testBrokerEtags,
-        activeBrokers = emptyList(), // to be removed
+        activeBrokers = listOf(testFileName1, testFileName2, testFileName3),
     )
 
     private val testExistingBrokerJsons = listOf(
@@ -471,5 +476,54 @@ class RealBrokerJsonUpdaterTest {
         assertTrue(result)
         verify(mockPirRepository, never()).setBrokerJsonsProcessedRevision(any())
         verify(mockPirRepository, never()).updateMainEtag(testNewEtag)
+    }
+
+    @Test
+    fun whenMainConfigListsBrokerThatIsNotActiveThenItIsNotDownloadedNorItsEtagStored() = runTest {
+        val config = testMainConfig.copy(activeBrokers = listOf(testFileName1, testFileName2))
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(2)
+        whenever(mockDbpService.getMainConfig("old-etag")).thenReturn(Response.success(config))
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testExistingBrokerJsons)
+
+        val result = testee.update()
+
+        assertTrue(result)
+        verify(mockBrokerDataDownloader).downloadBrokerData(listOf(testFileName2))
+        verify(mockPirRepository).updateBrokerJsons(testNewBrokerJsons.filter { it.fileName != testFileName3 })
+        verify(mockPirRepository).updateMainEtag(testNewEtag)
+    }
+
+    @Test
+    fun whenMainConfigIsSuccessfulThenStoredBrokersOutsideActiveListAreDeactivated() = runTest {
+        val config = testMainConfig.copy(activeBrokers = listOf(testFileName1, testFileName2))
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(3)
+        whenever(mockDbpService.getMainConfig("old-etag")).thenReturn(Response.success(config))
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testNewBrokerJsons)
+
+        val result = testee.update()
+
+        assertTrue(result)
+        verify(mockPirRepository).deactivateBrokersNotIn(setOf(testFileName1, testFileName2), testNowMs)
+        verifyNoInteractions(mockBrokerDataDownloader)
+    }
+
+    @Test
+    fun whenMainConfigHasNoActiveBrokersThenNothingIsUpdatedOrDeactivated() = runTest {
+        val config = testMainConfig.copy(activeBrokers = emptyList())
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(3)
+        whenever(mockDbpService.getMainConfig("old-etag")).thenReturn(Response.success(config))
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testExistingBrokerJsons)
+
+        val result = testee.update()
+
+        assertTrue(result)
+        verifyNoInteractions(mockBrokerDataDownloader)
+        verify(mockPirRepository, never()).updateBrokerJsons(any())
+        verify(mockPirRepository, never()).deactivateBrokersNotIn(any(), any())
+        verify(mockPirRepository, never()).updateMainEtag(any())
+        verify(mockPirPixelSender).reportDownloadBrokerJsonFailure(any())
     }
 }
