@@ -176,6 +176,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         when (event) {
             is ChatHistoryViewModel.NavigationEvent.OpenChat ->
                 startActivity(browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId))
+            is ChatHistoryViewModel.NavigationEvent.OpenExistingTab ->
+                startActivity(browserNav.openExistingTab(requireContext(), event.tabId))
             is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
             is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar(event.fileName)
             is ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadComplete -> showBulkDownloadCompleteSnackbar(event.count)
