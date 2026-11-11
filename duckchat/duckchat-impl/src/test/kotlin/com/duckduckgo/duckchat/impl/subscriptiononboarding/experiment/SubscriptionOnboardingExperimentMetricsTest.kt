@@ -51,7 +51,7 @@ class SubscriptionOnboardingExperimentMetricsTest {
 
     @Test
     fun whenAiFeaturesDisabledThenSendsMetricForBothExperimentToggles() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(freeTrialToggle, paidToggle))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(freeTrialToggle, paidToggle))
 
         testee.fireAiFeaturesDisabled()
 
@@ -67,11 +67,11 @@ class SubscriptionOnboardingExperimentMetricsTest {
     }
 
     @Test
-    fun whenOnlyUnrelatedTogglesInInventoryThenNoMetricSent() = runTest {
+    fun whenOnlyOtherExperimentsActiveThenNoMetricSent() = runTest {
         val unrelated: Toggle = mock {
             on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "someOtherToggle")
         }
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(unrelated))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(unrelated))
 
         testee.fireAiFeaturesDisabled()
 
@@ -79,8 +79,8 @@ class SubscriptionOnboardingExperimentMetricsTest {
     }
 
     @Test
-    fun whenNoTogglesInInventoryThenNoMetricSent() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(emptyList())
+    fun whenNoActiveExperimentsThenNoMetricSent() = runTest {
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
 
         testee.fireAiFeaturesDisabled()
 

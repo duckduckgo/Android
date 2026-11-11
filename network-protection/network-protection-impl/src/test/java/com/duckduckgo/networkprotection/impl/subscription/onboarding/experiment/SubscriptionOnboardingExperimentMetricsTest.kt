@@ -38,11 +38,9 @@ class SubscriptionOnboardingExperimentMetricsTest {
     private val inventory: FeatureTogglesInventory = mock()
     private val freeTrialToggle: Toggle = mock {
         on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "subscriptionOnboardingFreeTrialsOct2026")
-        onBlocking { isEnrolled() } doReturn true
     }
     private val paidToggle: Toggle = mock {
         on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "subscriptionOnboardingPaidSubsOct2026")
-        onBlocking { isEnrolled() } doReturn true
     }
     private lateinit var testee: SubscriptionOnboardingExperimentMetrics
 
@@ -57,7 +55,7 @@ class SubscriptionOnboardingExperimentMetricsTest {
 
     @Test
     fun whenVpnActivatedThenFiresD1AndExperimentSpecificLaterWindowForEachExperiment() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(freeTrialToggle, paidToggle))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(freeTrialToggle, paidToggle))
 
         testee.fireVpnActivated()
 
@@ -79,8 +77,8 @@ class SubscriptionOnboardingExperimentMetricsTest {
     }
 
     @Test
-    fun whenNoExperimentTogglesInInventoryThenNoMetricSent() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(emptyList())
+    fun whenNoActiveExperimentsThenNoMetricSent() = runTest {
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
 
         testee.fireVpnActivated()
 
@@ -89,7 +87,7 @@ class SubscriptionOnboardingExperimentMetricsTest {
 
     @Test
     fun whenVpnActivatedAgainThenNoMetricSentTwice() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(freeTrialToggle))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(freeTrialToggle))
 
         testee.fireVpnActivated()
         testee.fireVpnActivated()
@@ -98,12 +96,11 @@ class SubscriptionOnboardingExperimentMetricsTest {
     }
 
     @Test
-    fun whenNotEnrolledThenNoMetricSent() = runTest {
-        val notEnrolledToggle: Toggle = mock {
-            on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "subscriptionOnboardingFreeTrialsOct2026")
-            onBlocking { isEnrolled() } doReturn false
+    fun whenOnlyOtherExperimentsActiveThenNoMetricSent() = runTest {
+        val otherToggle: Toggle = mock {
+            on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "otherExperiment")
         }
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(notEnrolledToggle))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(otherToggle))
 
         testee.fireVpnActivated()
 
@@ -112,14 +109,10 @@ class SubscriptionOnboardingExperimentMetricsTest {
 
     @Test
     fun whenVpnActivatedBeforeEnrollmentThenMetricSentOnceEnrolled() = runTest {
-        val notEnrolledToggle: Toggle = mock {
-            on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "subscriptionOnboardingFreeTrialsOct2026")
-            onBlocking { isEnrolled() } doReturn false
-        }
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(notEnrolledToggle))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
         testee.fireVpnActivated()
 
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(freeTrialToggle))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(freeTrialToggle))
         testee.fireVpnActivated()
 
         assertEquals(2, fakeMetricsPixelExtension.sentMetrics.size)
