@@ -35,6 +35,11 @@ on:
         required: false
         type: string
         default: ''
+      gradle_flags:
+        description: 'Extra Gradle flags for the build (defaults to the same flags as the nightly e2e suites)'
+        required: false
+        type: string
+        default: '-Pautofill-disable-auth-requirement'
   workflow_dispatch:
     inputs:
       tags:
@@ -61,6 +66,11 @@ on:
         required: false
         type: string
         default: ''
+      gradle_flags:
+        description: 'Extra Gradle flags for the build (defaults to the same flags as the nightly e2e suites)'
+        required: false
+        type: string
+        default: '-Pautofill-disable-auth-requirement'
 
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}-${{ inputs.tags }}
@@ -86,6 +96,7 @@ jobs:
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          gradle_flags: ${{ inputs.gradle_flags }}
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
