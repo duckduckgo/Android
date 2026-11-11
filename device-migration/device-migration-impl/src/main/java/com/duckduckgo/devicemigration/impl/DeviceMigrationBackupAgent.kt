@@ -32,9 +32,9 @@ import java.io.File
  * Leaves the definite "this install was restored" signal that [RealDeviceMigration] prefers over its heuristics.
  *
  * The framework runs this agent in restricted mode, with the base Application instead of ours, so there is no DI graph here:
- * only plain Android APIs, and nothing that could fail the user's transfer. A device transfer is left to the default implementation
- * so the XML rules decide what it carries, except that it sends nothing while the remote flag is off: the new phone then starts as
- * a fresh install, with nothing to detect and nothing to act on later. Any other backup sends nothing.
+ * only plain Android APIs, and nothing that could fail the user's transfer. Backup itself is left to the default implementation
+ * so the XML rules stay the single source of what transfers, except that nothing is sent while the remote flag is off: the new
+ * phone then starts as a fresh install, with nothing to detect and nothing to act on later.
  */
 class DeviceMigrationBackupAgent : BackupAgent() {
 
@@ -46,7 +46,7 @@ class DeviceMigrationBackupAgent : BackupAgent() {
     override fun onRestore(data: BackupDataInput?, appVersionCode: Int, newState: ParcelFileDescriptor?) = Unit
 
     override fun onFullBackup(data: FullBackupDataOutput) {
-        if (shouldSendNothing(this, data.transportFlags)) return
+        if (shouldSendNothing(this)) return
         super.onFullBackup(data)
     }
 
@@ -72,13 +72,12 @@ class DeviceMigrationBackupAgent : BackupAgent() {
 
     internal companion object {
         /**
-         * Cloud and adb backups send nothing even though the rules already exclude them, so a mistake in the rules cannot upload
-         * user data. Samsung Smart Switch marks its backups as device transfers, so it is not affected. A phone that never saved
-         * the flag, or whose file cannot be read, still transfers, matching the flag's default.
+         * Samsung Smart Switch backups reach the agent without the device-transfer flag, so the transport flags cannot tell a
+         * transfer from a cloud backup: the remote flag holds back every backup, and the rules alone keep cloud backup empty.
+         * A phone that never saved the flag, or whose file cannot be read, still transfers, matching the flag's default.
          */
         @SuppressLint("DenyListedApi") // no SharedPreferencesProvider in restricted mode; the app writes this file as plain prefs
-        fun shouldSendNothing(context: Context, transportFlags: Int): Boolean {
-            if (transportFlags and FLAG_DEVICE_TO_DEVICE_TRANSFER == 0) return true
+        fun shouldSendNothing(context: Context): Boolean {
             return try {
                 !context.getSharedPreferences(LOCAL_FILE, Context.MODE_PRIVATE).getBoolean(KEY_TRANSFER_ALLOWED, true)
             } catch (e: Exception) {

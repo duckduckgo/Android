@@ -17,8 +17,6 @@
 package com.duckduckgo.devicemigration.impl
 
 import android.annotation.SuppressLint
-import android.app.backup.BackupAgent.FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED
-import android.app.backup.BackupAgent.FLAG_DEVICE_TO_DEVICE_TRANSFER
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -82,42 +80,21 @@ class DeviceMigrationBackupAgentTest {
     }
 
     @Test
-    fun whenTransferNotAllowedThenDeviceTransferSendsNothing() {
+    fun whenTransferNotAllowedThenBackupSendsNothing() {
         local.edit().putBoolean(KEY_TRANSFER_ALLOWED, false).commit()
 
-        assertTrue(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_DEVICE_TO_DEVICE_TRANSFER))
+        assertTrue(DeviceMigrationBackupAgent.shouldSendNothing(context))
     }
 
     @Test
-    fun whenTransferAllowedThenDeviceTransferSendsData() {
+    fun whenTransferAllowedThenBackupSendsData() {
         local.edit().putBoolean(KEY_TRANSFER_ALLOWED, true).commit()
 
-        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_DEVICE_TO_DEVICE_TRANSFER))
+        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context))
     }
 
     @Test
-    fun whenFlagNeverSavedThenDeviceTransferSendsData() {
-        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_DEVICE_TO_DEVICE_TRANSFER))
-    }
-
-    @Test
-    fun whenEncryptedDeviceTransferAllowedThenSendsData() {
-        local.edit().putBoolean(KEY_TRANSFER_ALLOWED, true).commit()
-
-        assertFalse(
-            DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_DEVICE_TO_DEVICE_TRANSFER or FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED),
-        )
-    }
-
-    @Test
-    fun whenTransferAllowedThenCloudBackupSendsNothing() {
-        local.edit().putBoolean(KEY_TRANSFER_ALLOWED, true).commit()
-
-        assertTrue(DeviceMigrationBackupAgent.shouldSendNothing(context, FLAG_CLIENT_SIDE_ENCRYPTION_ENABLED))
-    }
-
-    @Test
-    fun whenBackupHasNoTransportFlagsThenSendsNothing() {
-        assertTrue(DeviceMigrationBackupAgent.shouldSendNothing(context, 0))
+    fun whenFlagNeverSavedThenBackupSendsData() {
+        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context))
     }
 }
