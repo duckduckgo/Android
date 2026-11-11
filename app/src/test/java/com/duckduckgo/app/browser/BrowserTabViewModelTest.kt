@@ -118,7 +118,6 @@ import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
 import com.duckduckgo.app.browser.errorpage.BadUrlErrorPageWideEvent
-import com.duckduckgo.app.browser.errorpage.CustomErrorPagesFeature
 import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
@@ -771,7 +770,6 @@ class BrowserTabViewModelTest {
     private val fakeNewTabReturnHatchFeature = FakeFeatureToggleFactory.create(NewTabReturnHatchFeature::class.java)
     private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
-    private val fakeCustomErrorPagesFeature = FakeFeatureToggleFactory.create(CustomErrorPagesFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
     private val mockDuckAiEntryCallback: DuckAiEntryCallback = mock()
@@ -791,10 +789,6 @@ class BrowserTabViewModelTest {
     fun before() =
         runTest {
             MockitoAnnotations.openMocks(this)
-            fakeCustomErrorPagesFeature.apply {
-                self().setRawStoredState(State(enable = true))
-                keepErrorPageUntilNextPageStartsLoading().setRawStoredState(State(enable = true))
-            }
 
             // Register MIME types needed by file chooser tests (Robolectric's MimeTypeMap is empty by default)
             val mimeTypeMap = android.webkit.MimeTypeMap.getSingleton()
@@ -1128,7 +1122,6 @@ class BrowserTabViewModelTest {
                 newTabPageModalTrigger = mockNewTabPageModalTrigger,
                 suggestRedirectEvaluator = mockSuggestRedirectEvaluator,
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
-                customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
                 duckAiEntryCallback = lazy { mockDuckAiEntryCallback },
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
