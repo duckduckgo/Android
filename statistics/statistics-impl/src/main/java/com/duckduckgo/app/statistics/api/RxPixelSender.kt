@@ -30,6 +30,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
@@ -67,9 +68,15 @@ class RxPixelSender @Inject constructor(
     private val pixelSenderFeature: Lazy<PixelSenderFeature>,
     private val pixelRequiringAtbPlugins: PluginPoint<PixelRequiringAtbPlugin>,
     private val concurrencyLimitFeature: Lazy<PixelConcurrencyLimitFeature>,
+    private val deviceMigration: Lazy<DeviceMigration>, // break any possible DI dependency cycle
 ) : PixelSender, MainProcessLifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
+
+    private val transferredQueueLock = Any()
+
+    @Volatile
+    private var transferredQueueChecked = false
 
     private val shouldFirePixelsAsDev: Int? by lazy {
         if (statisticsLibraryConfig.shouldFirePixelsAsDev()) 1 else null
@@ -77,15 +84,44 @@ class RxPixelSender @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         compositeDisposable.add(
-            pendingPixelDao.pixels()
-                .flatMapIterable { it }
-                .switchMapCompletable(this::sendAndDeletePixel)
+            Completable.fromAction { clearTransferredQueueOnce() }
+                .andThen(
+                    pendingPixelDao.pixels()
+                        .flatMapIterable { it }
+                        .switchMapCompletable(this::sendAndDeletePixel),
+                )
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                     { logcat(VERBOSE) { "Pixel finished sync" } },
                     { logcat(WARN) { "Pixel failed to sync: ${it.asLog()}" } },
                 ),
         )
+    }
+
+    /**
+     * The pixel queue lives in app.db, which a device transfer copies with the bookmarks and tabs. Its rows are the previous
+     * phone's unsent pixels, which that phone may still send, so they are dropped before this phone first sends or enqueues
+     * a pixel: clearing after an enqueue would drop this phone's pixel too, and a unique pixel would never be sent again.
+     */
+    private fun clearTransferredQueueOnce() {
+        if (transferredQueueChecked) return
+        synchronized(transferredQueueLock) {
+            if (transferredQueueChecked) return
+            try {
+                val migration = deviceMigration.value
+                if (!migration.isDoneOnThisInstall(TRANSFERRED_QUEUE_CLEARED_KEY)) {
+                    if (runBlocking { migration.isMigratedInstall() }) pendingPixelDao.deleteAll()
+                    migration.markDoneOnThisInstall(TRANSFERRED_QUEUE_CLEARED_KEY)
+                }
+                transferredQueueChecked = true
+            } catch (e: Exception) {
+                logcat(WARN) { "Could not clear the pixel queue from the previous phone: ${e.asLog()}" }
+            }
+        }
+    }
+
+    private companion object {
+        const val TRANSFERRED_QUEUE_CLEARED_KEY = "statistics.transferredPixelQueueCleared"
     }
 
     override fun onStop(owner: LifecycleOwner) {
@@ -153,6 +189,7 @@ class RxPixelSender @Inject constructor(
         type: Pixel.PixelType,
     ): Single<PixelSender.EnqueuePixelResult> {
         return Single.fromCallable {
+            clearTransferredQueueOnce()
             runBlocking {
                 if (shouldFirePixel(pixelName, type)) {
                     val pixelEntity = PixelEntity(

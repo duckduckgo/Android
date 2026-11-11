@@ -30,4 +30,6 @@ interface PendingPixelDao {
     fun insert(pixel: PixelEntity): Long
 
     @Delete fun delete(pixel: PixelEntity)
+
+    @Query("delete from pixel_store") fun deleteAll()
 }
