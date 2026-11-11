@@ -141,7 +141,7 @@ class NewChatHintsView @JvmOverloads constructor(
 
     private fun render(hints: List<NewChatHint>, tabId: String) {
         row.removeAllViews()
-        hints.forEach { hint ->
+        hints.forEachIndexed { index, hint ->
             val label = LayoutInflater.from(context).inflate(R.layout.item_new_chat_hint, row, false) as DaxTextView
             val (text, icon) = when (hint) {
                 NewChatHint.DOCUMENTS -> R.string.newChatHintDocuments to R.drawable.ic_document_new_24
@@ -151,7 +151,7 @@ class NewChatHintsView @JvmOverloads constructor(
             label.setText(text)
             label.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
             label.setOnClickListener {
-                findViewTreeLifecycleOwner()?.lifecycleScope?.launch { viewModel.onHintTapped(hint, tabId) }
+                findViewTreeLifecycleOwner()?.lifecycleScope?.launch { viewModel.onHintTapped(hint, position = index + 1, tabId) }
             }
             row.addView(label)
         }

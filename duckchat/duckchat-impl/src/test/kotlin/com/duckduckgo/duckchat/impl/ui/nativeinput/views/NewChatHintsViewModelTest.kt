@@ -34,12 +34,15 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsEligibility
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -62,8 +65,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -73,6 +78,7 @@ class NewChatHintsViewModelTest {
     @get:Rule val coroutineRule = CoroutineTestRule()
 
     private val eligible = MutableStateFlow(true)
+    private val duckChatPixels: DuckChatPixels = mock()
     private val commands = NewChatHintCommands()
     private val selectedTab = MutableStateFlow<TabEntity?>(TabEntity("tab"))
     private val tabs = MutableStateFlow(listOf(TabEntity("tab", url = NEW_CHAT_URL)))
@@ -103,6 +109,7 @@ class NewChatHintsViewModelTest {
     private val chatStore: DuckAiChatStore = mock {
         onBlocking { getChatById(any()) } doAnswer { invocation -> chats.value.firstOrNull { it.chatId == invocation.getArgument(0) } }
     }
+    private val pixels = NewChatHintsPixels(duckChatPixels, mock(), coroutineRule.testDispatcherProvider)
     private fun viewModel(
         provider: NativeInputStateProvider = stateStore,
         eligibility: NewChatHintsEligibility = object : NewChatHintsEligibility {
@@ -110,7 +117,8 @@ class NewChatHintsViewModelTest {
         },
         browserMode: BrowserMode = BrowserMode.REGULAR,
     ) = NewChatHintsViewModel(
-        provider, modelManager, duckChat, commands, tabRepository, usage, eligibility, browserMode, chatStateStore, voiceSessions, chatStore,
+        provider, modelManager, duckChat, commands, tabRepository, usage, eligibility, browserMode,
+        NewChatDetector(provider, chatStateStore, voiceSessions, tabRepository, duckChat, chatStore, coroutineRule.testDispatcherProvider), pixels,
     )
 
     @Before
@@ -161,7 +169,7 @@ class NewChatHintsViewModelTest {
         val testee = viewModel()
         testee.viewState("tab").test {
             awaitItem()
-            testee.onHintTapped(NewChatHint.DOCUMENTS, "tab")
+            testee.onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab")
             runCurrent()
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
@@ -173,7 +181,7 @@ class NewChatHintsViewModelTest {
         val testee = viewModel()
         testee.viewState("tab").test {
             val initial = awaitItem()
-            testee.onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            testee.onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
             stateStore.update("tab") { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
             assertTrue(awaitItem().isEmpty())
             stateStore.update("tab") { it.copy(selectedTool = null) }
@@ -188,9 +196,9 @@ class NewChatHintsViewModelTest {
         whenever(modelManager.selectModel(any())).doSuspendableAnswer { selection.await() }
         val testee = viewModel()
         commands.commandsFor { "tab" }.test {
-            backgroundScope.launch { testee.onHintTapped(NewChatHint.DOCUMENTS, "tab") }
+            backgroundScope.launch { testee.onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab") }
             runCurrent()
-            testee.onHintTapped(NewChatHint.PHOTO, "tab")
+            testee.onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -222,7 +230,7 @@ class NewChatHintsViewModelTest {
         stateStore.update("tab") { it.copy(modelChangeMode = true) }
         assertTrue(viewModel().viewState("tab").first().isEmpty())
         commands.commandsFor { "tab" }.test {
-            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -269,7 +277,7 @@ class NewChatHintsViewModelTest {
             Unit
         }
         commands.commandsFor { "tab" }.test {
-            viewModel().onHintTapped(NewChatHint.DOCUMENTS, "tab")
+            viewModel().onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab")
             assertEquals("files", models.value.selectedModelId)
             assertEquals(NewChatHintCommand.OpenDocuments("tab", listOf("application/pdf")), awaitItem())
             cancelAndIgnoreRemainingEvents()
@@ -281,7 +289,7 @@ class NewChatHintsViewModelTest {
         models.value = models.value.copy(selectedModelId = "model")
         stateStore.update("tab") { it.copy(hasText = true) }
         commands.commandsFor { "tab" }.test {
-            viewModel().onHintTapped(NewChatHint.PHOTO, "tab")
+            viewModel().onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
             assertEquals(NewChatHintCommand.OpenPhoto("tab"), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -293,7 +301,7 @@ class NewChatHintsViewModelTest {
         commands.commandsFor { "other" }.test {
             val otherTab = this
             commands.commandsFor { "tab" }.test {
-                viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+                viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
                 assertEquals(NewChatHintCommand.CreateImage("tab"), awaitItem())
                 otherTab.expectNoEvents()
                 cancelAndIgnoreRemainingEvents()
@@ -306,9 +314,9 @@ class NewChatHintsViewModelTest {
     fun whenCapabilityDisappearsBeforeTheTapThenNoCommandIsSent() = runTest {
         models.value = ModelState()
         commands.commandsFor { "tab" }.test {
-            viewModel().onHintTapped(NewChatHint.DOCUMENTS, "tab")
-            viewModel().onHintTapped(NewChatHint.PHOTO, "tab")
-            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            viewModel().onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab")
+            viewModel().onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -321,7 +329,7 @@ class NewChatHintsViewModelTest {
             Unit
         }
         commands.commandsFor { "tab" }.test {
-            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -369,8 +377,8 @@ class NewChatHintsViewModelTest {
     fun whenNotEligibleThenTapsDoNotSendCommands() = runTest {
         eligible.value = false
         commands.commandsFor { "tab" }.test {
-            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
-            viewModel().onHintTapped(NewChatHint.PHOTO, "tab")
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
+            viewModel().onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -384,7 +392,7 @@ class NewChatHintsViewModelTest {
             Unit
         }
         commands.commandsFor { "tab" }.test {
-            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -400,7 +408,7 @@ class NewChatHintsViewModelTest {
         commands.commandsFor { "tab" }
             .onEach { deliveries += it.tabId to selectedTab.value?.tabId }
             .launchIn(backgroundScope)
-        backgroundScope.launch { viewModel(provider = provider).onHintTapped(NewChatHint.IMAGE_GENERATION, "tab") }
+        backgroundScope.launch { viewModel(provider = provider).onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab") }
         runCurrent()
 
         selectedTab.value = TabEntity("other")
@@ -437,14 +445,14 @@ class NewChatHintsViewModelTest {
     fun whenAHintIsTappedThenUsageIsToldEvenIfNoCommandIsSent() = runTest {
         eligible.value = false
 
-        viewModel().onHintTapped(NewChatHint.PHOTO, "tab")
+        viewModel().onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
 
         verify(usage).onHintTapped("tab")
     }
 
     @Test
     fun whenAHintIsTappedInFireModeThenUsageIsNotTold() = runTest {
-        viewModel(browserMode = BrowserMode.FIRE).onHintTapped(NewChatHint.PHOTO, "tab")
+        viewModel(browserMode = BrowserMode.FIRE).onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
 
         verify(usage, never()).onHintTapped(any())
     }
@@ -465,7 +473,7 @@ class NewChatHintsViewModelTest {
         openUrl(VOICE_MODE_URL)
         assertTrue(viewModel().viewState("tab").first().isEmpty())
         commands.commandsFor { "tab" }.test {
-            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+            viewModel().onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
             expectNoEvents()
         }
     }
@@ -492,7 +500,7 @@ class NewChatHintsViewModelTest {
             assertTrue(awaitItem().isEmpty())
             openUrl(NEW_CHAT_URL)
             commands.commandsFor { "tab" }.test {
-                testee.onHintTapped(NewChatHint.IMAGE_GENERATION, "tab")
+                testee.onHintTapped(NewChatHint.IMAGE_GENERATION, position = 1, "tab")
                 expectNoEvents()
             }
             cancelAndIgnoreRemainingEvents()
@@ -622,6 +630,53 @@ class NewChatHintsViewModelTest {
         }
 
         verify(usage, never()).onLeftNewChat(any())
+    }
+
+    @Test
+    fun whenHintsShowThenTheRowIsReportedOnce() = runTest {
+        val shown = viewModel().viewState("tab").first()
+        viewModel().viewState("tab").test {
+            awaitItem()
+            stateStore.update("tab") { it.copy(hasText = true) }
+            awaitItem()
+            stateStore.update("tab") { it.copy(hasText = false) }
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(duckChatPixels, times(1)).fireNewChatHintsShown(shown)
+    }
+
+    @Test
+    fun whenHintsShowBeforeTheNewChatIsReportedThenItIsCountedWithTheFlagOn() = runTest {
+        viewModel().viewState("tab").first()
+
+        verify(duckChatPixels, times(1)).fireNewChatShown(hasNewChatHints = true)
+    }
+
+    @Test
+    fun whenAHintIsTappedThenTheTapIsReportedWithItsSlot() = runTest {
+        viewModel(browserMode = BrowserMode.FIRE).onHintTapped(NewChatHint.PHOTO, position = 2, "tab")
+
+        verify(duckChatPixels).fireNewChatHintTapped(NewChatHint.PHOTO, 2)
+    }
+
+    @Test
+    fun whenAPromptIsSentAfterATapThenTheFirstPromptCarriesTheLastTappedHint() = runTest {
+        val testee = viewModel()
+        testee.viewState("tab").first()
+        testee.onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
+        testee.onHintTapped(NewChatHint.DOCUMENTS, position = 2, "tab")
+
+        pixels.onPromptSubmitted("tab", isNewChat = true, hasImageAttachment = false, hasFileAttachment = true, selectedTool = "none")
+
+        verify(duckChatPixels).fireNewChatFirstPromptSent(
+            hasNewChatHints = eq(true),
+            hintTapped = eq(NewChatHint.DOCUMENTS),
+            hasImageAttachment = eq(false),
+            hasFileAttachment = eq(true),
+            selectedTool = eq("none"),
+        )
     }
 
     private fun openUrl(url: String) {

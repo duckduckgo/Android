@@ -43,6 +43,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.SubscriptionFunnelSource
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_DUCKAI_DAU_TOGGLE_NEVER_ENABLED
@@ -314,6 +315,24 @@ interface DuckChatPixels {
     fun fireOmnibarFloatingSubmitPressed(isSearchMode: Boolean)
     fun fireOmnibarFloatingReturnPressed()
     fun fireOmnibarSessionBothModes()
+
+    /** A full-screen Duck.ai New Chat showed. [hasNewChatHints] is the hints flag. */
+    fun fireNewChatShown(hasNewChatHints: Boolean)
+
+    /** The first prompt sent from a New Chat counted by [fireNewChatShown]. [hintTapped] is the last hint tapped before it. */
+    fun fireNewChatFirstPromptSent(
+        hasNewChatHints: Boolean,
+        hintTapped: NewChatHint?,
+        hasImageAttachment: Boolean,
+        hasFileAttachment: Boolean,
+        selectedTool: String,
+    )
+
+    /** Once per New Chat; [hints] is the row in display order, which is shuffled per tab. */
+    fun fireNewChatHintsShown(hints: List<NewChatHint>)
+
+    /** [position] is the hint's 1-based slot in the row. */
+    fun fireNewChatHintTapped(hint: NewChatHint, position: Int)
 }
 
 @ContributesBinding(AppScope::class)
@@ -1403,6 +1422,61 @@ class RealDuckChatPixels @Inject constructor(
         DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY,
     )
 
+    override fun fireNewChatShown(hasNewChatHints: Boolean) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_NEW_CHAT_SHOWN_COUNT,
+        DuckChatPixelName.DUCK_CHAT_NEW_CHAT_SHOWN_DAILY,
+        mapOf(DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to hasNewChatHints.toString()),
+    )
+
+    override fun fireNewChatFirstPromptSent(
+        hasNewChatHints: Boolean,
+        hintTapped: NewChatHint?,
+        hasImageAttachment: Boolean,
+        hasFileAttachment: Boolean,
+        selectedTool: String,
+    ) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT,
+        DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY,
+        mapOf(
+            DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to hasNewChatHints.toString(),
+            DuckChatPixelParameters.HINT_TAPPED to (hintTapped?.pixelValue() ?: "none"),
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to hasImageAttachment.toString(),
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to hasFileAttachment.toString(),
+            DuckChatPixelParameters.SELECTED_TOOL to selectedTool,
+        ),
+    )
+
+    override fun fireNewChatHintsShown(hints: List<NewChatHint>) {
+        // A hint not shown reports position 0.
+        val positions = NewChatHint.entries.associate { hint -> hint.positionParam() to (hints.indexOf(hint) + 1).toString() }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN, parameters = positions)
+        }
+    }
+
+    override fun fireNewChatHintTapped(hint: NewChatHint, position: Int) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY,
+        newChatHintParams(hint, position),
+    )
+
+    private fun newChatHintParams(hint: NewChatHint, position: Int): Map<String, String> = mapOf(
+        DuckChatPixelParameters.HINT to hint.pixelValue(),
+        DuckChatPixelParameters.HINT_POSITION to position.toString(),
+    )
+
+    private fun NewChatHint.pixelValue(): String = when (this) {
+        NewChatHint.DOCUMENTS -> "documents"
+        NewChatHint.PHOTO -> "photo"
+        NewChatHint.IMAGE_GENERATION -> "image_generation"
+    }
+
+    private fun NewChatHint.positionParam(): String = when (this) {
+        NewChatHint.DOCUMENTS -> DuckChatPixelParameters.DOCUMENTS_HINT_POSITION
+        NewChatHint.PHOTO -> DuckChatPixelParameters.PHOTO_HINT_POSITION
+        NewChatHint.IMAGE_GENERATION -> DuckChatPixelParameters.IMAGE_GENERATION_HINT_POSITION
+    }
+
     private fun fireModeParam(name: DuckChatPixelName, isSearchMode: Boolean) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(pixel = name, parameters = inputScreenPixelsModeParam(isSearchMode))
@@ -1757,6 +1831,14 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_TAB_SWITCHER_SWITCH_TO_AI_TAB_DAILY("m_tab_manager_switch_to_ai_tab_daily"),
     DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_COUNT("m_tab_manager_close_ai_tab_count"),
     DUCK_CHAT_TAB_SWITCHER_CLOSE_AI_TAB_DAILY("m_tab_manager_close_ai_tab_daily"),
+
+    DUCK_CHAT_NEW_CHAT_SHOWN_COUNT("aichat_new_chat_shown_count"),
+    DUCK_CHAT_NEW_CHAT_SHOWN_DAILY("aichat_new_chat_shown_daily"),
+    DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT("aichat_new_chat_first_prompt_sent_count"),
+    DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY("aichat_new_chat_first_prompt_sent_daily"),
+    DUCK_CHAT_NEW_CHAT_HINTS_SHOWN("aichat_new_chat_hints_shown"),
+    DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT("aichat_new_chat_hint_tapped_count"),
+    DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY("aichat_new_chat_hint_tapped_daily"),
 }
 
 object DuckChatPixelParameters {
@@ -1807,6 +1889,15 @@ object DuckChatPixelParameters {
     const val UPSELL_FLOW_TYPE = "flow_type"
     const val UPSELL_HEADER = "header"
     const val MODEL_LABEL = "label"
+
+    // New Chat hints
+    const val NEW_CHAT_HINTS_ENABLED = "newchathints_enabled"
+    const val HINT = "hint"
+    const val HINT_POSITION = "position"
+    const val HINT_TAPPED = "hint_tapped"
+    const val DOCUMENTS_HINT_POSITION = "documents_position"
+    const val PHOTO_HINT_POSITION = "photo_position"
+    const val IMAGE_GENERATION_HINT_POSITION = "image_generation_position"
 
     // Subscription-funnel telemetry: the entry-point origin (e.g. funnel_duckai_android__modelpicker)
     const val ORIGIN = "origin"
@@ -2086,6 +2177,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             "m_aichat_attachment_privacy_" to PixelParameter.removeAtb(),
             // Same coverage for unified_input pixels added without the legacy m_ prefix.
             "aichat_unified_input_" to PixelParameter.removeAtb(),
+            "aichat_new_chat_" to PixelParameter.removeAtb(),
         )
     }
 }
