@@ -108,7 +108,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.chatsViewAll)
 
-        assertOpensChatHistory(launched)
+        assertLaunch(launched, launch = DuckChatLaunch.ChatHistory::class)
         verify(remoteViews).setViewVisibility(R.id.chatsViewAllContainer, View.VISIBLE)
     }
 
