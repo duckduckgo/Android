@@ -33,7 +33,7 @@ interface SponsorBlockService {
     suspend fun getSegments(@Path("hashPrefix") hashPrefix: String): Response<List<VideoSegmentsResponse>>
 
     companion object {
-        private const val SEGMENTS_ENDPOINT = "https://web-dew-1.duckduckgo.com/sponsorblock/v1/segments"
+        private const val SEGMENTS_ENDPOINT = "https://duckduckgo.com/sponsorblock/v1/segments"
     }
 }
 
