@@ -17,7 +17,8 @@ package com.duckduckgo.duckchat.impl.widget
 
 import android.content.Context
 import android.widget.RemoteViews
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -38,6 +39,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
     private val intents: DuckAiWidgetIntents,
     private val dispatcherProvider: DispatcherProvider,
 ) {
+    private val widgetLaunch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET)
 
     suspend fun populateRemoteViews(
         context: Context,
@@ -57,11 +59,11 @@ class DuckAiWidgetConfigurator @Inject constructor(
 
             remoteViews.setOnClickPendingIntent(
                 R.id.promptBarContainer,
-                intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl),
+                intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl, widgetLaunch),
             )
             remoteViews.setOnClickPendingIntent(
                 R.id.actionVoice,
-                intents.launchDuckAi(context, DuckAiWidgetTarget.VOICE.requestCode, state.voiceUrl),
+                intents.launchDuckAi(context, DuckAiWidgetTarget.VOICE.requestCode, state.voiceUrl, widgetLaunch),
             )
             remoteViews.setOnClickPendingIntent(
                 R.id.actionCreateImage,
@@ -69,7 +71,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
                     context,
                     DuckAiWidgetTarget.CREATE_IMAGE.requestCode,
                     state.newChatUrl,
-                    DuckChatLaunchAction.ImageGeneration,
+                    DuckChatLaunch.ImageGeneration(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
                 ),
             )
             remoteViews.setOnClickPendingIntent(
@@ -78,7 +80,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
                     context,
                     DuckAiWidgetTarget.TAKE_PHOTO.requestCode,
                     state.newChatUrl,
-                    DuckChatLaunchAction.CameraCapture,
+                    DuckChatLaunch.CameraCapture(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
                 ),
             )
         }

@@ -18,25 +18,35 @@ package com.duckduckgo.duckchat.impl.widget
 
 import android.content.Intent
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import org.junit.Assert.assertEquals
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.reflect.KClass
 
 private const val EXTRA_URL = "url"
-private const val EXTRA_ACTION = "action"
+private const val EXTRA_LAUNCH = "launch"
 private const val EXTRA_ORIGIN = "origin"
 
-/** A [BrowserNav] whose widget launch intents expose their arguments as extras, so tests can assert on them. */
+private fun DuckChatLaunch.origin(): DuckChatLaunchOrigin? = when (this) {
+    is DuckChatLaunch.Open -> origin
+    is DuckChatLaunch.ImageGeneration -> origin
+    is DuckChatLaunch.CameraCapture -> origin
+    is DuckChatLaunch.ChatHistory -> origin
+    is DuckChatLaunch.ContextualChat, is DuckChatLaunch.TextSelection -> null
+}
+
+/** A [BrowserNav] whose widget launch intents expose arguments as extras, so tests can assert on them. */
 internal fun fakeBrowserNav(): BrowserNav = mock<BrowserNav>().also { nav ->
-    whenever(nav.openDuckChat(any(), any(), any(), anyOrNull(), any())).thenAnswer {
+    whenever(nav.openDuckChat(any(), any(), anyOrNull(), any())).thenAnswer {
+        val launch = it.getArgument<DuckChatLaunch>(3)
         Intent()
-            .putExtra(EXTRA_URL, it.getArgument<String>(2))
-            .putExtra(EXTRA_ACTION, it.getArgument<DuckChatLaunchAction?>(3)?.let { action -> action::class.simpleName })
-            .putExtra(EXTRA_ORIGIN, it.getArgument<DuckChatLaunchOrigin>(4).name)
+            .putExtra(EXTRA_URL, it.getArgument<String?>(2))
+            .putExtra(EXTRA_LAUNCH, launch::class.simpleName)
+            .putExtra(EXTRA_ORIGIN, launch.origin()?.name)
     }
 }
 
@@ -45,9 +55,9 @@ internal fun fakeDuckAiWidgetIntents(): DuckAiWidgetIntents = DuckAiWidgetIntent
 internal fun assertLaunch(
     intent: Intent,
     url: String? = null,
-    action: DuckChatLaunchAction? = null,
+    launch: KClass<out DuckChatLaunch> = DuckChatLaunch.Open::class,
 ) {
     assertEquals(url, intent.getStringExtra(EXTRA_URL))
-    assertEquals(action?.let { it::class.simpleName }, intent.getStringExtra(EXTRA_ACTION))
+    assertEquals(launch.simpleName, intent.getStringExtra(EXTRA_LAUNCH))
     assertEquals(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET.name, intent.getStringExtra(EXTRA_ORIGIN))
 }

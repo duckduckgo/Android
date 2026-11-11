@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.mode.DuckAiWidget
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -54,7 +54,7 @@ class AppBrowserNavTest {
 
     @Test
     fun whenOpenDuckChatWithImageGenerationThenIntentForcesImageGeneration() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchAction = DuckChatLaunchAction.ImageGeneration)
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.ImageGeneration())
 
         assertTrue(intent.getBooleanExtra("OPEN_DUCK_CHAT_EXTRA", false))
         assertEquals(DUCK_AI_URL, intent.getStringExtra("DUCK_CHAT_URL"))
@@ -64,7 +64,7 @@ class AppBrowserNavTest {
 
     @Test
     fun whenOpenDuckChatWithCameraCaptureThenIntentCarriesCameraCaptureAndDoesNotForceImageGeneration() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchAction = DuckChatLaunchAction.CameraCapture)
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.CameraCapture())
 
         assertEquals("CAMERA_CAPTURE", intent.getStringExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA))
         assertFalse(intent.getBooleanExtra("DUCK_CHAT_FORCE_IMAGE_GENERATION", false))
@@ -72,19 +72,33 @@ class AppBrowserNavTest {
     }
 
     @Test
-    fun whenOpenDuckChatWithoutLaunchActionThenIntentHasNoNativeInputLaunch() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL)
+    fun whenOpenDuckChatWithOpenThenIntentIsPlainDuckChatLaunch() {
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.Open())
 
+        assertTrue(intent.getBooleanExtra("OPEN_DUCK_CHAT_EXTRA", false))
         assertNull(intent.getStringExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA))
+        assertFalse(intent.getBooleanExtra("DUCK_CHAT_FORCE_IMAGE_GENERATION", false))
+        assertFalse(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
+        assertNull(intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
+        assertFalse(intent.getBooleanExtra(BrowserActivity.OPEN_DUCK_CHAT_HISTORY, false))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithoutUrlThenIntentHasNoUrl() {
+        val intent = testee.openDuckChat(context)
+
+        assertTrue(intent.getBooleanExtra("OPEN_DUCK_CHAT_EXTRA", false))
+        assertNull(intent.getStringExtra("DUCK_CHAT_URL"))
     }
 
     @Test
     fun whenOpenDuckChatFromHomeScreenWidgetThenIntentRequiresRegularModeAndReportsWidgetEntryPoint() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchOrigin = DuckChatLaunchOrigin.HOME_SCREEN_WIDGET)
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
 
         assertTrue(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, false))
         assertEquals(DuckAiWidget.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
         assertEquals("WIDGET_DUCK_AI", intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA))
+        assertNull(intent.getStringExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA))
     }
 
     @Test
@@ -92,8 +106,7 @@ class AppBrowserNavTest {
         val intent = testee.openDuckChat(
             context,
             duckChatUrl = DUCK_AI_URL,
-            launchAction = DuckChatLaunchAction.CameraCapture,
-            launchOrigin = DuckChatLaunchOrigin.HOME_SCREEN_WIDGET,
+            launch = DuckChatLaunch.CameraCapture(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
         )
 
         assertTrue(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, false))
@@ -106,18 +119,18 @@ class AppBrowserNavTest {
         val intent = testee.openDuckChat(
             context,
             duckChatUrl = DUCK_AI_URL,
-            launchAction = DuckChatLaunchAction.ImageGeneration,
-            launchOrigin = DuckChatLaunchOrigin.HOME_SCREEN_WIDGET,
+            launch = DuckChatLaunch.ImageGeneration(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
         )
 
         assertTrue(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, false))
         assertTrue(intent.getBooleanExtra("DUCK_CHAT_FORCE_IMAGE_GENERATION", false))
+        assertEquals("IMAGE_GENERATION", intent.getStringExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA))
         assertEquals("WIDGET_DUCK_AI", intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA))
     }
 
     @Test
     fun whenOpenDuckChatFromInAppThenIntentDoesNotRequireRegularModeAndReportsNoEntryPoint() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchOrigin = DuckChatLaunchOrigin.IN_APP)
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.IN_APP))
 
         assertFalse(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, true))
         assertEquals(InAppNavigation.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
@@ -125,10 +138,24 @@ class AppBrowserNavTest {
     }
 
     @Test
-    fun whenOpenDuckChatWithoutLaunchActionThenIntentDoesNotForceImageGeneration() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL)
+    fun whenOpenDuckChatWithChatHistoryFromHomeScreenWidgetThenIntentOpensHistoryInRegularModeWithoutDuckChat() {
+        val intent = testee.openDuckChat(context, launch = DuckChatLaunch.ChatHistory(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
 
+        assertTrue(intent.getBooleanExtra(BrowserActivity.OPEN_DUCK_CHAT_HISTORY, false))
+        assertFalse(intent.getBooleanExtra("OPEN_DUCK_CHAT_EXTRA", false))
+        assertFalse(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
         assertFalse(intent.getBooleanExtra("DUCK_CHAT_FORCE_IMAGE_GENERATION", false))
+        assertNull(intent.getStringExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA))
+        assertTrue(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, false))
+        assertEquals(DuckAiWidget.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithChatHistoryFromInAppThenIntentDoesNotRequireRegularMode() {
+        val intent = testee.openDuckChat(context, launch = DuckChatLaunch.ChatHistory(DuckChatLaunchOrigin.IN_APP))
+
+        assertTrue(intent.getBooleanExtra(BrowserActivity.OPEN_DUCK_CHAT_HISTORY, false))
+        assertFalse(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, true))
     }
 
     @Test
@@ -136,7 +163,7 @@ class AppBrowserNavTest {
         val intent = testee.openDuckChat(
             context,
             duckChatUrl = DUCK_AI_URL,
-            launchAction = DuckChatLaunchAction.ContextualChat("selected"),
+            launch = DuckChatLaunch.ContextualChat("selected"),
         )
 
         assertTrue(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
@@ -147,7 +174,7 @@ class AppBrowserNavTest {
 
     @Test
     fun whenOpenDuckChatWithContextualChatWithoutSelectionThenIntentHasNoSelection() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchAction = DuckChatLaunchAction.ContextualChat(null))
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.ContextualChat(null))
 
         assertTrue(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
         assertNull(intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
@@ -156,19 +183,11 @@ class AppBrowserNavTest {
 
     @Test
     fun whenOpenDuckChatWithTextSelectionThenIntentIsNotContextualAndCarriesSelectionFromSelectedTextSource() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launchAction = DuckChatLaunchAction.TextSelection("selected"))
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.TextSelection("selected"))
 
         assertFalse(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
         assertEquals("selected", intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
         assertEquals(SelectedTextSearch.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
-    }
-
-    @Test
-    fun whenOpenDuckChatWithoutLaunchActionThenIntentIsNotContextualAndHasNoSelection() {
-        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL)
-
-        assertFalse(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
-        assertNull(intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
     }
 
     private companion object {
