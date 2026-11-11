@@ -60,7 +60,7 @@ class RealBrokerJsonUpdater @Inject constructor(
      * - We extract the json files from the zip. For every json etag that changed, we parse and validate the json file and update the data
      *   stored locally. A json with steps or actions this app version doesn't support is rejected, and the stored version of that broker is kept.
      * - We update the etags db, except for the jsons that were not stored: they keep their previous etag so they are attempted again on the
-     *   next main config change (e.g. after an app update that adds support for a new action).
+     *   next main config change. An app update alone doesn't trigger a retry, as the main config etag is still stored.
      * - If the network update fails (getMainConfig or downloadBrokerData), we fall back to loading broker JSONs from bundled raw resources,
      *   but only if no broker data has been stored previously.
      * - Returns true if either the network update or the bundled fallback succeeded. Returns false only if both fail.
