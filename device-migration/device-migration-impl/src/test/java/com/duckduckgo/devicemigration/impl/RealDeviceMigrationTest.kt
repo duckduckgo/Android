@@ -27,6 +27,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_DEFAULT_BROWSER
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_MIGRATED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
@@ -147,6 +148,51 @@ class RealDeviceMigrationTest {
 
         assertFalse(testee.isMigratedInstall())
         assertNull(testee.sourceDeviceIsNewInstall())
+    }
+
+    @Test
+    fun whenMigratedThenFlowPendingUntilCompleted() = runTest {
+        transferred.edit().putBoolean(KEY_SEEN, true).commit()
+
+        assertTrue(testee.isMigrationFlowPending())
+        testee.markMigrationFlowCompleted()
+
+        assertFalse(testee.isMigrationFlowPending())
+        assertFalse(newInstance().isMigrationFlowPending())
+    }
+
+    @Test
+    fun whenNotMigratedThenFlowNotPending() = runTest {
+        assertFalse(testee.isMigrationFlowPending())
+    }
+
+    @Test
+    fun whenMigratedBeforeTheFlowExistedThenFlowNotPending() = runTest {
+        local.edit().putBoolean(KEY_LAUNCHED, true).putBoolean(KEY_MIGRATED, true).commit()
+
+        assertTrue(testee.isMigratedInstall())
+        assertFalse(testee.isMigrationFlowPending())
+    }
+
+    @Test
+    fun whenPreviousPhoneRecordedDefaultBrowserThenReported() = runTest {
+        transferred.edit().putBoolean(KEY_SEEN, true).putBoolean(KEY_DEFAULT_BROWSER, true).commit()
+
+        assertEquals(true, testee.sourceDeviceWasDefaultBrowser())
+    }
+
+    @Test
+    fun whenPreviousPhoneNeverRecordedDefaultBrowserThenUnknown() = runTest {
+        transferred.edit().putBoolean(KEY_SEEN, true).commit()
+
+        assertNull(testee.sourceDeviceWasDefaultBrowser())
+    }
+
+    @Test
+    fun whenNotMigratedThenSourceDefaultBrowserUnknown() = runTest {
+        transferred.edit().putBoolean(KEY_DEFAULT_BROWSER, true).commit()
+
+        assertNull(testee.sourceDeviceWasDefaultBrowser())
     }
 
     @Test

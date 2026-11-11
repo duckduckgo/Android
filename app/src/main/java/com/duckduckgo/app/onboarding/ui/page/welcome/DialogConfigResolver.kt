@@ -265,6 +265,42 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        NewUserOnboardingActivityDialog.MigrationDefaultBrowser -> welcome(
+            background = OnboardingBackground.Horizon,
+            embellishment = Embellishment.BottomWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.deviceMigrationDefaultBrowserTitle),
+                body1 = TextConfig.Resource(R.string.deviceMigrationDefaultBrowserBody),
+                body2 = null,
+                pictogramRes = CommonR.drawable.mobile_device_default_96,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.deviceMigrationDefaultBrowserPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.MigrationSetDefaultBrowserRequested),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingWidgetPromptSecondaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.MigrationDefaultBrowserSkipped),
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.MigrationAllSet -> welcome(
+            background = OnboardingBackground.IslandWithHorizon,
+            embellishment = Embellishment.RightWing,
+            cardArrow = CardArrowConfig.AtStartMirrored,
+            content = ContentConfig.Welcome(
+                title = TextConfig.Resource(R.string.deviceMigrationAllSetTitle),
+                body1 = TextConfig.Resource(R.string.deviceMigrationAllSetBody1),
+                body2 = TextConfig.Resource(R.string.deviceMigrationAllSetBody2),
+                pictogramRes = R.drawable.team_96,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.deviceMigrationAllSetPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
@@ -288,10 +324,13 @@ class DialogConfigResolver @Inject constructor(
         content: ContentConfig.Welcome,
         primaryCta: CtaConfig,
         secondaryCta: CtaConfig? = null,
+        background: OnboardingBackground = OnboardingBackground.Pond,
+        embellishment: Embellishment = Embellishment.WalkingDax,
+        cardArrow: CardArrowConfig = CardArrowConfig.AtStart,
     ) = DialogConfig(
-        background = OnboardingBackground.Pond,
-        embellishment = Embellishment.WalkingDax,
-        cardArrow = CardArrowConfig.AtStart,
+        background = background,
+        embellishment = embellishment,
+        cardArrow = cardArrow,
         cardEntry = CardEntry.AfterBackgroundTransition,
         content = content,
         primaryCta = primaryCta,

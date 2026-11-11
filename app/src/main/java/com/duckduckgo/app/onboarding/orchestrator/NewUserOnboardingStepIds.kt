@@ -19,7 +19,7 @@ package com.duckduckgo.app.onboarding.orchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 
 /**
- * Stable identifiers for the steps composed by [NewUserOnboardingPlanProvider].
+ * Stable identifiers for the steps composed by [NewUserOnboardingPlanProvider] and [DeviceMigrationPlanProvider].
  */
 internal object NewUserOnboardingStepIds {
     const val INTRO_ANIMATION: LinearOnboardingStepId = "intro_animation"
@@ -45,4 +45,8 @@ internal object NewUserOnboardingStepIds {
     const val MODEL_PROVIDER: LinearOnboardingStepId = "model_provider"
     const val TOGGLE_POSITION: LinearOnboardingStepId = "toggle_position"
     const val DUCK_AI_STATE: LinearOnboardingStepId = "duck_ai_state"
+    const val MIGRATION_INTRO_ANIMATION: LinearOnboardingStepId = "migration_intro_animation"
+    const val MIGRATION_NOTIFICATION_PERMISSION: LinearOnboardingStepId = "migration_notification_permission"
+    const val MIGRATION_DEFAULT_BROWSER: LinearOnboardingStepId = "migration_default_browser"
+    const val MIGRATION_ALL_SET: LinearOnboardingStepId = "migration_all_set"
 }

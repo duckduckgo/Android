@@ -114,13 +114,25 @@ class NewUserOnboardingPlanBootstrapperTest {
 
     @Test
     fun `when a run is already in progress then returns it without building a plan`() = runTest {
-        val plan = LinearOnboardingPlan(id = "running_plan", steps = emptyList())
+        val plan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = emptyList())
         val running = InProgress(rootPlanId = plan.id, currentPlan = plan, currentStepIndex = 0)
         fakeOrchestrator.stateFlow.value = running
 
         val result = testee.startNewUserOnboardingPlan()
 
         assertEquals(running, result)
+        assertNull(fakeOrchestrator.startedPlan)
+        verify(planProvider, never()).buildRootPlan(any(), any())
+    }
+
+    @Test
+    fun `when another flow's run is in progress then it is not passed off as the new user plan and no plan is built`() = runTest {
+        val plan = LinearOnboardingPlan(id = DeviceMigrationPlanProvider.MIGRATION_PLAN_ID, steps = emptyList())
+        fakeOrchestrator.stateFlow.value = InProgress(rootPlanId = plan.id, currentPlan = plan, currentStepIndex = 0)
+
+        val exception = runCatching { testee.startNewUserOnboardingPlan() }.exceptionOrNull()
+
+        assertTrue(exception is IllegalStateException)
         assertNull(fakeOrchestrator.startedPlan)
         verify(planProvider, never()).buildRootPlan(any(), any())
     }

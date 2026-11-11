@@ -50,5 +50,19 @@
                 "description": "Whether this phone is signed in to Sync when the pixel is sent"
             }
         ]
+    },
+    "m_device_migration_all_set_prompt_shown": {
+        "description": "Sent once per install, when the \"You're all set\" screen at the end of the device migration flow is shown",
+        "owners": ["anikiki"],
+        "triggers": ["impression"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_device_migration_all_set_prompt_button_clicked": {
+        "description": "Sent once per install, when the button on the \"You're all set\" screen at the end of the device migration flow is tapped",
+        "owners": ["anikiki"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

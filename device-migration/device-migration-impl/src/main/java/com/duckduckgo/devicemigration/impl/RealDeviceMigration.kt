@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_DEFAULT_BROWSER
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_FLOW_PENDING
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_MIGRATED
@@ -87,6 +88,21 @@ class RealDeviceMigration @Inject constructor(
     override suspend fun isMigratedInstall(): Boolean = withContext(dispatchers.io()) { detection.migrated }
 
     override fun sourceDeviceIsNewInstall(): Boolean? = detection.sourceIsNewInstall
+
+    override suspend fun sourceDeviceWasDefaultBrowser(): Boolean? = withContext(dispatchers.io()) {
+        val local = markerStore.local
+        if (detection.migrated && local.contains(KEY_SOURCE_DEFAULT_BROWSER)) local.getBoolean(KEY_SOURCE_DEFAULT_BROWSER, false) else null
+    }
+
+    override suspend fun isMigrationFlowPending(): Boolean = withContext(dispatchers.io()) {
+        detection.migrated && markerStore.local.getBoolean(KEY_FLOW_PENDING, false)
+    }
+
+    override suspend fun markMigrationFlowCompleted() {
+        withContext(dispatchers.io()) {
+            markerStore.local.edit().putBoolean(KEY_FLOW_PENDING, false).commit()
+        }
+    }
 
     override suspend fun isMigrationExperienceEnabled(): Boolean = withContext(dispatchers.io()) {
         deviceMigrationFeature.self().isEnabled()
@@ -187,6 +203,7 @@ class RealDeviceMigration @Inject constructor(
             }
             .putBoolean(KEY_MIGRATED, true)
             .putBoolean(KEY_SOURCE_IS_NEW_INSTALL, source)
+            .putBoolean(KEY_FLOW_PENDING, true)
             .putBoolean(KEY_LAUNCHED, true)
             .commit()
         return Detection(migrated = true, sourceIsNewInstall = source)

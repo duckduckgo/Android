@@ -77,6 +77,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -157,6 +158,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     private val passwordImportExperiment: OnboardingPasswordImportExperimentManager = mock()
+    private val deviceMigration: DeviceMigration = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
@@ -171,7 +173,9 @@ class NewUserOnboardingPlanProviderTest {
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         // Most flows are exercised without the widget prompt; widget tests opt in by clearing this.
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        whenever(appBuildConfig.sdkInt).thenReturn(33)
         runBlocking {
+            whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
             whenever(syncAutoRestore.canRestore()).thenReturn(false)
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
             whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
@@ -206,8 +210,79 @@ class NewUserOnboardingPlanProviderTest {
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
+            deviceMigration = deviceMigration,
             appCoroutineScope = coroutineRule.testScope,
         )
+    }
+
+    @Test
+    fun `when the migration flow ran then the intro and notification steps are not shown again`() = runTest {
+        migrationFlowRan()
+
+        start()
+
+        assertStep(NewUserOnboardingStepIds.INITIAL)
+    }
+
+    @Test
+    fun `when the install was migrated but the migration flow has not run then the intro step is shown`() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+
+        start()
+        assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
+    }
+
+    @Test
+    fun `when the migration flow asked for the default browser then the default browser step is not shown again`() = runTest {
+        migrationFlowRan()
+        whenever(deviceMigration.sourceDeviceWasDefaultBrowser()).thenReturn(true)
+        start()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun `when the migration flow ran without asking for the default browser then the default browser step is shown`() = runTest {
+        migrationFlowRan()
+        whenever(deviceMigration.sourceDeviceWasDefaultBrowser()).thenReturn(false)
+        start()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertStep(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT)
+    }
+
+    private suspend fun migrationFlowRan() {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        whenever(deviceMigration.isDoneOnThisInstall(DeviceMigrationPlanProvider.MIGRATION_FLOW_ENDED_KEY)).thenReturn(true)
+    }
+
+    @Test
+    fun `when notifications are already granted then the notification step still shows to a new user`() = runTest {
+        start()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+
+        assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
+    }
+
+    @Test
+    fun `when below Android 13 then the notification step still shows to a new user`() = runTest {
+        whenever(appBuildConfig.sdkInt).thenReturn(32)
+        start()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+
+        assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
     }
 
     private suspend fun start(
