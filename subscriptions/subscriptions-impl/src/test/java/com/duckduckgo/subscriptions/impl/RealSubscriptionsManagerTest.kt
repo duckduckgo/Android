@@ -2995,7 +2995,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenSwitchSubscriptionPlanConfirmFailsThenDoesNotReportPurchaseFailure() = runTest {
+    fun whenSwitchSubscriptionPlanConfirmFailsThenKeepsStatusAndDoesNotReportPurchaseFailure() = runTest {
         givenConfirmPurchaseFails()
         val purchaseStateFlow = givenPlanSwitchStarted()
 
@@ -3004,6 +3004,7 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Waiting)
 
+            assertEquals(AUTO_RENEWABLE, authRepository.getSubscription()?.status)
             verify(pixelSender, never()).reportPurchaseFailureBackend()
 
             cancelAndConsumeRemainingEvents()
