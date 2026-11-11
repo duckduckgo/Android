@@ -20,8 +20,6 @@ import android.content.Intent
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
-import com.duckduckgo.duckchat.api.DuckChatHistoryParams
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import org.junit.Assert.assertEquals
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -32,7 +30,6 @@ import kotlin.reflect.KClass
 private const val EXTRA_URL = "url"
 private const val EXTRA_LAUNCH = "launch"
 private const val EXTRA_ORIGIN = "origin"
-private const val EXTRA_HISTORY = "history"
 
 private fun DuckChatLaunch.origin(): DuckChatLaunchOrigin? = when (this) {
     is DuckChatLaunch.Open -> origin
@@ -54,11 +51,7 @@ internal fun fakeBrowserNav(): BrowserNav = mock<BrowserNav>().also { nav ->
     }
 }
 
-internal fun fakeGlobalActivityStarter(): GlobalActivityStarter = mock<GlobalActivityStarter>().also { starter ->
-    whenever(starter.startIntent(any(), any<DuckChatHistoryParams>())).thenReturn(Intent().putExtra(EXTRA_HISTORY, true))
-}
-
-internal fun fakeDuckAiWidgetIntents(): DuckAiWidgetIntents = DuckAiWidgetIntents(fakeBrowserNav(), fakeGlobalActivityStarter())
+internal fun fakeDuckAiWidgetIntents(): DuckAiWidgetIntents = DuckAiWidgetIntents(fakeBrowserNav())
 
 internal fun assertLaunch(
     intent: Intent,
@@ -68,8 +61,4 @@ internal fun assertLaunch(
     assertEquals(url, intent.getStringExtra(EXTRA_URL))
     assertEquals(launch.simpleName, intent.getStringExtra(EXTRA_LAUNCH))
     assertEquals(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET.name, intent.getStringExtra(EXTRA_ORIGIN))
-}
-
-internal fun assertOpensChatHistory(intent: Intent) {
-    assertEquals(true, intent.getBooleanExtra(EXTRA_HISTORY, false))
 }

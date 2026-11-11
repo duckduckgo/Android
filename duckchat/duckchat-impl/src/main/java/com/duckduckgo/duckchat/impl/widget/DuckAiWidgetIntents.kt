@@ -21,34 +21,32 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
-import com.duckduckgo.duckchat.api.DuckChatHistoryParams
-import com.duckduckgo.duckchat.api.DuckChatHistorySource
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 
 class DuckAiWidgetIntents @Inject constructor(
     private val browserNav: BrowserNav,
-    private val globalActivityStarter: GlobalActivityStarter,
 ) {
 
     fun launchDuckAi(
         context: Context,
         requestCode: Int,
         duckChatUrl: String,
-        launchAction: DuckChatLaunchAction? = null,
+        launch: DuckChatLaunch,
     ): PendingIntent = PendingIntent.getActivity(
         context,
         requestCode,
-        openDuckChat(context, duckChatUrl, launchAction).asViewIntent(),
+        browserNav.openDuckChat(context, duckChatUrl = duckChatUrl, launch = launch).asViewIntent(),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
-    fun openChatHistory(context: Context, requestCode: Int): PendingIntent? {
-        val intent = globalActivityStarter.startIntent(context, DuckChatHistoryParams(DuckChatHistorySource.WIDGET)) ?: return null
-        return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-    }
+    fun openChatHistory(context: Context, requestCode: Int): PendingIntent = PendingIntent.getActivity(
+        context,
+        requestCode,
+        browserNav.openDuckChat(context, launch = DuckChatLaunch.ChatHistory(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET)).asViewIntent(),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
 
     /**
      * Template for list items; each item's fill-in intent, built by [chatFillInIntent], supplies every extra.
@@ -67,12 +65,11 @@ class DuckAiWidgetIntents @Inject constructor(
     fun chatFillInIntent(context: Context, chatUrl: String): Intent =
         Intent().putExtras(openDuckChat(context, chatUrl).extras!!)
 
-    private fun openDuckChat(context: Context, duckChatUrl: String, launchAction: DuckChatLaunchAction? = null): Intent =
+    private fun openDuckChat(context: Context, duckChatUrl: String): Intent =
         browserNav.openDuckChat(
             context,
             duckChatUrl = duckChatUrl,
-            launchAction = launchAction,
-            launchOrigin = DuckChatLaunchOrigin.HOME_SCREEN_WIDGET,
+            launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
         )
 
     private fun Intent.asViewIntent(): Intent = apply { action = Intent.ACTION_VIEW }
