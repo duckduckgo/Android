@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.auditlog.AuditLogSyncHook
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
@@ -72,6 +73,7 @@ class RealSyncEngine @Inject constructor(
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
     private val deletableDataManagerPlugins: PluginPoint<DeletableDataManager>,
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle>,
+    private val auditLogSyncHook: AuditLogSyncHook,
 ) : SyncEngine {
 
     override fun triggerSync(trigger: SyncTrigger) {
@@ -124,6 +126,7 @@ class RealSyncEngine @Inject constructor(
             patchLocalChanges(it, REMOTE_WINS)
         }
         syncStateRepository.updateSyncState(SUCCESS)
+        auditLogSyncHook.onSyncSucceeded()
         refreshConnectedDevices(ACCOUNT_CREATION)
     }
 
@@ -148,6 +151,7 @@ class RealSyncEngine @Inject constructor(
 
             logcat { "Sync-Engine: Sync finished" }
             syncStateRepository.updateSyncState(SUCCESS)
+            auditLogSyncHook.onSyncSucceeded()
             refreshConnectedDevices(trigger)
         }
     }
