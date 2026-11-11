@@ -200,6 +200,25 @@ class BrokerJsonProcessorTest {
         verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker.json"), eq(0L), isNull())
     }
 
+    @Test
+    fun whenStoredBrokerWasDeactivatedLocallyAndSameVersionArrivesThenStoresItAgain() = runTest {
+        whenever(mockPirRepository.getBrokerForName("Broker One")).thenReturn(storedBroker(version = "1.0", removedAt = 5000L))
+
+        testee.processAndStoreBroker("broker.json", brokerJsonSource("Broker One", "1.0"))
+
+        verify(mockPirRepository).updateBrokerData(eq("broker.json"), any())
+        verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker.json"), eq(0L), any())
+    }
+
+    @Test
+    fun whenStoredBrokerHasSameVersionAndSameRemovedAtThenSkipsStore() = runTest {
+        whenever(mockPirRepository.getBrokerForName("Broker One")).thenReturn(storedBroker(version = "1.0", removedAt = 5000L))
+
+        testee.processAndStoreBroker("broker.json", brokerJsonSource("Broker One", "1.0", removedAt = 5000L))
+
+        verify(mockPirRepository, never()).updateBrokerData(any(), any())
+    }
+
     // endregion
 
     // region helpers
@@ -225,14 +244,17 @@ class BrokerJsonProcessorTest {
             """.trimIndent(),
         )
 
-    private fun storedBroker(version: String) = Broker(
+    private fun storedBroker(
+        version: String,
+        removedAt: Long = 0L,
+    ) = Broker(
         name = "Broker One",
         fileName = "broker.json",
         url = "https://broker.com",
         version = version,
         parent = null,
         addedDatetime = 1000L,
-        removedAt = 0L,
+        removedAt = removedAt,
     )
 
     // endregion

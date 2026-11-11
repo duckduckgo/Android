@@ -1061,6 +1061,27 @@ class RealPirRepositoryTest {
     }
 
     @Test
+    fun whenDeactivateBrokersNotInThenMarksBrokersRemovedAndDropsTheirEtagsInOneTransaction() = runTest {
+        val activeFileNames = setOf("broker1.json", "broker2.json")
+
+        testee.deactivateBrokersNotIn(activeFileNames, 1234L)
+
+        verify(mockDatabase).runInTransaction(any<Runnable>())
+        verify(mockBrokerDao).markBrokersRemovedExcept(activeFileNames, 1234L)
+        verify(mockBrokerJsonDao).deleteEtagsExcept(activeFileNames)
+    }
+
+    @Test
+    fun whenDeactivateBrokersNotInAndDatabaseUnavailableThenDoesNothing() = runTest {
+        whenever(mockDatabaseFactory.getDatabase()).thenReturn(null)
+
+        testee.deactivateBrokersNotIn(setOf("broker1.json"), 1234L)
+
+        verify(mockBrokerDao, never()).markBrokersRemovedExcept(any(), any())
+        verify(mockBrokerJsonDao, never()).deleteEtagsExcept(any())
+    }
+
+    @Test
     fun whenUpdateProfileQueriesAndDatabaseUnavailableThenReturnFalse() = runTest {
         whenever(mockDatabaseFactory.getDatabase()).thenReturn(null)
 

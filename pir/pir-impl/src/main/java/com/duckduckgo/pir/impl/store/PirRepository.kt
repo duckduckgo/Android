@@ -89,6 +89,16 @@ interface PirRepository {
     suspend fun updateBrokerJsons(brokers: List<BrokerJson>)
 
     /**
+     * Marks every stored broker whose json file is not in [activeBrokerFileNames] as removed at [removedAtMs],
+     * and drops the stored etags of those files so they are downloaded again if they become active later.
+     * Brokers that are already removed keep their original removedAt.
+     */
+    suspend fun deactivateBrokersNotIn(
+        activeBrokerFileNames: Set<String>,
+        removedAtMs: Long,
+    )
+
+    /**
      * Clears all broker configuration: both the download etags and the parsed broker details
      * (details, scan/optOut steps, scheduling config, mirror sites).
      */
@@ -363,6 +373,19 @@ class RealPirRepository(
                 }.also {
                     brokerJsonDao()?.insertBrokerJsonEtags(it)
                 }
+        }
+    }
+
+    override suspend fun deactivateBrokersNotIn(
+        activeBrokerFileNames: Set<String>,
+        removedAtMs: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            val db = database.await() ?: return@withContext
+            db.runInTransaction {
+                db.brokerDao().markBrokersRemovedExcept(activeBrokerFileNames, removedAtMs)
+                db.brokerJsonDao().deleteEtagsExcept(activeBrokerFileNames)
+            }
         }
     }
 
