@@ -1170,7 +1170,7 @@
         ]
     },
     "m_dbp_update_databrokers_failure": {
-        "description": "Fired when a data broker JSON update has failed.",
+        "description": "Fired when a data broker JSON update has failed or was rejected.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -1186,6 +1186,12 @@
                 "key": "removed_at",
                 "description": "Timestamp, in milliseconds, when the broker was removed at (contained on the JSON)",
                 "type": "string"
+            },
+            {
+                "key": "reason",
+                "description": "Why the data broker JSON was not stored.",
+                "type": "string",
+                "enum": ["invalid_json", "unsupported_step", "unsupported_action", "invalid_step", "missing_step", "storage_error"]
             }
         ]
     },

@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdateFailureReason
 import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
@@ -1125,6 +1126,7 @@ class RealPirPixelSenderTest {
             brokerJsonFileName = "broker.json",
             removedAtMs = 987654321L,
             isFreeScan = false,
+            reason = BrokerJsonUpdateFailureReason.UNSUPPORTED_ACTION,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1140,6 +1142,7 @@ class RealPirPixelSenderTest {
         assert(params["free_scan"] == "false")
         assert(params["data_broker_json_file"] == "broker.json")
         assert(params["removed_at"] == "987654321")
+        assert(params["reason"] == "unsupported_action")
     }
 
     @Test

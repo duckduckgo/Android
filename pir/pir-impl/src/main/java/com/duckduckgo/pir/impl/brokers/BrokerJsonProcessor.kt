@@ -18,6 +18,8 @@ package com.duckduckgo.pir.impl.brokers
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirUserUtils
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdateFailureReason.INVALID_JSON
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdateFailureReason.STORAGE_ERROR
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -33,10 +35,19 @@ import javax.inject.Inject
 
 interface BrokerJsonProcessor {
     fun parseBroker(source: Source): PirJsonBroker?
+
+    /**
+     * Parses and validates a broker JSON and stores it, unless the stored broker is already at that version.
+     * A broker JSON that can't be parsed, or has steps this app version can't execute, is not stored and the
+     * previously stored version of the broker is kept.
+     *
+     * @return true if the stored broker is now at the version of this JSON, false if the JSON was rejected or
+     *  couldn't be stored
+     */
     suspend fun processAndStoreBroker(
         fileName: String,
         source: Source,
-    )
+    ): Boolean
 }
 
 /**
@@ -48,6 +59,7 @@ class RealBrokerJsonProcessor @Inject constructor(
     private val pirRepository: PirRepository,
     private val pirPixelSender: PirPixelSender,
     private val pirUserUtils: PirUserUtils,
+    private val brokerStepsValidator: BrokerStepsValidator,
 ) : BrokerJsonProcessor {
     private val brokerAdapter by lazy {
         Moshi.Builder()
@@ -65,28 +77,24 @@ class RealBrokerJsonProcessor @Inject constructor(
     override suspend fun processAndStoreBroker(
         fileName: String,
         source: Source,
-    ) {
-        processAndStoreBroker(fileName, parseBroker(source))
-    }
-
-    private suspend fun processAndStoreBroker(
-        fileName: String,
-        broker: PirJsonBroker?,
-    ) {
+    ): Boolean {
+        val broker = parseBroker(source)
         if (broker == null) {
-            pirPixelSender.reportUpdateBrokerJsonFailure(
-                brokerJsonFileName = fileName,
-                removedAtMs = 0L,
-                isFreeScan = isFreeScan(),
-            )
-            return
+            reportFailure(fileName, removedAtMs = 0L, reason = INVALID_JSON)
+            return false
+        }
+
+        brokerStepsValidator.validate(broker.steps)?.let { reason ->
+            logcat(ERROR) { "PIR-update: Rejected $fileName version ${broker.version} ($reason), keeping the stored version" }
+            reportFailure(fileName, removedAtMs = broker.removedAt ?: 0L, reason = reason)
+            return false
         }
 
         val stored = try {
             val storedVersion = pirRepository.getBrokerForName(broker.name)?.version
             if (storedVersion == broker.version) {
                 logcat { "PIR-update: $fileName already at version ${broker.version}, skipping" }
-                return
+                return true
             }
             logcat { "PIR-update: $fileName version changed ($storedVersion → ${broker.version}), updating" }
             pirRepository.updateBrokerData(fileName, broker)
@@ -94,6 +102,7 @@ class RealBrokerJsonProcessor @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
+            logcat(ERROR) { "PIR-update: Failed to store $fileName: $e" }
             false
         }
 
@@ -104,12 +113,22 @@ class RealBrokerJsonProcessor @Inject constructor(
                 isFreeScan = isFreeScan(),
             )
         } else {
-            pirPixelSender.reportUpdateBrokerJsonFailure(
-                brokerJsonFileName = fileName,
-                removedAtMs = broker.removedAt ?: 0L,
-                isFreeScan = isFreeScan(),
-            )
+            reportFailure(fileName, removedAtMs = broker.removedAt ?: 0L, reason = STORAGE_ERROR)
         }
+        return stored
+    }
+
+    private suspend fun reportFailure(
+        fileName: String,
+        removedAtMs: Long,
+        reason: BrokerJsonUpdateFailureReason,
+    ) {
+        pirPixelSender.reportUpdateBrokerJsonFailure(
+            brokerJsonFileName = fileName,
+            removedAtMs = removedAtMs,
+            isFreeScan = isFreeScan(),
+            reason = reason,
+        )
     }
 
     private suspend fun isFreeScan(): Boolean? = try {

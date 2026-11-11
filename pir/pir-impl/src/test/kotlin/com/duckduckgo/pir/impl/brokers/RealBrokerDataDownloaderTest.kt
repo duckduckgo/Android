@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,6 +53,7 @@ class RealBrokerDataDownloaderTest {
     private val mockPirRepository: PirRepository = mock()
     private val mockContext: Context = mock()
     private val mockPixelSender: PirPixelSender = mock()
+    private val mockBrokerStepsValidator: BrokerStepsValidator = mock()
     private val mockPirUserUtils: PirUserUtils = mock {
         onBlocking { hasPirSubscription() } doReturn true
     }
@@ -65,7 +67,7 @@ class RealBrokerDataDownloaderTest {
             dbpService = mockDbpService,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             context = mockContext,
-            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender, mockPirUserUtils),
+            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender, mockPirUserUtils, mockBrokerStepsValidator),
         )
     }
 
@@ -73,8 +75,9 @@ class RealBrokerDataDownloaderTest {
     fun whenDownloadBrokerDataWithEmptyListThenDoNothing() = runTest {
         val brokersToUpdate = emptyList<String>()
 
-        testee.downloadBrokerData(brokersToUpdate)
+        val result = testee.downloadBrokerData(brokersToUpdate)
 
+        assertEquals(emptySet<String>(), result)
         verify(mockDbpService, never()).getBrokerJsonFiles()
         verify(mockPirRepository, never()).updateBrokerData(any(), any())
     }
@@ -129,8 +132,9 @@ class RealBrokerDataDownloaderTest {
 
         whenever(mockDbpService.getBrokerJsonFiles()).thenReturn(responseBody)
 
-        testee.downloadBrokerData(brokersToUpdate)
+        val result = testee.downloadBrokerData(brokersToUpdate)
 
+        assertEquals(setOf("broker1.json", "broker2.json"), result)
         verify(mockDbpService).getBrokerJsonFiles()
         verify(mockPirRepository).updateBrokerData(eq("broker1.json"), any())
         verify(mockPirRepository).updateBrokerData(eq("broker2.json"), any())
@@ -150,11 +154,12 @@ class RealBrokerDataDownloaderTest {
 
         whenever(mockDbpService.getBrokerJsonFiles()).thenReturn(responseBody)
 
-        testee.downloadBrokerData(brokersToUpdate)
+        val result = testee.downloadBrokerData(brokersToUpdate)
 
+        assertEquals(emptySet<String>(), result)
         verify(mockDbpService).getBrokerJsonFiles()
         verify(mockPirRepository, never()).updateBrokerData(eq("broker1.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonFailure(eq("broker1.json"), eq(0L), anyOrNull())
+        verify(mockPixelSender).reportUpdateBrokerJsonFailure(eq("broker1.json"), eq(0L), anyOrNull(), any())
     }
 
     @Test
@@ -207,8 +212,9 @@ class RealBrokerDataDownloaderTest {
 
         whenever(mockDbpService.getBrokerJsonFiles()).thenReturn(responseBody)
 
-        testee.downloadBrokerData(brokersToUpdate)
+        val result = testee.downloadBrokerData(brokersToUpdate)
 
+        assertEquals(setOf("broker1.json"), result)
         verify(mockPirRepository).updateBrokerData(eq("broker1.json"), any())
         verify(mockPirRepository, never()).updateBrokerData(eq("broker2.json"), any())
         verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker1.json"), any(), anyOrNull())
@@ -245,10 +251,46 @@ class RealBrokerDataDownloaderTest {
         whenever(mockDbpService.getBrokerJsonFiles()).thenReturn(responseBody)
         whenever(mockPirRepository.updateBrokerData(any(), any())).thenThrow(RuntimeException("Database error"))
 
-        testee.downloadBrokerData(brokersToUpdate)
+        val result = testee.downloadBrokerData(brokersToUpdate)
 
+        assertEquals(emptySet<String>(), result)
         verify(mockPirRepository).updateBrokerData(eq("broker1.json"), any())
-        verify(mockPixelSender).reportUpdateBrokerJsonFailure(eq("broker1.json"), any(), anyOrNull())
+        verify(mockPixelSender).reportUpdateBrokerJsonFailure(eq("broker1.json"), any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenRequestedBrokerJsonIsMissingFromZipThenItIsNotReturnedAsUpToDate() = runTest {
+        val zipBytes = createZipWithFiles(mapOf("data/broker1.json" to brokerJson("Broker One")))
+        whenever(mockDbpService.getBrokerJsonFiles()).thenReturn(zipBytes.toResponseBody())
+
+        val result = testee.downloadBrokerData(listOf("broker1.json", "broker2.json"))
+
+        assertEquals(setOf("broker1.json"), result)
+    }
+
+    @Test
+    fun whenBrokerJsonIsRejectedByValidatorThenItIsNotStoredNorReturnedAsUpToDate() = runTest {
+        val rejectedStep = """{"stepType":"rejected"}"""
+        val zipBytes = createZipWithFiles(
+            mapOf(
+                "data/broker1.json" to brokerJson("Broker One", steps = "[$rejectedStep]"),
+                "data/broker2.json" to brokerJson("Broker Two"),
+            ),
+        )
+        whenever(mockDbpService.getBrokerJsonFiles()).thenReturn(zipBytes.toResponseBody())
+        whenever(mockBrokerStepsValidator.validate(listOf(rejectedStep))).thenReturn(BrokerJsonUpdateFailureReason.UNSUPPORTED_ACTION)
+
+        val result = testee.downloadBrokerData(listOf("broker1.json", "broker2.json"))
+
+        assertEquals(setOf("broker2.json"), result)
+        verify(mockPirRepository, never()).updateBrokerData(eq("broker1.json"), any())
+        verify(mockPirRepository).updateBrokerData(eq("broker2.json"), any())
+        verify(mockPixelSender).reportUpdateBrokerJsonFailure(
+            eq("broker1.json"),
+            eq(0L),
+            anyOrNull(),
+            eq(BrokerJsonUpdateFailureReason.UNSUPPORTED_ACTION),
+        )
     }
 
     @Test
@@ -321,6 +363,23 @@ class RealBrokerDataDownloaderTest {
         verify(mockPirRepository).updateBrokerData(eq("broker1.json"), any())
         verify(mockPirRepository, never()).updateBrokerData(eq("malicious.json"), any())
     }
+
+    private fun brokerJson(
+        name: String,
+        steps: String = "[]",
+    ): String = """
+        {
+            "name": "$name",
+            "url": "https://broker.com",
+            "version": "1.0",
+            "parent": null,
+            "addedDatetime": 1000,
+            "optOutUrl": "https://broker.com/optout",
+            "steps": $steps,
+            "schedulingConfig": { "retryError": 24, "confirmOptOutScan": 7, "maintenanceScan": 30, "maxAttempts": 3 },
+            "removedAt": null
+        }
+    """.trimIndent()
 
     private fun createZipWithFiles(files: Map<String, String>): ByteArray {
         val outputStream = ByteArrayOutputStream()
