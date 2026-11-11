@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
@@ -81,7 +82,7 @@ class NewChatHintsViewModel @Inject constructor(
             tabRepository.flowSelectedTab,
             provider.stateForTab(tabId),
             modelManager.modelState,
-            eligible.filterNotNull(),
+            eligible.filterNotNull().combine(usage.isPromoClear(tabId)) { isEligible, isPromoClear -> isEligible && isPromoClear },
             newChat,
         ) { selectedTab, input, models, isEligible, newChat ->
             val showHints = selectedTab?.tabId == tabId && isEligible && newChat.isGuaranteed && input.isDraftEmpty()
@@ -113,7 +114,7 @@ class NewChatHintsViewModel @Inject constructor(
         val model = capableModel(hint, models) ?: return
         if (model.id != models.selectedModelId) {
             modelManager.selectModel(model)
-            // Selecting a model suspends; the tab, chat or eligibility may have changed meanwhile.
+            // Selecting a model suspends; the tab, chat, eligibility or promo may have changed meanwhile.
             if (!canAct(tabId)) return
         }
         val command = when (hint) {
@@ -132,6 +133,7 @@ class NewChatHintsViewModel @Inject constructor(
 
     private suspend fun canAct(tabId: String): Boolean =
         eligible.value == true &&
+            usage.isPromoClear(tabId).first() &&
             tabRepository.flowSelectedTab.firstOrNull()?.tabId == tabId &&
             newChat(tabId).firstOrNull()?.isGuaranteed == true
 

@@ -54,6 +54,7 @@ import com.duckduckgo.duckchat.impl.feature.recentDaysCutoff
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -161,6 +162,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val tabSessions: DuckAiTabSessionRepository,
+    private val newChatHintsUsage: NewChatHintsUsage,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -301,6 +303,14 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_CANCEL_EDIT -> {
                 activeEditSessionId.get()?.let { editPromptSessionStore.resolve(it, EditPromptResult.Cancelled) }
+                null
+            }
+
+            METHOD_AI_CHAT_PROMO_VISIBILITY -> {
+                val isVisible = data?.opt("visible") as? Boolean
+                if (mode == Mode.FULL && tabId.isNotEmpty() && isVisible != null) {
+                    newChatHintsUsage.onPromoVisibilityChanged(tabId, isVisible)
+                }
                 null
             }
 
@@ -884,6 +894,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val MAX_CHATS_LIMIT = 20
         private const val METHOD_EDIT_PROMPT = "editPrompt"
         private const val METHOD_CANCEL_EDIT = "cancelEdit"
+        private const val METHOD_AI_CHAT_PROMO_VISIBILITY = "aiChatPromoVisibility"
 
         // Backstop only: the FE owns the primary timeout and sends cancelEdit if it fires. This is long
         // enough to never interrupt a real edit, just to reclaim a session abandoned before the FE's own
