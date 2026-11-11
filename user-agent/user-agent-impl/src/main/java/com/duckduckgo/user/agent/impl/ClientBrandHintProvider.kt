@@ -37,6 +37,8 @@ import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.WEBVIEW
 import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
@@ -141,7 +143,14 @@ class RealClientBrandHintProvider @Inject constructor(
         }
 
         currentBranding = branding
-        val metadata = WebSettingsCompat.getUserAgentMetadata(settings)
+        // androidx.webkit 1.18.0 reads form factors without checking USER_AGENT_METADATA_FORM_FACTORS,
+        // so some WebView versions throw here even though USER_AGENT_METADATA is supported.
+        val metadata = try {
+            WebSettingsCompat.getUserAgentMetadata(settings)
+        } catch (e: UnsupportedOperationException) {
+            logcat(WARN) { "ClientBrandHintProvider: unable to read user agent metadata, skipping: ${e.asLog()}" }
+            return
+        }
         val finalBrandList = metadata.brandVersionList.map {
             when (currentBranding) {
                 CHROME -> {
