@@ -42,7 +42,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
@@ -133,7 +132,7 @@ class NewChatHintsViewModel @Inject constructor(
 
     private suspend fun canAct(tabId: String): Boolean =
         eligible.value == true &&
-            usage.isPromoClear(tabId).first() &&
+            usage.isPromoClear(tabId).firstOrNull() == true &&
             tabRepository.flowSelectedTab.firstOrNull()?.tabId == tabId &&
             newChat(tabId).firstOrNull()?.isGuaranteed == true
 
