@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.nativeinput
 
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 
 /**
  * Launch actions a new Duck.ai tab's native input can honour the first time it shows.
@@ -27,15 +27,15 @@ enum class NativeInputLaunch {
     CAMERA_CAPTURE,
     ;
 
-    fun toLaunchAction(): DuckChatLaunchAction = when (this) {
-        IMAGE_GENERATION -> DuckChatLaunchAction.ImageGeneration
-        CAMERA_CAPTURE -> DuckChatLaunchAction.CameraCapture
+    fun toDuckChatLaunch(): DuckChatLaunch = when (this) {
+        IMAGE_GENERATION -> DuckChatLaunch.ImageGeneration()
+        CAMERA_CAPTURE -> DuckChatLaunch.CameraCapture()
     }
 
     companion object {
-        fun from(action: DuckChatLaunchAction?): NativeInputLaunch? = when (action) {
-            DuckChatLaunchAction.ImageGeneration -> IMAGE_GENERATION
-            DuckChatLaunchAction.CameraCapture -> CAMERA_CAPTURE
+        fun from(launch: DuckChatLaunch): NativeInputLaunch? = when (launch) {
+            is DuckChatLaunch.ImageGeneration -> IMAGE_GENERATION
+            is DuckChatLaunch.CameraCapture -> CAMERA_CAPTURE
             else -> null
         }
 

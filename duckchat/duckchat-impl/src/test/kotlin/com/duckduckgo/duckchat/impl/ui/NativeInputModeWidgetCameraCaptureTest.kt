@@ -16,7 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
-import com.duckduckgo.app.tabs.DuckChatLaunchAction
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldLaunchCameraCapture
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -26,17 +26,17 @@ class NativeInputModeWidgetCameraCaptureTest {
 
     @Test
     fun `launches camera for camera capture action in Duck ai mode`() {
-        assertTrue(shouldLaunchCameraCapture(isDuckAiMode = true, launchAction = DuckChatLaunchAction.CameraCapture))
+        assertTrue(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.CameraCapture()))
     }
 
     @Test
     fun `does not launch camera in browser mode`() {
-        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = false, launchAction = DuckChatLaunchAction.CameraCapture))
+        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = false, launch = DuckChatLaunch.CameraCapture()))
     }
 
     @Test
     fun `does not launch camera for other or no launch action`() {
-        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launchAction = DuckChatLaunchAction.ImageGeneration))
-        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launchAction = null))
+        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.ImageGeneration()))
+        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.Open()))
     }
 }
