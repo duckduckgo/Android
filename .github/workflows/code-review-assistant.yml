@@ -35,7 +35,7 @@ on:
       model:
         description: Model for the main session
         required: false
-        default: sonnet
+        default: opus
         type: string
 
 permissions:
@@ -89,12 +89,12 @@ jobs:
     needs: select
     if: needs.select.outputs.run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       MODE: ${{ needs.select.outputs.mode }}
       PR: ${{ needs.select.outputs.pr }}
       PLUGIN_REF: ${{ inputs.plugin_ref || 'main' }}
-      MODEL: ${{ inputs.model || 'sonnet' }}
+      MODEL: ${{ inputs.model || 'opus' }}
       WORK: /tmp/code-review-assistant/${{ needs.select.outputs.mode == 'review' && format('pr-{0}', needs.select.outputs.pr) || 'reconcile' }}
     steps:
       - name: Check out the pull request, or develop to reconcile
@@ -154,7 +154,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "$MODE" = review ]; then request="${PR} ci"; else request="reconcile ci"; fi
-          claude -p "/android-factory:code-review-assistant ${request}" \
+          # A finished run has been seen to keep the claude process alive, so it gets a
+          # deadline; the records it wrote before then still get pushed.
+          timeout --kill-after=30s 30m claude -p "/android-factory:code-review-assistant ${request}" \
             --plugin-dir "$RUNNER_TEMP/review-plugin" \
             --model "$MODEL" \
             --max-turns 100 \
@@ -165,10 +167,26 @@ jobs:
             --output-format stream-json --verbose \
             > "$RUNNER_TEMP/transcript.jsonl" 2> "$RUNNER_TEMP/transcript.err" \
             || echo "::warning::claude exited with status $?"
+          # Event types and tool names only: the transcript itself must not reach this public log.
+          echo "results: $(jq -c 'select(.type=="result") | .subtype' "$RUNNER_TEMP/transcript.jsonl" | tr '\n' ' ')"
+          echo "last tools: $(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="tool_use") | .name' "$RUNNER_TEMP/transcript.jsonl" | tail -5 | tr '\n' ' ')"
           if [ "$MODE" = review ] && [ ! -s "$WORK/review.md" ]; then
             echo "::error::The review ended without writing review.md"
             exit 1
           fi
+
+      # Only the daily reconcile rebuilds the page, so review runs never race on it.
+      - name: Rebuild the records dashboard
+        if: env.MODE == 'reconcile'
+        run: |
+          python3 "$RUNNER_TEMP/review-plugin/skills/code-review-assistant/scripts/candidates.py" json \
+            --learnings "$WORK/records/records/learnings" --reconcile "$WORK/records/records/reconcile" \
+            > "$RUNNER_TEMP/candidates.json"
+          cd "$WORK/records"
+          python3 records/dashboard/build.py records records/dashboard/template.html \
+            records/dashboard/index.html "$(git log -1 --format='%h %ci')" "$RUNNER_TEMP/candidates.json"
+          git add records/dashboard/index.html
+          git commit -q -m "Rebuild the records dashboard" || echo "Dashboard unchanged"
 
       - name: Push the records
         if: always()
@@ -197,13 +215,16 @@ jobs:
           (umask 077 && printf '%s\n' "$KEY" > "$key_file")
           export GIT_SSH_COMMAND="ssh -i $key_file -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
           git remote set-url origin git@github.com:duckduckgo/claude-skills-factory-android.git
-          for attempt in 1 2 3; do
+          # Parallel runs race for the branch, so a failed attempt is undone and
+          # retried after a random wait rather than in lockstep.
+          for attempt in 1 2 3 4 5; do
             if git pull -q --rebase origin records && git push -q origin HEAD:records; then
               echo "RECORDS_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
               exit 0
             fi
+            git rebase --abort 2>/dev/null || true
             echo "Push attempt ${attempt} failed"
-            sleep $((attempt * 5))
+            sleep $((attempt * 5 + RANDOM % 15))
           done
           exit 1
 
