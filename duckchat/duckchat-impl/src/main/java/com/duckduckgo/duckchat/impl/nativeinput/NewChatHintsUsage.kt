@@ -30,9 +30,11 @@ import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -48,6 +50,7 @@ import javax.inject.Inject
  * a new chat started after a tap starts over. Leaving the new chat, or prompting outside one, drops the tab's interaction,
  * so only a prompt sent from the new chat the hints were shown in counts. Hiding is derived from the count rather than
  * stored, so raising the threshold shows hints again. Callers only record Regular-mode activity, so a Fire session leaves nothing behind.
+ * Hints wait for the page to report that no promo is showing, and step aside for as long as one is.
  */
 @SingleIn(AppScope::class)
 class NewChatHintsUsage @Inject constructor(
@@ -56,6 +59,7 @@ class NewChatHintsUsage @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
     private val interactions = ConcurrentHashMap<String, HintInteraction>()
+    private val promoVisibility = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     private val writeMutex = Mutex()
 
     val isExhausted: Flow<Boolean> = store.data
@@ -63,9 +67,18 @@ class NewChatHintsUsage @Inject constructor(
         .map { preferences -> (preferences[DUCK_AI_NEW_CHAT_HINTS_IGNORED_CHATS] ?: 0) >= HIDE_AFTER_IGNORED_CHATS }
         .distinctUntilChanged()
 
+    /** False until the page has reported its promo, so hints never flash up under one that is about to appear. */
+    fun isPromoClear(tabId: String): Flow<Boolean> = promoVisibility.map { it[tabId] == false }.distinctUntilChanged()
+
     fun onHintsDisplayed(tabId: String) {
         // Hints show again after a tap (e.g. a cancelled picker), which must not undo the tap.
         interactions.putIfAbsent(tabId, HintInteraction.DISPLAYED)
+    }
+
+    /** While a promo shows it takes the hints' place, so a prompt sent meanwhile isn't ignoring them. A tap still counts. */
+    fun onPromoVisibilityChanged(tabId: String, isVisible: Boolean) {
+        promoVisibility.update { it + (tabId to isVisible) }
+        if (isVisible) interactions.remove(tabId, HintInteraction.DISPLAYED)
     }
 
     fun onHintTapped(tabId: String) {

@@ -50,6 +50,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
@@ -148,6 +149,7 @@ class RealDuckChatJSHelperTest {
     }
     private val entryWideEvent: DuckAiEntryWideEvent = mock()
     private val tabSessions: DuckAiTabSessionRepository = mock()
+    private val newChatHintsUsage: NewChatHintsUsage = mock()
 
     private val pdfPageContextResolver: PdfPageContextResolver = mock()
 
@@ -181,6 +183,7 @@ class RealDuckChatJSHelperTest {
         responseWaitWideEvent = mockResponseWaitWideEvent,
         duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         tabSessions = tabSessions,
+        newChatHintsUsage = newChatHintsUsage,
     )
 
     init {
@@ -635,6 +638,49 @@ class RealDuckChatJSHelperTest {
         )
 
         assertFalse(result!!.params.has("installAge"))
+    }
+
+    @Test
+    fun whenPromoBecomesVisibleThenNewChatHintsAreToldForTheTab() = runTest {
+        testee.processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "aiChatPromoVisibility", null, JSONObject("""{"visible":true}"""), tabId = "tab-1")
+
+        verify(newChatHintsUsage).onPromoVisibilityChanged("tab-1", isVisible = true)
+    }
+
+    @Test
+    fun whenPromoIsNotVisibleThenNewChatHintsAreToldForTheTab() = runTest {
+        testee.processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "aiChatPromoVisibility", null, JSONObject("""{"visible":false}"""), tabId = "tab-1")
+
+        verify(newChatHintsUsage).onPromoVisibilityChanged("tab-1", isVisible = false)
+    }
+
+    @Test
+    fun whenPromoVisibilityHasNoVisibleFlagThenNewChatHintsAreNotTold() = runTest {
+        testee.processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "aiChatPromoVisibility", null, JSONObject("""{"isVisible":true}"""), tabId = "tab-1")
+        testee.processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "aiChatPromoVisibility", null, null, tabId = "tab-1")
+
+        verifyNoInteractions(newChatHintsUsage)
+    }
+
+    @Test
+    fun whenPromoVisibilityHasNoTabThenNewChatHintsAreNotTold() = runTest {
+        testee.processJsCallbackMessage(DUCK_CHAT_FEATURE_NAME, "aiChatPromoVisibility", null, JSONObject("""{"visible":false}"""), tabId = "")
+
+        verifyNoInteractions(newChatHintsUsage)
+    }
+
+    @Test
+    fun whenPromoBecomesVisibleInContextualSheetThenNewChatHintsAreNotTold() = runTest {
+        testee.processJsCallbackMessage(
+            DUCK_CHAT_FEATURE_NAME,
+            "aiChatPromoVisibility",
+            null,
+            JSONObject("""{"visible":true}"""),
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+        )
+
+        verifyNoInteractions(newChatHintsUsage)
     }
 
     @Test
