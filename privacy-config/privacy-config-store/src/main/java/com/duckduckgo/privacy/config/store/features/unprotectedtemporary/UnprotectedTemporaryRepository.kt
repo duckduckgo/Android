@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 
 interface UnprotectedTemporaryRepository {
     fun updateAll(exceptions: List<UnprotectedTemporaryEntity>)
+    fun loadToMemory()
 
     val exceptions: List<FeatureException>
 }
@@ -58,7 +59,7 @@ class RealUnprotectedTemporaryRepository(
         loadToMemory()
     }
 
-    private fun loadToMemory() {
+    override fun loadToMemory() {
         snapshot = unprotectedTemporaryDao.getAll().map { it.toFeatureException() }
     }
 }

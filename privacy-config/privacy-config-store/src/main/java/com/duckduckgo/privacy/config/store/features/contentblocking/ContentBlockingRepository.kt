@@ -27,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 interface ContentBlockingRepository {
     fun updateAll(exceptions: List<ContentBlockingExceptionEntity>)
+    fun loadToMemory()
     val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
@@ -53,7 +54,7 @@ class RealContentBlockingRepository(
         loadToMemory()
     }
 
-    private fun loadToMemory() {
+    override fun loadToMemory() {
         exceptions.clear()
         contentBlockingDao.getAll().map { exceptions.add(it.toFeatureException()) }
     }

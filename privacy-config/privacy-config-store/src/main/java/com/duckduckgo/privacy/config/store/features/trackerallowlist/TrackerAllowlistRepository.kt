@@ -26,6 +26,7 @@ import logcat.logcat
 
 interface TrackerAllowlistRepository {
     fun updateAll(exceptions: List<TrackerAllowlistEntity>)
+    fun loadToMemory()
     val rulesByDomain: Map<String, List<CompiledRule>>
 }
 
@@ -60,7 +61,7 @@ class RealTrackerAllowlistRepository(
         loadToMemory()
     }
 
-    private fun loadToMemory() {
+    override fun loadToMemory() {
         rulesByDomain = buildRulesByDomain(trackerAllowlistDao.getAll())
     }
 }
