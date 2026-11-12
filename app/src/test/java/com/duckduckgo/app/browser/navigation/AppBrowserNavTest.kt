@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.navigation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
 import com.duckduckgo.app.tabs.DuckChatLaunch
@@ -77,6 +78,7 @@ class AppBrowserNavTest {
         assertTrue(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
         assertEquals("selected", intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
         assertFalse(intent.getBooleanExtra("DUCK_CHAT_FORCE_IMAGE_GENERATION", false))
+        assertEquals(InAppNavigation.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
     }
 
     @Test
@@ -85,6 +87,7 @@ class AppBrowserNavTest {
 
         assertTrue(intent.getBooleanExtra("DUCK_CHAT_CONTEXTUAL_EXTRA", false))
         assertNull(intent.getStringExtra("DUCK_CHAT_TEXT_SELECTION_EXTRA"))
+        assertEquals(InAppNavigation.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
     }
 
     @Test
