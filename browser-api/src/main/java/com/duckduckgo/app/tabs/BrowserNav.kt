@@ -34,7 +34,9 @@ interface BrowserNav {
     fun openInCurrentTab(context: Context, url: String): Intent
 
     /**
-     * Returns an Intent that opens Duck.ai full screen in a new tab.
+     * Returns an Intent that opens Duck.ai as described by [launch]: a new full screen tab by default,
+     * the contextual sheet on the current tab for [DuckChatLaunch.ContextualChat], or the chat history
+     * screen for [DuckChatLaunch.ChatHistory].
      *
      * @param duckChatUrl the URL to open, or null to start a new chat.
      * @param launch how Duck.ai is launched and where the launch comes from.
