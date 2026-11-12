@@ -1114,7 +1114,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(onboardingProgress.completionPercentage()).thenReturn(50)
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1_000L)
         stubReadySubscription(startedAt = 1_000L, platform = "stripe")
         viewModel.onCreate(mock())

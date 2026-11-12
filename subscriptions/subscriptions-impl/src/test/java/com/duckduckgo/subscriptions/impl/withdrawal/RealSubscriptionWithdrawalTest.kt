@@ -216,14 +216,13 @@ class RealSubscriptionWithdrawalTest {
 
     private companion object {
         private val REFUND = Refund(amount = BigDecimal("9.99"), currency = "GBP")
-        private const val REQUESTED_AT_SECONDS = 1791288000L
         private const val REQUESTED_AT_MILLIS = 1791288000000L
     }
 
     private fun withdrawResponse(
         refundedAmount: String? = "9.99",
         currency: String? = "gbp",
-        requestedAt: Long? = REQUESTED_AT_SECONDS,
+        requestedAt: Long? = REQUESTED_AT_MILLIS,
     ) = WithdrawResponse(refundedAmount = refundedAmount, currency = currency, requestedAt = requestedAt)
 
     private fun eligibleResponse() = WithdrawalEligibilityResponse(

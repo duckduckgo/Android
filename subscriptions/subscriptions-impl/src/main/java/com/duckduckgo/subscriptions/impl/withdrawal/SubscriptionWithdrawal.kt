@@ -29,7 +29,6 @@ import com.squareup.moshi.JsonEncodingException
 import dev.zacsweers.metro.ContributesBinding
 import retrofit2.HttpException
 import java.math.BigDecimal
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface SubscriptionWithdrawal {
@@ -120,7 +119,7 @@ class RealSubscriptionWithdrawal @Inject constructor(
 
         return Success(
             refund = response?.toRefund(),
-            requestedAtMillis = response?.requestedAt?.let { TimeUnit.SECONDS.toMillis(it) },
+            requestedAtMillis = response?.requestedAt,
         )
     }
 
