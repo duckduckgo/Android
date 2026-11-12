@@ -770,6 +770,42 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenFolderRelationsContainCycleThenGetFolderBranchTerminates() = runTest {
+        val parentFolder =
+            BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, numBookmarks = 0, numFolders = 1, lastModified = "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Child Folder", "folder1", numBookmarks = 1, numFolders = 0, lastModified = "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
+        repository.insertFolderBranch(FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder)))
+
+        // folder2 is already a child of folder1; making folder1 a child of folder2 closes the loop
+        savedSitesRelationsDao.insert(Relation(folderId = childFolder.id, entityId = parentFolder.id))
+
+        val branch = repository.getFolderBranch(parentFolder)
+
+        assertTrue(branch.folders.any { it.id == parentFolder.id })
+        assertTrue(branch.folders.any { it.id == childFolder.id })
+        assertEquals(branch.folders.distinctBy { it.id }.size, branch.folders.size)
+        assertEquals(listOf(childBookmark), branch.bookmarks)
+    }
+
+    @Test
+    fun whenFolderRelationsContainCycleThenDeleteFolderBranchTerminates() = runTest {
+        val parentFolder =
+            BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, numBookmarks = 0, numFolders = 1, lastModified = "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Child Folder", "folder1", numBookmarks = 1, numFolders = 0, lastModified = "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
+        repository.insertFolderBranch(FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder)))
+
+        savedSitesRelationsDao.insert(Relation(folderId = childFolder.id, entityId = parentFolder.id))
+
+        repository.deleteFolderBranch(parentFolder)
+
+        assertNull(repository.getFolder(parentFolder.id))
+        assertNull(repository.getFolder(childFolder.id))
+        assertNull(repository.getBookmark(childBookmark.url))
+    }
+
+    @Test
     fun whenBuildFlatStructureThenReturnFolderListWithDepth() = runTest {
         val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         val parentFolder = BookmarkFolder(
@@ -797,6 +833,36 @@ class SavedSitesRepositoryTest {
         )
 
         assertEquals(items, flatStructure)
+    }
+
+    @Test
+    fun whenFolderRelationsContainCycleThenGetFolderTreeTerminates() = runTest {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+        val childFolder = BookmarkFolder(id = "folder2", name = "another name", lastModified = "timestamp", parentId = "folder1")
+
+        repository.insert(rootFolder)
+        repository.insert(parentFolder)
+        repository.insert(childFolder)
+
+        // close the loop: folder1 becomes a child of folder2, which is already a child of folder1
+        savedSitesRelationsDao.insert(Relation(folderId = childFolder.id, entityId = parentFolder.id))
+
+        val flatStructure = repository.getFolderTree(childFolder.id, null)
+
+        assertEquals(flatStructure.distinctBy { it.bookmarkFolder.id }.size, flatStructure.size)
+    }
+
+    @Test
+    fun whenSameFolderInsertedTwiceThenRelationIsNotDuplicated() = runTest {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val folder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+
+        repository.insert(rootFolder)
+        repository.insert(folder)
+        repository.insert(folder)
+
+        assertEquals(1, savedSitesRelationsDao.relationsByEntityId(folder.id).size)
     }
 
     @Test
