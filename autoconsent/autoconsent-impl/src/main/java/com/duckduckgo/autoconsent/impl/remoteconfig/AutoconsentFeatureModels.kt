@@ -25,6 +25,9 @@ class AutoconsentFeatureModels {
         val disabledCMPs: List<String>,
         @field:Json(name = "compactRuleList")
         val compactRuleList: CompactRules,
+        // Read untyped so that an invalid value cannot fail parsing of the whole settings object.
+        @field:Json(name = "heuristicPopupSearchTimeout")
+        val heuristicPopupSearchTimeout: Any? = null,
     )
 
     data class CompactRules(
