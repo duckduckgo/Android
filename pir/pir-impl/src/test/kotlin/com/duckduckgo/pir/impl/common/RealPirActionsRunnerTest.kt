@@ -71,7 +71,7 @@ class RealPirActionsRunnerTest {
     private val mockEngineFactory: PirActionsRunnerStateEngineFactory = mock()
     private val mockEngine: PirActionsRunnerStateEngine = mock()
     private val mockWebView: WebView = mock()
-    private val testUserAgent = "test-user-agent"
+    private val testUserAgent = PirWebViewUserAgent("test-user-agent")
     private val mockBrokerUserAgentResolver: PirBrokerUserAgentResolver = mock {
         onBlocking { resolve(any()) } doReturn testUserAgent
     }

@@ -26,12 +26,22 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
+/**
+ * The user agent a PIR WebView runs a broker with.
+ *
+ * @param clientHints the client hints matching [userAgent], or null to keep the WebView's own.
+ */
+data class PirWebViewUserAgent(
+    val userAgent: String,
+    val clientHints: PirClientHints? = null,
+)
+
 interface PirBrokerUserAgentResolver {
     /**
      * Returns the user agent the PIR WebView should use while running steps for [broker]: the
      * broker's own user agent when it defines one, otherwise the default PIR user agent.
      */
-    suspend fun resolve(broker: Broker): String
+    suspend fun resolve(broker: Broker): PirWebViewUserAgent
 }
 
 @ContributesBinding(AppScope::class)
@@ -41,13 +51,18 @@ class RealPirBrokerUserAgentResolver @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : PirBrokerUserAgentResolver {
 
-    override suspend fun resolve(broker: Broker): String = withContext(dispatcherProvider.io()) {
+    override suspend fun resolve(broker: Broker): PirWebViewUserAgent = withContext(dispatcherProvider.io()) {
         val brokerUserAgent = broker.userAgent?.takeIf { it.isNotBlank() }
         if (brokerUserAgent != null && pirRemoteFeatures.customWebViewUserAgent().isEnabled()) {
-            logcat { "PIR-RUNNER: Using broker user agent for ${broker.name}: $brokerUserAgent" }
-            brokerUserAgent
+            val clientHints = if (pirRemoteFeatures.customWebViewUserAgentClientHints().isEnabled()) {
+                PirClientHintsParser.parse(brokerUserAgent)
+            } else {
+                null
+            }
+            logcat { "PIR-RUNNER: Using broker user agent for ${broker.name}: $brokerUserAgent, client hints: $clientHints" }
+            PirWebViewUserAgent(brokerUserAgent, clientHints)
         } else {
-            userAgentProvider.userAgent()
+            PirWebViewUserAgent(userAgentProvider.userAgent())
         }
     }
 }

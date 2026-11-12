@@ -90,6 +90,13 @@ interface PirRemoteFeatures {
      */
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun customWebViewUserAgent(): Toggle
+
+    /**
+     * Kill-switch for matching the WebView's client hints (`Sec-CH-UA*`) to a broker-specific user agent.
+     * When disabled, the WebView keeps its own client hints even when a broker sets its user agent.
+     */
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun customWebViewUserAgentClientHints(): Toggle
 }
 
 @SingleIn(AppScope::class)
