@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
+import android.os.Bundle
+import android.os.Looper
 import android.os.Message
 import android.view.View
 import android.view.Window
@@ -29,6 +31,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.browser.tabs.transition.NewTabOrigin
 import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionConfig
@@ -38,6 +41,7 @@ import com.duckduckgo.app.browser.tabs.transition.PendingNewTabTransition
 import com.duckduckgo.app.browser.tabs.transition.RealNewTabTransitionState
 import com.duckduckgo.app.browser.tabs.transition.RealPendingNewTabTransitions
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.InputMode
@@ -65,6 +69,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 /**
@@ -95,6 +100,7 @@ class BrowserActivityNewTabTransitionTest {
     private val coordinator = NewTabTransitionCoordinator(player, pending, state) {}
     private var swiping = true
     private var listed = listOf(SOURCE, ADDED, OTHER)
+    private lateinit var binding: ActivityBrowserBinding
 
     init {
         doReturn(host.lifecycle).whenever(browser).lifecycle
@@ -328,6 +334,61 @@ class BrowserActivityNewTabTransitionTest {
         assertNull(pending.peek(ADDED))
     }
 
+    // The new tab showing is what plays its transition, so each way the browser shows a tab has to tell the coordinator.
+
+    @Test
+    fun selectingTheNewTabPlaysItsTransition() {
+        swiping = false
+        setField("lastActiveTabs", BrowserActivity::class.java.getDeclaredField("lastActiveTabs").type.getDeclaredConstructor().newInstance())
+        val fragments: FragmentManager = mock {
+            on { findFragmentByTag(ADDED) } doReturn mock<BrowserTabFragment>()
+            on { beginTransaction() } doReturn mock()
+        }
+        doReturn(fragments).whenever(browser).supportFragmentManager
+        pending.register(ADDED, readyTransition())
+
+        invoke("selectTab", TabEntity::class.java to TabEntity(tabId = ADDED))
+
+        verify(player).play(eq(binding.fragmentContainer), any(), any(), any())
+    }
+
+    @Test
+    fun movingThePagerToTheNewTabPlaysItsTransition() {
+        host.setContentView(pager)
+        pending.register(ADDED, readyTransition())
+
+        invoke("onMoveToTabRequested", Int::class.javaPrimitiveType!! to listed.indexOf(ADDED))
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(player).play(eq(pager), any(), any(), any())
+    }
+
+    @Test
+    fun newTabListedInThePagerIsCovered() {
+        pending.register(ADDED, readyTransition())
+
+        invoke(
+            "onTabsUpdated",
+            List::class.java to listOf(TabModel(SOURCE, null, false, null), TabModel(ADDED, null, false, SOURCE)),
+            Bundle::class.java to null,
+            Boolean::class.javaPrimitiveType!! to false,
+        )
+
+        verify(player).cover(eq(pager), any(), any())
+    }
+
+    @Test
+    fun tabOpenedByAPageWithSwipingOffPlaysItsTransition() {
+        swiping = false
+        doReturn(mock<FragmentManager> { on { isStateSaved } doReturn true }).whenever(browser).supportFragmentManager
+        // The browser's own picture comes back empty here, so a ready one stands in for it.
+        doReturn(readyTransition()).whenever(pending).consume(ADDED)
+
+        browser.openMessageInNewTab(Message.obtain(), SOURCE)
+
+        verify(player).play(eq(binding.fragmentContainer), any(), any(), any())
+    }
+
     private fun assertRegistered() {
         verify(pending).register(eq(ADDED), any())
     }
@@ -354,7 +415,7 @@ class BrowserActivityNewTabTransitionTest {
     private fun bindingDelegate(): Any {
         val constructor = ActivityBrowserBinding::class.java.declaredConstructors.single().apply { isAccessible = true }
         val views = constructor.parameterTypes.map { if (it == FrameLayout::class.java) FrameLayout(host) else null }
-        val binding = constructor.newInstance(*views.toTypedArray())
+        binding = constructor.newInstance(*views.toTypedArray()) as ActivityBrowserBinding
         val delegate = BrowserActivity::class.java.getDeclaredField("binding\$delegate").type
             .getConstructor(Class::class.java, AppCompatActivity::class.java)
             .newInstance(ActivityBrowserBinding::class.java, mock<AppCompatActivity>())
@@ -365,6 +426,14 @@ class BrowserActivityNewTabTransitionTest {
     private fun emptyWindow(): Window = mock { on { decorView } doReturn View(host) }
 
     private fun picture() = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888)
+
+    private fun readyTransition() =
+        PendingNewTabTransition(CompletableDeferred(picture()), NewTabTransitionConfig.DEFAULT.motionFor(NewTabOrigin.RIGHT_OF_CENTER))
+
+    private fun invoke(name: String, vararg args: Pair<Class<*>, Any?>) {
+        BrowserActivity::class.java.getDeclaredMethod(name, *args.map { it.first }.toTypedArray()).apply { isAccessible = true }
+            .invoke(browser, *args.map { it.second }.toTypedArray())
+    }
 
     private fun setField(name: String, value: Any?) {
         BrowserActivity::class.java.getDeclaredField(name).apply { isAccessible = true }.set(browser, value)
