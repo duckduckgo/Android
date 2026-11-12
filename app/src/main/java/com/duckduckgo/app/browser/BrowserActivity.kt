@@ -76,6 +76,15 @@ import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.TabReuseDistanceReporter
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionConfig
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionConfigProvider
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionCoordinator
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionPlayer
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionState
+import com.duckduckgo.app.browser.tabs.transition.PendingNewTabTransition
+import com.duckduckgo.app.browser.tabs.transition.PendingNewTabTransitions
+import com.duckduckgo.app.browser.tabs.transition.TabPagerSwipeGate
+import com.duckduckgo.app.browser.tabs.transition.capturePicture
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.AppShortcutDataClearer
 import com.duckduckgo.app.fire.DataClearer
@@ -147,6 +156,7 @@ import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
@@ -251,6 +261,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var newTabTransitionConfigProvider: NewTabTransitionConfigProvider
+
+    @Inject
+    lateinit var pendingNewTabTransitions: PendingNewTabTransitions
+
+    @Inject
+    lateinit var newTabTransitionState: NewTabTransitionState
+
     override val applyFireTheme: Boolean
         get() = currentBrowserMode == BrowserMode.FIRE
 
@@ -320,6 +339,20 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private val tabPagerAdapter by lazy {
         TabPagerAdapter(this, tabReuseDistanceReporter)
     }
+
+    private val tabPagerSwipeGate by lazy {
+        TabPagerSwipeGate(tabPager)
+    }
+
+    private val newTabTransitionCoordinator by lazy {
+        NewTabTransitionCoordinator(
+            NewTabTransitionPlayer(binding.newTabTransitionCover, newTabTransitionState),
+            pendingNewTabTransitions,
+            newTabTransitionState,
+        ) { running -> tabPagerSwipeGate.pausedByTransition = running }
+    }
+
+    private var newTabTransitionConfig: NewTabTransitionConfig? = null
 
     private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
     private lateinit var omnibarToolbarMockupBottomBinding: IncludeOmnibarToolbarMockupBottomBinding
@@ -654,6 +687,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onStart() {
+        // Before super: the tab flows resume inside it and may show the tab manager's new tab straight away.
+        if (viewModel.currentMode.value == currentBrowserMode) {
+            newTabTransitionCoordinator.onBrowserStarting(if (swipingTabsFeature.isEnabled) tabPager else binding.fragmentContainer)
+        } else {
+            // The browser is about to be recreated for the other mode; mode switches aren't animated.
+            pendingNewTabTransitions.clear()
+        }
         super.onStart()
 
         // The intent's tab replaces the landing tab, so waiting for the landing tab would only hit the timeout.
@@ -732,6 +772,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onResume() {
         super.onResume()
+        newTabTransitionCoordinator.onBrowserResumed()
+        lifecycleScope.launch { newTabTransitionConfig = newTabTransitionConfigProvider.enabledConfig() }
         appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.STANDARD)
         pendingLaunchSource = null
     }
@@ -745,6 +787,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
         releaseFirstFrameHold?.invoke()
+        newTabTransitionCoordinator.cancel()
+        newTabTransitionCoordinator.onBrowserStopped()
+        pendingNewTabTransitions.clear()
 
         super.onStop()
     }
@@ -856,6 +901,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         viewModel.onTabActivated(tab.tabId)
 
+        newTabTransitionCoordinator.onTabShowing(tab.tabId, binding.fragmentContainer)
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
             openNewTab(tab.tabId, tab.url, tab.skipHome, isExternal = consumeExternalLaunchForTab(tab.tabId))
@@ -868,6 +914,50 @@ open class BrowserActivity : DuckDuckGoActivity() {
         transaction.show(fragment)
         transaction.commit()
         currentTab = fragment
+    }
+
+    private fun registerNewTabTransition(
+        tabId: String,
+        transition: PendingNewTabTransition,
+    ) {
+        // An add that returns after the browser has stopped no longer matches what the user tapped on.
+        if (!lifecycle.currentState.isAtLeast(STARTED)) return
+        pendingNewTabTransitions.register(tabId, transition)
+        if (swipingTabsFeature.isEnabled) {
+            onSwipingNewTabTransitionRegistered(tabId)
+            // The tab list can get there before the picture, which then decides whether the tab is still hidden to cover.
+            if (!transition.picture.isCompleted) {
+                lifecycleScope.launch {
+                    transition.picture.await()
+                    if (pendingNewTabTransitions.peek(tabId) === transition) onSwipingNewTabTransitionRegistered(tabId)
+                }
+            }
+        } else {
+            newTabTransitionCoordinator.onTabRegistered(
+                tabId,
+                listedTabIds = emptyList(),
+                visibleTabId = currentTab?.tabId,
+                container = binding.fragmentContainer,
+            )
+        }
+    }
+
+    private fun onSwipingNewTabTransitionRegistered(tabId: String) {
+        newTabTransitionCoordinator.onTabRegistered(
+            tabId,
+            listedTabIds = (0 until tabPagerAdapter.itemCount).mapNotNull { tabPagerAdapter.getTabIdAtPosition(it) },
+            visibleTabId = tabPagerAdapter.getTabIdAtPosition(tabPager.currentItem),
+            container = tabPager,
+        )
+    }
+
+    private fun startNewTabTransition(): PendingNewTabTransition? {
+        val config = newTabTransitionConfig ?: return null
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return null
+        return PendingNewTabTransition(
+            picture = lifecycleScope.async { window.capturePicture() },
+            motion = config.motionFor(config.browserOrigin),
+        )
     }
 
     private fun removeTabs(fragments: List<BrowserTabFragment>) {
@@ -1434,6 +1524,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        newTabTransitionCoordinator.cancel()
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             viewModel.sendPixelEventForLandscapeOrientation()
         }
@@ -1577,10 +1668,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         lifecycleScope.launch {
                             // delay disabling of the swiping to allow the swipe animation to finish
                             delay(DISABLE_SWIPING_DELAY)
-                            tabPager.isUserInputEnabled = false
+                            tabPagerSwipeGate.allowedByBrowser = false
                         }
                     } else {
-                        tabPager.isUserInputEnabled = true
+                        tabPagerSwipeGate.allowedByBrowser = true
                     }
                 }
             }
@@ -1784,6 +1875,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun onMoveToTabRequested(index: Int) {
         tabPager.post {
             tabPagerAdapter.currentTabIndex = index
+            tabPagerAdapter.getTabIdAtPosition(index)?.let { newTabTransitionCoordinator.onTabShowing(it, tabPager) }
             tabPager.setCurrentItem(index, false)
         }
     }
@@ -1816,6 +1908,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         savedInstanceState: Bundle?,
         tabRestorationFixEnabled: Boolean,
     ) {
+        newTabTransitionCoordinator.onTabsChanged(updatedTabIds.map { it.tabId }, tabPager)
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
 
         if (tabRestorationFixEnabled) {
@@ -1833,6 +1926,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean = false,
         browserMode: BrowserMode = currentBrowserMode,
         inputModeTarget: InputMode? = null,
+        animated: Boolean = false,
     ) {
         if (inputModeTarget == InputMode.SEARCH) {
             isDuckChatVisible = false
@@ -1841,6 +1935,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             browserMode,
             PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal, inputModeTarget),
             BrowserModeSwitchSource.NEW_TAB,
+            animated,
         )
     }
 
@@ -1856,10 +1951,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
      * mode matches and the action runs; were it ever to run before the recreate, it simply re-stashes.
      *
      * @param source The UI origin of the switch, reported on the mode-switched pixel.
+     * @param animated Whether a new tab opened by [action] grows in. Only when no switch is needed: a switch recreates the activity.
      */
-    private fun switchModeThen(targetMode: BrowserMode, action: PendingAction, source: BrowserModeSwitchSource) {
+    private fun switchModeThen(
+        targetMode: BrowserMode,
+        action: PendingAction,
+        source: BrowserModeSwitchSource,
+        animated: Boolean = false,
+    ) {
         if (targetMode == currentBrowserMode) {
-            runAction(action)
+            runAction(action, animated)
             return
         }
         if (viewModel.switchToMode(targetMode, source)) {
@@ -1870,7 +1971,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun runAction(action: PendingAction) {
+    private fun runAction(
+        action: PendingAction,
+        animated: Boolean = false,
+    ) {
         when (action) {
             // Security invariant: a carried Intent is only ever *consumed* here (its extras read by
             // processIntent), never re-launched via startActivity/startService. Launching an Intent
@@ -1884,6 +1988,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 action.skipHome,
                 action.isExternal,
                 action.inputModeTarget,
+                newTabTransition = if (animated) startNewTabTransition() else null,
             )
             is PendingAction.OpenExistingTab -> openExistingTab(action.tabId)
         }
@@ -1895,12 +2000,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         skipHome: Boolean,
         isExternal: Boolean,
         inputModeTarget: InputMode? = null,
+        newTabTransition: PendingNewTabTransition? = null,
     ) {
         val landingId = onIntentOpening()
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
                 val tabId = tabManager.openNewTab(query, sourceTabId, skipHome)
                 onIntentLanded(tabId, landingId)
+                newTabTransition?.let { registerNewTabTransition(tabId, it) }
                 if (isExternal) {
                     externalLaunchTabIds.add(tabId)
                 }
@@ -1912,6 +2019,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             } else {
                 val tabId = viewModel.onNewTabRequested()
                 onIntentLanded(tabId, landingId)
+                newTabTransition?.let { registerNewTabTransition(tabId, it) }
                 if (inputModeTarget != null) {
                     pendingInputModeTargets[tabId] = inputModeTarget
                 }
@@ -1922,9 +2030,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
     fun openInNewTab(
         query: String,
         sourceTabId: String?,
+        animated: Boolean = false,
     ) {
+        val newTabTransition = if (animated) startNewTabTransition() else null
         lifecycleScope.launch {
-            viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
+            val tabId = viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
+            newTabTransition?.let { registerNewTabTransition(tabId, it) }
         }
     }
 
@@ -1932,6 +2043,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         message: Message,
         sourceTabId: String?,
     ) {
+        val newTabTransition = startNewTabTransition()
         openMessageInNewTabJob =
             lifecycleScope.launch {
                 if (swipingTabsFeature.isEnabled) {
@@ -1939,9 +2051,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (sourceTabId != null) {
                         tabPagerAdapter.setMessageForNewFragment(sourceTabId, message)
                     }
-                    tabManager.openNewTab(sourceTabId = sourceTabId)
+                    val tabId = tabManager.openNewTab(sourceTabId = sourceTabId)
+                    newTabTransition?.let { registerNewTabTransition(tabId, it) }
                 } else {
                     val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
+                    // This tab is added here rather than through selectTab, so its transition starts here too.
+                    newTabTransition?.let { registerNewTabTransition(tabId, it) }
+                    newTabTransitionCoordinator.onTabShowing(tabId, binding.fragmentContainer)
                     val fragment = openNewTab(tabId, null, false, intent?.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ?: false)
                     fragment.messageFromPreviousTab = message
                 }
