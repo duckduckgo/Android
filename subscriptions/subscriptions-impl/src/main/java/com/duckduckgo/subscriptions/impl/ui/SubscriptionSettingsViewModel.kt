@@ -54,7 +54,6 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
-import com.duckduckgo.subscriptions.impl.withdrawal.Refund
 import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
 import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
@@ -189,10 +188,11 @@ class SubscriptionSettingsViewModel @Inject constructor(
         loadWithdrawalOptionIfNeeded(subscription)
     }
 
-    private fun completedWithdrawalState(refund: Refund?): CompletedWithdrawalState {
+    private fun completedWithdrawalState(success: WithdrawalResult.Success): CompletedWithdrawalState {
+        val requestedAtMillis = success.requestedAtMillis ?: currentTimeProvider.currentTimeMillis()
         return CompletedWithdrawalState(
-            date = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(currentTimeProvider.currentTimeMillis())),
-            refundAmount = refund?.let { formatAmount(it.amount, it.currency) },
+            date = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(requestedAtMillis)),
+            refundAmount = success.refund?.let { formatAmount(it.amount, it.currency) },
         )
     }
 
@@ -241,7 +241,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 command.send(ShowWithdrawalDialogError)
             } else {
                 withdrawalOption = null
-                val completedWithdrawal = (result as? WithdrawalResult.Success)?.let { completedWithdrawalState(it.refund) }
+                val completedWithdrawal = (result as? WithdrawalResult.Success)?.let { completedWithdrawalState(it) }
                 _viewState.update { state ->
                     if (state is Ready) {
                         state.copy(

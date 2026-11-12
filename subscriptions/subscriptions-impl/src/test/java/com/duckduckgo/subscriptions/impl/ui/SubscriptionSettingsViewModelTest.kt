@@ -902,7 +902,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalConfirmedAndSucceedsThenHideWithdrawalOption() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
 
@@ -947,7 +947,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalSucceedsThenDismissWithdrawalDialog() = runTest {
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         stubReadySubscription(platform = "stripe")
 
         viewModel.commands().test {
@@ -1044,7 +1044,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalSucceedsThenShowCompletedWithdrawal() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
@@ -1053,7 +1053,7 @@ class SubscriptionSettingsViewModelTest {
             assertNull((expectMostRecentItem() as Ready).completedWithdrawal)
             viewModel.onWithdrawalConfirmed()
             val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
-            assertEquals("October 15, 2026", completedWithdrawal?.date)
+            assertEquals("October 06, 2026", completedWithdrawal?.date)
             assertTrue(completedWithdrawal!!.refundAmount!!.contains("9.99"))
         }
     }
@@ -1062,7 +1062,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalSucceedsWithoutRefundThenShowCompletedWithdrawalWithoutAmount() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(refund = null))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(refund = null, requestedAtMillis = null))
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
@@ -1073,6 +1073,22 @@ class SubscriptionSettingsViewModelTest {
             val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
             assertNotNull(completedWithdrawal)
             assertNull(completedWithdrawal!!.refundAmount)
+        }
+    }
+
+    @Test
+    fun whenWithdrawalSucceedsWithoutRequestedAtThenShowCurrentDate() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(refund = null, requestedAtMillis = null))
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            expectMostRecentItem()
+            viewModel.onWithdrawalConfirmed()
+            assertEquals("October 15, 2026", (expectMostRecentItem() as Ready).completedWithdrawal?.date)
         }
     }
 
@@ -1098,7 +1114,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(onboardingProgress.completionPercentage()).thenReturn(50)
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1_000L)
         stubReadySubscription(startedAt = 1_000L, platform = "stripe")
         viewModel.onCreate(mock())
@@ -1133,7 +1149,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenCompletedWithdrawalShownAndAccountSignedOutThenItStaysOnResume() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
@@ -1184,6 +1200,11 @@ class SubscriptionSettingsViewModelTest {
             eligibleUntil = 1792065600000,
             refundAmount = BigDecimal("9.99"),
             refundCurrency = "EUR",
+        )
+        private const val REQUESTED_AT_MILLIS = 1791288000000L
+        private val WITHDRAWAL_SUCCESS = WithdrawalResult.Success(
+            refund = Refund(amount = BigDecimal("9.99"), currency = "EUR"),
+            requestedAtMillis = REQUESTED_AT_MILLIS,
         )
     }
 }
