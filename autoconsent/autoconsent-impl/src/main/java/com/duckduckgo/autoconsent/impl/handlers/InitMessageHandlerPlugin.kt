@@ -141,6 +141,7 @@ class InitMessageHandlerPlugin @Inject constructor(
             enableCosmeticRules = true,
             enableHeuristicDetection = true,
             heuristicMode = heuristicModeProvider.getHeuristicMode(),
+            enableHeuristicHitTest = autoconsentFeature.heuristicHitTest().isEnabled(),
         )
     }
 
@@ -247,6 +248,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
         val enableHeuristicDetection: Boolean,
         val heuristicMode: String,
+        val enableHeuristicHitTest: Boolean,
     )
 
     data class AutoconsentRuleset(val compact: Any?)
