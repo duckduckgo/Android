@@ -40,15 +40,7 @@ interface NetPDefaultConfigProvider {
     fun fallbackDns(): Set<InetAddress> = emptySet()
 
     suspend fun routes(): Map<String, Int> = emptyMap()
-
-    fun pcapConfig(): PcapConfig? = null
 }
-
-data class PcapConfig(
-    val filename: String,
-    val snapLen: Int,
-    val fileSize: Int,
-)
 
 @ContributesBinding(VpnScope::class)
 class RealNetPDefaultConfigProvider @Inject constructor(

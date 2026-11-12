@@ -35,8 +35,5 @@ interface NetPInternalFeatureToggles {
     fun excludeSystemApps(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
-    fun enablePcapRecording(): Toggle
-
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun useVpnStagingEnvironment(): Toggle
 }
