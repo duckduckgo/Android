@@ -39,9 +39,7 @@ import javax.inject.Inject
 interface SyncSetupWideEvent {
     suspend fun onFlowStarted(launchSource: SyncLaunchSource = SyncLaunchSource.Other)
     suspend fun onDeviceAuthNotEnrolled()
-    suspend fun onEnrollDeviceAuthDialogShown()
     suspend fun onUserAuthSuccess()
-    suspend fun onUserAuthCancelled()
     suspend fun onIntroScreenShown()
     suspend fun onSyncEnabled()
     suspend fun onAccountCreationApiStarted()
@@ -105,16 +103,9 @@ class SyncSetupWideEventImpl @Inject constructor(
     }
 
     /**
-     * In production, we always require user to be authenticated before setting up sync.
-     *
-     * If device auth is not enrolled at all, note that as a step.
-     *
-     * If the dialog prompting user to enroll in device auth is shown, abort the flow, see [onEnrollDeviceAuthDialogShown].
-     * If the dialog is never shown, the flow will become stale and be reported as [FlowStatus.Unknown] with last step being [STEP_DEVICE_AUTH_NOT_ENROLLED]
-     * which indicates an issue.
-     *
-     * When we authenticate on the intro screen, the enroll dialog does not abort the flow, because the user can enroll and retry
-     * without leaving the screen. There, [STEP_DEVICE_AUTH_NOT_ENROLLED] can be followed by [STEP_USER_AUTH] and a successful finish,
+     * In production, we always require user to be authenticated before setting up sync. We authenticate on the setup screens,
+     * where the enroll dialog does not abort the flow, because the user can enroll and retry without leaving the screen.
+     * There, [STEP_DEVICE_AUTH_NOT_ENROLLED] can be followed by [STEP_USER_AUTH] and a successful finish,
      * and leaving the screen finishes the flow as [FlowStatus.Cancelled].
      */
     override suspend fun onDeviceAuthNotEnrolled() {
@@ -124,33 +115,11 @@ class SyncSetupWideEventImpl @Inject constructor(
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_DEVICE_AUTH_NOT_ENROLLED, success = true)
     }
 
-    /**
-     * @see onDeviceAuthNotEnrolled
-     */
-    override suspend fun onEnrollDeviceAuthDialogShown() {
-        if (!isFeatureEnabled()) return
-        val id = getCurrentWideEventId() ?: return
-
-        wideEventClient.flowAbort(wideEventId = id)
-        cachedFlowId = null
-    }
-
     override suspend fun onUserAuthSuccess() {
         if (!isFeatureEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_USER_AUTH, success = true)
-    }
-
-    override suspend fun onUserAuthCancelled() {
-        if (!isFeatureEnabled()) return
-        val id = getCurrentWideEventId() ?: return
-
-        wideEventClient.flowFinish(
-            wideEventId = id,
-            status = FlowStatus.Cancelled,
-        )
-        cachedFlowId = null
     }
 
     override suspend fun onIntroScreenShown() {

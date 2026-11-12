@@ -16,9 +16,7 @@
 
 package com.duckduckgo.sync.impl.auth
 
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
@@ -27,7 +25,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationResult
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SyncDeviceAuthenticator {
@@ -44,8 +41,6 @@ interface SyncDeviceAuthenticator {
 class RealSyncDeviceAuthenticator @Inject constructor(
     private val authenticator: DeviceAuthenticator,
     private val syncPixels: SyncPixels,
-    private val syncFeature: SyncFeature,
-    private val dispatchers: DispatcherProvider,
 ) : SyncDeviceAuthenticator {
     override val currentPrompt: StateFlow<AuthPrompt?>
         get() = authenticator.currentPrompt
@@ -56,12 +51,8 @@ class RealSyncDeviceAuthenticator @Inject constructor(
         onEvent: (Event) -> Unit,
     ): Response {
         val response = authenticator.authenticate(request, onEvent)
-        withContext(dispatchers.io()) {
-            if (syncFeature.canUseImprovedSyncFlow().isEnabled()) {
-                response.toPixelResult()?.let { result ->
-                    syncPixels.fireSetupAuthenticationResult(result, source)
-                }
-            }
+        response.toPixelResult()?.let { result ->
+            syncPixels.fireSetupAuthenticationResult(result, source)
         }
         return response
     }

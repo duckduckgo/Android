@@ -67,7 +67,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                android:text="@string/sync_simplified_setup_header_headline"
+                android:text="@string/sync_simplified_setup_header_headline_v2"
                 app:textType="primary"
                 app:typography="h1" />
 
@@ -78,7 +78,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                android:text="@string/sync_simplified_setup_header_body"
+                android:text="@string/sync_simplified_setup_header_body_v2"
                 app:textType="primary"
                 app:typography="body1" />
 

@@ -19,9 +19,7 @@ package com.duckduckgo.sync.impl.ui.pairing.read.camera
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.OpenPermissionSettings
@@ -34,45 +32,31 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class ReadSyncCodeCameraIntroViewModel @Inject constructor(
     private val cameraAccess: CameraAccess,
     private val syncPixels: SyncPixels,
-    private val syncFeature: SyncFeature,
-    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val isCameraHardwareAvailable = cameraAccess.isHardwareAvailable()
     private val isCameraGrantedOnInit = cameraAccess.isPermissionGranted()
     private var shouldReportCameraPermission = true
-    private var shouldAutoRequestCameraPermission = false
+    private var shouldAutoRequestCameraPermission = isCameraHardwareAvailable && !isCameraGrantedOnInit
 
     private val _viewState = MutableStateFlow(
         ViewState(
-            viewMode = if (isCameraHardwareAvailable) ViewMode.Loading else ViewMode.NoCameraAvailable,
+            viewMode = when {
+                !isCameraHardwareAvailable -> ViewMode.NoCameraAvailable
+                !isCameraGrantedOnInit -> ViewMode.NoCameraPermission
+                else -> ViewMode.Intro
+            },
         ),
     )
     val viewState = _viewState.asStateFlow()
 
     private val _command = Channel<Command>(Channel.BUFFERED)
     val commands = _command.receiveAsFlow()
-
-    private val initializationJob = viewModelScope.launch {
-        val isImprovedSyncFlow = withContext(dispatchers.io()) { syncFeature.canUseImprovedSyncFlow().isEnabled() }
-        val viewMode = when {
-            !isCameraHardwareAvailable -> ViewMode.NoCameraAvailable
-            isImprovedSyncFlow && !cameraAccess.isPermissionGranted() -> {
-                shouldAutoRequestCameraPermission = true
-                ViewMode.NoCameraPermission
-            }
-            else -> ViewMode.Intro
-        }
-        _viewState.update { current ->
-            current.copy(viewMode = viewMode, isImprovedSyncEnabled = isImprovedSyncFlow)
-        }
-    }
 
     fun requestAnimationStart() = withCameraHardware {
         val state = viewState.value
@@ -95,7 +79,7 @@ class ReadSyncCodeCameraIntroViewModel @Inject constructor(
                 requestCameraActivation()
             }
 
-            shouldAutoRequestCameraPermission && !isPermissionGranted -> {
+            shouldAutoRequestCameraPermission -> {
                 shouldAutoRequestCameraPermission = false
                 _command.send(RequestCameraPermission)
             }
@@ -153,10 +137,10 @@ class ReadSyncCodeCameraIntroViewModel @Inject constructor(
         }
     }
 
-    // The improved flow asks for the permission before the intro has played, so a grant leads into the intro, which
-    // hands over to the camera once it finishes. The old flow only asks after the intro, so a grant goes straight to the camera.
+    // We ask for the permission before the intro has played, so a grant leads into the intro, which
+    // hands over to the camera once it finishes.
     private fun ViewState.viewModeAfterGrant(): ViewMode {
-        return if (isImprovedSyncEnabled && !animationFinished) ViewMode.Intro else ViewMode.Camera
+        return if (!animationFinished) ViewMode.Intro else ViewMode.Camera
     }
 
     private fun reportCameraPermissionState(isGranted: Boolean) {
@@ -170,23 +154,18 @@ class ReadSyncCodeCameraIntroViewModel @Inject constructor(
 
     private fun withCameraHardware(block: suspend () -> Unit) {
         if (!isCameraHardwareAvailable) return
-        viewModelScope.launch {
-            initializationJob.join()
-            block()
-        }
+        viewModelScope.launch { block() }
     }
 
     data class ViewState(
         val animationFinished: Boolean = false,
-        val isImprovedSyncEnabled: Boolean = false,
         val viewMode: ViewMode = ViewMode.Intro,
     ) {
         val showCameraPreview: Boolean
-            get() = viewMode == ViewMode.Camera || (isImprovedSyncEnabled && viewMode == ViewMode.Intro)
+            get() = viewMode == ViewMode.Camera || viewMode == ViewMode.Intro
     }
 
     enum class ViewMode {
-        Loading,
         Intro,
         Camera,
         NoCameraPermission,

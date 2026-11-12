@@ -607,7 +607,6 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
         testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
 
-        verify(syncSetupWideEvent, never()).onUserAuthCancelled()
         verify(syncSetupWideEvent, never()).onUserAuthSuccess()
     }
 
@@ -621,7 +620,6 @@ class SyncThisDeviceViewModelTest {
             testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
             skipItems(1)
 
-            verify(syncSetupWideEvent, never()).onUserAuthCancelled()
             verify(syncSetupWideEvent, never()).onUserAuthSuccess()
 
             cancel()
@@ -646,8 +644,6 @@ class SyncThisDeviceViewModelTest {
 
         val testee = createTestee()
         testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
-
-        verify(syncSetupWideEvent, never()).onEnrollDeviceAuthDialogShown()
     }
 
     @Test
@@ -659,7 +655,6 @@ class SyncThisDeviceViewModelTest {
         testee.syncThisDevice(launchSource = SyncLaunchSource.Other)
 
         verify(syncSetupWideEvent, never()).onUserAuthSuccess()
-        verify(syncSetupWideEvent, never()).onUserAuthCancelled()
     }
 
     @Test
@@ -687,7 +682,6 @@ class SyncThisDeviceViewModelTest {
             skipItems(1)
 
             verify(syncSetupWideEvent, never()).onUserAuthSuccess()
-            verify(syncSetupWideEvent, never()).onUserAuthCancelled()
 
             cancel()
         }
