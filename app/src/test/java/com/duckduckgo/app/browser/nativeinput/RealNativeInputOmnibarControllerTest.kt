@@ -152,6 +152,55 @@ class RealNativeInputOmnibarControllerTest {
     }
 
     @Test
+    fun whenOverlayActiveAndTierUnknownThenTitleAndPillHidden() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        aiTitle.visibility = View.VISIBLE
+        duckAIFreePill.visibility = View.VISIBLE
+
+        testee.hideBackground()
+
+        assertEquals(View.GONE, aiTitle.visibility)
+        assertEquals(View.GONE, duckAIFreePill.visibility)
+    }
+
+    @Test
+    fun whenTierPaidArrivesAfterOverlayActiveThenTitleShown() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        testee.hideBackground()
+
+        testee.updateTierTitle(DuckAiTier.Paid, {}) {}
+
+        assertEquals(View.VISIBLE, aiTitle.visibility)
+        assertEquals(View.GONE, duckAIFreePill.visibility)
+    }
+
+    @Test
+    fun whenTierFreeArrivesAfterOverlayActiveThenFreePillShownAndImpressionFired() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        var impressions = 0
+        testee.hideBackground()
+
+        testee.updateTierTitle(DuckAiTier.Free, {}) { impressions++ }
+
+        assertEquals(View.GONE, aiTitle.visibility)
+        assertEquals(View.VISIBLE, duckAIFreePill.visibility)
+        assertEquals(1, impressions)
+    }
+
+    @Test
+    fun whenOverlayActiveAndTierPaidThenTitleShownAndPillHidden() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        aiTitle.visibility = View.GONE
+        duckAIFreePill.visibility = View.VISIBLE
+        testee.updateTierTitle(DuckAiTier.Paid, {}) {}
+
+        testee.hideBackground()
+
+        assertEquals(View.VISIBLE, aiTitle.visibility)
+        assertEquals(View.GONE, duckAIFreePill.visibility)
+    }
+
+    @Test
     fun whenOverlayRestoredThenLaterFreeTierUpdateDoesNotResurrectFreePill() {
         whenever(omnibar.omnibarView).thenReturn(omnibarView)
         testee.updateTierTitle(DuckAiTier.Free, {}) {}

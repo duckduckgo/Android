@@ -222,12 +222,18 @@ class RealNativeInputOmnibarController(
                 freePill?.setOnClickListener(null)
                 freePill?.isClickable = false
             }
-            is DuckAiTier.Paid, is DuckAiTier.Unknown -> {
+            is DuckAiTier.Paid -> {
                 freePill?.gone()
                 freePill?.setOnClickListener(null)
                 aiTitle?.show()
                 aiTitle?.setTextIfChanged(aiTitle.context.getString(R.string.duckAiHeaderPaidTitle))
                 aiTitle?.textSize = 16f
+            }
+            // Empty until the plan loads, so free users don't see the paid title before their pill.
+            is DuckAiTier.Unknown -> {
+                aiTitle?.gone()
+                freePill?.gone()
+                freePill?.setOnClickListener(null)
             }
         }
     }
