@@ -434,6 +434,7 @@ class BrowserTabFragment :
     private val supervisorJob = SupervisorJob()
 
     private var duckAiContextualFragment: Fragment? = null
+    private var removeContextualSheetWhenHidden = false
     private var duckChatButtonAnchor: View? = null
     private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
@@ -2053,6 +2054,8 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
+        // With swiping tabs, a tab is paused when another one shows.
+        removeContextualSheetIfWaitingForHide()
         nativeInputManager.onTabVisibilityChanged(false)
         pdfDownloadTooltipPopup?.dismiss()
         pdfDownloadTooltipPopup = null
@@ -4131,11 +4134,20 @@ class BrowserTabFragment :
     private fun reactToDuckChatContextualSheetResult() {
         childFragmentManager.setFragmentResultListener(DuckChatContextual.RESULT_KEY, viewLifecycleOwner) { _, bundle ->
             val contextualChatUrl = bundle.getString(DuckChatContextual.RESULT_URL)
-            contextualChatUrl?.let {
+            // The sheet stays until the new tab replaces this one, so the page behind it doesn't show while the tab opens.
+            // While it waits, another full-screen tap would open a second tab.
+            if (contextualChatUrl != null && !removeContextualSheetWhenHidden) {
+                // Outside BrowserActivity (a custom tab) no tab opens here to hide this one, so the sheet hides directly.
+                if (browserActivity == null) removeDuckChatContextualSheet() else removeContextualSheetWhenHidden = true
                 viewModel.openLinkInNewTab(contextualChatUrl.toUri())
-                removeDuckChatContextualSheet()
             }
         }
+    }
+
+    private fun removeContextualSheetIfWaitingForHide() {
+        if (!removeContextualSheetWhenHidden) return
+        removeContextualSheetWhenHidden = false
+        removeDuckChatContextualSheet()
     }
 
     private fun ensureBrowserIsCompatibleWithContextualSheetState() {
@@ -5218,6 +5230,7 @@ class BrowserTabFragment :
 
     private fun onTabHidden() {
         if (!isAdded) return
+        removeContextualSheetIfWaitingForHide()
         nativeInputManager.onTabVisibilityChanged(false)
         viewModel.onViewHidden()
         webViewClient.onTabBackgrounded()

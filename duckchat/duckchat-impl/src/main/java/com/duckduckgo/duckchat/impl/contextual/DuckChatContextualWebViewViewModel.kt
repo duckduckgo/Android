@@ -156,6 +156,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private var pendingEntryCarriesTermsConsent: Boolean = true
 
     private var hidingSheetForNewChat = false
+    private var fullModeRequested = false
 
     sealed class Command {
         data class LoadUrl(val url: String) : Command()
@@ -774,6 +775,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     }
 
     fun onFullModeRequested() {
+        // The sheet stays up until the new tab shows, so a second tap would report the entry again.
+        if (fullModeRequested) return
+        fullModeRequested = true
         logcat { "Duck.ai: request fullmode url $fullModeUrl" }
         val hasPrompt = fullModeUrl.isNotEmpty()
         val chatUrl = fullModeUrl.ifEmpty { duckChat.getDuckChatUrl("", false, sidebar = false) }
