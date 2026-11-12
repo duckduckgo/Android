@@ -23,6 +23,7 @@ import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,6 +40,7 @@ class RealPirBrokerUserAgentResolverTest {
     private val mockUserAgentProvider: UserAgentProvider = mock()
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
     private val mockCustomUserAgentToggle: Toggle = mock()
+    private val mockClientHintsToggle: Toggle = mock()
 
     private lateinit var testee: RealPirBrokerUserAgentResolver
 
@@ -47,6 +49,8 @@ class RealPirBrokerUserAgentResolverTest {
         whenever(mockUserAgentProvider.userAgent(anyOrNull(), any())).thenReturn(DEFAULT_UA)
         whenever(mockPirRemoteFeatures.customWebViewUserAgent()).thenReturn(mockCustomUserAgentToggle)
         whenever(mockCustomUserAgentToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirRemoteFeatures.customWebViewUserAgentClientHints()).thenReturn(mockClientHintsToggle)
+        whenever(mockClientHintsToggle.isEnabled()).thenReturn(true)
 
         testee = RealPirBrokerUserAgentResolver(
             userAgentProvider = mockUserAgentProvider,
@@ -56,25 +60,41 @@ class RealPirBrokerUserAgentResolverTest {
     }
 
     @Test
-    fun whenBrokerHasUserAgentAndFeatureEnabledThenReturnsBrokerUserAgent() = runTest {
-        assertEquals(BROKER_UA, testee.resolve(broker(userAgent = BROKER_UA)))
+    fun whenBrokerHasChromiumUserAgentAndFeaturesEnabledThenReturnsBrokerUserAgentWithClientHints() = runTest {
+        val result = testee.resolve(broker(userAgent = CHROME_WINDOWS_UA))
+
+        assertEquals(CHROME_WINDOWS_UA, result.userAgent)
+        assertEquals(PirClientHintsParser.parse(CHROME_WINDOWS_UA), result.clientHints)
+        assertNotNull(result.clientHints)
+    }
+
+    @Test
+    fun whenBrokerHasNonChromiumUserAgentThenReturnsBrokerUserAgentWithoutClientHints() = runTest {
+        assertEquals(PirWebViewUserAgent(FIREFOX_UA), testee.resolve(broker(userAgent = FIREFOX_UA)))
+    }
+
+    @Test
+    fun whenClientHintsFeatureDisabledThenReturnsBrokerUserAgentWithoutClientHints() = runTest {
+        whenever(mockClientHintsToggle.isEnabled()).thenReturn(false)
+
+        assertEquals(PirWebViewUserAgent(CHROME_WINDOWS_UA), testee.resolve(broker(userAgent = CHROME_WINDOWS_UA)))
     }
 
     @Test
     fun whenBrokerHasUserAgentAndFeatureDisabledThenReturnsDefaultUserAgent() = runTest {
         whenever(mockCustomUserAgentToggle.isEnabled()).thenReturn(false)
 
-        assertEquals(DEFAULT_UA, testee.resolve(broker(userAgent = BROKER_UA)))
+        assertEquals(PirWebViewUserAgent(DEFAULT_UA), testee.resolve(broker(userAgent = CHROME_WINDOWS_UA)))
     }
 
     @Test
     fun whenBrokerHasNoUserAgentThenReturnsDefaultUserAgent() = runTest {
-        assertEquals(DEFAULT_UA, testee.resolve(broker(userAgent = null)))
+        assertEquals(PirWebViewUserAgent(DEFAULT_UA), testee.resolve(broker(userAgent = null)))
     }
 
     @Test
     fun whenBrokerHasBlankUserAgentThenReturnsDefaultUserAgent() = runTest {
-        assertEquals(DEFAULT_UA, testee.resolve(broker(userAgent = " ")))
+        assertEquals(PirWebViewUserAgent(DEFAULT_UA), testee.resolve(broker(userAgent = " ")))
     }
 
     private fun broker(userAgent: String?) = Broker(
@@ -90,6 +110,8 @@ class RealPirBrokerUserAgentResolverTest {
 
     private companion object {
         const val DEFAULT_UA = "default-pir-user-agent"
-        const val BROKER_UA = "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0"
+        const val CHROME_WINDOWS_UA =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+        const val FIREFOX_UA = "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0"
     }
 }

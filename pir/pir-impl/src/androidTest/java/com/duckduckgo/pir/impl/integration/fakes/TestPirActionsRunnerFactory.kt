@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.common.EmailDataResolver
 import com.duckduckgo.pir.impl.common.PirBrokerUserAgentResolver
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirWebViewUserAgent
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.actions.RealPirActionsRunnerStateEngineFactory
 import com.duckduckgo.pir.impl.models.Broker
@@ -48,7 +49,7 @@ class TestPirActionsRunnerFactory(
             dispatcherProvider = dispatcherProvider,
             pirDetachedWebViewProvider = pirDetachedWebViewProvider,
             brokerUserAgentResolver = object : PirBrokerUserAgentResolver {
-                override suspend fun resolve(broker: Broker): String = broker.userAgent ?: TEST_USER_AGENT
+                override suspend fun resolve(broker: Broker) = PirWebViewUserAgent(broker.userAgent ?: TEST_USER_AGENT)
             },
             brokerActionProcessor = brokerActionProcessor,
             nativeBrokerActionHandler = nativeBrokerActionHandler,
