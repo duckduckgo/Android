@@ -32,7 +32,8 @@ import org.json.JSONArray
 import javax.inject.Inject
 
 /**
- * Hints are only for returning users, so they stay hidden while the frontend still shows its own first-run pills.
+ * Hints are only for returning users, so they stay hidden while the frontend still shows its own first-run pills,
+ * and once [NewChatHintsUsage] says the user keeps prompting without them.
  */
 interface NewChatHintsEligibility {
     fun observeEligible(browserMode: BrowserMode): Flow<Boolean>
@@ -42,6 +43,7 @@ interface NewChatHintsEligibility {
 class RealNewChatHintsEligibility @Inject constructor(
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val termsRepository: DuckAiTermsRepository,
+    private val usage: NewChatHintsUsage,
     private val dispatchers: DispatcherProvider,
 ) : NewChatHintsEligibility {
 
@@ -51,8 +53,9 @@ class RealNewChatHintsEligibility @Inject constructor(
         return combine(
             isReturningUser,
             termsRepository.observeTermsAccepted(browserMode),
-        ) { returning, accepted ->
-            returning && accepted
+            usage.isExhausted,
+        ) { returning, accepted, exhausted ->
+            returning && accepted && !exhausted
         }
             .distinctUntilChanged()
     }

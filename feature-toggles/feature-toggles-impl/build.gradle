@@ -59,8 +59,6 @@ dependencies {
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation Square.retrofit2.converter.moshi
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 tasks.register('androidTestsBuild') {
@@ -72,8 +70,5 @@ android {
   namespace 'com.duckduckgo.feature.impl'
   lintOptions {
       baseline file("lint-baseline.xml")
-  }
-  compileOptions {
-    coreLibraryDesugaringEnabled = true
   }
 }

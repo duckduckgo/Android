@@ -52,13 +52,8 @@ dependencies {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
     namespace "com.duckduckgo.duckchat.store.impl"
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }

@@ -1,0 +1,45 @@
+appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
+---
+# One ad click detection case. Env:
+#   ANCHOR: fragment the page scrolls to (usually the same as AD_ID)
+#   AD_ID:  id of the ad to tap
+#   EXPECT: "blocked" or "allowed"
+#
+# The retry wraps only this case, so a flaky case doesn't rerun the whole group.
+# Each attempt relaunches without clearing state, to get back to the browser even if the
+# previous attempt stopped inside the privacy dashboard, then fires: attribution is kept per
+# tab and the relaunch reuses the last tab, so fire is what keeps cases from sharing it.
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          stopApp: true
+      # A relaunch reopens the last tab with the address bar in edit mode, where the fire
+      # button is the input widget's, which click_on_fire_button.yaml doesn't look for.
+      # Direct taps instead of the shared conditional subflows: each absent branch there
+      # waits ~10 s, and a missing button or sheet fails the attempt rather than letting the
+      # previous case's attribution carry over.
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/inputModeWidgetNavFire"
+      - tapOn:
+          text: "Delete Tabs and Data|Delete All"
+      - tapOn:
+          id: "omnibarTextInput|inputField"
+      - inputText: "https://www.search-company.site/#${ANCHOR}"
+      - pressKey: Enter
+      - assertVisible:
+          id: ${AD_ID}
+      - tapOn:
+          id: ${AD_ID}
+      - assertVisible:
+          text: "Publisher site"
+      - runFlow: ../../shared/browser_screen/click_on_privacy_shield.yaml
+      - runFlow:
+          when:
+            true: ${EXPECT == 'blocked'}
+          file: assert_blocked.yaml
+      - runFlow:
+          when:
+            true: ${EXPECT == 'allowed'}
+          file: assert_allowed.yaml

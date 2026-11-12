@@ -61,6 +61,9 @@ class RealBrokerJsonUpdaterTest {
         whenever(mockPirRepository.isRepositoryAvailable()).thenReturn(true)
         whenever(mockPirRemoteFeatures.useBundledBrokerJsons()).thenReturn(mockUseBundledBrokerJsonsToggle)
         whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(true)
+        whenever(mockBrokerDataDownloader.downloadBrokerData(any())).thenAnswer { invocation ->
+            invocation.getArgument<List<String>>(0).toSet()
+        }
 
         testee = RealBrokerJsonUpdater(
             dbpService = mockDbpService,
@@ -138,6 +141,46 @@ class RealBrokerJsonUpdaterTest {
         verify(mockPirRepository).updateBrokerJsons(testNewBrokerJsons)
         // testFileName2 has updated etag, testFileName3 is new
         verify(mockBrokerDataDownloader).downloadBrokerData(listOf(testFileName2, testFileName3))
+    }
+
+    @Test
+    fun whenChangedBrokerJsonIsNotStoredThenItKeepsItsPreviousEtag() = runTest {
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(2)
+        whenever(mockDbpService.getMainConfig("old-etag")).thenReturn(Response.success(testMainConfig))
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testExistingBrokerJsons)
+        whenever(mockBrokerDataDownloader.downloadBrokerData(listOf(testFileName2, testFileName3))).thenReturn(setOf(testFileName3))
+
+        val result = testee.update()
+
+        assertTrue(result)
+        verify(mockPirRepository).updateMainEtag(testNewEtag)
+        verify(mockPirRepository).updateBrokerJsons(
+            listOf(
+                BrokerJson(fileName = testFileName1, etag = testEtag),
+                BrokerJson(fileName = testFileName3, etag = testNewEtag),
+            ),
+        )
+    }
+
+    @Test
+    fun whenNewBrokerJsonIsNotStoredThenItsEtagIsNotStored() = runTest {
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(2)
+        whenever(mockDbpService.getMainConfig("old-etag")).thenReturn(Response.success(testMainConfig))
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testExistingBrokerJsons)
+        whenever(mockBrokerDataDownloader.downloadBrokerData(listOf(testFileName2, testFileName3))).thenReturn(setOf(testFileName2))
+
+        val result = testee.update()
+
+        assertTrue(result)
+        verify(mockPirRepository).updateMainEtag(testNewEtag)
+        verify(mockPirRepository).updateBrokerJsons(
+            listOf(
+                BrokerJson(fileName = testFileName1, etag = testEtag),
+                BrokerJson(fileName = testFileName2, etag = testNewEtag),
+            ),
+        )
     }
 
     @Test

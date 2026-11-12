@@ -170,7 +170,7 @@ interface AutofillFeature {
      * Remote Flag that enables promoting the import of one data type on the import result screen of another,
      * such as the passwords import promo on the bookmarks import result screen
      */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun showCrossFeaturePromo(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)

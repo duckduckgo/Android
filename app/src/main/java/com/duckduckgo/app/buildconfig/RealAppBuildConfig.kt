@@ -23,6 +23,7 @@ import com.duckduckgo.app.install.ReinstallDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import dev.zacsweers.metro.ContributesBinding
@@ -34,6 +35,7 @@ import javax.inject.Inject
 class RealAppBuildConfig @Inject constructor(
     private val variantManager: Lazy<VariantManager>, // break any possible DI dependency cycle
     private val reinstallDetector: Lazy<ReinstallDetector>, // break any possible DI dependency cycle
+    private val deviceMigration: Lazy<DeviceMigration>, // break any possible DI dependency cycle
     private val context: Context,
 ) : AppBuildConfig {
     override val isDebug: Boolean = BuildConfig.DEBUG
@@ -73,7 +75,8 @@ class RealAppBuildConfig @Inject constructor(
 
     override fun isNewInstall(): Boolean {
         val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        return packageInfo.firstInstallTime == packageInfo.lastUpdateTime
+        val isFreshPackage = packageInfo.firstInstallTime == packageInfo.lastUpdateTime
+        return isFreshPackage && (deviceMigration.value.sourceDeviceIsNewInstall() ?: true)
     }
 
     override val buildDateTimeMillis: Long

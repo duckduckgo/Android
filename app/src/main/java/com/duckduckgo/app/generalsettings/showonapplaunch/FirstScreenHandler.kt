@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLanding
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingResult
+import com.duckduckgo.app.browser.state.IdleReturnLandingGate
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
@@ -31,6 +32,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
@@ -74,6 +76,8 @@ class FirstScreenHandlerImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val idleThresholdResolver: IdleThresholdResolver,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val idleReturnLandingGate: IdleReturnLandingGate,
+    private val newTabReturnHatchFeature: NewTabReturnHatchFeature,
 ) : BrowserLifecycleObserver {
 
     // Launch boundary: process-lifecycle callback, no activity graph exists to provide a frozen mode.
@@ -107,13 +111,29 @@ class FirstScreenHandlerImpl @Inject constructor(
         } else {
             null
         }
+
+        // BrowserActivity's first frame runs before the async landing below, so the hold must be set here.
+        if (
+            androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
+            newTabReturnHatchFeature.idleReturnFirstFrameHold().isEnabled() &&
+            computeWasIdle()
+        ) {
+            idleReturnLandingGate.hold()
+        } else {
+            idleReturnLandingGate.open()
+        }
+
         appCoroutineScope.launch {
             logcat { "FirstScreen: onOpen isFreshLaunch $isFreshLaunch" }
-            // Persist the new-user default eagerly so screens that read optionFlow
-            // (e.g. GeneralSettings) don't fall back to LastOpenedTab before the
-            // after-inactivity flow has had a chance to run.
-            ensureNewUserDefault()
-            val resolvedLanding = handleFirstScreen(isFreshLaunch, preAppliedFreshNtpTreatment)
+            val resolvedLanding = try {
+                // Persist the new-user default eagerly so screens that read optionFlow
+                // (e.g. GeneralSettings) don't fall back to LastOpenedTab before the
+                // after-inactivity flow has had a chance to run.
+                ensureNewUserDefault()
+                handleFirstScreen(isFreshLaunch, preAppliedFreshNtpTreatment)
+            } finally {
+                idleReturnLandingGate.resolve()
+            }
             returnSessionLandingListener.onReturnLandingResolved(resolvedLanding)
             // Report a duck.ai tab launch to the Ai session wide event.
             val duckAiTab = tabRepository.getSelectedTab().takeIf { resolvedLanding.landing == ReturnSessionLanding.DUCK_AI }
@@ -154,13 +174,19 @@ class FirstScreenHandlerImpl @Inject constructor(
                 if (isVoiceSessionActiveOnCurrentTab() || isActiveTabCustomTab()) {
                     return resolveCurrentLanding(currentMode)
                 }
+
                 val result = showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle, currentMode = currentMode)
-                return resolveReturnLanding(
-                    result = result,
-                    fallbackTreatment = preAppliedFreshNtpTreatment.takeIf {
-                        currentMode == BrowserMode.REGULAR && result.destinationUrl.isNullOrBlank()
-                    },
+                val fallbackTreatment = preAppliedFreshNtpTreatment.takeIf {
+                    currentMode == BrowserMode.REGULAR && result.destinationUrl.isNullOrBlank()
+                }
+
+                // A restored NTP isn't re-added, but its hatch is still resolving, so the frame waits for it too.
+                val landingTabId = result.landingTabId ?: if (fallbackTreatment != null) tabRepository.getSelectedTab()?.tabId else null
+                idleReturnLandingGate.resolve(
+                    landingTabId,
+                    awaitHatch = result.treatment == AfterIdleTreatment.NTP || fallbackTreatment != null,
                 )
+                return resolveReturnLanding(result = result, fallbackTreatment = fallbackTreatment)
             }
         } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
             if (isVoiceSessionActiveOnCurrentTab()) {

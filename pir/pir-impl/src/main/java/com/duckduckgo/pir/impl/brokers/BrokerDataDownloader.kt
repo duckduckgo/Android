@@ -38,8 +38,10 @@ interface BrokerDataDownloader {
      * and updates the stored broker data locally.
      *
      * @param brokersToUpdate - A list of broker json filenames whose etags have been updated
+     * @return the subset of [brokersToUpdate] whose stored broker is now up to date. Broker JSONs that were missing
+     *  from the download, rejected or couldn't be stored are left out, and their previous version stays stored.
      */
-    suspend fun downloadBrokerData(brokersToUpdate: List<String>)
+    suspend fun downloadBrokerData(brokersToUpdate: List<String>): Set<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -50,29 +52,30 @@ class RealBrokerDataDownloader @Inject constructor(
     private val brokerJsonProcessor: BrokerJsonProcessor,
 ) : BrokerDataDownloader {
 
-    override suspend fun downloadBrokerData(brokersToUpdate: List<String>) {
-        withContext(dispatcherProvider.io()) {
-            if (brokersToUpdate.isNotEmpty()) {
-                logcat { "PIR-update: Starting to download broker data" }
-                val extractFolder = File(context.filesDir, "unzipped-broker-json")
-                val zipFile = File.createTempFile("broker-data", ".zip", context.cacheDir)
-                try {
-                    dbpService.getBrokerJsonFiles().use { body ->
-                        body.byteStream().use { input ->
-                            zipFile.outputStream().use { input.copyTo(it) }
-                        }
-                    }
-                    extractJsonFilesFromZip(zipFile, extractFolder)
-                    processBrokerJsonFiles(extractFolder, brokersToUpdate)
-                } finally {
-                    zipFile.delete()
-                    if (extractFolder.exists()) {
-                        SYSTEM.deleteRecursively(extractFolder.path.toPath())
-                    }
+    override suspend fun downloadBrokerData(brokersToUpdate: List<String>): Set<String> = withContext(dispatcherProvider.io()) {
+        if (brokersToUpdate.isEmpty()) {
+            return@withContext emptySet()
+        }
+
+        logcat { "PIR-update: Starting to download broker data" }
+        val extractFolder = File(context.filesDir, "unzipped-broker-json")
+        val zipFile = File.createTempFile("broker-data", ".zip", context.cacheDir)
+        val upToDateBrokers = try {
+            dbpService.getBrokerJsonFiles().use { body ->
+                body.byteStream().use { input ->
+                    zipFile.outputStream().use { input.copyTo(it) }
                 }
-                logcat { "PIR-update: Done downloading broker data" }
+            }
+            extractJsonFilesFromZip(zipFile, extractFolder)
+            processBrokerJsonFiles(extractFolder, brokersToUpdate)
+        } finally {
+            zipFile.delete()
+            if (extractFolder.exists()) {
+                SYSTEM.deleteRecursively(extractFolder.path.toPath())
             }
         }
+        logcat { "PIR-update: Done downloading broker data" }
+        upToDateBrokers
     }
 
     private fun extractJsonFilesFromZip(
@@ -106,21 +109,22 @@ class RealBrokerDataDownloader @Inject constructor(
     private suspend fun processBrokerJsonFiles(
         directory: File,
         brokersToUpdate: List<String>,
-    ) {
+    ): Set<String> {
         logcat { "PIR-update: Attempting to process all relevant json for $brokersToUpdate" }
         if (!directory.exists() || !directory.isDirectory) {
             logcat(ERROR) { "PIR-update: $directory is not the json directory" }
-            return
+            return emptySet()
         }
 
         val brokersToUpdateSet = brokersToUpdate.toHashSet()
-        directory.listFiles()?.firstOrNull()?.listFiles { file ->
+        val upToDateBrokers = directory.listFiles()?.firstOrNull()?.listFiles { file ->
             file.extension == "json" && file.name in brokersToUpdateSet
-        }?.forEach { jsonFile ->
+        }.orEmpty().filter { jsonFile ->
             logcat { "PIR-update: Processing data from ${jsonFile.name}" }
             brokerJsonProcessor.processAndStoreBroker(jsonFile.name, jsonFile.source())
-        }
+        }.mapTo(hashSetOf()) { it.name }
 
         logcat { "PIR-update: Stored all new broker data" }
+        return upToDateBrokers
     }
 }

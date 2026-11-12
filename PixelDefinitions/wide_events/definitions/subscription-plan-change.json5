@@ -4,7 +4,7 @@
         "owners": ["lmac012"],
         "meta": {
             "type": "android-subscription-plan-change",
-            "version": "0.0"
+            "version": "0.1"
         },
         "feature": {
             "name": "subscription-plan-change",
@@ -13,11 +13,11 @@
                 "ext": {
                     "from_plan": {
                         "type": "string",
-                        "description": "Play basePlan ID the user is switching from"
+                        "description": "Plan ID the user is switching from. Stripe plan IDs have the billing country removed"
                     },
                     "to_plan": {
                         "type": "string",
-                        "description": "Play basePlan ID the user is switching to"
+                        "description": "Plan ID the user is switching to. Stripe plan IDs have the billing country removed"
                     },
                     "from_tier": {
                         "type": "string",
@@ -39,9 +39,14 @@
                         "description": "Direction of the tier change",
                         "enum": ["upgrade", "downgrade", "crossgrade"]
                     },
+                    "purchase_platform": {
+                        "type": "string",
+                        "description": "Platform where the subscription was bought",
+                        "enum": ["play_store", "stripe"]
+                    },
                     "activation_latency_ms_bucketed": {
                         "type": "string",
-                        "description": "Duration from the Play billing switch to subscription activation",
+                        "description": "Duration from the Play billing switch or Stripe redirect to subscription activation",
                         "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
                     },
                     "failure_reason": "failureReason",
@@ -64,6 +69,10 @@
                         "type": "string",
                         "description": "Present if the Play billing switch succeeded",
                         "enum": ["true"]
+                    },
+                    "step.stripe_redirect": {
+                        "type": "boolean",
+                        "description": "Whether the user was sent to Stripe to complete the plan change"
                     },
                     "step.confirm_switch": {
                         "type": "string",

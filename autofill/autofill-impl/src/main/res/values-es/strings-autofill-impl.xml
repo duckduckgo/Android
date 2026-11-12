@@ -324,4 +324,12 @@
     <string name="importBookmarksRedesignResultTitle">¡Importación completada!</string>
     <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Marcadores importados: <b>%1$d</b>]]></string>
 
+    <!-- Passwords import promo on the bookmarks import result screen -->
+    <string name="passwords_import_promo_in_bookmarks_import_title">Trae tus contraseñas de Google a DuckDuckGo.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_button">Importar contraseñas de Google</string>
+
+    <!-- Bookmarks import promo on the passwords import result screen -->
+    <string name="bookmarks_import_promo_in_passwords_import_title">Trae tus marcadores de Google a DuckDuckGo.</string>
+    <string name="bookmarks_import_promo_in_passwords_import_button">Importa marcadores desde Google</string>
+
 </resources>

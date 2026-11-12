@@ -22,9 +22,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace "com.duckduckgo.daxprompts.api"
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -32,6 +29,4 @@ dependencies {
 
     implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

@@ -186,7 +186,6 @@ import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
 import com.duckduckgo.app.browser.errorpage.BadUrlErrorPageWideEvent
-import com.duckduckgo.app.browser.errorpage.CustomErrorPagesFeature
 import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
@@ -233,7 +232,6 @@ import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectEvaluator
-import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectOnUnresolvedErrorFeature
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
@@ -626,10 +624,8 @@ class BrowserTabViewModel @Inject constructor(
     private val adBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider,
     private val newTabPageModalPresenterRegistry: NewTabPageModalPresenterRegistry,
     private val newTabPageModalTrigger: NewTabPageModalTrigger,
-    private val suggestRedirectOnUnresolvedErrorFeature: SuggestRedirectOnUnresolvedErrorFeature,
     private val suggestRedirectEvaluator: SuggestRedirectEvaluator,
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
-    private val customErrorPagesFeature: CustomErrorPagesFeature,
     private val duckAiSessionCallback: DuckAiSessionCallback,
     private val duckAiEntryCallback: Lazy<DuckAiEntryCallback>,
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
@@ -1708,12 +1704,8 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             badUrlErrorPageWideEvent.onErrorPageRefreshed(tabId)
         }
-        val keepErrorPage = keepErrorPage()
-        val state = currentBrowserViewState()
-        browserViewState.value = state.copy(
+        browserViewState.value = currentBrowserViewState().copy(
             browserShowing = true,
-            browserError = if (keepErrorPage) state.browserError else OMITTED,
-            redirectSuggestion = if (keepErrorPage) state.redirectSuggestion else null,
             sslError = NONE,
             maliciousSiteBlocked = false,
             maliciousSiteStatus = null,
@@ -2922,9 +2914,9 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String?,
     ) {
-        if (keepErrorPage()) {
-            // Fallback in case onPageCommitVisible is not called
-            if (errorPagePendingDismissal) resetBrowserError()
+        // Fallback in case onPageCommitVisible is not called
+        if (errorPagePendingDismissal) {
+            resetBrowserError()
         }
         when (currentBrowserViewState().browserError) {
             OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
@@ -2984,8 +2976,9 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String,
     ) {
-        if (keepErrorPage()) {
-            if (errorPagePendingDismissal) resetBrowserError()
+        if (url != ABOUT_BLANK) command.value = Command.PageCommitVisible
+        if (errorPagePendingDismissal) {
+            resetBrowserError()
         }
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
@@ -5010,10 +5003,7 @@ class BrowserTabViewModel @Inject constructor(
             OMITTED -> badUrlErrorPageWideEvent.onOmittedErrorReceived(tabId)
             LOADING, TIMEOUT -> Unit
         }
-        if (errorType == BAD_URL &&
-            suggestRedirectOnUnresolvedErrorFeature.self().isEnabled() &&
-            suggestRedirectOnUnresolvedErrorFeature.suggestRedirect().isEnabled()
-        ) {
+        if (errorType == BAD_URL) {
             suggestRedirectJob += viewModelScope.launch {
                 suggestRedirectEvaluator.suggestRedirect(url)?.let { suggestion ->
                     badUrlErrorPageWideEvent.onRedirectSuggested(tabId)
@@ -6390,14 +6380,8 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onRedirectSuggestionClicked(url: String) {
         badUrlErrorPageWideEvent.onRedirectClicked(tabId)
-        if (!keepErrorPage()) {
-            resetBrowserError()
-        }
         command.value = NavigationCommand.Navigate(url, getUrlHeaders(url))
     }
-
-    private fun keepErrorPage(): Boolean =
-        customErrorPagesFeature.self().isEnabled() && customErrorPagesFeature.keepErrorPageUntilNextPageStartsLoading().isEnabled()
 
     private fun trackersCount(): String =
         siteLiveData.value?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""

@@ -25,7 +25,6 @@
     <string name="no">Ne</string>
     <string name="open">Otvori</string>
     <string name="cancel">Odustani</string>
-    <string name="search">Pretraga</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Čavrljanje je izbrisano</string>

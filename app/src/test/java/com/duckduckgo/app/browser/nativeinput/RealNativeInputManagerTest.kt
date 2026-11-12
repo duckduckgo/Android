@@ -25,21 +25,25 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewPropertyAnimator
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -61,7 +65,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -88,7 +91,6 @@ import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class RealNativeInputManagerTest {
 
@@ -111,7 +113,9 @@ class RealNativeInputManagerTest {
         override suspend fun create(context: Context, tabId: String): View = View(context)
     }
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
-    private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
+    private val nativeInputRecalculateContentPaddingOnTabSwitchFeature = FakeFeatureToggleFactory.create(
+        NativeInputRecalculateContentPaddingOnTabSwitchFeature::class.java,
+    )
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val layoutResources: Resources = spy(context.resources)
@@ -131,7 +135,6 @@ class RealNativeInputManagerTest {
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
         whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(MutableStateFlow(false))
-        nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = true))
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -142,11 +145,11 @@ class RealNativeInputManagerTest {
             duckChatInputModeState,
             pixel,
             nativeInputStateBugKillSwitch,
-            nativeInputUrlClearingFeature,
             nativeInputEventListener,
             edgeToEdgeHandler,
             duckAiChatStore,
             newChatHintsRenderer,
+            nativeInputRecalculateContentPaddingOnTabSwitchFeature,
         )
     }
 
@@ -883,6 +886,80 @@ class RealNativeInputManagerTest {
     }
 
     @Test
+    fun whenTabViewIsDetachedThenAutocompleteKeepsClearingWidget() {
+        val tab = givenBottomWidgetOverAutocomplete(recalculateContentPaddingOnTabSwitch = true)
+
+        tab.pager.removeView(tab.root)
+
+        assertEquals(tab.paddingWhileShown, tab.autoCompleteList.paddingBottom)
+    }
+
+    @Test
+    fun whenPaddingRecalculationDisabledAndTabViewIsDetachedThenAutocompleteReturnsToBasePadding() {
+        val tab = givenBottomWidgetOverAutocomplete(recalculateContentPaddingOnTabSwitch = false)
+
+        tab.pager.removeView(tab.root)
+
+        assertEquals(0, tab.autoCompleteList.paddingBottom)
+    }
+
+    @Test
+    fun whenWidgetIsRemovedThenAutocompleteReturnsToBasePadding() {
+        val tab = givenBottomWidgetOverAutocomplete(recalculateContentPaddingOnTabSwitch = true)
+
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+
+        assertNull(tab.root.findViewById<View?>(R.id.inputModeRoot))
+        assertEquals(0, tab.autoCompleteList.paddingBottom)
+    }
+
+    private class TabWithAutocomplete(val pager: ViewGroup, val root: ViewGroup, val autoCompleteList: View) {
+        val paddingWhileShown = autoCompleteList.paddingBottom.also { check(it > 0) }
+    }
+
+    private fun givenBottomWidgetOverAutocomplete(recalculateContentPaddingOnTabSwitch: Boolean): TabWithAutocomplete {
+        nativeInputRecalculateContentPaddingOnTabSwitchFeature.self().setRawStoredState(State(enable = recalculateContentPaddingOnTabSwitch))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
+        whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.NewTab)
+        whenever(omnibar.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
+        whenever(omnibar.getText()).thenReturn("")
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val pager = FrameLayout(activity).also { activity.setContentView(it) }
+        val autoCompleteList = RecyclerView(activity).apply { id = R.id.autoCompleteSuggestionsList }
+        val root = CoordinatorLayout(activity).apply {
+            addView(FrameLayout(activity).apply { id = R.id.includeNewBrowserTab })
+            addView(autoCompleteList, CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
+        pager.addView(root)
+        testee.init(omnibar, root, lifecycleOwner)
+        val widgetView = FrameLayout(activity).apply {
+            id = R.id.inputModeRoot
+            addView(TestNativeInputWidget(activity).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
+        }
+        val inflater: LayoutInflater = mock()
+        whenever(inflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)
+        testee.showNativeInput(
+            tabId = "tab",
+            layoutInflater = inflater,
+            lifecycleOwner = lifecycleOwner,
+            tabs = mock<LiveData<List<TabEntity>>>(),
+            currentTabUrl = emptyFlow(),
+            callbacks = NativeInputCallbacks(
+                onSearchTextChanged = {},
+                onSearchSubmitted = {},
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onChatSuggestionSelected = {},
+                onClearAutocomplete = {},
+                onStopTapped = {},
+            ),
+        )
+        shadowOf(Looper.getMainLooper()).idle()
+        return TabWithAutocomplete(pager, root, autoCompleteList)
+    }
+
+    @Test
     fun whenContextualSheetWidgetIsAttachedThenInputFocusIsReadFromOmnibarWidget() {
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
         whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.NewTab)
@@ -1014,15 +1091,6 @@ class RealNativeInputManagerTest {
         input.switchToDuckAi()
 
         assertEquals("", input.text)
-    }
-
-    @Test
-    fun whenUrlClearingKillSwitchDisabledThenInputNotCleared() {
-        nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = false))
-        val input = givenUrlCachingBound(text = URL)
-        input.switchToDuckAi()
-
-        assertEquals(URL, input.text)
     }
 
     @Test

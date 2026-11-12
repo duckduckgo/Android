@@ -22,16 +22,22 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController.Event.StepFinished
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Companion.PIR_ROW_ID
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionOnboardingStepPixels.Step
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
@@ -56,6 +62,8 @@ class SubscriptionOnboardingCompletionViewModelTest {
     private val onboardingStore: SubscriptionOnboardingStore = mock()
     private val subscriptions: Subscriptions = mock()
     private val pirFeature: PirFeature = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
+    private val subscriptionsManager: SubscriptionsManager = mock()
 
     @Test
     fun whenStepsHaveSummaryEntriesThenOnlyThoseBecomeRows() = runTest {
@@ -181,6 +189,26 @@ class SubscriptionOnboardingCompletionViewModelTest {
     }
 
     @Test
+    fun whenPirRowClickedThenReportsPirStepShown() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(isFreeTrial = false))
+        val testee = createViewModel()
+
+        testee.onPirRowClicked()
+
+        verify(pixelSender).reportOnboardingStepShown(Step.PIR, false)
+    }
+
+    @Test
+    fun whenPirRowClickedOnFreeTrialThenReportsPirStepShownWithFreeTrial() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(subscription(isFreeTrial = true))
+        val testee = createViewModel()
+
+        testee.onPirRowClicked()
+
+        verify(pixelSender).reportOnboardingStepShown(Step.PIR, true)
+    }
+
+    @Test
     fun whenPirEntitledButNotEligibleThenNoPirRow() = runTest {
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
@@ -289,8 +317,20 @@ class SubscriptionOnboardingCompletionViewModelTest {
             subscriptions = subscriptions,
             pirFeature = pirFeature,
             handoffState = SubscriptionOnboardingHandoffState().apply { isHandoff = handoff },
+            pixelSender = pixelSender,
+            subscriptionsManager = subscriptionsManager,
         )
     }
+
+    private fun subscription(isFreeTrial: Boolean) = Subscription(
+        productId = "test-plan",
+        billingPeriod = "Monthly",
+        startedAt = 0L,
+        expiresOrRenewsAt = 0L,
+        status = AUTO_RENEWABLE,
+        platform = "android",
+        activeOffers = if (isFreeTrial) listOf(ActiveOfferType.TRIAL) else emptyList(),
+    )
 
     private fun fakePlugin(
         id: String,

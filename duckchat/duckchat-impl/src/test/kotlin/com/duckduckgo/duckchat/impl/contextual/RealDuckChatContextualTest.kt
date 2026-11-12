@@ -20,6 +20,7 @@ import android.view.View
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
@@ -28,7 +29,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -108,6 +112,45 @@ class RealDuckChatContextualTest {
     }
 
     @Test
+    fun whenChatInProgressOnNewTabPageThenSkipReportedWithNtpPageType() = runTest {
+        givenChatInProgress()
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) {}
+
+        verify(duckChatPixels).reportContextualAddressBarMenuSkipped(DuckChatPixelPageType.NTP)
+    }
+
+    @Test
+    fun whenChatInProgressOnSearchResultsThenSkipReportedWithSerpPageType() = runTest {
+        givenChatInProgress()
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(SERP_URL)).thenReturn(true)
+
+        testee.launch("tabId", sourceUrl = SERP_URL, anchor = anchor) {}
+
+        verify(duckChatPixels).reportContextualAddressBarMenuSkipped(DuckChatPixelPageType.SERP)
+    }
+
+    @Test
+    fun whenChatInProgressOnWebsiteThenSkipReportedWithWebsitePageType() = runTest {
+        givenChatInProgress()
+
+        testee.launch("tabId", sourceUrl = "https://example.com", anchor = anchor) {}
+
+        verify(duckChatPixels).reportContextualAddressBarMenuSkipped(DuckChatPixelPageType.WEBSITE)
+    }
+
+    @Test
+    fun whenChatInProgressAndLaunchedFromTextSelectionThenSkipNotReported() = runTest {
+        givenChatInProgress()
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = "https://example.com", anchor = anchor, textSelection = "selected") { askAboutPageCount++ }
+
+        assertEquals(1, askAboutPageCount)
+        verify(duckChatPixels, never()).reportContextualAddressBarMenuSkipped(any())
+    }
+
+    @Test
     fun whenStoredChatSessionExpiredThenTreatedAsNoChatInProgress() = runTest {
         whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
         whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
@@ -120,5 +163,15 @@ class RealDuckChatContextualTest {
 
         // Session expired: the menu path is taken instead of opening the chat directly.
         assertEquals(0, askAboutPageCount)
+        verify(duckChatPixels, never()).reportContextualAddressBarMenuSkipped(any())
+    }
+
+    private suspend fun givenChatInProgress() {
+        whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
+        whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(null)
+    }
+
+    private companion object {
+        const val SERP_URL = "https://duckduckgo.com/?q=ducks"
     }
 }

@@ -16,6 +16,16 @@ jobs:
     outputs:
       commit_sha: ${{ steps.resolve.outputs.commit_sha }}
     steps:
+      - name: Fail when not on the default branch
+        # Scheduled runs always use the default branch, so only a manual dispatch can pick another one.
+        if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name != github.event.repository.default_branch }}
+        env:
+          REF: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          echo "::error::The nightly orchestrator tags LGC and moves Asana tasks, so it only runs on $DEFAULT_BRANCH (got $REF)."
+          exit 1
+
       - name: Resolve commit SHA
         id: resolve
         run: |

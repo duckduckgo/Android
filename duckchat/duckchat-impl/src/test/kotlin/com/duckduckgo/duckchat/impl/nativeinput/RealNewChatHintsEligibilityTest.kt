@@ -62,7 +62,11 @@ class RealNewChatHintsEligibilityTest {
         whenever(it.observeTermsAccepted(BrowserMode.REGULAR)).thenReturn(termsAccepted)
         whenever(it.observeTermsAccepted(BrowserMode.FIRE)).thenReturn(fireTermsAccepted)
     }
-    private val testee = RealNewChatHintsEligibility(storageProvider, termsRepository, coroutineRule.testDispatcherProvider)
+    private val exhausted = MutableStateFlow(false)
+    private val usage: NewChatHintsUsage = mock {
+        whenever(it.isExhausted).thenReturn(exhausted)
+    }
+    private val testee = RealNewChatHintsEligibility(storageProvider, termsRepository, usage, coroutineRule.testDispatcherProvider)
 
     @Test
     fun whenUserHasPromptedAndAcceptedTermsThenEligible() = runTest {
@@ -145,6 +149,32 @@ class RealNewChatHintsEligibilityTest {
     fun whenFireTermsNotAcceptedThenNotEligibleInFireModeEvenIfAcceptedInRegular() = runTest {
         conversions.value = row("""["duckai_prompt"]""")
         termsAccepted.value = true
+
+        testee.observeEligible(BrowserMode.FIRE).test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenHintsAreExhaustedThenNotEligibleUntilTheCountDropsAgain() = runTest {
+        conversions.value = row("""["duckai_prompt"]""")
+        termsAccepted.value = true
+        exhausted.value = true
+
+        testee.observeEligible(BrowserMode.REGULAR).test {
+            assertFalse(awaitItem())
+            exhausted.value = false
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenHintsAreExhaustedThenNotEligibleInFireModeEither() = runTest {
+        conversions.value = row("""["duckai_prompt"]""")
+        fireTermsAccepted.value = true
+        exhausted.value = true
 
         testee.observeEligible(BrowserMode.FIRE).test {
             assertFalse(awaitItem())

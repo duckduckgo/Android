@@ -46,7 +46,7 @@ pixel: "burn_error_delete_IOException"
 ## Pixel Parameters
 
 - **Prefer shared dictionary entries.** If a parameter is used by multiple pixels, define it in `params_dictionary` and reference it by key.
-- **Use structured, typed parameters.** Each parameter should have a clear type (`string`, `integer`, `number`, `boolean`) and, where possible, a bounded `enum` of allowed values.
+- **Use structured, typed parameters.** Each parameter should have a clear type (`string`, `integer`, `number`, `boolean`) and string parameters need a bounded `enum` (or tight `pattern`) of allowed values — see Privacy Pitfalls below.
 - **Include error context for error pixels.** When a pixel reports an error, include enough information to diagnose the issue — error type, error code, failing step — without leaking PII.
 - **Bucket all numeric values.** Durations, counts, sizes, and other continuous values must be bucketed into ranges.
 
@@ -57,6 +57,77 @@ pixel: "burn_error_delete_IOException"
 # Bad — exact value
 "duration_ms": "237841"
 ```
+
+## Privacy Pitfalls
+
+Pixels that look harmless in a diff can still single out a user or reveal what they did. Check every
+new or changed pixel against these, in addition to the AGENTS.md invariants.
+
+### Bound every string
+
+A string parameter that can take any value can't be reviewed. Declare an `enum` (or a tight `pattern`)
+for it in the definition, and send a value the code controls.
+
+- **Never send `e.message`.** Exception messages carry hostnames, URLs, file paths and queries
+  (`Unable to resolve host "files.mybank.example"`). Send the exception class
+  (`e.javaClass.simpleName`) plus a bounded stage or step enum instead.
+- **Never send `toString()` of a data or sealed class.** It prints every field, and any field added
+  later leaks without review (`Failed(code=-2, url=https://...)`). Map each state to a value with an
+  explicit `when`.
+- **Never send an enum constant's `.name`.** A rename silently changes the data, and nothing stops a
+  future caller sending something else. Give the enum a stable `pixelValue` property and declare the
+  same values as the definition's `enum`.
+
+```kotlin
+// Good
+enum class AppTheme(val pixelValue: String) { LIGHT("light"), DARK("dark"), SYSTEM("system") }
+pixel.fire(SettingsPixelName.THEME_CHANGED, mapOf("theme" to newTheme.pixelValue))
+
+// Bad
+pixel.fire(SettingsPixelName.THEME_CHANGED, mapOf("theme" to newTheme.name.lowercase()))
+pixel.fire(DownloadsPixelName.DOWNLOAD_FAILED, mapOf("error" to e.message.orEmpty()))
+```
+
+### Bucket so every bucket is crowded
+
+A bucket only protects users if many of them share it. Use narrow buckets where most users sit and
+widen them toward the tail, ending in an open bucket (`over_50`) that still holds many users. Rare top
+buckets (`501_1000`, `over_5000` tabs) are as identifying as the exact number, and worse on a daily
+pixel, on a rare pixel, or next to other rare values. Check the cut against real data if unsure.
+
+### Watch the combinations
+
+Values that are common on their own can identify someone together. API level + full WebView version +
+manufacturer + model + locale + font scale in one daily pixel is a device fingerprint. Ask one question
+per pixel, send coarse values (major versions only), and drop anything the analysis doesn't need.
+
+Several fields are fine when the combination stays common: a `pattern` like
+`^default:(on|off),widget:(on|off),address_bar:(top|bottom|split)$` has 12 possible values, each shared
+by many users. The test is whether the combination makes people rare, not how many fields it has.
+
+### Don't let events link to each other
+
+Anything that lets one event be matched to another turns anonymous events into one user's history.
+
+- **No exact timestamps.** A precise time is a join key, and local time also reveals the time zone. The
+  server already knows roughly when a pixel arrived, so usually drop it. If timing matters, send a
+  bucketed duration (`under_1h`, `1h_to_1d`, `over_1d`) or part of day in a fixed time zone, wider the
+  rarer the event.
+- **No values that change predictably.** `days_since_install` goes up by one every day, so whoever sent
+  43 today sends 44 tomorrow. Send a few wide ranges (`0`, `1_7`, `8_30`, `31_90`, `over_90`) that stay
+  the same for weeks.
+- **Review pixels fired together as one.** Pixels sent by the same trigger arrive together from the same
+  device with the same `appVersion`, so four one-parameter daily pixels can be paired back into the
+  fingerprint above. Apply the combination check across all of them.
+
+To make arrival time harder to match, add the `petal` parameter, which routes the pixel through the
+PETAL timestamp-randomization pipeline:
+
+```kotlin
+put(Pixel.PixelParameter.PETAL, Pixel.PixelValues.PETAL_RANDOMIZE)
+```
+
+and reference `"petal"` from `params_dictionary.json` in the definition's `parameters`.
 
 ## Pixel Definition Files
 

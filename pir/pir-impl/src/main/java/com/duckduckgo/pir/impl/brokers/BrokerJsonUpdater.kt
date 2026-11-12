@@ -56,9 +56,11 @@ class RealBrokerJsonUpdater @Inject constructor(
      * Process:
      * - Main config is requested with current etag. If config is not modified, we don't do anything.
      * - If active brokers AND all json etag did not change, we don't do anything.
-     * - If active brokers and/or any json etag has changed, we update the etags db.
      * - If any json etag changed, we download the json zip file.
-     * - We extract the json files from the zip. For every json etag that changed, we parse the json file and update the data stored locally.
+     * - We extract the json files from the zip. For every json etag that changed, we parse and validate the json file and update the data
+     *   stored locally. A json with steps or actions this app version doesn't support is rejected, and the stored version of that broker is kept.
+     * - We update the etags db, except for the jsons that were not stored: they keep their previous etag so they are attempted again on the
+     *   next main config change. An app update alone doesn't trigger a retry, as the main config etag is still stored.
      * - If the network update fails (getMainConfig or downloadBrokerData), we fall back to loading broker JSONs from bundled raw resources,
      *   but only if no broker data has been stored previously.
      * - Returns true if either the network update or the bundled fallback succeeded. Returns false only if both fail.
@@ -159,14 +161,19 @@ class RealBrokerJsonUpdater @Inject constructor(
 
         val updatedJsons = jsonEtagsFromConfig.toSet() - existingEtags.toSet()
 
-        if (updatedJsons.isNotEmpty()) {
+        val notUpdatedFileNames = if (updatedJsons.isNotEmpty()) {
             logcat { "PIR-update: Downloading updated broker json files: $updatedJsons" }
-            brokerDataDownloader.downloadBrokerData(updatedJsons.map { it.fileName })
+            val updatedFileNames = updatedJsons.map { it.fileName }
+            updatedFileNames.toSet() - brokerDataDownloader.downloadBrokerData(updatedFileNames)
         } else {
             logcat { "PIR-update: No broker json files to update." }
+            emptySet()
         }
 
-        pirRepository.updateBrokerJsons(jsonEtagsFromConfig)
+        if (notUpdatedFileNames.isNotEmpty()) {
+            logcat(ERROR) { "PIR-update: Keeping previous etags for broker json files that were not stored: $notUpdatedFileNames" }
+        }
+        pirRepository.updateBrokerJsons(jsonEtagsFromConfig.filterNot { it.fileName in notUpdatedFileNames })
     }
 
     private fun String.sanitize(): String? {

@@ -60,6 +60,9 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
@@ -83,6 +86,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -102,6 +106,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
@@ -153,6 +158,9 @@ class NativeInputModeWidgetViewModelTest {
     }
     private val chatStateStore = ChatStateStore()
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
+    private val newChatHintsUsage: NewChatHintsUsage = mock()
+    private val newChatHintsPixels: NewChatHintsPixels = mock()
+    private val newChatDetector: NewChatDetector = mock { on { observe(any()) } doReturn emptyFlow() }
     private val realNativeInputStateStore = RealNativeInputStateStore(
         lazy { tabRepositoryProvider },
         browserModeStateHolder,
@@ -266,6 +274,10 @@ class NativeInputModeWidgetViewModelTest {
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
             chatStateStore = chatStateStore,
             responseWaitWideEvent = responseWaitWideEvent,
+            newChatHintsUsage = newChatHintsUsage,
+            newChatHintsPixels = newChatHintsPixels,
+            newChatDetector = newChatDetector,
+            tabRepository = tabRepository,
         )
     }
 
@@ -1175,6 +1187,118 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.onPromptSubmitted()
 
         assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenPromptSubmittedInANewDuckAiChatThenNewChatHintsUsageCountsIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = true)
+    }
+
+    @Test
+    fun whenPromptSubmittedInAnExistingChatThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
+    }
+
+    @Test
+    fun whenPromptSubmittedOutsideDuckAiThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
+    }
+
+    @Test
+    fun whenPromptSubmittedFromTheContextualSheetThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
+    }
+
+    @Test
+    fun whenSubmissionPixelsFireInANewDuckAiChatThenNewChatHintsPixelsGetTheFirstPrompt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+
+        verify(newChatHintsPixels).onPromptSubmitted(
+            tabId = "tab-A",
+            isNewChat = true,
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            selectedTool = "image_generation",
+        )
+    }
+
+    @Test
+    fun whenConfiguredThenNewChatsInTheTabAreTracked() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        verify(newChatHintsPixels).track(eq("tab-A"), any(), any())
+    }
+
+    @Test
+    fun whenConfiguredInBrowserModeThenNewChatsInTheTabAreNotTracked() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        verify(newChatHintsPixels, never()).track(any(), any(), any())
+    }
+
+    @Test
+    fun whenSubmissionPixelsFireFromTheContextualSheetThenNewChatHintsPixelsAreToldItIsNotANewChat() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+
+        verify(newChatHintsPixels).onPromptSubmitted(
+            tabId = "tab-A",
+            isNewChat = false,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+        )
     }
 
     @Test

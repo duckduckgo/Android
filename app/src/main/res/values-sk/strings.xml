@@ -25,7 +25,6 @@
     <string name="no">Nie</string>
     <string name="open">Otvorené</string>
     <string name="cancel">Zrušiť</string>
-    <string name="search">Vyhľadávať</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat bol odstránený</string>

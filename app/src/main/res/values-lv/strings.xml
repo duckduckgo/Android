@@ -25,7 +25,6 @@
     <string name="no">Nē</string>
     <string name="open">Atvērt</string>
     <string name="cancel">Atcelt</string>
-    <string name="search">Meklēt</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Saruna izdzēsta</string>

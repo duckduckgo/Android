@@ -195,6 +195,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deleteCachedAccountInfoKeyButton.setOnClickListener { viewModel.onDeleteCachedAccountInfoKeyClicked() }
         binding.renameDeviceButton.setOnClickListener { viewModel.onRenameDeviceClicked() }
         binding.fetchDecryptDevicesButton.setOnClickListener { viewModel.onFetchAndDecryptDevicesClicked() }
+        binding.fetchDecryptAuditLogButton.setOnClickListener { viewModel.onFetchAndDecryptAuditLogClicked() }
         binding.runMigrationButton.setOnClickListener { viewModel.onRunMigrationClicked() }
         binding.resetMigrationMarkerButton.setOnClickListener { viewModel.onResetMigrationMarkerClicked() }
         binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
@@ -380,6 +381,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.cachedAccountInfoKeyTextView.text = viewState.cachedAccountInfoKeyResult
         binding.renameDeviceResultTextView.text = viewState.renameDeviceResult
         binding.fetchDecryptDevicesResultTextView.text = viewState.fetchDecryptDevicesResult
+        binding.fetchDecryptAuditLogResultTextView.text = viewState.fetchDecryptAuditLogResult
         binding.canWriteUnifiedDeviceListToggle.quietlySetIsChecked(viewState.canWriteUnifiedDeviceListEnabled) { _, enabled ->
             viewModel.onCanWriteUnifiedDeviceListFlagChanged(enabled)
         }

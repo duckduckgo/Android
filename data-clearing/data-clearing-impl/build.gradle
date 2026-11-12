@@ -39,8 +39,6 @@ dependencies {
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -49,8 +47,5 @@ android {
         unitTests {
             returnDefaultValues = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }

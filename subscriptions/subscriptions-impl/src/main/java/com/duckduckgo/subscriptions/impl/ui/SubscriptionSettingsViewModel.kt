@@ -243,7 +243,15 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 withdrawalOption = null
                 val completedWithdrawal = (result as? WithdrawalResult.Success)?.let { completedWithdrawalState(it.refund) }
                 _viewState.update { state ->
-                    if (state is Ready) state.copy(withdrawal = null, completedWithdrawal = completedWithdrawal) else state
+                    if (state is Ready) {
+                        state.copy(
+                            withdrawal = null,
+                            completedWithdrawal = completedWithdrawal,
+                            onboardingEntryPoint = state.onboardingEntryPoint.takeIf { completedWithdrawal == null },
+                        )
+                    } else {
+                        state
+                    }
                 }
                 command.send(DismissWithdrawalDialog)
             }

@@ -222,14 +222,27 @@ class RealNativeInputOmnibarController(
                 freePill?.setOnClickListener(null)
                 freePill?.isClickable = false
             }
-            is DuckAiTier.Paid, is DuckAiTier.Unknown -> {
+            is DuckAiTier.Paid -> {
                 freePill?.gone()
                 freePill?.setOnClickListener(null)
                 aiTitle?.show()
-                aiTitle?.text = aiTitle?.context?.getString(R.string.duckAiHeaderPaidTitle)
+                aiTitle?.setTextIfChanged(aiTitle.context.getString(R.string.duckAiHeaderPaidTitle))
                 aiTitle?.textSize = 16f
             }
+            // Empty until the plan loads, so free users don't see the paid title before their pill.
+            is DuckAiTier.Unknown -> {
+                aiTitle?.gone()
+                freePill?.gone()
+                freePill?.setOnClickListener(null)
+            }
         }
+    }
+
+    // Runs from the omnibar's OnLayoutChangeListener. setText on a wrap_content TextView always requests
+    // a layout, even for identical text, so an unconditional set re-triggers the listener on every frame
+    // and the queued traversal holds back the keyboard's InputConnection calls.
+    private fun TextView.setTextIfChanged(value: String) {
+        if (text.toString() != value) text = value
     }
 
     private fun applyOnLayout(omnibarView: View, block: () -> Unit) {

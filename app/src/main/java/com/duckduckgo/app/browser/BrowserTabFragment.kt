@@ -68,6 +68,7 @@ import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
@@ -83,6 +84,7 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -432,6 +434,7 @@ class BrowserTabFragment :
     private val supervisorJob = SupervisorJob()
 
     private var duckAiContextualFragment: Fragment? = null
+    private var removeContextualSheetWhenHidden = false
     private var duckChatButtonAnchor: View? = null
     private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
@@ -2051,6 +2054,8 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
+        // With swiping tabs, a tab is paused when another one shows.
+        removeContextualSheetIfWaitingForHide()
         nativeInputManager.onTabVisibilityChanged(false)
         pdfDownloadTooltipPopup?.dismiss()
         pdfDownloadTooltipPopup = null
@@ -2258,6 +2263,14 @@ class BrowserTabFragment :
     }
 
     private fun isActiveCustomTab(): Boolean = tabId.startsWith(CUSTOM_TAB_NAME_PREFIX) && fragmentIsVisible()
+
+    // The platform keeps only the first call, so later tabs and content changes are no-ops.
+    private fun reportFullyDrawnIfSelected() {
+        if (isFullyDrawnReported()) return
+        if (viewModel.liveSelectedTab.value?.tabId == tabId) activity?.reportFullyDrawn()
+    }
+
+    private fun isFullyDrawnReported(): Boolean = (activity as? ComponentActivity)?.fullyDrawnReporter?.isFullyDrawnReported == true
 
     private fun fragmentIsVisible(): Boolean {
         // using isHidden rather than isVisible, as isVisible will incorrectly return false when windowToken is not yet initialized.
@@ -3091,6 +3104,7 @@ class BrowserTabFragment :
 
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
+            is Command.PageCommitVisible -> reportFullyDrawnIfSelected()
             is Command.EnableDuckAIFullScreen -> {
                 setWebViewZoomSupported(false)
                 showDuckAI(it.browserViewState)
@@ -3908,8 +3922,8 @@ class BrowserTabFragment :
                     }
                 }
 
-                override fun onHatchRendered(visible: Boolean) {
-                    // no-op
+                override fun onIdleReturnSettled() {
+                    browserActivity?.onIdleReturnHatchSettled(tabId)
                 }
 
                 override fun onTabClosed(
@@ -4028,7 +4042,11 @@ class BrowserTabFragment :
                     )
                     setChatMenuItemText(
                         com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab,
-                        if (plusMenuUpdateEnabled) R.string.search else com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab,
+                        if (plusMenuUpdateEnabled) {
+                            com.duckduckgo.mobile.android.R.string.search
+                        } else {
+                            com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab
+                        },
                     )
                     chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
@@ -4116,11 +4134,20 @@ class BrowserTabFragment :
     private fun reactToDuckChatContextualSheetResult() {
         childFragmentManager.setFragmentResultListener(DuckChatContextual.RESULT_KEY, viewLifecycleOwner) { _, bundle ->
             val contextualChatUrl = bundle.getString(DuckChatContextual.RESULT_URL)
-            contextualChatUrl?.let {
+            // The sheet stays until the new tab replaces this one, so the page behind it doesn't show while the tab opens.
+            // While it waits, another full-screen tap would open a second tab.
+            if (contextualChatUrl != null && !removeContextualSheetWhenHidden) {
+                // Outside BrowserActivity (a custom tab) no tab opens here to hide this one, so the sheet hides directly.
+                if (browserActivity == null) removeDuckChatContextualSheet() else removeContextualSheetWhenHidden = true
                 viewModel.openLinkInNewTab(contextualChatUrl.toUri())
-                removeDuckChatContextualSheet()
             }
         }
+    }
+
+    private fun removeContextualSheetIfWaitingForHide() {
+        if (!removeContextualSheetWhenHidden) return
+        removeContextualSheetWhenHidden = false
+        removeDuckChatContextualSheet()
     }
 
     private fun ensureBrowserIsCompatibleWithContextualSheetState() {
@@ -5203,6 +5230,7 @@ class BrowserTabFragment :
 
     private fun onTabHidden() {
         if (!isAdded) return
+        removeContextualSheetIfWaitingForHide()
         nativeInputManager.onTabVisibilityChanged(false)
         viewModel.onViewHidden()
         webViewClient.onTabBackgrounded()
@@ -6566,6 +6594,9 @@ class BrowserTabFragment :
                                 LayoutParams.MATCH_PARENT,
                             ),
                         )
+                        if (!isFullyDrawnReported()) {
+                            newBrowserTab.newTabContainerLayout.doOnPreDraw { reportFullyDrawnIfSelected() }
+                        }
                     }
                 }.launchIn(viewLifecycleOwner.lifecycleScope)
         }

@@ -90,6 +90,7 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
     implementation project(path: ':browser-api')
+    implementation project(':test-seeder-api')
 
     implementation AndroidX.core.ktx
 
@@ -105,7 +106,9 @@ dependencies {
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation KotlinX.coroutines.test
+    testImplementation(KotlinX.coroutines.test) {
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 }
 
 tasks.register('copyConfigPatches') {

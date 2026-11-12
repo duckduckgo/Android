@@ -75,6 +75,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -89,6 +90,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -97,6 +99,7 @@ import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
@@ -190,11 +193,18 @@ class BrowserViewModel @Inject constructor(
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
-    val selectedTabFlow: Flow<String> = tabRepository.flowSelectedTab
-        .map { tab -> tab?.tabId }
-        .filterNotNull()
-        .distinctUntilChanged()
-        .debounce(100)
+    // Read once so the flows below and the activity's collector can't disagree if remote config changes mid-session.
+    val isSelectedTabDebounceRemoved: Boolean = swipingTabsFeature.removeSelectedTabDebounceEnabled()
+
+    private val distinctSelectedTabFlow: Flow<String> =
+        tabRepository.flowSelectedTab
+            .mapNotNull { tab -> tab?.tabId }
+            .distinctUntilChanged()
+
+    // Stays debounced so selections that only last a moment don't update the tab's last access.
+    val lastAccessedTabFlow: Flow<String> = distinctSelectedTabFlow.debounce(100.milliseconds)
+
+    val selectedTabFlow: Flow<String> = if (isSelectedTabDebounceRemoved) distinctSelectedTabFlow else lastAccessedTabFlow
 
     val tabsFlow: Flow<List<TabModel>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome, tab.sourceTabId) } }
@@ -203,6 +213,10 @@ class BrowserViewModel @Inject constructor(
     val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         tabs.indexOfFirst { it.tabId == selectedTab }
     }.filterNot { it == -1 }
+
+    val tabIdToMoveTo: Flow<String> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
+        selectedTab.takeIf { tabs.any { it.tabId == selectedTab } }
+    }.filterNotNull()
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
@@ -313,10 +327,13 @@ class BrowserViewModel @Inject constructor(
         }
     }
 
-    suspend fun onOpenFavoriteFromWidget(query: String) {
+    suspend fun onOpenFavoriteFromWidget(query: String): String {
         pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
-        tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
+        return selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
     }
+
+    private suspend fun selectByUrlOrNewTab(url: String): String =
+        tabRepository.getTabId(url)?.also { tabRepository.select(it) } ?: tabRepository.add(url = url, skipHome = true)
 
     fun launchFromThirdParty() {
         pixel.fire(
@@ -421,12 +438,9 @@ class BrowserViewModel @Inject constructor(
         launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
     }
 
-    fun onOpenShortcut(url: String) {
-        launch(dispatchers.io()) {
-            tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
-            pixel.fire(AppPixelName.SHORTCUT_OPENED)
-        }
-    }
+    suspend fun onOpenShortcut(url: String): String = async(dispatchers.io()) {
+        selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url)).also { pixel.fire(AppPixelName.SHORTCUT_OPENED) }
+    }.await()
 
     fun onLaunchedFromNotification(pixelName: String) {
         pixel.fire(pixelName)

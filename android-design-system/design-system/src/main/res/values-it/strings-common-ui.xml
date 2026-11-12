@@ -33,6 +33,7 @@
     <string name="undo">Annulla</string>
     <string name="cancel">Annulla</string>
     <string name="done">Fatto</string>
+    <string name="search">Ricerca</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Sempre attiva</string>

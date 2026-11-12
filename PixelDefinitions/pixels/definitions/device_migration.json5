@@ -1,0 +1,54 @@
+{
+    "m_device_migration_detected": {
+        "description": "Sent once per install, the first time the app comes to the foreground on a phone whose data arrived from another phone through a device-to-device transfer. Its count is the number of migrated installs, and the denominator of the 7-day return rate.",
+        "owners": ["anikiki"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "old_phone_default_browser",
+                "type": "string",
+                "description": "Whether DuckDuckGo was the default browser on the previous phone, as that phone last recorded it; unknown when the previous phone never opened a version that records it",
+                "enum": ["true", "false", "unknown"]
+            },
+            {
+                "key": "old_phone_sync",
+                "type": "string",
+                "description": "Whether the previous phone was signed in to Sync, as that phone last recorded it; unknown when the previous phone never opened a version that records it",
+                "enum": ["yes", "no", "unknown"]
+            }
+        ]
+    },
+    "m_device_migration_day7": {
+        "description": "Sent once per install, the first time the app comes to the foreground at least 7 days after m_device_migration_detected was sent. Carries the previous phone's state so the change in default browser and Sync can be read from this pixel alone.",
+        "owners": ["anikiki"],
+        "triggers": ["startup"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "old_phone_default_browser",
+                "type": "string",
+                "description": "Whether DuckDuckGo was the default browser on the previous phone, as that phone last recorded it; unknown when the previous phone never opened a version that records it",
+                "enum": ["true", "false", "unknown"]
+            },
+            {
+                "key": "old_phone_sync",
+                "type": "string",
+                "description": "Whether the previous phone was signed in to Sync, as that phone last recorded it; unknown when the previous phone never opened a version that records it",
+                "enum": ["yes", "no", "unknown"]
+            },
+            {
+                "key": "is_default_browser",
+                "type": "boolean",
+                "description": "Whether DuckDuckGo is the default browser on this phone when the pixel is sent"
+            },
+            {
+                "key": "sync_enabled",
+                "type": "boolean",
+                "description": "Whether this phone is signed in to Sync when the pixel is sent"
+            }
+        ]
+    }
+}

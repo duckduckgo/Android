@@ -61,6 +61,14 @@ interface SyncService {
         @Header("Authorization") token: String,
     ): Call<DeviceResponse>
 
+    @GET("$SYNC_PROD_ENVIRONMENT_URL$AUDIT_LOG_PATH")
+    fun getAuditLog(
+        @Header("Authorization") token: String,
+        @Query("after") after: String? = null,
+        @Query("before") before: String? = null,
+        @Query("limit") limit: Int? = null,
+    ): Call<AuditLogResponse>
+
     @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/devices")
     fun patchDevices(
         @Header("Authorization") token: String,
@@ -196,6 +204,7 @@ interface SyncService {
         const val SYNC_DEV_ENVIRONMENT_URL = "https://sync-staging.duckduckgo.com"
 
         const val EXCHANGE_CHANNEL_PATH_PREFIX = "/sync/v2/exchange/"
+        const val AUDIT_LOG_PATH = "/sync/account/audit-log"
     }
 }
 
@@ -304,6 +313,35 @@ data class PatchDevicesResponse(
     val devices: List<Device> = emptyList(),
     @field:Json(name = "devices_v2") val devicesV2: List<DeviceV2> = emptyList(),
 )
+
+data class AuditLogResponse(
+    @field:Json(name = "audit_log") val auditLog: AuditLogPage,
+)
+
+/**
+ * Entries are always newest first, whichever cursor was sent. [after] is always present; a missing [before] means the start of the log
+ * was reached.
+ */
+data class AuditLogPage(
+    val entries: List<AuditLogEntry> = emptyList(),
+    val after: String? = null,
+    val before: String? = null,
+)
+
+/** [payload] is a JWE compact string encrypted to the account_info public key. */
+data class AuditLogEntry(
+    val id: String,
+    @field:Json(name = "version") val rawVersion: Any? = null,
+    val payload: String,
+) {
+    /** Older entries send `version` as a JSON number rather than a string. */
+    val version: String?
+        get() = when (val raw = rawVersion) {
+            is String -> raw
+            is Number -> raw.toDouble().takeIf { it % 1.0 == 0.0 }?.toLong()?.toString()
+            else -> null
+        }
+}
 
 data class ErrorResponse(
     val code: Int = -1,
