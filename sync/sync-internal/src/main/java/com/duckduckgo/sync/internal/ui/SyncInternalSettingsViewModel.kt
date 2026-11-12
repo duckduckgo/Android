@@ -108,7 +108,6 @@ constructor(
     private val gracePeriod: DeviceAuthorizationGracePeriod,
     private val promotionDataStore: InternalSyncPromotionDataStore,
     private val promotionAppInstall: InternalSyncPromotionAppInstall,
-    private val auditLogDebugReport: AuditLogDebugReport,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -160,7 +159,6 @@ constructor(
         val cachedAccountInfoKeyResult: String = "",
         val renameDeviceResult: String = "",
         val fetchDecryptDevicesResult: String = "",
-        val fetchDecryptAuditLogResult: String = "",
         val canWriteUnifiedDeviceListEnabled: Boolean = false,
         val canReadUnifiedDeviceListEnabled: Boolean = false,
         val canUsePatchEndpointForLegacyDeviceRenameEnabled: Boolean = false,
@@ -387,7 +385,6 @@ constructor(
                 cachedAccountInfoKeyResult = if (accountInfo.isSignedIn) viewState.value.cachedAccountInfoKeyResult else "",
                 renameDeviceResult = if (accountInfo.isSignedIn) viewState.value.renameDeviceResult else "",
                 fetchDecryptDevicesResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptDevicesResult else "",
-                fetchDecryptAuditLogResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptAuditLogResult else "",
                 canWriteUnifiedDeviceListEnabled = syncFeature.canWriteUnifiedDeviceList().isEnabled(),
                 canReadUnifiedDeviceListEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled(),
                 canUsePatchEndpointForLegacyDeviceRenameEnabled = syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled(),
@@ -834,19 +831,6 @@ constructor(
                     command.send(ShowMessage(text))
                 }
             }
-        }
-    }
-
-    fun onFetchAndDecryptAuditLogClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            val token = syncStore.token
-            if (token.isNullOrEmpty()) {
-                command.send(ShowMessage("Not signed in"))
-                return@launch
-            }
-            viewState.update { it.copy(fetchDecryptAuditLogResult = "Loading…") }
-            val text = auditLogDebugReport.fetchAndDescribe(token, syncStore.deviceId)
-            viewState.update { it.copy(fetchDecryptAuditLogResult = text) }
         }
     }
 

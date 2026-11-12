@@ -86,7 +86,7 @@ class AuditLogDebugReportTest {
 
         val text = report.fetchAndDescribe(TOKEN, OWN_DEVICE_ID)
 
-        assertTrue(text, text.contains("LOGIN  $OCCURRED_AT"))
+        assertTrue(text, text.contains("$OCCURRED_AT\n  LOGIN\n"))
         assertTrue(text, text.contains("name: Work laptop (desktop) [LATER_INFO]"))
         assertTrue(text, text.contains("device: other [credential=3party]"))
     }
@@ -114,7 +114,7 @@ class AuditLogDebugReportTest {
 
         val text = report.fetchAndDescribe(TOKEN, OWN_DEVICE_ID)
 
-        assertTrue(text, text.contains("LOGOUT  $OCCURRED_AT"))
+        assertTrue(text, text.contains("$OCCURRED_AT\n  LOGOUT\n"))
         assertTrue(text, text.contains("name: Unknown device [PLACEHOLDER]"))
         assertTrue(text, text.contains("actor: $OWN_DEVICE_ID (this device)"))
     }
@@ -126,7 +126,7 @@ class AuditLogDebugReportTest {
 
         val text = report.fetchAndDescribe(TOKEN, OWN_DEVICE_ID)
 
-        assertTrue(text, text.contains("DEVICE_INFO_ADDED  $OCCURRED_AT"))
+        assertTrue(text, text.contains("$OCCURRED_AT\n  DEVICE_INFO_ADDED\n"))
         assertTrue(text, !text.contains("name:"))
     }
 
