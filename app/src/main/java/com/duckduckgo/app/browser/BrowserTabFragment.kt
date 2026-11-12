@@ -865,6 +865,7 @@ class BrowserTabFragment :
     private var lastTouchX: Float = 0f
     private var lastTouchY: Float = 0f
     private var lastLongPressUrl: String? = null
+    private var hideNativeInputForTabSwitcher = false
 
     private val tabSwitcherActivityResult =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -2006,15 +2007,23 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        // Dismiss the native input first (no-op when it isn't shown) so a browser-input widget doesn't
-        // linger behind the switcher and leave the omnibar and widget both visible on return. Skip Duck.ai:
-        // there the widget is the persistent chat input, and hideNativeInput would restore the default
-        // omnibar and tear it down.
+        // Dismissed once the switcher covers this tab, so the input doesn't collapse on screen just before it opens.
+        hideNativeInputForTabSwitcher = true
+        val intent = TabSwitcherActivity.intent(activity)
+        tabSwitcherActivityResult.launch(intent)
+    }
+
+    /**
+     * Dismisses the native input (no-op when it isn't shown) so a browser-input widget doesn't linger behind the switcher
+     * and leave the omnibar and widget both visible on return. Skip Duck.ai: there the widget is the persistent chat
+     * input, and hideNativeInput would restore the default omnibar and tear it down.
+     */
+    private fun hideNativeInputLeftForTabSwitcher() {
+        if (!hideNativeInputForTabSwitcher) return
+        hideNativeInputForTabSwitcher = false
         if (omnibar.viewMode != ViewMode.DuckAI) {
             nativeInputManager.hideNativeInput(animate = false)
         }
-        val intent = TabSwitcherActivity.intent(activity)
-        tabSwitcherActivityResult.launch(intent)
     }
 
     override fun onStart() {
@@ -2024,6 +2033,8 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
+        // Normally done in onStop. This covers the edge case where we come back from the tab switcher before onStop had a chance to run.
+        hideNativeInputLeftForTabSwitcher()
 
         // we need to prevent new tab initialization while clearing data, because it can mess up onboarding state after the process is restarted
         if (swipingTabsFeature.isEnabled && (requireActivity() as? BrowserActivity)?.isDataClearingInProgress == true) {
@@ -2064,6 +2075,7 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        hideNativeInputLeftForTabSwitcher()
         viewModel.onViewStopped()
         webViewClient.onTabBackgrounded()
         alertDialog?.dismiss()
@@ -2699,7 +2711,7 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
-                // Skip Duck.ai for the same reason launchTabSwitcher does: the widget is that tab's
+                // Skip Duck.ai for the same reason hideNativeInputLeftForTabSwitcher does: the widget is that tab's
                 // persistent chat input, and tearing it down restores the default omnibar, so the
                 // chat would be sitting behind an address bar when the user comes back to it.
                 if (omnibar.viewMode != DuckAI) {
