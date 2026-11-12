@@ -42,6 +42,7 @@ import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.auditlog.AuditLogSyncHook
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
@@ -84,6 +85,7 @@ internal class SyncEngineTest {
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle> = mock()
     private val connectedDevicesRepository: ConnectedDevicesRepository = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val auditLogSyncHook: AuditLogSyncHook = mock()
     private lateinit var syncEngine: RealSyncEngine
 
     @Before
@@ -101,6 +103,7 @@ internal class SyncEngineTest {
             syncablePersisterPlugins,
             deletableDataManagerPlugins,
             lifecyclePlugins,
+            auditLogSyncHook,
         )
         syncFeature.refreshConnectedDevicesOnSync().setRawStoredState(State(enable = true))
         whenever(syncStore.isSignedIn()).thenReturn(true)
@@ -188,6 +191,61 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenSyncFinishesForAnyTriggerThenAuditLogCheckStartsAfterSuccess() {
+        whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
+        givenNoLocalChanges()
+        givenGetSuccess()
+        val triggers = listOf(APP_OPEN, BACKGROUND_SYNC, FEATURE_READ, DATA_CHANGE, ACCOUNT_LOGIN)
+
+        triggers.forEach { syncEngine.triggerSync(it) }
+
+        val inOrder = inOrder(syncStateRepository, auditLogSyncHook)
+        repeat(triggers.size) {
+            inOrder.verify(syncStateRepository).updateSyncState(SUCCESS)
+            inOrder.verify(auditLogSyncHook).onSyncSucceeded()
+        }
+    }
+
+    @Test
+    fun whenAccountCreationSyncFinishesThenAuditLogCheckStartsAfterSuccess() {
+        givenLocalChanges()
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(ACCOUNT_CREATION)
+
+        val inOrder = inOrder(syncStateRepository, auditLogSyncHook)
+        inOrder.verify(syncStateRepository).updateSyncState(SUCCESS)
+        inOrder.verify(auditLogSyncHook).onSyncSucceeded()
+    }
+
+    @Test
+    fun whenSyncAlreadyInProgressThenAuditLogCheckDoesNotStart() {
+        whenever(syncStateRepository.current()).thenReturn(SyncAttempt(state = IN_PROGRESS))
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(auditLogSyncHook, never()).onSyncSucceeded()
+    }
+
+    @Test
+    fun whenBackgroundSyncIsDebouncedThenAuditLogCheckDoesNotStart() {
+        whenever(syncScheduler.scheduleOperation()).thenReturn(DISCARD)
+
+        syncEngine.triggerSync(BACKGROUND_SYNC)
+
+        verify(auditLogSyncHook, never()).onSyncSucceeded()
+    }
+
+    @Test
+    fun whenSignedOutThenAuditLogCheckDoesNotStart() {
+        whenever(syncStore.isSignedIn()).thenReturn(false)
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(auditLogSyncHook, never()).onSyncSucceeded()
     }
 
     @Test
