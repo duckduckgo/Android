@@ -30,7 +30,6 @@ import com.duckduckgo.duckchat.api.PageContextTrigger
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
@@ -84,7 +83,6 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
-    private val duckChatFeature: DuckChatFeature,
     private val modelManager: DuckAiModelManager,
     private val chatHistoryRepository: ChatHistoryRepository,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
@@ -187,12 +185,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
     init {
-        viewModelScope.launch(dispatchers.io()) {
-            _viewState.update {
-                it.copy(isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled())
-            }
-            observeRecentChats()
-        }
+        observeRecentChats()
         promoCampaignJSHelper.promoRecordEvents
             .onEach { event -> _subscriptionEventDataChannel.trySend(event) }
             .launchIn(viewModelScope)
@@ -206,7 +199,6 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val contextMimeType: String = "",
         val tabId: String = "",
         val userRemovedContext: Boolean = false,
-        val isFireButtonEnabled: Boolean = false,
         val recentChats: List<ChatHistoryItem> = emptyList(),
     )
 

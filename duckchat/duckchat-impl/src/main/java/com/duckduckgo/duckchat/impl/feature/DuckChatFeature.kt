@@ -157,14 +157,6 @@ interface DuckChatFeature {
     fun chatTabAttachments(): Toggle
 
     /**
-     * @return `true` when the fire button is shown in the contextual Duck.ai sheet,
-     * allowing the user to clear their current chat.
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun contextualFireButton(): Toggle
-
-    /**
      * @return `true` when the native storage for duck.ai data is ready to be used
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
