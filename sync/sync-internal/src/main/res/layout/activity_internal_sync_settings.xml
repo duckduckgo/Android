@@ -270,22 +270,34 @@
             android:layout_marginBottom="@dimen/keyline_4"
             app:typography="body2" />
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/fetchDecryptAuditLogButton"
-            android:layout_width="wrap_content"
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Fetch &amp; decrypt audit log" />
+            app:primaryText="Device Audit Log" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/fetchDecryptAuditLogResultTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4"
-            android:layout_marginBottom="@dimen/keyline_4"
-            android:textIsSelectable="true"
-            app:typography="body2" />
+            android:text="Logins and logouts on this Sync account, read from the server log. Includes the unseen logins check and fake logins from other devices."
+            app:typography="body2"
+            app:textType="secondary" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/openAuditLogDebugButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_audit_log_open_dev_screen" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"

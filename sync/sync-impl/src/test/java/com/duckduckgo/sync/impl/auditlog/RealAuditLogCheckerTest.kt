@@ -31,9 +31,13 @@ import com.duckduckgo.sync.impl.ThirdPartyDeviceListDecryptor.Companion.FALLBACK
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckResult.FailureReason
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.DEVICE_INFO_ADDED
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGIN
+import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGOUT
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Skipped
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -167,6 +171,37 @@ class RealAuditLogCheckerTest {
             ),
             stateStore.read().pendingLogins,
         )
+    }
+
+    @Test
+    fun whenDeviceLogsInAndOutInSameCheckThenLoginIsStillAdded() = runTest {
+        givenCursor("c1")
+        whenever(syncApi.getAuditLogAfter(TOKEN, "c1")).thenReturn(
+            page(
+                after = "c2",
+                logout("e3", OTHER_DEVICE, actor = OTHER_DEVICE, at = 30),
+                infoAdded("e2", OTHER_DEVICE, info = "info:Laptop", at = 20),
+                login("e1", OTHER_DEVICE, at = 10),
+            ),
+        )
+        whenever(syncApi.getAuditLogAfter(TOKEN, "c2")).thenReturn(page(after = "c2"))
+
+        val result = testee.check()
+
+        assertEquals(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0, logouts = 1), result)
+        assertEquals(listOf(pending("e1", OTHER_DEVICE, "Laptop", 10)), stateStore.read().pendingLogins)
+    }
+
+    @Test
+    fun whenPendingLoginDeviceLogsOutInLaterCheckThenLoginIsKept() = runTest {
+        givenState(cursor = "c1", pending("e1", OTHER_DEVICE, "Laptop", 10))
+        whenever(syncApi.getAuditLogAfter(TOKEN, "c1")).thenReturn(page(after = "c2", logout("e2", OTHER_DEVICE, actor = OWN_DEVICE, at = 20)))
+        whenever(syncApi.getAuditLogAfter(TOKEN, "c2")).thenReturn(page(after = "c2"))
+
+        val result = testee.check()
+
+        assertEquals(AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 0, logouts = 1), result)
+        assertEquals(AuditLogCheckState(cursor = "c2", pendingLogins = listOf(pending("e1", OTHER_DEVICE, "Laptop", 10))), stateStore.read())
     }
 
     @Test
@@ -344,6 +379,48 @@ class RealAuditLogCheckerTest {
     }
 
     @Test
+    fun whenACheckIsRunningThenAnotherCheckIsSkipped() = runTest {
+        feature.notificationEnabled = false
+        val firstCheckGate = feature.suspendNextCheck()
+        val firstCheck = async { testee.check() }
+        runCurrent()
+
+        val secondResult = testee.check()
+        firstCheckGate.complete(Unit)
+
+        assertEquals(AuditLogCheckResult.AlreadyRunning, secondResult)
+        assertEquals(AuditLogCheckResult.Disabled, firstCheck.await())
+    }
+
+    @Test
+    fun whenPreviousCheckFinishedThenNextCheckRuns() = runTest {
+        feature.notificationEnabled = false
+        val firstCheckGate = feature.suspendNextCheck()
+        val firstCheck = async { testee.check() }
+        runCurrent()
+        firstCheckGate.complete(Unit)
+        firstCheck.await()
+
+        val result = testee.check()
+
+        assertEquals(AuditLogCheckResult.Disabled, result)
+    }
+
+    @Test
+    fun whenPreviousCheckWasCancelledThenNextCheckRuns() = runTest {
+        feature.notificationEnabled = false
+        feature.suspendNextCheck()
+        val firstCheck = async { testee.check() }
+        runCurrent()
+        firstCheck.cancel()
+        runCurrent()
+
+        val result = testee.check()
+
+        assertEquals(AuditLogCheckResult.Disabled, result)
+    }
+
+    @Test
     fun whenUnexpectedExceptionThenCheckReturnsFailure() = runTest {
         givenCursor("c1")
         whenever(syncApi.getAuditLogAfter(TOKEN, "c1")).thenThrow(IllegalStateException("boom"))
@@ -369,6 +446,9 @@ class RealAuditLogCheckerTest {
 
     private fun login(id: String, deviceId: String, info: String? = null, at: Long = 0) =
         Decoded(id, LOGIN, Instant.ofEpochSecond(at), DeviceV2(deviceId = deviceId, deviceInfo = info), null)
+
+    private fun logout(id: String, deviceId: String, actor: String, at: Long = 0) =
+        Decoded(id, LOGOUT, Instant.ofEpochSecond(at), DeviceV2(deviceId = deviceId), DeviceV2(deviceId = actor))
 
     private fun infoAdded(id: String, deviceId: String, info: String, at: Long = 0) =
         Decoded(id, DEVICE_INFO_ADDED, Instant.ofEpochSecond(at), DeviceV2(deviceId = deviceId, deviceInfo = info), null)
@@ -407,8 +487,18 @@ class RealAuditLogCheckerTest {
 
     private class FakeLoginAuditLogFeature : LoginAuditLogFeature {
         var notificationEnabled = true
+        private var nextCheck: CompletableDeferred<Unit>? = null
+
+        fun suspendNextCheck(): CompletableDeferred<Unit> = CompletableDeferred<Unit>().also { nextCheck = it }
+
         override suspend fun isAuditLogEnabled(): Boolean = true
-        override suspend fun isNotificationEnabled(): Boolean = notificationEnabled
+        override suspend fun isNotificationEnabled(): Boolean {
+            nextCheck?.let {
+                nextCheck = null
+                it.await()
+            }
+            return notificationEnabled
+        }
     }
 
     private class FakeSyncStore : SyncStore by mock<SyncStore>() {

@@ -35,5 +35,11 @@
             android:label="@string/sync_promotion_debug_activity_label"
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.SyncInternalSettingsActivity" />
+        <activity
+            android:name=".ui.SyncAuditLogDebugActivity"
+            android:exported="true"
+            android:label="@string/sync_audit_log_debug_activity_label"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.SyncInternalSettingsActivity" />
     </application>
 </manifest>
