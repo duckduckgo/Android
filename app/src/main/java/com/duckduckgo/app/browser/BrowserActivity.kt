@@ -1913,6 +1913,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             // Resolved at post time because the adapter may already hold a newer tab list than the one the selection was combined with.
             val index = tabPagerAdapter.getPositionOfTab(tabId).takeIf { it != -1 } ?: return@post
             tabPagerAdapter.currentTabIndex = index
+            newTabTransitionCoordinator.onTabShowing(tabId, tabPager)
             tabPager.setCurrentItem(index, false)
         }
     }
