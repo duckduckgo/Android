@@ -16,27 +16,15 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RealAdvertisedExchangeV2VersionTest {
 
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
-    private val advertisedVersion = RealAdvertisedExchangeV2Version(syncFeature)
+    private val advertisedVersion = RealAdvertisedExchangeV2Version()
 
-    @Test fun `advertises v2_1 when the version flag is enabled`() {
-        syncFeature.canUseExchangeV2Point1().setRawStoredState(State(remoteEnableState = true))
-
+    @Test fun `advertises v2_1`() {
         assertEquals(ExchangeProtocolVersion.V2_1, advertisedVersion.resolve())
-    }
-
-    @Test fun `advertises v2_0 when the version flag is disabled`() {
-        syncFeature.canUseExchangeV2Point1().setRawStoredState(State(remoteEnableState = false))
-
-        assertEquals(ExchangeProtocolVersion.V2_0, advertisedVersion.resolve())
     }
 }
