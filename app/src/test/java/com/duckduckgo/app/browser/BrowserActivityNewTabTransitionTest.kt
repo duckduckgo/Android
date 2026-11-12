@@ -33,6 +33,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
+import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import com.duckduckgo.app.browser.navigation.AppBrowserNav
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
@@ -463,6 +464,16 @@ class BrowserActivityNewTabTransitionTest {
     @Test
     fun linkFromAnotherAppDoesNotGrowIn() {
         processIntentWhileOnScreen(BrowserActivity.intent(host, InAppNavigation, queryExtra = URL, sourceTabId = SOURCE, isExternal = true))
+        assertTabOpened()
+        assertNotRegistered()
+    }
+
+    @Test
+    fun selectedTextFromAnotherAppDoesNotGrowIn() {
+        // Its tab still gets the tab on screen as its source, but it wasn't asked for from that tab.
+        processIntentWhileOnScreen(
+            BrowserActivity.intent(host, SelectedTextSearch, queryExtra = "selected", selectedText = true, interstitialScreen = true),
+        )
         assertTabOpened()
         assertNotRegistered()
     }
