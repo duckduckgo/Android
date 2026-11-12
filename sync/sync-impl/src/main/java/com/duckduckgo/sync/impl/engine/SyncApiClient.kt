@@ -160,7 +160,7 @@ class AppSyncApiClient @Inject constructor(
 
         return when (val result = syncApi.deleteAiChats(token, until)) {
             is Result.Error -> {
-                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to inform sync of of deleted duck ai chats $result" }
+                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to inform sync of deleted duck ai chats $result" }
                 syncApiErrorRecorder.record(DeletableType.DUCK_AI_CHATS, result)
                 result
             }
