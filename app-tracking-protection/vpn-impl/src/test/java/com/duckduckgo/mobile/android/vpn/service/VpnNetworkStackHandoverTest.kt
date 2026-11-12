@@ -104,6 +104,20 @@ class VpnNetworkStackHandoverTest {
     }
 
     @Test
+    fun whenNextNeedsNetworkToPrepareThenDoesNotSupportInPlaceRestart() {
+        whenever(next.needsNetworkToPrepare).thenReturn(true)
+
+        assertFalse(VpnNetworkStackHandover.supportsInPlaceRestart(next))
+    }
+
+    @Test
+    fun whenNextDoesNotNeedNetworkToPrepareThenSupportsInPlaceRestart() {
+        whenever(next.needsNetworkToPrepare).thenReturn(false)
+
+        assertTrue(VpnNetworkStackHandover.supportsInPlaceRestart(next))
+    }
+
+    @Test
     fun whenSameStackThenAbortDoesNothing() {
         val handover = VpnNetworkStackHandover(current = current, next = current)
 

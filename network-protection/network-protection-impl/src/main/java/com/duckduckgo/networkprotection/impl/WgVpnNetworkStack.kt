@@ -68,6 +68,9 @@ class WgVpnNetworkStack @Inject constructor(
 
     override val name: String = NetPVpnFeature.NETP_VPN.featureName
 
+    // Registration with the controller is not excluded from the NetP tunnel, so it would go through the running tunnel
+    override val needsNetworkToPrepare: Boolean = true
+
     override fun onCreateVpn(): Result<Unit> = Result.success(Unit)
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
