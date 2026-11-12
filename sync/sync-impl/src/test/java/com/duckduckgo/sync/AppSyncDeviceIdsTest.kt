@@ -123,6 +123,10 @@ class AppSyncDeviceIdsTest {
 
             override var connectedDevicesCount: Int = 0
 
+            override var auditLogCursor: String? = null
+
+            override var auditLogPending: String? = null
+
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
             override fun isSignedIn(): Boolean = primaryKey != null
@@ -162,6 +166,10 @@ class AppSyncDeviceIdsTest {
             override fun connectedDevicesCountFlow(): Flow<Int> = flowOf(0)
 
             override var connectedDevicesCount: Int = 0
+
+            override var auditLogCursor: String? = null
+
+            override var auditLogPending: String? = null
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
