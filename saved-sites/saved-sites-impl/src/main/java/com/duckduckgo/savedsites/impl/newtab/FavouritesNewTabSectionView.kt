@@ -210,7 +210,8 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
                     viewModel.onTouchDown(ev.x, ev.y)
                     removeCallbacks(longPressRunnable)
                     postDelayed(longPressRunnable, longPressTimeoutMs)
-                    parent?.requestDisallowInterceptTouchEvent(false)
+                    // Keep the parent ViewPager from taking over until we know which axis the user intended.
+                    parent?.requestDisallowInterceptTouchEvent(true)
                 }
 
                 MotionEvent.ACTION_MOVE -> {
