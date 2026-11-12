@@ -25,12 +25,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.logcat
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
 interface AuditLogSyncHook {
-    /** Starts an audit log check in the background and returns at once. Does nothing if a check is already running. */
+    /** Starts an audit log check in the background and returns at once. The checker skips it if a check is already running. */
     fun onSyncSucceeded()
 }
 
@@ -42,14 +41,8 @@ class RealAuditLogSyncHook @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : AuditLogSyncHook {
 
-    private val checkRunning = AtomicBoolean(false)
-
     override fun onSyncSucceeded() {
         appCoroutineScope.launch(dispatchers.io()) {
-            if (!checkRunning.compareAndSet(false, true)) {
-                logcat { "Sync-AuditLog: check already running, skipped" }
-                return@launch
-            }
             try {
                 checker.check()
             } catch (e: CancellationException) {
@@ -57,8 +50,6 @@ class RealAuditLogSyncHook @Inject constructor(
             } catch (e: Exception) {
                 // The app scope has no exception handler, so anything that escapes here crashes the app.
                 logcat(WARN) { "Sync-AuditLog: check threw ${e.javaClass.simpleName}" }
-            } finally {
-                checkRunning.set(false)
             }
         }
     }

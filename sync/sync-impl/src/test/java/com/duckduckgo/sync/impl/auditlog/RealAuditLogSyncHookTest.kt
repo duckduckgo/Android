@@ -17,12 +17,10 @@
 package com.duckduckgo.sync.impl.auditlog
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import kotlin.coroutines.cancellation.CancellationException
 
 class RealAuditLogSyncHookTest {
 
@@ -45,39 +43,6 @@ class RealAuditLogSyncHookTest {
     }
 
     @Test
-    fun whenSyncSucceedsWhileACheckIsRunningThenDoesNotStartAnotherCheck() = runTest {
-        val running = checker.suspendNextCheck()
-
-        hook.onSyncSucceeded()
-        hook.onSyncSucceeded()
-        running.complete(AuditLogCheckResult.Initialised)
-
-        assertEquals(1, checker.checkCount)
-    }
-
-    @Test
-    fun whenPreviousCheckFinishedThenNextSyncChecksAgain() = runTest {
-        val running = checker.suspendNextCheck()
-        hook.onSyncSucceeded()
-        running.complete(AuditLogCheckResult.Initialised)
-
-        hook.onSyncSucceeded()
-
-        assertEquals(2, checker.checkCount)
-    }
-
-    @Test
-    fun whenPreviousCheckWasCancelledThenNextSyncChecksAgain() = runTest {
-        val running = checker.suspendNextCheck()
-        hook.onSyncSucceeded()
-        running.completeExceptionally(CancellationException())
-
-        hook.onSyncSucceeded()
-
-        assertEquals(2, checker.checkCount)
-    }
-
-    @Test
     fun whenCheckThrowsThenHookDoesNotThrowAndNextSyncChecksAgain() = runTest {
         checker.throwOnNextCheck = IllegalStateException()
         hook.onSyncSucceeded()
@@ -90,10 +55,7 @@ class RealAuditLogSyncHookTest {
     private class FakeAuditLogChecker : AuditLogChecker {
         var checkCount = 0
             private set
-        private var nextCheck: CompletableDeferred<AuditLogCheckResult>? = null
         var throwOnNextCheck: Exception? = null
-
-        fun suspendNextCheck(): CompletableDeferred<AuditLogCheckResult> = CompletableDeferred<AuditLogCheckResult>().also { nextCheck = it }
 
         override suspend fun check(): AuditLogCheckResult {
             checkCount++
@@ -101,9 +63,7 @@ class RealAuditLogSyncHookTest {
                 throwOnNextCheck = null
                 throw it
             }
-            val pending = nextCheck ?: return AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 0)
-            nextCheck = null
-            return pending.await()
+            return AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 0)
         }
     }
 }

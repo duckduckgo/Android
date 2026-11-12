@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="1. Flags" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/loginAuditLogToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="loginAuditLog"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/loginNotificationToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="loginNotification"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="The unseen logins check runs only when both flags are on."
+                app:textType="secondary"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="2. Server log" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="Reads the newest 100 entries from the server and decrypts them. Changes nothing on this device. Works with the flags off."
+                app:textType="secondary"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/readServerLogButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Read server log" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/serverLogResultTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:textIsSelectable="true"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="3. Unseen logins" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/unseenLoginsCountTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                app:typography="h2" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:text="Logins from other devices that the user has not seen yet. The banner and notification will show these. A check also runs after every sync."
+                app:textType="secondary"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/findUnseenAuditEntriesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Find unseen audit entries" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                android:id="@+id/markAllAuditLoginsSeenButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Mark all as seen" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/unseenLoginsResultTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:textIsSelectable="true"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="4. Other synced devices" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="Every device on this account except this one. Simulate login logs in a real extra device named &quot;Fake device &lt;time&gt;&quot;, with no phone or computer behind it. It stays logged in until you log it out. Each login or log out adds an entry to the server log."
+                app:textType="secondary"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/simulateLoginButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Simulate login on other device" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/otherDevicesResultTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:textIsSelectable="true"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/otherDevicesCountTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:typography="h4" />
+
+            <LinearLayout
+                android:id="@+id/otherDevicesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

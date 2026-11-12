@@ -24,18 +24,21 @@ import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckResult.FailureReason
 import com.duckduckgo.sync.store.SyncStore
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
 interface AuditLogChecker {
     /**
      * Fetches audit log entries added since the last check and adds logins by other devices to the pending list.
-     * The first check for an account only stores a cursor, so it adds nothing. Never throws, except for cancellation.
+     * The first check for an account only stores a cursor, so it adds nothing. Returns [AuditLogCheckResult.AlreadyRunning]
+     * at once if another check is running. Never throws, except for cancellation.
      */
     suspend fun check(): AuditLogCheckResult
 }
@@ -43,8 +46,11 @@ interface AuditLogChecker {
 sealed interface AuditLogCheckResult {
     data object Disabled : AuditLogCheckResult
     data object NotSignedIn : AuditLogCheckResult
+    data object AlreadyRunning : AuditLogCheckResult
     data object Initialised : AuditLogCheckResult
-    data class Checked(val newLogins: Int, val renamedLogins: Int) : AuditLogCheckResult
+
+    /** [logouts] counts every `logout` entry in the check. They are never stored or notified. */
+    data class Checked(val newLogins: Int, val renamedLogins: Int, val logouts: Int = 0) : AuditLogCheckResult
 
     /** The account or the stored cursor changed while the check ran, so nothing was written. */
     data object Discarded : AuditLogCheckResult
@@ -65,6 +71,7 @@ sealed interface AuditLogCheckResult {
     }
 }
 
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAuditLogChecker @Inject constructor(
     private val syncStore: SyncStore,
@@ -76,7 +83,22 @@ class RealAuditLogChecker @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : AuditLogChecker {
 
-    override suspend fun check(): AuditLogCheckResult = withContext(dispatchers.io()) {
+    private val checkRunning = AtomicBoolean(false)
+
+    override suspend fun check(): AuditLogCheckResult {
+        // The cursor check already stops a double write, but an overlapping check would still repeat every request.
+        if (!checkRunning.compareAndSet(false, true)) {
+            logcat { "Sync-AuditLog: check already running, skipped" }
+            return AuditLogCheckResult.AlreadyRunning
+        }
+        return try {
+            withContext(dispatchers.io()) { checkCatchingErrors() }
+        } finally {
+            checkRunning.set(false)
+        }
+    }
+
+    private suspend fun checkCatchingErrors(): AuditLogCheckResult {
         val result = try {
             checkSignedInAccount()
         } catch (e: CancellationException) {
@@ -86,7 +108,7 @@ class RealAuditLogChecker @Inject constructor(
             AuditLogCheckResult.Failed(FailureReason.UNEXPECTED)
         }
         logcat { "Sync-AuditLog: check result $result" }
-        result
+        return result
     }
 
     /** Checks the flag and the account, then runs init if there is no stored cursor, or a normal check if there is. */
@@ -143,7 +165,8 @@ class RealAuditLogChecker @Inject constructor(
         }
 
         val update = pendingLoginsUpdater.prepare(decodeResult.entries, deviceId, pendingLogins)
-        return saveCheckResult(update, deviceId, fromCursor = cursor, toCursor = fetched.nextCursor)
+        val logouts = decodeResult.entries.count { it is DecodedAuditLogEntry.Decoded && it.type == AuditLogEntryType.LOGOUT }
+        return saveCheckResult(update, deviceId, fromCursor = cursor, toCursor = fetched.nextCursor, logouts = logouts)
     }
 
     /** Follows the `after` cursor until a page is empty or [MAX_PAGES_PER_CHECK] is reached. Returns the entries newest first. */
@@ -175,6 +198,7 @@ class RealAuditLogChecker @Inject constructor(
         deviceId: String,
         fromCursor: String,
         toCursor: String,
+        logouts: Int = 0,
     ): AuditLogCheckResult {
         var added = 0
         var renamed = 0
@@ -184,7 +208,7 @@ class RealAuditLogChecker @Inject constructor(
             renamed = applied.renamed
             state.copy(cursor = toCursor, pendingLogins = applied.pendingLogins)
         }
-        return if (written) AuditLogCheckResult.Checked(added, renamed) else AuditLogCheckResult.Discarded
+        return if (written) AuditLogCheckResult.Checked(added, renamed, logouts) else AuditLogCheckResult.Discarded
     }
 
     /**

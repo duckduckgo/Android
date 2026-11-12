@@ -60,7 +60,7 @@ class AuditLogDebugReport @Inject constructor(
     private fun describe(entry: DecodedAuditLogEntry, name: ResolvedDeviceName?, ownDeviceId: String?): String = when (entry) {
         is Skipped -> "SKIPPED  ${entry.reason}\n  entry: ${entry.id}"
         is Decoded -> buildString {
-            append("${entry.type}  ${entry.occurredAt}")
+            append("${entry.occurredAt}\n  ${entry.type}")
             name?.let { append("\n  name: ${it.name}${it.type?.let { type -> " ($type)" }.orEmpty()} [${it.source}]") }
             append("\n  device: ${describeDevice(entry.device, ownDeviceId)} [credential=${entry.device.credentialId ?: "ddg"}]")
             entry.actor?.let { append("\n  actor: ${describeDevice(it, ownDeviceId)}") }
