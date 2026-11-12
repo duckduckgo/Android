@@ -4,7 +4,7 @@
         "owners": ["YoussefKeyrouz"],
         "meta": {
             "type": "android-return-session",
-            "version": "0.2"
+            "version": "0.3"
         },
         "feature": {
             "name": "return_session",
@@ -117,6 +117,7 @@
                             "contextual_chat",
                             "widget_quick_actions",
                             "widget_favorite",
+                            "widget_duck_ai",
                             "system_search",
                             "digital_assistant",
                             "deep_link_other",
