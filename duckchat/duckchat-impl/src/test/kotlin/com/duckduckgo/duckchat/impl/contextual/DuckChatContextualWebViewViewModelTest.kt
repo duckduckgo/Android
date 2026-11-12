@@ -745,6 +745,22 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onFullModeRequested twice opens fullscreen and reports once`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.commands.test {
+            testee.onFullModeRequested()
+            testee.onFullModeRequested()
+
+            assertTrue(awaitItem() is DuckChatContextualWebViewViewModel.Command.OpenFullscreenMode)
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(duckChatPixels).reportContextualSheetExpanded()
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
     fun `onFullModeRequested ends the selection journey as moved to tab`() = runTest {
         (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
         testee.onSheetOpened("tab-1")
