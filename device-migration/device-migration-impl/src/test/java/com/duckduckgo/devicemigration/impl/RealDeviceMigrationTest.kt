@@ -127,9 +127,9 @@ class RealDeviceMigrationTest {
     }
 
     @Test
-    fun localFileNameMatchesTheBackupRulesExclude() {
-        // :app's backup rules exclude this exact file from a device transfer; renaming it would let it transfer.
-        assertEquals("com.duckduckgo.devicemigration.local", LOCAL_FILE)
+    fun transferredFileNameMatchesTheBackupRulesInclude() {
+        // :app's backup rules include this exact file in a device transfer; renaming it would stop it transferring.
+        assertEquals("com.duckduckgo.devicemigration.transferred", TRANSFERRED_FILE)
     }
 
     @Test

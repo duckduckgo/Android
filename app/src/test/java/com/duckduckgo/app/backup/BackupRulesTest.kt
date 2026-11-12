@@ -28,6 +28,8 @@ class BackupRulesTest {
     private val modernRules = parse("backup_rules_android_12_upwards.xml")
     private val legacyRules = parse("backup_rules_android_11_and_older.xml")
 
+    private val deviceTransferIncludes = modernRules.section("device-transfer").rules("include")
+
     @Test
     fun cloudBackupExcludesEveryDomain() {
         val cloudBackup = modernRules.section("cloud-backup")
@@ -51,63 +53,54 @@ class BackupRulesTest {
     }
 
     @Test
-    fun deviceTransferIncludesUnencryptedDomains() {
-        val expected = TRANSFERRED_DOMAINS.map { it to "." }.toSet()
-
-        assertEquals(expected, modernRules.section("device-transfer").rules("include").toSet())
-        assertEquals(expected, legacyRules.documentElement.rules("include").toSet())
+    fun deviceTransferIsAnInclusionList() {
+        assertTrue(deviceTransferIncludes.isNotEmpty())
+        assertTrue(modernRules.section("device-transfer").rules("exclude").isEmpty())
+        assertTrue(legacyRules.documentElement.rules("exclude").isEmpty())
     }
 
     @Test
-    fun exclusionListsMatch() {
-        val deviceTransferExcludes = modernRules.section("device-transfer").rules("exclude").toSet()
-        val legacyExcludes = legacyRules.documentElement.rules("exclude").toSet()
+    fun noWholeDomainIsIncluded() {
+        val wholeDomains = deviceTransferIncludes.filter { (_, path) -> path == "." || path.isEmpty() }
 
-        assertEquals(deviceTransferExcludes, legacyExcludes)
+        assertTrue("whole domains included: $wholeDomains", wholeDomains.isEmpty())
     }
 
     @Test
-    fun localMigrationMarkerIsExcluded() {
-        val marker = "sharedpref" to "com.duckduckgo.devicemigration.local.xml"
-
-        assertTrue(modernRules.section("device-transfer").rules("exclude").contains(marker))
-        assertTrue(legacyRules.documentElement.rules("exclude").contains(marker))
+    fun inclusionListsMatch() {
+        assertEquals(deviceTransferIncludes.toSet(), legacyRules.documentElement.rules("include").toSet())
     }
 
     @Test
-    fun transferredMarkerIsNotExcluded() {
-        val excludes = modernRules.section("device-transfer").rules("exclude")
-
-        assertTrue(excludes.none { it.second.startsWith("com.duckduckgo.devicemigration.transferred") })
+    fun transferredMarkerIsIncluded() {
+        assertTrue("sharedpref" to "com.duckduckgo.devicemigration.transferred.xml" in deviceTransferIncludes)
     }
 
     @Test
-    fun atbStoreIsTransferred() {
+    fun atbStoreIsIncluded() {
         // Device migration detection falls back to a transferred ATB when the old phone never wrote the migration marker.
-        val atbStore = "sharedpref" to "com.duckduckgo.app.statistics.xml"
-
-        assertTrue(atbStore !in modernRules.section("device-transfer").rules("exclude"))
-        assertTrue(atbStore !in legacyRules.documentElement.rules("exclude"))
+        assertTrue("sharedpref" to "com.duckduckgo.app.statistics.xml" in deviceTransferIncludes)
     }
 
     @Test
-    fun encryptedStoresAreExcluded() {
-        val excludes = modernRules.section("device-transfer").rules("exclude").toSet()
-
-        val expected = ENCRYPTED_AND_NON_TRANSFERABLE.toSet()
-        assertTrue("missing: ${expected - excludes}", excludes.containsAll(expected))
-    }
-
-    @Test
-    fun vpnUserChoicesAreTransferred() {
-        val excludes = modernRules.section("device-transfer").rules("exclude").toSet()
-
+    fun vpnUserChoicesAreIncluded() {
         val vpnUserChoices = setOf(
             "database" to "vpn.db",
             "file" to "harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1",
         )
-        assertTrue("excluded: ${vpnUserChoices intersect excludes}", (vpnUserChoices intersect excludes).isEmpty())
+
+        assertTrue("missing: ${vpnUserChoices - deviceTransferIncludes.toSet()}", deviceTransferIncludes.containsAll(vpnUserChoices))
     }
+
+    @Test
+    fun nonTransferableStoresAreNotIncluded() {
+        val included = NON_TRANSFERABLE.filter { store -> deviceTransferIncludes.any { it.covers(store) } }
+
+        assertTrue("included: $included", included.isEmpty())
+    }
+
+    private fun Pair<String, String>.covers(store: Pair<String, String>): Boolean =
+        first == store.first && (second == store.second || store.second.startsWith("$second/"))
 
     private fun parse(name: String): org.w3c.dom.Document =
         DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(File("src/main/res/xml/$name"))
@@ -129,49 +122,33 @@ class BackupRulesTest {
             "Cloud backup must carry no data until device migration detection can tell a cloud restore from a device transfer"
 
         val ALL_DOMAINS = listOf("file", "database", "sharedpref", "external", "root")
-        val TRANSFERRED_DOMAINS = listOf("file", "database", "sharedpref", "root")
 
-        val ENCRYPTED_AND_NON_TRANSFERABLE =
+        // Keystore-encrypted stores cannot be decrypted on another phone; the rest are per-device, per-install or telemetry state.
+        val NON_TRANSFERABLE =
             listOf(
                 "sharedpref" to "com.duckduckgo.devicemigration.local.xml",
                 "sharedpref" to "com.duckduckgo.app.email.settings.xml",
                 "sharedpref" to "com.duckduckgo.app.email.settings.encryptiontest.xml",
                 "sharedpref" to "com.duckduckgo.sync.store.v1.xml",
                 "sharedpref" to "com.duckduckgo.securestorage.store.xml",
+                "sharedpref" to "com.duckduckgo.autofill.store.autofill_store.xml",
                 "sharedpref" to "com.duckduckgo.app.fire.unsentpixels.settings.xml",
-                "sharedpref" to "com.duckduckgo.feature.toggles.pixels.prefs.xml",
-                "sharedpref" to "com.duckduckgo.adclick.impl.pixels.xml",
                 "file" to "harmony_prefs/com.duckduckgo.subscriptions.store",
                 "file" to "harmony_prefs/com.duckduckgo.pir.impl.store.secure",
                 "file" to "harmony_prefs/com.duckduckgo.securestorage.store_v2",
                 "file" to "harmony_prefs/com.duckduckgo.securestorage.store_v3",
+                "file" to "harmony_prefs/com.duckduckgo.vpn.tunnel.config.v1",
                 "file" to "fire_mode_duck_ai_files",
                 "database" to "secure_storage_database_encrypted.db",
                 "database" to "pir_encrypted.db",
                 "database" to "pir_decrypted.db",
                 "database" to "fire_mode.db",
                 "database" to "fire_mode_duck_ai.db",
+                "database" to "sync.db",
                 "database" to "pixels.db",
                 "database" to "wide_events.db",
-                "database" to "event_hub_pixel_state.db",
                 "database" to "crash_database.db",
                 "database" to "anr_database.db",
-                "database" to "crash_anr_internal_database.db",
-                "database" to "sync.db",
-                "sharedpref" to "com.duckduckgo.mobile.android.app.tracking.conn.loss.xml",
-                "sharedpref" to "com.duckduckgo.mobile.android.vpn.prefs.xml",
-                "sharedpref" to "com.duckduckgo.android.atp.onboarding.store.xml",
-                "sharedpref" to "com.duckduckgo.mobile.atp.cohort.prefs.xml",
-                "file" to "harmony_prefs/com.duckduckgo.mobile.android.vpn.feature.registry.v1",
-                "file" to "harmony_prefs/com.duckduckgo.vpn.tunnel.config.v1",
-                "file" to "harmony_prefs/com.duckduckgo.netp.store.waitlist",
-                "file" to "harmony_prefs/com.duckduckgo.android.atp.onboarding.store",
-                "file" to "harmony_prefs/com.duckduckgo.mobile.android.vpn.service.notification.v1",
-                "file" to "harmony_prefs/com.duckduckgo.networkprotection.dialog.access.revoked.store.v1",
-                "file" to "harmony_prefs/com.duckduckgo.networkprotection.cohort.prefs.v1",
-                "file" to "harmony_prefs/com.duckduckgo.mobile.atp.cohort.prefs",
-                "file" to "harmony_prefs/com.duckduckgo.networkprotection.internal.connectionclass.v1",
-                "file" to "harmony_prefs/network.type.collector.file.v1",
                 "root" to "app_webview/Profiles/Fire",
             )
     }

@@ -16,48 +16,34 @@
   -->
 
 <full-backup-content>
-    <include domain="file" path="." requireFlags="deviceToDeviceTransfer"/>
-    <include domain="database" path="." requireFlags="deviceToDeviceTransfer"/>
-    <include domain="sharedpref" path="." requireFlags="deviceToDeviceTransfer"/>
-    <include domain="root" path="." requireFlags="deviceToDeviceTransfer"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.devicemigration.local.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.app.email.settings.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.app.email.settings.encryptiontest.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.sync.store.v1.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.securestorage.store.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.app.fire.unsentpixels.settings.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.feature.toggles.pixels.prefs.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.adclick.impl.pixels.xml"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.subscriptions.store"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.pir.impl.store.secure"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.securestorage.store_v2"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.securestorage.store_v3"/>
-    <exclude domain="file" path="fire_mode_duck_ai_files"/>
-    <exclude domain="database" path="secure_storage_database_encrypted.db"/>
-    <exclude domain="database" path="pir_encrypted.db"/>
-    <exclude domain="database" path="pir_decrypted.db"/>
-    <exclude domain="database" path="fire_mode.db"/>
-    <exclude domain="database" path="fire_mode_duck_ai.db"/>
-    <exclude domain="database" path="pixels.db"/>
-    <exclude domain="database" path="wide_events.db"/>
-    <exclude domain="database" path="event_hub_pixel_state.db"/>
-    <exclude domain="database" path="crash_database.db"/>
-    <exclude domain="database" path="anr_database.db"/>
-    <exclude domain="database" path="crash_anr_internal_database.db"/>
-    <exclude domain="database" path="sync.db"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.app.tracking.conn.loss.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.mobile.android.vpn.prefs.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.android.atp.onboarding.store.xml"/>
-    <exclude domain="sharedpref" path="com.duckduckgo.mobile.atp.cohort.prefs.xml"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.android.vpn.feature.registry.v1"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.vpn.tunnel.config.v1"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.netp.store.waitlist"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.android.atp.onboarding.store"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.android.vpn.service.notification.v1"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.dialog.access.revoked.store.v1"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.cohort.prefs.v1"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.mobile.atp.cohort.prefs"/>
-    <exclude domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.internal.connectionclass.v1"/>
-    <exclude domain="file" path="harmony_prefs/network.type.collector.file.v1"/>
-    <exclude domain="root" path="app_webview/Profiles/Fire"/>
+    <include domain="database" path="app.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="history.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="tab_visited_sites.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="site_permissions.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="site_preferences.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="duck_ai_bridge.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="vpn.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="vpn-netp.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="downloads.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="database" path="remote_messaging.db" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.devicemigration.transferred.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.app.statistics.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.app.install.settings.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.app.global.migrations.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.app.settings_activity.settings.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.app.onboarding.settings.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.site.permissions.settings.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.privacy.config.impl.features.gpc.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.app.voice.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.savedsites.settings.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/duck_chat.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/duck_player.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/show_on_app_launch.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/tab_switcher.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/new_address_bar_picker.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/default_browser_prompts_datastore.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/com.duckduckgo.sync.auto_restore.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="duck_ai_bridge_files" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="root" path="app_webview/Default" requireFlags="deviceToDeviceTransfer"/>
 </full-backup-content>
