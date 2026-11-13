@@ -216,7 +216,6 @@ class DuckAiWidgetConfigurator @Inject constructor(
         }
     }
 
-
     private fun widgetColors(): WidgetColors? = when {
         Build.VERSION.SDK_INT < 31 -> null
         duckChatFeature.duckAiWidgetDynamicColors().isEnabled() -> WidgetColors.DYNAMIC
