@@ -167,8 +167,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         if (rules.index != null) {
             val genericRules = rules.r.slice(IntRange(rules.index.genericRuleRange[0], rules.index.genericRuleRange[1] - 1))
             val specificRules = rules.r.slice(IntRange(rules.index.specificRuleRange[0], rules.index.specificRuleRange[1] - 1)).filter {
-                (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
-                    (it[4] as Double).toInt() != 1 &&
+                (it[4] as Double).toInt() != 1 &&
                     (it[3] == "" || (it[3] as String).toRegex().containsMatchIn(url))
             }
             if (specificRules.isEmpty()) {
@@ -182,15 +181,14 @@ class InitMessageHandlerPlugin @Inject constructor(
                     ),
                 )
             }
-            // combine generic and specific rules, then filter out strings after genericStringEnd that are not used by matched specificRules.
+            // combine generic and specific rules; strings before genericStringEnd belong to generic rules and are always kept.
             val filteredRules = genericRules + specificRules
             val filteredStrings = filterUnusedStrings(specificRules, rules.s, rules.index.genericStringEnd)
             return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules, index = null))
         }
         // No index: run rule and string filtering over the entire ruleset.
         val filteredRules = rules.r.filter {
-            (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
-                (it[4] as Double).toInt() != 1 &&
+            (it[4] as Double).toInt() != 1 &&
                 (it[3] == "" || (it[3] as String).toRegex().containsMatchIn(url))
         }
         val filteredStrings = filterUnusedStrings(filteredRules, rules.s, 0)
@@ -200,7 +198,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private fun filterUnusedStrings(
         rules: List<List<Any>>,
         strings: List<String>,
-        offset: Int = 0,
+        genericStringEnd: Int = 0,
     ): List<String> {
         val usedStringIndices = HashSet<Int>()
         val shortKeys = arrayOf("v", "e", "c", "h", "k", "cc", "w", "wv")
@@ -227,8 +225,9 @@ class InitMessageHandlerPlugin @Inject constructor(
             addStringIdsFromRuleSteps(it[9] as List<Map<String, Any>>)
             (it[5] as List<Int>).forEach { usedStringIndices.add(it) }
         }
-        return strings.slice(IntRange(start = 0, endInclusive = usedStringIndices.max())).mapIndexed { index, str ->
-            if (index <= offset || usedStringIndices.contains(index)) str else ""
+        val lastIndex = minOf(strings.lastIndex, maxOf(genericStringEnd - 1, usedStringIndices.maxOrNull() ?: -1))
+        return strings.slice(IntRange(start = 0, endInclusive = lastIndex)).mapIndexed { index, str ->
+            if (index < genericStringEnd || usedStringIndices.contains(index)) str else ""
         }
     }
 
@@ -259,6 +258,5 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     companion object {
         const val MAX_SUPPORTED_RULES_VERSION = 1
-        const val MAX_SUPPORTED_STEP_VERSION = 1
     }
 }
