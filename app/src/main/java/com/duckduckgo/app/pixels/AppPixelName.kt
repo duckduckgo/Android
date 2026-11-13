@@ -524,4 +524,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED("m_aichat_voice_session_digital-assistant_started"),
 
     WEBVIEW_SESSION_LARGE_BYTES("webview_session_large_bytes"),
+
+    DEVICE_MIGRATION_ALL_SET_PROMPT_SHOWN("m_device_migration_all_set_prompt_shown"),
+    DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED("m_device_migration_all_set_prompt_button_clicked"),
 }

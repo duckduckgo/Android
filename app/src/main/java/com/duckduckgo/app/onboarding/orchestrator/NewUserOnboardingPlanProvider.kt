@@ -38,6 +38,7 @@ import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
+import com.duckduckgo.app.onboarding.orchestrator.DeviceMigrationPlanProvider.Companion.MIGRATION_FLOW_ENDED_KEY
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
@@ -64,6 +65,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
@@ -123,6 +125,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
+    private val deviceMigration: DeviceMigration,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
 
@@ -388,9 +391,20 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         }
 
+    // The device migration flow already showed these. A flow still pending (for example, held back remotely) has not, and neither
+    // has an install migrated before the flow existed.
+    private suspend fun sawMigrationFlow(): Boolean = withContext(dispatchers.io()) {
+        deviceMigration.isDoneOnThisInstall(MIGRATION_FLOW_ENDED_KEY)
+    }
+
+    // The flow asks only users whose previous phone had DuckDuckGo as default; everyone else still gets this plan's prompt.
+    private suspend fun migrationFlowAskedForDefaultBrowser(): Boolean =
+        sawMigrationFlow() && deviceMigration.sourceDeviceWasDefaultBrowser() == true
+
     private fun introAnimationStep(withDuckAi: Boolean = false) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INTRO_ANIMATION,
         pixelName = null,
+        precondition = { !sawMigrationFlow() },
         resolveDialog = {
             NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi)
         },
@@ -407,6 +421,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.NOTIFICATION_PERMISSION,
             pixelName = pixelName,
+            precondition = { !sawMigrationFlow() },
             resolveDialog = { NewUserOnboardingActivityDialog.NotificationPermission },
             transition = { event ->
                 when {
@@ -845,7 +860,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         id = NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT,
         // No shown pixel of its own; the confirmed result belongs to the set-default pixel (started on the comparison-chart step).
         pixelName = null,
-        precondition = { defaultRoleBrowserDialog.shouldShowDialog() },
+        precondition = { defaultRoleBrowserDialog.shouldShowDialog() && !migrationFlowAskedForDefaultBrowser() },
         resolveDialog = { NewUserOnboardingActivityDialog.DefaultBrowserPrompt },
         transition = { event ->
             when {
