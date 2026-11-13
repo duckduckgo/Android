@@ -34,7 +34,7 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
+import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -100,7 +100,7 @@ class WebViewRequestInterceptor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @IsMainProcess private val isMainProcess: Boolean,
-    private val webTrackersBlockedHistory: WebTrackersBlockedHistory,
+    private val trackerStatsWriter: TrackerStatsWriter,
 ) : RequestInterceptor {
 
     private var checkMaliciousAfterHttpsUpgrade = false
@@ -371,7 +371,7 @@ class WebViewRequestInterceptor(
         }
 
         logcat { "Blocking request ${request.url}" }
-        appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementBlockedTrackerCount() }
+        trackerStatsWriter.incrementBlockedCount()
         return WebResourceResponse(null, null, null)
     }
 
@@ -431,9 +431,7 @@ class WebViewRequestInterceptor(
 
     private fun recordTrackerBlocked(trackingEvent: TrackingEvent) {
         val trackerCompany = trackingEvent.entity?.displayName ?: "Undefined"
-        appCoroutineScope.launch(dispatchers.io()) {
-            webTrackersBlockedHistory.onTrackerBlocked(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany)
-        }
+        trackerStatsWriter.recordBlockedHistory(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany)
     }
 
     private fun appUrlPixel(url: Uri?): Boolean =

@@ -18,7 +18,6 @@ package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
-import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -26,12 +25,15 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDatabase) : WebTrackersBlockedHistory {
+class WebTrackersBlockedAppRepository @Inject constructor(
+    appDatabase: AppDatabase,
+    private val trackerStatsWriter: TrackerStatsWriter,
+) : WebTrackersBlockedHistory {
 
     private val dao = appDatabase.webTrackersBlockedDao()
 
     override suspend fun onTrackerBlocked(trackerUrl: String, trackerCompany: String) {
-        dao.insert(WebTrackerBlocked(trackerUrl = trackerUrl, trackerCompany = trackerCompany))
+        trackerStatsWriter.recordBlockedHistory(trackerUrl = trackerUrl, trackerCompany = trackerCompany)
     }
 
     override suspend fun trackerCountForLast7Days(): Int = dao.getTrackersCountBetween(
@@ -40,6 +42,7 @@ class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDataba
     )
 
     override suspend fun deleteAll() {
+        trackerStatsWriter.discardPendingHistory()
         dao.deleteAll()
     }
 

@@ -324,6 +324,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
+import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autoconsent.api.AutoconsentResult
@@ -633,6 +634,7 @@ class BrowserTabViewModel @Inject constructor(
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
     private val autocompleteSpeedFeature: AutocompleteSpeedFeature,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val trackerStatsWriter: TrackerStatsWriter,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3078,7 +3080,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
         val networkName = event.entity?.name ?: return
-        appCoroutineScope.launch(dispatchers.io()) { networkLeaderboardDao.incrementNetworkCount(networkName) }
+        trackerStatsWriter.incrementNetworkCount(networkName)
     }
 
     override fun pageHasHttpResources(page: String) {

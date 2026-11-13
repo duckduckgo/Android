@@ -73,7 +73,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
+import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.codegen.annotations.ContributesPluginPoint
@@ -191,7 +191,7 @@ class BrowserModule {
         dispatchers: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         @IsMainProcess isMainProcess: Boolean,
-        webTrackersBlockedHistory: WebTrackersBlockedHistory,
+        trackerStatsWriter: TrackerStatsWriter,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -209,7 +209,7 @@ class BrowserModule {
             androidBrowserConfigFeature,
             appCoroutineScope,
             isMainProcess,
-            webTrackersBlockedHistory,
+            trackerStatsWriter,
         )
 
     @Provides

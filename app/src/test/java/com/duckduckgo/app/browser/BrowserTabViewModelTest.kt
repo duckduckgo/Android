@@ -266,6 +266,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TestEntity
+import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -473,6 +474,7 @@ class BrowserTabViewModelTest {
     private val mockEntityLookup: EntityLookup = mock()
 
     private val mockNetworkLeaderboardDao: NetworkLeaderboardDao = mock()
+    private val mockTrackerStatsWriter: TrackerStatsWriter = mock()
 
     private val mockStatisticsUpdater: StatisticsUpdater = mock()
 
@@ -1134,6 +1136,7 @@ class BrowserTabViewModelTest {
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
                 autocompleteSpeedFeature = fakeAutocompleteSpeedFeature,
                 currentTimeProvider = fakeCurrentTimeProvider,
+                trackerStatsWriter = mockTrackerStatsWriter,
             )
 
         if (loadData) {
@@ -1774,7 +1777,7 @@ class BrowserTabViewModelTest {
                 type = TrackerType.OTHER,
             )
         testee.trackerDetected(event)
-        verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
+        verify(mockTrackerStatsWriter).incrementNetworkCount("Network1")
     }
 
     @Test
