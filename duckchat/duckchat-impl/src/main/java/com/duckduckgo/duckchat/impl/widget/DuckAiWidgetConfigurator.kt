@@ -48,7 +48,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
         val state = withContext(dispatcherProvider.io()) {
             if (!duckChat.isEnabled()) return@withContext null
             // Built once: the URL builders consume the one-shot address bar picker attribution.
-            State(newChatUrl = duckChat.getDuckChatUrl("", false), voiceUrl = duckChat.getVoiceDuckChatUrl())
+            State(voiceUrl = duckChat.getVoiceDuckChatUrl())
         }
 
         withContext(dispatcherProvider.main()) {
@@ -59,7 +59,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
 
             remoteViews.setOnClickPendingIntent(
                 R.id.promptBarContainer,
-                intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl, widgetLaunch),
+                intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, null, widgetLaunch),
             )
             remoteViews.setOnClickPendingIntent(
                 R.id.actionVoice,
@@ -70,7 +70,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
                 intents.launchDuckAi(
                     context,
                     DuckAiWidgetTarget.CREATE_IMAGE.requestCode,
-                    state.newChatUrl,
+                    null,
                     DuckChatLaunch.ImageGeneration(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
                 ),
             )
@@ -79,7 +79,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
                 intents.launchDuckAi(
                     context,
                     DuckAiWidgetTarget.TAKE_PHOTO.requestCode,
-                    state.newChatUrl,
+                    null,
                     DuckChatLaunch.CameraCapture(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
                 ),
             )
@@ -87,7 +87,6 @@ class DuckAiWidgetConfigurator @Inject constructor(
     }
 
     private class State(
-        val newChatUrl: String,
         val voiceUrl: String,
     )
 }
