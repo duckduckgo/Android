@@ -242,11 +242,44 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     @Test
-    fun whenChatTappedThenFillInIntentOpensThatChat() {
-        val fillIn = fakeDuckAiWidgetIntents().chatFillInIntent(activity, CHAT_URL)
+    @Config(sdk = [34])
+    fun whenChatsAvailableThenEachRowFillInIntentOpensItsOwnChat() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+        whenever(chatStore.getChats()).thenReturn(
+            listOf(
+                chat("a", lastEdit = "2026-01-01T00:00:00.000Z"),
+                chat("b", lastEdit = "2026-02-01T00:00:00.000Z"),
+            ),
+        )
+        whenever(duckChat.buildChatUrl(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
 
-        assertLaunch(fillIn, url = CHAT_URL)
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
+
+        val captor = argumentCaptor<RemoteViews.RemoteCollectionItems>()
+        verify(remoteViews).setRemoteAdapter(eq(R.id.chatsList), captor.capture())
+        val items = captor.firstValue
+        val fillIns = (0 until items.itemCount).associate { index ->
+            val row = items.getItemView(index)
+            val title = row.apply(activity, FrameLayout(activity)).findViewById<TextView>(R.id.chatsItemTitle).text.toString()
+            title to row.fillInIntent()
+        }
+        assertEquals(setOf("Title a", "Title b"), fillIns.keys)
+        assertLaunch(fillIns.getValue("Title a"), url = "https://duck.ai/?chatID=a")
+        assertLaunch(fillIns.getValue("Title b"), url = "https://duck.ai/?chatID=b")
     }
+
+    private fun RemoteViews.fillInIntent(): Intent {
+        val actions = reflectField(this, "mActions") as Iterable<*>
+        val response = reflectField(actions.filterNotNull().single { it.javaClass.simpleName == "SetOnClickResponse" }, "mResponse")
+        return reflectField(response!!, "mFillIntent") as Intent
+    }
+
+    private fun reflectField(target: Any, name: String): Any? =
+        generateSequence<Class<*>>(target.javaClass) { it.superclass }
+            .mapNotNull { runCatching { it.getDeclaredField(name) }.getOrNull() }
+            .first()
+            .apply { isAccessible = true }
+            .get(target)
 
     @Test
     fun whenNoChatsThenEmptyMessageShownAndActionsStillWired() = runTest {
@@ -399,6 +432,5 @@ class DuckAiWidgetConfiguratorTest {
 
     private companion object {
         const val APP_WIDGET_ID = 7
-        const val CHAT_URL = "https://duck.ai/?chatID=abc"
     }
 }
