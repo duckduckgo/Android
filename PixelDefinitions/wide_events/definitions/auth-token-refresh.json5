@@ -38,7 +38,7 @@
                     },
                     "consecutive_failures_bucket": {
                         "type": "string",
-                        "description": "How many refreshes in a row had failed on this device before this one, counting backend and client failures but not network errors, rounded down to a bucket boundary. Reset by a successful refresh or a sign-out.",
+                        "description": "How many refreshes in a row had failed on this device before this one, counting backend rejections and client failures but not network errors or backend 5xx responses, rounded down to a bucket boundary. Reset by a successful refresh or a sign-out.",
                         "enum": ["0", "1", "2", "3", "5", "10", "20", "50"]
                     },
                     "time_since_last_success_h_bucketed": {
