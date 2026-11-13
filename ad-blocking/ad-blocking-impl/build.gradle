@@ -64,6 +64,7 @@ dependencies {
     implementation project(':settings-api')
     implementation project(path: ':statistics-api')
 
+    implementation Square.retrofit2.retrofit
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.airbnb.android:lottie:_"
 
