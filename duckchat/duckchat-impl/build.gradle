@@ -68,7 +68,7 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.viewPager2
-    implementation "androidx.core:core-remoteviews:1.1.0"
+    implementation "androidx.core:core-remoteviews:_"
 
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.github.bumptech.glide:glide:_"
