@@ -47,7 +47,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
-import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.toPixelValue
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
@@ -728,23 +727,12 @@ class RealDuckChat @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             // Only force image generation once an image-capable model is selected, otherwise the tool
             // would be unavailable. The new tab this opens consumes the flag when its input configures.
-            val launch = if (ensureImageCapableModelSelected()) DuckChatLaunch.ImageGeneration() else DuckChatLaunch.Open()
+            val launch = if (duckAiModelManager.ensureImageCapableModelSelected()) DuckChatLaunch.ImageGeneration() else DuckChatLaunch.Open()
             withContext(dispatchers.main()) {
                 reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
                 openDuckChat(emptyMap(), forceNewSession = true, launch = launch)
             }
         }
-    }
-
-    private suspend fun ensureImageCapableModelSelected(): Boolean {
-        val state = duckAiModelManager.modelState.value
-        val selectedModel = state.models.firstOrNull { it.id == state.selectedModelId }
-        if (selectedModel?.supportsTool(Tool.IMAGE_GENERATION) == true) return true
-        val imageCapableModel = state.models.firstOrNull {
-            it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
-        } ?: return false
-        duckAiModelManager.selectModel(imageCapableModel)
-        return true
     }
 
     override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) {

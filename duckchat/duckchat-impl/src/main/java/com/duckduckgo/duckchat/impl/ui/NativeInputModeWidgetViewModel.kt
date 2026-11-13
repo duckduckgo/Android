@@ -710,10 +710,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         } else {
             null
         }
-        // An "open Duck.ai for image generation" launch preselects image generation on the new tab.
-        // The image-capable model was already selected when the launch was requested.
+        // The selected model can change after a launch (a widget tap) was built, so the tool is only preselected
+        // once an image-capable model is selected; otherwise the options clear it again.
         if (isDuckAiMode && launch is DuckChatLaunch.ImageGeneration) {
-            nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+            viewModelScope.launch {
+                if (modelManager.ensureImageCapableModelSelected()) {
+                    nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+                }
+            }
         }
     }
 

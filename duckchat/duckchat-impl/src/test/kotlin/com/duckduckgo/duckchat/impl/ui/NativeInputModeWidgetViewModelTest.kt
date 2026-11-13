@@ -513,12 +513,24 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenConfigureDuckAiModeAndForceImageGenerationThenImageToolSelectedForTab() = runTest {
+        whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(true)
+
         testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.ImageGeneration())
 
         assertEquals(
             Tool.IMAGE_GENERATION.rawValue,
             nativeInputStateProvider.stateForTab("tab-1").value.selectedTool,
         )
+        verify(modelManager).ensureImageCapableModelSelected()
+    }
+
+    @Test
+    fun whenConfigureForImageGenerationAndNoCapableModelThenToolNotSelected() = runTest {
+        whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(false)
+
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.ImageGeneration())
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
     }
 
     @Test
