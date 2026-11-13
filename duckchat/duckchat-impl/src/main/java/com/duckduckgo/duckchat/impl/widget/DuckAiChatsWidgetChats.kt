@@ -17,14 +17,13 @@ package com.duckduckgo.duckchat.impl.widget
 
 import android.content.Context
 import com.duckduckgo.browsermode.api.RegularMode
+import com.duckduckgo.duckchat.impl.history.toChatHistoryItems
 import com.duckduckgo.duckchat.impl.models.ChatType
-import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import java.time.Instant
 import javax.inject.Inject
 import com.duckduckgo.duckchat.impl.R as DuckChatR
 
@@ -49,26 +48,12 @@ class DuckAiChatsWidgetChats @Inject constructor(
     private fun untitledTitle(): String = context.getString(DuckChatR.string.duck_ai_chat_history_untitled)
 }
 
-/** Same ordering as the native chat history screen: pinned first, each group by last edit descending. */
 fun List<DuckAiChat>.toWidgetChats(
     untitledTitle: String,
     limit: Int = DUCK_AI_CHATS_WIDGET_MAX_CHATS,
-): List<DuckAiChatsWidgetChat> {
-    val (pinned, recent) = partition { it.pinned }
-    return (pinned.sortedByDescending { it.lastEditMillis() } + recent.sortedByDescending { it.lastEditMillis() })
+): List<DuckAiChatsWidgetChat> =
+    toChatHistoryItems(untitledTitle)
         .take(limit)
-        .map { chat ->
-            DuckAiChatsWidgetChat(
-                chatId = chat.chatId,
-                title = chat.title.takeIf { it.isNotBlank() && it != UPSTREAM_UNTITLED } ?: untitledTitle,
-                pinned = chat.pinned,
-                type = chat.toChatType(),
-            )
-        }
-}
-
-private fun DuckAiChat.lastEditMillis(): Long = runCatching { Instant.parse(lastEdit).toEpochMilli() }.getOrDefault(0L)
+        .map { DuckAiChatsWidgetChat(chatId = it.chatId, title = it.displayTitle, pinned = it.pinned, type = it.type) }
 
 const val DUCK_AI_CHATS_WIDGET_MAX_CHATS = 20
-
-private const val UPSTREAM_UNTITLED = "Untitled Chat"
