@@ -372,13 +372,15 @@ class DuckChatContextualWebViewFragment :
                             RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     if (!viewModel.handleJSCall(method)) {
-                                        val (contextRequest, pageContext, allowAutomaticAttachment) = withContext(dispatcherProvider.main()) {
-                                            Triple(
-                                                viewModel.capturePageContextRequest(),
-                                                viewModel.currentPageContext,
-                                                !viewModel.viewState.value.userRemovedContext,
-                                            )
-                                        }
+                                        val (contextRequest, pageContext, allowAutomaticAttachment, sheetUrl) =
+                                            withContext(dispatcherProvider.main()) {
+                                                SheetJsCallState(
+                                                    contextRequest = viewModel.capturePageContextRequest(),
+                                                    pageContext = viewModel.currentPageContext,
+                                                    allowAutomaticAttachment = !viewModel.viewState.value.userRemovedContext,
+                                                    sheetUrl = simpleWebview.url,
+                                                )
+                                            }
                                         duckChatJSHelper.processJsCallbackMessage(
                                             featureName,
                                             method,
@@ -388,6 +390,7 @@ class DuckChatContextualWebViewFragment :
                                             pageContext,
                                             contextRequest.tabId,
                                             browserMode,
+                                            pageUrl = sheetUrl,
                                             allowAutomaticPageContextAttachment = allowAutomaticAttachment,
                                         )?.let { response ->
                                             logcat { "JS Helper: response ready" }
@@ -1033,3 +1036,10 @@ class DuckChatContextualWebViewFragment :
         const val KEY_DUCK_AI_CONTEXTUAL_TAB_ID: String = "KEY_DUCK_AI_CONTEXTUAL_TAB_ID"
     }
 }
+
+private data class SheetJsCallState(
+    val contextRequest: DuckChatContextualWebViewViewModel.PageContextRequest,
+    val pageContext: String,
+    val allowAutomaticAttachment: Boolean,
+    val sheetUrl: String?,
+)
