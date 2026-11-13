@@ -1997,14 +1997,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         browserMode: BrowserMode = currentBrowserMode,
         inputModeTarget: InputMode? = null,
         animated: Boolean = false,
-        nativeInputLaunch: NativeInputLaunch? = null,
     ) {
         if (inputModeTarget == InputMode.SEARCH) {
             isDuckChatVisible = false
         }
         switchModeThen(
             browserMode,
-            PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal, inputModeTarget, nativeInputLaunch),
+            PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal, inputModeTarget),
             BrowserModeSwitchSource.NEW_TAB,
             animated,
         )
@@ -2060,7 +2059,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 action.isExternal,
                 action.inputModeTarget,
                 newTabTransition = if (animated) startNewTabTransition() else null,
-                nativeInputLaunch = action.nativeInputLaunch,
             )
             is PendingAction.OpenExistingTab -> openExistingTab(action.tabId)
         }
