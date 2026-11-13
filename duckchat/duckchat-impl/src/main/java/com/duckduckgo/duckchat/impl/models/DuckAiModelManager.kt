@@ -64,7 +64,13 @@ data class ModelState(
      * change this to a bounded Map<String, ReasoningMode> keyed by chatId.
      * */
     val chatScopedReasoningMode: ReasoningMode? = null,
-)
+) {
+    /**
+     * Models not loaded yet count as supported, so the entry points are not hidden while they fetch.
+     */
+    fun supportsImageUpload(imageUploadEnabled: Boolean): Boolean =
+        models.isEmpty() || (models.firstOrNull { it.id == selectedModelId }?.supportsImageUpload == true && imageUploadEnabled)
+}
 
 interface DuckAiModelManager {
     val modelState: StateFlow<ModelState>

@@ -534,6 +534,45 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenSelectedModelSupportsImageUploadAndSettingOnThenSupportsImageUpload() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        modelStateFlow.value = ModelState(models = listOf(toolModel("m", imageUpload = true)), selectedModelId = "m")
+
+        assertTrue(testee.supportsImageUpload())
+    }
+
+    @Test
+    fun whenImageUploadSettingOffThenDoesNotSupportImageUpload() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(false)
+        modelStateFlow.value = ModelState(models = listOf(toolModel("m", imageUpload = true)), selectedModelId = "m")
+
+        assertFalse(testee.supportsImageUpload())
+    }
+
+    @Test
+    fun whenSelectedModelDoesNotSupportImageUploadThenDoesNotSupportImageUpload() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        modelStateFlow.value = ModelState(models = listOf(toolModel("m", imageUpload = false)), selectedModelId = "m")
+
+        assertFalse(testee.supportsImageUpload())
+    }
+
+    private fun toolModel(
+        id: String,
+        vararg tools: Tool,
+        imageUpload: Boolean = false,
+    ) = AIChatModel(
+        id = id,
+        name = id,
+        displayName = id,
+        shortName = id,
+        accessTier = emptyList(),
+        isAccessible = true,
+        supportedTools = tools.toList(),
+        supportsImageUpload = imageUpload,
+    )
+
+    @Test
     fun whenConfigureDuckAiModeAndNotForceImageGenerationThenNoToolSelected() = runTest {
         testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open())
 

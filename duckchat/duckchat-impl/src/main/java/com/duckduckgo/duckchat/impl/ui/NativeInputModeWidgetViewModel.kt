@@ -721,6 +721,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun supportsImageUpload(): Boolean = modelManager.modelState.value.supportsImageUpload(duckChatInternal.isImageUploadEnabled())
+
     private fun replayPendingState(tabId: String) {
         if (hasPendingChatId) {
             val pending = pendingChatId

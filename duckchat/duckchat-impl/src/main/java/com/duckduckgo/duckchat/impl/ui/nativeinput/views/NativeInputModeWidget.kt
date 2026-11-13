@@ -1556,7 +1556,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             viewModel.configure(tabId, isDuckAiMode, isBottom, launch)
             publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
-            if (shouldLaunchCameraCapture(isDuckAiMode, launch)) launchCameraCapture()
+            if (shouldLaunchCameraCapture(isDuckAiMode, launch, viewModel.supportsImageUpload())) launchCameraCapture()
         }
     }
 
@@ -2155,7 +2155,8 @@ internal fun hasPendingAdoptedAttachments(
 internal fun shouldLaunchCameraCapture(
     isDuckAiMode: Boolean,
     launch: DuckChatLaunch,
-): Boolean = isDuckAiMode && launch is DuckChatLaunch.CameraCapture
+    supportsImageUpload: Boolean,
+): Boolean = isDuckAiMode && launch is DuckChatLaunch.CameraCapture && supportsImageUpload
 
 /**
  * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on
