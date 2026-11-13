@@ -20,6 +20,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Context
+import android.content.ContextWrapper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -32,6 +33,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
@@ -59,6 +61,25 @@ class DuckAiWidgetUpdaterTest {
 
         chatsFlow.value = listOf(chat("a"), chat("b"))
 
+        assertTrue(shadowOf(context).broadcastIntents.isEmpty())
+        assertEquals(0, chatsFlow.subscriptionCount.value)
+    }
+
+    @Test
+    fun whenLastWidgetInstanceIsRemovedThenCollectionStopsOnNextChange() {
+        var widgetIds = intArrayOf(WIDGET_ID)
+        val manager = mock<AppWidgetManager> { on { getAppWidgetIds(any()) } doAnswer { widgetIds } }
+        val widgetContext = object : ContextWrapper(context) {
+            override fun getSystemService(name: String): Any? = if (name == APPWIDGET_SERVICE) manager else super.getSystemService(name)
+        }
+        val updater = DuckAiWidgetUpdater(widgetContext, DuckAiChatsWidgetChats(stringContext, chatStore), coroutineTestRule.testScope)
+        updater.startObservingIfNeeded()
+        assertEquals(1, chatsFlow.subscriptionCount.value)
+
+        widgetIds = IntArray(0)
+        chatsFlow.value = listOf(chat("a"), chat("b"))
+
+        assertEquals(0, chatsFlow.subscriptionCount.value)
         assertTrue(shadowOf(context).broadcastIntents.isEmpty())
     }
 
