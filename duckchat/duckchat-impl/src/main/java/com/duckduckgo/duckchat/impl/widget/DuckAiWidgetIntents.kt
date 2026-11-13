@@ -32,7 +32,7 @@ class DuckAiWidgetIntents @Inject constructor(
     fun launchDuckAi(
         context: Context,
         requestCode: Int,
-        duckChatUrl: String,
+        duckChatUrl: String?,
         launch: DuckChatLaunch,
     ): PendingIntent = PendingIntent.getActivity(
         context,
@@ -52,12 +52,12 @@ class DuckAiWidgetIntents @Inject constructor(
      * Template for list items; each item's fill-in intent, built by [chatFillInIntent], supplies every extra.
      * [Intent.fillIn] never overwrites an extra already present, so the template must carry none.
      */
-    fun chatClickTemplate(context: Context, requestCode: Int, newChatUrl: String): PendingIntent {
+    fun chatClickTemplate(context: Context, requestCode: Int): PendingIntent {
         val mutability = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0
         return PendingIntent.getActivity(
             context,
             requestCode,
-            openDuckChat(context, newChatUrl).replaceExtras(null).asViewIntent(),
+            openDuckChat(context, null).replaceExtras(null).asViewIntent(),
             PendingIntent.FLAG_UPDATE_CURRENT or mutability,
         )
     }
@@ -65,7 +65,7 @@ class DuckAiWidgetIntents @Inject constructor(
     fun chatFillInIntent(context: Context, chatUrl: String): Intent =
         Intent().putExtras(openDuckChat(context, chatUrl).extras!!)
 
-    private fun openDuckChat(context: Context, duckChatUrl: String): Intent =
+    private fun openDuckChat(context: Context, duckChatUrl: String?): Intent =
         browserNav.openDuckChat(
             context,
             duckChatUrl = duckChatUrl,
