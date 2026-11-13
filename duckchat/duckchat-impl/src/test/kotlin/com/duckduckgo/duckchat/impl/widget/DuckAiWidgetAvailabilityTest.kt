@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -50,6 +51,7 @@ class DuckAiWidgetAvailabilityTest {
     private val packageManager: PackageManager = mock()
     private val appWidgetManager: AppWidgetManager = mock()
     private val pixel: Pixel = mock()
+    private val homeScreenWidgetLifecycle: HomeScreenWidgetLifecycle = mock()
     private val context: Context = mock<Context>().also {
         whenever(it.packageName).thenReturn("com.duckduckgo.mobile.android")
         whenever(it.packageManager).thenReturn(packageManager)
@@ -69,6 +71,7 @@ class DuckAiWidgetAvailabilityTest {
         duckChatFeatureRepository = repository,
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         pixel = pixel,
+        homeScreenWidgetLifecycle = homeScreenWidgetLifecycle,
         appCoroutineScope = coroutineTestRule.testScope,
     )
 
@@ -111,6 +114,7 @@ class DuckAiWidgetAvailabilityTest {
         testee.onPrivacyConfigDownloaded()
 
         verify(pixel).fire(DuckChatPixelName.DUCK_AI_WIDGET_DELETED)
+        verify(homeScreenWidgetLifecycle).onWidgetDisabled()
     }
 
     @Test
@@ -122,6 +126,7 @@ class DuckAiWidgetAvailabilityTest {
         testee.onPrivacyConfigDownloaded()
 
         verify(pixel, never()).fire(eq(DuckChatPixelName.DUCK_AI_WIDGET_DELETED), any(), any(), any())
+        verify(homeScreenWidgetLifecycle, never()).onWidgetDisabled()
     }
 
     @Test
@@ -133,6 +138,7 @@ class DuckAiWidgetAvailabilityTest {
         testee.onPrivacyConfigDownloaded()
 
         verify(pixel, never()).fire(eq(DuckChatPixelName.DUCK_AI_WIDGET_DELETED), any(), any(), any())
+        verify(homeScreenWidgetLifecycle, never()).onWidgetDisabled()
     }
 
     @Test
