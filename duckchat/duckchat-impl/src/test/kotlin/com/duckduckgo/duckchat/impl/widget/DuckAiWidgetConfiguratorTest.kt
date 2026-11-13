@@ -61,7 +61,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.promptBarContainer)
 
-        assertLaunch(launched, url = NEW_CHAT_URL)
+        assertLaunch(launched, url = null)
     }
 
     @Test
@@ -79,7 +79,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.actionCreateImage)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, launch = DuckChatLaunch.ImageGeneration::class)
+        assertLaunch(launched, url = null, launch = DuckChatLaunch.ImageGeneration::class)
     }
 
     @Test
@@ -88,7 +88,16 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.actionTakePhoto)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, launch = DuckChatLaunch.CameraCapture::class)
+        assertLaunch(launched, url = null, launch = DuckChatLaunch.CameraCapture::class)
+    }
+
+    @Test
+    fun whenRenderedThenNoNewChatUrlIsBuilt() = runTest {
+        stubDuckAi(enabled = true)
+
+        testee.populateRemoteViews(activity, remoteViews)
+
+        verify(duckChat, never()).getDuckChatUrl(any(), any(), any())
     }
 
     @Test
@@ -109,7 +118,6 @@ class DuckAiWidgetConfiguratorTest {
 
     private fun stubDuckAi(enabled: Boolean) {
         whenever(duckChat.isEnabled()).thenReturn(enabled)
-        whenever(duckChat.getDuckChatUrl("", false)).thenReturn(NEW_CHAT_URL)
         whenever(duckChat.getVoiceDuckChatUrl()).thenReturn(VOICE_URL)
     }
 
@@ -121,7 +129,6 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     private companion object {
-        const val NEW_CHAT_URL = "https://duck.ai/"
         const val VOICE_URL = "https://duck.ai/?mode=voice-mode"
     }
 }
