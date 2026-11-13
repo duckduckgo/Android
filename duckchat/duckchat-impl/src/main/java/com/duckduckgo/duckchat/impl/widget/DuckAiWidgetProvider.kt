@@ -95,11 +95,12 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
     ) {
-        val heightDp = appWidgetManager.getAppWidgetOptions(appWidgetId)
-            ?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, Int.MAX_VALUE) ?: Int.MAX_VALUE
+        val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
+        val heightDp = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, Int.MAX_VALUE) ?: Int.MAX_VALUE
+        val widthDp = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, Int.MAX_VALUE) ?: Int.MAX_VALUE
 
         appCoroutineScope.launch {
-            val views = duckAiWidgetConfigurator.createRemoteViews(context, appWidgetId, heightDp)
+            val views = duckAiWidgetConfigurator.createRemoteViews(context, appWidgetId, heightDp, widthDp)
             appWidgetManager.updateAppWidget(appWidgetId, views)
             logcat { "DuckAiWidgetProvider updateAppWidget completed for widget id = $appWidgetId" }
         }
