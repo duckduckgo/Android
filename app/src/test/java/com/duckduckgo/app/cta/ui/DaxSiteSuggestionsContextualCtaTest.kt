@@ -193,6 +193,7 @@ class DaxSiteSuggestionsContextualCtaTest {
             onboardingPixelSender = mock(),
             contextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit(),
             contextualCtaSuppressorPlugins = mock(),
+            syncAfterDeviceTransferPrompt = FakeSyncAfterDeviceTransferPrompt(),
         )
     }
 

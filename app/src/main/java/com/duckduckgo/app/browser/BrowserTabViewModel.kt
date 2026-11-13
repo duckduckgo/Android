@@ -121,6 +121,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardin
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
 import com.duckduckgo.app.browser.commands.Command.LaunchSubscription
+import com.duckduckgo.app.browser.commands.Command.LaunchSyncSetup
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.commands.Command.LaunchVpnManagement
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -276,6 +277,7 @@ import com.duckduckgo.app.cta.ui.DaxTryASearchBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBubbleCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
+import com.duckduckgo.app.cta.ui.SyncAfterDeviceTransferBubbleCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -4099,6 +4101,7 @@ class BrowserTabViewModel @Inject constructor(
                     ctaViewModel.areBubbleDaxDialogsCompleted()
                 }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
+            val previousCta = currentCtaViewState().cta
             ctaViewState.value =
                 currentCtaViewState().copy(
                     cta = cta,
@@ -4106,6 +4109,11 @@ class BrowserTabViewModel @Inject constructor(
                     isBrowserShowing = isBrowserShowing,
                     isErrorShowing = isErrorShowing,
                 )
+            // The renderer only brings the new tab page back when onboarding counts as complete there, so a Sync suggestion
+            // that stopped being due (Sync turned on, or dismissed elsewhere) is hidden explicitly.
+            if (cta == null && !isBrowserShowing && previousCta is SyncAfterDeviceTransferBubbleCta) {
+                command.value = HideOnboardingDaxBubbleCta(previousCta)
+            }
             return cta
         }
         return null
@@ -4165,6 +4173,8 @@ class BrowserTabViewModel @Inject constructor(
         val onboardingCommand =
             when (cta) {
                 is ContextualDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
+                // Stays due if the user backs out of setup; the next refresh drops it once Sync is on.
+                is SyncAfterDeviceTransferBubbleCta -> LaunchSyncSetup
                 is DaxBubbleCta -> {
                     onDaxBubbleCtaOkButtonClicked(cta)
                     null

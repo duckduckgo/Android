@@ -30,6 +30,7 @@ import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_MIGRATED
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
@@ -104,6 +105,13 @@ class RealDeviceMigration @Inject constructor(
         }
     }
 
+    // Only the restorer's finding decides, not the old phone's stamp that it was signed in: with no restore payload the user would
+    // otherwise be left without Sync and without the suggestion, whose setup still offers to join the existing account. Until the
+    // restorer has answered, it counts as "had Sync", so the suggestion never competes with a silent restore in progress.
+    override suspend fun previousDeviceHadSync(): Boolean = withContext(dispatchers.io()) {
+        detection.migrated && markerStore.local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true)
+    }
+
     override suspend fun isMigrationExperienceEnabled(): Boolean = withContext(dispatchers.io()) {
         deviceMigrationFeature.self().isEnabled()
     }
@@ -123,15 +131,7 @@ class RealDeviceMigration @Inject constructor(
                 .putBoolean(KEY_SEEN, true)
                 .putBoolean(KEY_IS_NEW_INSTALL, installTimeComparison.isUnupdatedSinceFirstInstall() && (sourceIsNewInstall ?: true))
                 .commit()
-            // Sync can be turned on or off between starts, so the stamp is refreshed every time.
-            try {
-                val signedIn = deviceSyncState.value.isUserSignedInOnDevice()
-                markerStore.transferred.edit().putBoolean(KEY_SIGNED_IN_TO_SYNC, signedIn).commit()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logcat(ERROR) { "Could not record Sync state for a future device transfer: ${e.javaClass.simpleName}" }
-            }
+            stampSyncState()
             stampDefaultBrowser()
         }
     }
@@ -141,6 +141,27 @@ class RealDeviceMigration @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             detection
             stampDefaultBrowser()
+        }
+    }
+
+    // A transfer app backs up the app while it is in the background, often right after the user turned Sync on in this process.
+    override fun onStop(owner: LifecycleOwner) {
+        appCoroutineScope.launch(dispatchers.io()) {
+            detection
+            stampSyncState()
+        }
+    }
+
+    private fun stampSyncState() {
+        try {
+            val signedIn = deviceSyncState.value.isUserSignedInOnDevice()
+            val transferred = markerStore.transferred
+            if (transferred.contains(KEY_SIGNED_IN_TO_SYNC) && transferred.getBoolean(KEY_SIGNED_IN_TO_SYNC, false) == signedIn) return
+            transferred.edit().putBoolean(KEY_SIGNED_IN_TO_SYNC, signedIn).commit()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(ERROR) { "Could not record Sync state for a future device transfer: ${e.javaClass.simpleName}" }
         }
     }
 

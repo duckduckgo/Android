@@ -48,6 +48,7 @@ import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
@@ -64,6 +65,7 @@ import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.sync.api.SyncAfterDeviceTransferPrompt
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -111,6 +113,7 @@ class CtaViewModel @Inject constructor(
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
     private val onboardingPixelSender: OnboardingPixelSender,
     private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
+    private val syncAfterDeviceTransferPrompt: SyncAfterDeviceTransferPrompt,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -225,6 +228,9 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
+            if (cta is SyncAfterDeviceTransferBubbleCta) {
+                pixel.fire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
+            }
             if (cta is DaxSubscriptionBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
@@ -248,6 +254,10 @@ class CtaViewModel @Inject constructor(
         viaSkipBtn: Boolean = false,
     ) {
         withContext(dispatchers.io()) {
+            if (cta is SyncAfterDeviceTransferBubbleCta) {
+                syncAfterDeviceTransferPrompt.dismiss()
+                return@withContext
+            }
             if (viaCloseBtn || viaSkipBtn) {
                 contextualOnboardingPixelNames(cta).forEach {
                     onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = false))
@@ -278,6 +288,9 @@ class CtaViewModel @Inject constructor(
         }
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
+        }
+        if (cta is SyncAfterDeviceTransferBubbleCta) {
+            pixel.fire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
         }
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.userAcceptedPrompt()
@@ -435,6 +448,11 @@ class CtaViewModel @Inject constructor(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                     segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
                 )
+            }
+
+            // Last, so any onboarding dialog that is due goes first and the suggestion waits for the next new tab.
+            syncAfterDeviceTransferPrompt.shouldShow() -> {
+                SyncAfterDeviceTransferBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
             }
             else -> null
         }

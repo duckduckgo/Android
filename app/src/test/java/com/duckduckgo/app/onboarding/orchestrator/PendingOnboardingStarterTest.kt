@@ -329,6 +329,7 @@ class PendingOnboardingStarterTest {
             pending = false
         }
         override suspend fun sourceDeviceWasDefaultBrowser(): Boolean? = sourceDefaultBrowser
+        override suspend fun previousDeviceHadSync(): Boolean = false
         override suspend fun isMigrationExperienceEnabled(): Boolean = experienceEnabled
         private val done = mutableSetOf<String>()
         override fun isDoneOnThisInstall(key: String): Boolean = key in done

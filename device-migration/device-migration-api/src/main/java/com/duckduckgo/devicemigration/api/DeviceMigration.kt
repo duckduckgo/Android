@@ -42,6 +42,13 @@ interface DeviceMigration {
     suspend fun markMigrationFlowCompleted()
 
     /**
+     * True when the previous phone's Sync account was found to restore silently, or when that is not known yet, so callers never
+     * offer to set up Sync while it is being restored. False when the install is not migrated, or when nothing was found to
+     * restore, even if the previous phone was signed in.
+     */
+    suspend fun previousDeviceHadSync(): Boolean
+
+    /**
      * Remote kill switch for what a migrated install adds on the new phone: silent restores, the migration pixels and resets that
      * only improve the experience. While it is false, callers do none of it and record none of it as done, so turning it on later
      * still runs each piece once. Detection, [isMigratedInstall] and cleanups that keep a feature correct do not depend on it.
