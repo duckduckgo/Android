@@ -35,6 +35,7 @@ private fun DuckChatLaunch.origin(): DuckChatLaunchOrigin? = when (this) {
     is DuckChatLaunch.Open -> origin
     is DuckChatLaunch.ImageGeneration -> origin
     is DuckChatLaunch.CameraCapture -> origin
+    is DuckChatLaunch.Voice -> origin
     is DuckChatLaunch.ChatHistory -> origin
     is DuckChatLaunch.ContextualChat, is DuckChatLaunch.TextSelection -> null
 }

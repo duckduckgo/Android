@@ -1106,6 +1106,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 currentTab?.launchContextualDuckAi(textSelection)
                 return
             }
+            if (intent.getBooleanExtra(DUCK_CHAT_VOICE, false)) {
+                // openVoiceDuckChat reports the entry and relaunches this activity with the voice URL.
+                val entryPoint = intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)
+                    ?.let { runCatching { DuckChatEntryPoint.valueOf(it) }.getOrNull() }
+                    ?: DuckChatEntryPoint.DEEP_LINK_OTHER
+                duckChat.openVoiceDuckChat(entryPoint)
+                return
+            }
             pendingDuckChatTextSelection = textSelection
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
             pendingDuckChatForceImageGeneration = intent.getBooleanExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, false)
@@ -1638,6 +1646,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
             duckChatForceImageGeneration: Boolean = false,
+            duckChatVoice: Boolean = false,
             openDuckChatHistory: Boolean = false,
             deletedTabCount: Int = 0,
             nativeInputLaunch: NativeInputLaunch? = null,
@@ -1660,6 +1669,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, duckChatForceImageGeneration)
+            intent.putExtra(DUCK_CHAT_VOICE, duckChatVoice)
             intent.putExtra(OPEN_DUCK_CHAT_HISTORY, openDuckChatHistory)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA, nativeInputLaunch?.name)
@@ -1705,6 +1715,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
         private const val DUCK_CHAT_SESSION_ACTIVE = "DUCK_CHAT_SESSION_ACTIVE"
         private const val DUCK_CHAT_FORCE_IMAGE_GENERATION = "DUCK_CHAT_FORCE_IMAGE_GENERATION"
+        private const val DUCK_CHAT_VOICE = "DUCK_CHAT_VOICE"
         private const val NATIVE_INPUT_LAUNCH_ACTION_EXTRA = "NATIVE_INPUT_LAUNCH_ACTION_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40

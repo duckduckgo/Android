@@ -72,6 +72,26 @@ class AppBrowserNavTest {
     }
 
     @Test
+    fun whenOpenDuckChatWithVoiceFromWidgetThenIntentIsVoiceLaunchWithoutUrl() {
+        val intent = testee.openDuckChat(context, launch = DuckChatLaunch.Voice(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+
+        assertTrue(intent.getBooleanExtra("OPEN_DUCK_CHAT_EXTRA", false))
+        assertTrue(intent.getBooleanExtra("DUCK_CHAT_VOICE", false))
+        assertNull(intent.getStringExtra("DUCK_CHAT_URL"))
+        assertNull(intent.getStringExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA))
+        assertTrue(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, false))
+        assertEquals(DuckAiWidget.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
+        assertEquals("WIDGET_DUCK_AI", intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithOpenThenIntentIsNotVoice() {
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.Open())
+
+        assertFalse(intent.getBooleanExtra("DUCK_CHAT_VOICE", false))
+    }
+
+    @Test
     fun whenOpenDuckChatWithOpenThenIntentIsPlainDuckChatLaunch() {
         val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.Open())
 

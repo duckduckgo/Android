@@ -65,12 +65,12 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     @Test
-    fun whenVoiceActionTappedThenLaunchesVoiceChatUrl() = runTest {
+    fun whenVoiceActionTappedThenLaunchesVoiceWithoutUrl() = runTest {
         stubDuckAi(enabled = true)
 
         val launched = populateAndCaptureClickIntent(R.id.actionVoice)
 
-        assertLaunch(launched, url = VOICE_URL)
+        assertLaunch(launched, url = null, launch = DuckChatLaunch.Voice::class)
     }
 
     @Test
@@ -118,7 +118,6 @@ class DuckAiWidgetConfiguratorTest {
 
     private fun stubDuckAi(enabled: Boolean) {
         whenever(duckChat.isEnabled()).thenReturn(enabled)
-        whenever(duckChat.getVoiceDuckChatUrl()).thenReturn(VOICE_URL)
     }
 
     private suspend fun populateAndCaptureClickIntent(viewId: Int): Intent {
@@ -129,6 +128,5 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     private companion object {
-        const val VOICE_URL = "https://duck.ai/?mode=voice-mode"
     }
 }
