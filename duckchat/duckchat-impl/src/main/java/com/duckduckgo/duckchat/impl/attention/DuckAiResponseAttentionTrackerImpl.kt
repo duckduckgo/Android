@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.attention
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -25,7 +24,6 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.attention.PendingResponse.ScreenChange
 import com.duckduckgo.duckchat.impl.attention.ResponseAttentionEvent.LeftWhileGenerating
 import com.duckduckgo.duckchat.impl.attention.ResponseAttentionEvent.Returned
@@ -146,23 +144,13 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
             is Action.NativePromptSubmitted -> startResponse(action.tabId, action.browserMode)
             is Action.ResponseState -> applyResponseState(action.tabId, action.status)
             is Action.StopTapped -> responses.firstOrNull { it.isOnScreenIn(action.tabId) }?.done = true
-            is Action.ClearChats -> action.types.forEach { abort(clearedBy(it)) }
+            is Action.ClearChats -> action.types.forEach { abort(responses.clearedBy(it, duckChat)) }
             is Action.PageDeletedChats -> abort(
                 responses.filter {
                     it.browserMode == action.browserMode && (action.chatId == null || it.chatId == action.chatId)
                 },
             )
         }
-    }
-
-    private fun clearedBy(type: ClearableData): List<AttentionPendingResponse> = when (type) {
-        is ClearableData.DuckChats.All -> responses.toList()
-        is ClearableData.DuckChats.AllForMode -> responses.filter { it.browserMode == type.mode }
-        is ClearableData.DuckChats.SelectedForMode -> {
-            val chatIds = type.chatUrls.mapNotNull { it.toUri().toChatIdOrNull(duckChat) }.toSet()
-            responses.filter { it.browserMode == type.mode && it.chatId in chatIds }
-        }
-        else -> emptyList()
     }
 
     private suspend fun abort(aborted: List<AttentionPendingResponse>) {
@@ -256,8 +244,8 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
     private class AttentionPendingResponse(
         val id: Long,
         tabId: String,
-        val browserMode: BrowserMode,
-    ) : PendingResponse(tabId) {
+        browserMode: BrowserMode,
+    ) : PendingResponse(tabId, browserMode) {
         /** True from [LeftWhileGenerating] until [Returned]. [StatusWhileAway] and [TrackingAborted] are sent only while it is true. */
         var away = false
 

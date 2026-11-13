@@ -16,6 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.attention
 
+import androidx.core.net.toUri
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.toChatIdOrNull
+
 /**
  * A response the user is waiting for, with the tab and chat it belongs to, and whether the user is looking at it.
  * Requires integration with [DuckAiChatVisibility.onScreen] through [updateOnScreen].
@@ -23,6 +29,7 @@ package com.duckduckgo.duckchat.impl.attention
  */
 internal open class PendingResponse(
     tabId: String,
+    val browserMode: BrowserMode,
     chatId: String? = null,
     chatSwitchedAway: Boolean = false,
 ) {
@@ -78,4 +85,15 @@ internal open class PendingResponse(
 internal fun <T : PendingResponse> Iterable<T>.describedByStatusFrom(tabId: String): T? {
     val candidates = filter { it.tabId == tabId && !it.chatSwitchedAway }
     return candidates.firstOrNull { it.onScreen } ?: candidates.firstOrNull()
+}
+
+/** Returns the responses whose chats [type] deletes. */
+internal fun <T : PendingResponse> Iterable<T>.clearedBy(type: ClearableData, duckChat: DuckChat): List<T> = when (type) {
+    is ClearableData.DuckChats.All -> toList()
+    is ClearableData.DuckChats.AllForMode -> filter { it.browserMode == type.mode }
+    is ClearableData.DuckChats.SelectedForMode -> {
+        val chatIds = type.chatUrls.mapNotNull { it.toUri().toChatIdOrNull(duckChat) }.toSet()
+        filter { it.browserMode == type.mode && it.chatId in chatIds }
+    }
+    else -> emptyList()
 }
