@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Hiljutised</string>
     <string name="duck_ai_chat_history_untitled">Pealkirjata vestlus</string>
     <string name="duck_ai_chat_history_empty_title">Ei ole veel ühtegi vestlust</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Ava Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Veel valikuid</string>
     <string name="duck_ai_chat_history_action_select">Vali</string>
     <string name="duck_ai_chat_history_action_pin">Kinnita</string>

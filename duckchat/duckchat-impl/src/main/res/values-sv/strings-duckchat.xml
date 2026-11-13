@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Senaste</string>
     <string name="duck_ai_chat_history_untitled">Chatt utan titel</string>
     <string name="duck_ai_chat_history_empty_title">Inga chattar ännu</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Öppna Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Fler alternativ</string>
     <string name="duck_ai_chat_history_action_select">Välj</string>
     <string name="duck_ai_chat_history_action_pin">Fäst</string>

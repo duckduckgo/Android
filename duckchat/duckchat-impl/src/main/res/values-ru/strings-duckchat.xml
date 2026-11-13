@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Недавние</string>
     <string name="duck_ai_chat_history_untitled">Чат без названия</string>
     <string name="duck_ai_chat_history_empty_title">Пока нет чатов</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Открыть Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Другие параметры</string>
     <string name="duck_ai_chat_history_action_select">Выбрать</string>
     <string name="duck_ai_chat_history_action_pin">Закрепить</string>

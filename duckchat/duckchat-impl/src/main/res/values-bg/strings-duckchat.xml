@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Последни</string>
     <string name="duck_ai_chat_history_untitled">Чат без заглавие</string>
     <string name="duck_ai_chat_history_empty_title">Все още няма чатове</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Отваряне на Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Още опции</string>
     <string name="duck_ai_chat_history_action_select">Избор</string>
     <string name="duck_ai_chat_history_action_pin">Добавяне като отметка</string>

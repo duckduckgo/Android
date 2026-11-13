@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Son</string>
     <string name="duck_ai_chat_history_untitled">Başlıksız sohbet</string>
     <string name="duck_ai_chat_history_empty_title">Henüz sohbet yok</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Duck.ai\'ı aç</string>
     <string name="duck_ai_chat_history_more_options">Diğer seçenekler</string>
     <string name="duck_ai_chat_history_action_select">Seç</string>
     <string name="duck_ai_chat_history_action_pin">Sabitleyin</string>

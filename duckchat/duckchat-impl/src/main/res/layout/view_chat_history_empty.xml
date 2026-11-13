@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_5"
             android:layout_marginTop="@dimen/keyline_5"
-            android:text="@string/duck_ai_chat_history_empty_cta_open"
+            android:text="@string/browserMenuNewChat"
             app:daxButtonSize="large"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Nylige</string>
     <string name="duck_ai_chat_history_untitled">Chat uten tittel</string>
     <string name="duck_ai_chat_history_empty_title">Ingen chatter ennå</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Åpne Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Flere alternativer</string>
     <string name="duck_ai_chat_history_action_select">Velg</string>
     <string name="duck_ai_chat_history_action_pin">Fest</string>

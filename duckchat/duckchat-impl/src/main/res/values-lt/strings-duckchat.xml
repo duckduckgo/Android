@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Naujausi</string>
     <string name="duck_ai_chat_history_untitled">Pokalbis be pavadinimo</string>
     <string name="duck_ai_chat_history_empty_title">Pokalbių dar nėra</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Atidaryti „Duck.ai“</string>
     <string name="duck_ai_chat_history_more_options">Daugiau parinkčių</string>
     <string name="duck_ai_chat_history_action_select">Pasirinkti</string>
     <string name="duck_ai_chat_history_action_pin">Prisegti</string>

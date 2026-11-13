@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Nedávné</string>
     <string name="duck_ai_chat_history_untitled">Chat bez názvu</string>
     <string name="duck_ai_chat_history_empty_title">Zatím žádné chaty</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Spustit Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Další možnosti</string>
     <string name="duck_ai_chat_history_action_select">Zvolit</string>
     <string name="duck_ai_chat_history_action_pin">Připnout</string>
