@@ -1488,6 +1488,7 @@ private class FakeDuckAiModelManager : DuckAiModelManager {
     }
 
     override suspend fun selectModel(model: AIChatModel) = Unit
+    override suspend fun ensureImageCapableModelSelected(): Boolean = false
     override suspend fun selectProvider(provider: ModelProvider) = Unit
     override suspend fun selectReasoningMode(mode: ReasoningMode) = Unit
     override suspend fun setChatScopedReasoningMode(mode: ReasoningMode?) = Unit

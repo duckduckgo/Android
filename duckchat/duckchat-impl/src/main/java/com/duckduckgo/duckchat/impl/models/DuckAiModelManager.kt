@@ -74,6 +74,12 @@ interface DuckAiModelManager {
     suspend fun selectModel(model: AIChatModel)
 
     /**
+     * Switches to the first accessible image-capable model unless the selected one already is.
+     * Returns false when no such model exists.
+     */
+    suspend fun ensureImageCapableModelSelected(): Boolean
+
+    /**
      * Pins the user to a provider rather than to one of its models, so they keep following the
      * server-side default within it. Replaces any earlier [selectModel] pick.
      */
@@ -297,6 +303,17 @@ class RealDuckAiModelManager @Inject constructor(
                 logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
             }
         }
+    }
+
+    override suspend fun ensureImageCapableModelSelected(): Boolean {
+        val state = _modelState.value
+        val selectedModel = state.models.firstOrNull { it.id == state.selectedModelId }
+        if (selectedModel?.supportsTool(Tool.IMAGE_GENERATION) == true) return true
+        val imageCapableModel = state.models.firstOrNull {
+            it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
+        } ?: return false
+        selectModel(imageCapableModel)
+        return true
     }
 
     override suspend fun selectProvider(provider: ModelProvider) {
