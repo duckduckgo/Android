@@ -86,7 +86,7 @@ interface PlayBillingManager {
     )
 
     /**
-     * Launches the billing flow to buy the current plan again, without purchase metrics
+     * Launches the billing flow to buy the current canceled (not expired) plan again
      */
     suspend fun launchCancellationUndoFlow(
         activity: Activity,
@@ -498,9 +498,6 @@ sealed class PurchaseState {
     data class Failure(val errorType: String) : PurchaseState()
 }
 
-/**
- * The kind of billing flow, so each one only reports its own metrics
- */
 enum class BillingFlowType {
     PURCHASE,
     PLAN_SWITCH,
