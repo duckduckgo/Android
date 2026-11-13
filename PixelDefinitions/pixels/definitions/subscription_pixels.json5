@@ -48,46 +48,137 @@
             }
         ]
     },
-    "subscription_onboarding_step_shown": {
-        "description": "Fired when a native subscription onboarding step screen is shown",
+    "subscription_onboarding_step_shown_intro": {
+        "description": "Fired when the intro step of the native subscription onboarding is shown",
         "owners": ["nalcalag"],
-        "triggers": ["other"],
-        "suffixes": [
-            {
-                "description": "The onboarding step that was shown",
-                "type": "string"
-            },
-            "count_short",
-            "form_factor"
-        ],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion", "freeTrial"]
     },
-    "subscription_onboarding_step_completed": {
-        "description": "Fired when a native subscription onboarding step is completed by the user",
+    "subscription_onboarding_step_shown_features_summary": {
+        "description": "Fired when the features summary step of the native subscription onboarding is shown",
         "owners": ["nalcalag"],
-        "triggers": ["other"],
-        "suffixes": [
-            {
-                "description": "The onboarding step that was completed",
-                "type": "string"
-            },
-            "count_short",
-            "form_factor"
-        ],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion", "freeTrial"]
     },
-    "subscription_onboarding_step_skipped": {
-        "description": "Fired when a native subscription onboarding step is skipped by the user",
+    "subscription_onboarding_step_shown_vpn": {
+        "description": "Fired when the VPN step of the native subscription onboarding is shown",
         "owners": ["nalcalag"],
-        "triggers": ["other"],
-        "suffixes": [
-            {
-                "description": "The onboarding step that was skipped",
-                "type": "string"
-            },
-            "count_short",
-            "form_factor"
-        ],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_shown_idtr": {
+        "description": "Fired when the Identity Theft Restoration step of the native subscription onboarding is shown",
+        "owners": ["nalcalag"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_shown_duck_ai": {
+        "description": "Fired when the Duck.ai step of the native subscription onboarding is shown",
+        "owners": ["nalcalag"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_shown_pir": {
+        "description": "Fired when the Personal Information Removal step of the native subscription onboarding is shown",
+        "owners": ["nalcalag"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_shown_completion": {
+        "description": "Fired when the completion step of the native subscription onboarding is shown",
+        "owners": ["nalcalag"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_completed_intro": {
+        "description": "Fired when the intro step of the native subscription onboarding is completed by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_completed_features_summary": {
+        "description": "Fired when the features summary step of the native subscription onboarding is completed by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_completed_vpn": {
+        "description": "Fired when the VPN step of the native subscription onboarding is completed by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_completed_idtr": {
+        "description": "Fired when the Identity Theft Restoration step of the native subscription onboarding is completed by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_completed_duck_ai": {
+        "description": "Fired when the Duck.ai step of the native subscription onboarding is completed by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_completed_pir": {
+        "description": "Fired when the Personal Information Removal step of the native subscription onboarding is completed by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_skipped_intro": {
+        "description": "Fired when the intro step of the native subscription onboarding is skipped by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_skipped_features_summary": {
+        "description": "Fired when the features summary step of the native subscription onboarding is skipped by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_skipped_vpn": {
+        "description": "Fired when the VPN step of the native subscription onboarding is skipped by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_skipped_idtr": {
+        "description": "Fired when the Identity Theft Restoration step of the native subscription onboarding is skipped by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_skipped_duck_ai": {
+        "description": "Fired when the Duck.ai step of the native subscription onboarding is skipped by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_onboarding_step_skipped_pir": {
+        "description": "Fired when the Personal Information Removal step of the native subscription onboarding is skipped by the user",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion", "freeTrial"]
     },
     "subscription_webview_render_process_crash": {
