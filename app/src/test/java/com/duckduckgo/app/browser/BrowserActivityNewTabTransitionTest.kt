@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.browser.navigation.AppBrowserNav
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
@@ -53,6 +54,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.InputMode
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -121,6 +123,7 @@ class BrowserActivityNewTabTransitionTest {
         setField("viewModel\$delegate", lazyOf(viewModel))
         setField("binding\$delegate", bindingDelegate())
         setField("pendingInputModeTargets", mutableMapOf<String, InputMode>())
+        setField("pendingNativeInputLaunches", mutableMapOf<String, NativeInputLaunch>())
         setField("externalLaunchTabIds", mutableSetOf<String>())
         setField("newTabTransitionConfig", NewTabTransitionConfig.DEFAULT)
         whenever(adapter.itemCount).thenAnswer { listed.size }
@@ -421,6 +424,25 @@ class BrowserActivityNewTabTransitionTest {
     }
 
     @Test
+    fun nativeInputLaunchIsStoredForTheNewTabAndConsumedOnce() {
+        processIntentWhileOnScreen(duckAiIntent(launch = DuckChatLaunch.ImageGeneration()))
+
+        assertNull(browser.consumeNativeInputLaunchForTab(OTHER))
+        assertEquals(NativeInputLaunch.IMAGE_GENERATION, browser.consumeNativeInputLaunchForTab(ADDED))
+        assertNull(browser.consumeNativeInputLaunchForTab(ADDED))
+    }
+
+    @Test
+    fun nativeInputLaunchIsStoredForTheNewTabAndConsumedOnceWithSwipingOff() {
+        swiping = false
+        processIntentWhileOnScreen(duckAiIntent(launch = DuckChatLaunch.CameraCapture()))
+
+        assertNull(browser.consumeNativeInputLaunchForTab(OTHER))
+        assertEquals(NativeInputLaunch.CAMERA_CAPTURE, browser.consumeNativeInputLaunchForTab(ADDED))
+        assertNull(browser.consumeNativeInputLaunchForTab(ADDED))
+    }
+
+    @Test
     fun duckAiChatFromAWidgetDoesNotGrowIn() {
         processIntentWhileOnScreen(BrowserActivity.intent(host, SearchWidgetDuckAi, openDuckChat = true, duckChatUrl = URL))
         assertTabOpened()
@@ -507,11 +529,14 @@ class BrowserActivityNewTabTransitionTest {
         verify(pending, never()).register(any(), any())
     }
 
-    private fun duckAiIntent(textSelection: String? = null): Intent = AppBrowserNav().openDuckChat(
+    private fun duckAiIntent(
+        textSelection: String? = null,
+        launch: DuckChatLaunch = textSelection?.let { DuckChatLaunch.TextSelection(it) } ?: DuckChatLaunch.Open(),
+    ): Intent = AppBrowserNav().openDuckChat(
         context = host,
         hasSessionActive = false,
         duckChatUrl = URL,
-        launch = textSelection?.let { DuckChatLaunch.TextSelection(it) } ?: DuckChatLaunch.Open(),
+        launch = launch,
     )
 
     // The browser on screen is paused while it gets an intent.
