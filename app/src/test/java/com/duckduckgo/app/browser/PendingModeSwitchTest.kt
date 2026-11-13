@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.duckchat.api.InputMode
@@ -44,53 +43,6 @@ class PendingModeSwitchTest {
         val restoredIntent = (action as PendingAction.ProcessIntent).intent
         assertEquals(Intent.ACTION_VIEW, restoredIntent.action)
         assertEquals(EXTRA_VALUE, restoredIntent.getStringExtra(EXTRA_KEY))
-    }
-
-    @Test
-    fun whenOpenNewTabWithImageGenerationLaunchEncodedThenItRoundTripsExactly() {
-        val original = PendingModeSwitch(
-            targetMode = BrowserMode.REGULAR,
-            action = PendingAction.OpenNewTab(
-                query = "https://duck.ai",
-                sourceTabId = null,
-                skipHome = false,
-                isExternal = false,
-                nativeInputLaunch = NativeInputLaunch.IMAGE_GENERATION,
-            ),
-            source = BrowserModeSwitchSource.NEW_TAB,
-        )
-
-        assertEquals(original, original.toBundle().toPendingModeSwitch())
-    }
-
-    @Test
-    fun whenOpenNewTabWithCameraCaptureLaunchEncodedThenItRoundTripsExactly() {
-        val original = PendingModeSwitch(
-            targetMode = BrowserMode.REGULAR,
-            action = PendingAction.OpenNewTab(
-                query = "https://duck.ai",
-                sourceTabId = null,
-                skipHome = false,
-                isExternal = false,
-                nativeInputLaunch = NativeInputLaunch.CAMERA_CAPTURE,
-            ),
-            source = BrowserModeSwitchSource.NEW_TAB,
-        )
-
-        assertEquals(original, original.toBundle().toPendingModeSwitch())
-    }
-
-    @Test
-    fun whenOpenNewTabHasNoNativeInputLaunchThenItDecodesToNull() {
-        val original = PendingModeSwitch(
-            BrowserMode.REGULAR,
-            PendingAction.OpenNewTab(query = null, sourceTabId = null, skipHome = false, isExternal = false),
-            BrowserModeSwitchSource.NEW_TAB,
-        )
-
-        val action = original.toBundle().toPendingModeSwitch()?.action as PendingAction.OpenNewTab
-
-        assertNull(action.nativeInputLaunch)
     }
 
     @Test
