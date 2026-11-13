@@ -86,6 +86,7 @@
                 tools:ignore="ContentDescription, UseAppTint" />
 
             <TextView
+                android:id="@+id/labelVoice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_2"
@@ -120,6 +121,7 @@
                 tools:ignore="ContentDescription, UseAppTint" />
 
             <TextView
+                android:id="@+id/labelCreateImage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_2"
@@ -154,6 +156,7 @@
                 tools:ignore="ContentDescription, UseAppTint" />
 
             <TextView
+                android:id="@+id/labelTakePhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_2"

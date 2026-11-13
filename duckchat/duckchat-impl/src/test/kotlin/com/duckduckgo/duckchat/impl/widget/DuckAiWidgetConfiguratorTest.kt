@@ -19,6 +19,7 @@ import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.SizeF
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -349,19 +350,27 @@ class DuckAiWidgetConfiguratorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenApi31AndPrefOnThenSizeMapWithCompactAndFullVariantsBothWired() = runTest {
+    fun whenApi31AndPrefOnThenSizeMapHasWidthAndHeightVariantsAllWired() = runTest {
         stubDuckAi(enabled = true, historyAvailable = true)
 
         val views = testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 50)
 
-        val variants = sizedVariants(views)
-        assertEquals(2, variants.size)
+        val variants = sizedVariantsByKey(views)
         assertEquals(
-            setOf(View.GONE, View.VISIBLE),
-            variants.map { chatsSectionVisibility(it) }.toSet(),
+            setOf(
+                SizeF(180f, 110f),
+                SizeF(180f, MIN_CHATS_HEIGHT_DP.toFloat()),
+                SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 110f),
+                SizeF(MIN_LABELS_WIDTH_DP.toFloat(), MIN_CHATS_HEIGHT_DP.toFloat()),
+            ),
+            variants.keys,
         )
-        variants.forEach {
-            val root = it.apply(activity, FrameLayout(activity))
+        variants.forEach { (size, variant) ->
+            val root = variant.apply(activity, FrameLayout(activity))
+            val expectedLabels = if (size.width >= MIN_LABELS_WIDTH_DP) View.VISIBLE else View.GONE
+            val expectedChats = if (size.height >= MIN_CHATS_HEIGHT_DP) View.VISIBLE else View.GONE
+            assertEquals(expectedChats, root.findViewById<View>(R.id.chatsSection).visibility)
+            labelIds.forEach { assertEquals(expectedLabels, root.findViewById<View>(it).visibility) }
             listOf(R.id.promptBarContainer, R.id.actionVoice, R.id.actionCreateImage, R.id.actionTakePhoto).forEach { id ->
                 assertTrue(root.findViewById<View>(id).hasOnClickListeners())
             }
@@ -370,15 +379,57 @@ class DuckAiWidgetConfiguratorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenApi31AndPrefOffThenOnlyCompactVariant() = runTest {
+    fun whenApi31AndPrefOffThenOnlyNarrowAndWideCompactVariants() = runTest {
         stubDuckAi(enabled = true, historyAvailable = true)
         whenever(widgetPreferences.showRecentChats(APP_WIDGET_ID)).thenReturn(false)
 
         val views = testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400)
 
-        assertTrue(sizedVariants(views).isEmpty())
-        assertEquals(View.GONE, chatsSectionVisibility(views))
+        val variants = sizedVariantsByKey(views)
+        assertEquals(setOf(SizeF(180f, 110f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 110f)), variants.keys)
+        variants.values.forEach { assertEquals(View.GONE, chatsSectionVisibility(it)) }
     }
+
+    @Test
+    fun whenWidthBelowThresholdThenLabelsHiddenAndPillsDescribed() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = false)
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews, widthDp = MIN_LABELS_WIDTH_DP - 1)
+
+        labelIds.forEach { verify(remoteViews).setViewVisibility(it, View.GONE) }
+        verify(remoteViews).setContentDescription(R.id.actionVoice, "Voice")
+        verify(remoteViews).setContentDescription(R.id.actionCreateImage, "Image")
+        verify(remoteViews).setContentDescription(R.id.actionTakePhoto, "Camera")
+        verify(remoteViews).setOnClickPendingIntent(eq(R.id.actionVoice), any())
+    }
+
+    @Test
+    fun whenWidthAtThresholdThenLabelsShownWithoutPillDescription() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = false)
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews, widthDp = MIN_LABELS_WIDTH_DP)
+
+        labelIds.forEach { verify(remoteViews).setViewVisibility(it, View.VISIBLE) }
+        verify(remoteViews).setContentDescription(R.id.actionVoice, null)
+        verify(remoteViews).setContentDescription(R.id.actionCreateImage, null)
+        verify(remoteViews).setContentDescription(R.id.actionTakePhoto, null)
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun whenBelowApi31ThenSingleVariantFollowsWidth() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+
+        val narrow = testee.createRemoteViews(activity, APP_WIDGET_ID, 400, MIN_LABELS_WIDTH_DP - 1).apply(activity, FrameLayout(activity))
+        val wide = testee.createRemoteViews(activity, APP_WIDGET_ID, 400, MIN_LABELS_WIDTH_DP).apply(activity, FrameLayout(activity))
+
+        labelIds.forEach {
+            assertEquals(View.GONE, narrow.findViewById<View>(it).visibility)
+            assertEquals(View.VISIBLE, wide.findViewById<View>(it).visibility)
+        }
+    }
+
+    private val labelIds = listOf(R.id.labelVoice, R.id.labelCreateImage, R.id.labelTakePhoto)
 
     private fun chatsSectionVisibility(views: RemoteViews) = views.apply(
         activity,
@@ -390,6 +441,12 @@ class DuckAiWidgetConfiguratorTest {
         val field = RemoteViews::class.java.getDeclaredField("mSizedRemoteViews").apply { isAccessible = true }
         return (field.get(views) as List<RemoteViews>?).orEmpty()
     }
+
+    private fun sizedVariantsByKey(views: RemoteViews): Map<SizeF, RemoteViews> =
+        sizedVariants(views).associateBy { variant ->
+            val field = RemoteViews::class.java.getDeclaredField("mIdealSize").apply { isAccessible = true }
+            field.get(variant) as SizeF
+        }
 
     @Test
     fun whenAllTargetsBuiltThenRequestCodesAreDistinct() {

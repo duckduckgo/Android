@@ -50,6 +50,22 @@ enum class DuckAiWidgetTarget(val requestCode: Int) {
  */
 const val MIN_CHATS_HEIGHT_DP = 280
 
+/**
+ * Widget width from which the action pills show their labels next to the icons; narrower widgets show icons only.
+ * Three equal-width pills need ~93dp each for the widest label ("Camera", ~48dp text at 14sp, plus the icon and 8dp paddings and gaps),
+ * so ~325dp of host width including the row padding. Launchers report ~7dp more than the host view, hence 336dp (a 4-column widget
+ * reported 342dp on a 384dp-wide phone; narrower phones fall back to icons only instead of truncating the labels).
+ */
+const val MIN_LABELS_WIDTH_DP = 336
+
+private class ActionPill(val pillId: Int, val labelId: Int, val labelRes: Int)
+
+private val ACTION_PILLS = listOf(
+    ActionPill(R.id.actionVoice, R.id.labelVoice, R.string.duckAiWidgetVoiceAction),
+    ActionPill(R.id.actionCreateImage, R.id.labelCreateImage, R.string.duckAiWidgetImageAction),
+    ActionPill(R.id.actionTakePhoto, R.id.labelTakePhoto, R.string.duckAiWidgetCameraAction),
+)
+
 private const val MIN_WIDTH_DP = 180f
 private const val MIN_HEIGHT_DP = 110f
 
@@ -66,17 +82,46 @@ class DuckAiWidgetConfigurator @Inject constructor(
         context: Context,
         appWidgetId: Int,
         heightDp: Int,
+        widthDp: Int = Int.MAX_VALUE,
     ): RemoteViews {
         val loaded = load(appWidgetId)
-        if (Build.VERSION.SDK_INT >= 31 && loaded.showChats) {
-            val compact = RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight)
-            val full = RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight)
-            render(context, appWidgetId, compact, loaded, showChats = false)
-            render(context, appWidgetId, full, loaded, showChats = true)
-            return RemoteViews(mapOf(SizeF(MIN_WIDTH_DP, MIN_HEIGHT_DP) to compact, SizeF(MIN_WIDTH_DP, MIN_CHATS_HEIGHT_DP.toFloat()) to full))
+        if (Build.VERSION.SDK_INT >= 31) {
+            suspend fun variant(showLabels: Boolean, showChats: Boolean) =
+                RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight).also {
+                    render(
+                        context = context,
+                        appWidgetId = appWidgetId,
+                        remoteViews = it,
+                        loaded = loaded,
+                        showChats = showChats,
+                        showLabels = showLabels,
+                    )
+                }
+
+            val variants = buildMap {
+                put(SizeF(MIN_WIDTH_DP, MIN_HEIGHT_DP), variant(showLabels = false, showChats = false))
+                if (loaded.showChats) {
+                    put(SizeF(MIN_WIDTH_DP, MIN_CHATS_HEIGHT_DP.toFloat()), variant(showLabels = false, showChats = true))
+                }
+                put(SizeF(MIN_LABELS_WIDTH_DP.toFloat(), MIN_HEIGHT_DP), variant(showLabels = true, showChats = false))
+                if (loaded.showChats) {
+                    put(
+                        SizeF(MIN_LABELS_WIDTH_DP.toFloat(), MIN_CHATS_HEIGHT_DP.toFloat()),
+                        variant(showLabels = true, showChats = true),
+                    )
+                }
+            }
+            return RemoteViews(variants)
         }
         return RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight).also {
-            render(context, appWidgetId, it, loaded, showChats = loaded.showChats && heightDp >= MIN_CHATS_HEIGHT_DP)
+            render(
+                context = context,
+                appWidgetId = appWidgetId,
+                remoteViews = it,
+                loaded = loaded,
+                showChats = loaded.showChats && heightDp >= MIN_CHATS_HEIGHT_DP,
+                showLabels = widthDp >= MIN_LABELS_WIDTH_DP,
+            )
         }
     }
 
@@ -85,9 +130,17 @@ class DuckAiWidgetConfigurator @Inject constructor(
         appWidgetId: Int,
         remoteViews: RemoteViews,
         heightDp: Int = Int.MAX_VALUE,
+        widthDp: Int = Int.MAX_VALUE,
     ) {
         val loaded = load(appWidgetId)
-        render(context, appWidgetId, remoteViews, loaded, showChats = loaded.showChats && heightDp >= MIN_CHATS_HEIGHT_DP)
+        render(
+            context = context,
+            appWidgetId = appWidgetId,
+            remoteViews = remoteViews,
+            loaded = loaded,
+            showChats = loaded.showChats && heightDp >= MIN_CHATS_HEIGHT_DP,
+            showLabels = widthDp >= MIN_LABELS_WIDTH_DP,
+        )
     }
 
     private suspend fun load(appWidgetId: Int): Loaded {
@@ -105,10 +158,12 @@ class DuckAiWidgetConfigurator @Inject constructor(
         remoteViews: RemoteViews,
         loaded: Loaded,
         showChats: Boolean,
+        showLabels: Boolean,
     ) {
         val state = loaded.state
         withContext(dispatcherProvider.main()) {
             if (Build.VERSION.SDK_INT >= 31) fitCardToContent(remoteViews, !showChats)
+            showActionLabels(context, remoteViews, showLabels)
             remoteViews.setViewVisibility(R.id.chatsSection, if (showChats) View.VISIBLE else View.GONE)
             if (state == null) {
                 logcat { "DuckAiWidgetProvider Duck.ai disabled, click targets not wired" }
@@ -138,6 +193,18 @@ class DuckAiWidgetConfigurator @Inject constructor(
     private fun fitCardToContent(remoteViews: RemoteViews, fit: Boolean) {
         val height = if (fit) ViewGroup.LayoutParams.WRAP_CONTENT else ViewGroup.LayoutParams.MATCH_PARENT
         remoteViews.setViewLayoutHeight(R.id.duckAiWidgetContainer, height.toFloat(), TypedValue.COMPLEX_UNIT_PX)
+    }
+
+    /** Icon-only pills stay accessible through the pill's content description; with labels shown the label itself is announced. */
+    private fun showActionLabels(
+        context: Context,
+        remoteViews: RemoteViews,
+        showLabels: Boolean,
+    ) {
+        ACTION_PILLS.forEach { pill ->
+            remoteViews.setViewVisibility(pill.labelId, if (showLabels) View.VISIBLE else View.GONE)
+            remoteViews.setContentDescription(pill.pillId, if (showLabels) null else context.getString(pill.labelRes))
+        }
     }
 
     private suspend fun loadState(showChats: Boolean): State {
