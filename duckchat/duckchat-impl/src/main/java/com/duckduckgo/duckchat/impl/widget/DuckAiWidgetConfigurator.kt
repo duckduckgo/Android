@@ -46,6 +46,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
     private val repository: DuckChatFeatureRepository,
     private val duckChat: DuckChatInternal,
     private val chats: DuckAiChatsWidgetChats,
+    private val widgetPreferences: DuckAiWidgetPreferences,
     private val intents: DuckAiWidgetIntents,
     private val dispatcherProvider: DispatcherProvider,
 ) {
@@ -56,12 +57,29 @@ class DuckAiWidgetConfigurator @Inject constructor(
         appWidgetId: Int,
         remoteViews: RemoteViews,
     ) {
+        val loaded = load(appWidgetId)
+        render(context, appWidgetId, remoteViews, loaded, showChats = loaded.showChats)
+    }
+
+    private suspend fun load(appWidgetId: Int): Loaded {
+        val showChats = widgetPreferences.showRecentChats(appWidgetId)
         val state = withContext(dispatcherProvider.io()) {
             if (!(duckChatFeature.self().isEnabled() && repository.isDuckChatUserEnabled())) return@withContext null
-            loadState()
+            loadState(showChats)
         }
+        return Loaded(showChats, state)
+    }
 
+    private suspend fun render(
+        context: Context,
+        appWidgetId: Int,
+        remoteViews: RemoteViews,
+        loaded: Loaded,
+        showChats: Boolean,
+    ) {
+        val state = loaded.state
         withContext(dispatcherProvider.main()) {
+            remoteViews.setViewVisibility(R.id.chatsSection, if (showChats) View.VISIBLE else View.GONE)
             if (state == null) {
                 logcat { "DuckAiWidgetProvider Duck.ai disabled, click targets not wired" }
                 remoteViews.setViewVisibility(R.id.chatsViewAllContainer, View.GONE)
@@ -74,13 +92,20 @@ class DuckAiWidgetConfigurator @Inject constructor(
                 intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl, widgetLaunch),
             )
             wireActions(context, remoteViews, state)
-            wireViewAllChats(context, remoteViews, state.chatHistoryAvailable)
-            renderChats(context, appWidgetId, remoteViews, state)
+            if (showChats) {
+                wireViewAllChats(context, remoteViews, state.chatHistoryAvailable)
+                renderChats(context, appWidgetId, remoteViews, state)
+            }
         }
     }
 
-    private suspend fun loadState(): State {
-        val historyAvailable = duckChat.isChatHistoryAvailable()
+    private class Loaded(
+        val showChats: Boolean,
+        val state: State?,
+    )
+
+    private suspend fun loadState(showChats: Boolean): State {
+        val historyAvailable = showChats && duckChat.isChatHistoryAvailable()
         val widgetChats = if (historyAvailable) runCatching { chats.getChats() }.getOrDefault(emptyList()) else emptyList()
         // Built once: the URL builders consume the one-shot address bar picker attribution.
         val newChatUrl = duckChat.getDuckChatUrl("", false)
