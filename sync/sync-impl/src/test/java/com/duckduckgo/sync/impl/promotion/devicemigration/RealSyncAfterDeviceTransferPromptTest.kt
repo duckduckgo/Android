@@ -117,7 +117,7 @@ class RealSyncAfterDeviceTransferPromptTest {
         override suspend fun markMigrationFlowCompleted() {
             flowPending = false
         }
-        override fun previousDeviceHadSync(): Boolean = migrated && previousDeviceHadSync
+        override suspend fun previousDeviceHadSync(): Boolean = migrated && previousDeviceHadSync
         override suspend fun isMigrationExperienceEnabled(): Boolean = experienceEnabled
 
         val done = mutableSetOf<String>()

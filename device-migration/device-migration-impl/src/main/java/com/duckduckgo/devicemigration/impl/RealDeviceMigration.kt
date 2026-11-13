@@ -108,9 +108,8 @@ class RealDeviceMigration @Inject constructor(
     // Only the restorer's finding decides, not the old phone's stamp that it was signed in: with no restore payload the user would
     // otherwise be left without Sync and without the suggestion, whose setup still offers to join the existing account. Until the
     // restorer has answered, it counts as "had Sync", so the suggestion never competes with a silent restore in progress.
-    override fun previousDeviceHadSync(): Boolean {
-        if (!detection.migrated) return false
-        return markerStore.local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true)
+    override suspend fun previousDeviceHadSync(): Boolean = withContext(dispatchers.io()) {
+        detection.migrated && markerStore.local.getBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true)
     }
 
     override suspend fun isMigrationExperienceEnabled(): Boolean = withContext(dispatchers.io()) {
