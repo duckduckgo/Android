@@ -76,13 +76,18 @@ interface AuthRepository {
     suspend fun removeLocalPurchasedAt()
     suspend fun setPendingPlans(pendingPlans: List<PendingPlan>)
     suspend fun getPendingPlans(): List<PendingPlan>
-    suspend fun saveTokensV2(accessToken: AccessToken, refreshToken: RefreshToken): Boolean
+    suspend fun saveTokensV2(
+        accessToken: AccessToken,
+        refreshToken: RefreshToken,
+        entitlements: List<Entitlement>,
+        account: Account,
+    ): Boolean
     suspend fun isTokenStoreAvailable(): Boolean
     suspend fun hasRefreshTokenV2Entry(): Boolean
     suspend fun getTokenRefreshHistory(): TokenRefreshHistory
     suspend fun recordTokenRefreshSuccess(at: Instant)
     suspend fun recordTokenRefreshFailure()
-    suspend fun clearTokenRefreshHistory()
+    suspend fun clearTokensAndHistory()
 }
 
 @BindingContainer
@@ -398,12 +403,20 @@ internal class RealAuthRepository constructor(
         } ?: emptyList()
     }
 
-    override suspend fun saveTokensV2(accessToken: AccessToken, refreshToken: RefreshToken): Boolean = withContext(dispatcherProvider.io()) {
+    override suspend fun saveTokensV2(
+        accessToken: AccessToken,
+        refreshToken: RefreshToken,
+        entitlements: List<Entitlement>,
+        account: Account,
+    ): Boolean = withContext(dispatcherProvider.io()) {
         val saved = subscriptionsDataStore.saveTokensV2(
             accessToken = accessToken.jwt,
             accessTokenExpiresAt = accessToken.expiresAt,
             refreshToken = refreshToken.jwt,
             refreshTokenExpiresAt = refreshToken.expiresAt,
+            entitlements = moshi.listToJson(entitlements),
+            email = account.email,
+            externalId = account.externalId,
         )
         if (saved) updateSerpPromoCookie()
         saved
@@ -435,10 +448,9 @@ internal class RealAuthRepository constructor(
         subscriptionsDataStore.tokenRefreshFailureStreak += 1
     }
 
-    override suspend fun clearTokenRefreshHistory() = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.tokenRefreshFailureStreak = 0
-        subscriptionsDataStore.lastTokenRefreshSuccessAt = null
-        subscriptionsDataStore.lastTokenRefreshProcess = null
+    override suspend fun clearTokensAndHistory() = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.clearTokensAndHistory()
+        updateSerpPromoCookie()
     }
 }
 

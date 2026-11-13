@@ -610,15 +610,10 @@ class RealSubscriptionsManager @Inject constructor(
                 coroutineScope.launch { authClient.tryLogout(accessTokenV2 = jwt) }
             }
         }
-        authRepository.setAccessTokenV2(null)
-        authRepository.setRefreshTokenV2(null)
-        authRepository.setAuthToken(null)
-        authRepository.setAccessToken(null)
-        authRepository.setAccount(null)
+        authRepository.clearTokensAndHistory()
         authRepository.setSubscription(null)
         authRepository.setEntitlements(emptyList())
         authRepository.removeLocalPurchasedAt()
-        authRepository.clearTokenRefreshHistory()
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
         _entitlements.emit(emptyList())
@@ -900,7 +895,7 @@ class RealSubscriptionsManager @Inject constructor(
                         newAccessToken
                     } catch (e: Exception) {
                         // Network errors say nothing about the token, so they do not count towards a stuck device
-                        if (e !is IOException && isSignedInV2()) {
+                        if (e !is IOException && !e.isServerError() && isSignedInV2()) {
                             authRepository.recordTokenRefreshFailure()
                         }
                         throw e
@@ -1127,13 +1122,13 @@ class RealSubscriptionsManager @Inject constructor(
                 authRepository.saveTokensV2(
                     accessToken = AccessToken(accessToken, accessTokenClaims.expiresAt),
                     refreshToken = RefreshToken(refreshToken, refreshTokenClaims.expiresAt),
+                    entitlements = accessTokenClaims.entitlements,
+                    account = Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId),
                 )
             } catch (e: Exception) {
                 throw TokenStoreException("Token pair write failed", e)
             }
             if (!saved) throw TokenStoreException("Token pair commit returned false")
-            authRepository.setEntitlements(accessTokenClaims.entitlements)
-            authRepository.setAccount(Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId))
             backgroundTokenRefresh.schedule()
         } catch (e: Exception) {
             pixelSender.reportAuthV2TokenStoreError()
@@ -1612,3 +1607,5 @@ data class PurchaseExperiments(
     val experiments: List<Experiment> = emptyList(),
     val legacyExperiment: Experiment? = null,
 )
+
+private fun Exception.isServerError(): Boolean = this is HttpException && code() >= 500
