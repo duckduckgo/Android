@@ -363,6 +363,25 @@ class DuckAiResponseWaitWideEventTest {
     }
 
     @Test
+    fun `when the prompt reaches the page after the app was backgrounded then left_via app_backgrounded and ready is not watched`() = runTest {
+        stubOpenFlowIds(1L)
+        onChat(tabId = "t1", chatId = null)
+        testee.onClose()
+        testee.onNativePromptSubmitted(tabId = "t1", browserMode = BrowserMode.REGULAR, reasoningEffort = null, selectedTool = null)
+        testee.onResponseState(tabId = "t1", status = "start_stream:new_prompt")
+        testee.onResponseState(tabId = "t1", status = "ready")
+        testee.onOpen(isFreshLaunch = false)
+        testee.onLaunchLandingResolved(tabId = "t1", url = "$DUCK_AI_URL?chatID=A")
+        idle()
+
+        verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "app_backgrounded")))
+        verify(wideEventClient).intervalEnd(eq(1L), eq("prompt_to_leave_ms_bucketed"))
+        verify(wideEventClient).flowStep(eq(1L), eq("response_ready_while_away"), eq(true), eq(emptyMap()))
+        verify(wideEventClient).flowStep(eq(1L), eq("returned"), eq(true), eq(emptyMap()))
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
     fun `when exit intent new_tab_opened then left_via new_tab_opened`() = runTest {
         promptInChat()
 

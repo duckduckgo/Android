@@ -48,6 +48,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
@@ -136,6 +137,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     chatStateStore: ChatStateStore,
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
+    private val attentionTracker: DuckAiResponseAttentionTracker,
     private val newChatHintsUsage: NewChatHintsUsage,
     private val newChatHintsPixels: NewChatHintsPixels,
     private val newChatDetector: NewChatDetector,
@@ -354,7 +356,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             )
         }
         inputOutcomeTracker.promptSubmitted(submitMethod)
-        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onNativePromptSubmitted(it, browserMode, reasoningEffort, rawTool) }
+        activeDuckAiTabId(surface)?.let {
+            responseWaitWideEvent.onNativePromptSubmitted(it, browserMode, reasoningEffort, rawTool)
+            attentionTracker.onNativePromptSubmitted(it, browserMode)
+        }
     }
 
     fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat(currentSurface())
@@ -369,7 +374,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun fireStopGenerationTapped() {
         val surface = currentSurface()
         duckChatPixels.fireStopGenerationTapped(surface)
-        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onStopTapped(it) }
+        activeDuckAiTabId(surface)?.let {
+            responseWaitWideEvent.onStopTapped(it)
+            attentionTracker.onStopTapped(it)
+        }
     }
 
     // The edit screen's synthetic key never matches a tab, so a flow started under it could only expire unwatched.

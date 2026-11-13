@@ -87,7 +87,7 @@ class DuckAiNativeStorageJsMessageHandlerModeTest {
     }
 
     private fun handlerForMode(mode: BrowserMode): JsMessageHandler =
-        DuckAiNativeStorageJsMessageHandler(provider, hostProvider, DuckAiMigrationPrefs(mock()), mock(), mode)
+        DuckAiNativeStorageJsMessageHandler(provider, hostProvider, DuckAiMigrationPrefs(mock()), mock(), mock(), mode)
             .getJsMessageHandler()
 
     private fun putChat(chatId: String): JsMessage =
