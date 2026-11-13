@@ -687,11 +687,10 @@ class DuckChatContextualWebViewFragment :
     // Matches Duck.ai by sitting next to the native input and hiding while it's focused. The web input is
     // drawn inside the WebView, so a native button can't sit beside it and falls back to the header.
     private fun renderFireButton() {
-        val isFireButtonEnabled = viewModel.viewState.value.isFireButtonEnabled
         val isNativeInputVisible = binding.contextualNativeInputCard.isVisible
         val isNativeInputFocused = binding.contextualNativeInputCard.widget.hasInputFocus()
-        if (isFireButtonEnabled && !isNativeInputVisible) binding.contextualFire.show() else binding.contextualFire.gone()
-        if (isFireButtonEnabled && isNativeInputVisible && !isNativeInputFocused) {
+        if (!isNativeInputVisible) binding.contextualFire.show() else binding.contextualFire.gone()
+        if (isNativeInputVisible && !isNativeInputFocused) {
             binding.contextualInputFire.show()
         } else {
             binding.contextualInputFire.gone()
