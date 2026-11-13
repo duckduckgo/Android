@@ -35,6 +35,8 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
 
@@ -127,6 +129,7 @@ class DuckAiWidgetUpdaterTest {
         chatsFlow.value = listOf(chat("a"), chat("b"))
 
         assertEquals(1, shadowOf(context).broadcastIntents.size)
+        verify(chatStore, times(1)).getChatsFlow()
     }
 
     @Test
