@@ -34,6 +34,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -388,6 +389,18 @@ class DuckAiResponseAttentionTrackerImplTest {
     }
 
     @Test
+    fun `when the chat comes on screen while the gate is off then a prompt after re-enabling starts on screen`() {
+        duckChatFeature.nativeChatInput().setRawStoredState(Toggle.State(enable = false))
+        onChat("t1", "A")
+        duckChatFeature.nativeChatInput().setRawStoredState(Toggle.State(enable = true))
+        testee.onNativePromptSubmitted(tabId = "t1", browserMode = BrowserMode.REGULAR)
+        status("start_stream:new_prompt")
+        switchToOtherSite()
+
+        assertEquals(listOf(LeftWhileGenerating(r())), listener.events)
+    }
+
+    @Test
     fun `when a listener throws then the other listener still gets this and later events`() {
         val throwing = RecordingListener().apply { failure = IllegalStateException("listener failure") }
         testee = createTestee(linkedSetOf(throwing, listener))
@@ -546,6 +559,8 @@ class DuckAiResponseAttentionTrackerImplTest {
         var failure: Exception? = null
 
         override suspend fun onEvent(event: ResponseAttentionEvent) {
+            // Suspends like a real listener would, so a test fails if onClearData returns before delivery.
+            yield()
             failure?.let { throw it }
             events += event
         }
