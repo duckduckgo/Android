@@ -26,6 +26,15 @@ interface VpnNetworkStack {
     val name: String
 
     /**
+     * `true` when [onPrepareVpn] makes network calls from this app, e.g. to register with a backend.
+     *
+     * While a tunnel that routes this app is up, those calls go through it. The VPN service then prepares this stack
+     * behind its null-route tunnel, which excludes this app, instead of restarting in place.
+     */
+    val needsNetworkToPrepare: Boolean
+        get() = false
+
+    /**
      *
      * @return `true` if the networking layer is successfully created, `false` otherwise
      */

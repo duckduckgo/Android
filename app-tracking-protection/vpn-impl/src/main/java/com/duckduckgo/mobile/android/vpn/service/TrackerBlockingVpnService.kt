@@ -322,7 +322,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
-        val restartInPlace = restarting && appTpRemoteFeatures.restartInPlace().isEnabled()
+        // Resolved once so the in-place decision, the wide event and the handover all see the same stack
+        val restartNetworkStack = if (restarting) vpnNetworkStackProvider.provideNetworkStack() else null
+        val restartInPlace = restartNetworkStack != null && appTpRemoteFeatures.restartInPlace().isEnabled() &&
+            VpnNetworkStackHandover.supportsInPlaceRestart(restartNetworkStack)
 
         if (!restarting) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
@@ -333,10 +336,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: skipping service callbacks while restarting" }
         }
 
-        if (restarting) {
+        if (restartNetworkStack != null) {
             // Every timed phase runs on the stack the restart brings up, which differs from the running one when a VPN feature was toggled
-            val nextStackName = vpnNetworkStackProvider.provideNetworkStack().name
-            vpnRestartWideEvent.onRestartStarted(networkStackName = nextStackName, inPlace = restartInPlace)
+            vpnRestartWideEvent.onRestartStarted(networkStackName = restartNetworkStack.name, inPlace = restartInPlace)
         }
 
         // An in-place restart prepares the next stack and establishes the new tunnel while the current tunnel is
@@ -345,7 +347,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         val handover = if (restartInPlace) {
             VpnNetworkStackHandover(
                 current = vpnNetworkStack,
-                next = vpnNetworkStackProvider.provideNetworkStack(),
+                next = restartNetworkStack!!,
             ).also { handover ->
                 logcat { "VPN log: in-place restart, ${if (handover.isSameStack) "reusing" else "switching to"} ${handover.next.name}" }
                 if (!handover.isSameStack) {
