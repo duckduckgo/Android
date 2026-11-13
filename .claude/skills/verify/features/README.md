@@ -1,45 +1,52 @@
 # DuckDuckGo Android verification map
 
-The maintained recipes for verifying user-facing behaviour of the internal debug build. Read this index,
-then the feature file that matches the change. Commands use `V=.claude/skills/verify/verify.sh` from
-`../SKILL.md`.
+Recipes for verifying user-facing behaviour of the internal debug build. The inventory of what exists is
+trapdoor's catalog, generated from this checkout's code; these files are the maintained recipes for the
+areas that have one. Commands use `V=.claude/skills/verify/verify.sh` from `../SKILL.md`.
 
 ## Baseline preconditions
 
-- `$V doctor` passes: emulator owned by this checkout, install newer than the APK, layout readable.
-- The app was launched from a fresh `$V boot` (wiped data) and the SKILL.md baseline ran: notification prompt denied, onboarding skipped, `inputField` visible on the New Tab Page.
-- Default settings: omnibar at the top, native input on (internal builds), one tab open.
-- Network access works. Use `privacy-test-pages.site` or `www.search-company.site` as targets; they are DDG controlled and stable.
+- `$V doctor` passes: emulator owned by this checkout, bridge and catalog match `HEAD`.
+- The app starts past onboarding with one tab on the New Tab Page. trapdoor prepares first-run state on install; if a previous recipe left tabs or data behind, `$V t reset` (only without asking on an emulator the run booted, see SKILL.md) and `$V t goto browser.newtab`.
+- Default settings: omnibar at the top, native input on (internal builds), light theme.
+- Web Content Debugging on (SKILL.md, Web content). Recipes prove page loads with `web eval`, so this is part of every baseline; `reset` clears it, so switch it on again after one.
+- Use `privacy-test-pages.site` and `www.search-company.site` as web targets; they are DDG controlled and stable.
 
 ## Driving conventions
 
-- Select by resource id first, text regex second; run `$V ui` after every screen change.
-- The browser screen and the New Tab Page use different ids for the same buttons (`fireIconMenu` vs `inputModeWidgetNavFire`), so check which screen you are on.
-- Page links and text appear in `android layout`; form fields, values and page state need `$V web eval` / `$V web tap` (SKILL.md, Web content).
+- Reach the starting state with `goto`, `browse` and `seed`; drive the step under test with `tap`, `type` and `web tap` on the entry points the file lists.
+- Select by `id:` first, then `text:` / `desc:`. Refs from `hierarchy` are fine within one screen but expire on any layout change.
+- The New Tab Page and a loaded page use different ids for the same toolbar buttons (`inputModeWidgetNavFire` vs `fireIconMenu`); run `$V t where --json` and `$V t hierarchy --interactive-only` when unsure.
 
 ## Proof and skip reporting
 
-- Every recipe runs inside `$V rec start <feature-id>` / `$V rec stop`, so each feature has a video.
-- Shot before and after the step under test, plus the `assert` or `web eval` lines, all from the same run id.
+- Every recipe runs inside `$V t record start <feature-id>.mp4` / `$V t record stop`, so each feature has a video.
+- Shot before and after the step under test (`$V t shot <name>.png`), plus the `assert` or `web eval` results, all in the same run id.
 - A mutation is proved through a second view (tab switcher, bookmarks list), not the screen that made it.
-- Report every entry point in the feature's list as verified, failed, or not attempted. Do not report an entry point as verified because another one worked.
+- Report every entry point in a file as verified, failed (command and exit code) or not attempted. Do not report one as verified because another worked.
 
 ## Features
 
-| File | Feature |
-|---|---|
-| [search-and-navigate.md](search-and-navigate.md) | Typing a URL or query in the native input and loading the result |
-| [tabs.md](tabs.md) | Tab switcher, opening and closing tabs |
-| [fire-button.md](fire-button.md) | Clearing tabs and site data |
-| [browser-menu.md](browser-menu.md) | Overflow menu entries: bookmarks, downloads, settings |
-| [web-forms.md](web-forms.md) | Links, form fields and submit inside a page |
-| [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history |
+| File | Feature | Catalog targets |
+|---|---|---|
+| [search-and-navigate.md](search-and-navigate.md) | Typing a URL or query and loading the result | `browser.newtab`, `browser.main` |
+| [tabs.md](tabs.md) | Tab switcher, opening, switching and closing tabs | `tabSwitcher`, `tabs.tab-switcher-menu`, `seed tabs` |
+| [fire-button.md](fire-button.md) | Clearing tabs and site data | `browser.data-clearing`, `fire.*`, `browser.single-tab-fire-sheet` |
+| [browser-menu.md](browser-menu.md) | Browser menu entries, bookmarks | `browser.menu-sheet`, `bookmarks*`, `seed bookmarks` |
+| [web-forms.md](web-forms.md) | Links, form fields and submit inside a page | `browser.main` + DevTools |
+| [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history | `browser.duckai-view`, `duckai.*`, `duckchat.*`, `seed duckai-chat-history` |
+
+Catalog areas without a recipe yet (screen + surface counts on 2026-11-13): onboarding 34, sync 23,
+autofill 20, subscriptions 18, apptp 18, designsystem 18, pir 11, feedback 8, networkprotection 7,
+settings 5, privacy 5, vpn 4, sitepermissions 3, downloads 3. List them with
+`$V t list --screens` / `--surfaces`, or `$V t find <area>`.
 
 ## Adding a feature
 
-1. Drive it once by hand on a fresh run: `$V ui` on every screen (and `$V web eval` for page content) to collect real ids. Never copy ids from code or Maestro flows without seeing them on screen.
-2. Create `<feature>.md` here with an H1, one paragraph of user-visible behaviour, then exactly these H2s: `Sub-features` (short ids, one line each), `How to get to it (user POV)` (every entry point), `Driving it with verify.sh` (commands and the observable end state per entry point), `Gotchas`.
-3. Add a row to the table above.
-4. Run the recipe end to end inside `rec start` / `rec stop` and fix what drifted. List any sub-feature you did not drive under Gotchas.
+1. Find its targets: `$V t find <words>`, and the fixtures that set it up: `$V t list --fixtures`.
+2. Drive it once on a fresh run. `goto` the starting point, then walk every user entry point with `$V t hierarchy --interactive-only` on each screen (and `$V web eval` inside pages) to collect real selectors. Never copy selectors from code or Maestro flows without seeing them in the hierarchy.
+3. Create `<feature>.md` here: an H1, one paragraph of user-visible behaviour, then exactly these H2s: `Sub-features` (short ids, one line each), `How to get to it (user POV)` (every entry point), `Driving it with verify.sh` (commands and the observable end state per entry point), `Gotchas` (ending with which sub-features have been driven and when).
+4. Add a row to the table above and remove the area from the "without a recipe" list.
+5. Run the recipe end to end inside `record start` / `record stop` and fix what drifted.
 
 `/maintain-verification-skill` does this against recent code changes when the map falls behind the app.

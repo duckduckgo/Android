@@ -1,122 +1,135 @@
 ---
 name: verify
-description: Launches the DuckDuckGo Android browser (internal debug build of this checkout) on a dedicated emulator, drives a real user path with the android CLI and adb, and captures screenshots and layout dumps as proof. Use to verify an Android app change works on device, reproduce a UI bug, or prove a feature end to end before a PR. Not for unit tests (./gradlew jvm_tests) or Maestro CI suites (.maestro/).
+description: Verifies DuckDuckGo Android changes on the attached device (or an emulator the user picks): builds this checkout's internal debug app with the trapdoor bridge, drives real user paths with trapdoor (plus DevTools for WebView content), and records a video and screenshots per feature as proof. Use to verify an app change works on device, reproduce a UI bug, or prove a feature end to end before a PR. Not for unit tests (./gradlew jvm_tests) or Maestro CI suites (.maestro/).
 ---
 
 # Verify the DuckDuckGo Android app
 
-Every command goes through `.claude/skills/verify/verify.sh` (run from the repo root, shown as `V` below).
-It owns one emulator per checkout, so it never drives the user's phone or their own AVDs.
+Two tools, one entry point. [trapdoor](https://github.com/duckduckgo/android-trapdoor) does navigation,
+the view hierarchy, taps, typing, asserts, test data, screenshots, video and proofs.
+`.claude/skills/verify/verify.sh` (`V` below, run from the repo root) adds what trapdoor does not:
+choosing devices and booting emulators, and acting inside WebViews.
 
 ```bash
 V=.claude/skills/verify/verify.sh
 ```
 
-Prerequisites: JDK 21 at `/opt/homebrew/opt/openjdk@21` (override with `JAVA_HOME_21`), Android SDK at
-`~/Library/Android/sdk` with `system-images;android-34;google_apis_playstore;arm64-v8a`, the `android` CLI
-on PATH, `jq`, `local.properties` with `sdk.dir`, and submodules (`git submodule update --init`).
+Prerequisites: trapdoor installed per its `INSTALL.md` (`~/.local/bin/trapdoor`; its driving skill
+`ddg-android-trapdoor` covers every trapdoor command in depth), JDK 21 at `/opt/homebrew/opt/openjdk@21`
+(override with `JAVA_HOME_21`), the Android SDK, `node` 22+, `jq`, `local.properties` with `sdk.dir`, and submodules (`git submodule update --init --recursive`).
+The fallback AVD needs `system-images;android-34;google_apis_playstore;arm64-v8a`.
+
+## Choose the device
+
+```bash
+$V devices   # attached devices (model, internal app installed or not) and the AVDs on this machine
+```
+
+1. **One device attached:** use it. Commands pick it up automatically.
+2. **Several attached:** ask the user which one or ones to verify on, listing each serial with its model, then `$V use <serial> [<serial>...]`. With more than one, run per-device commands through `$V each <command>` or `$V on <serial> <command>`; evidence is split per device.
+3. **None attached:** ask the user which of their AVDs to start (the list from `devices`), then `$V boot <avd>`. Their AVD boots with a window and without saving over its snapshot.
+4. **None attached and no AVDs at all:** `$V boot` with no argument creates and starts the fallback AVD `ddg_verify_api34` (API 34, Play Store, 8 GB). Its first boot wipes it and waits 240 s for Google Play services to settle (about 4.5 minutes, once); later boots take about 15 s.
+
+Never reach for `ddg_verify_api34` while the user has devices or AVDs of their own, and never start an
+emulator without asking unless rule 4 applies.
+
+The device decides what the run may do to it. Only on an emulator this run booted may you `$V t reset`,
+uninstall, or clear data without asking. On the user's phone or an emulator they already had running,
+ask first; trapdoor itself refuses `reset` on a physical device without `--yes`.
 
 ## Launch
 
 ```bash
-$V build      # ./gradlew :app:assembleInternalDebug, a few minutes cold
-$V boot       # boots AVD ddg_verify_api34 headless with wiped data; prints "ready: emulator-NNNN"
-$V install    # installs the newest internal debug APK and force-stops the old process
-$V launch     # cold start of com.duckduckgo.mobile.android.debug; expect "Status: ok"
-```
-
-`boot` uses a dedicated `ddg_verify_api34` AVD (8 GB data), created on first use. The very first boot
-wipes it, waits 240 s for Google Play services to finish restarting, and saves the `verify-base`
-snapshot (about 4.5 minutes, once). Every later boot loads `verify-base` without saving over it, so
-each run starts on a settled device without the app, and `install` puts a fresh copy on it. Build and boot are
-independent, so run them in parallel when both are needed. The internal flavor is required: native
-input, the onboarding skip button and Developer Settings exist only there.
-
-Readiness: `boot` returns only after `sys.boot_completed=1`; the app is ready once
-`$V wait --id skipOnboardingButton 30` (first launch) or `$V wait --id inputField` (after onboarding) passes.
-
-## Doctor
-
-```bash
+$V build     # trapdoor refresh --no-pull: builds this checkout with the bridge, installs, smoke-tests
+$V install   # reinstalls the last bridge build without rebuilding (e.g. on a second selected device)
 $V doctor
 ```
 
-Read-only. Fails unless the emulator process is the one this checkout started, the device is online and
-booted, the debug package is installed, the install is newer than the APK on disk (otherwise you are
-driving a stale build, so run `$V install`), and `android layout` can read the screen. It also prints the
-branch, commit and dirty file count so the evidence names the exact code under test. Run it first, and
-again whenever the app does something the code says it should not.
+A fresh worktree's first `build` also generates trapdoor's catalog for it (a few minutes); `refresh` ends
+with smoke steps and is ready when its log shows `PASS smoke-where-browser-menu-sheet`. Use `build`
+whenever the code changed since the last build; `install` only reinstalls what is on disk, and `doctor`
+fails if that no longer matches `HEAD`. Installing keeps the app's data. For a clean start on an emulator
+the run booted, `$V t reset` after installing.
+
+`build` installs over whatever internal app the device has. If that fails with
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE`, the device has an internal build signed with another key; uninstalling
+it deletes the user's app data, so ask.
+
+## Doctor
+
+`$V doctor` is read-only. It checks the device is online, says whether this run booted it (and so may
+reset it) or it belongs to the user, then runs
+`trapdoor doctor`: bridge replies, protocol, catalog generated for this checkout, installed catalog and
+screens match, and `sourceHead matches HEAD`. It prints the branch, commit and dirty file count so the
+evidence names the code under test. Run it first, and whenever the app does something the code says it
+should not. A catalog failure prints the exact generation command; run it, then `$V build`.
 
 ## Drive
 
-Navigation uses `android layout` (a JSON list of on-screen elements) and `adb shell input`, wrapped by:
+Every trapdoor command goes through `$V t`, which pins the selected device and this checkout and saves
+relative capture paths into that device's evidence folder.
 
 | Command | Does |
 |---|---|
-| `$V ui [name]` | Lists elements as `resource-id  text/desc  [x,y]  interactions`; with a name, saves the JSON as evidence |
-| `$V wait --id X [secs]` | Polls until the element is on screen (default 20 s) |
-| `$V assert [--not] --id X` | Passes or fails on the current screen without touching it |
-| `$V tap --id X [index]` | Taps the centre of the first (or index-th) match |
-| `$V type "text"` / `$V key KEYCODE_ENTER` | Types into the focused field / sends a key |
+| `$V t find <words>` / `$V t list --screens\|--surfaces\|--fixtures\|--commands` | The catalog: every registered screen, surface (dialogs, sheets, menus) and fixture |
+| `$V t goto <target>` | Opens a screen or surface through the app's own navigation; `$V t where --json` reports where you are |
+| `$V t hierarchy --interactive-only` | Tappable Views and Compose nodes with `ref`, `id`, `text`, `description`, bounds |
+| `$V t tap <selector>` | `id:inputField`, `text:Bookmarks`, `desc:Tabs`, `ref:0003`; `--index N` when it repeats |
+| `$V t type <selector> <text>` / `$V t key back\|home\|enter` | Replaces a native field's text / sends a key |
+| `$V t assert visible\|not-visible <selector>`, `assert text <selector> <expected>`, `assert where <target>` | Exit code 15 when false |
+| `$V wait <selector> [secs]` | Polls `assert visible` (trapdoor's assert does not wait) |
+| `$V t browse --url <url> [--new-tab]` | Submits a URL to the tab without typing in the omnibar |
+| `$V t seed <fixture>` / `$V t set theme\|flag ...` / `$V t reset` | Test data and state; `reset` clears app data |
 
-Selectors: `--id` matches the bare resource name (`inputField`), `--text` and `--desc` take a
-case-insensitive regex. Prefer `--id`, then `--text`; never hard-code coordinates, they move with the
-omnibar position and the screen size. Run `$V ui` after every screen change instead of guessing ids.
+Use `goto`, `browse` and `seed` to reach the starting state of a recipe, never as the proof. The step under
+test is driven the way a user does it: taps and typing on the real entry points the feature file lists.
+`goto` succeeding proves a screen opens, not that a user can get there.
 
 ### Web content
 
-`android layout` sees WebView links and text through accessibility, so `$V tap --text "Geolocation"` works
-on a page. For form fields, values, icon-only elements or page state, use DevTools:
+trapdoor's hierarchy stops at the WebView (`id:browserWebView`). Inside pages, use DevTools:
 
 | Command | Does |
 |---|---|
-| `$V web targets` | Lists the app's WebView pages (visible/attached, URL) |
-| `$V web eval '<js>' [url-regex]` | Evaluates JS in the visible attached page (or the one matching the URL) and prints the JSON result; awaits promises |
-| `$V web tap '<css selector>'` | Scrolls the element into view and taps its centre with a real touch (CSS px × devicePixelRatio + the WebView's on-screen bounds) |
+| `$V web targets` | The app's WebView pages (visible/attached, URL) |
+| `$V web eval '<js>' [url-regex]` | Evaluates JS in the visible attached page and prints the JSON result; awaits promises |
+| `$V web tap '<css selector>'` | Scrolls the element into view and taps its centre with a real touch (CSS px × devicePixelRatio + the WebView bounds from trapdoor) |
+| `$V web type '<text>'` | Types into the focused web field (trapdoor `type` only targets native fields) |
 
-Use `web eval` to read and assert, never to act: clicking through JS bypasses the touch path the user
-takes. Act with `web tap` and `$V type`. DevTools needs Developer Settings > Web Content Debugging on
-(baseline step below); it applies live, no restart.
-
-Baseline from a fresh boot, used by every recipe in [features/](features/README.md):
+Read and assert with `web eval`; act with `web tap` / `web type`, never with JS clicks, which skip the
+touch path the user takes. DevTools needs Web Content Debugging on, once per run (applies live):
 
 ```bash
-$V launch
-$V wait --id permission_deny_button 15 && $V tap --id permission_deny_button   # Android 13+ notification prompt
-$V wait --id skipOnboardingButton 30 && $V tap --id skipOnboardingButton
-$V wait --id inputField                                                         # New Tab Page with native input
+$V t goto dev.settings
+$V t tap id:trailingSwitch --index 2   # third switch is "Web Content Debugging"; confirm with $V t hierarchy
+$V t goto browser.main
 ```
-
-When the recipe touches web content, also enable DevTools once per run:
-
-```bash
-$V tap --id inputModeWidgetNavMenu && $V wait --id settingsMenuItem && $V tap --id settingsMenuItem
-# swipe until "Developer Settings" is listed: adb -s <serial> shell input swipe 672 2200 672 900 600
-$V tap --text "^Developer Settings$"
-$V tap --id trailingSwitch 2          # third switch: "Web Content Debugging"; $V ui shows primaryText to confirm
-$V key KEYCODE_BACK; $V key KEYCODE_BACK
-```
-
-Then follow the feature file for what you are verifying. Each lists every user entry point; a proof that
-uses one entry point does not cover the others.
 
 ## Evidence
 
+Each feature recipe is one video plus screenshots of its key states, all in
+`build/verify/evidence/<run-id>/<device>/` (`doctor` prints it):
+
 ```bash
-$V rec start search-url  # video of the whole recipe; start after the baseline, before the first step
-$V shot 03-page-loaded   # PNG via adb screencap + the layout JSON next to it
-$V rec stop              # pulls search-url.mp4 (3-minute segments joined with ffmpeg)
-$V logcat                # full logcat dump, for crashes or log markers
+$V t record start search-url.mp4   # before the first step under test; stops by itself at 170 s
+$V t shot search-loaded.png        # waits for the UI to settle; writes a .json sidecar with screen and theme
+$V t record stop
 ```
 
-Everything lands in `build/verify/evidence/<run-id>/` (run id printed by `doctor`). Proof standards:
+For flows made only of trapdoor commands, `$V t proof <name> -- <cmd> --then <cmd> ...` does the same in
+one go: a screenshot per step, a video, and a README of step results. `--baseline <earlier proof>` adds
+screenshot comparisons against a previous run, and `--theme dark --font-scale 1.3 --language de` before
+the `--` repeats it under visual settings.
 
-- Every feature recipe is recorded: one `rec start <feature-id>` / `rec stop` pair per recipe, plus shots of the key states. The video shows the path; the shots and asserts are what you cite.
-- Drive the real user path (taps and typing), never internal settings, intents or test hooks the user cannot reach, unless the feature file says so. Developer Settings toggles are allowed as setup, not as the thing under test.
-- Capture the action and the resulting state: a shot before the step that matters and one after, plus the `assert` or `web eval` output.
-- Verify side effects, not just pixels: after a mutation, reach the stored result through a second view (the tab switcher after opening a tab, the bookmarks screen after adding one).
-- Look at every PNG you cite. For web content, pair the screenshot with a `web eval` read of the same state.
-- Report the commit from `doctor` with the evidence path. A step you could not reach is reported as not verified, with the command that failed.
+Proof standards:
+
+- Every recipe has a video. The screenshots, `assert` exit codes and `web eval` output are what you cite.
+- Drive the real user path for the step under test. `goto`, `browse`, `seed` and Developer Settings are setup only.
+- Capture the action and the resulting state: a shot before the step that matters and one after.
+- Verify side effects through a second view (the tab switcher after opening a tab, the bookmarks screen after adding one).
+- Look at every PNG you cite; for web content pair it with a `web eval` read of the same state.
+- Report the commit from `doctor` with the evidence path. An entry point you could not drive is reported as not verified, with the failing command and its exit code.
+- Use synthetic data only and keep captures on this machine (trapdoor's rule too).
 
 ## Cleanup
 
@@ -124,19 +137,20 @@ Everything lands in `build/verify/evidence/<run-id>/` (run id printed by `doctor
 $V cleanup
 ```
 
-Stops a running recording (keeping the video), removes this emulator's adb forwards, stops only the
-emulator whose pid this checkout recorded and deletes `build/verify/state`. Evidence in
-`build/verify/evidence/` is kept; delete it by hand when done. Never `adb emu kill` or `pkill` other
-devices, and never uninstall the app from a device you did not boot. If a run fails halfway, still run
-`$V cleanup` before retrying.
+Undoes only what the run did: stops recordings (keeping the videos), removes the adb forwards it created,
+stops emulators it booted, and deletes `build/verify/state`. The user's phone and emulators they started
+keep running, with the verified build still installed. Evidence stays in `build/verify/evidence/` until
+you delete it. Never `adb emu kill` or `pkill` devices the run did not boot. Run `$V cleanup` after a
+failed run too, before retrying.
 
 ## Gotchas
 
-- `shot` uses `adb screencap`, which targets the run's emulator. `android screen capture` has no device flag and refuses to run whenever another device (the user's phone) is attached.
-- The `android` CLI may print an update notice; it is harmless. Do not run `android update` unprompted.
-- `android layout` lists only elements with text, an id that carries content, or an interaction, and gives no bounds or class. Bare containers such as `browserLayout` never appear, so assert on a child (the omnibar URL, a title) instead. `web tap` reads the WebView bounds from `uiautomator dump` for this reason.
-- Booting a wiped Play Store image and launching straight away gets the app killed ("depends on provider ... in dying proc com.google.android.gms") or crashes it inside the system WebView. That is why boots load `verify-base`. If `verify-base` is ever deleted, the next boot rebuilds it; if the app disappears mid-run, check `adb logcat -b crash` and `$V logcat` before blaming the change.
+- A device can have this checkout's internal app *without* the bridge (installed from Android Studio or plain Gradle). `trapdoor doctor` then passes its catalog and `sourceHead` checks but fails `bridge replies`; `$V build` fixes it. Confirm with `adb -s <serial> shell dumpsys package com.duckduckgo.mobile.android.debug | grep -c -i trapdoor` (0 means no bridge).
+- On a Pixel 7 with Android 17 (2026-11-13), every UI command returns `notReady: could not establish UI safety from device observations`, even with the app focused and the screen unlocked. trapdoor's `UiSafety` reads `mPackageName` only from a line that starts with it, and this Android version prints it mid-line in `dumpsys window sessions`. Until trapdoor handles that, verify on an emulator or another device and report the phone as not verified.
+- trapdoor exit codes: 10 `notReady` (retry once), 11 `wrongScreen`, 12 `unavailable`, 14 `staleRef` (refs expire on any layout change; use the fresh hierarchy in the reply), 15 assertion false. Do not repeat a mutation after an ambiguous reply; check `$V t where --json` first.
+- trapdoor prepares first-run state on install, so recipes start past onboarding. Onboarding itself is driven through the `onboarding.*` targets and the `seed dax-onboarding` / `onboarding-fixture` fixtures.
+- Booting a wiped Play Store image and launching straight away gets the app killed ("depends on provider ... in dying proc com.google.android.gms") or crashed inside the system WebView. That is why the fallback AVD settles on its first boot (marker file `verify-settled` in its AVD folder). Don't add `fastboot.forceColdBoot` or snapshot flags to its config; snapshots went stale under cold boots and failed to load.
 - With several tabs, older WebViews stay `visible` but `detached` in `web targets`; `web eval` picks the attached one. Pass a URL regex when two are attached.
-- `adb install -r` does not restart a running app; `install` force-stops it, but after a manual install run `$V launch`.
-- `$V type` sends text through `adb shell input text`; characters like `&`, `'` and `(` need shell escaping.
-- A second checkout running this skill picks the next free emulator port, but both share the `ddg_verify_api34` AVD and the emulator refuses a second instance of a running AVD. Finish or clean up one run before starting another.
+- `$V web type` escapes spaces only; avoid `&`, quotes and parentheses.
+- An AVD can run once at a time. If the user's chosen AVD is already running, it shows up in `devices` as attached; select it with `use` rather than booting it again.
+- Selection lives in `build/verify/state/devices` per checkout. Two checkouts driving the same device at once will fight over it; finish one run first.
