@@ -22,6 +22,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
+import kotlinx.coroutines.flow.Flow
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -137,6 +138,10 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
             requestedIds += videoId
             return segments
         }
+
+        override fun modeFlow(): Flow<SponsorBlockMode> = throw UnsupportedOperationException()
+
+        override suspend fun setMode(mode: SponsorBlockMode) = throw UnsupportedOperationException()
     }
 
     private companion object {
