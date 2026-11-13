@@ -166,8 +166,8 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         val response = AttentionPendingResponse(id = nextId++, tabId = tabId, browserMode = browserMode)
         response.updateOnScreen(chatVisibility.onScreen())
         responses += response
-        // A prompt from the address bar reaches the page only once it loads, which can be after the app was backgrounded.
-        if (!chatVisibility.isAppOpen) {
+        // A prompt from the address bar reaches the page only once it loads, which can be after the app was backgrounded or the tab switched.
+        if (!chatVisibility.isAppOpen || chatVisibility.selectedTabId != tabId) {
             response.away = true
             emit(LeftWhileGenerating(response.snapshot()))
         }

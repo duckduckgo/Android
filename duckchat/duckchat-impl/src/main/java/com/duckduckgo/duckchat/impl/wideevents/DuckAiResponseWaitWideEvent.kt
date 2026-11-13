@@ -289,8 +289,11 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
             flows += flow
             wideEventClient.intervalStart(flowId, INTERVAL_PROMPT_TO_LEAVE, buckets = PROMPT_BUCKETS)
             logcat(tag = TAG) { "Duck.ai response wait started" }
-            // A prompt from the address bar reaches the page only once it loads, which can be after the app was backgrounded.
-            if (!chatVisibility.isAppOpen) recordLeave(flow, LEFT_VIA_APP_BACKGROUNDED)
+            // A prompt from the address bar reaches the page only once it loads, which can be after the app was backgrounded or the tab switched.
+            when {
+                !chatVisibility.isAppOpen -> recordLeave(flow, LEFT_VIA_APP_BACKGROUNDED)
+                chatVisibility.selectedTabId != tabId -> recordLeave(flow, LEFT_VIA_TAB_SWITCHED)
+            }
         }.onFailure { error ->
             logcat(tag = TAG) { "Failed to start Duck.ai response wait: ${error.message}" }
         }

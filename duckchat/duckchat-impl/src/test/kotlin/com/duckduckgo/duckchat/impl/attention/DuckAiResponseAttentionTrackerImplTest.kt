@@ -445,6 +445,24 @@ class DuckAiResponseAttentionTrackerImplTest {
     }
 
     @Test
+    fun `when the prompt reaches the page after the tab was switched then the user is away`() {
+        onChat(tabId = "t1", chatId = null)
+        switchToOtherSite()
+        testee.onNativePromptSubmitted(tabId = "t1", browserMode = BrowserMode.REGULAR)
+        status("start_stream:new_prompt")
+        onChat(tabId = "t1", chatId = "A")
+
+        assertEquals(
+            listOf(
+                LeftWhileGenerating(r(chatId = null)),
+                StatusWhileAway(r(chatId = null), "start_stream:new_prompt"),
+                Returned(r()),
+            ),
+            listener.events,
+        )
+    }
+
+    @Test
     fun `when the app reopens on the chat then Returned`() {
         promptInChat()
         status("loading")
