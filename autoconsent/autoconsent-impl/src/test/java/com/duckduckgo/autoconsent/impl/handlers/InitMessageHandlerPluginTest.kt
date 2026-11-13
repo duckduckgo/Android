@@ -500,6 +500,42 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    fun filterCompactRulesWhenSpecificRuleUsesNoStringsThenGenericStringsAreKept() {
+        settingsCache.updateSettings(stringEdgeCaseRulesetJson)
+        val rules = settingsCache.getSettings()!!.compactRuleList
+
+        val result = invokeFilterCompactRules(rules, "https://no-strings.example/")
+        val compact = result.compact as CompactRules
+
+        assertEquals(listOf("generic-a", "site-no-strings"), compact.r.map { it[1] })
+        assertEquals(listOf("#generic-a", "#generic-b"), compact.s)
+    }
+
+    @Test
+    fun filterCompactRulesWhenSpecificRuleUsesOnlyGenericStringsThenAllGenericStringsAreKept() {
+        settingsCache.updateSettings(stringEdgeCaseRulesetJson)
+        val rules = settingsCache.getSettings()!!.compactRuleList
+
+        val result = invokeFilterCompactRules(rules, "https://shared.example/")
+        val compact = result.compact as CompactRules
+
+        assertEquals(listOf("generic-a", "site-shared-string"), compact.r.map { it[1] })
+        assertEquals(listOf("#generic-a", "#generic-b"), compact.s)
+    }
+
+    @Test
+    fun filterCompactRulesKeepsSpecificRulesWithNewerStepVersions() {
+        settingsCache.updateSettings(stringEdgeCaseRulesetJson)
+        val rules = settingsCache.getSettings()!!.compactRuleList
+
+        val result = invokeFilterCompactRules(rules, "https://v3.example/")
+        val compact = result.compact as CompactRules
+
+        assertEquals(listOf("generic-a", "site-step-v3"), compact.r.map { it[1] })
+        assertEquals(listOf("#generic-a", "#generic-b", "#site-only"), compact.s)
+    }
+
+    @Test
     fun whenRuleFilteringDisabledThenUseOriginalRuleset() {
         settingsRepository.userSetting = true
         settingsCache.updateSettings(mockRulesetJson)
@@ -516,6 +552,20 @@ class InitMessageHandlerPluginTest {
 
         assertEquals(5, rules.size)
     }
+
+    // Generic rule uses strings 0 and 1; site rules use no strings, only string 0, or step version 3.
+    private val stringEdgeCaseRulesetJson = """
+        {"disabledCMPs": [], "compactRuleList": {"v": 1,
+          "s": ["#generic-a", "#generic-b", "#site-only"],
+          "r": [
+            [1, "generic-a", 2, "", 22, [0], [{"e": 0}], [{"v": 0}], [{"c": 1}], [], {}],
+            [1, "site-no-strings", 2, "^https?://no-strings\\.example/", 22, [], [{"eval": "X"}], [{"eval": "X"}], [{"eval": "X"}], [], {}],
+            [1, "site-shared-string", 2, "^https?://(www\\.)?shared\\.example/", 22, [], [{"e": 0}], [{"v": 0}], [{"c": 0}], [], {}],
+            [3, "site-step-v3", 2, "^https?://(www\\.)?v3\\.example/", 22, [], [{"e": 2}], [{"v": 2}], [{"c": 2}], [], {}]
+          ],
+          "index": {"genericRuleRange": [0, 1], "frameRuleRange": [1, 1], "specificRuleRange": [1, 4], "genericStringEnd": 2, "frameStringEnd": 2}
+        }}
+    """.trimIndent()
 
     private fun invokeFilterCompactRules(
         rules: CompactRules,
