@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -61,6 +62,7 @@ class DuckAiWidgetAvailability @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val homeScreenWidgetLifecycle: HomeScreenWidgetLifecycle,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
@@ -104,6 +106,7 @@ class DuckAiWidgetAvailability @Inject constructor(
             if (removesPlacedWidgets) {
                 // A disabled receiver no longer gets the removal broadcast, so the removal is reported here.
                 pixel.fire(DuckChatPixelName.DUCK_AI_WIDGET_DELETED)
+                homeScreenWidgetLifecycle.onWidgetDisabled()
             }
         }
     }

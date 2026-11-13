@@ -16,35 +16,23 @@
 
 package com.duckduckgo.widget
 
-import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.nextsteps.NextStepsAdoptionMetrics
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
+import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
 import javax.inject.Inject
 
 class SearchWidgetLifecycleDelegate @Inject constructor(
-    private val appInstallStore: AppInstallStore,
-    private val widgetCapabilities: AppWidgetCapabilities,
+    private val homeScreenWidgetLifecycle: HomeScreenWidgetLifecycle,
     private val pixel: Pixel,
-    private val nextStepsAdoptionMetrics: NextStepsAdoptionMetrics,
 ) {
 
     fun handleOnWidgetEnabled(widgetSpecificAddedPixel: AppPixelName) {
-        if (!appInstallStore.widgetInstalled) {
-            appInstallStore.widgetInstalled = true
-            pixel.fire(AppPixelName.WIDGETS_ADDED)
-        }
+        homeScreenWidgetLifecycle.onWidgetEnabled()
         pixel.fire(widgetSpecificAddedPixel)
-        nextStepsAdoptionMetrics.onWidgetAdded()
     }
 
     fun handleOnWidgetDisabled(widgetSpecificDeletedPixel: AppPixelName) {
-        if (appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
-            appInstallStore.widgetInstalled = false
-            pixel.fire(WIDGETS_DELETED)
-        }
+        homeScreenWidgetLifecycle.onWidgetDisabled()
         pixel.fire(widgetSpecificDeletedPixel)
     }
 }

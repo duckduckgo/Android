@@ -28,6 +28,7 @@ import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -41,6 +42,9 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var homeScreenWidgetLifecycle: HomeScreenWidgetLifecycle
 
     @Inject
     @AppCoroutineScope
@@ -57,6 +61,7 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
         pixel.fire(DuckChatPixelName.DUCK_AI_WIDGET_ADDED)
+        homeScreenWidgetLifecycle.onWidgetEnabled()
     }
 
     override fun onUpdate(
@@ -100,5 +105,6 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
         pixel.fire(DuckChatPixelName.DUCK_AI_WIDGET_DELETED)
+        homeScreenWidgetLifecycle.onWidgetDisabled()
     }
 }
