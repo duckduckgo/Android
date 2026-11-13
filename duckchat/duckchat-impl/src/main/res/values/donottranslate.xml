@@ -52,6 +52,9 @@
     <string name="duckAiWidgetDescription">Start a private chat with Duck.ai, use quick actions or pick up a recent chat.</string>
     <string name="duckAiWidgetConfigurationTitle">Duck.ai widget</string>
     <string name="duckAiWidgetShowRecentChats">Show recent chats</string>
+    <string name="duckAiWidgetPreviewChat1">Ideas for a weekend trip</string>
+    <string name="duckAiWidgetPreviewChat2">Explain quantum computing simply</string>
+    <string name="duckAiWidgetPreviewChat3">Recipe with what\'s in my fridge</string>
     <string name="duckAiWidgetHint" instruction="Placeholder text shown in the prompt bar of the Duck.ai home-screen widget">Chat privately</string>
     <string name="duckAiWidgetVoiceAction" instruction="Label of the pill button that starts a voice chat with Duck.ai in the home-screen widget">Voice</string>
     <string name="duckAiWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the home-screen widget">Image</string>
