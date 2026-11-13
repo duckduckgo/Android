@@ -86,7 +86,7 @@ interface PlayBillingManager {
     )
 
     /**
-     * Replaces the cancelled purchase with the same plan, without proration and without purchase or switch metrics
+     * Replaces the current canceled (not expired) plan with the same plan, without proration
      */
     suspend fun launchCancellationUndoFlow(
         activity: Activity,
@@ -518,9 +518,6 @@ sealed class PurchaseState {
     data class Failure(val errorType: String) : PurchaseState()
 }
 
-/**
- * The kind of billing flow, so each one only reports its own metrics
- */
 enum class BillingFlowType {
     PURCHASE,
     PLAN_SWITCH,
