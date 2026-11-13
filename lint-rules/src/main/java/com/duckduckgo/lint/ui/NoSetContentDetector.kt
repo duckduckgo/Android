@@ -39,7 +39,7 @@ class NoSetContentDetector : Detector(), SourceCodeScanner {
 
     internal class SetContentCallHandler(private val context: JavaContext) : UElementHandler() {
         override fun visitCallExpression(node: UCallExpression) {
-            if (isInDesignSystemModule(context.project.name)) return
+            if (ComposeHostingPolicy.isComposeHostAllowed(context.project.name, context.file)) return
             if (node.methodName == "setContent") {
                 val containingClass = node.getContainingUClass()
                 if (containingClass != null && isActivityClass(containingClass)) {
@@ -60,19 +60,15 @@ class NoSetContentDetector : Detector(), SourceCodeScanner {
             )
         }
 
-        private fun isInDesignSystemModule(projectName: String): Boolean {
-            return projectName in DESIGN_SYSTEM_MODULES
-        }
     }
 
     companion object {
-        private val DESIGN_SYSTEM_MODULES = setOf("design-system", "design-system-internal")
         val NO_SET_CONTENT_USAGE = Issue
             .create(
                 id = "NoSetContentUsage",
                 briefDescription = "setContent should not be used in Activities",
-                explanation = "Compose is not yet approved to be used in production. The setContent function should not be used in Activities until Compose usage is officially approved for the codebase.",
-                moreInfo = "https://app.asana.com/0/1202857801505092/list",
+                explanation = "Compose hosts are limited to the Compose integration Phase 2 scenarios. setContent in an Activity is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml.",
+                moreInfo = "https://app.asana.com/1/137249556945/task/1219547140965597",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,
                 severity = Severity.ERROR,
