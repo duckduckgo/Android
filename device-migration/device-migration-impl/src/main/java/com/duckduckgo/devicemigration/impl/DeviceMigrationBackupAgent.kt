@@ -74,14 +74,15 @@ class DeviceMigrationBackupAgent : BackupAgent() {
         /**
          * Samsung Smart Switch backups reach the agent without the device-transfer flag, so the transport flags cannot tell a
          * transfer from a cloud backup: the remote flag holds back every backup, and the rules alone keep cloud backup empty.
-         * A phone that never saved the flag, or whose file cannot be read, still transfers, matching the flag's default.
+         * A phone that never saved the flag, or whose file cannot be read, sends nothing: the app has not started on this version
+         * yet, so whether transfers are allowed is not known.
          */
         @SuppressLint("DenyListedApi") // no SharedPreferencesProvider in restricted mode; the app writes this file as plain prefs
         fun shouldSendNothing(context: Context): Boolean {
             return try {
-                !context.getSharedPreferences(LOCAL_FILE, Context.MODE_PRIVATE).getBoolean(KEY_TRANSFER_ALLOWED, true)
+                !context.getSharedPreferences(LOCAL_FILE, Context.MODE_PRIVATE).getBoolean(KEY_TRANSFER_ALLOWED, false)
             } catch (e: Exception) {
-                false
+                true
             }
         }
 

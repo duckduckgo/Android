@@ -127,6 +127,12 @@ class RealDeviceMigrationTest {
     }
 
     @Test
+    fun transferredFileNameMatchesTheBackupRulesInclude() {
+        // :app's backup rules include this exact file in a device transfer; renaming it would stop it transferring.
+        assertEquals("com.duckduckgo.devicemigration.transferred", TRANSFERRED_FILE)
+    }
+
+    @Test
     fun whenNoMarkersThenNotMigratedAndMarkersWritten() = runTest {
         assertFalse(testee.isMigratedInstall())
 
