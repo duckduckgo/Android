@@ -41,10 +41,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
-import com.duckduckgo.duckchat.impl.models.ModelState
-import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -2006,64 +2003,25 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatImageGenerationAndCurrentModelSupportsItThenModelNotSwitchedAndOpensWithImageGenerationForced() = runTest {
-        val current = aiModel("m1", tools = listOf(Tool.IMAGE_GENERATION))
-        whenever(mockDuckAiModelManager.modelState).thenReturn(
-            MutableStateFlow(ModelState(models = listOf(current), selectedModelId = "m1")),
-        )
+        whenever(mockDuckAiModelManager.ensureImageCapableModelSelected()).thenReturn(true)
 
         testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.ImageGeneration()))
-        verify(mockContext).startActivity(mockIntent)
-    }
-
-    @Test
-    fun whenOpenDuckChatImageGenerationAndCurrentModelUnsupportedThenSwitchesToCapableModelAndForcesImageGeneration() = runTest {
-        val current = aiModel("m1")
-        val capable = aiModel("m2", tools = listOf(Tool.IMAGE_GENERATION))
-        whenever(mockDuckAiModelManager.modelState).thenReturn(
-            MutableStateFlow(ModelState(models = listOf(current, capable), selectedModelId = "m1")),
-        )
-
-        testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
-        coroutineRule.testScope.advanceUntilIdle()
-
-        verify(mockDuckAiModelManager).selectModel(capable)
         verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.ImageGeneration()))
         verify(mockContext).startActivity(mockIntent)
     }
 
     @Test
     fun whenOpenDuckChatImageGenerationAndNoAccessibleImageCapableModelThenDoesNotForceImageGenerationButStillOpens() = runTest {
-        val current = aiModel("m1")
-        val inaccessible = aiModel("m2", isAccessible = false, tools = listOf(Tool.IMAGE_GENERATION))
-        whenever(mockDuckAiModelManager.modelState).thenReturn(
-            MutableStateFlow(ModelState(models = listOf(current, inaccessible), selectedModelId = "m1")),
-        )
+        whenever(mockDuckAiModelManager.ensureImageCapableModelSelected()).thenReturn(false)
 
         testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(mockDuckAiModelManager, never()).selectModel(any())
         verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.Open()))
         verify(mockContext).startActivity(mockIntent)
     }
-
-    private fun aiModel(
-        id: String,
-        isAccessible: Boolean = true,
-        tools: List<Tool> = emptyList(),
-    ) = AIChatModel(
-        id = id,
-        name = id,
-        displayName = id,
-        shortName = id,
-        accessTier = emptyList(),
-        isAccessible = isAccessible,
-        supportedTools = tools,
-    )
 
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))
