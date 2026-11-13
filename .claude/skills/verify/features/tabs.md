@@ -5,27 +5,31 @@ closes tabs.
 
 ## Sub-features
 
-- `tabs-open-switcher` the switcher opens from the toolbar and shows "N Tab(s)".
+- `tabs-open-switcher` the switcher opens from the toolbar and lists every tab.
 - `tabs-card` each open page has a card titled with the page title.
-- `tabs-new` "New Tab" opens the New Tab Page and increments `tabCount`.
+- `tabs-new` "New Tab" opens the New Tab Page and increments the tab count.
 - `tabs-switch` tapping a card returns to that page.
 - `tabs-close` the card's close button removes it.
+- `tabs-menu` the switcher's overflow menu (`tabs.tab-switcher-menu`).
 
 ## How to get to it (user POV)
 
-- Tap the tab count button in the toolbar (`tabCount`, on both the New Tab Page and a loaded page).
-- Overflow menu, "New Tab" (`newTabMenuItem`) for a new tab without the switcher.
+- New Tab Page: the tab count button (`inputModeWidgetNavTabs`, its text is the count).
+- Loaded page: the tab count button (`tabsMenu`, count in `tabCount`).
+- Browser menu: "New Tab" (`newTabMenuItem`) opens a tab without the switcher.
 
 ## Driving it with verify.sh
 
-Preconditions: baseline, then load `privacy-test-pages.site` as in `search-and-navigate.md`.
+Preconditions: baseline; `$V t browse --url https://privacy-test-pages.site/` and `$V wait id:browserWebView 20`.
 
-- **Open switcher.** `$V tap --id tabCount`, `$V wait --text "Privacy Test Pages" 10`, `$V assert --text "^1 Tab$"`, `$V shot tabs-switcher`. The card `title` reads `Privacy Test Pages - Home`.
-- **New tab.** `$V tap --id newTabToolbarButton`, `$V wait --id inputField`, then `$V assert --text "^2$"` (the `tabCount` text).
-- **Switch.** Back in the switcher, `$V tap --text "Privacy Test Pages - Home"`; `omnibarTextInput` reads `privacy-test-pages.site`.
-- **Close.** In the switcher, `$V tap --id close 0` on the first card; `$V assert --not --text "Privacy Test Pages - Home"`.
+- **Open switcher.** `$V t record start tabs.mp4`, `$V t tap id:tabsMenu`, `$V t assert where tabSwitcher`, `$V t assert visible "text:Privacy Test Pages - Home"`, `$V t shot tabs-switcher.png`.
+- **New tab.** `$V t tap id:newTabToolbarButton`, `$V wait id:inputField`, `$V t assert text id:inputModeWidgetNavTabs 2`, `$V t shot tabs-new.png`.
+- **Switch.** `$V t tap id:inputModeWidgetNavTabs`, `$V t tap "text:Privacy Test Pages - Home"`, `$V wait id:browserWebView`, `$V web eval 'location.host'` returns `"privacy-test-pages.site"`.
+- **Close.** In the switcher, `$V t tap id:close --index 0` and `$V t assert not-visible "text:Privacy Test Pages - Home"`. `$V t record stop`.
+- Many tabs: `$V t seed tabs --count 20` before opening the switcher.
 
 ## Gotchas
 
-- Switcher toolbar ids: `duckAIToolbarButton`, `fireToolbarButton`, `newTabToolbarButton`, `popupMenuToolbarButton`; back is the unlabelled "Navigate up" element.
-- The "trackers blocked" info panel (`infoPanelText`) sits above the cards and shifts their positions; never tap cards by coordinate.
+- Switcher toolbar ids: `duckAIToolbarButton`, `fireToolbarButton`, `newTabToolbarButton`, `popupMenuToolbarButton`; back is `desc:Navigate up`.
+- The "trackers blocked" panel (`item_container`) is the first tappable item; cards follow it, and every card's close button is `id:close`, so index by card order.
+- Driven with trapdoor: `tabs-open-switcher`, `tabs-new` (2026-11-13). The rest were driven with the earlier harness only.
