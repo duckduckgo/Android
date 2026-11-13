@@ -94,7 +94,7 @@ class DeviceMigrationBackupAgentTest {
     }
 
     @Test
-    fun whenFlagNeverSavedThenBackupSendsData() {
-        assertFalse(DeviceMigrationBackupAgent.shouldSendNothing(context))
+    fun whenFlagNeverSavedThenBackupSendsNothing() {
+        assertTrue(DeviceMigrationBackupAgent.shouldSendNothing(context))
     }
 }
