@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.wideevents
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
@@ -30,12 +29,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.attention.ChatVisibilityEvent
 import com.duckduckgo.duckchat.impl.attention.DuckAiChatVisibility
 import com.duckduckgo.duckchat.impl.attention.PendingResponse
 import com.duckduckgo.duckchat.impl.attention.PendingResponse.ScreenChange
 import com.duckduckgo.duckchat.impl.attention.PendingResponseStatus
+import com.duckduckgo.duckchat.impl.attention.clearedBy
 import com.duckduckgo.duckchat.impl.attention.describedByStatusFrom
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -347,15 +346,7 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
 
     private suspend fun clearChats(types: Set<ClearableData>) {
         types.forEach { type ->
-            val cleared = when (type) {
-                is ClearableData.DuckChats.All -> flows.toList()
-                is ClearableData.DuckChats.AllForMode -> flows.filter { it.browserMode == type.mode }
-                is ClearableData.DuckChats.SelectedForMode -> {
-                    val chatIds = type.chatUrls.mapNotNull { it.toUri().toChatIdOrNull(duckChat) }.toSet()
-                    flows.filter { it.browserMode == type.mode && it.chatId in chatIds }
-                }
-                else -> emptyList()
-            }
+            val cleared = flows.clearedBy(type, duckChat)
             cleared.forEach { flow ->
                 // Matches leaving the screen: a return already seen still counts, anything else ends as the 24h cleanup would.
                 if (flow.returned && flow.done) finish(flow, REASON_RETURNED) else failNotReturned(flow)
@@ -420,11 +411,11 @@ class DuckAiResponseWaitWideEventImpl @Inject constructor(
     private class WideEventPendingResponse(
         val flowId: Long,
         tabId: String,
-        val browserMode: BrowserMode,
+        browserMode: BrowserMode,
         chatId: String? = null,
         chatSwitchedAway: Boolean = false,
         var awaitingFirstProgressStatus: Boolean = false,
-    ) : PendingResponse(tabId, chatId, chatSwitchedAway) {
+    ) : PendingResponse(tabId, browserMode, chatId, chatSwitchedAway) {
         var left = false
         var returned = false
         var done = false
