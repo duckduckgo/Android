@@ -16,12 +16,15 @@
 
 package com.duckduckgo.duckchat.impl.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -45,9 +48,12 @@ class DuckAiWidgetAvailabilityTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val packageManager: PackageManager = mock()
+    private val appWidgetManager: AppWidgetManager = mock()
+    private val pixel: Pixel = mock()
     private val context: Context = mock<Context>().also {
         whenever(it.packageName).thenReturn("com.duckduckgo.mobile.android")
         whenever(it.packageManager).thenReturn(packageManager)
+        whenever(it.getSystemService(AppWidgetManager::class.java)).thenReturn(appWidgetManager)
     }
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val userEnabledFlow = MutableStateFlow(true)
@@ -62,6 +68,7 @@ class DuckAiWidgetAvailabilityTest {
         duckChatFeature = duckChatFeature,
         duckChatFeatureRepository = repository,
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        pixel = pixel,
         appCoroutineScope = coroutineTestRule.testScope,
     )
 
@@ -93,6 +100,39 @@ class DuckAiWidgetAvailabilityTest {
         testee.onPrivacyConfigDownloaded()
 
         verify(packageManager).setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+    }
+
+    @Test
+    fun whenDisablingReceiverWithPlacedWidgetsThenFiresDeletedPixel() = runTest {
+        givenConditions(feature = false)
+        givenReceiverState(PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
+        whenever(appWidgetManager.getAppWidgetIds(receiver)).thenReturn(intArrayOf(7))
+
+        testee.onPrivacyConfigDownloaded()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_AI_WIDGET_DELETED)
+    }
+
+    @Test
+    fun whenDisablingReceiverWithoutPlacedWidgetsThenDoesNotFireDeletedPixel() = runTest {
+        givenConditions(feature = false)
+        givenReceiverState(PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
+        whenever(appWidgetManager.getAppWidgetIds(receiver)).thenReturn(intArrayOf())
+
+        testee.onPrivacyConfigDownloaded()
+
+        verify(pixel, never()).fire(eq(DuckChatPixelName.DUCK_AI_WIDGET_DELETED), any(), any(), any())
+    }
+
+    @Test
+    fun whenReceiverAlreadyDisabledThenDoesNotFireDeletedPixelAgain() = runTest {
+        givenConditions(feature = false)
+        givenReceiverState(PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
+        whenever(appWidgetManager.getAppWidgetIds(receiver)).thenReturn(intArrayOf(7))
+
+        testee.onPrivacyConfigDownloaded()
+
+        verify(pixel, never()).fire(eq(DuckChatPixelName.DUCK_AI_WIDGET_DELETED), any(), any(), any())
     }
 
     @Test
