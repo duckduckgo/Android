@@ -67,6 +67,16 @@
             android:exported="false"
             android:foregroundServiceType="microphone" />
 
+        <!-- Launched by the launcher/system for the widget, so it needs the CONFIGURE action but no launcher entry. -->
+        <activity
+            android:name=".widget.DuckAiWidgetConfigurationActivity"
+            android:exported="false"
+            android:label="@string/duckAiWidgetConfigurationTitle">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".widget.DuckAiWidgetProvider"
             android:enabled="false"

@@ -33,11 +33,13 @@ import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -55,6 +57,9 @@ class DuckAiWidgetConfiguratorTest {
 
     private val duckChat: DuckChatInternal = mock()
     private val chatStore: DuckAiChatStore = mock()
+    private val widgetPreferences: DuckAiWidgetPreferences = mock<DuckAiWidgetPreferences> {
+        onBlocking { showRecentChats(any()) } doReturn true
+    }
     private val remoteViews: RemoteViews = mock()
     private val stringContext: Context = mock<Context>().also { whenever(it.getString(any())).thenReturn("Untitled chat") }
     private val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
@@ -62,6 +67,7 @@ class DuckAiWidgetConfiguratorTest {
     private val testee = DuckAiWidgetConfigurator(
         duckChat = duckChat,
         chats = DuckAiChatsWidgetChats(stringContext, chatStore),
+        widgetPreferences = widgetPreferences,
         intents = fakeDuckAiWidgetIntents(),
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
@@ -110,6 +116,29 @@ class DuckAiWidgetConfiguratorTest {
 
         assertLaunch(launched, launch = DuckChatLaunch.ChatHistory::class)
         verify(remoteViews).setViewVisibility(R.id.chatsViewAllContainer, View.VISIBLE)
+    }
+
+    @Test
+    fun whenShowRecentChatsOnThenChatsSectionVisible() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
+
+        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.VISIBLE)
+    }
+
+    @Test
+    fun whenShowRecentChatsOffThenChatsSectionHiddenAndChatsNotLoadedOrWired() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+        whenever(widgetPreferences.showRecentChats(APP_WIDGET_ID)).thenReturn(false)
+
+        val launched = populateAndCaptureClickIntent(R.id.promptBarContainer)
+
+        assertLaunch(launched, url = NEW_CHAT_URL)
+        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.GONE)
+        verify(remoteViews, never()).setOnClickPendingIntent(eq(R.id.chatsViewAll), any())
+        verify(remoteViews, never()).setRemoteAdapter(eq(R.id.chatsList), any<RemoteViews.RemoteCollectionItems>())
+        verify(chatStore, never()).getChats()
     }
 
     @Test
