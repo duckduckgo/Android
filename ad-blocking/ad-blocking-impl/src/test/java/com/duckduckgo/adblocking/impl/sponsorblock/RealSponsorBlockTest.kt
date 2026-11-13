@@ -81,8 +81,8 @@ class RealSponsorBlockTest {
 
     @Test
     fun whenValidIdThenReturnsSegmentsSortedByStart() = runTest {
-        val late = SponsorBlockSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip")
-        val early = SponsorBlockSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip")
+        val late = SponsorBlockSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", uuid = "late")
+        val early = SponsorBlockSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip", uuid = "early")
         segmentsProvider.segments = listOf(late, early)
 
         assertEquals(listOf(early, late), sponsorBlock.getSegments(VALID_ID))

@@ -17,6 +17,8 @@
 package com.duckduckgo.adblocking.impl.sponsorblock
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
@@ -63,9 +65,20 @@ class RealSponsorBlockSegmentsProviderTest {
         )
 
         assertEquals(
-            listOf(SponsorBlockSegment(start = 10.0, end = 20.0, category = "sponsor", actionType = "skip", videoDuration = 300.0)),
+            listOf(
+                SponsorBlockSegment(start = 10.0, end = 20.0, category = "sponsor", actionType = "skip", videoDuration = 300.0, uuid = "uuid-10.0"),
+            ),
             provider.getSegments(VIDEO_ID),
         )
+    }
+
+    @Test
+    fun whenResponseIsParsedThenSegmentUuidIsRead() = runTest {
+        val type = Types.newParameterizedType(List::class.java, VideoSegmentsResponse::class.java)
+        val json = """[{"videoID":"$VIDEO_ID","segments":[{"segment":[10.0,20.0],"category":"sponsor","actionType":"skip","UUID":"abc"}]}]"""
+        service.response = Response.success(Moshi.Builder().build().adapter<List<VideoSegmentsResponse>>(type).fromJson(json))
+
+        assertEquals(listOf("abc"), provider.getSegments(VIDEO_ID).map { it.uuid })
     }
 
     @Test
@@ -92,24 +105,28 @@ class RealSponsorBlockSegmentsProviderTest {
             listOf(
                 video(
                     VIDEO_ID,
-                    SegmentResponse(segment = null, category = "sponsor", actionType = "skip", videoDuration = null),
-                    SegmentResponse(segment = listOf(1.0), category = "sponsor", actionType = "skip", videoDuration = null),
-                    SegmentResponse(segment = listOf(1.0, 2.0, 3.0), category = "sponsor", actionType = "skip", videoDuration = null),
-                    SegmentResponse(segment = listOf(1.0, null), category = "sponsor", actionType = "skip", videoDuration = null),
+                    SegmentResponse(segment = null, category = "sponsor", actionType = "skip", videoDuration = null, uuid = "uuid"),
+                    SegmentResponse(segment = listOf(1.0), category = "sponsor", actionType = "skip", videoDuration = null, uuid = "uuid"),
+                    SegmentResponse(segment = listOf(1.0, 2.0, 3.0), category = "sponsor", actionType = "skip", videoDuration = null, uuid = "uuid"),
+                    SegmentResponse(segment = listOf(1.0, null), category = "sponsor", actionType = "skip", videoDuration = null, uuid = "uuid"),
                     segment(-1.0, 2.0),
                     segment(5.0, 5.0),
                     segment(6.0, 4.0),
                     segment(1.0, Double.POSITIVE_INFINITY),
                     segment(Double.NaN, 2.0),
-                    SegmentResponse(segment = listOf(1.0, 2.0), category = null, actionType = "skip", videoDuration = null),
-                    SegmentResponse(segment = listOf(1.0, 2.0), category = "sponsor", actionType = null, videoDuration = null),
+                    SegmentResponse(segment = listOf(1.0, 2.0), category = null, actionType = "skip", videoDuration = null, uuid = "uuid"),
+                    SegmentResponse(segment = listOf(1.0, 2.0), category = "sponsor", actionType = null, videoDuration = null, uuid = "uuid"),
+                    segment(7.0, 8.0, uuid = null),
+                    segment(9.0, 10.0, uuid = ""),
                     segment(30.0, 40.0, videoDuration = 0.0),
                 ),
             ),
         )
 
         assertEquals(
-            listOf(SponsorBlockSegment(start = 30.0, end = 40.0, category = "sponsor", actionType = "skip", videoDuration = null)),
+            listOf(
+                SponsorBlockSegment(start = 30.0, end = 40.0, category = "sponsor", actionType = "skip", videoDuration = null, uuid = "uuid-30.0"),
+            ),
             provider.getSegments(VIDEO_ID),
         )
     }
@@ -196,7 +213,8 @@ class RealSponsorBlockSegmentsProviderTest {
         category: String = "sponsor",
         actionType: String = "skip",
         videoDuration: Double? = null,
-    ) = SegmentResponse(segment = listOf(start, end), category = category, actionType = actionType, videoDuration = videoDuration)
+        uuid: String? = "uuid-$start",
+    ) = SegmentResponse(segment = listOf(start, end), category = category, actionType = actionType, videoDuration = videoDuration, uuid = uuid)
 
     private class FakeSponsorBlockService : SponsorBlockService {
         val requestedPrefixes = mutableListOf<String>()
