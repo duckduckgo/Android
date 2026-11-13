@@ -16,8 +16,13 @@
 package com.duckduckgo.duckchat.impl.widget
 
 import android.content.Context
+import android.os.Build
+import android.util.SizeF
+import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.widget.RemoteViews
+import androidx.annotation.RequiresApi
 import androidx.core.widget.RemoteViewsCompat
 import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
@@ -39,6 +44,15 @@ enum class DuckAiWidgetTarget(val requestCode: Int) {
     CHAT(1598),
 }
 
+/**
+ * Widget height from which the recent chats list is shown. Two launcher rows host up to ~230dp (the host view includes padding
+ * and exceeds the reported option sizes), three rows ~350dp; this fits the prompt bar, pills, two chats and the footer in between.
+ */
+const val MIN_CHATS_HEIGHT_DP = 280
+
+private const val MIN_WIDTH_DP = 180f
+private const val MIN_HEIGHT_DP = 110f
+
 class DuckAiWidgetConfigurator @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val chats: DuckAiChatsWidgetChats,
@@ -48,13 +62,32 @@ class DuckAiWidgetConfigurator @Inject constructor(
 ) {
     private val widgetLaunch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET)
 
+    suspend fun createRemoteViews(
+        context: Context,
+        appWidgetId: Int,
+        heightDp: Int,
+    ): RemoteViews {
+        val loaded = load(appWidgetId)
+        if (Build.VERSION.SDK_INT >= 31 && loaded.showChats) {
+            val compact = RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight)
+            val full = RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight)
+            render(context, appWidgetId, compact, loaded, showChats = false)
+            render(context, appWidgetId, full, loaded, showChats = true)
+            return RemoteViews(mapOf(SizeF(MIN_WIDTH_DP, MIN_HEIGHT_DP) to compact, SizeF(MIN_WIDTH_DP, MIN_CHATS_HEIGHT_DP.toFloat()) to full))
+        }
+        return RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight).also {
+            render(context, appWidgetId, it, loaded, showChats = loaded.showChats && heightDp >= MIN_CHATS_HEIGHT_DP)
+        }
+    }
+
     suspend fun populateRemoteViews(
         context: Context,
         appWidgetId: Int,
         remoteViews: RemoteViews,
+        heightDp: Int = Int.MAX_VALUE,
     ) {
         val loaded = load(appWidgetId)
-        render(context, appWidgetId, remoteViews, loaded, showChats = loaded.showChats)
+        render(context, appWidgetId, remoteViews, loaded, showChats = loaded.showChats && heightDp >= MIN_CHATS_HEIGHT_DP)
     }
 
     private suspend fun load(appWidgetId: Int): Loaded {
@@ -75,6 +108,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
     ) {
         val state = loaded.state
         withContext(dispatcherProvider.main()) {
+            if (Build.VERSION.SDK_INT >= 31) fitCardToContent(remoteViews, !showChats)
             remoteViews.setViewVisibility(R.id.chatsSection, if (showChats) View.VISIBLE else View.GONE)
             if (state == null) {
                 logcat { "DuckAiWidgetProvider Duck.ai disabled, click targets not wired" }
@@ -99,6 +133,12 @@ class DuckAiWidgetConfigurator @Inject constructor(
         val showChats: Boolean,
         val state: State?,
     )
+
+    @RequiresApi(31)
+    private fun fitCardToContent(remoteViews: RemoteViews, fit: Boolean) {
+        val height = if (fit) ViewGroup.LayoutParams.WRAP_CONTENT else ViewGroup.LayoutParams.MATCH_PARENT
+        remoteViews.setViewLayoutHeight(R.id.duckAiWidgetContainer, height.toFloat(), TypedValue.COMPLEX_UNIT_PX)
+    }
 
     private suspend fun loadState(showChats: Boolean): State {
         val historyAvailable = showChats && duckChat.isChatHistoryAvailable()

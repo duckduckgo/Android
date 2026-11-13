@@ -276,6 +276,89 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     @Test
+    fun whenHeightBelowThresholdThenChatsHiddenAndNotWired() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews, heightDp = MIN_CHATS_HEIGHT_DP - 1)
+
+        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.GONE)
+        verify(remoteViews, never()).setOnClickPendingIntent(eq(R.id.chatsViewAll), any())
+        verify(remoteViews).setOnClickPendingIntent(eq(R.id.actionVoice), any())
+    }
+
+    @Test
+    fun whenHeightAtThresholdThenChatsShown() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews, heightDp = MIN_CHATS_HEIGHT_DP)
+
+        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.VISIBLE)
+    }
+
+    @Test
+    fun whenPrefOffAndLargeHeightThenChatsHidden() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+        whenever(widgetPreferences.showRecentChats(APP_WIDGET_ID)).thenReturn(false)
+
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews, heightDp = 400)
+
+        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.GONE)
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun whenBelowApi31ThenSingleVariantFollowsHeight() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+
+        assertEquals(View.GONE, chatsSectionVisibility(testee.createRemoteViews(activity, APP_WIDGET_ID, MIN_CHATS_HEIGHT_DP - 1)))
+        assertEquals(View.VISIBLE, chatsSectionVisibility(testee.createRemoteViews(activity, APP_WIDGET_ID, MIN_CHATS_HEIGHT_DP)))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenApi31AndPrefOnThenSizeMapWithCompactAndFullVariantsBothWired() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+
+        val views = testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 50)
+
+        val variants = sizedVariants(views)
+        assertEquals(2, variants.size)
+        assertEquals(
+            setOf(View.GONE, View.VISIBLE),
+            variants.map { chatsSectionVisibility(it) }.toSet(),
+        )
+        variants.forEach {
+            val root = it.apply(activity, FrameLayout(activity))
+            listOf(R.id.promptBarContainer, R.id.actionVoice, R.id.actionCreateImage, R.id.actionTakePhoto).forEach { id ->
+                assertTrue(root.findViewById<View>(id).hasOnClickListeners())
+            }
+        }
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenApi31AndPrefOffThenOnlyCompactVariant() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+        whenever(widgetPreferences.showRecentChats(APP_WIDGET_ID)).thenReturn(false)
+
+        val views = testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400)
+
+        assertTrue(sizedVariants(views).isEmpty())
+        assertEquals(View.GONE, chatsSectionVisibility(views))
+    }
+
+    private fun chatsSectionVisibility(views: RemoteViews) = views.apply(
+        activity,
+        FrameLayout(activity),
+    ).findViewById<View>(R.id.chatsSection).visibility
+
+    @Suppress("UNCHECKED_CAST")
+    private fun sizedVariants(views: RemoteViews): List<RemoteViews> {
+        val field = RemoteViews::class.java.getDeclaredField("mSizedRemoteViews").apply { isAccessible = true }
+        return (field.get(views) as List<RemoteViews>?).orEmpty()
+    }
+
+    @Test
     fun whenAllTargetsBuiltThenRequestCodesAreDistinct() {
         val requestCodes = DuckAiWidgetTarget.entries.map { it.requestCode }
 
