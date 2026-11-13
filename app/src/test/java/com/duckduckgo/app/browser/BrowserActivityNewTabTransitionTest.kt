@@ -53,6 +53,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.InputMode
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.After
@@ -445,6 +446,21 @@ class BrowserActivityNewTabTransitionTest {
     }
 
     @Test
+    fun voiceLaunchDelegatesToOpenVoiceDuckChatWithoutLaunchingATabOrReportingTwice() {
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Voice(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+
+        val duckChat: DuckChat = mock()
+
+        processIntentWhileOnScreen(intent, duckChat)
+
+        verify(duckChat).openVoiceDuckChat(DuckChatEntryPoint.WIDGET_DUCK_AI)
+        verify(duckChat, never()).reportDuckChatEntry(any(), any(), any(), any())
+        verify(duckChat, never()).getDuckChatUrl(any(), any(), any())
+        verifyBlocking(tabManager, never()) { openNewTab(anyOrNull(), anyOrNull(), any()) }
+        verifyBlocking(viewModel, never()) { onOpenInNewTabRequested(any(), anyOrNull(), any()) }
+    }
+
+    @Test
     fun newChatLaunchWithoutUrlBuildsTheChatUrlAtTapTime() {
         val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
 
@@ -619,5 +635,6 @@ class BrowserActivityNewTabTransitionTest {
         const val OTHER = "other"
         const val REPLACEMENT = "replacement"
         const val URL = "https://example.com"
+        const val VOICE_URL = "https://duck.ai/?mode=voice-mode"
     }
 }

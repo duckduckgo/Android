@@ -68,6 +68,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             is DuckChatLaunch.Open -> launch.origin.toLaunchSource()
             is DuckChatLaunch.ImageGeneration -> launch.origin.toLaunchSource()
             is DuckChatLaunch.CameraCapture -> launch.origin.toLaunchSource()
+            is DuckChatLaunch.Voice -> launch.origin.toLaunchSource()
             is DuckChatLaunch.ChatHistory -> launch.origin.toLaunchSource()
             is DuckChatLaunch.ContextualChat -> InAppNavigation
             is DuckChatLaunch.TextSelection -> SelectedTextSearch
@@ -80,6 +81,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
             duckChatForceImageGeneration = launch is DuckChatLaunch.ImageGeneration,
+            duckChatVoice = launch is DuckChatLaunch.Voice,
             openDuckChatHistory = launch is DuckChatLaunch.ChatHistory,
             duckChatTextSelection = contextual?.textSelection ?: externalSelection?.text,
             nativeInputLaunch = NativeInputLaunch.from(launch),

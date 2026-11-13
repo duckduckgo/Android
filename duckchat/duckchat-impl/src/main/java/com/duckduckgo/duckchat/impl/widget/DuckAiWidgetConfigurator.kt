@@ -45,14 +45,10 @@ class DuckAiWidgetConfigurator @Inject constructor(
         context: Context,
         remoteViews: RemoteViews,
     ) {
-        val state = withContext(dispatcherProvider.io()) {
-            if (!duckChat.isEnabled()) return@withContext null
-            // Built once: the URL builders consume the one-shot address bar picker attribution.
-            State(voiceUrl = duckChat.getVoiceDuckChatUrl())
-        }
+        val enabled = withContext(dispatcherProvider.io()) { duckChat.isEnabled() }
 
         withContext(dispatcherProvider.main()) {
-            if (state == null) {
+            if (!enabled) {
                 logcat { "DuckAiWidgetProvider Duck.ai disabled, click targets not wired" }
                 return@withContext
             }
@@ -63,7 +59,12 @@ class DuckAiWidgetConfigurator @Inject constructor(
             )
             remoteViews.setOnClickPendingIntent(
                 R.id.actionVoice,
-                intents.launchDuckAi(context, DuckAiWidgetTarget.VOICE.requestCode, state.voiceUrl, widgetLaunch),
+                intents.launchDuckAi(
+                    context,
+                    DuckAiWidgetTarget.VOICE.requestCode,
+                    null,
+                    DuckChatLaunch.Voice(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
+                ),
             )
             remoteViews.setOnClickPendingIntent(
                 R.id.actionCreateImage,
@@ -85,8 +86,4 @@ class DuckAiWidgetConfigurator @Inject constructor(
             )
         }
     }
-
-    private class State(
-        val voiceUrl: String,
-    )
 }

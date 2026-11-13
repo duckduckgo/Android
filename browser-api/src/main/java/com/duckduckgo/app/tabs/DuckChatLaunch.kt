@@ -42,6 +42,13 @@ sealed interface DuckChatLaunch {
     data class CameraCapture(val origin: DuckChatLaunchOrigin = DuckChatLaunchOrigin.IN_APP) : DuckChatLaunch
 
     /**
+     * Opens a new Duck.ai voice chat.
+     *
+     * @param origin where the launch comes from.
+     */
+    data class Voice(val origin: DuckChatLaunchOrigin = DuckChatLaunchOrigin.IN_APP) : DuckChatLaunch
+
+    /**
      * Opens the native chat history screen.
      *
      * @param origin where the launch comes from.
