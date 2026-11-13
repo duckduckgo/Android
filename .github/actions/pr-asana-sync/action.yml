@@ -29,5 +29,5 @@ outputs:
   result:
     description: "Will be one of: created, updated"
 runs:
-  using: "node20"
+  using: "node24"
   main: "dist/index.js"
