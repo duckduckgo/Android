@@ -202,7 +202,7 @@
                 android:gravity="center"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:text="@string/duckAiWidgetEmpty"
+                android:text="@string/duck_ai_chat_history_empty_title"
                 android:textSize="14sp"
                 android:textColor="@color/duckAiWidgetHintColor"
                 android:visibility="gone" />

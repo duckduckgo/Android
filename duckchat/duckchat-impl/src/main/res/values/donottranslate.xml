@@ -46,7 +46,6 @@
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
 
     <!-- Duck.ai widget: copy not final yet -->
-    <string name="duckAiWidgetEmpty">No chats yet</string>
     <string name="duckAiWidgetUnavailable">Chat history is not available</string>
     <string name="duckAiWidgetLabel">Duck.ai with chats</string>
     <string name="duckAiWidgetDescription">Start a private chat with Duck.ai, use quick actions or pick up a recent chat.</string>
