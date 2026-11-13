@@ -32,7 +32,8 @@ areas that have one. Commands use `V=.claude/skills/verify/verify.sh` from `../S
 | [search-and-navigate.md](search-and-navigate.md) | Typing a URL or query and loading the result | `browser.newtab`, `browser.main` |
 | [tabs.md](tabs.md) | Tab switcher, opening, switching and closing tabs | `tabSwitcher`, `tabs.tab-switcher-menu`, `seed tabs` |
 | [fire-button.md](fire-button.md) | Clearing tabs and site data | `browser.data-clearing`, `fire.*`, `browser.single-tab-fire-sheet` |
-| [browser-menu.md](browser-menu.md) | Browser menu entries, bookmarks | `browser.menu-sheet`, `bookmarks*`, `seed bookmarks` |
+| [browser-menu.md](browser-menu.md) | Browser menu: every entry and where it lands | `browser.menu-sheet` |
+| [bookmarks.md](bookmarks.md) | Add, folders, move, delete and undo, favourites, import | `bookmarks*`, `seed bookmarks-populated` |
 | [web-forms.md](web-forms.md) | Links, form fields and submit inside a page | `browser.main` + DevTools |
 | [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history | `browser.duckai-view`, `duckai.*`, `duckchat.*`, `seed duckai-chat-history` |
 | [settings.md](settings.md) | Settings hub, General, After Inactivity, next steps, web settings | `settings*`, `browser.private-search`, `seed settings-next-steps-visible` |
