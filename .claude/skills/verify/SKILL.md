@@ -74,10 +74,12 @@ relative capture paths into that device's evidence folder.
 | `$V t find <words>` / `$V t list --screens\|--surfaces\|--fixtures\|--commands` | The catalog: every registered screen, surface (dialogs, sheets, menus) and fixture |
 | `$V t goto <target>` | Opens a screen or surface through the app's own navigation; `$V t where --json` reports where you are |
 | `$V t hierarchy --interactive-only` | Tappable Views and Compose nodes with `ref`, `id`, `text`, `description`, bounds |
-| `$V t tap <selector>` | `id:inputField`, `text:Bookmarks`, `desc:Tabs`, `ref:0003`; `--index N` when it repeats |
+| `$V t tap <selector>` | `id:inputField`, `text:Bookmarks`, `desc:Tabs`, `ref:0003`; `--index N` (1-based) when it repeats |
 | `$V t type <selector> <text>` / `$V t key back\|home\|enter` | Replaces a native field's text / sends a key |
 | `$V t assert visible\|not-visible <selector>`, `assert text <selector> <expected>`, `assert where <target>` | Exit code 15 when false |
 | `$V wait <selector> [secs]` | Polls `assert visible` (trapdoor's assert does not wait) |
+| `$V checked <resource-id> [index]` | `true`/`false` for a switch, checkbox or radio (trapdoor's hierarchy has no checked state) |
+| `$V survey '<name regex>'` | Opens every matching catalog target and saves where/hierarchy/screenshot; the raw material for a new feature file |
 | `$V t browse --url <url> [--new-tab]` | Submits a URL to the tab without typing in the omnibar |
 | `$V t seed <fixture>` / `$V t set theme\|flag ...` / `$V t reset` | Test data and state; `reset` clears app data |
 
@@ -101,7 +103,8 @@ touch path the user takes. DevTools needs Web Content Debugging on, once per run
 
 ```bash
 $V t goto dev.settings
-$V t tap id:trailingSwitch --index 2   # third switch is "Web Content Debugging"; confirm with $V t hierarchy
+$V t tap id:trailingSwitch --index 3   # 1-based: the third switch, "Web Content Debugging"
+$V t shot dev-settings.png             # look at it: the switch must be on, and "Start-up tracing" off
 $V t goto browser.main
 ```
 
@@ -147,6 +150,10 @@ failed run too, before retrying.
 
 - A device can have this checkout's internal app *without* the bridge (installed from Android Studio or plain Gradle). `trapdoor doctor` then passes its catalog and `sourceHead` checks but fails `bridge replies`; `$V build` fixes it. Confirm with `adb -s <serial> shell dumpsys package com.duckduckgo.mobile.android.debug | grep -c -i trapdoor` (0 means no bridge).
 - On a Pixel 7 with Android 17 (2026-11-13), every UI command returns `notReady: could not establish UI safety from device observations`, even with the app focused and the screen unlocked. trapdoor's `UiSafety` reads `mPackageName` only from a line that starts with it, and this Android version prints it mid-line in `dumpsys window sessions`. Until trapdoor handles that, verify on an emulator or another device and report the phone as not verified.
+- `--index` is 1-based. Index 0 is rejected; an off-by-one silently taps the neighbour, so read state with `$V checked` or a screenshot after tapping.
+- With the native input focused (keyboard up), `goto` to another activity returns `notReady: probe did not pass: ActivityResumed(...)`. Press `$V t key back` two or three times first. After any `goto`, `$V wait` for the first element you tap.
+- `doctor` fails `sourceHead matches HEAD` after any new commit, even one that touches no app code. Run `$V build`.
+- WebView debugging can appear to work with the switch off: `UrlExtractingWebView` enables it process-wide when created. Still switch it on in the baseline so `web` commands do not depend on that.
 - trapdoor exit codes: 10 `notReady` (retry once), 11 `wrongScreen`, 12 `unavailable`, 14 `staleRef` (refs expire on any layout change; use the fresh hierarchy in the reply), 15 assertion false. Do not repeat a mutation after an ambiguous reply; check `$V t where --json` first.
 - trapdoor prepares first-run state on install, so recipes start past onboarding. Onboarding itself is driven through the `onboarding.*` targets and the `seed dax-onboarding` / `onboarding-fixture` fixtures.
 - Booting a wiped Play Store image and launching straight away gets the app killed ("depends on provider ... in dying proc com.google.android.gms") or crashed inside the system WebView. That is why the fallback AVD settles on its first boot (marker file `verify-settled` in its AVD folder). Don't add `fastboot.forceColdBoot` or snapshot flags to its config; snapshots went stale under cold boots and failed to load.

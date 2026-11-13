@@ -25,7 +25,7 @@ Preconditions: baseline; `$V t browse --url https://privacy-test-pages.site/` an
 - **Open switcher.** `$V t record start tabs.mp4`, `$V t tap id:tabsMenu`, `$V t assert where tabSwitcher`, `$V t assert visible "text:Privacy Test Pages - Home"`, `$V t shot tabs-switcher.png`.
 - **New tab.** `$V t tap id:newTabToolbarButton`, `$V wait id:inputField`, `$V t assert text id:inputModeWidgetNavTabs 2`, `$V t shot tabs-new.png`.
 - **Switch.** `$V t tap id:inputModeWidgetNavTabs`, `$V t tap "text:Privacy Test Pages - Home"`, `$V wait id:browserWebView`, `$V web eval 'location.host'` returns `"privacy-test-pages.site"`.
-- **Close.** In the switcher, `$V t tap id:close --index 0` and `$V t assert not-visible "text:Privacy Test Pages - Home"`. `$V t record stop`.
+- **Close.** In the switcher, `$V t tap id:close --index 1` and `$V t assert not-visible "text:Privacy Test Pages - Home"`. `$V t record stop`.
 - Many tabs: `$V t seed tabs --count 20` before opening the switcher.
 
 ## Gotchas

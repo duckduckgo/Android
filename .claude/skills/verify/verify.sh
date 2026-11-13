@@ -261,6 +261,59 @@ cmd_web() {
   esac
 }
 
+# trapdoor's hierarchy has no checked state; uiautomator does. Prints true/false for the Nth (1-based)
+# visible view with this resource id, so a recipe can read a switch before and after tapping it.
+cmd_checked() {
+  local id="${1:?usage: verify.sh checked <resource-id> [index]}" index="${2:-1}" value
+  value="$(a exec-out uiautomator dump /dev/tty 2>/dev/null | grep -o "<node [^>]*resource-id=\"[^\"]*:id/$id\"[^>]*>" \
+    | sed -n "${index}p" | grep -o 'checked="[a-z]*"' | head -1 | cut -d'"' -f2)"
+  [[ -n "$value" ]] || die "no view with id $id at index $index"
+  echo "$value"
+}
+
+# Opens every catalog screen and surface whose name matches a regex and saves what each one shows:
+# where, the tappable elements and a screenshot. Raw material for a feature file, not proof of a user path.
+cmd_survey() {
+  local pattern="${1:?usage: verify.sh survey '<name regex>'   e.g. '^settings'}"
+  local out; out="$VERIFY_ROOT/survey/$(printf '%s' "$pattern" | tr -c 'A-Za-z0-9._-' '_')"
+  mkdir -p "$out"
+  local targets
+  targets="$( { td list --screens; td list --surfaces; } | awk -F'\t' -v p="$pattern" '$1 ~ p { print $1 "\t" $2 "\t" $NF }')"
+  [[ -n "$targets" ]] || die "no catalog targets match $pattern; try: verify.sh t find <words>"
+  {
+    echo "# Survey: $pattern"
+    echo
+    echo "$(label "$(serial)"), $(git -C "$REPO" rev-parse --short HEAD), $(date '+%Y-%m-%d %H:%M')"
+    echo
+    echo "| Target | Type | Result | Reached | Tappable |"
+    echo "|---|---|---|---|---|"
+  } > "$out/README.md"
+  local name type drivable reply status where count
+  while IFS=$'\t' read -r name type drivable; do
+    if [[ "$drivable" != "not-drivable: -" ]]; then
+      echo "| \`$name\` | $type | not drivable | ${drivable#not-drivable: } | |" >> "$out/README.md"; continue
+    fi
+    td dismiss >/dev/null 2>&1 || true
+    reply="$(td goto "$name" --json 2>/dev/null || true)"
+    status="$(jq -r '.status // "error"' <<<"$reply" 2>/dev/null || echo error)"
+    if [[ "$status" == "notReady" ]]; then
+      reply="$(td goto "$name" --json 2>/dev/null || true)"; status="$(jq -r '.status // "error"' <<<"$reply" 2>/dev/null || echo error)"
+    fi
+    if [[ "$status" == "ok" ]]; then
+      where="$(td where --json | jq -r '.data | "\(.screenName)\(if .surface then " / " + .surface else "" end)"')"
+      td hierarchy --interactive-only --json > "$out/$name.hierarchy.json" 2>/dev/null || true
+      count="$(jq '.data.tappable | length' "$out/$name.hierarchy.json" 2>/dev/null || echo "?")"
+      (cd "$out" && td shot "$name.png" >/dev/null 2>&1) || true
+      echo "| \`$name\` | $type | ok | $where | $count |" >> "$out/README.md"
+    else
+      echo "| \`$name\` | $type | $status | $(jq -r '.reason // ""' <<<"$reply" 2>/dev/null | tr '|' '/') | |" >> "$out/README.md"
+    fi
+    echo "$name: $status"
+  done <<<"$targets"
+  td dismiss >/dev/null 2>&1 || true
+  echo "survey: $out/README.md"
+}
+
 cmd_logcat() { local d; d="$(evidence_dir)"; a logcat -d > "$d/logcat-$(date +%H%M%S).txt"; echo "$d"; }
 
 # Undoes only what the run did: stops recordings, removes its own adb forwards, and stops emulators
@@ -286,7 +339,7 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|t|wait|web|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|t|wait|checked|web|survey|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on
@@ -297,6 +350,8 @@ usage: verify.sh devices                      attached devices and AVDs on this 
        verify.sh t <trapdoor args>            trapdoor on the device, captures saved to evidence
        verify.sh wait <selector> [secs]       poll trapdoor assert visible (id:X, text:X, desc:X)
        verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'
+       verify.sh checked <resource-id> [index]  true/false for a switch or checkbox (1-based index)
+       verify.sh survey '<name regex>'       open every matching catalog target, save where/hierarchy/shot
        verify.sh logcat
 EOF
      exit 2 ;;
