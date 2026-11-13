@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Nesen</string>
     <string name="duck_ai_chat_history_untitled">Tērzēšana bez nosaukuma</string>
     <string name="duck_ai_chat_history_empty_title">Vēl nav nevienas tērzēšanas</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Atvērt Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Citas iespējas</string>
     <string name="duck_ai_chat_history_action_select">Atlasīt</string>
     <string name="duck_ai_chat_history_action_pin">Piespraust</string>

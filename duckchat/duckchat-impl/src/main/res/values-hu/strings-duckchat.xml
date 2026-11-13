@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Legutóbbi</string>
     <string name="duck_ai_chat_history_untitled">Névtelen beszélgetés</string>
     <string name="duck_ai_chat_history_empty_title">Még nincsenek csevegések</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Duck.ai megnyitása</string>
     <string name="duck_ai_chat_history_more_options">További lehetőségek</string>
     <string name="duck_ai_chat_history_action_select">Kiválasztás</string>
     <string name="duck_ai_chat_history_action_pin">Kitűzés</string>

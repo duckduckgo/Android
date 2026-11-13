@@ -230,7 +230,6 @@
     <string name="duck_ai_chat_history_section_recent">Recent</string>
     <string name="duck_ai_chat_history_untitled">Untitled chat</string>
     <string name="duck_ai_chat_history_empty_title">No chats yet</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Open Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">More options</string>
     <string name="duck_ai_chat_history_action_select">Select</string>
     <string name="duck_ai_chat_history_action_pin">Pin</string>

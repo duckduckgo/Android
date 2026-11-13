@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Πρόσφατα</string>
     <string name="duck_ai_chat_history_untitled">Συνομιλία χωρίς τίτλο</string>
     <string name="duck_ai_chat_history_empty_title">Δεν υπάρχουν συνομιλίες ακόμα</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Άνοιξε το Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Περισσότερες επιλογές</string>
     <string name="duck_ai_chat_history_action_select">Επιλογή</string>
     <string name="duck_ai_chat_history_action_pin">Καρφίτσα</string>

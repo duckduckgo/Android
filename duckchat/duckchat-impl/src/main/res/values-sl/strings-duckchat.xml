@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Nedavno</string>
     <string name="duck_ai_chat_history_untitled">Nepoimenovan klepet</string>
     <string name="duck_ai_chat_history_empty_title">Še ni pogovorov</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Odprite Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Več možnosti</string>
     <string name="duck_ai_chat_history_action_select">Izberi</string>
     <string name="duck_ai_chat_history_action_pin">Pripni</string>

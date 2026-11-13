@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Recent</string>
     <string name="duck_ai_chat_history_untitled">Chat fără titlu</string>
     <string name="duck_ai_chat_history_empty_title">Nu există încă chaturi</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Deschide Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Mai multe opțiuni</string>
     <string name="duck_ai_chat_history_action_select">Selectează</string>
     <string name="duck_ai_chat_history_action_pin">Fixează</string>

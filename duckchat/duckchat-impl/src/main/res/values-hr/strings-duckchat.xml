@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Nedavno</string>
     <string name="duck_ai_chat_history_untitled">Neimenovano čavrljanje</string>
     <string name="duck_ai_chat_history_empty_title">Još nema čavrljanja</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Otvori Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Dodatne mogućnosti</string>
     <string name="duck_ai_chat_history_action_select">Odabir</string>
     <string name="duck_ai_chat_history_action_pin">Prikvači</string>

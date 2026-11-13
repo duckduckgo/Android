@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Seneste</string>
     <string name="duck_ai_chat_history_untitled">Chat uden titel</string>
     <string name="duck_ai_chat_history_empty_title">Ingen chats endnu</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Åbn Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Flere muligheder</string>
     <string name="duck_ai_chat_history_action_select">Vælg</string>
     <string name="duck_ai_chat_history_action_pin">Fastgør</string>

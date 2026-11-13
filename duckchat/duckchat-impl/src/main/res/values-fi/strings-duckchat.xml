@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Viimeaikaiset</string>
     <string name="duck_ai_chat_history_untitled">Nimetön keskustelu</string>
     <string name="duck_ai_chat_history_empty_title">Ei vielä yhtään keskustelua</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Avaa Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Lisää vaihtoehtoja</string>
     <string name="duck_ai_chat_history_action_select">Valitse</string>
     <string name="duck_ai_chat_history_action_pin">Kiinnitä</string>
