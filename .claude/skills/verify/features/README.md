@@ -35,15 +35,17 @@ areas that have one. Commands use `V=.claude/skills/verify/verify.sh` from `../S
 | [browser-menu.md](browser-menu.md) | Browser menu entries, bookmarks | `browser.menu-sheet`, `bookmarks*`, `seed bookmarks` |
 | [web-forms.md](web-forms.md) | Links, form fields and submit inside a page | `browser.main` + DevTools |
 | [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history | `browser.duckai-view`, `duckai.*`, `duckchat.*`, `seed duckai-chat-history` |
+| [settings.md](settings.md) | Settings hub, General, After Inactivity, next steps, web settings | `settings*`, `browser.private-search`, `seed settings-next-steps-visible` |
 
 Catalog areas without a recipe yet (screen + surface counts on 2026-11-13): onboarding 34, sync 23,
 autofill 20, subscriptions 18, apptp 18, designsystem 18, pir 11, feedback 8, networkprotection 7,
-settings 5, privacy 5, vpn 4, sitepermissions 3, downloads 3. List them with
+privacy 5, vpn 4, sitepermissions 3, downloads 3. List them with
 `$V t list --screens` / `--surfaces`, or `$V t find <area>`.
 
 ## Adding a feature
 
-1. Find its targets: `$V t find <words>`, and the fixtures that set it up: `$V t list --fixtures`.
+1. Survey it: `$V survey '<name regex>'` (e.g. `'^settings'`) opens every matching catalog target and saves where it landed, its tappable elements and a screenshot to `build/verify/survey/<regex>/`, with a README table of what opened and what did not. A target that is `notReady` usually needs a fixture: `$V t list --fixtures`.
+   Then find the user entry points in code: the screen's `@ContributeToActivityStarter` params, and every `globalActivityStarter.start(..., <Params>)` call site. The survey only proves a screen opens; the code tells you how a user reaches it.
 2. Drive it once on a fresh run. `goto` the starting point, then walk every user entry point with `$V t hierarchy --interactive-only` on each screen (and `$V web eval` inside pages) to collect real selectors. Never copy selectors from code or Maestro flows without seeing them in the hierarchy.
 3. Create `<feature>.md` here: an H1, one paragraph of user-visible behaviour, then exactly these H2s: `Sub-features` (short ids, one line each), `How to get to it (user POV)` (every entry point), `Driving it with verify.sh` (commands and the observable end state per entry point), `Gotchas` (ending with which sub-features have been driven and when).
 4. Add a row to the table above and remove the area from the "without a recipe" list.
