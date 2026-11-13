@@ -72,6 +72,9 @@ class FakeSubscriptionsDataStore(
         accessTokenExpiresAt: Instant,
         refreshToken: String,
         refreshTokenExpiresAt: Instant,
+        entitlements: String,
+        email: String?,
+        externalId: String,
     ): Boolean {
         if (simluateAccessTokenV2StoreError) throw IOException()
         if (!available || simulateTokenCommitFailure) return false
@@ -79,6 +82,25 @@ class FakeSubscriptionsDataStore(
         accessTokenV2ExpiresAt = accessTokenExpiresAt
         refreshTokenV2 = refreshToken
         refreshTokenV2ExpiresAt = refreshTokenExpiresAt
+        this.entitlements = entitlements
+        this.email = email
+        this.externalId = externalId
+        return true
+    }
+
+    override fun clearTokensAndHistory(): Boolean {
+        if (!available) return false
+        accessTokenV2 = null
+        accessTokenV2ExpiresAt = null
+        refreshTokenV2 = null
+        refreshTokenV2ExpiresAt = null
+        accessToken = null
+        authToken = null
+        email = null
+        externalId = null
+        tokenRefreshFailureStreak = 0
+        lastTokenRefreshSuccessAt = null
+        lastTokenRefreshProcess = null
         return true
     }
 }

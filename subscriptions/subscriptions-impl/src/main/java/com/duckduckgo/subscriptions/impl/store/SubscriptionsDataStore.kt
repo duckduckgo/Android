@@ -70,7 +70,12 @@ interface SubscriptionsDataStore {
         accessTokenExpiresAt: Instant,
         refreshToken: String,
         refreshTokenExpiresAt: Instant,
+        entitlements: String,
+        email: String?,
+        externalId: String,
     ): Boolean
+
+    fun clearTokensAndHistory(): Boolean
 }
 
 /**
@@ -316,6 +321,9 @@ internal class SubscriptionsEncryptedDataStore(
         accessTokenExpiresAt: Instant,
         refreshToken: String,
         refreshTokenExpiresAt: Instant,
+        entitlements: String,
+        email: String?,
+        externalId: String,
     ): Boolean {
         val editor = encryptedPreferences?.edit() ?: return false
         return editor
@@ -323,6 +331,26 @@ internal class SubscriptionsEncryptedDataStore(
             .putLong(KEY_ACCESS_TOKEN_V2_EXPIRES_AT, accessTokenExpiresAt.toEpochMilli())
             .putString(KEY_REFRESH_TOKEN_V2, refreshToken)
             .putLong(KEY_REFRESH_TOKEN_V2_EXPIRES_AT, refreshTokenExpiresAt.toEpochMilli())
+            .putString(KEY_ENTITLEMENTS, entitlements)
+            .putString(KEY_EMAIL, email)
+            .putString(KEY_EXTERNAL_ID, externalId)
+            .commit()
+    }
+
+    override fun clearTokensAndHistory(): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor
+            .remove(KEY_ACCESS_TOKEN_V2)
+            .remove(KEY_ACCESS_TOKEN_V2_EXPIRES_AT)
+            .remove(KEY_REFRESH_TOKEN_V2)
+            .remove(KEY_REFRESH_TOKEN_V2_EXPIRES_AT)
+            .remove(KEY_ACCESS_TOKEN)
+            .remove(KEY_AUTH_TOKEN)
+            .remove(KEY_EMAIL)
+            .remove(KEY_EXTERNAL_ID)
+            .remove(KEY_TOKEN_REFRESH_FAILURE_STREAK)
+            .remove(KEY_LAST_TOKEN_REFRESH_SUCCESS_AT)
+            .remove(KEY_LAST_TOKEN_REFRESH_PROCESS)
             .commit()
     }
 

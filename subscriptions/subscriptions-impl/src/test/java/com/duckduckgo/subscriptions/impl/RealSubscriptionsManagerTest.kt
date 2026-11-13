@@ -1797,13 +1797,10 @@ class RealSubscriptionsManagerTest {
             subscriptionOnboardingExperiments,
         )
         manager.signOut()
+        verify(mockRepo).clearTokensAndHistory()
         verify(mockRepo).setSubscription(null)
-        verify(mockRepo).setAccount(null)
-        verify(mockRepo).setAuthToken(null)
-        verify(mockRepo).setAccessToken(null)
         verify(mockRepo).setEntitlements(emptyList())
-        verify(mockRepo).setAccessTokenV2(null)
-        verify(mockRepo).setRefreshTokenV2(null)
+        verify(mockRepo).removeLocalPurchasedAt()
     }
 
     @Test
@@ -2500,6 +2497,33 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenRefreshFailsWithServerErrorThenFailureStreakIsUnchanged() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        val responseBody = "unavailable".toResponseBody("text/json".toMediaTypeOrNull())
+        whenever(authClient.getTokens(any())).thenThrow(HttpException(Response.error<Void>(503, responseBody)))
+        authDataStore.tokenRefreshFailureStreak = 1
+
+        subscriptionsManager.getAccessToken()
+
+        assertEquals(1, authDataStore.tokenRefreshFailureStreak)
+        assertTrue(subscriptionsManager.isSignedIn())
+    }
+
+    @Test
+    fun whenRefreshSucceedsThenEntitlementsAndAccountAreSavedWithTheTokens() = runTest {
+        givenUserIsSignedIn(accountExternalId = "5678")
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newRefreshToken = "new refresh token")
+
+        subscriptionsManager.getAccessToken()
+
+        assertEquals("new refresh token", authDataStore.refreshTokenV2)
+        assertEquals("1234", authDataStore.externalId)
+        assertEquals(listOf(Entitlement(product = NetP.value, name = "subscriber")), authRepository.getEntitlements())
+    }
+
+    @Test
     fun whenRefreshTokenIsMissingThenTokenReadFailureIsReportedAsMissing() = runTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
@@ -2575,6 +2599,7 @@ class RealSubscriptionsManagerTest {
 
         assertTrue(result is AccessTokenResult.Failure)
         assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
+        assertEquals("1234", authDataStore.externalId)
         verify(tokenRefreshWideEvent).onTokenSaveFailed(TokenStoreError.WRITE_FAILED)
         verify(tokenRefreshWideEvent, never()).onTokensSaved()
         verify(pixelSender).reportAuthV2TokenStoreError()
