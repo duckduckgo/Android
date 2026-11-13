@@ -30,4 +30,4 @@ Preconditions: baseline; `$V t goto browser.newtab`.
 - On the New Tab Page the field is `inputField`; on a loaded page tap `omnibarTextInputClickCatcher` to open the input.
 - `$V t type` replaces the field's text; trapdoor reports only the length, so assert on its effect (the suggestion rows) and check the `nav-typed.png` shot.
 - `browse --url` is setup only. It skips the input entirely, so it never proves this feature.
-- Driven with trapdoor: `nav-url` (2026-11-13). The other sub-features were driven with the earlier android-CLI harness only.
+- Driven with trapdoor: `nav-url` (2026-11-13, on the `ddg_verify_api34` emulator and on a Pixel 7 with Android 17). The other sub-features were driven with the earlier android-CLI harness only.

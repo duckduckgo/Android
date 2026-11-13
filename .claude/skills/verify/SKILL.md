@@ -149,7 +149,8 @@ failed run too, before retrying.
 ## Gotchas
 
 - A device can have this checkout's internal app *without* the bridge (installed from Android Studio or plain Gradle). `trapdoor doctor` then passes its catalog and `sourceHead` checks but fails `bridge replies`; `$V build` fixes it. Confirm with `adb -s <serial> shell dumpsys package com.duckduckgo.mobile.android.debug | grep -c -i trapdoor` (0 means no bridge).
-- On a Pixel 7 with Android 17 (2026-11-13), every UI command returns `notReady: could not establish UI safety from device observations`, even with the app focused and the screen unlocked. trapdoor's `UiSafety` reads `mPackageName` only from a line that starts with it, and this Android version prints it mid-line in `dumpsys window sessions`. Until trapdoor handles that, verify on an emulator or another device and report the phone as not verified.
+- Android 17 devices need trapdoor `d062f99` or later (`trapdoor update`, then `$V build`). Older versions refuse every UI command with `notReady: could not establish UI safety from device observations`.
+- `$V checked` uses `uiautomator dump`, which is killed (`Killed`) while another UI-automation client runs on the device, such as a leftover Maestro driver (`dev.mobile.maestro`). On the user's device, ask before stopping it; until then, read switch state from a screenshot.
 - `--index` is 1-based. Index 0 is rejected; an off-by-one silently taps the neighbour, so read state with `$V checked` or a screenshot after tapping.
 - With the native input focused (keyboard up), `goto` to another activity returns `notReady: probe did not pass: ActivityResumed(...)`. Press `$V t key back` two or three times first. After any `goto`, `$V wait` for the first element you tap.
 - `doctor` fails `sourceHead matches HEAD` after any new commit, even one that touches no app code. Run `$V build`.

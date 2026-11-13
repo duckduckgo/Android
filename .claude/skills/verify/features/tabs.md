@@ -32,4 +32,6 @@ Preconditions: baseline; `$V t browse --url https://privacy-test-pages.site/` an
 
 - Switcher toolbar ids: `duckAIToolbarButton`, `fireToolbarButton`, `newTabToolbarButton`, `popupMenuToolbarButton`; back is `desc:Navigate up`.
 - The "trackers blocked" panel (`item_container`) is the first tappable item; cards follow it, and every card's close button is `id:close`, so index by card order.
+- A card's title can stay empty right after its page loads (seen on a Pixel 7 with Android 17: still empty after 10 s, while the emulator showed it). Assert the card count or the selected card rather than only its title text, and look at the screenshot.
+- On the user's device, count tabs before the recipe and close the ones it opened; `goto browser.newtab` and "New Tab" both add tabs.
 - Driven with trapdoor: `tabs-open-switcher`, `tabs-new` (2026-11-13). The rest were driven with the earlier harness only.

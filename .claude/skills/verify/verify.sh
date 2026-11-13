@@ -267,7 +267,7 @@ cmd_checked() {
   local id="${1:?usage: verify.sh checked <resource-id> [index]}" index="${2:-1}" value
   value="$(a exec-out uiautomator dump /dev/tty 2>/dev/null | grep -o "<node [^>]*resource-id=\"[^\"]*:id/$id\"[^>]*>" \
     | sed -n "${index}p" | grep -o 'checked="[a-z]*"' | head -1 | cut -d'"' -f2)"
-  [[ -n "$value" ]] || die "no view with id $id at index $index"
+  [[ -n "$value" ]] || die "no view with id $id at index $index (uiautomator killed? another UI-automation client such as Maestro may be running)"
   echo "$value"
 }
 
