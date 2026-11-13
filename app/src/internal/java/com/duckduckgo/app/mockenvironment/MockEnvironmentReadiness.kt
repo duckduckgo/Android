@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.mockenvironment
 
+import android.content.Context
 import android.net.Uri
 import android.os.Process
 import android.util.Log
+import android.webkit.WebSettings
 import androidx.webkit.ProxyConfig
 import androidx.webkit.ProxyController
 import androidx.webkit.WebViewFeature
@@ -47,6 +49,7 @@ import kotlin.coroutines.resume
  */
 @SingleIn(AppScope::class)
 class MockEnvironmentReadiness @Inject constructor(
+    private val context: Context,
     private val snapshot: MockEnvironmentSnapshot,
     private val store: MockEnvironmentStore,
     private val dispatchers: DispatcherProvider,
@@ -91,7 +94,13 @@ class MockEnvironmentReadiness @Inject constructor(
         return if (runCatching { setProxy("$PROXY_HOST:${store.fixturePort}") }.isSuccess) null else "proxy_failed"
     }
 
-    private suspend fun setProxy(hostAndPort: String) = suspendCancellableCoroutine { continuation ->
+    private suspend fun setProxy(hostAndPort: String) {
+        // setProxyOverride throws "Must be started before we block!" until WebView is started, which a WebView call on the main thread does.
+        withContext(dispatchers.main()) { WebSettings.getDefaultUserAgent(context) }
+        setProxyOverride(hostAndPort)
+    }
+
+    private suspend fun setProxyOverride(hostAndPort: String) = suspendCancellableCoroutine { continuation ->
         // One rule for every scheme and no direct fallback, so a dead proxy fails requests instead of reaching the internet.
         // Loopback stays implicitly bypassed, which is how the fixture page itself is still loaded directly.
         val config = ProxyConfig.Builder().addProxyRule(hostAndPort).build()
