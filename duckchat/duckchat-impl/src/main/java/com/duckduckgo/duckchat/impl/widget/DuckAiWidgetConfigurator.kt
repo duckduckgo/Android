@@ -119,7 +119,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
 
             remoteViews.setOnClickPendingIntent(
                 R.id.promptBarContainer,
-                intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, state.newChatUrl, widgetLaunch),
+                intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, null, widgetLaunch),
             )
             wireActions(context, remoteViews, state)
             if (showChats) {
@@ -143,11 +143,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
     private suspend fun loadState(showChats: Boolean): State {
         val historyAvailable = showChats && duckChat.isChatHistoryAvailable()
         val widgetChats = if (historyAvailable) runCatching { chats.getChats() }.getOrDefault(emptyList()) else emptyList()
-        // Built once: the URL builders consume the one-shot address bar picker attribution.
-        val newChatUrl = duckChat.getDuckChatUrl("", false)
         return State(
-            newChatUrl = newChatUrl,
-            voiceUrl = duckChat.getVoiceDuckChatUrl(),
             chatHistoryAvailable = historyAvailable,
             chats = widgetChats,
             chatUrls = widgetChats.associate { it.chatId to duckChat.buildChatUrl(it.chatId) },
@@ -161,14 +157,19 @@ class DuckAiWidgetConfigurator @Inject constructor(
     ) {
         remoteViews.setOnClickPendingIntent(
             R.id.actionVoice,
-            intents.launchDuckAi(context, DuckAiWidgetTarget.VOICE.requestCode, state.voiceUrl, widgetLaunch),
+            intents.launchDuckAi(
+                context,
+                DuckAiWidgetTarget.VOICE.requestCode,
+                null,
+                DuckChatLaunch.Voice(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
+            ),
         )
         remoteViews.setOnClickPendingIntent(
             R.id.actionCreateImage,
             intents.launchDuckAi(
                 context,
                 DuckAiWidgetTarget.CREATE_IMAGE.requestCode,
-                state.newChatUrl,
+                null,
                 DuckChatLaunch.ImageGeneration(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
             ),
         )
@@ -177,7 +178,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
             intents.launchDuckAi(
                 context,
                 DuckAiWidgetTarget.TAKE_PHOTO.requestCode,
-                state.newChatUrl,
+                null,
                 DuckChatLaunch.CameraCapture(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
             ),
         )
@@ -233,7 +234,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
         RemoteViewsCompat.setRemoteAdapter(context, remoteViews, appWidgetId, R.id.chatsList, items.build())
         remoteViews.setPendingIntentTemplate(
             R.id.chatsList,
-            intents.chatClickTemplate(context, DuckAiWidgetTarget.CHAT.requestCode, state.newChatUrl),
+            intents.chatClickTemplate(context, DuckAiWidgetTarget.CHAT.requestCode),
         )
     }
 
@@ -248,8 +249,6 @@ class DuckAiWidgetConfigurator @Inject constructor(
     }
 
     private class State(
-        val newChatUrl: String,
-        val voiceUrl: String,
         val chatHistoryAvailable: Boolean,
         val chats: List<DuckAiChatsWidgetChat>,
         val chatUrls: Map<String, String>,

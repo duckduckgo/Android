@@ -78,7 +78,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.promptBarContainer)
 
-        assertLaunch(launched, url = NEW_CHAT_URL)
+        assertLaunch(launched, url = null)
     }
 
     @Test
@@ -87,7 +87,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.actionVoice)
 
-        assertLaunch(launched, url = VOICE_URL)
+        assertLaunch(launched, url = null, launch = DuckChatLaunch.Voice::class)
     }
 
     @Test
@@ -96,7 +96,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.actionCreateImage)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, launch = DuckChatLaunch.ImageGeneration::class)
+        assertLaunch(launched, url = null, launch = DuckChatLaunch.ImageGeneration::class)
     }
 
     @Test
@@ -105,7 +105,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.actionTakePhoto)
 
-        assertLaunch(launched, url = NEW_CHAT_URL, launch = DuckChatLaunch.CameraCapture::class)
+        assertLaunch(launched, url = null, launch = DuckChatLaunch.CameraCapture::class)
     }
 
     @Test
@@ -134,7 +134,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val launched = populateAndCaptureClickIntent(R.id.promptBarContainer)
 
-        assertLaunch(launched, url = NEW_CHAT_URL)
+        assertLaunch(launched, url = null)
         verify(remoteViews).setViewVisibility(R.id.chatsSection, View.GONE)
         verify(remoteViews, never()).setOnClickPendingIntent(eq(R.id.chatsViewAll), any())
         verify(remoteViews, never()).setRemoteAdapter(eq(R.id.chatsList), any<RemoteViews.RemoteCollectionItems>())
@@ -371,8 +371,6 @@ class DuckAiWidgetConfiguratorTest {
     ) {
         whenever(duckChat.isEnabled()).thenReturn(enabled)
         whenever(duckChat.isChatHistoryAvailable()).thenReturn(historyAvailable)
-        whenever(duckChat.getDuckChatUrl("", false)).thenReturn(NEW_CHAT_URL)
-        whenever(duckChat.getVoiceDuckChatUrl()).thenReturn(VOICE_URL)
         if (historyAvailable) whenever(chatStore.getChats()).thenReturn(emptyList())
     }
 
@@ -401,8 +399,6 @@ class DuckAiWidgetConfiguratorTest {
 
     private companion object {
         const val APP_WIDGET_ID = 7
-        const val NEW_CHAT_URL = "https://duck.ai/"
-        const val VOICE_URL = "https://duck.ai/?mode=voice-mode"
         const val CHAT_URL = "https://duck.ai/?chatID=abc"
     }
 }

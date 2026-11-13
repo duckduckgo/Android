@@ -36,7 +36,6 @@ import org.robolectric.Shadows.shadowOf
 @RunWith(AndroidJUnit4::class)
 class DuckAiWidgetIntentsFillInTest {
 
-    private val newChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     private val chatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5&chatID=abc"
 
     // Mirrors BrowserActivity.intent(): the URL and every launch extra are always written, even when empty.
@@ -54,7 +53,7 @@ class DuckAiWidgetIntentsFillInTest {
     @Test
     fun whenChatRowFillInIsAppliedToTemplateThenChatUrlAndWidgetLaunchExtrasWin() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        val template = shadowOf(intents.chatClickTemplate(context, 1, newChatUrl)).savedIntent
+        val template = shadowOf(intents.chatClickTemplate(context, 1)).savedIntent
 
         template.fillIn(intents.chatFillInIntent(context, chatUrl), 0)
 
@@ -67,7 +66,7 @@ class DuckAiWidgetIntentsFillInTest {
     fun whenChatClickTemplateIsBuiltThenItCarriesNoExtras() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
-        val template = shadowOf(intents.chatClickTemplate(context, 1, newChatUrl)).savedIntent
+        val template = shadowOf(intents.chatClickTemplate(context, 1)).savedIntent
 
         assertNull(template.extras)
     }
