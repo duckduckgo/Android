@@ -48,9 +48,11 @@ import com.duckduckgo.app.browser.tabs.transition.RealNewTabTransitionState
 import com.duckduckgo.app.browser.tabs.transition.RealPendingNewTabTransitions
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.tabs.DuckChatLaunch
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.InputMode
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.After
@@ -443,6 +445,19 @@ class BrowserActivityNewTabTransitionTest {
     }
 
     @Test
+    fun newChatLaunchWithoutUrlBuildsTheChatUrlAtTapTime() {
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+
+        val duckChat: DuckChat = mock { on { getDuckChatUrl("", false) } doReturn URL }
+
+        processIntentWhileOnScreen(intent, duckChat)
+
+        verify(duckChat, never()).openVoiceDuckChat(any())
+        verifyBlocking(tabManager) { openNewTab(eq(URL), anyOrNull(), any()) }
+        assertTabOpened()
+    }
+
+    @Test
     fun duckAiChatFromAWidgetDoesNotGrowIn() {
         processIntentWhileOnScreen(BrowserActivity.intent(host, SearchWidgetDuckAi, openDuckChat = true, duckChatUrl = URL))
         assertTabOpened()
@@ -540,16 +555,16 @@ class BrowserActivityNewTabTransitionTest {
     )
 
     // The browser on screen is paused while it gets an intent.
-    private fun processIntentWhileOnScreen(intent: Intent) {
+    private fun processIntentWhileOnScreen(intent: Intent, duckChat: DuckChat = mock()) {
         controller.pause()
-        processIntent(intent)
+        processIntent(intent, duckChat)
     }
 
-    private fun processIntent(intent: Intent) {
+    private fun processIntent(intent: Intent, duckChat: DuckChat = mock()) {
         val sourceTab: BrowserTabFragment = mock { on { tabId } doReturn SOURCE }
         browser.emailProtectionLinkVerifier = mock()
         browser.syncUrlIdentifier = mock()
-        browser.duckChat = mock()
+        browser.duckChat = duckChat
         browser.duckAiEntryCallback = lazyOf(mock())
         browser.omnibarEntryConverter = mock { on { convertQueryToUrl(any(), anyOrNull(), any(), any()) } doReturn URL }
         whenever(tabManager.getSelectedTabId()).thenReturn(SOURCE)

@@ -30,7 +30,7 @@ class DuckAiWidgetIntents @Inject constructor(
     fun launchDuckAi(
         context: Context,
         requestCode: Int,
-        duckChatUrl: String,
+        duckChatUrl: String?,
         launch: DuckChatLaunch,
     ): PendingIntent = PendingIntent.getActivity(
         context,
