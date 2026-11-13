@@ -630,6 +630,22 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
+    fun whenPackagelessIntentResolvesOnlyToCallerThenTrustedCallerIntentReturned() {
+        val intent = browsableIntent()
+
+        val trusted = testee.trustedCallerIntent(intent, CALLER) { listOf(resolveInfo(CALLER)) }
+
+        assertEquals(CALLER, trusted?.activities?.single()?.activityInfo?.packageName)
+    }
+
+    @Test
+    fun whenPackagelessIntentAlsoResolvesToAnotherAppThenTrustedCallerIntentIsNull() {
+        val intent = browsableIntent()
+
+        assertNull(testee.trustedCallerIntent(intent, CALLER) { listOf(resolveInfo(CALLER), resolveInfo("com.other.app")) })
+    }
+
+    @Test
     fun whenIntentHasComponentThenTrustedCallerIntentResolvedWithoutIt() {
         val intent = browsableIntent().setComponent(ComponentName(CALLER, "$CALLER.InternalActivity"))
         var queried: Intent? = null

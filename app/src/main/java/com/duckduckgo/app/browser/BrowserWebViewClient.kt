@@ -54,6 +54,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
+import com.duckduckgo.app.browser.applinks.AppLinkFeature
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -154,6 +155,7 @@ class BrowserWebViewClient @Inject constructor(
     pageLoadTimeoutWatchdogFactory: RealPageLoadTimeoutWatchdog.Factory,
     private val pageLoadTimeoutPixels: PageLoadTimeoutPixels,
     private val pageLoadFeature: PageLoadFeature,
+    private val appLinkFeature: AppLinkFeature,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -161,6 +163,7 @@ class BrowserWebViewClient @Inject constructor(
 
     // WebView clears hasGesture() on redirect hops, but the App Link rules assume Chromium's per-navigation gesture flag.
     private var mainFrameGestureOriginUrl: String? = null
+    private var gesturedPost: GesturedPost? = null
     private var duckChatEntryReportedForCurrentNavigation = false
     private var start: Long? = null
 
@@ -182,8 +185,16 @@ class BrowserWebViewClient @Inject constructor(
 
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
     private val isForceRecompositeEnabled = AtomicBoolean(true)
+    private val isGesturedPostNavigationEnabled = AtomicBoolean(false)
 
     init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appLinkFeature.gesturedPostNavigation().enabled()
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    isGesturedPostNavigationEnabled.set(enabled)
+                }
+        }
         appCoroutineScope.launch(dispatcherProvider.io()) {
             appSchemeInterceptionFeature.self().enabled()
                 .distinctUntilChanged()
@@ -316,8 +327,19 @@ class BrowserWebViewClient @Inject constructor(
                 mainFrameGestureOriginUrl = webView.originalUrl.takeIf { hasGesture }
                 duckChatEntryReportedForCurrentNavigation = false
             }
-            val hasGestureInNavigation = hasGesture ||
-                (isForMainFrame && isRedirect && mainFrameGestureOriginUrl != null && mainFrameGestureOriginUrl == webView.originalUrl)
+            val carriedPost = gesturedPost.takeIf { isForMainFrame }
+            val carryAppliesToRedirect = carriedPost != null && !carriedPost.responseStarted
+            val postResponseCommitted = carriedPost != null && webView.url?.withoutFragment() == carriedPost.url.withoutFragment()
+            val postedToOtherPage = carriedPost != null && carriedPost.url.withoutFragment() != carriedPost.formPageUrl
+            val carryAppliesToNonRedirect = carriedPost != null &&
+                (carriedPost.responseStarted || carriedPost.afterRedirectHop || (postResponseCommitted && postedToOtherPage))
+            val hasGesturedPostCarry = if (isRedirect) carryAppliesToRedirect else carryAppliesToNonRedirect
+            val redirectStaysInGesturedChain =
+                isForMainFrame && isRedirect && mainFrameGestureOriginUrl != null && mainFrameGestureOriginUrl == webView.originalUrl
+            val hasGestureInNavigation = hasGesture || hasGesturedPostCarry || redirectStaysInGesturedChain
+            if (carriedPost != null) {
+                gesturedPost = if (isRedirect) carriedPost.copy(url = url.toString(), afterRedirectHop = true) else null
+            }
             webViewClientListener?.onShouldOverride()
             if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, webView.url?.toUri(), isForMainFrame)) {
                 return true
@@ -361,6 +383,7 @@ class BrowserWebViewClient @Inject constructor(
                     if (hasGestureInNavigation) {
                         // Re-anchor here so a further redirect (e.g. app-not-installed fallback) still carries the gesture, not the stale first hop.
                         mainFrameGestureOriginUrl = webView.originalUrl
+                        gesturedPost = null
                     }
                     webViewClientListener?.let { listener ->
                         return listener.handleAppLink(urlType, isForMainFrame, hasGestureInNavigation)
@@ -404,6 +427,7 @@ class BrowserWebViewClient @Inject constructor(
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     logcat(INFO) { "Found non-http app link for ${urlType.uriString}" }
                     if (isForMainFrame) {
+                        if (hasGestureInNavigation) gesturedPost = null
                         webViewClientListener?.let { listener ->
                             return listener.handleNonHttpAppLink(urlType)
                         }
@@ -634,6 +658,8 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
 
+        gesturedPost = gesturedPost?.takeIf { url != null && it.url.withoutFragment() == url.withoutFragment() }?.copy(responseStarted = true)
+
         pageCommitVisibleFired = false
         recompositeScheduled = false
 
@@ -804,6 +830,7 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
         url?.let { pageLoadTimeoutWatchdog.onFinished(it) }
+        if (gesturedPost?.responseStarted == true) gesturedPost = null
 
         // WebView reports the outgoing page's progress for a never-committing (204) navigation, so this can't wait for the progress check below.
         if (url != null && url != ABOUT_BLANK && url != webView.url) webViewClientListener?.onNavigationFinishedWithoutCommit()
@@ -922,6 +949,7 @@ class BrowserWebViewClient @Inject constructor(
                     if (request.hasGesture()) pageLoadTimeoutWatchdog.onUserInitiatedLoad()
                     pageLoadTimeoutWatchdog.onMainFrameRequest(request.url.toString())
                 }
+                if (request.isForMainFrame && !request.isSpeculativeLoad()) updateGesturedPost(request, webView.url)
                 webView.url
             }
             logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
@@ -932,6 +960,19 @@ class BrowserWebViewClient @Inject constructor(
                 webViewClientListener,
             )
         }
+
+    // WebView doesn't call shouldOverrideUrlLoading for POST navigations, so the tap is only visible here.
+    private fun updateGesturedPost(request: WebResourceRequest, formPageUrl: String?) {
+        val url = request.url.toString()
+        if (request.method == "POST") {
+            val isGestured = isGesturedPostNavigationEnabled.get() && request.hasGesture()
+            gesturedPost = if (isGestured) GesturedPost(url, responseStarted = false, formPageUrl = formPageUrl?.withoutFragment()) else null
+        } else if (gesturedPost?.url?.withoutFragment() != url.withoutFragment()) {
+            gesturedPost = null
+        }
+    }
+
+    private fun String.withoutFragment() = substringBefore('#')
 
     // Speculative loads (prefetch/prerender) never commit, so they must not arm the page-load watchdog.
     private fun WebResourceRequest.isSpeculativeLoad(): Boolean {
@@ -1175,6 +1216,13 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         requestInterceptor.addExemptedMaliciousSite(url, feed)
     }
+
+    private data class GesturedPost(
+        val url: String,
+        val responseStarted: Boolean,
+        val afterRedirectHop: Boolean = false,
+        val formPageUrl: String? = null,
+    )
 
     companion object {
         val parallelRequestCounter = AtomicInteger(0)
