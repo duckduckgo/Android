@@ -38,7 +38,7 @@
         <ImageView
             android:id="@+id/promptBarDaxIcon"
             style="@style/Widget.DuckDuckGo.SearchWidgetDDGLogo"
-            android:src="@drawable/ai_chat_color_24"
+            android:src="@drawable/ic_duck_ai_color_24"
             android:importantForAccessibility="no"
             tools:ignore="ContentDescription" />
 
