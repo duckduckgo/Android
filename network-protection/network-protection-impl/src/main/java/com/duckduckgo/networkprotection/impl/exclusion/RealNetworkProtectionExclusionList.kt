@@ -30,6 +30,6 @@ class RealNetworkProtectionExclusionList @Inject constructor(
 ) : NetworkProtectionExclusionList {
     override suspend fun isExcluded(packageName: String): Boolean {
         return vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) &&
-            netPExclusionListRepository.getExcludedAppPackages().contains(packageName)
+            netPExclusionListRepository.isExcluded(packageName)
     }
 }

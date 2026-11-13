@@ -13,12 +13,16 @@ import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class RealNetPExclusionListRepositoryTest {
@@ -148,6 +152,38 @@ class RealNetPExclusionListRepositoryTest {
             ),
             repository.getExcludedAppPackages(),
         )
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenCheckingSinglePackageThenIsExcludedMatchesManualAndAutoExclusionRules() = runTest {
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(
+            listOf(
+                NetPManuallyExcludedApp(packageId = "com.a.app", isProtected = false),
+                NetPManuallyExcludedApp(packageId = "com.c.app", isProtected = true),
+            ),
+        )
+        localConfig.autoExcludeBrokenApps().setRawStoredState(State(enable = true))
+        autoExcludeAppsRepository.setIncompatibleApps(
+            listOf(
+                VpnIncompatibleApp("com.c.app"),
+                VpnIncompatibleApp("com.e.app"),
+            ),
+        )
+
+        assertTrue(repository.isExcluded("com.a.app"))
+        assertFalse(repository.isExcluded("com.b.app"))
+        assertFalse(repository.isExcluded("com.c.app"))
+        assertTrue(repository.isExcluded("com.e.app"))
+    }
+
+    @Test
+    fun whenCheckingSinglePackageThenInstalledAppsAreNotQueried() = runTest {
+        whenever(manualExclusionListRepository.getManualAppExclusionList()).thenReturn(emptyList())
+
+        repository.isExcluded("com.a.app")
+
+        verify(packageManager, never()).getInstalledApplications(any<Int>())
     }
 
     private fun newAppInfo(
