@@ -47,11 +47,11 @@ jobs:
 
       - name: Create Asana task when workflow failed on push to develop
         if: ${{ failure() && github.ref == 'refs/heads/develop' && github.event_name == 'push' }}
-        uses: honeycombio/gha-create-asana-task@main
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
-          asana-secret: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
           asana-task-name: GH Workflow Failure - Build F-Droid apk
           asana-task-description: The build F-Droid apk workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
