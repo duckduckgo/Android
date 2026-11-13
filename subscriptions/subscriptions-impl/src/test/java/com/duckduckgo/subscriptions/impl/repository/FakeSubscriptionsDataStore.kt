@@ -23,6 +23,9 @@ import java.time.Instant
 class FakeSubscriptionsDataStore(
     private val supportEncryption: Boolean = true,
     var simluateAccessTokenV2StoreError: Boolean = false,
+    var available: Boolean = true,
+    var simulateTokenCommitFailure: Boolean = false,
+    var simulateUnreadableRefreshToken: Boolean = false,
 ) : SubscriptionsDataStore {
 
     // Auth
@@ -55,4 +58,49 @@ class FakeSubscriptionsDataStore(
     override var subscriptionEntitlements: String? = null
     override var pendingPlans: String? = null
     override var planCountry: String? = null
+
+    override var tokenRefreshFailureStreak: Int = 0
+    override var lastTokenRefreshSuccessAt: Long? = null
+    override var lastTokenRefreshProcess: String? = null
+
+    override fun isAvailable(): Boolean = available
+
+    override fun hasRefreshTokenV2Entry(): Boolean = available && (refreshTokenV2 != null || simulateUnreadableRefreshToken)
+
+    override fun saveTokensV2(
+        accessToken: String,
+        accessTokenExpiresAt: Instant,
+        refreshToken: String,
+        refreshTokenExpiresAt: Instant,
+        entitlements: String,
+        email: String?,
+        externalId: String,
+    ): Boolean {
+        if (simluateAccessTokenV2StoreError) throw IOException()
+        if (!available || simulateTokenCommitFailure) return false
+        accessTokenV2 = accessToken
+        accessTokenV2ExpiresAt = accessTokenExpiresAt
+        refreshTokenV2 = refreshToken
+        refreshTokenV2ExpiresAt = refreshTokenExpiresAt
+        this.entitlements = entitlements
+        this.email = email
+        this.externalId = externalId
+        return true
+    }
+
+    override fun clearTokensAndHistory(): Boolean {
+        if (!available) return false
+        accessTokenV2 = null
+        accessTokenV2ExpiresAt = null
+        refreshTokenV2 = null
+        refreshTokenV2ExpiresAt = null
+        accessToken = null
+        authToken = null
+        email = null
+        externalId = null
+        tokenRefreshFailureStreak = 0
+        lastTokenRefreshSuccessAt = null
+        lastTokenRefreshProcess = null
+        return true
+    }
 }

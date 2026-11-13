@@ -71,6 +71,7 @@ import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.TokenStoreException
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.repository.isExpired
@@ -83,6 +84,7 @@ import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.TokenStoreError
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
@@ -552,11 +554,7 @@ class RealSubscriptionsManager @Inject constructor(
                 coroutineScope.launch { authClient.tryLogout(accessTokenV2 = jwt) }
             }
         }
-        authRepository.setAccessTokenV2(null)
-        authRepository.setRefreshTokenV2(null)
-        authRepository.setAuthToken(null)
-        authRepository.setAccessToken(null)
-        authRepository.setAccount(null)
+        authRepository.clearTokensAndHistory()
         authRepository.setSubscription(null)
         authRepository.setEntitlements(emptyList())
         authRepository.removeLocalPurchasedAt()
@@ -762,7 +760,11 @@ class RealSubscriptionsManager @Inject constructor(
         return coroutineScope.async {
             tokenRefreshMutex.withLock {
                 try {
-                    tokenRefreshWideEvent.onStart(subscriptionStatus())
+                    tokenRefreshWideEvent.onStart(
+                        subscriptionStatus = subscriptionStatus(),
+                        subscriptionPlatform = authRepository.getSubscription()?.platform,
+                        refreshHistory = authRepository.getTokenRefreshHistory(),
+                    )
 
                     val lockResult = crossProcessLock.acquire(TOKEN_REFRESH_LOCK_KEY)
                     tokenRefreshWideEvent.onCrossProcessLockAcquired(lockResult)
@@ -777,7 +779,15 @@ class RealSubscriptionsManager @Inject constructor(
                             }
                         }
 
-                        doRefreshAccessToken()
+                        val newAccessToken = doRefreshAccessToken()
+                        authRepository.recordTokenRefreshSuccess(at = Instant.ofEpochMilli(timeProvider.currentTimeMillis()))
+                        newAccessToken
+                    } catch (e: Exception) {
+                        // Network errors say nothing about the token, so they do not count towards a stuck device
+                        if (e !is IOException && !e.isServerError() && isSignedInV2()) {
+                            authRepository.recordTokenRefreshFailure()
+                        }
+                        throw e
                     } finally {
                         lockResult.getOrNull()?.let { lockHandle ->
                             withContext(dispatcherProvider.io()) { lockHandle.close() }
@@ -799,7 +809,15 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun doRefreshAccessToken(): AccessToken {
-        val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+        val refreshToken = authRepository.getRefreshTokenV2() ?: run {
+            val storeError = when {
+                !authRepository.isTokenStoreAvailable() -> TokenStoreError.UNAVAILABLE
+                authRepository.hasRefreshTokenV2Entry() -> TokenStoreError.UNREADABLE
+                else -> TokenStoreError.MISSING
+            }
+            tokenRefreshWideEvent.onTokenReadFailed(storeError)
+            throw TokenStoreException("Refresh token ${storeError.paramValue}")
+        }
         tokenRefreshWideEvent.onTokenRead()
 
         /*
@@ -881,7 +899,14 @@ class RealSubscriptionsManager @Inject constructor(
             }
         }
 
-        saveTokens(newTokens)
+        try {
+            saveTokens(newTokens)
+        } catch (e: TokenStoreException) {
+            val storeError = if (authRepository.isTokenStoreAvailable()) TokenStoreError.WRITE_FAILED else TokenStoreError.UNAVAILABLE
+            tokenRefreshWideEvent.onTokenSaveFailed(storeError)
+            throw e
+        }
+        tokenRefreshWideEvent.onTokensSaved()
         return AccessToken(newTokens.accessToken, newTokens.accessTokenClaims.expiresAt)
     }
 
@@ -973,10 +998,17 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun saveTokens(tokens: ValidatedTokenPair) = with(tokens) {
         try {
-            authRepository.setAccessTokenV2(AccessToken(accessToken, accessTokenClaims.expiresAt))
-            authRepository.setRefreshTokenV2(RefreshToken(refreshToken, refreshTokenClaims.expiresAt))
-            authRepository.setEntitlements(accessTokenClaims.entitlements)
-            authRepository.setAccount(Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId))
+            val saved = try {
+                authRepository.saveTokensV2(
+                    accessToken = AccessToken(accessToken, accessTokenClaims.expiresAt),
+                    refreshToken = RefreshToken(refreshToken, refreshTokenClaims.expiresAt),
+                    entitlements = accessTokenClaims.entitlements,
+                    account = Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId),
+                )
+            } catch (e: Exception) {
+                throw TokenStoreException("Token pair write failed", e)
+            }
+            if (!saved) throw TokenStoreException("Token pair commit returned false")
             backgroundTokenRefresh.schedule()
         } catch (e: Exception) {
             pixelSender.reportAuthV2TokenStoreError()
@@ -1452,3 +1484,5 @@ data class PurchaseExperiments(
     val experiments: List<Experiment> = emptyList(),
     val legacyExperiment: Experiment? = null,
 )
+
+private fun Exception.isServerError(): Boolean = this is HttpException && code() >= 500
