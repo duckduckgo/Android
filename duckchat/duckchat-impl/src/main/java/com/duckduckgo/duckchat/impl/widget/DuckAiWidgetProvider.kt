@@ -20,13 +20,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.RemoteViews
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
 import kotlinx.coroutines.CoroutineScope
@@ -97,14 +95,11 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
     ) {
-        val views = RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight)
+        val heightDp = appWidgetManager.getAppWidgetOptions(appWidgetId)
+            ?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, Int.MAX_VALUE) ?: Int.MAX_VALUE
 
         appCoroutineScope.launch {
-            duckAiWidgetConfigurator.populateRemoteViews(
-                context = context,
-                appWidgetId = appWidgetId,
-                remoteViews = views,
-            )
+            val views = duckAiWidgetConfigurator.createRemoteViews(context, appWidgetId, heightDp)
             appWidgetManager.updateAppWidget(appWidgetId, views)
             logcat { "DuckAiWidgetProvider updateAppWidget completed for widget id = $appWidgetId" }
         }
