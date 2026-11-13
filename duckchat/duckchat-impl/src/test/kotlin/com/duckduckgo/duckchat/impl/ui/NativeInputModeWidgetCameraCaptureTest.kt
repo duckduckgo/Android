@@ -26,17 +26,22 @@ class NativeInputModeWidgetCameraCaptureTest {
 
     @Test
     fun `launches camera for camera capture action in Duck ai mode`() {
-        assertTrue(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.CameraCapture()))
+        assertTrue(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.CameraCapture(), supportsImageUpload = true))
     }
 
     @Test
     fun `does not launch camera in browser mode`() {
-        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = false, launch = DuckChatLaunch.CameraCapture()))
+        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = false, launch = DuckChatLaunch.CameraCapture(), supportsImageUpload = true))
     }
 
     @Test
     fun `does not launch camera for other or no launch action`() {
-        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.ImageGeneration()))
-        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.Open()))
+        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.ImageGeneration(), supportsImageUpload = true))
+        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.Open(), supportsImageUpload = true))
+    }
+
+    @Test
+    fun `does not launch camera when image upload is not supported`() {
+        assertFalse(shouldLaunchCameraCapture(isDuckAiMode = true, launch = DuckChatLaunch.CameraCapture(), supportsImageUpload = false))
     }
 }
