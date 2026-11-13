@@ -26,6 +26,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
 import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -50,6 +51,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(scope = AppScope::class)
 class SyncBookmarksPromotion @Inject constructor(
@@ -132,7 +134,11 @@ class SyncBookmarksPromotionView @JvmOverloads constructor(
         with(binding.syncPromotion) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.sync_check_56,
+                    topIllustration = if (context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)) {
+                        R.drawable.sync_start_96
+                    } else {
+                        R.drawable.sync_check_56
+                    },
                     title = context.getString(R.string.syncPromoTitleBookmarks),
                     subtitle = context.getString(R.string.syncPromoSubtitleBookmarks),
                     action = context.getString(R.string.syncPromoPrimaryButton),
