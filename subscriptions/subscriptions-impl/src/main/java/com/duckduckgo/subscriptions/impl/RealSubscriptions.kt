@@ -430,7 +430,7 @@ interface SubscriptionsFeature {
     /**
      * When enabled, Play subscribers can undo a cancellation
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun undoSubscriptionCancellation(): Toggle
 
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
