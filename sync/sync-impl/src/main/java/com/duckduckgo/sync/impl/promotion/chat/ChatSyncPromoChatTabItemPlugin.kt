@@ -18,11 +18,13 @@ package com.duckduckgo.sync.impl.promotion.chat
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
@@ -148,6 +150,15 @@ private class ChatSyncPromoBottomSheetDialog(
             notNowButton.setOnClickListener { dismiss() }
             closeButton.setOnClickListener { dismiss() }
         }
+        binding.root.applyRebrandBottomSheetSpacing(
+            header = binding.sheetIllustration,
+            title = binding.sheetTitle,
+            messages = listOf(binding.sheetMessage),
+            buttons = binding.scanQrCodeButton,
+            secondary = listOf(binding.notNowButton),
+            close = binding.closeButton,
+            content = binding.root.getChildAt(0) as ViewGroup,
+        )
         setContentView(binding.root)
         binding.root.applyBottomSystemBarInsetPadding()
 

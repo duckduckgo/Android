@@ -40,6 +40,8 @@ class AppBrandDesignUpdatePreWarmObserverTest {
     private val addressBarFeature = mock<Toggle>()
     private val pictogramsFeature = mock<Toggle>()
     private val badgesFeature = mock<Toggle>()
+    private val dialogSpacingFeature = mock<Toggle>()
+    private val bottomSheetsFeature = mock<Toggle>()
     private val dispatcherProvider = mock<DispatcherProvider>()
 
     private val testee = AppBrandDesignUpdatePreWarmObserver(
@@ -56,6 +58,8 @@ class AppBrandDesignUpdatePreWarmObserverTest {
         whenever(toggles.addressBar()).thenReturn(addressBarFeature)
         whenever(toggles.pictograms()).thenReturn(pictogramsFeature)
         whenever(toggles.badges()).thenReturn(badgesFeature)
+        whenever(toggles.dialogSpacing()).thenReturn(dialogSpacingFeature)
+        whenever(toggles.bottomSheets()).thenReturn(bottomSheetsFeature)
     }
 
     @Test
@@ -67,6 +71,8 @@ class AppBrandDesignUpdatePreWarmObserverTest {
         verify(addressBarFeature).isEnabled()
         verify(pictogramsFeature).isEnabled()
         verify(badgesFeature).isEnabled()
+        verify(dialogSpacingFeature).isEnabled()
+        verify(bottomSheetsFeature).isEnabled()
     }
 
     @Test

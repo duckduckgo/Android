@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <dimen name="rebrandSheetTabletSide">64dp</dimen>
+
+    <!-- True when the dialog spacing brand design update is on. Absent from the base themes, so it resolves to false. -->
+    <attr name="daxRebrandDialogSpacing" format="boolean" />
+
+    <style name="ThemeOverlay.Rebrand.DialogSpacing" parent="">
+        <item name="daxRebrandDialogSpacing">true</item>
+    </style>
+
+    <attr name="daxRebrandBottomSheets" format="boolean" />
+
+    <style name="ThemeOverlay.Rebrand.BottomSheets" parent="">
+        <item name="daxRebrandBottomSheets">true</item>
+    </style>
+
+    <!-- Blank margin the Material radio drawable (a 32dp box around a 20dp circle) keeps on each side of its circle. -->
+    <dimen name="rebrandRadioIconInset">6dp</dimen>
+
+</resources>

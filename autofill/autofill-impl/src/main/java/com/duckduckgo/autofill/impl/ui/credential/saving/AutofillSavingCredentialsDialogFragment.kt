@@ -68,6 +68,7 @@ import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclin
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -168,6 +169,15 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
         configureViews(binding)
         observeViewModel()
+        binding.dialogRootView.applyRebrandBottomSheetSpacing(
+            header = binding.appIcon,
+            title = binding.dialogTitle,
+            messages = listOf(binding.onboardingSubtitle, binding.keyFeaturesContainer),
+            buttons = binding.saveLoginButton,
+            secondary = listOf(binding.secondaryButton),
+            close = binding.closeButton,
+            content = binding.autofillDialogContentContainer,
+        )
         binding.dialogRootView.applyBottomSystemBarInsetPadding()
         return binding.root
     }

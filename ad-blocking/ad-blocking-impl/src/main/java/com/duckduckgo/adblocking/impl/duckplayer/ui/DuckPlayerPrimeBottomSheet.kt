@@ -29,6 +29,7 @@ import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ModalDuckPlayerBinding
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -70,6 +71,13 @@ class DuckPlayerPrimeBottomSheet : BottomSheetDialogFragment() {
         binding.closeButton.setOnClickListener {
             dismiss()
         }
+        binding.root.applyRebrandBottomSheetSpacing(
+            header = binding.animationContainer,
+            title = binding.title,
+            messages = listOf(binding.body),
+            buttons = binding.dismissButton,
+            close = binding.closeButton,
+        )
         binding.root.applyBottomSystemBarInsetPadding()
         return binding.root
     }

@@ -43,6 +43,7 @@ import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUse
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment.DialogEvent.Shown
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.android.support.AndroidSupportInjection
@@ -97,6 +98,14 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
         val binding = ContentAutofillGeneratePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
+        binding.dialogRootView.applyRebrandBottomSheetSpacing(
+            header = binding.appIcon,
+            title = binding.dialogTitle,
+            buttons = binding.useSecurePasswordButton,
+            secondary = listOf(binding.cancelButton),
+            close = binding.closeButton,
+            content = binding.autofillDialogContentContainer,
+        )
         binding.dialogRootView.applyBottomSystemBarInsetPadding()
         return binding.root
     }

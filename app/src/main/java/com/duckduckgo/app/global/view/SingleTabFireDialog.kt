@@ -45,6 +45,7 @@ import com.duckduckgo.app.global.view.SingleTabFireDialogViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
@@ -140,6 +141,15 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.fireDialogRootView.applyRebrandBottomSheetSpacing(
+            header = binding.fireIcon,
+            title = binding.dialogTitle,
+            messages = listOf(binding.dialogSubtitle),
+            buttons = binding.buttonsContainer,
+            secondary = listOf(binding.deleteAllSecondaryButton),
+            content = binding.headerContainer.parent as ViewGroup,
+            sections = listOf(binding.headerContainer, binding.buttonsContainer),
+        )
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.setOrigin(readOriginFromArguments())
