@@ -36,8 +36,8 @@ import javax.inject.Inject
 
 /**
  * Keeps the Duck.ai widget in sync with what it renders: it follows the regular-mode chat store while an instance is
- * placed (collection stops itself once the last instance is gone) and is re-rendered when the remote config changes,
- * since that can enable or disable Duck.ai.
+ * placed (collection stops itself once the last instance is gone) and is re-rendered on app start and when the remote
+ * config changes, since flags can enable or disable Duck.ai or change how it is coloured.
  */
 @SingleIn(AppScope::class)
 @ContributesIntoSet(
@@ -55,6 +55,11 @@ class DuckAiWidgetUpdater @Inject constructor(
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     private var observeJob = ConflatedJob()
+
+    // Feature flags, including local overrides, are read at render time, so a new process re-renders to pick them up.
+    override fun onCreate(owner: LifecycleOwner) {
+        refresh()
+    }
 
     override fun onStart(owner: LifecycleOwner) {
         startObservingIfNeeded()

@@ -340,4 +340,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiWidget(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai home-screen widget follows the system colour palette on Android 12+.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiWidgetDynamicColors(): Toggle
 }

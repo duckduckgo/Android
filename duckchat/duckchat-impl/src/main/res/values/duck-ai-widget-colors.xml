@@ -22,4 +22,11 @@
     <color name="duckAiWidgetHintColor">@color/searchWidgetSearchBarHintColor</color>
     <color name="duckAiWidgetTextColor">@color/searchWidgetSearchBarTrailingIconColor</color>
     <color name="duckAiWidgetOnContainerColor">@color/searchWidgetSearchBarTrailingIconColor</color>
+    <color name="duckAiWidgetDynamicBackgroundColor">@color/duckAiWidgetBackgroundColor</color>
+    <color name="duckAiWidgetDynamicSearchBarColor">@color/duckAiWidgetSearchBarColor</color>
+    <color name="duckAiWidgetDynamicContainerColor">@color/duckAiWidgetContainerColor</color>
+    <color name="duckAiWidgetDynamicDividerColor">@color/duckAiWidgetDividerColor</color>
+    <color name="duckAiWidgetDynamicHintColor">@color/duckAiWidgetHintColor</color>
+    <color name="duckAiWidgetDynamicTextColor">@color/duckAiWidgetTextColor</color>
+    <color name="duckAiWidgetDynamicOnContainerColor">@color/duckAiWidgetOnContainerColor</color>
 </resources>

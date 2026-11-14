@@ -144,6 +144,24 @@ class DuckAiWidgetUpdaterTest {
     }
 
     @Test
+    fun whenAppCreatedThenPlacedWidgetIsRefreshed() {
+        val widgetId = createWidget()
+
+        testee.onCreate(mock())
+
+        val intent = shadowOf(context).broadcastIntents.single()
+        assertEquals(DuckAiWidgetProvider::class.java.name, intent.component?.className)
+        assertEquals(listOf(widgetId), intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)?.toList())
+    }
+
+    @Test
+    fun whenAppCreatedWithoutWidgetsThenNoBroadcast() {
+        testee.onCreate(mock())
+
+        assertTrue(shadowOf(context).broadcastIntents.isEmpty())
+    }
+
+    @Test
     fun whenPrivacyConfigDownloadedWithoutWidgetsThenNoBroadcast() {
         testee.onPrivacyConfigDownloaded()
 
