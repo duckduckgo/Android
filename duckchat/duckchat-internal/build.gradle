@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -28,6 +29,9 @@ android {
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     namespace 'com.duckduckgo.duckchat.internal'
+    buildFeatures {
+        compose true
+    }
 }
 
 dependencies {
@@ -50,6 +54,7 @@ dependencies {
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
     implementation AndroidX.appCompat
+    implementation AndroidX.activity.compose
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation Google.android.material
@@ -63,6 +68,7 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine
     testImplementation project(path: ':data-store-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
