@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.wideevents
 
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTrackerImpl
 import org.junit.Test
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -25,8 +26,9 @@ class DuckAiSessionCallbackDispatcherTest {
 
     private val session: RealDuckAiSessionWideEvent = mock()
     private val responseWait: DuckAiResponseWaitWideEventImpl = mock()
+    private val attentionTracker: DuckAiResponseAttentionTrackerImpl = mock()
     private val entry: DuckAiEntryWideEvent = mock()
-    private val testee = DuckAiSessionCallbackDispatcher(session, responseWait, entry)
+    private val testee = DuckAiSessionCallbackDispatcher(session, responseWait, attentionTracker, entry)
 
     @Test
     fun `when each callback is called then all receivers get it in order`() {
@@ -37,15 +39,18 @@ class DuckAiSessionCallbackDispatcherTest {
         testee.onPromptSubmitted("tab")
         testee.onNewChatCreated("tab")
 
-        inOrder(session, responseWait, entry) {
+        inOrder(session, responseWait, attentionTracker, entry) {
             verify(session).onLaunchLandingResolved("tab", "https://duck.ai")
             verify(responseWait).onLaunchLandingResolved("tab", "https://duck.ai")
+            verify(attentionTracker).onLaunchLandingResolved("tab", "https://duck.ai")
             verify(entry).onLaunchLandingResolved("tab", "https://duck.ai")
             verify(session).onDuckAiPageVisible("tab", "https://duck.ai")
             verify(responseWait).onDuckAiPageVisible("tab", "https://duck.ai")
+            verify(attentionTracker).onDuckAiPageVisible("tab", "https://duck.ai")
             verify(entry).onDuckAiPageVisible("tab", "https://duck.ai")
             verify(session).onSelectedTabChanged("tab", "https://duck.ai")
             verify(responseWait).onSelectedTabChanged("tab", "https://duck.ai")
+            verify(attentionTracker).onSelectedTabChanged("tab", "https://duck.ai")
             verify(entry).onSelectedTabChanged("tab", "https://duck.ai")
             verify(session).onExitIntent("tab", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
             verify(responseWait).onExitIntent("tab", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
