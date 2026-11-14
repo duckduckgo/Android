@@ -23,6 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
@@ -512,7 +513,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenConfigureDuckAiModeAndForceImageGenerationThenImageToolSelectedForTab() = runTest {
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, forceImageGeneration = true)
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.ImageGeneration())
 
         assertEquals(
             Tool.IMAGE_GENERATION.rawValue,
@@ -522,14 +523,14 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenConfigureDuckAiModeAndNotForceImageGenerationThenNoToolSelected() = runTest {
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, forceImageGeneration = false)
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open())
 
         assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
     }
 
     @Test
     fun whenConfigureBrowserModeAndForceImageGenerationThenNoToolSelected() = runTest {
-        testee.configure(tabId = "tab-1", isDuckAiMode = false, isBottom = false, forceImageGeneration = true)
+        testee.configure(tabId = "tab-1", isDuckAiMode = false, isBottom = false, launch = DuckChatLaunch.ImageGeneration())
 
         assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
     }

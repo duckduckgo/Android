@@ -787,6 +787,7 @@ class RealDuckChatPixels @Inject constructor(
         DuckChatHistorySource.CONTEXTUAL_CHAT -> "contextual_chat"
         DuckChatHistorySource.SIDEBAR -> "sidebar"
         DuckChatHistorySource.TAB_SWITCHER -> "tab_switcher"
+        DuckChatHistorySource.WIDGET -> "widget"
     }
 
     override fun reportContextualOpenDuckAiMenuTapped() {
