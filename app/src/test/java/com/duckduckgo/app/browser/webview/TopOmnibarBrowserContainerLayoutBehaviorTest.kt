@@ -21,6 +21,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -103,6 +105,26 @@ class TopOmnibarBrowserContainerLayoutBehaviorTest {
     }
 
     @Test
+    fun whenMarginChangesThenLayoutRequested() {
+        layoutParent()
+        dependency.layout(0, 0, 500, 224)
+
+        behavior.correctBottomMargin(child, dependency)
+
+        assertTrue(child.isLayoutRequested)
+    }
+
+    @Test
+    fun whenMarginUnchangedThenNoLayoutRequested() {
+        layoutParent()
+        dependency.layout(0, -224, 500, 0)
+
+        behavior.correctBottomMargin(child, dependency)
+
+        assertFalse(child.isLayoutRequested)
+    }
+
+    @Test
     fun whenChildIsGoneThenNoChange() {
         dependency.layout(0, 0, 500, 224)
 
@@ -128,5 +150,11 @@ class TopOmnibarBrowserContainerLayoutBehaviorTest {
         behavior.correctBottomMargin(child, dependency)
 
         assertEquals(0, (child.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin)
+    }
+
+    private fun layoutParent() {
+        val spec = View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY)
+        parent.measure(spec, spec)
+        parent.layout(0, 0, 1000, 1000)
     }
 }
