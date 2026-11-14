@@ -333,4 +333,11 @@ interface DuckChatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun newChatHints(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai home-screen widget can be added from the launcher's widget picker.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiWidget(): Toggle
 }

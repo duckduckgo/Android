@@ -56,6 +56,9 @@ data object FavoritesWidget : ExternalLaunchSource
 /** Search widget Duck.ai button. */
 data object SearchWidgetDuckAi : ExternalLaunchSource
 
+/** Duck.ai home-screen widget. */
+data object DuckAiWidget : ExternalLaunchSource
+
 /** App long-press shortcut: "New Tab". */
 data object AppShortcutNewTab : ExternalLaunchSource
 

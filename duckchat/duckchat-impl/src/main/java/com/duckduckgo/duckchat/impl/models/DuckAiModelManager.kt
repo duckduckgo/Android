@@ -64,7 +64,13 @@ data class ModelState(
      * change this to a bounded Map<String, ReasoningMode> keyed by chatId.
      * */
     val chatScopedReasoningMode: ReasoningMode? = null,
-)
+) {
+    /**
+     * Models not loaded yet count as supported, so the entry points are not hidden while they fetch.
+     */
+    fun supportsImageUpload(imageUploadEnabled: Boolean): Boolean =
+        models.isEmpty() || (models.firstOrNull { it.id == selectedModelId }?.supportsImageUpload == true && imageUploadEnabled)
+}
 
 interface DuckAiModelManager {
     val modelState: StateFlow<ModelState>
@@ -72,6 +78,12 @@ interface DuckAiModelManager {
     suspend fun fetchModels()
 
     suspend fun selectModel(model: AIChatModel)
+
+    /**
+     * Switches to the first accessible image-capable model unless the selected one already is.
+     * Returns false when no such model exists.
+     */
+    suspend fun ensureImageCapableModelSelected(): Boolean
 
     /**
      * Pins the user to a provider rather than to one of its models, so they keep following the
@@ -297,6 +309,17 @@ class RealDuckAiModelManager @Inject constructor(
                 logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
             }
         }
+    }
+
+    override suspend fun ensureImageCapableModelSelected(): Boolean {
+        val state = _modelState.value
+        val selectedModel = state.models.firstOrNull { it.id == state.selectedModelId }
+        if (selectedModel?.supportsTool(Tool.IMAGE_GENERATION) == true) return true
+        val imageCapableModel = state.models.firstOrNull {
+            it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
+        } ?: return false
+        selectModel(imageCapableModel)
+        return true
     }
 
     override suspend fun selectProvider(provider: ModelProvider) {

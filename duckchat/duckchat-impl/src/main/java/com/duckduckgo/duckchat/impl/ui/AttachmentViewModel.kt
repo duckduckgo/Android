@@ -150,8 +150,7 @@ class AttachmentViewModel @Inject constructor(
         val conversationFilesSent = conversationFilesUsed.count
         val conversationFileSizeSentBytes = conversationFilesUsed.sizeBytes
         val model = modelState.models.find { it.id == modelState.selectedModelId }
-        val supportsImageUpload = modelState.models.isEmpty() ||
-            (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled())
+        val supportsImageUpload = modelState.supportsImageUpload(duckChatInternal.isImageUploadEnabled())
         val supportedFileTypes = model?.supportedFileTypes.orEmpty()
         val imageLimits = modelState.attachmentLimits.images
         val fileLimits = modelState.attachmentLimits.files

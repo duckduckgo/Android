@@ -161,6 +161,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.nativeinput.NativeInputCallbacks
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
@@ -730,6 +731,10 @@ class BrowserTabFragment :
     // opened the tab and handed to the viewmodel in loadData. Not persisted: only meaningful for the
     // tab's initial launch within this process.
     var inputModeTarget: InputMode? = null
+
+    // One-shot native input instructions for this tab's first Duck.ai show (e.g. from a home-screen widget).
+    // Not persisted, for the same reason as inputModeTarget.
+    var nativeInputLaunch: NativeInputLaunch? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
 
@@ -2463,8 +2468,9 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
+        val pendingLaunch = nativeInputLaunch.also { nativeInputLaunch = null }
         showNativeInput(
-            launch = if (forceImageGeneration) DuckChatLaunch.ImageGeneration() else DuckChatLaunch.Open(),
+            launch = if (forceImageGeneration) DuckChatLaunch.ImageGeneration() else pendingLaunch?.toDuckChatLaunch() ?: DuckChatLaunch.Open(),
             textSelection = browserActivity?.consumePendingDuckChatTextSelection(),
         )
     }

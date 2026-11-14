@@ -45,6 +45,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -1165,6 +1166,7 @@ class RealDuckAiModelManagerTest {
         supportedFileTypes: List<String>? = null,
         supportedReasoningEffort: List<String>? = null,
         reasoningEffortAccess: List<RemoteReasoningEffortAccess>? = null,
+        supportedTools: List<String>? = null,
         label: String? = null,
     ) = RemoteAIChatModel(
         id = id,
@@ -1178,6 +1180,7 @@ class RealDuckAiModelManagerTest {
         supportedFileTypes = supportedFileTypes,
         supportedReasoningEffort = supportedReasoningEffort,
         reasoningEffortAccess = reasoningEffortAccess,
+        supportedTools = supportedTools,
         label = label,
     )
 
@@ -1812,6 +1815,53 @@ class RealDuckAiModelManagerTest {
         )
 
         verify(dataStore).setSelectedProvider(null)
+    }
+
+    @Test
+    fun whenSelectedModelSupportsImageGenerationThenEnsureImageCapableReturnsTrueWithoutSwitching() = runTest {
+        givenModels(remoteModel("text"), remoteModel("image", supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)))
+        testee.selectModel(testee.modelState.value.models.first { it.id == "image" })
+        clearInvocations(dataStore)
+
+        assertTrue(testee.ensureImageCapableModelSelected())
+
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        assertEquals("image", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenSelectedModelCannotGenerateImagesThenEnsureImageCapableSwitchesToAccessibleCapableModel() = runTest {
+        givenModels(
+            remoteModel("text"),
+            remoteModel("locked", accessTier = listOf("plus"), supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)),
+            remoteModel("image", supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)),
+        )
+        testee.selectModel(testee.modelState.value.models.first { it.id == "text" })
+
+        assertTrue(testee.ensureImageCapableModelSelected())
+
+        assertEquals("image", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenNoAccessibleModelCanGenerateImagesThenEnsureImageCapableReturnsFalseWithoutSwitching() = runTest {
+        givenModels(
+            remoteModel("text"),
+            remoteModel("locked", accessTier = listOf("plus"), supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)),
+        )
+        testee.selectModel(testee.modelState.value.models.first { it.id == "text" })
+
+        assertFalse(testee.ensureImageCapableModelSelected())
+
+        assertEquals("text", testee.modelState.value.selectedModelId)
+    }
+
+    private suspend fun givenModels(vararg models: RemoteAIChatModel) {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(models.toList()))
+        testee = createManager()
+        testee.fetchModels()
     }
 
     /** [DuckChatDataStore] is a mock, so the provider key has to remember what was written to it. */

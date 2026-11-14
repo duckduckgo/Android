@@ -2126,5 +2126,19 @@
                 "enum": [1, 2, 3]
             }
         ]
+    },
+    "m_aichat_widget_added": {
+        "description": "Triggered when the Duck.ai home-screen widget is added",
+        "owners": ["GerardPaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_widget_deleted": {
+        "description": "Triggered when the Duck.ai home-screen widget is removed",
+        "owners": ["GerardPaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

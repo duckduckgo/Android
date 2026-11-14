@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.mode.AppShortcutDuckAi
 import com.duckduckgo.app.browser.mode.AppShortcutNewTab
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.mode.DuckAiPinShortcut
+import com.duckduckgo.app.browser.mode.DuckAiWidget
 import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.FavoritesWidget
 import com.duckduckgo.app.browser.mode.FireRestart
@@ -168,6 +169,6 @@ fun BrowserLaunchSource.toPixelLaunchSourceValue(): String = when (this) {
     AppLauncher -> LaunchSourceValues.STANDARD
     ExternalUrl -> LaunchSourceValues.URL
     AppShortcutNewTab, AppShortcutBookmarks, AppShortcutDuckAi, PinnedPageShortcut, DuckAiPinShortcut -> LaunchSourceValues.SHORTCUT
-    FavoritesWidget, SearchWidgetDuckAi -> LaunchSourceValues.WIDGET
+    FavoritesWidget, SearchWidgetDuckAi, DuckAiWidget -> LaunchSourceValues.WIDGET
     SelectedTextSearch, PrivacyNotification, SystemSearchExternal, Onboarding, FireRestart, InAppNavigation -> LaunchSourceValues.OTHER
 }
