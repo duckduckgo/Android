@@ -28,7 +28,6 @@
     <string name="autoconsentPromptTitle">Är du trött på popup-fönster för cookies?</string>
     <string name="autoconsentPromptFootnote">Du kan alltid justera det här senare i inställningarna.</string>
     <string name="autoconsentPromptCpmOnMessage">Vissa cookies kan inte avvisas. Vi kan godkänna dessa åt dig.</string>
-    <string name="autoconsentPromptCpmOnPrimaryButton">Godkänn cookies åt mig</string>
     <string name="autoconsentPromptCpmOnPrimaryButtonV2">Avvisa om möjligt, eller acceptera åt mig</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Jag accepterar dem själv</string>
     <string name="autoconsentPromptCpmOffMessage">Låt oss hantera dem åt dig. Vi avvisar cookies när det går, och godkänner de som inte kan avvisas.</string>

@@ -27,7 +27,6 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.core.graphics.drawable.toDrawable
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -110,11 +109,8 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
         binding.cookiePopupOptInFootnote.setTextAppearance(R.style.Typography_DuckDuckGo_CookiePopupOptIn_Hint)
     }
 
-    /**
-     * Blocks system Back unless Back dismissal is enabled through remote config.
-     */
     private fun setupOnBackNavigation() {
-        val callback = object : OnBackPressedCallback(!viewModel.viewState.value.isBackDismissEnabled) {
+        val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = Unit
         }
         backNavigationCallback = callback
@@ -122,10 +118,6 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     }
 
     private fun setupListeners() {
-        binding.cookiePopupOptInCloseButton.setOnClickListener {
-            disableActions()
-            viewModel.onCloseClicked()
-        }
         binding.cookiePopupOptInAcceptButton.setOnClickListener {
             disableActions()
             viewModel.onAcceptClicked()
@@ -139,7 +131,6 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     private fun disableActions() {
         binding.cookiePopupOptInAcceptButton.isEnabled = false
         binding.cookiePopupOptInDeclineButton.isEnabled = false
-        binding.cookiePopupOptInCloseButton.isEnabled = false
         backNavigationCallback?.isEnabled = true
     }
 
@@ -157,11 +148,9 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         val text = viewState.variant.textResources()
-        val acceptButton = if (viewState.useV2PrimaryButtonCopy) R.string.autoconsentPromptCpmOnPrimaryButtonV2 else text.acceptButton
-        binding.cookiePopupOptInCloseButton.isVisible = viewState.isCloseButtonVisible
         binding.cookiePopupOptInTitle.setText(text.title)
         binding.cookiePopupOptInDescription.setText(text.description)
-        binding.cookiePopupOptInAcceptButton.text = getString(acceptButton)
+        binding.cookiePopupOptInAcceptButton.text = getString(text.acceptButton)
         binding.cookiePopupOptInDeclineButton.text = getString(text.declineButton)
     }
 
@@ -169,7 +158,7 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
         Variant.PROTECTION_ON -> TextResources(
             title = R.string.autoconsentPromptTitle,
             description = R.string.autoconsentPromptCpmOnMessage,
-            acceptButton = R.string.autoconsentPromptCpmOnPrimaryButton,
+            acceptButton = R.string.autoconsentPromptCpmOnPrimaryButtonV2,
             declineButton = R.string.autoconsentPromptCpmOnSecondaryButton,
         )
 
