@@ -16,17 +16,20 @@
   ~ limitations under the License.
   -->
 
-<!-- previewImage is a placeholder pending a design asset for the widget picker. -->
+<!-- previewImage is the pre-Android 12 picker fallback, a placeholder pending a design asset. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialLayout="@layout/duck_ai_widget_daynight"
     android:minWidth="250dp"
-    android:minHeight="130dp"
+    android:minHeight="250dp"
     android:minResizeWidth="180dp"
-    android:minResizeHeight="130dp"
+    android:minResizeHeight="110dp"
     android:targetCellWidth="4"
-    android:targetCellHeight="2"
+    android:targetCellHeight="4"
+    android:configure="com.duckduckgo.duckchat.impl.widget.DuckAiWidgetConfigurationActivity"
     android:previewImage="@drawable/duck_ai_widget_preview"
+    android:previewLayout="@layout/duck_ai_widget_preview"
     android:description="@string/duckAiWidgetDescription"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
-    android:widgetCategory="home_screen" />
+    android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable|configuration_optional" />

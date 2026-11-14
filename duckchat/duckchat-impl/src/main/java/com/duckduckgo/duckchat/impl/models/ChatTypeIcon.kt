@@ -20,8 +20,39 @@ import androidx.annotation.DrawableRes
 import com.duckduckgo.duckchat.impl.R
 
 @DrawableRes
-internal fun ChatType.iconRes(pinned: Boolean): Int = when (this) {
-    ChatType.Discussion -> if (pinned) R.drawable.ic_pin_24 else R.drawable.ic_chat_24
-    ChatType.ImageGeneration -> if (pinned) R.drawable.ic_images_pin_24 else R.drawable.ic_images_24
-    ChatType.Voice -> if (pinned) R.drawable.ic_voice_pin_24 else R.drawable.ic_voice_24
+internal fun ChatType.iconRes(pinned: Boolean): Int = iconRes(
+    pinned,
+    discussion = R.drawable.ic_chat_24,
+    discussionPinned = R.drawable.ic_pin_24,
+    image = R.drawable.ic_images_24,
+    imagePinned = R.drawable.ic_images_pin_24,
+    voice = R.drawable.ic_voice_24,
+    voicePinned = R.drawable.ic_voice_pin_24,
+)
+
+/** Same mapping as [iconRes] with the `_daynight` copies, since RemoteViews cannot resolve `?attr` colours. */
+@DrawableRes
+internal fun ChatType.widgetIconRes(pinned: Boolean): Int = iconRes(
+    pinned,
+    discussion = R.drawable.ic_chat_24_daynight,
+    discussionPinned = R.drawable.ic_pin_24_daynight,
+    image = R.drawable.ic_images_24_daynight,
+    imagePinned = R.drawable.ic_images_pin_24_daynight,
+    voice = R.drawable.ic_voice_24_daynight,
+    voicePinned = R.drawable.ic_voice_pin_24_daynight,
+)
+
+@Suppress("LongParameterList")
+private fun ChatType.iconRes(
+    pinned: Boolean,
+    discussion: Int,
+    discussionPinned: Int,
+    image: Int,
+    imagePinned: Int,
+    voice: Int,
+    voicePinned: Int,
+): Int = when (this) {
+    ChatType.Discussion -> if (pinned) discussionPinned else discussion
+    ChatType.ImageGeneration -> if (pinned) imagePinned else image
+    ChatType.Voice -> if (pinned) voicePinned else voice
 }

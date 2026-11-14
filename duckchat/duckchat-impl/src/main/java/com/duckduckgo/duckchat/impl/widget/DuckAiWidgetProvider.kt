@@ -20,13 +20,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.RemoteViews
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +37,12 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
 
     @Inject
     lateinit var duckAiWidgetConfigurator: DuckAiWidgetConfigurator
+
+    @Inject
+    lateinit var duckAiWidgetUpdater: DuckAiWidgetUpdater
+
+    @Inject
+    lateinit var widgetPreferences: DuckAiWidgetPreferences
 
     @Inject
     lateinit var pixel: Pixel
@@ -70,6 +74,7 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         logcat { "DuckAiWidgetProvider onUpdate" }
+        duckAiWidgetUpdater.startObservingIfNeeded()
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
@@ -90,16 +95,23 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
     ) {
-        val views = RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight)
+        val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
+        val heightDp = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, Int.MAX_VALUE) ?: Int.MAX_VALUE
+        val widthDp = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, Int.MAX_VALUE) ?: Int.MAX_VALUE
 
         appCoroutineScope.launch {
-            duckAiWidgetConfigurator.populateRemoteViews(
-                context = context,
-                remoteViews = views,
-            )
+            val views = duckAiWidgetConfigurator.createRemoteViews(context, appWidgetId, heightDp, widthDp)
             appWidgetManager.updateAppWidget(appWidgetId, views)
             logcat { "DuckAiWidgetProvider updateAppWidget completed for widget id = $appWidgetId" }
         }
+    }
+
+    override fun onDeleted(
+        context: Context,
+        appWidgetIds: IntArray,
+    ) {
+        super.onDeleted(context, appWidgetIds)
+        appCoroutineScope.launch { widgetPreferences.remove(appWidgetIds) }
     }
 
     override fun onDisabled(context: Context?) {

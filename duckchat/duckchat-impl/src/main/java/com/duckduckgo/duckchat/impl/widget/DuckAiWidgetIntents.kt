@@ -19,8 +19,10 @@ package com.duckduckgo.duckchat.impl.widget
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.DuckChatLaunch
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import javax.inject.Inject
 
 class DuckAiWidgetIntents @Inject constructor(
@@ -35,13 +37,40 @@ class DuckAiWidgetIntents @Inject constructor(
     ): PendingIntent = PendingIntent.getActivity(
         context,
         requestCode,
+        browserNav.openDuckChat(context, duckChatUrl = duckChatUrl, launch = launch).asViewIntent(),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
+
+    fun openChatHistory(context: Context, requestCode: Int): PendingIntent = PendingIntent.getActivity(
+        context,
+        requestCode,
+        browserNav.openDuckChat(context, launch = DuckChatLaunch.ChatHistory(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET)).asViewIntent(),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
+
+    /**
+     * Template for list items; each item's fill-in intent, built by [chatFillInIntent], supplies every extra.
+     * [Intent.fillIn] never overwrites an extra already present, so the template must carry none.
+     */
+    fun chatClickTemplate(context: Context, requestCode: Int): PendingIntent {
+        val mutability = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0
+        return PendingIntent.getActivity(
+            context,
+            requestCode,
+            openDuckChat(context, null).replaceExtras(null).asViewIntent(),
+            PendingIntent.FLAG_UPDATE_CURRENT or mutability,
+        )
+    }
+
+    fun chatFillInIntent(context: Context, chatUrl: String): Intent =
+        Intent().putExtras(openDuckChat(context, chatUrl).extras!!)
+
+    private fun openDuckChat(context: Context, duckChatUrl: String?): Intent =
         browserNav.openDuckChat(
             context,
             duckChatUrl = duckChatUrl,
-            launch = launch,
-        ).asViewIntent(),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-    )
+            launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET),
+        )
 
     private fun Intent.asViewIntent(): Intent = apply { action = Intent.ACTION_VIEW }
 }

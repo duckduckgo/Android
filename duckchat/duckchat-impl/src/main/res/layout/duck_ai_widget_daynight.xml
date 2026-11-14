@@ -86,6 +86,7 @@
                 tools:ignore="ContentDescription, UseAppTint" />
 
             <TextView
+                android:id="@+id/labelVoice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_2"
@@ -120,6 +121,7 @@
                 tools:ignore="ContentDescription, UseAppTint" />
 
             <TextView
+                android:id="@+id/labelCreateImage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_2"
@@ -154,6 +156,7 @@
                 tools:ignore="ContentDescription, UseAppTint" />
 
             <TextView
+                android:id="@+id/labelTakePhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_2"
@@ -163,6 +166,89 @@
                 android:text="@string/duckAiWidgetCameraAction"
                 android:textColor="@color/duckAiWidgetOnContainerColor"
                 android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chatsSection"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:background="@color/duckAiWidgetDividerColor" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ListView
+                android:id="@+id/chatsList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@null"
+                android:dividerHeight="0dp" />
+
+            <TextView
+                android:id="@+id/chatsMessageEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="@string/duck_ai_chat_history_empty_title"
+                android:textSize="14sp"
+                android:textColor="@color/duckAiWidgetHintColor"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/chatsMessageUnavailable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="@string/duckAiWidgetUnavailable"
+                android:textSize="14sp"
+                android:textColor="@color/duckAiWidgetHintColor"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/chatsViewAllContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:background="@color/duckAiWidgetDividerColor" />
+
+            <TextView
+                android:id="@+id/chatsViewAll"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/keyline_7"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:text="@string/duckAiChatHistoryViewAllChats"
+                android:textColor="@color/duckAiWidgetTextColor"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
