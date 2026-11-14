@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Posts the weekly API quality report to Asana and files one backlog task per new finding group.
+Posts the weekly API quality report to Asana, and one regressions task listing every new finding of the week.
 
-A group is one module and one rule, so a PR that leaves ten members undocumented opens one M4 task, not ten.
-When an open task for the same module and rule already exists, the new declarations are added to it as a comment.
-A re-run of the workflow updates its own report task instead of creating a second one; see upsert_run_task.
+A week creates at most two tasks, however many findings it has: the triage owner assigns the regressions or splits them
+into their own tasks. A re-run of the workflow updates the tasks it created instead of adding more; see upsert_run_task.
 Every Asana ID comes from the GH_API_QUALITY_* environment variables, which the workflows fill from repository
 variables of the same names.
 
@@ -24,7 +23,8 @@ from datetime import datetime, timedelta, timezone
 import asana
 from asana.rest import ApiException
 
-from compare import AWAITING_TRIAGE_CELL, RULES, rule_label
+from compare import (AWAITING_TRIAGE_CELL, MAX_DETAILED_FINDINGS, REGRESSIONS_TASK_MARKER, SHORT_FIXES, detail_md,
+                     rule_label)
 
 TASK_PREFIX = "[API quality]"
 CONFIG_VARIABLES = {
@@ -35,7 +35,9 @@ CONFIG_VARIABLES = {
     "status": "GH_API_QUALITY_STATUS_FIELD_KEY_ID",
     "status_needs_explanation": "GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID",
 }
-UNEXPLAINED_AFTER_DAYS = 14
+UNTRIAGED_AFTER_DAYS = 14
+# Asana gives every column the same default width, which wraps these long cells; widths are in pixels.
+COLUMN_WIDTHS = {"Metric": 280, "API": 220, "Rule": 280, "Details": 400, "Fix": 320}
 
 
 def log(message):
@@ -65,10 +67,14 @@ def markdown_to_asana_html(markdown, tables=True):
             out.append("<ul>" + "".join(f"<li>{b}</li>" for b in bullets) + "</ul>")
             bullets.clear()
 
+    def td(column, content):
+        width = COLUMN_WIDTHS.get(table_header[column]) if column < len(table_header) else None
+        return f'<td data-cell-widths="{width}">{content}</td>' if width else f"<td>{content}</td>"
+
     def flush_table():
         if table_header is not None and tables:
-            header = "<tr>" + "".join(f"<td><strong>{inline(h)}</strong></td>" for h in table_header) + "</tr>"
-            body = "".join("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in row) + "</tr>" for row in rows)
+            header = "<tr>" + "".join(td(i, f"<strong>{inline(h)}</strong>") for i, h in enumerate(table_header)) + "</tr>"
+            body = "".join("<tr>" + "".join(td(i, inline(c)) for i, c in enumerate(row)) + "</tr>" for row in rows)
             out.append(f"<table>{header}{body}</table>")
         rows.clear()
 
@@ -123,50 +129,30 @@ def with_rich_text(call, markdown):
         return call(markdown_to_asana_html(markdown, tables=False))
 
 
-def finding_task_name(group):
-    rule = RULES[group["rule"]][0].replace("`", "") if group["rule"] in RULES else group["rule"]
-    return f"{TASK_PREFIX} {group['module']}: {rule}"
+def regressions_notes(groups, date, report_url, rules_url):
+    """Every new finding of the week with its line, details and fix, so the task can be triaged without the report."""
+    findings = [(g, f) for g in groups for f in g["findings"]]
+    rows = []
+    for g, f in findings[:MAX_DETAILED_FINDINGS]:
+        where = f"{os.path.basename(f['file'])}:{f['line']}" if f["file"] else "module"
+        where = f"[{where}]({f['url']})" if f.get("url") else f"`{where}`"
+        rows.append(f"| `{g['module']}` | {rule_label(g['rule'])} | {where} | `{f['declaration']}`: {detail_md(f['detail'])} "
+                    f"| {SHORT_FIXES.get(g['rule'], '')} |")
+    if len(findings) > MAX_DETAILED_FINDINGS:
+        rows.append(f"| | | | …and {len(findings) - MAX_DETAILED_FINDINGS} more in the run's artifact | |")
+    md = [f"Detected in the [{date} weekly report]({report_url}).", "",
+          "| API | Rule | Line | Details | Fix |", "|---|---|---|---|---|"] + rows
+    md += ["", "Please assign each finding to the author of the change, or split it into its own task, then mark this task "
+           "complete."]
+    if rules_url:
+        md += ["", f"**Ref:** [API quality rules and scores]({rules_url})"]
+    return "\n".join(md) + "\n"
 
 
-def finding_lines(group):
-    lines = []
-    for f in group["findings"]:
-        where = f"{os.path.basename(f['file'])}:{f['line']}" if f["file"] else group["module"]
-        where = f'<a href="{html.escape(f["url"])}">{html.escape(where)}</a>' if f.get("url") else html.escape(where)
-        lines.append(f"<li>{where} <code>{html.escape(f['declaration'])}</code>: {html.escape(f['detail'])}</li>")
-    return lines
-
-
-def finding_notes(group, date, report_url, rules_url):
-    """Where it was found, what broke and how to fix it. No score effect: a finding that doesn't move the score still
-    deserves a fix."""
-    _, why, fix = RULES.get(group["rule"], ("", "", ""))
-    ref = f'\n\n<strong>Ref:</strong> <a href="{html.escape(rules_url)}">API quality rules and scores</a>' if rules_url else ""
-    return (
-        f'<body>Detected in the <a href="{report_url}">{date} weekly report</a>.'
-        f"\n\n<strong>API:</strong> <code>{html.escape(group['module'])}</code>"
-        f"\n<strong>Rule:</strong> {inline(rule_label(group['rule']))}"
-        f"\n<strong>Lines:</strong><ul>{''.join(finding_lines(group))}</ul>"
-        f"<strong>Details:</strong> {inline(why)}"
-        f"\n<strong>How to fix:</strong> {inline(fix)}"
-        "\n\nPlease update the API quality status field above and add a comment if needed."
-        f"{ref}</body>"
-    )
-
-
-def link_tasks(report, filed):
-    """Replaces each group's marker from compare.py with a link to its task; unmatched markers are dropped."""
-    urls = {(group["module"], group["rule"]): url for group, url, _ in filed}
-
-    def link(match):
-        url = urls.get((match.group(1), match.group(2)))
-        return f"[task]({url})" if url else ""
-    return re.sub(r"<!-- task:(\S+):(\S+) -->", link, report)
-
-
-def open_tasks_by_name(tasks_api, project_id):
-    tasks = tasks_api.get_tasks_for_project(project_id, {"completed_since": "now", "opt_fields": "name,permalink_url"})
-    return {t["name"]: t for t in tasks}
+def link_regressions_task(report, url):
+    """Swaps the report's marker for a link to the regressions task, or drops it when there's no task."""
+    link = f"Lines, details and fixes for every new finding: [regressions task]({url})" if url else ""
+    return report.replace(REGRESSIONS_TASK_MARKER, link)
 
 
 def load_config(env=os.environ):
@@ -181,10 +167,6 @@ def load_config(env=os.environ):
     }
 
 
-def needs_explanation(config):
-    return {config["fields"]["status"]: config["fields"]["status_needs_explanation"]}
-
-
 def status_of(task, config):
     for f in task.get("custom_fields") or []:
         if f.get("gid") == config["fields"]["status"]:
@@ -192,18 +174,16 @@ def status_of(task, config):
     return None
 
 
-def count_unexplained(tasks_api, config, now):
-    """Open finding tasks still at the default status after the deadline, in whichever section they are."""
-    cutoff = now - timedelta(days=UNEXPLAINED_AFTER_DAYS)
+def count_untriaged(tasks_api, config, now):
+    """
+    Open tasks still at Needs explanation after the deadline, in whichever section they are. The triager sets that status
+    on each finding split from a regressions task, so manually created tasks count as well.
+    """
+    cutoff = now - timedelta(days=UNTRIAGED_AFTER_DAYS)
     tasks = tasks_api.get_tasks_for_project(
-        config["project"], {"completed_since": "now", "opt_fields": "name,created_at,custom_fields.gid,custom_fields.enum_value.gid"})
-    stale = 0
-    for t in tasks:
-        created = datetime.fromisoformat(t["created_at"].replace("Z", "+00:00"))
-        if (t["name"].startswith(TASK_PREFIX) and created < cutoff
-                and status_of(t, config) == config["fields"]["status_needs_explanation"]):
-            stale += 1
-    return stale
+        config["project"], {"completed_since": "now", "opt_fields": "created_at,custom_fields.gid,custom_fields.enum_value.gid"})
+    return sum(1 for t in tasks if status_of(t, config) == config["fields"]["status_needs_explanation"]
+               and datetime.fromisoformat(t["created_at"].replace("Z", "+00:00")) < cutoff)
 
 
 def github_run(kind):
@@ -264,35 +244,6 @@ def asana_apis():
     return asana.TasksApi(client), asana.StoriesApi(client)
 
 
-def file_finding_groups(tasks_api, stories_api, config, date, groups, report_url):
-    """Files or comments one task per group; returns `(group, task link, created)` for the report to link back to."""
-    project = config["project"]
-    existing = open_tasks_by_name(tasks_api, project)
-    filed = []
-    for group in groups:
-        name = finding_task_name(group)
-        items = "".join(finding_lines(group))
-        if name in existing:
-            stories_api.create_story_for_task(
-                {"data": {"html_text": f"<body>Detected again in the <a href=\"{report_url}\">{date} weekly report</a>:<ul>{items}</ul></body>"}},
-                existing[name]["gid"],
-                {},
-            )
-            log(f"Commented on {existing[name]['permalink_url']}")
-            filed.append((group, existing[name]["permalink_url"], False))
-            continue
-        notes = finding_notes(group, date, report_url, os.environ.get("GH_API_QUALITY_RULES_URL"))
-        task = tasks_api.create_task(
-            {"data": {"name": name, "html_notes": notes, "projects": [project],
-                      "memberships": [{"project": project, "section": config["sections"]["triage"]}],
-                      "custom_fields": needs_explanation(config)}},
-            {"opt_fields": "permalink_url"},
-        )
-        log(f"Created finding task {task['permalink_url']}")
-        filed.append((group, task["permalink_url"], True))
-    return filed
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--report-md", required=True)
@@ -308,16 +259,21 @@ def main():
     with open(args.new_json) as f:
         groups = json.load(f)["new"]
 
-    unexplained = count_unexplained(tasks_api, config, datetime.now(timezone.utc))
-    report = report.replace(AWAITING_TRIAGE_CELL, str(unexplained))
+    untriaged = count_untriaged(tasks_api, config, datetime.now(timezone.utc))
+    report = report.replace(AWAITING_TRIAGE_CELL, str(untriaged))
     report_task = upsert_run_task(tasks_api, stories_api, config["project"], config["sections"]["weekly_reports"],
-                                  f"API Weekly Report, {args.date}", link_tasks(report, []),
+                                  f"API Weekly Report, {args.date}", link_regressions_task(report, None),
                                   config["fields"]["github_run"], run_id, run_url)
-    filed = file_finding_groups(tasks_api, stories_api, config, args.date, groups, report_task["permalink_url"])
-    # The finding tasks link to the report, which exists first; the report links to them once they exist.
-    if filed:
-        with_rich_text(lambda notes: tasks_api.update_task({"data": {"html_notes": notes}}, report_task["gid"], {}),
-                       link_tasks(report, filed))
+    if not groups:
+        return
+    # The regressions task links to the report, which exists first; the report links to it once it exists.
+    regressions_run_id, _ = github_run("weekly-regressions")
+    regressions_task = upsert_run_task(
+        tasks_api, stories_api, config["project"], config["sections"]["triage"], f"{TASK_PREFIX} Regressions, {args.date}",
+        regressions_notes(groups, args.date, report_task["permalink_url"], os.environ.get("GH_API_QUALITY_RULES_URL")),
+        config["fields"]["github_run"], regressions_run_id, run_url)
+    with_rich_text(lambda notes: tasks_api.update_task({"data": {"html_notes": notes}}, report_task["gid"], {}),
+                   link_regressions_task(report, regressions_task["permalink_url"]))
 
 
 if __name__ == "__main__":

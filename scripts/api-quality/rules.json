@@ -36,14 +36,14 @@
       "short_fix": "Make it unable to fail, or return a sealed result."
     },
     {
-      "id": "M7",
+      "id": "M6",
       "name": "No untyped or positional types",
       "why": "`Any`, `Pair` or `Triple` is in a public signature. `Any` turns type errors into runtime crashes; `Pair` and `Triple` drop the names of what's returned.",
       "fix": "Name the thing: a data class or a sealed hierarchy.",
       "short_fix": "Use a named data class or sealed type."
     },
     {
-      "id": "M8",
+      "id": "M7",
       "name": "No exposed write access",
       "why": "A public `var`, or a writable type in a signature (`Mutable*`, Java collections like `ArrayList`, `Atomic*`, or a coroutines `Channel`), lets any consumer change state its owning module is responsible for.",
       "fix": "Use a `val` plus a function named for the intent; narrow `MutableStateFlow` to `StateFlow` at the boundary.",

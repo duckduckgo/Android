@@ -93,7 +93,7 @@ def test_weekly_json_groups_new_findings_by_module_and_rule(tmp_path, monkeypatc
     groups = json.loads(out_json.read_text())["new"]
     assert [(g["module"], g["rule"], len(g["findings"])) for g in groups] == [("a-api", "M3", 2)]
     assert groups[0]["findings"][0]["url"] == "https://gh/blob/sha/A.kt#L1"
-    assert "| `a-api` | M3: Top-level declarations documented | <!-- task:a-api:M3 --> |" in out_md.read_text()
+    assert "<!-- regressions-task -->\n\n| API | Rule | Findings |\n|---|---|---|\n| `a-api` | M3: Top-level declarations documented | 2 |" in out_md.read_text()
 
 
 def test_new_finding_is_a_regression(tmp_path):
@@ -170,8 +170,8 @@ def test_pr_comment_lists_every_new_finding_with_a_link_to_its_line(tmp_path):
 
 
 def test_weekly_report_lists_each_regression_once_and_resolved_by_module(tmp_path):
-    before = write_run(tmp_path / "before", [["a-api", 7, 2, 0, 0, ""], ["b-api", 6, 2, 0, 0, "M8"]],
-                       [["b-api", "M8", "B.kt", 1, "B.x", "public var"]])
+    before = write_run(tmp_path / "before", [["a-api", 7, 2, 0, 0, ""], ["b-api", 6, 2, 0, 0, "M7"]],
+                       [["b-api", "M7", "B.kt", 1, "B.x", "public var"]])
     after = write_run(tmp_path / "after", [["a-api", 6, 4, 0, 0, "M3"], ["b-api", 7, 2, 0, 0, ""]], [
         ["a-api", "M3", "A.kt", 1, "A", "no KDoc"],
         ["a-api", "M3", "C.kt", 1, "C", "no KDoc"],
@@ -181,7 +181,7 @@ def test_weekly_report_lists_each_regression_once_and_resolved_by_module(tmp_pat
     report = render_weekly(b, a, diff_runs(b, a), weekly_report=True)
 
     assert report.count("| `a-api` | M3") == 1
-    assert "| `b-api` | M8 |" in report
+    assert "| `b-api` | M7 |" in report
     assert "| `a-api` | 7/7 | 6/7 |" in report
     assert "score effect" not in report.lower()
 
@@ -238,10 +238,10 @@ def test_same_name_getting_worse_in_another_module_is_not_a_move(tmp_path):
 
 def test_hiding_one_constructor_and_exposing_a_same_named_one_is_new(tmp_path):
     constructors = [("a-api", "a/one/A.kt", "A.constructor(Any)"), ("a-api", "a/two/A.kt", "A.constructor(Any)")]
-    before = write_run(tmp_path / "before", [["a-api", 6, 10, 0, 0, "M7"]],
-                       [["a-api", "M7", "a/one/A.kt", 3, "A.constructor(Any)", "Any in Any"]], constructors=constructors)
-    after = write_run(tmp_path / "after", [["a-api", 6, 10, 0, 0, "M7"]],
-                      [["a-api", "M7", "a/two/A.kt", 3, "A.constructor(Any)", "Any in Any"]], constructors=constructors)
+    before = write_run(tmp_path / "before", [["a-api", 6, 10, 0, 0, "M6"]],
+                       [["a-api", "M6", "a/one/A.kt", 3, "A.constructor(Any)", "Any in Any"]], constructors=constructors)
+    after = write_run(tmp_path / "after", [["a-api", 6, 10, 0, 0, "M6"]],
+                      [["a-api", "M6", "a/two/A.kt", 3, "A.constructor(Any)", "Any in Any"]], constructors=constructors)
     b, a = load_run(before), load_run(after)
 
     diff = diff_runs(b, a)
@@ -252,8 +252,8 @@ def test_hiding_one_constructor_and_exposing_a_same_named_one_is_new(tmp_path):
 
 def test_pr_comment_keeps_generic_types_in_code(tmp_path):
     before = write_run(tmp_path / "before", [["a-api", 7, 1, 0, 0, ""]], [])
-    after = write_run(tmp_path / "after", [["a-api", 6, 1, 0, 0, "M8"]],
-                      [["a-api", "M8", "A.kt", 1, "A.items", "MutableList in MutableList<String>"]])
+    after = write_run(tmp_path / "after", [["a-api", 6, 1, 0, 0, "M7"]],
+                      [["a-api", "M7", "A.kt", 1, "A.items", "MutableList in MutableList<String>"]])
     b, a = load_run(before), load_run(after)
 
     assert "`A.items`: MutableList in `MutableList<String>`" in render_pr(b, a, diff_runs(b, a))
@@ -261,12 +261,12 @@ def test_pr_comment_keeps_generic_types_in_code(tmp_path):
 
 def test_comparison_lists_each_regression_with_its_line_details_and_fix(tmp_path):
     before = write_run(tmp_path / "before", [["a-api", 7, 1, 0, 0, ""]], [])
-    after = write_run(tmp_path / "after", [["a-api", 6, 2, 0, 0, "M8"]], [["a-api", "M8", "src/A.kt", 4, "A.x", "public var"]])
+    after = write_run(tmp_path / "after", [["a-api", 6, 2, 0, 0, "M7"]], [["a-api", "M7", "src/A.kt", 4, "A.x", "public var"]])
     b, a = load_run(before), load_run(after)
 
     report = render_weekly(b, a, diff_runs(b, a), "API quality: x compared with y", link_base="https://gh/blob/sha")
 
-    assert "| API | Line | Details | Fix |" in report and "<!-- task:" not in report
+    assert "| API | Line | Details | Fix |" in report and "<!-- regressions-task -->" not in report
     assert "| `a-api` | [A.kt:4](https://gh/blob/sha/src/A.kt#L4) | `A.x`: public var | Expose a `val`" in report
 
 

@@ -11,7 +11,7 @@ Refer to [API Quality Rules and Scores](https://app.asana.com/1/137249556945/pro
 |---|---|-------------------------------------|
 | `score.sh` + `Scorer.java` | Scores the checked-out code | Manual or every workflow            |
 | `compare.py` | Diffs two scorer runs by declaration: new, resolved and moved findings, score changes, and whether it regressed | Every workflow except the scorecard |
-| `asana_sync.py` | Posts the weekly report to Asana and files one Triage task per new finding group | Weekly workflow                     |
+| `asana_sync.py` | Posts the weekly report to Asana, and one Triage task listing all of the week's new findings | Weekly workflow                     |
 | `asana_task.py` | Creates the one Asana task of a run, or updates it on a re-run | Compare workflow                    |
 | `rules.json` | Each rule's name, why it matters and how to fix it: the single source for the texts in reports, PR comments and Asana tasks | `compare.py`, `asana_sync.py`       |
 
@@ -58,12 +58,12 @@ Variables*), which the workflows pass in as environment variables of the same na
 | Variable | Asana ID of |
 |---|---|
 | `GH_API_QUALITY_PROJECT_ID` | The project |
-| `GH_API_QUALITY_TRIAGE_SECTION_ID` | Its Triage section: finding and regression tasks |
+| `GH_API_QUALITY_TRIAGE_SECTION_ID` | Its Triage section: weekly regressions tasks and compare regression tasks |
 | `GH_API_QUALITY_WEEKLY_REPORTS_SECTION_ID` | Its Weekly Reports section: weekly report tasks |
 | `GH_API_QUALITY_GITHUB_RUN_FIELD_KEY_ID` | The "GitHub run" text field, which lets a re-run find and update its own task |
 | `GH_API_QUALITY_STATUS_FIELD_KEY_ID` | The "API quality status" single-select field |
-| `GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID` | Its "Needs explanation" option, set on every new finding and regression task |
-| `GH_API_QUALITY_RULES_URL` | Optional: the "API quality rules and scores" task, linked at the end of PR comments, reports and finding tasks |
+| `GH_API_QUALITY_STATUS_FIELD_NEEDS_EXPLANATION_VALUE_ID` | Its "Needs explanation" option: the weekly report counts open tasks still at it after 14 days |
+| `GH_API_QUALITY_RULES_URL` | Optional: the "API quality rules and scores" task, linked at the end of PR comments, reports and regressions tasks |
 
 Scheduled weekly runs post once `GH_API_QUALITY_PROJECT_ID` is set. A run that posts with any variable missing fails and
 names the missing ones. Posting uses the existing `ASANA_ACCESS_TOKEN` secret.
@@ -84,22 +84,22 @@ names the missing ones. Posting uses the existing `ASANA_ACCESS_TOKEN` secret.
   `@property`/`@param` tag or a `[name]` link. **KDoc coverage**, the share of declarations with KDoc, is reported next to the
   scores to show progress while a module still fails the checks.
 - **Constructors:** a `val`/`var` parameter is a property, public even behind a private constructor. Other parameters of a
-  public constructor are checked by M2, M7 and M8 as `Type.constructor(...)`; enum and sealed class constructors aren't.
+  public constructor are checked by M2, M6 and M7 as `Type.constructor(...)`; enum and sealed class constructors aren't.
 - **M1:** a type name ending in `Repository`, `Dao`, `Entity`, `ViewModel` or `Impl`, or starting with `Real` followed by an
   uppercase letter (`RealFoo`, not `Realm`).
 - **M2:** `Toggle` anywhere in a signature or supertype, including type arguments such as `List<Toggle>`. A qualified name such
   as `Toggle.State` doesn't count.
 - **M5:** a function whose declared return type is exactly `Intent?`, `Fragment?`, `View?` or `Bundle?`.
-- **M7:** `Any`, `Pair` or `Triple` anywhere in a signature, including type arguments, except `equals(other: Any?)` and
+- **M6:** `Any`, `Pair` or `Triple` anywhere in a signature, including type arguments, except `equals(other: Any?)` and
   `readResolve()`.
-- **M8:** a public `var` whose setter is also public, or a writable type anywhere in a signature: `Mutable*`, the Java
+- **M7:** a public `var` whose setter is also public, or a writable type anywhere in a signature: `Mutable*`, the Java
   mutable collections (`ArrayList`, `HashMap`, `HashSet`, `LinkedHashMap`, `LinkedHashSet`, `LinkedList`, `ConcurrentHashMap`,
   `CopyOnWriteArrayList`), the `Atomic*` types, and the coroutines `Channel` and `SendChannel`. The last two only count
   when the file imports them from `kotlinx.coroutines.channels` or writes their full name, since this repo also has its own
   `Channel` class. Arrays aren't checked: they're the usual type for binary data.
 
 Files are parsed with the Kotlin compiler's own parser, so the same code always gives the same score. There is no symbol
-resolution: types are matched by simple name, and a declaration whose type is inferred isn't checked by M2, M5, M7 or M8.
+resolution: types are matched by simple name, and a declaration whose type is inferred isn't checked by M2, M5, M6 or M7.
 
 Changing any definition changes scores across the fleet, so it follows the re-baseline procedure.
 

@@ -33,8 +33,8 @@ def score(tmp_path, source):
 def test_public_property_behind_a_private_constructor_is_checked(tmp_path):
     findings = score(tmp_path, "/** Doc. */\nclass A private constructor(var items: MutableList<String>)\n")
 
-    assert ("M8", "A.items", "public var") in findings
-    assert ("M8", "A.items", "MutableList in MutableList<String>") in findings
+    assert ("M7", "A.items", "public var") in findings
+    assert ("M7", "A.items", "MutableList in MutableList<String>") in findings
 
 
 def test_public_constructor_parameters_are_checked_whatever_they_are_stored_in(tmp_path):
@@ -47,16 +47,16 @@ def test_public_constructor_parameters_are_checked_whatever_they_are_stored_in(t
     ))
 
     assert findings == {
-        ("M8", "A.constructor(MutableList<String>, Any)", "MutableList in MutableList<String>"),
-        ("M7", "A.constructor(MutableList<String>, Any)", "Any in Any"),
-        ("M7", "A.constructor(Pair<Int, Int>)", "Pair in Pair<Int, Int>"),
+        ("M7", "A.constructor(MutableList<String>, Any)", "MutableList in MutableList<String>"),
+        ("M6", "A.constructor(MutableList<String>, Any)", "Any in Any"),
+        ("M6", "A.constructor(Pair<Int, Int>)", "Pair in Pair<Int, Int>"),
     }
 
 
 def test_public_val_parameter_is_reported_once_as_its_property(tmp_path):
     findings = score(tmp_path, "/** Doc.\n * @property value the value\n */\nclass A(val value: Any)\n")
 
-    assert findings == {("M7", "A.value", "Any in Any")}
+    assert findings == {("M6", "A.value", "Any in Any")}
 
 
 def test_constructors_outside_callers_reach_are_skipped(tmp_path):
@@ -94,7 +94,7 @@ def test_multiline_types_give_one_single_line_finding(tmp_path):
 
     with open(out / "api-quality-findings-t.csv", newline="") as f:
         rows = list(csv.DictReader(f))
-    assert [(row["rule"], row["declaration"], row["detail"]) for row in rows] == [("M7", "A.f(List<Any>)", "Any in List<Any>")]
+    assert [(row["rule"], row["declaration"], row["detail"]) for row in rows] == [("M6", "A.f(List<Any>)", "Any in List<Any>")]
     assert len((out / "api-quality-findings-t.csv").read_text().splitlines()) == 2
 
 
@@ -156,8 +156,8 @@ def test_writable_types_beyond_mutable_are_exposed_write_access(tmp_path):
         "}\n"
     ))
 
-    m8 = {declaration for rule, declaration, _ in findings if rule == "M8"}
-    assert m8 == {"A.items", "A.counter"}
+    m7 = {declaration for rule, declaration, _ in findings if rule == "M7"}
+    assert m7 == {"A.items", "A.counter"}
 
 
 def test_channel_counts_only_when_it_is_the_coroutines_one(tmp_path):
@@ -170,8 +170,8 @@ def test_channel_counts_only_when_it_is_the_coroutines_one(tmp_path):
     ))
     own = score(tmp_path / "own", "/** Doc. */\ndata class Channel(val id: String)\n\n/** Doc. */\ninterface B {\n    /** Doc. */\n    val channel: Channel\n}\n")
 
-    assert {d for rule, d, _ in findings if rule == "M8"} == {"A.events", "A.outgoing"}
-    assert not any(rule == "M8" for rule, _, _ in own)
+    assert {d for rule, d, _ in findings if rule == "M7"} == {"A.events", "A.outgoing"}
+    assert not any(rule == "M7" for rule, _, _ in own)
 
 
 def test_flavor_source_sets_are_scored_and_test_source_sets_are_not(tmp_path):

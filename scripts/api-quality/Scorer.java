@@ -80,7 +80,7 @@ public class Scorer {
     static final Map<String, String> MUTABLE_IMPORTED_TYPES = Map.of(
         "Channel", "kotlinx.coroutines.channels.Channel",
         "SendChannel", "kotlinx.coroutines.channels.SendChannel");
-    static final String[] RULES = {"M1", "M2", "M3", "M4", "M5", "M7", "M8"};
+    static final String[] RULES = {"M1", "M2", "M3", "M4", "M5", "M6", "M7"};
     static final int MAX_SCORE = RULES.length;
 
     /** SEALED_CASE: a subtype nested in its sealed parent. Counts as a declaration but needs no KDoc, like an enum entry. */
@@ -270,7 +270,7 @@ public class Scorer {
                     param.getDocComment() != null || documentsParameter(classDoc, param.getName()));
                 checkTypeReference(module, rel, file, param, pname, param.getTypeReference(), false);
                 if (param.isMutable()) {
-                    addFinding(module, "M8", rel, file, param, pname, "public var");
+                    addFinding(module, "M7", rel, file, param, pname, "public var");
                 }
             }
             if (cls.getPrimaryConstructor() != null) {
@@ -438,7 +438,7 @@ public class Scorer {
     }
 
     /**
-     * Applies M2, M7 and M8 to the parameters of a public constructor. A public val/var parameter is left to its property;
+     * Applies M2, M6 and M7 to the parameters of a public constructor. A public val/var parameter is left to its property;
      * a private or overriding one isn't checked as a property, but callers still pass it. Enum and sealed class
      * constructors can't be called from outside, so they're skipped.
      */
@@ -459,10 +459,10 @@ public class Scorer {
         if (!prop.isVar()) return;
         KtPropertyAccessor setter = prop.getSetter();
         if (setter != null && !isPublic(setter)) return;
-        addFinding(module, "M8", rel, file, prop, name, "public var");
+        addFinding(module, "M7", rel, file, prop, name, "public var");
     }
 
-    /** Applies M2, M7 and M8 to every type named in one type reference, including generic arguments. */
+    /** Applies M2, M6 and M7 to every type named in one type reference, including generic arguments. */
     static void checkTypeReference(
         Module module, String rel, KtFile file, PsiElement owner, String name, KtTypeReference ref, boolean untypedExempt) {
         if (ref == null) return;
@@ -475,12 +475,12 @@ public class Scorer {
                 addFinding(module, "M2", rel, file, owner, name, "Toggle in " + type);
             }
             if (!untypedExempt && UNTYPED_TYPES.contains(simple)) {
-                addFinding(module, "M7", rel, file, owner, name, simple + " in " + type);
+                addFinding(module, "M6", rel, file, owner, name, simple + " in " + type);
             }
             boolean mutableNamed = simple.startsWith("Mutable") && simple.length() > 7 && Character.isUpperCase(simple.charAt(7));
             String library = MUTABLE_IMPORTED_TYPES.get(simple);
             if (mutableNamed || MUTABLE_TYPES.contains(simple) || (library != null && refersTo(file, user, library))) {
-                addFinding(module, "M8", rel, file, owner, name, simple + " in " + type);
+                addFinding(module, "M7", rel, file, owner, name, simple + " in " + type);
             }
         }
     }

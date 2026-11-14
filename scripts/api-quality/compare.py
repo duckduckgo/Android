@@ -27,8 +27,10 @@ PR_COMMENT_MARKER = "<!-- api-quality-check -->"
 RULES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rules.json")
 # Filled in by asana_sync.py, which can count the Asana tasks; a dash where nothing posts.
 AWAITING_TRIAGE_CELL = "— <!-- awaiting-triage -->"
+# Replaced by asana_sync.py with a link to the week's regressions task; invisible where nothing posts.
+REGRESSIONS_TASK_MARKER = "<!-- regressions-task -->"
 # O1's proposed goals for 2027-06-30, from the objective; shown next to the weekly numbers.
-GOALS = {"weighted": "75%", "unweighted": "90%", "floor": "5", "awaiting_triage": "0"}
+GOALS = {"weighted": "75%", "unweighted": "90%", "floor": "4", "awaiting_triage": "0"}
 
 
 @dataclass(frozen=True)
@@ -202,11 +204,6 @@ def rule_label(rule):
     return f"{rule}: {RULES[rule][0]}" if rule in RULES else rule
 
 
-def task_marker(module, rule):
-    """Invisible in GitHub's markdown; asana_sync.py swaps it for a link to the group's Asana task."""
-    return f"<!-- task:{module}:{rule} -->"
-
-
 def location_url(f, link_base):
     return f"{link_base}/{f.file}#L{f.line}" if link_base and f.file else None
 
@@ -286,7 +283,7 @@ def summary_table(before: Run, after: Run, diff: Diff, baseline: Run = None, wee
     rows = [
         ["Score, weighted by declarations"] + [pct(f["weighted"]) for f in fleets] + [GOALS["weighted"]],
         ["Score, average per module"] + [pct(f["unweighted"]) for f in fleets] + [GOALS["unweighted"]],
-        [f"Lowest module score, excluding `{FLOOR_EXCLUDED_MODULE}`"] + [f"{f['floor']}/{MAX_SCORE}" for f in fleets]
+        ["Lowest module score"] + [f"{f['floor']}/{MAX_SCORE}" for f in fleets]
         + [f"{GOALS['floor']}/{MAX_SCORE}"],
         ["Open findings"] + [f"{f['open_findings']:,}" for f in fleets] + [""],
         ["KDoc coverage of public declarations"] + [pct(f["kdoc_coverage"]) for f in fleets] + [""],
@@ -302,8 +299,8 @@ def summary_table(before: Run, after: Run, diff: Diff, baseline: Run = None, wee
 
 
 def regressions_table(diff: Diff, link_base=None, detailed=False):
-    """The weekly report lists one row per API and rule, linked to its finding task; a comparison has no tasks, so it
-    lists every finding with its line, like the PR comment."""
+    """The weekly report lists one row per API and rule, and its regressions task has every finding; a comparison has no
+    such task, so it lists every finding with its line, like the PR comment."""
     modules_with_new = {f.module for f in diff.new}
     drops = [(m, score_drop_text(m, x, y, diff)) for m, x, y in score_drops(diff) if m not in modules_with_new]
     if detailed:
@@ -313,9 +310,10 @@ def regressions_table(diff: Diff, link_base=None, detailed=False):
             rows.append(f"| | | …and {len(diff.new) - MAX_DETAILED_FINDINGS} more in the run's artifact | |")
         rows += [f"| `{m}` | | {text} | |" for m, text in drops]
         return (["| API | Line | Details | Fix |", "|---|---|---|---|"] + rows) if rows else ["None."]
-    rows = [f"| `{module}` | {rule_label(rule)} | {task_marker(module, rule)} |" for (module, rule), _ in group(diff.new)]
+    rows = [f"| `{module}` | {rule_label(rule)} | {len(items)} |" for (module, rule), items in group(diff.new)]
     rows += [f"| `{m}` | {text} | |" for m, text in drops]
-    return (["| API | Rule | Task |", "|---|---|---|"] + rows) if rows else ["None."]
+    link = [REGRESSIONS_TASK_MARKER, ""] if diff.new else []
+    return (link + ["| API | Rule | Findings |", "|---|---|---|"] + rows) if rows else ["None."]
 
 
 def findings_sections(diff: Diff, link_base=None, detailed=False):

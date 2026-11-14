@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       post_to_asana:
-        description: 'Post the report and finding tasks to Asana'
+        description: 'Post the report and the regressions task to Asana'
         type: boolean
         default: false
 
@@ -139,8 +139,8 @@ jobs:
           retention-days: 90
 
       # Posting is the last step. Scheduled runs post once the Asana project variable is set; until then they only report
-      # on the run page. A re-run posts again, like the original was meant to: it updates the report task its first
-      # attempt created, found by the run ID, and comments on finding tasks that already exist.
+      # on the run page. A re-run posts again, like the original was meant to: it updates the report and regressions
+      # tasks its first attempt created, found by the run ID.
       - name: Post to Asana
         if: (github.event_name == 'schedule' && vars.GH_API_QUALITY_PROJECT_ID != '') || inputs.post_to_asana
         env:
