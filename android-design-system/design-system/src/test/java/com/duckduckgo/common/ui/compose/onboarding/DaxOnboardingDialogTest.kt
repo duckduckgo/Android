@@ -48,6 +48,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -59,6 +60,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performCustomAccessibilityActionWithLabel
@@ -76,6 +78,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [28])
@@ -853,6 +856,111 @@ class DaxOnboardingDialogTest {
         val title = compose.onNodeWithText("Hi").getUnclippedBoundsInRoot()
         val body = compose.onNodeWithText("A body that is wider than the title").getUnclippedBoundsInRoot()
         assertEquals((body.left + body.right).value / 2, (title.left + title.right).value / 2, 1f)
+    }
+
+    @Test
+    @Config(qualifiers = "mdpi")
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun primaryCtaPillKeepsItsVisibleGapsToTheContentAndTheCardEdge() {
+        assertPrimaryCtaGaps(ctaText = "Continue")
+    }
+
+    @Test
+    @Config(qualifiers = "mdpi")
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun primaryCtaPillKeepsTheSameVisibleGapsWhenItsLabelWraps() {
+        val ctaText = "Let's do it, show me how all of this works before I continue browsing"
+
+        assertPrimaryCtaGaps(ctaText)
+
+        val pill = compose.onNodeWithText(ctaText).getUnclippedBoundsInRoot()
+        assertTrue("The label must wrap for this fixture: ${pill.bottom - pill.top}", pill.bottom - pill.top > 48.dp)
+    }
+
+    private fun assertPrimaryCtaGaps(ctaText: String) {
+        compose.setContent {
+            DuckDuckGoTheme {
+                OnboardingTheme {
+                    DaxOnboardingDialog(
+                        contentKey = "gaps",
+                        title = "Gaps",
+                        body = "Body",
+                        modifier = Modifier.testTag("dialog"),
+                        animate = false,
+                        primaryCta = DaxOnboardingDialogCta(text = ctaText, onClick = {}),
+                    ) {
+                        Box(Modifier.size(48.dp).testTag("slot"))
+                    }
+                }
+            }
+        }
+
+        val pill = compose.onNodeWithText(ctaText).getUnclippedBoundsInRoot()
+        assertEquals(24f, (pill.top - compose.onNodeWithTag("slot").getUnclippedBoundsInRoot().bottom).value, 0.5f)
+        assertEquals(24f, (compose.onNodeWithTag("dialog").getUnclippedBoundsInRoot().bottom - pill.bottom).value, 0.5f)
+    }
+
+    @Test
+    @Config(qualifiers = "land-mdpi")
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun landscapePrimaryCtaPillStaysVerticallyCentred() {
+        assertLandscapePrimaryCtaCentred(ctaText = "Continue")
+    }
+
+    @Test
+    @Config(qualifiers = "land-mdpi")
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun landscapePrimaryCtaPillStaysVerticallyCentredWhenItsLabelWraps() {
+        val ctaText = "Let's do it, show me how all of this works"
+
+        assertLandscapePrimaryCtaCentred(ctaText)
+
+        val pill = compose.onNodeWithText(ctaText).getUnclippedBoundsInRoot()
+        assertTrue("The label must wrap for this fixture: ${pill.bottom - pill.top}", pill.bottom - pill.top > 48.dp)
+    }
+
+    private fun assertLandscapePrimaryCtaCentred(ctaText: String) {
+        compose.setContent {
+            DuckDuckGoTheme {
+                OnboardingTheme {
+                    DaxContextualOnboardingDialog(
+                        contentKey = "landscape",
+                        title = "Landscape",
+                        body = "Body",
+                        modifier = Modifier.testTag("dialog"),
+                        animate = false,
+                        primaryCta = DaxOnboardingDialogCta(text = ctaText, onClick = {}),
+                    )
+                }
+            }
+        }
+
+        val pill = compose.onNodeWithText(ctaText).getUnclippedBoundsInRoot()
+        val dialog = compose.onNodeWithTag("dialog").getUnclippedBoundsInRoot()
+        val cardTop = dialog.top + DaxOnboardingDialogDefaults.DismissOffset
+        assertEquals(((cardTop + dialog.bottom) / 2).value, ((pill.top + pill.bottom) / 2).value, 0.5f)
+    }
+
+    @Test
+    @Config(qualifiers = "mdpi")
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun primaryCtaPillWithoutContentKeepsItsVisibleGapToTheBody() {
+        compose.setContent {
+            DuckDuckGoTheme {
+                OnboardingTheme {
+                    DaxOnboardingDialog(
+                        contentKey = "gaps",
+                        title = "Gaps",
+                        body = "Body",
+                        animate = false,
+                        primaryCta = DaxOnboardingDialogCta(text = "Continue", onClick = {}),
+                    )
+                }
+            }
+        }
+
+        val pill = compose.onNodeWithText("Continue").getUnclippedBoundsInRoot()
+        assertEquals(20f, (pill.top - compose.onNodeWithText("Body").getUnclippedBoundsInRoot().bottom).value, 0.5f)
     }
 
     @Test
