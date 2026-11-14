@@ -37,6 +37,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/replayPreBrowserOnboarding"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/onboardingDevSettingsReplayTitle"
+                app:secondaryText="@string/onboardingDevSettingsReplaySubtitle" />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/onboardingStateSection"
                 android:layout_width="wrap_content"
