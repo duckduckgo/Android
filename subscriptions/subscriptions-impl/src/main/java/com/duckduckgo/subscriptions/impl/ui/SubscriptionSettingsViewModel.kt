@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.icu.text.DateFormat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -27,14 +28,17 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLUS_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.UndoCancellationResult
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -46,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPlayStoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
@@ -98,6 +103,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private var withdrawalOption: WithdrawalOption? = null
     private var withdrawalEligibilityRequested = false
     private var withdrawalInProgress = false
+    private var undoCancellationInProgress = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -107,10 +113,54 @@ class SubscriptionSettingsViewModel @Inject constructor(
             .onEach {
                 emitChanges()
             }.launchIn(viewModelScope)
+
+        subscriptionsManager.currentPurchaseState
+            .onEach { onPurchaseStateChanged(it) }
+            .launchIn(viewModelScope)
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        viewModelScope.launch { emitChanges() }
+        viewModelScope.launch {
+            emitChanges()
+            refreshIfCancelled()
+        }
+    }
+
+    // Cancelling or restoring in Play happens outside the app, so the cached status can be stale
+    private suspend fun refreshIfCancelled() {
+        val subscription = subscriptionsManager.getSubscription() ?: return
+        if (!canUndoCancellation(subscription)) return
+        runCatching { subscriptionsManager.refreshSubscriptionData() }
+        emitChanges()
+    }
+
+    private fun canUndoCancellation(subscription: Subscription): Boolean {
+        return subscriptionsFeature.undoSubscriptionCancellation().isEnabled() &&
+            subscription.status == NOT_AUTO_RENEWABLE &&
+            subscription.platform == "google"
+    }
+
+    fun onKeepSubscriptionClicked(activity: Activity) {
+        if (undoCancellationInProgress) return
+        undoCancellationInProgress = true
+        viewModelScope.launch {
+            if (subscriptionsManager.undoSubscriptionCancellation(activity) == UndoCancellationResult.NotEligible) {
+                undoCancellationInProgress = false
+                command.send(GoToPlayStoreSubscription)
+            }
+        }
+    }
+
+    private suspend fun onPurchaseStateChanged(purchase: CurrentPurchase) {
+        if (!undoCancellationInProgress) return
+        when (purchase) {
+            is CurrentPurchase.Failure -> {
+                undoCancellationInProgress = false
+                command.send(GoToPlayStoreSubscription)
+            }
+            is CurrentPurchase.Success, CurrentPurchase.Canceled, CurrentPurchase.Waiting -> undoCancellationInProgress = false
+            else -> Unit
+        }
     }
 
     private suspend fun emitChanges() {
@@ -182,6 +232,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 effectiveTier = effectiveTier,
                 onboardingEntryPoint = onboardingEntryPoint(subscription),
                 withdrawal = withdrawalOption.takeIf { subscriptionWithdrawal.isWithdrawable(subscription) },
+                showUndoCancellation = canUndoCancellation(subscription),
             ),
         )
 
@@ -380,6 +431,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToWithdrawalHelp : Command()
         data object DismissWithdrawalDialog : Command()
         data object ShowWithdrawalDialogError : Command()
+        data object GoToPlayStoreSubscription : Command()
     }
 
     data class OnboardingEntryPoint(val percentage: Int)
@@ -418,6 +470,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val onboardingEntryPoint: OnboardingEntryPoint? = null,
             val withdrawal: WithdrawalOption? = null,
             val completedWithdrawal: CompletedWithdrawalState? = null,
+            val showUndoCancellation: Boolean = false,
         ) : ViewState()
     }
 

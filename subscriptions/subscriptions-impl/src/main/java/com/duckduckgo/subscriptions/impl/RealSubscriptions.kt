@@ -427,6 +427,12 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun stripeTierOptionsByCountry(): Toggle
 
+    /**
+     * When enabled, Play subscribers can undo a cancellation
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun undoSubscriptionCancellation(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),

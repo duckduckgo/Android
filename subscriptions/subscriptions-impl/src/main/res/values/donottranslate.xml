@@ -156,4 +156,10 @@
     <string name="subscriptionOnboardingSettingsCardDescription">Some premium protections aren\'t active yet.</string>
     <string name="subscriptionOnboardingSettingsCardButton">Continue Setup</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Expiring</string>
+    <string name="subscriptionExpiringIconContentDescription">Subscription expiring</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Your subscription will expire on %1$s.</string>
+    <string name="subscriptionKeepSubscription">Keep Subscription</string>
+
 </resources>
