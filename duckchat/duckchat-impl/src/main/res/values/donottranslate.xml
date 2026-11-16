@@ -50,6 +50,9 @@
     <string name="duckAiRespondingNotificationChannelName">Duck.ai responses in progress</string>
 
     <!-- Duck.ai client tool permission prompt -->
+    <string name="duckAiClientToolPromptAlwaysAllow">Always Allow</string>
+    <string name="duckAiClientToolPromptAllowOnce">Allow Once</string>
+    <string name="duckAiClientToolPromptNeverAllow">Never Allow</string>
     <string name="duckAiClientToolListOpenTabsPromptTitle">Allow Duck.ai to see your open tabs?</string>
     <string name="duckAiClientToolListOpenTabsPromptMessage">Duck.ai will see the titles and addresses of the tabs open in this browser. It won’t see what’s on them.</string>
 </resources>

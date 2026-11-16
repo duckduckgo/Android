@@ -231,7 +231,7 @@ class RealClientToolsExecutorTest {
         val reply = async { executeAskTool() }
         runCurrent()
 
-        assertEquals(ClientToolPermissionRequest(DUCK_AI_ORIGIN, "askTool", CHAT_TAB_ID, ASK_MODE), prompt.current.request)
+        assertEquals(ClientToolPermissionRequest(DUCK_AI_ORIGIN, "askTool", CHAT_TAB_ID, BrowserMode.REGULAR, ASK_MODE), prompt.current.request)
         prompt.current.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
         reply.await()
     }

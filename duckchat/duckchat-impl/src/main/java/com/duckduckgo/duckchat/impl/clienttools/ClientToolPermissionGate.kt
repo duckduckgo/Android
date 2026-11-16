@@ -111,7 +111,7 @@ class RealClientToolPermissionGate @Inject constructor(
         mode: ClientToolPermissionMode.Ask,
         context: ClientToolCallContext,
     ): ClientToolPermissionDecision {
-        val request = ClientToolPermissionRequest(context.origin, tool.name, context.chatTabId, mode)
+        val request = ClientToolPermissionRequest(context.origin, tool.name, context.chatTabId, context.browserMode, mode)
         return when (prompt.request(request)) {
             ClientToolPermissionAnswer.ALLOW_ONCE -> ClientToolPermissionDecision.ALLOWED
             ClientToolPermissionAnswer.ALWAYS -> {
