@@ -301,6 +301,9 @@ interface SubscriptionsFeature {
     fun sendSubscriptionSwitchWideEvent(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionUndoCancellationWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionRestoreWideEvent(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
