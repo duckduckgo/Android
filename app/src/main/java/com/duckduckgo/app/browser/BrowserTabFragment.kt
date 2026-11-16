@@ -2940,8 +2940,9 @@ class BrowserTabFragment :
 
             is Command.OpenAppLink -> {
                 val launched = openAppLink(it.appLink)
-                if (it.finishCustomTabOnLaunch && launched) {
-                    finishCustomTab()
+                if (launched) {
+                    if (it.finishCustomTabOnLaunch) finishCustomTab()
+                    if (it.closeTabOnLaunch) viewModel.closeCurrentTab()
                 }
             }
 
@@ -2956,6 +2957,7 @@ class BrowserTabFragment :
                     trustedCallerPackage = it.trustedCallerPackage,
                     finishCustomTabOnTrustedCallerLaunch = it.finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly = it.trustedCallerOnly,
+                    closeTabOnTrustedCallerLaunch = it.closeTabOnTrustedCallerLaunch,
                 )
             }
 
@@ -3518,6 +3520,7 @@ class BrowserTabFragment :
         trustedCallerPackage: String? = null,
         finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
+        closeTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         context?.let {
             val pm = it.packageManager
@@ -3594,6 +3597,7 @@ class BrowserTabFragment :
                     finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly,
                     fallbackUrl,
+                    closeTabOnTrustedCallerLaunch,
                 )
             }
         }
@@ -3611,6 +3615,7 @@ class BrowserTabFragment :
         finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
         fallbackUrl: String? = null,
+        closeTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
@@ -3631,7 +3636,7 @@ class BrowserTabFragment :
                 useFirstActivityFound = useFirstActivityFound,
                 showConfirmation = showConfirmation,
                 trustedCallerIntent = trustedCallerIntent,
-                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch,
+                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch || closeTabOnTrustedCallerLaunch,
             )
 
             val resolvedIntent = if (launch.useChooser) {
@@ -3647,7 +3652,7 @@ class BrowserTabFragment :
             } else {
                 context.startActivity(resolvedIntent)
                 if (launch.finishCustomTab) {
-                    finishCustomTab()
+                    if (isActiveCustomTab()) finishCustomTab() else viewModel.closeCurrentTab()
                 }
             }
         }.onFailure { exception ->

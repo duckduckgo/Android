@@ -7882,6 +7882,71 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPlainTabAndTrustedAppLinkOpensThenTabClosedOnLaunch() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        setPlainTabLaunchedBy("com.example.origin")
+
+        testee.handleAppLink(appLinkResolvingTo("com.example.origin"), isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink> { assertTrue(closeTabOnLaunch) }
+    }
+
+    @Test
+    fun whenPlainTabFlagOffAndAppLinkOpensThenTabNotClosedOnLaunch() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        setPlainTabLaunchedBy("com.example.origin", flagEnabled = false)
+
+        testee.handleAppLink(appLinkResolvingTo("com.example.origin"), isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink> { assertFalse(closeTabOnLaunch) }
+    }
+
+    @Test
+    fun whenPlainTabAndAppLinkTargetsOtherAppThenTabNotClosedOnLaunch() {
+        delegateAppLinksHandlerToRealImplementation()
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        setPlainTabLaunchedBy("com.example.origin")
+
+        testee.handleAppLink(appLinkResolvingTo("com.google.android.youtube"), isForMainFrame = true, hasGesture = true)
+
+        assertCommandIssued<Command.OpenAppLink> { assertFalse(closeTabOnLaunch) }
+    }
+
+    @Test
+    fun whenPlainTabAndTrustedNonHttpThenTabClosedOnTrustedCallerLaunch() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        setPlainTabLaunchedBy("com.example.origin")
+
+        testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
+
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(closeTabOnTrustedCallerLaunch) }
+    }
+
+    @Test
+    fun whenPlainTabAndTrustedNonHttpUnderNeverThenTabClosedOnTrustedCallerLaunch() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(false)
+        setPlainTabLaunchedBy("com.example.origin")
+
+        testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
+
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(closeTabOnTrustedCallerLaunch) }
+    }
+
+    @Test
+    fun whenPlainTabFlagOffAndNonHttpThenTabNotClosedOnLaunch() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        setPlainTabLaunchedBy("com.example.origin", flagEnabled = false)
+
+        testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
+
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertFalse(closeTabOnTrustedCallerLaunch) }
+    }
+
+    @Test
     fun whenPlainTabReferrerTrustAlreadyUsedForHandoffThenSecondHandoffFollowsSetting() {
         delegateAppLinksHandlerToRealImplementation()
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)

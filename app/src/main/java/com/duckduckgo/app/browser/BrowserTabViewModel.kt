@@ -4322,7 +4322,7 @@ class BrowserTabViewModel @Inject constructor(
         when {
             hasGesture && appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller()) -> {
                 plainTabLaunchingApp = null
-                command.value = OpenAppLink(appLink)
+                command.value = OpenAppLink(appLink, closeTabOnLaunch = true)
             }
             inCustomTab && !customTabsFeature.handleTrustedCallers().isEnabled() -> command.value = OpenAppLink(appLink)
             inCustomTab && appLinksHandler.isTrustedCaller(appLink, callerPackage) -> {
@@ -4385,6 +4385,7 @@ class BrowserTabViewModel @Inject constructor(
                         showConfirmation = false,
                         trustedCallerPackage = plainTabCaller,
                         trustedCallerOnly = true,
+                        closeTabOnTrustedCallerLaunch = true,
                     )
                 }
                 else -> navigateToFallbackUrl(appLink.fallbackUrl)
@@ -4398,6 +4399,7 @@ class BrowserTabViewModel @Inject constructor(
             showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
             trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false) ?: plainTabCaller,
             finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+            closeTabOnTrustedCallerLaunch = plainTabCaller != null,
         )
     }
 

@@ -227,6 +227,7 @@ sealed class Command {
         val trustedCallerPackage: String? = null,
         val finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         val trustedCallerOnly: Boolean = false,
+        val closeTabOnTrustedCallerLaunch: Boolean = false,
     ) : Command()
 
     class ShowAppLinkPrompt(
@@ -236,6 +237,7 @@ sealed class Command {
     class OpenAppLink(
         val appLink: AppLink,
         val finishCustomTabOnLaunch: Boolean = false,
+        val closeTabOnLaunch: Boolean = false,
     ) : Command()
 
     class ExtractUrlFromCloakedAmpLink(
