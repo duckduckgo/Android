@@ -23,6 +23,7 @@ into the chat WebView. Previous chats are listed in the history.
 - Browser menu, shortcut row Duck.ai (`newDuckChatMenuItem`) or "New Chat" (`duckAiNewChatMenuItem`).
 - The chat icon next to the address bar (`aiChatIconMenu`, "Start chat"); it opens a menu with `contextualChatMenuNewChat` (New Chat) and `contextualChatMenuAllChats` (Chats).
 - Tab switcher, `duckAIToolbarButton`.
+- Whether the address bar input has Search / Duck.ai tabs, and which entry points exist at all, is set in AI Features settings: see [ai-settings.md](ai-settings.md).
 - Native input controls appear once `inputField` is focused: `modelPickerChip` (model), `reasoningModePickerButton` (desc "Reasoning mode"), and an unnamed `ImageView` with desc "Duck.ai options" (Create Image, Web Search, Customize Responses).
 - Upsell entries: the gated rows in the model and reasoning pickers, and the header pill `duckAIFreePill` ("Free Plan" `duckAIFreePillTitle`, "Upgrade" `duckAIFreePillUpgrade`).
 

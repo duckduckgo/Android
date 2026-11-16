@@ -2,7 +2,7 @@
 
 The browser menu is a bottom sheet with a shortcut row (Back, New Tab, Duck.ai, Settings) and entries for
 page actions, Bookmarks, Passwords, Downloads, Duck.ai, data clearing and privacy. Each entry hands off to
-another feature; this file maps where each one lands. Bookmarks themselves are in `bookmarks.md`.
+another feature; this file maps where each one lands.
 
 ## Sub-features
 
@@ -30,9 +30,9 @@ Preconditions: baseline; a loaded page (`$V t browse --url https://privacy-test-
 | `duckAiNewVoiceChatMenuItem` | Duck.ai chat view (no voice UI on an emulator without a microphone) |
 | `duckAiChatsMenuItem` | `duckai.history` |
 | `duckAiChatSettingsMenuItem` | a Duck.ai settings page in the tab |
-| `settingsMenuItem` | `settings` (see `settings.md`) |
+| `settingsMenuItem` | `settings` (AI Features is in `ai-settings.md`) |
 | `refreshMenuItem` | the same page, reloaded |
-| `addBookmarksMenuItem` | bookmark-added sheet for about 3 s (see `bookmarks.md`) |
+| `addBookmarksMenuItem` | bookmark-added sheet for about 3 s |
 | `bookmarksMenuItem` | `bookmarks` |
 | `sharePageMenuItem` | the Android share sheet (system `ChooserActivity`) |
 | `addToHomeMenuItem` | the launcher's add-to-home dialog |

@@ -33,13 +33,12 @@ areas that have one. Commands use `V=.claude/skills/verify/verify.sh` from `../S
 | [tabs.md](tabs.md) | Tab switcher, opening, switching and closing tabs | `tabSwitcher`, `tabs.tab-switcher-menu`, `seed tabs` |
 | [fire-button.md](fire-button.md) | Clearing tabs and site data | `browser.data-clearing`, `fire.*`, `browser.single-tab-fire-sheet` |
 | [browser-menu.md](browser-menu.md) | Browser menu: every entry and where it lands | `browser.menu-sheet` |
-| [bookmarks.md](bookmarks.md) | Add, folders, move, delete and undo, favourites, import | `bookmarks*`, `seed bookmarks-populated` |
-| [web-forms.md](web-forms.md) | Links, form fields and submit inside a page | `browser.main` + DevTools |
 | [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history, and what each subscription tier gets (header, models, reasoning, upsells) | `browser.duckai-view`, `duckai.*`, `duckchat.*`, `seed duckai-chat-history` |
-| [settings.md](settings.md) | Settings hub, General, After Inactivity, next steps, web settings | `settings*`, `browser.private-search`, `seed settings-next-steps-visible` |
+| [ai-settings.md](ai-settings.md) | AI Features settings: Search Only vs Search & Duck.ai, New Tab Toggle Position, Duck.ai on/off, shortcuts, Without AI | `duckai.settings`, `duckai.shortcut.settings` |
 | [subscription.md](subscription.md) | Subscription tier, region and status, and how Duck.ai, VPN, PIR, ITR and AppTP change with it | `ppro.settings`, `vpn.main`, `duckai.paid-settings`, `seed subscription` |
 
-Catalog areas without a recipe yet (screen + surface counts on 2026-11-13): onboarding 34, sync 23,
+Catalog areas without a recipe yet (screen + surface counts on 2026-11-13; the map is scoped to Duck.ai and its
+entry points, so bookmarks, page forms and the rest of Settings are deliberately left out): onboarding 34, sync 23,
 autofill 20, subscriptions 18 (state recipe in subscription.md; onboarding and feedback flows not covered), apptp 18,
 designsystem 18, pir 11, feedback 8, networkprotection 7 (entry points in subscription.md), privacy 5, vpn 4, sitepermissions 3, downloads 3. List them with
 `$V t list --screens` / `--surfaces`, or `$V t find <area>`.
