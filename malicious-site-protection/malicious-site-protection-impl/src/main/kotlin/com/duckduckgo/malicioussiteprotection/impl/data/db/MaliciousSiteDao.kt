@@ -21,9 +21,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.duckduckgo.common.utils.versionedset.VersionedSetDelta
+import com.duckduckgo.common.utils.versionedset.VersionedSetUpdate
+import com.duckduckgo.common.utils.versionedset.updateFrom
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
-import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 
 @Dao
@@ -78,15 +80,27 @@ interface MaliciousSiteDao {
 
     @Transaction
     suspend fun updateHashPrefixes(
-        hashPrefixes: HashPrefixesWithRevision?,
+        feed: Feed,
+        hashPrefixes: VersionedSetDelta<String>,
     ) {
-        hashPrefixes ?: return
-
-        updateData(
-            type = hashPrefixes.type,
-            feed = hashPrefixes.feed,
-            updateWithRevision = { localRevision: Int -> updateHashPrefixes(hashPrefixes, localRevision) },
-        )
+        val currentLocalRevision = getLatestRevision(feed = feed, type = Type.HASH_PREFIXES)
+        val update = hashPrefixes.updateFrom(currentLocalRevision)
+        val newRevision = when (update) {
+            is VersionedSetUpdate.Delta -> {
+                update.delete.forEach { deleteHashPrefix(it, feed.name) }
+                insertHashPrefixes(update.insert.map { HashPrefixEntity(hashPrefix = it, type = feed.name) })
+                update.revision
+            }
+            VersionedSetUpdate.Ignore -> currentLocalRevision
+            is VersionedSetUpdate.Replace -> {
+                deleteHashPrefixes(feed.name)
+                insertHashPrefixes(update.insert.map { HashPrefixEntity(hashPrefix = it, type = feed.name) })
+                update.revision
+            }
+        }
+        if (currentLocalRevision != newRevision) {
+            insertRevision(RevisionEntity(feed = feed.name, type = Type.HASH_PREFIXES.name, revision = newRevision))
+        }
     }
 
     @Transaction
@@ -110,18 +124,6 @@ interface MaliciousSiteDao {
                 deleteItem = { deleteFilter(it.hash, filterSet.feed.name) },
                 insertItems = { insertFilters(filterSet.insert.map { FilterEntity(it.hash, it.regex, type = filterSet.feed.name) }.toSet()) },
                 itemsToDelete = filterSet.delete,
-            )
-        }?.revision ?: currentLocalRevision
-    }
-
-    private suspend fun updateHashPrefixes(hashPrefixes: HashPrefixesWithRevision, currentLocalRevision: Int): Int {
-        return hashPrefixes.takeIf { isNewRevisionNewerThanLocal(it.revision, currentLocalRevision) }?.apply {
-            updateData(
-                replace = hashPrefixes.replace,
-                deleteAll = { deleteHashPrefixes(hashPrefixes.feed.name) },
-                deleteItem = { deleteHashPrefix(it, hashPrefixes.feed.name) },
-                insertItems = { insertHashPrefixes(hashPrefixes.insert.map { HashPrefixEntity(hashPrefix = it, type = hashPrefixes.feed.name) }) },
-                itemsToDelete = hashPrefixes.delete,
             )
         }?.revision ?: currentLocalRevision
     }
