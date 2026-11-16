@@ -1075,6 +1075,7 @@ class RealDuckChatPixelsTest {
     fun whenFireNewChatFirstPromptSentWithoutATapThenHintTappedIsNone() = runTest {
         testee.fireNewChatFirstPromptSent(
             hasNewChatHints = true,
+            hintsShown = false,
             hintTapped = null,
             hasImageAttachment = true,
             hasFileAttachment = false,
@@ -1085,6 +1086,7 @@ class RealDuckChatPixelsTest {
 
         val params = mapOf(
             DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to "true",
+            DuckChatPixelParameters.HINTS_SHOWN to "false",
             DuckChatPixelParameters.HINT_TAPPED to "none",
             DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "true",
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
@@ -1098,6 +1100,7 @@ class RealDuckChatPixelsTest {
     fun whenFireNewChatFirstPromptSentAfterATapThenHintTappedIsTheHint() = runTest {
         testee.fireNewChatFirstPromptSent(
             hasNewChatHints = true,
+            hintsShown = true,
             hintTapped = NewChatHint.IMAGE_GENERATION,
             hasImageAttachment = false,
             hasFileAttachment = false,
@@ -1108,6 +1111,7 @@ class RealDuckChatPixelsTest {
 
         val params = mapOf(
             DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to "true",
+            DuckChatPixelParameters.HINTS_SHOWN to "true",
             DuckChatPixelParameters.HINT_TAPPED to "image_generation",
             DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
@@ -1128,6 +1132,15 @@ class RealDuckChatPixelsTest {
             DuckChatPixelParameters.IMAGE_GENERATION_HINT_POSITION to "1",
         )
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN, params)
+    }
+
+    @Test
+    fun whenFireNewChatHintsCapReachedThenUniquePixelFired() = runTest {
+        testee.fireNewChatHintsCapReached()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_CAP_REACHED, type = Pixel.PixelType.Unique())
     }
 
     @Test

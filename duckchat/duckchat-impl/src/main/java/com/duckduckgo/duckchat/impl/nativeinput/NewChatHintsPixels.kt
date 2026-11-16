@@ -85,6 +85,7 @@ class NewChatHintsPixels @Inject constructor(
         newChat.isPrompted = true
         duckChatPixels.fireNewChatFirstPromptSent(
             hasNewChatHints = newChat.hasNewChatHints,
+            hintsShown = newChat.isHintsShownReported,
             hintTapped = newChat.lastTappedHint,
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
