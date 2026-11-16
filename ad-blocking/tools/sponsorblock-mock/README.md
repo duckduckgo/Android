@@ -20,36 +20,20 @@ The mock serves the proposed prefix dataset API. It keeps revision history in me
 
    Set `SERIAL=<device-id>` when multiple devices are connected, or `NO_DEVICE=1` to run the server without adb. Ctrl-C stops it and removes the reverse.
 
-3. Open the [SponsorBlock mock server](http://127.0.0.1:8765/) on your computer. Add YouTube video URLs or IDs to the draft, or remove prefixes from it, choose a new revision number, then select **Save revision**. The new number must be greater than the current one. If the device is ahead, the page suggests the device revision plus one. The page shows the draft and current dataset as hash prefixes, and can preview the response for any client revision. Revisions that were never saved fall back to the full dataset. Once synced, listed videos can request segments from the normal endpoint; unlisted videos should not request segments.
+3. Open the [SponsorBlock mock server](http://127.0.0.1:8765/) on your computer.
 
-Select **Force device to request revision** under **Device database** to request a sync and refresh the displayed device data. The page also reads device data on load; **Refresh** reads it again on demand. Both actions use `adb` and the same `SERIAL` as the server. The sync runs asynchronously and still requires the SponsorBlock feature flag. Refresh reads a snapshot without stopping the app; if a sync is writing at the same time, refresh again if the snapshot fails or appears stale.
+## Use the web tool
 
-To sync a new revision immediately, run:
+1. **Edit the draft:** paste a YouTube video URL or ID and select **Add video**. Use **Remove** to remove a prefix. The draft and current dataset display hash prefixes.
+2. **Save a revision:** choose a number greater than the current revision and select **Save revision**. Check **Force clients to replace their dataset** to send the full list to clients updating across this revision. The controls are disabled until the draft changes. If the device is ahead, the page suggests the device revision plus one.
+3. **Preview a response:** under **Preview response**, enter a client revision and select **Show response**. The field starts with the device's revision when available. Revisions that were never saved fall back to the full dataset.
+4. **Sync the device:** select **Force device to request revision**. Sync runs asynchronously and requires the SponsorBlock feature flag to be enabled.
+5. **Inspect the device:** the **Device database** section shows its stored revision and prefixes, refreshing approximately every second while the page is open. It shows an error until the app creates the database. Select **Refresh** to read it immediately. If a sync is writing at the same time, the snapshot can temporarily fail or appear stale.
+6. **Inspect requests:** the **Phone requests** column automatically shows the latest 100 dataset requests with local timestamps. Expand a request to see the response; preview requests from the page are excluded. Requests to the normal segment endpoint do not appear here.
 
-```sh
-adb shell am broadcast -n com.duckduckgo.mobile.android.debug/com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMockSyncReceiver
-```
+The web tool uses the device selected by `SERIAL` and the `com.duckduckgo.mobile.android.debug` application ID. Start the app and enable SponsorBlock before requesting a sync. Watch the server log for `/revision` and `/hashPrefix` requests. Mock builds also schedule periodic syncs approximately every 15 minutes; Android may delay them.
 
-Use the application ID of your installed internal debug build if it differs. The receiver is present only in debug builds and triggers work only when the mock endpoint is enabled. The worker still checks the SponsorBlock feature flag. Watch the server log for `/revision` and `/hashPrefix` requests. Restart the app before rechecking a video already looked up: segment results are cached in the app process. Mock builds schedule periodic syncs approximately every 15 minutes; Android may delay them.
-
-To print the revision stored on the device, use `sqlite3` on your computer:
-
-```sh
-(
-  set -e
-  package=com.duckduckgo.mobile.android.debug
-  db_dir=$(mktemp -d)
-  trap 'rm -rf "$db_dir"' EXIT
-  adb shell am force-stop "$package"
-  adb exec-out run-as "$package" cat databases/sponsor_block_dataset.db > "$db_dir/dataset.db"
-  if adb shell run-as "$package" test -f databases/sponsor_block_dataset.db-wal; then
-    adb exec-out run-as "$package" cat databases/sponsor_block_dataset.db-wal > "$db_dir/dataset.db-wal"
-  fi
-  sqlite3 "$db_dir/dataset.db" 'SELECT revision FROM sponsor_revision WHERE id = 0;'
-)
-```
-
-This stops the app to copy a consistent snapshot. Open it again to resume testing. An empty result means no revision has been saved yet; the database file is created when the app first accesses it.
+After syncing, videos whose prefixes are in the dataset can request segments from the normal endpoint; other videos should not request segments. Restart the app before rechecking a video already looked up, because segment results are cached in the app process.
 
 Restarting the server clears its revision history. When the device database is available, the server starts from its current revision and prefixes; otherwise it starts with an empty dataset at revision 1.
 

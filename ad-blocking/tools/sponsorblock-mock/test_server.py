@@ -10,9 +10,11 @@ import server
 class DeltaTest(unittest.TestCase):
     def setUp(self):
         server.versions.clear()
+        server.replacement_revisions.clear()
         server.versions.update({1: {'0649a8bb'}, 2: {'cb1ad2a7'}})
         server.draft.clear()
         server.draft.update(server.versions[2])
+        server.requests.clear()
 
     def test_full_diff_and_up_to_date(self):
         self.assertEqual(server.delta(0), {'insert': ['cb1ad2a7'], 'delete': [], 'replace': True, 'revision': 2})
@@ -57,6 +59,39 @@ class DeltaTest(unittest.TestCase):
     def test_cannot_save_unchanged_draft(self):
         with self.assertRaisesRegex(ValueError, 'no draft changes'):
             server.update_draft({'save': ['1'], 'revision': ['3']})
+
+    def test_force_replace_applies_to_clients_crossing_revision(self):
+        server.update_draft({'video': ['anotherVideo']})
+        server.update_draft({'save': ['1'], 'revision': ['3'], 'replace': ['1']})
+        server.update_draft({'remove': ['cb1ad2a7']})
+        server.update_draft({'save': ['1'], 'revision': ['4']})
+        self.assertEqual(server.delta(2), {
+            'insert': [server.prefix('anotherVideo')], 'delete': [], 'replace': True, 'revision': 4,
+        })
+        self.assertFalse(server.delta(3)['replace'])
+        self.assertFalse(server.delta(4)['replace'])
+
+    def test_request_log_excludes_preview_and_contains_responses(self):
+        handler = object.__new__(server.Handler)
+        handler.json = lambda value: None
+        handler.send = lambda code, body, content_type: None
+        handler.path = '/preview?revision=1'
+        handler.do_GET()
+        self.assertFalse(server.requests)
+        handler.path = server.BASE + '/hashPrefix?revision=1'
+        handler.do_GET()
+        self.assertEqual({k: v for k, v in server.requests[-1].items() if k != 'time'}, {
+            'path': handler.path,
+            'status': 200,
+            'response': server.delta(1),
+        })
+        self.assertIsNotNone(server.datetime.fromisoformat(server.requests[-1]['time']).tzinfo)
+        handler.path = server.BASE + '/revision'
+        handler.do_GET()
+        self.assertEqual(server.requests[-1]['response'], {'revision': 2})
+        handler.path = server.BASE + '/hashPrefix?revision=bad'
+        handler.do_GET()
+        self.assertEqual(server.requests[-1]['status'], 400)
 
     def test_initialize_dataset_from_device(self):
         server.initialize_from_device({'revision': 4, 'prefixes': ['0649a8bb', 'cb1ad2a7']})

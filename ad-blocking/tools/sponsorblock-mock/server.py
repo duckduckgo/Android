@@ -8,6 +8,8 @@ import re
 import sqlite3
 import subprocess
 import tempfile
+from collections import deque
+from datetime import datetime
 from threading import Lock
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,8 +18,10 @@ from urllib.parse import parse_qs, urlsplit
 PORT = 8765
 BASE = '/sponsorblock/v1'
 versions = {1: set()}
+replacement_revisions = set()
 draft = set()
 state_lock = Lock()
+requests = deque(maxlen=100)
 PACKAGE = 'com.duckduckgo.mobile.android.debug'
 DATABASE = 'databases/sponsor_block_dataset.db'
 RECEIVER = PACKAGE + '/com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMockSyncReceiver'
@@ -26,7 +30,10 @@ STYLE = '''
   :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #222; background: #f7f7f7; }
   * { box-sizing: border-box; }
   body { margin: 0; }
-  main { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+  main { max-width: 1400px; margin: 0 auto; padding: 48px 24px; }
+  .layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); gap: 24px; align-items: start; }
+  .request-column { position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow-y: auto; }
+  .request-column .card:first-child { margin-top: 0; }
   .eyebrow { color: #de5833; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
   h1 { margin: 8px 0 12px; font-size: 32px; letter-spacing: -.03em; }
   h2 { margin: 0; font-size: 20px; }
@@ -36,6 +43,8 @@ STYLE = '''
   .card-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .badge { background: #edf2ff; color: #3154a5; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
   label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+  .checkbox { display: flex; align-items: center; gap: 8px; margin: 16px 0; }
+  .checkbox input { flex: none; }
   .add-form { display: flex; gap: 8px; }
   input { min-width: 0; flex: 1; padding: 12px; border: 1px solid #b6b6b6; border-radius: 8px; font: inherit; }
   button { padding: 12px 18px; border: 0; border-radius: 8px; background: #3969ef; color: white; font: inherit; font-weight: 600; cursor: pointer; }
@@ -51,6 +60,8 @@ STYLE = '''
   td:last-child { text-align: right; }
   code { font-size: 13px; }
   .hint { margin: 16px 0 0; font-size: 14px; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } .request-column { position: static; max-height: none; } }
   @media (max-width: 480px) { main { padding: 32px 16px; } .card { padding: 16px; } .add-form { flex-direction: column; } }
 '''
 
@@ -88,6 +99,8 @@ def delta(revision):
         if revision not in versions or revision <= 0 or latest - revision > 1000 or (revision < latest and not targets):
             return dict(insert=sorted(versions[latest]), delete=[], replace=True, revision=latest)
         target = max(targets) if targets else revision
+        if any(revision < replaced <= target for replaced in replacement_revisions):
+            return dict(insert=sorted(versions[target]), delete=[], replace=True, revision=target)
         old = versions[revision]
         new = versions[target]
         return dict(insert=sorted(new - old), delete=sorted(old - new), replace=False, revision=target)
@@ -110,8 +123,16 @@ def update_draft(fields):
             if not max(versions) < revision <= 2147483647:
                 raise ValueError('New revision must be greater than the current revision and at most 2147483647')
             versions[revision] = draft.copy()
+            if 'replace' in fields:
+                replacement_revisions.add(revision)
         else:
             raise ValueError('Missing action')
+
+
+def record_request(path, status, response):
+    with state_lock:
+        requests.append({'time': datetime.now().astimezone().isoformat(timespec='seconds'),
+                         'path': path, 'status': status, 'response': response})
 
 
 def adb_command():
@@ -162,6 +183,7 @@ def initialize_from_device(dataset):
         raise ValueError('Invalid device dataset')
     with state_lock:
         versions.clear()
+        replacement_revisions.clear()
         versions[revision] = prefixes
         draft.clear()
         draft.update(prefixes)
@@ -203,6 +225,7 @@ class Handler(BaseHTTPRequestHandler):
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>SponsorBlock mock</title>
 <style>{STYLE}</style></head><body><main>
 <div class="eyebrow">DuckDuckGo · Local testing</div><h1>SponsorBlock mock</h1>
+<div class="layout"><div class="controls">
 <section class="card"><label for="video">YouTube video URL or ID</label>
 <form class="add-form" method="post"><input id="video" name="video" required placeholder="Paste a video URL or ID">
 <button>Add video</button></form></section>
@@ -210,7 +233,8 @@ class Handler(BaseHTTPRequestHandler):
 <span class="badge">{'Unsaved changes' if changed else 'No changes'}</span></div>{contents}
 <form method="post"><label for="revision">New revision number</label><div class="add-form">
 <input id="revision" name="revision" type="number" min="{revision + 1}" max="2147483647" value="{revision + 1}" required{disabled}>
-<button name="save" value="1"{disabled}>Save revision</button></div></form>
+<button name="save" value="1"{disabled}>Save revision</button></div>
+<label class="checkbox"><input type="checkbox" name="replace" value="1"{disabled}> Force clients to replace their dataset</label></form>
 <p id="revision-hint" class="hint"></p></section>
 <section class="card"><div class="card-heading"><h2>Current dataset ({len(saved_videos)})</h2>
 <span class="badge">Revision {revision}</span></div>{saved_contents}</section>
@@ -218,13 +242,16 @@ class Handler(BaseHTTPRequestHandler):
 <form id="preview-form"><label for="preview-revision">Client revision</label><div class="add-form">
 <input id="preview-revision" type="number" min="0" max="2147483647" value="0" required>
 <button>Show response</button></div></form><pre id="preview-result" aria-live="polite"></pre></section>
+</div><aside class="request-column">
 <section class="card"><div class="card-heading"><h2>Device database</h2>
 <button id="inspect" type="button">Refresh</button></div>
-<p class="hint">Read the revision and prefixes stored by the debug app on the connected device.</p>
-<p id="device-status" aria-live="polite">Select Refresh to inspect the device.</p>
+<p class="hint">Updates every second while this page is open.</p>
+<p id="device-status" aria-live="polite">Reading device database…</p>
 <pre id="device-prefixes"></pre><button id="sync" type="button">Force device to request revision</button>
 <p id="sync-status" class="hint" aria-live="polite"></p></section>
-</main><script>
+<section class="card"><h2>Phone requests</h2><p class="hint">Latest 100 dataset requests, newest first. Updates automatically.</p>
+<div id="requests" aria-live="polite">No requests yet.</div></section>
+</aside></div></main><script>
 const serverRevision = {revision};
 const revisionInput = document.getElementById('revision');
 const previewInput = document.getElementById('preview-revision');
@@ -254,12 +281,22 @@ async function refreshDevice() {{
   return result;
 }}
 
+async function pollDevice() {{
+  try {{ await refreshDevice(); }}
+  catch (error) {{
+    document.getElementById('device-status').textContent = error.message === 'file is not a database'
+      ? "Database doesn't exist yet" : 'Unable to read device database: ' + error.message;
+    document.getElementById('device-prefixes').textContent = '';
+  }}
+  finally {{ setTimeout(pollDevice, 1000); }}
+}}
+
 document.getElementById('preview-form').addEventListener('submit', async (event) => {{
   event.preventDefault();
   const result = document.getElementById('preview-result');
   try {{
     const revision = document.getElementById('preview-revision').value;
-    const response = await fetch('/sponsorblock/v1/hashPrefix?revision=' + encodeURIComponent(revision));
+    const response = await fetch('/preview?revision=' + encodeURIComponent(revision));
     if (!response.ok) throw new Error(await response.text());
     result.textContent = JSON.stringify(await response.json(), null, 2);
   }} catch (error) {{ result.textContent = 'Unable to load response: ' + error.message; }}
@@ -268,7 +305,10 @@ document.getElementById('inspect').addEventListener('click', async () => {{
   const status = document.getElementById('device-status');
   status.textContent = 'Reading device database…';
   try {{ await refreshDevice(); }}
-  catch (error) {{ status.textContent = 'Unable to read device database: ' + error.message; }}
+  catch (error) {{
+    status.textContent = error.message === 'file is not a database'
+      ? "Database doesn't exist yet" : 'Unable to read device database: ' + error.message;
+  }}
 }});
 document.getElementById('sync').addEventListener('click', async () => {{
   const status = document.getElementById('sync-status');
@@ -279,19 +319,39 @@ document.getElementById('sync').addEventListener('click', async () => {{
     const response = await fetch('/device-sync', {{ method: 'POST' }});
     const result = await response.json();
     if (!response.ok) throw new Error(result.error);
-    status.textContent = 'Sync requested. Waiting for the device database…';
-    let device;
-    for (let attempt = 0; attempt < 10; attempt++) {{
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      device = await refreshDevice();
-      if (device.revision !== null && device.revision >= serverRevision) break;
-    }}
-    status.textContent = device.revision !== null && device.revision >= serverRevision
-      ? 'Device database refreshed.' : 'Sync requested; the device has not reached the current revision yet.';
+    status.textContent = 'Sync requested. The device database updates automatically.';
   }} catch (error) {{ status.textContent = 'Unable to request sync: ' + error.message; }}
   finally {{ button.disabled = false; }}
 }});
-refreshDevice().catch(error => {{ document.getElementById('device-status').textContent = 'Unable to read device database: ' + error.message; }});
+pollDevice();
+let lastRequests = null;
+async function refreshRequests() {{
+  try {{
+    const response = await fetch('/requests', {{ cache: 'no-store' }});
+    if (!response.ok) throw new Error('Request log unavailable');
+    const entries = await response.json();
+    const snapshot = JSON.stringify(entries);
+    if (snapshot === lastRequests) return;
+    lastRequests = snapshot;
+    const container = document.getElementById('requests');
+    container.replaceChildren();
+    if (!entries.length) {{ container.textContent = 'No requests yet.'; return; }}
+    for (const entry of entries) {{
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = `${{new Date(entry.time).toLocaleString()}} · GET ${{entry.path}} — HTTP ${{entry.status}}`;
+      const body = document.createElement('pre');
+      body.textContent = JSON.stringify(entry.response, null, 2);
+      details.append(summary, body);
+      container.append(details);
+    }}
+  }} catch (error) {{
+    lastRequests = null;
+    document.getElementById('requests').textContent = 'Unable to load requests: ' + error.message;
+  }}
+}}
+refreshRequests();
+setInterval(refreshRequests, 2000);
 </script></body></html>'''
             self.send(200, body.encode(), 'text/html; charset=utf-8')
         elif url.path == '/device-dataset':
@@ -299,19 +359,30 @@ refreshDevice().catch(error => {{ document.getElementById('device-status').textC
                 self.json(device_dataset())
             except (OSError, sqlite3.Error, subprocess.TimeoutExpired, RuntimeError) as error:
                 self.send(500, json.dumps({'error': str(error)}).encode(), 'application/json')
+        elif url.path == '/requests':
+            with state_lock:
+                entries = list(reversed(requests))
+            self.json(entries)
         elif url.path == BASE + '/revision':
             with state_lock:
                 latest = max(versions)
-            self.json({'revision': latest})
-        elif url.path == BASE + '/hashPrefix':
+            response = {'revision': latest}
+            record_request(self.path, 200, response)
+            self.json(response)
+        elif url.path in (BASE + '/hashPrefix', '/preview'):
             try:
                 revision = int(parse_qs(url.query)['revision'][0])
                 if revision < 0:
                     raise ValueError()
             except (ValueError, KeyError):
+                if url.path != '/preview':
+                    record_request(self.path, 400, 'Invalid revision')
                 self.send(400, b'Invalid revision', 'text/plain')
                 return
-            self.json(delta(revision))
+            response = delta(revision)
+            if url.path != '/preview':
+                record_request(self.path, 200, response)
+            self.json(response)
         else:
             self.send(404, b'Not found', 'text/plain')
 
