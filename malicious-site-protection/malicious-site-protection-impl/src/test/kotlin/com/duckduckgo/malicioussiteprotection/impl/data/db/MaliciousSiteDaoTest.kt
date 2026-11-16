@@ -26,6 +26,7 @@ import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -112,6 +113,29 @@ class MaliciousSiteDaoTest {
 
         assertNotNull(dao.getHashPrefix("prefix2"))
         assertNotNull(dao.getHashPrefix("prefix1"))
+    }
+
+    @Test
+    fun testHashPrefixDeltaDeletesAndInsertsOnlyForItsFeed() = runTest {
+        dao.insertHashPrefixes(
+            listOf(
+                HashPrefixEntity(hashPrefix = "old", type = Feed.PHISHING.name),
+                HashPrefixEntity(hashPrefix = "other", type = Feed.MALWARE.name),
+            ),
+        )
+        dao.insertRevision(RevisionEntity(feed = Feed.PHISHING.name, type = Type.HASH_PREFIXES.name, revision = 1))
+        dao.insertRevision(RevisionEntity(feed = Feed.MALWARE.name, type = Type.HASH_PREFIXES.name, revision = 1))
+
+        dao.updateHashPrefixes(
+            Feed.PHISHING,
+            VersionedSetDelta(insert = setOf("new"), delete = setOf("old", "other"), revision = 2, replace = false),
+        )
+
+        assertNull(dao.getHashPrefix("old"))
+        assertEquals(Feed.PHISHING.name, dao.getHashPrefix("new")?.type)
+        assertEquals(Feed.MALWARE.name, dao.getHashPrefix("other")?.type)
+        assertEquals(2, dao.getLatestRevision(Feed.PHISHING.name, Type.HASH_PREFIXES.name)?.revision)
+        assertEquals(1, dao.getLatestRevision(Feed.MALWARE.name, Type.HASH_PREFIXES.name)?.revision)
     }
 
     @Test
