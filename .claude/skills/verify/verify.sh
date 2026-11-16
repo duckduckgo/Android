@@ -179,6 +179,52 @@ $(user_avds | sed 's/^/  /')"
 # Builds this checkout with the trapdoor bridge, installs it on the device and smoke-tests it.
 cmd_build() { td refresh --no-pull; }
 
+# Puts the app in a subscription state and restarts it so every in-memory flow reads the new state.
+# `none` removes a seeded subscription; anything else goes to `seed subscription` (--tier, --region, ...).
+# The relaunch goes through the launcher: after a force-stop, trapdoor's own goto is a background
+# activity start, which Android blocks (BAL_BLOCK in logcat) on recent versions.
+cmd_subscription() {
+  local out
+  if [[ "${1:-}" == "none" ]]; then out="$(td --json seed subscription-none)"
+  else out="$(td --json seed subscription "$@")"; fi
+  echo "$out"
+  grep -q '"error"' <<<"$out" && die "seed refused"
+  a shell am force-stop "$PKG"
+  a shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+  local i; for i in $(seq 1 20); do
+    td where --json 2>/dev/null | grep -q '"activity":"[A-Za-z]' && { echo "app restarted"; return; }
+    sleep 1
+  done
+  die "app did not come to the foreground after the restart"
+}
+
+# Compact interactive hierarchy: top, id, text, description, and DISABLED for a disabled view.
+cmd_ui() {
+  td hierarchy --interactive-only --json | jq -r '.data.tappable[]
+    | [.bounds.top, (.id // "-"), (.text // "-"), (.description // "-"), (if .enabled then "" else "DISABLED" end)] | @tsv'
+}
+
+# Every on-screen node with text, from uiautomator: id, text, DISABLED. trapdoor's hierarchy and asserts
+# only see tappable views, so status labels (a tier pill, "Subscribed", an expiry line) need this.
+# With an id, prints only that node's text and exits 15 when it is not on screen, like trapdoor's assert.
+cmd_text() {
+  local f="/sdcard/verify-ui.xml"
+  a shell uiautomator dump "$f" >/dev/null 2>&1 || die "uiautomator dump failed"
+  a exec-out cat "$f" | python3 -c '
+import sys, xml.etree.ElementTree as E
+want = sys.argv[1] if len(sys.argv) > 1 else None
+found = False
+for n in E.fromstring(sys.stdin.read()).iter("node"):
+    rid = (n.get("resource-id") or "").split("/")[-1] or "-"
+    text = n.get("text") or n.get("content-desc") or ""
+    if want:
+        if rid == want:
+            print(text); found = True; break
+    elif text:
+        print(rid, text, "" if n.get("enabled") == "true" else "DISABLED", sep="\t")
+sys.exit(15 if want and not found else 0)' "$@"
+}
+
 # Reinstalls the last bridge build without rebuilding, keeping app data.
 cmd_install() {
   local f; f="$(ls -t "$APK_DIR"/*.apk 2>/dev/null | head -1)"
@@ -339,7 +385,7 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|t|wait|checked|web|survey|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|t|wait|checked|web|survey|logcat|cleanup|subscription|ui|text) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on
@@ -352,6 +398,10 @@ usage: verify.sh devices                      attached devices and AVDs on this 
        verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'
        verify.sh checked <resource-id> [index]  true/false for a switch or checkbox (1-based index)
        verify.sh survey '<name regex>'       open every matching catalog target, save where/hierarchy/shot
+       verify.sh subscription none | [--tier plus|pro] [--region us|row] [--status <s>] [--trial true] [--products <list>]
+                                              seed a subscription state, then restart the app into it
+       verify.sh ui                           compact tappable list: top, id, text, description, DISABLED
+       verify.sh text [<resource-id>]         every text node on screen (uiautomator), or one node's text
        verify.sh logcat
 EOF
      exit 2 ;;

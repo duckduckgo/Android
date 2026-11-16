@@ -80,6 +80,9 @@ relative capture paths into that device's evidence folder.
 | `$V wait <selector> [secs]` | Polls `assert visible` (trapdoor's assert does not wait) |
 | `$V checked <resource-id> [index]` | `true`/`false` for a switch, checkbox or radio (trapdoor's hierarchy has no checked state) |
 | `$V survey '<name regex>'` | Opens every matching catalog target and saves where/hierarchy/screenshot; the raw material for a new feature file |
+| `$V ui` | `hierarchy --interactive-only` as one tab-separated line per view: top, id, text, description, `DISABLED` |
+| `$V text [<resource-id>]` | Every on-screen node with text, from uiautomator, including labels trapdoor cannot see (it lists and asserts only tappable views). With an id, prints that node's text or exits 15 when it is absent. Popup menus are not in it; use `$V ui` for those |
+| `$V subscription none \| [--tier plus\|pro] [--region us\|row] [--status <s>] [--billing yearly\|monthly] [--trial true] [--products <list>]` | Seeds a synthetic subscription (or removes one) and restarts the app into it; see [features/subscription.md](features/subscription.md) |
 | `$V t browse --url <url> [--new-tab]` | Submits a URL to the tab without typing in the omnibar |
 | `$V t seed <fixture>` / `$V t set theme\|flag ...` / `$V t reset` | Test data and state; `reset` clears app data |
 
