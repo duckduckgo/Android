@@ -4279,13 +4279,13 @@ class BrowserTabViewModel @Inject constructor(
             appLink,
             trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true),
         )
-        val plainTabCallerOverridesNever = hasGesture && appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller())
+        val plainTabCallerOverridesNever = appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller())
         val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled && (customTabCallerOverridesNever || plainTabCallerOverridesNever)
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink,
             hasGesture,
-            customTab?.clientPackage,
+            customTab?.clientPackage ?: plainTabTrustedCaller(),
             appLinksEnabled,
             !appSettingsPreferencesStore.showAppLinksPrompt,
             trustedCallerOverridesDisabledAppLinks,
@@ -4320,7 +4320,7 @@ class BrowserTabViewModel @Inject constructor(
         val inCustomTab = customTab != null
         val callerPackage = customTab?.clientPackage ?: customTab?.referrerPackage
         when {
-            hasGesture && appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller()) -> {
+            appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller()) -> {
                 plainTabLaunchingApp = null
                 command.value = OpenAppLink(appLink, closeTabOnLaunch = true)
             }
@@ -4364,7 +4364,7 @@ class BrowserTabViewModel @Inject constructor(
         hasGesture: Boolean = false,
     ) {
         if (!nonHttpAppLinkChecker.isPermitted(appLink.intent)) return
-        val plainTabCaller = plainTabTrustedCaller()?.takeIf { hasGesture }
+        val plainTabCaller = plainTabTrustedCaller()
         val headers = getUrlHeaders(appLink.fallbackUrl)
         if (!appSettingsPreferencesStore.appLinksEnabled) {
             val customTabCaller = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
