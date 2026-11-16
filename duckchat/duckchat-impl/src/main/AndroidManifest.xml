@@ -66,5 +66,9 @@
             android:name=".ui.DuckChatVoiceMicrophoneService"
             android:exported="false"
             android:foregroundServiceType="microphone" />
+        <service
+            android:name=".responding.DuckAiRespondingService"
+            android:exported="false"
+            android:foregroundServiceType="shortService" />
     </application>
 </manifest>
