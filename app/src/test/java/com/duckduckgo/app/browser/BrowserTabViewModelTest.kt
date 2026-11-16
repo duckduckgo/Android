@@ -2139,6 +2139,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPageStartedThenTabsWaitingClientToolCallsAreCancelled() {
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+
+        verify(mockDuckChatJSHelper).cancelPendingClientToolCalls("abc")
+    }
+
+    @Test
     fun whenWillOverrideUrlAfterCompletionThenProgressEventsFlowWithoutWaitingForCommit() {
         enableStartProgressAtIntent()
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))

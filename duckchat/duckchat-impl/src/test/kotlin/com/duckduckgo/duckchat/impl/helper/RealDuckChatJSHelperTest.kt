@@ -501,6 +501,13 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenCancelPendingClientToolCallsThenTheTabsWaitingCallsAreCancelled() {
+        testee.cancelPendingClientToolCalls("tab-1")
+
+        verify(allowingPermissionGate).cancelPending("tab-1")
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndPromoCampaignsDisabledThenSupportsBonusOfferIsFalse() = runTest {
         mockDuckChatFeature.duckAiPromoCampaigns().setRawStoredState(Toggle.State(enable = false))
 
