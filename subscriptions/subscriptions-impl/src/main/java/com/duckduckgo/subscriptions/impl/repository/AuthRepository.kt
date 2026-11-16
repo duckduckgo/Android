@@ -80,6 +80,7 @@ interface AuthRepository {
         refreshToken: RefreshToken,
         entitlements: List<Entitlement>,
         account: Account,
+        deleteBackupRefreshToken: Boolean = false,
     ): Boolean
     suspend fun clearTokens()
     suspend fun isTokenStoreAvailable(): Boolean
@@ -405,6 +406,7 @@ internal class RealAuthRepository constructor(
         refreshToken: RefreshToken,
         entitlements: List<Entitlement>,
         account: Account,
+        deleteBackupRefreshToken: Boolean,
     ): Boolean = withContext(dispatcherProvider.io()) {
         val saved = subscriptionsDataStore.saveTokensV2(
             accessToken = accessToken.jwt,
@@ -414,6 +416,7 @@ internal class RealAuthRepository constructor(
             entitlements = moshi.listToJson(entitlements),
             email = account.email,
             externalId = account.externalId,
+            clearBackupRefreshToken = deleteBackupRefreshToken,
         )
         if (saved) updateSerpPromoCookie()
         saved

@@ -73,6 +73,7 @@ interface SubscriptionsDataStore {
         entitlements: String,
         email: String?,
         externalId: String,
+        clearBackupRefreshToken: Boolean = false,
     ): Boolean
 
     fun clearTokens(): Boolean
@@ -322,8 +323,10 @@ internal class SubscriptionsEncryptedDataStore(
         entitlements: String,
         email: String?,
         externalId: String,
+        clearBackupRefreshToken: Boolean,
     ): Boolean {
         val editor = encryptedPreferences?.edit() ?: return false
+        if (clearBackupRefreshToken) editor.removeBackupRefreshToken()
         return editor
             .putString(KEY_ACCESS_TOKEN_V2, accessToken)
             .putLong(KEY_ACCESS_TOKEN_V2_EXPIRES_AT, accessTokenExpiresAt.toEpochMilli())

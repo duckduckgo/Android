@@ -22,6 +22,11 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.ValidatedTokenPair
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult.Failure.NetworkError
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult.Failure.NotAvailable
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult.Failure.Rejected
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult.Recovered
 import com.duckduckgo.subscriptions.impl.auth.BackupTokenState.EXPIRED
 import com.duckduckgo.subscriptions.impl.auth.BackupTokenState.FLAG_OFF
 import com.duckduckgo.subscriptions.impl.auth.BackupTokenState.NONE
@@ -41,6 +46,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
+import retrofit2.HttpException
+import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
@@ -50,6 +57,8 @@ interface BackupTokenManager {
         spentRefreshToken: RefreshToken,
         accountExternalId: String,
     )
+
+    suspend fun recover(accountExternalId: String): BackupRecoveryResult
 
     suspend fun deleteIfAccountChanged(newAccountExternalId: String)
 
@@ -66,6 +75,21 @@ enum class BackupTokenState(val paramValue: String) {
     EXPIRED("expired"),
     OTHER_ACCOUNT("other_account"),
     FLAG_OFF("flag_off"),
+}
+
+sealed interface BackupRecoveryResult {
+    data class Recovered(
+        val tokens: ValidatedTokenPair,
+        val spentBackupRefreshToken: RefreshToken,
+    ) : BackupRecoveryResult
+
+    sealed interface Failure : BackupRecoveryResult {
+        data object NotAvailable : Failure
+
+        data object Rejected : Failure
+
+        data object NetworkError : Failure
+    }
 }
 
 @SingleIn(AppScope::class)
@@ -134,6 +158,84 @@ class RealBackupTokenManager @Inject constructor(
         return belongsToTheAccount && accountIsStillSignedIn
     }
 
+    override suspend fun recover(accountExternalId: String): BackupRecoveryResult {
+        if (!isMainProcess) return NotAvailable
+        return logFailureAndReturn(operation = "recovery", fallback = NotAvailable) {
+            recoverWithTrustedBackup(accountExternalId)
+        }
+    }
+
+    private suspend fun recoverWithTrustedBackup(accountExternalId: String): BackupRecoveryResult {
+        if (!isFlagEnabled()) return NotAvailable
+        val backup = authRepository.getBackupRefreshToken() ?: return NotAvailable
+        if (!isTrusted(backup = backup, accountExternalId = accountExternalId)) {
+            authRepository.deleteBackupRefreshToken()
+            return NotAvailable
+        }
+        val result = sendBackup(backup = backup, accountExternalId = accountExternalId)
+        if (result is Rejected) authRepository.deleteBackupRefreshToken()
+        return result
+    }
+
+    private fun isTrusted(
+        backup: BackupRefreshToken,
+        accountExternalId: String,
+    ): Boolean {
+        val belongsToTheAccount = backup.accountExternalId == accountExternalId
+        val hasNotExpired = backup.expiresAt > getCurrentTime()
+        return belongsToTheAccount && hasNotExpired
+    }
+
+    private suspend fun sendBackup(
+        backup: BackupRefreshToken,
+        accountExternalId: String,
+    ): BackupRecoveryResult {
+        val recoveredTokens = try {
+            requestValidatedTokens(refreshToken = backup.jwt)
+        } catch (e: Exception) {
+            return failedRecoveryResult(e)
+        }
+        if (recoveredTokens.accessTokenClaims.accountExternalId != accountExternalId) return Rejected
+        return recoveredWith(tokens = recoveredTokens, backup = backup)
+    }
+
+    private fun failedRecoveryResult(e: Exception): BackupRecoveryResult.Failure {
+        if (e is IOException) return NetworkError
+        if (e is HttpException && e.isServerError()) return NetworkError
+        if (e is HttpException) return Rejected
+        if (e is TokenValidationException) return Rejected
+        throw e
+    }
+
+    private fun recoveredWith(
+        tokens: ValidatedTokenPair,
+        backup: BackupRefreshToken,
+    ): Recovered {
+        val spentBackupRefreshToken = RefreshToken(
+            jwt = backup.jwt,
+            expiresAt = backup.expiresAt,
+        )
+        return Recovered(
+            tokens = tokens,
+            spentBackupRefreshToken = spentBackupRefreshToken,
+        )
+    }
+
+    private fun HttpException.isServerError(): Boolean = code() >= FIRST_SERVER_ERROR_CODE
+
+    private suspend fun requestValidatedTokens(refreshToken: String): ValidatedTokenPair {
+        val jwks = authClient.getJwks()
+        val tokenPair = authClient.getTokens(refreshToken)
+        val accessTokenClaims = authJwtValidator.validateAccessToken(jwt = tokenPair.accessToken, jwkSet = jwks)
+        val refreshTokenClaims = authJwtValidator.validateRefreshToken(jwt = tokenPair.refreshToken, jwkSet = jwks)
+        return ValidatedTokenPair(
+            accessToken = tokenPair.accessToken,
+            accessTokenClaims = accessTokenClaims,
+            refreshToken = tokenPair.refreshToken,
+            refreshTokenClaims = refreshTokenClaims,
+        )
+    }
+
     override suspend fun deleteIfAccountChanged(newAccountExternalId: String) {
         if (!isMainProcess) return
         logFailureAndReturn(operation = "account check", fallback = Unit) {
@@ -184,6 +286,7 @@ class RealBackupTokenManager @Inject constructor(
     private fun getCurrentTime(): Instant = Instant.ofEpochMilli(timeProvider.currentTimeMillis())
 
     private companion object {
+        const val FIRST_SERVER_ERROR_CODE = 500
         val MAX_BACKUP_AGE: Duration = Duration.ofDays(14)
         val STATES_THAT_NEED_A_NEW_BACKUP = setOf(NONE, STALE, EXPIRED, OTHER_ACCOUNT)
     }

@@ -28,6 +28,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult
 import com.duckduckgo.subscriptions.impl.auth.BackupTokenState
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.ClaimsParseError
@@ -81,6 +82,7 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onAccessTokenValidationFailed(reason: TokenValidationFailureReason)
     suspend fun onRefreshTokenValidationFailed(reason: TokenValidationFailureReason)
     suspend fun onUnknownAccountError()
+    suspend fun onBackupRecovery(result: BackupRecoveryResult)
     suspend fun onPlayLoginSuccess()
     suspend fun onPlayLoginFailure(
         signedOut: Boolean,
@@ -142,7 +144,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_TIME_SINCE_LAST_SUCCESS to refreshHistory.lastSuccessAt.toHoursSinceBucket(timeProvider.currentTimeMillis()).toString(),
                     KEY_LAST_REFRESH_PROCESS to refreshHistory.lastSuccessProcess.toProcessParamValue(),
                 ) + listOfNotNull(backupTokenState?.let { KEY_BACKUP_TOKEN_STATE to it.paramValue }),
-                definition = WideEventDefinition(version = Version(minor = 1, patch = 4)),
+                definition = WideEventDefinition(version = Version(minor = 1, patch = 5)),
             )
             .getOrNull()
             ?.also { wideEventId ->
@@ -282,6 +284,34 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         }
     }
 
+    override suspend fun onBackupRecovery(result: BackupRecoveryResult) {
+        if (!isFeatureEnabled()) return
+        ongoingTokenRefreshWideEventId?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_BACKUP_RECOVERY,
+                success = result is BackupRecoveryResult.Recovered,
+                metadata = result.toMetadata(),
+            )
+        }
+    }
+
+    private fun BackupRecoveryResult.toMetadata(): Map<String, String> = when (this) {
+        is BackupRecoveryResult.Recovered -> mapOf(
+            KEY_BACKUP_RECOVERY_RESULT to "recovered",
+            KEY_RECOVERY_STRATEGY to RECOVERY_STRATEGY_BACKUP_TOKEN,
+            KEY_RECOVERY_OUTCOME to RECOVERY_OUTCOME_RECOVERED,
+        )
+        BackupRecoveryResult.Failure.NetworkError -> mapOf(
+            KEY_BACKUP_RECOVERY_RESULT to "network_error",
+            KEY_RECOVERY_STRATEGY to RECOVERY_STRATEGY_BACKUP_TOKEN,
+            KEY_RECOVERY_OUTCOME to RECOVERY_OUTCOME_DEFERRED,
+            KEY_SIGNED_OUT to false.toString(),
+        )
+        BackupRecoveryResult.Failure.Rejected -> mapOf(KEY_BACKUP_RECOVERY_RESULT to "rejected")
+        BackupRecoveryResult.Failure.NotAvailable -> mapOf(KEY_BACKUP_RECOVERY_RESULT to "not_available")
+    }
+
     override suspend fun onPlayLoginSuccess() {
         if (!isFeatureEnabled()) return
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
@@ -396,6 +426,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val STEP_JWKS_FETCH = "jwks_fetch"
         const val STEP_TOKEN_REQUEST = "token_request"
         const val STEP_TOKEN_VALIDATION = "token_validation"
+        const val STEP_BACKUP_RECOVERY = "backup_recovery"
         const val STEP_PLAY_LOGIN = "play_login"
         const val STEP_TOKEN_SAVE = "token_save"
 
@@ -424,11 +455,13 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val KEY_TIME_SINCE_LAST_SUCCESS = "time_since_last_success_h_bucketed"
         const val KEY_LAST_REFRESH_PROCESS = "last_refresh_process"
         const val KEY_BACKUP_TOKEN_STATE = "backup_token_state"
+        const val KEY_BACKUP_RECOVERY_RESULT = "backup_recovery_result"
         const val KEY_STORE_ERROR = "store_error"
         const val KEY_RECOVERY_STRATEGY = "recovery_strategy"
         const val KEY_RECOVERY_OUTCOME = "recovery_outcome"
 
         const val RECOVERY_STRATEGY_PLAY_LOGIN = "play_login"
+        const val RECOVERY_STRATEGY_BACKUP_TOKEN = "backup_token"
         const val RECOVERY_OUTCOME_RECOVERED = "recovered"
         const val RECOVERY_OUTCOME_DEFERRED = "deferred"
         const val RECOVERY_OUTCOME_SIGNED_OUT = "signed_out"

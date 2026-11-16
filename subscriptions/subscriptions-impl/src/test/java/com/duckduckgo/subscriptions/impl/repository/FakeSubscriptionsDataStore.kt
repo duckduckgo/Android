@@ -71,9 +71,11 @@ class FakeSubscriptionsDataStore(
         entitlements: String,
         email: String?,
         externalId: String,
+        clearBackupRefreshToken: Boolean,
     ): Boolean {
         if (simluateAccessTokenV2StoreError) throw IOException()
         if (!available || simulateTokenCommitFailure) return false
+        if (clearBackupRefreshToken) clearBackupRefreshToken()
         accessTokenV2 = accessToken
         accessTokenV2ExpiresAt = accessTokenExpiresAt
         refreshTokenV2 = refreshToken

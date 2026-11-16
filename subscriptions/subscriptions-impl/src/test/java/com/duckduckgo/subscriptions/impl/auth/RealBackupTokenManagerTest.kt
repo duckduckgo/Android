@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.ValidatedTokenPair
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.BackupRefreshToken
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
@@ -29,8 +30,10 @@ import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,6 +44,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import retrofit2.HttpException
+import retrofit2.Response
 import java.io.IOException
 import java.time.Duration
 import java.time.Instant
@@ -282,6 +287,156 @@ class RealBackupTokenManagerTest {
     }
 
     @Test
+    fun whenBackendAcceptsTheBackupThenRecoveryReturnsTheNewTokensAndTheSpentBackup() = runTest {
+        val backupExpiry = now() + Duration.ofDays(20)
+        givenStoredBackup(jwt = STORED_BACKUP, expiresAt = backupExpiry)
+        val recoveredTokens = givenBackendAccepts(refreshToken = STORED_BACKUP)
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        val expectedSpentBackup = RefreshToken(
+            jwt = STORED_BACKUP,
+            expiresAt = backupExpiry,
+        )
+        val expected = BackupRecoveryResult.Recovered(
+            tokens = recoveredTokens,
+            spentBackupRefreshToken = expectedSpentBackup,
+        )
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun whenBackupIsDueForRenewalButNotExpiredThenItStillRecovers() = runTest {
+        givenStoredBackup(jwt = STORED_BACKUP, issuedAt = now() - Duration.ofDays(20))
+        givenBackendAccepts(refreshToken = STORED_BACKUP)
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertTrue(result is BackupRecoveryResult.Recovered)
+    }
+
+    @Test
+    fun whenNoBackupIsStoredThenRecoveryIsNotAvailableAndTheBackendIsNotCalled() = runTest {
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.NotAvailable, result)
+        verify(authClient, never()).getTokens(any())
+    }
+
+    @Test
+    fun whenBackupBelongsToAnotherAccountThenItIsDeletedAndNotSent() = runTest {
+        givenStoredBackup(accountExternalId = OTHER_ACCOUNT)
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.NotAvailable, result)
+        assertNull(authRepository.getBackupRefreshToken())
+        verify(authClient, never()).getTokens(any())
+    }
+
+    @Test
+    fun whenBackupHasExpiredThenItIsDeletedAndNotSent() = runTest {
+        givenStoredBackup(issuedAt = now() - Duration.ofDays(31), expiresAt = now() - Duration.ofDays(1))
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.NotAvailable, result)
+        assertNull(authRepository.getBackupRefreshToken())
+        verify(authClient, never()).getTokens(any())
+    }
+
+    @Test
+    fun whenBackendRejectsTheBackupThenItIsDeleted() = runTest {
+        givenStoredBackup()
+        whenever(authClient.getTokens(any())).doSuspendableAnswer { throw httpException(code = 400) }
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.Rejected, result)
+        assertNull(authRepository.getBackupRefreshToken())
+    }
+
+    @Test
+    fun whenTheNetworkFailsDuringRecoveryThenTheBackupIsKept() = runTest {
+        givenStoredBackup(jwt = STORED_BACKUP)
+        whenever(authClient.getTokens(any())).doSuspendableAnswer { throw IOException() }
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.NetworkError, result)
+        assertEquals(STORED_BACKUP, authRepository.getBackupRefreshToken()?.jwt)
+    }
+
+    @Test
+    fun whenTheBackendHasAnOutageDuringRecoveryThenTheBackupIsKept() = runTest {
+        givenStoredBackup(jwt = STORED_BACKUP)
+        whenever(authClient.getTokens(any())).doSuspendableAnswer { throw httpException(code = 503) }
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.NetworkError, result)
+        assertEquals(STORED_BACKUP, authRepository.getBackupRefreshToken()?.jwt)
+    }
+
+    @Test
+    fun whenRecoveredTokensBelongToAnotherAccountThenTheBackupIsDeleted() = runTest {
+        givenStoredBackup(jwt = STORED_BACKUP)
+        givenBackendAccepts(refreshToken = STORED_BACKUP, accountExternalId = OTHER_ACCOUNT)
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.Rejected, result)
+        assertNull(authRepository.getBackupRefreshToken())
+    }
+
+    @Test
+    fun whenRecoveredTokensFailValidationThenTheSpentBackupIsDeleted() = runTest {
+        givenStoredBackup(jwt = STORED_BACKUP)
+        givenBackendAccepts(refreshToken = STORED_BACKUP)
+        val invalidSignature = TokenValidationException(reason = TokenValidationFailureReason.InvalidSignature)
+        whenever(authJwtValidator.validateAccessToken(jwt = RECOVERED_ACCESS_TOKEN, jwkSet = JWKS)).thenThrow(invalidSignature)
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.Rejected, result)
+        assertNull(authRepository.getBackupRefreshToken())
+    }
+
+    @Test
+    fun whenBackendRefusesTheBackupWithAnotherClientErrorThenItIsDeleted() = runTest {
+        givenStoredBackup()
+        whenever(authClient.getTokens(any())).doSuspendableAnswer { throw httpException(code = 401) }
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.Rejected, result)
+        assertNull(authRepository.getBackupRefreshToken())
+    }
+
+    @Test
+    fun whenFlagIsOffThenRecoveryIsNotAvailableAndTheStoredBackupIsKept() = runTest {
+        givenStoredBackup(jwt = STORED_BACKUP)
+        givenFlagEnabled(false)
+
+        val result = backupTokenManager.recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.NotAvailable, result)
+        assertEquals(STORED_BACKUP, authRepository.getBackupRefreshToken()?.jwt)
+        verify(authClient, never()).getTokens(any())
+    }
+
+    @Test
+    fun whenNotInMainProcessThenRecoveryIsNotAvailableAndTheStoredBackupIsKept() = runTest {
+        givenStoredBackup(jwt = STORED_BACKUP)
+
+        val result = createManager(isMainProcess = false).recover(accountExternalId = ACCOUNT)
+
+        assertEquals(BackupRecoveryResult.Failure.NotAvailable, result)
+        assertEquals(STORED_BACKUP, authRepository.getBackupRefreshToken()?.jwt)
+        verify(authClient, never()).getTokens(any())
+    }
+
+    @Test
     fun whenNewTokensBelongToAnotherAccountThenBackupIsDeleted() = runTest {
         givenStoredBackup(accountExternalId = ACCOUNT)
 
@@ -387,6 +542,40 @@ class RealBackupTokenManagerTest {
         whenever(authJwtValidator.validateRefreshToken(jwt = refreshToken, jwkSet = JWKS)).thenReturn(refreshTokenClaims)
     }
 
+    private suspend fun givenBackendAccepts(
+        refreshToken: String,
+        accountExternalId: String = ACCOUNT,
+    ): ValidatedTokenPair {
+        val accessTokenClaims = AccessTokenClaims(
+            expiresAt = now() + Duration.ofHours(4),
+            accountExternalId = accountExternalId,
+            email = null,
+            entitlements = emptyList(),
+        )
+        val refreshTokenClaims = RefreshTokenClaims(
+            expiresAt = now() + Duration.ofDays(30),
+            accountExternalId = accountExternalId,
+        )
+        val recoveredTokenPair = TokenPair(
+            accessToken = RECOVERED_ACCESS_TOKEN,
+            refreshToken = RECOVERED_REFRESH_TOKEN,
+        )
+        whenever(authClient.getTokens(refreshToken)).thenReturn(recoveredTokenPair)
+        whenever(authJwtValidator.validateAccessToken(jwt = RECOVERED_ACCESS_TOKEN, jwkSet = JWKS)).thenReturn(accessTokenClaims)
+        whenever(authJwtValidator.validateRefreshToken(jwt = RECOVERED_REFRESH_TOKEN, jwkSet = JWKS)).thenReturn(refreshTokenClaims)
+        return ValidatedTokenPair(
+            accessToken = RECOVERED_ACCESS_TOKEN,
+            accessTokenClaims = accessTokenClaims,
+            refreshToken = RECOVERED_REFRESH_TOKEN,
+            refreshTokenClaims = refreshTokenClaims,
+        )
+    }
+
+    private fun httpException(code: Int): HttpException {
+        val errorBody = "".toResponseBody(contentType = null)
+        return HttpException(Response.error<Void>(code, errorBody))
+    }
+
     private fun now(): Instant = timeProvider.currentTime
 
     private class FakeTimeProvider : CurrentTimeProvider {
@@ -403,6 +592,8 @@ class RealBackupTokenManagerTest {
         const val JWKS = "fake jwks"
         const val STORED_BACKUP = "stored backup refresh token"
         const val MINTED_REFRESH_TOKEN = "minted refresh token"
+        const val RECOVERED_ACCESS_TOKEN = "recovered access token"
+        const val RECOVERED_REFRESH_TOKEN = "recovered refresh token"
         val SPENT_REFRESH_TOKEN = RefreshToken(
             jwt = "spent refresh token",
             expiresAt = Instant.parse("2026-12-01T00:00:00Z"),

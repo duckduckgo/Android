@@ -40,6 +40,7 @@ import com.duckduckgo.subscriptions.impl.auth.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.AuthClient
 import com.duckduckgo.subscriptions.impl.auth.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult
 import com.duckduckgo.subscriptions.impl.auth.BackupTokenManager
 import com.duckduckgo.subscriptions.impl.auth.BackupTokenState
 import com.duckduckgo.subscriptions.impl.auth.CrossProcessLock
@@ -61,8 +62,10 @@ import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboa
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import com.duckduckgo.subscriptions.impl.repository.BackupRefreshToken
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
+import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.repository.TokenStoreException
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
@@ -184,6 +187,7 @@ class RealSubscriptionsManagerTest {
         whenever(context.packageName).thenReturn("packageName")
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(FakeLockHandle()))
+        whenever(backupTokenManager.recover(any())).thenReturn(BackupRecoveryResult.Failure.NotAvailable)
         subscriptionsManager = RealSubscriptionsManager(
             subscriptionsService,
             authRepository,
@@ -2522,6 +2526,87 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenRefreshTokenIsRejectedAndBackupRecoversThenUserStaysSignedInWithTheRecoveredTokens() = runTest {
+        givenUserIsSignedIn(accountExternalId = "1234")
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        val recovered = givenBackupRecovers(accountExternalId = "1234")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertEquals(recovered.tokens.accessToken, (result as AccessTokenResult.Success).accessToken)
+        assertEquals(recovered.tokens.refreshToken, authRepository.getRefreshTokenV2()?.jwt)
+        assertTrue(subscriptionsManager.isSignedInV2())
+        verify(playBillingManager, never()).getLatestPurchase()
+        verify(tokenRefreshWideEvent).onBackupRecovery(recovered)
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenRecovered()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
+    }
+
+    @Test
+    fun whenBackupRecoversThenSpentBackupIsDeletedAndNewOneIsMintedFromIt() = runTest {
+        givenUserIsSignedIn(accountExternalId = "1234")
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        val recovered = givenBackupRecovers(accountExternalId = "1234")
+        val storedBackup = BackupRefreshToken(
+            jwt = recovered.spentBackupRefreshToken.jwt,
+            expiresAt = recovered.spentBackupRefreshToken.expiresAt,
+            accountExternalId = "1234",
+            issuedAt = timeProvider.currentTime,
+        )
+        authRepository.saveBackupRefreshToken(storedBackup)
+
+        subscriptionsManager.getAccessToken()
+
+        assertNull(authRepository.getBackupRefreshToken())
+        verify(backupTokenManager).mintIfNeeded(spentRefreshToken = recovered.spentBackupRefreshToken, accountExternalId = "1234")
+    }
+
+    @Test
+    fun whenBackupRecoveryHitsNetworkErrorThenUserStaysSignedInAndStoreLoginIsNotAttempted() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        whenever(backupTokenManager.recover(any())).thenReturn(BackupRecoveryResult.Failure.NetworkError)
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        assertTrue(subscriptionsManager.isSignedInV2())
+        verify(playBillingManager, never()).getLatestPurchase()
+        verify(tokenRefreshWideEvent).onBackupRecovery(BackupRecoveryResult.Failure.NetworkError)
+        verify(backupTokenManager, never()).mintIfNeeded(spentRefreshToken = any(), accountExternalId = any())
+    }
+
+    @Test
+    fun whenBackupIsRejectedThenStoreLoginStillRecoversTheSession() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        whenever(backupTokenManager.recover(any())).thenReturn(BackupRecoveryResult.Failure.Rejected)
+        givenPurchaseStored()
+        givenStoreLoginSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+        verify(tokenRefreshWideEvent).onBackupRecovery(BackupRecoveryResult.Failure.Rejected)
+        verify(tokenRefreshWideEvent).onPlayLoginSuccess()
+    }
+
+    @Test
+    fun whenAccountNoLongerExistsThenBackupRecoveryIsNotAttempted() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "unknown_account")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(backupTokenManager, never()).recover(any())
+    }
+
+    @Test
     fun whenSigningInThenBackupIsCheckedAgainstTheNewAccount() = runTest {
         givenValidateV2TokensSucceeds()
 
@@ -2899,6 +2984,35 @@ class RealSubscriptionsManagerTest {
                 accountExternalId = "1234",
             ),
         )
+    }
+
+    private suspend fun givenBackupRecovers(accountExternalId: String): BackupRecoveryResult.Recovered {
+        val accessTokenClaims = AccessTokenClaims(
+            expiresAt = timeProvider.currentTime + Duration.ofHours(4),
+            accountExternalId = accountExternalId,
+            email = null,
+            entitlements = listOf(Entitlement(product = NetP.value, name = "subscriber")),
+        )
+        val refreshTokenClaims = RefreshTokenClaims(
+            expiresAt = timeProvider.currentTime + Duration.ofDays(30),
+            accountExternalId = accountExternalId,
+        )
+        val recoveredTokens = ValidatedTokenPair(
+            accessToken = "recovered access token",
+            accessTokenClaims = accessTokenClaims,
+            refreshToken = "recovered refresh token",
+            refreshTokenClaims = refreshTokenClaims,
+        )
+        val spentBackupRefreshToken = RefreshToken(
+            jwt = "backup refresh token",
+            expiresAt = timeProvider.currentTime + Duration.ofDays(20),
+        )
+        val recovered = BackupRecoveryResult.Recovered(
+            tokens = recoveredTokens,
+            spentBackupRefreshToken = spentBackupRefreshToken,
+        )
+        whenever(backupTokenManager.recover(accountExternalId)).thenReturn(recovered)
+        return recovered
     }
 
     private suspend fun givenAccessTokenIsExpired() {
