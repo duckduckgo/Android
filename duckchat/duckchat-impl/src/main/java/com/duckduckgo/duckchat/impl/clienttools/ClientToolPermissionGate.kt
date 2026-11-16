@@ -64,7 +64,8 @@ class RealClientToolPermissionGate @Inject constructor(
         tool: ClientTool,
         context: ClientToolCallContext,
     ): ClientToolPermissionDecision {
-        if (tool.permissionMode == ClientToolPermissionMode.AUTO || skipsPromptForDevelopment()) {
+        val mode = tool.permissionMode
+        if (mode !is ClientToolPermissionMode.Ask || skipsPromptForDevelopment()) {
             return ClientToolPermissionDecision.ALLOWED
         }
         val chatGone = startWaiting(context.chatTabId)
@@ -72,7 +73,7 @@ class RealClientToolPermissionGate @Inject constructor(
             return withTimeoutOrNull(DECISION_DEADLINE_MILLIS) {
                 coroutineScope {
                     val decision = async {
-                        storedDecision(tool, context) ?: promptLock.withLock { storedDecision(tool, context) ?: ask(tool, context) }
+                        storedDecision(tool, context) ?: promptLock.withLock { storedDecision(tool, context) ?: ask(tool, mode, context) }
                     }
                     select {
                         decision.onAwait { it }
@@ -107,9 +108,10 @@ class RealClientToolPermissionGate @Inject constructor(
 
     private suspend fun ask(
         tool: ClientTool,
+        mode: ClientToolPermissionMode.Ask,
         context: ClientToolCallContext,
     ): ClientToolPermissionDecision {
-        val request = ClientToolPermissionRequest(context.origin, tool.name, context.chatTabId)
+        val request = ClientToolPermissionRequest(context.origin, tool.name, context.chatTabId, mode)
         return when (prompt.request(request)) {
             ClientToolPermissionAnswer.ALLOW_ONCE -> ClientToolPermissionDecision.ALLOWED
             ClientToolPermissionAnswer.ALWAYS -> {

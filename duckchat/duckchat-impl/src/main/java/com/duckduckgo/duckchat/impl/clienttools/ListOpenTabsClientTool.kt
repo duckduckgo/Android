@@ -21,6 +21,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.R
 import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONArray
 import org.json.JSONObject
@@ -37,7 +38,10 @@ class ListOpenTabsClientTool @Inject constructor(
 
     override val name: String = "listOpenTabs"
     override val version: Int = 1
-    override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.ASK
+    override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.Ask(
+        promptTitle = R.string.duckAiClientToolListOpenTabsPromptTitle,
+        promptMessage = R.string.duckAiClientToolListOpenTabsPromptMessage,
+    )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.listOpenTabs().isEnabled()
 

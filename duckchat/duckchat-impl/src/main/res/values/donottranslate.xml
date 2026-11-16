@@ -44,4 +44,8 @@
     <!-- Duck.ai on/off, shown in the onboarding Duck.ai state choice -->
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
+
+    <!-- Duck.ai client tool permission prompt -->
+    <string name="duckAiClientToolListOpenTabsPromptTitle">Allow Duck.ai to see your open tabs?</string>
+    <string name="duckAiClientToolListOpenTabsPromptMessage">Duck.ai will see the titles and addresses of the tabs open in this browser. It won’t see what’s on them.</string>
 </resources>

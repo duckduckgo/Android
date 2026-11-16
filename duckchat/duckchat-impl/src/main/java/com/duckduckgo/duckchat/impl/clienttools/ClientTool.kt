@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
+import androidx.annotation.StringRes
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -37,9 +38,14 @@ interface ClientTool {
     ): ClientToolResult
 }
 
-enum class ClientToolPermissionMode {
-    ASK,
-    AUTO,
+sealed interface ClientToolPermissionMode {
+    data object Auto : ClientToolPermissionMode
+
+    /** Asks the user before running, with the tool's own prompt copy. */
+    data class Ask(
+        @StringRes val promptTitle: Int,
+        @StringRes val promptMessage: Int,
+    ) : ClientToolPermissionMode
 }
 
 /**
