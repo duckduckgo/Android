@@ -518,6 +518,33 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
+    fun `when subscription update fails then next purchase failure reports store failure`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+
+        subject.purchaseState.test {
+            subject.launchSubscriptionUpdate(
+                activity = mock(),
+                newPlanId = MONTHLY_PLAN_US,
+                externalId = "external_id",
+                newOfferId = null,
+                oldPurchaseToken = "old_purchase_token",
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+            awaitItem()
+
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("ITEM_UNAVAILABLE"))
+            awaitItem()
+
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("BILLING_UNAVAILABLE"))
+            awaitItem()
+        }
+
+        verify(pixelSender, never()).reportPurchaseFailureStore("ITEM_UNAVAILABLE")
+        verify(pixelSender).reportPurchaseFailureStore("BILLING_UNAVAILABLE")
+    }
+
+    @Test
     fun `getLatestPurchase returns Present when active subscription purchase exists`() = runTest {
         val activePurchase = mock<Purchase> {
             whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))

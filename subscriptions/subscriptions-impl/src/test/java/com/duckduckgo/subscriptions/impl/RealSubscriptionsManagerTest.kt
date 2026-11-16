@@ -3045,6 +3045,71 @@ class RealSubscriptionsManagerTest {
 
             verify(subscriptionSwitchWideEvent).onSwitchConfirmationFailure("confirm_not_active")
             verify(subscriptionSwitchWideEvent, never()).onSwitchConfirmationSuccess()
+            assertNotEquals(WAITING, authRepository.getSubscription()?.status)
+            verify(pixelSender, never()).reportPurchaseFailureBackend()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseCancelledThenDoesNotReportSwitchWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+
+            verify(subscriptionPurchaseWideEvent).onPurchaseCancelledByUser()
+            verify(subscriptionSwitchWideEvent, never()).onUserCancelled()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseFailsThenDoesNotReportSwitchWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Failure("error"))
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(subscriptionPurchaseWideEvent).onBillingFlowPurchaseFailure("error")
+            verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanCancelledThenNextBillingResultIsReportedAsPurchase() = runTest {
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+
+            purchaseStateFlow.emit(Failure("error"))
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(subscriptionSwitchWideEvent).onUserCancelled()
+            verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
+            verify(subscriptionPurchaseWideEvent).onBillingFlowPurchaseFailure("error")
 
             cancelAndConsumeRemainingEvents()
         }
