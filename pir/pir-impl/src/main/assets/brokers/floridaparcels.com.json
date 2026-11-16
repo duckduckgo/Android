@@ -1,7 +1,7 @@
 {
   "name": "FloridaParcels",
   "url": "floridaparcels.com",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "addedDatetime": 1791331200000,
   "optOutUrl": "https://floridaparcels.com/redaction/",
   "steps": [
@@ -161,9 +161,9 @@
     }
   ],
   "schedulingConfig": {
-    "retryError": 48,
+    "retryError": 168,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 120,
+    "maintenanceScan": 720,
     "maxAttempts": -1
   },
   "removedAt": null

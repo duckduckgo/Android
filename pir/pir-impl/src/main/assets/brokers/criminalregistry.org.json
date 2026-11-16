@@ -1,0 +1,105 @@
+{
+  "name": "CriminalRegistry",
+  "url": "criminalregistry.org",
+  "version": "0.1.2",
+  "addedDatetime": 1792713600000,
+  "optOutUrl": "https://criminalregistry.org/remove.php",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "_comment": "the per-name pages live on <first>-<last>.criminalregistry.org, which a URL template cannot build, so scan the removal search, which lists the same records",
+          "actionType": "navigate",
+          "id": "e1ed13c9-a596-49ce-9ced-32323c6422c0",
+          "url": "https://www.criminalregistry.org/removeinfo.php?tid=&firstname=${firstName}&lastname=${lastName}"
+        },
+        {
+          "_comment": "guard on the results table or the no-results heading",
+          "actionType": "expectation",
+          "id": "62771304-deeb-4e16-b69a-dd685f8463c8",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(@class,'results-table')]//table | //h2[contains(., 'We have no result')]"
+            }
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "ab13424e-c5c0-42bd-9988-87ea038c64dc",
+          "selector": "//div[contains(@class,'results-table')]//tbody/tr",
+          "noResultsSelector": "//h2[contains(., 'We have no result')]",
+          "profile": {
+            "name": {
+              "selector": ".//span[@class='name']/a"
+            },
+            "age": {
+              "selector": ".//td[3]/strong"
+            },
+            "addressCityStateList": {
+              "selector": ".//td[4]//li",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "_comment": "removeinfo.php is what remove.php's name search submits to; it lists every record under the name and removes them together",
+          "actionType": "navigate",
+          "id": "da33a1ba-a8af-4362-9bb5-003248e0c029",
+          "url": "https://www.criminalregistry.org/removeinfo.php?tid=&firstname=${firstName}&lastname=${lastName}"
+        },
+        {
+          "actionType": "expectation",
+          "id": "100e97bd-8f27-4b3f-af1e-0306f4c72772",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//form[@name='form1' and contains(@action,'removecheck.php')]"
+            }
+          ]
+        },
+        {
+          "_comment": "the captcha is a plain sum of the hidden a and b inputs. removecheck.php applies the removal within 3 s but takes about 90 s to answer, usually with a Cloudflare 502, so fire the form's GET, wait 3 s and verify by searching again rather than waiting on the reply",
+          "actionType": "executeScript",
+          "id": "412822cf-4f88-493b-86c6-3a179bcb1341",
+          "script": "var f = root.querySelector(\"form[name='form1']\");\nf.querySelector(\"input[name='answer']\").value = String(\n  Number(f.querySelector(\"input[name='a']\").value) +\n    Number(f.querySelector(\"input[name='b']\").value),\n);\nfetch(f.action + \"?\" + new URLSearchParams(new FormData(f)).toString(), {\n  mode: \"no-cors\",\n  credentials: \"include\",\n}).catch(function () {});\nreturn new Promise(function (resolve) {\n  setTimeout(resolve, 3000);\n});\n"
+        },
+        {
+          "_comment": "the removal is applied immediately: the same search must now return no records for the name",
+          "actionType": "navigate",
+          "id": "af33855c-ea47-4e65-b895-3bd517c139ef",
+          "url": "https://www.criminalregistry.org/removeinfo.php?tid=&firstname=${firstName}&lastname=${lastName}"
+        },
+        {
+          "actionType": "expectation",
+          "id": "b6d4eea6-1268-4cfa-951d-e0ed7aa90882",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h2[contains(., 'We have no result')]"
+            }
+          ],
+          "_comment": "the removal is applied within seconds; the expectation's element retry covers any lag"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

@@ -1,7 +1,7 @@
 {
   "name": "Vehicle Related Records",
   "url": "vehiclerelatedrecords.com",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "parent": "spyfly.com",
   "addedDatetime": 1778777242134,
   "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
@@ -20,7 +20,7 @@
           "expectations": [
             {
               "type": "element",
-              "selector": "table.results-table"
+              "selector": "//table[contains(@class, 'results-table')] | //span[contains(@class, 'search_title') and contains(., 'Your search was unsuccessful')]"
             }
           ],
           "id": "1ed7d7fb-d6a5-44b3-8755-a62cb0021aef"

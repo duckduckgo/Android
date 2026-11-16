@@ -1,7 +1,7 @@
 {
   "name": "Public Record Reports",
   "url": "publicrecordreports.com",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "parent": "spyfly.com",
   "addedDatetime": 1778777242134,
   "optOutUrl": "https://www.publicrecordreports.com/help-center/privacy-requests",
@@ -178,6 +178,10 @@
           "actionType": "expectation",
           "expectations": [
             {
+              "type": "element",
+              "selector": ".section__head h1"
+            },
+            {
               "type": "text",
               "selector": ".section__head h1",
               "expect": "Select Data for Removal"
@@ -224,10 +228,11 @@
         },
         {
           "actionType": "expectation",
+          "_comment": "Opt-outs are off on purpose: the correct selector is `.main`. Set it back to re-enable opt-outs, see https://app.asana.com/1/137249556945/project/1206873150423133/task/1220296008414083",
           "expectations": [
             {
               "type": "element",
-              "selector": ".main"
+              "selector": "#pir-opt-out-off-on-purpose"
             }
           ],
           "id": "48c0af01-182c-49a9-a4f1-2e9caa04bfb7"
