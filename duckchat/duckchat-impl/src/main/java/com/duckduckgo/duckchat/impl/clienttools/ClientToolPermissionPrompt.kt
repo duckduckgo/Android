@@ -29,6 +29,7 @@ data class ClientToolPermissionRequest(
     val origin: String,
     val toolName: String,
     val chatTabId: String,
+    val copy: ClientToolPermissionMode.Ask,
 )
 
 enum class ClientToolPermissionAnswer {

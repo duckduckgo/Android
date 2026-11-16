@@ -27,7 +27,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class FakeClientTool(
     override val name: String = "fakeTool",
     override val version: Int = 1,
-    override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.AUTO,
+    override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.Auto,
     var enabled: Boolean = true,
     var validInput: (JSONObject) -> Boolean = { true },
     var result: suspend (JSONObject) -> ClientToolResult = { ClientToolResult.Success(JSONObject().put("echo", it)) },
