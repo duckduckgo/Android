@@ -68,6 +68,7 @@ import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
+import com.duckduckgo.app.autocomplete.api.NoOpAutoCompleteSearchCache
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -834,6 +835,7 @@ class BrowserTabViewModelTest {
             mockAutoCompleteApi =
                 AutoCompleteApi(
                     mockAutoCompleteService,
+                    NoOpAutoCompleteSearchCache,
                     mockSavedSitesRepository,
                     mockNavigationHistory,
                     mockAutoCompleteScorer,

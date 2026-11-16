@@ -20,6 +20,7 @@ import android.webkit.WebStorage
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.autocomplete.api.AutoCompleteSearchCache
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
@@ -73,6 +74,7 @@ class ClearPersonalDataActionTest {
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockSitePreferencesDataClearer: SitePreferencesDataClearer = mock()
+    private val mockAutoCompleteSearchCache: AutoCompleteSearchCache = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -111,12 +113,19 @@ class ClearPersonalDataActionTest {
         duckAiHostProvider = mockDuckAiHostProvider,
         siteDataCleaner = siteDataCleaner,
         sitePreferencesDataClearer = mockSitePreferencesDataClearer,
+        autoCompleteSearchCache = mockAutoCompleteSearchCache,
     )
 
     @Test
     fun whenClearBrowserDataOnlyThenDesktopPreferencesClearedExceptFireproofed() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
         verify(mockSitePreferencesDataClearer).clearAllButFireproofed(any())
+    }
+
+    @Test
+    fun whenClearBrowserDataOnlyThenAutoCompleteSearchCacheCleared() = runTest {
+        testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
+        verify(mockAutoCompleteSearchCache).clear()
     }
 
     @Test

@@ -59,6 +59,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -74,9 +75,12 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -125,6 +129,8 @@ class AutoCompleteApiTest {
 
     private val fakeAutocompleteSpeedFeature = FakeFeatureToggleFactory.create(AutocompleteSpeedFeature::class.java)
 
+    private var searchCache: AutoCompleteSearchCache = NoOpAutoCompleteSearchCache
+
     private lateinit var testee: AutoCompleteApi
 
     @Before
@@ -142,6 +148,49 @@ class AutoCompleteApiTest {
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
         testee = createTestee()
+    }
+
+    @Test
+    fun whenSameQueryRequestedAgainThenSearchResultsServedFromCache() = runTest {
+        useCachingSearchCache()
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(listOf(AutoCompleteServiceRawResult("foo bar", isNav = false)))
+
+        val first = testee.autoComplete("foo").first()
+        val second = testee.autoComplete("foo").first()
+
+        verify(mockAutoCompleteService, times(1)).autoComplete("foo")
+        assertEquals(first, second)
+    }
+
+    @Test
+    fun whenOmnibarListsLocalSuggestionsFirstAndSameQueryRequestedAgainThenSearchResultsServedFromCache() = runTest {
+        fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
+        useCachingSearchCache(isOmnibar = true)
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(listOf(AutoCompleteServiceRawResult("foo bar", isNav = false)))
+
+        val first = testee.autoComplete("foo").toList().last()
+        val second = testee.autoComplete("foo").toList().last()
+
+        verify(mockAutoCompleteService, times(1)).autoComplete("foo")
+        assertEquals(first, second)
+    }
+
+    @Test
+    fun whenSearchRequestFailsThenNextRequestForSameQueryHitsTheService() = runTest {
+        useCachingSearchCache()
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenThrow(RuntimeException())
+
+        testee.autoComplete("foo").first()
+        testee.autoComplete("foo").first()
+
+        verify(mockAutoCompleteService, times(2)).autoComplete("foo")
+    }
+
+    private fun useCachingSearchCache(isOmnibar: Boolean = false) {
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        searchCache = RealAutoCompleteSearchCache(fakeAutocompleteSpeedFeature, mock { on { elapsedRealtime() } doReturn 0L })
+        testee = createTestee(isOmnibar = isOmnibar)
     }
 
     @Test
@@ -2334,6 +2383,7 @@ class AutoCompleteApiTest {
     ): AutoCompleteApi {
         return AutoCompleteApi(
             mockAutoCompleteService,
+            searchCache,
             mockSavedSitesRepository,
             mockNavigationHistory,
             RealAutoCompleteScorer(),

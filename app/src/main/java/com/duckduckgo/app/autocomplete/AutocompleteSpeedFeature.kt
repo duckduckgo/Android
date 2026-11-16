@@ -34,4 +34,7 @@ interface AutocompleteSpeedFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun localSuggestionsFirst(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun cacheSuggestResults(): Toggle
 }

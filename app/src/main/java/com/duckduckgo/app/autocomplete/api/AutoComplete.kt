@@ -96,6 +96,7 @@ class DefaultAutoComplete @Inject constructor(
 
 class AutoCompleteApi constructor(
     private val autoCompleteService: AutoCompleteService,
+    private val searchCache: AutoCompleteSearchCache,
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
@@ -209,7 +210,7 @@ class AutoCompleteApi constructor(
     private fun searchRequest(query: String): Deferred<List<AutoCompleteSearchSuggestion>> = synchronized(searchRequestsInFlight) {
         searchRequestsInFlight.getOrPut(query) {
             coroutineScope.async(dispatchers.io()) {
-                val result = runCatching { autoCompleteService.autoComplete(query).map { it.toSearchSuggestion() } }
+                val result = runCatching { fetchSearchResults(query).map { it.toSearchSuggestion() } }
                 synchronized(searchRequestsInFlight) { searchRequestsInFlight.remove(query) }
                 result.onSuccess { latestSearchResults.value = SearchResults(query, it) }
                 result.getOrDefault(emptyList())
@@ -444,13 +445,16 @@ class AutoCompleteApi constructor(
     private fun getAutoCompleteSearchResults(query: String) = flow {
         val searchSuggestionsList = mutableListOf<AutoCompleteSearchSuggestion>()
         runCatching {
-            val rawResults = autoCompleteService.autoComplete(query)
+            val rawResults = fetchSearchResults(query)
             for (rawResult in rawResults) {
                 searchSuggestionsList.add(rawResult.toSearchSuggestion())
             }
             emit(searchSuggestionsList.toList())
         }.getOrElse { emit(searchSuggestionsList.toList()) }
     }
+
+    private suspend fun fetchSearchResults(query: String): List<AutoCompleteServiceRawResult> =
+        searchCache.get(query) ?: autoCompleteService.autoComplete(query).also { searchCache.put(query, it) }
 
     private fun AutoCompleteServiceRawResult.toSearchSuggestion() = AutoCompleteSearchSuggestion(
         phrase = phrase.formatIfUrl(),

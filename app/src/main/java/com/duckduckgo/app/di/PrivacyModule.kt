@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import com.duckduckgo.app.autocomplete.api.AutoCompleteSearchCache
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -85,6 +86,7 @@ object PrivacyModule {
         duckAiHostProvider: DuckAiHostProvider,
         siteDataCleaner: SiteDataCleaner,
         sitePreferencesDataClearer: SitePreferencesDataClearer,
+        autoCompleteSearchCache: AutoCompleteSearchCache,
     ): ClearDataAction {
         // TODO: Burns currently only clear @RegularMode tabs. Cross-mode tab clearing will be
         // handled as part of the data-clearing fire-mode work.
@@ -109,6 +111,7 @@ object PrivacyModule {
             duckAiHostProvider,
             siteDataCleaner,
             sitePreferencesDataClearer,
+            autoCompleteSearchCache,
         )
     }
 
