@@ -2962,6 +2962,7 @@ class RealSubscriptionsManagerTest {
 
     @Test
     fun whenUndoCancellationAndFlagDisabledThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(false)
         givenUserIsSignedIn()
         givenCancelledGoogleSubscription()
         givenOwnedPurchase()
