@@ -47,7 +47,6 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
-import com.duckduckgo.mobile.android.vpn.integration.NgVpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -153,8 +152,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     @Inject lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
 
     @Inject lateinit var crashLogger: CrashLogger
-
-    @Inject lateinit var dnsChangeCallback: DnsChangeCallback
 
     @Inject lateinit var appTpRemoteFeatures: AppTpRemoteFeatures
 
@@ -312,7 +309,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
         deviceShieldPixels.reportVpnStartAttempt()
-        dnsChangeCallback.unregister()
 
         runCatching {
             vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
@@ -469,18 +465,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         deviceShieldPixels.reportVpnStartAttemptSuccess()
         vpnEnableWideEvent.onVpnStarted()
-
-        // This is something temporary while we confirm whether we're able to fix the moto g issues with appTP
-        // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
-        tunnelConfig?.let { config ->
-            // TODO this is temporary hack until we know this approach works for moto g. If it does we'll spend time making it better/more permanent
-            if (vpnNetworkStack is NgVpnNetworkStack && config.dns.isNotEmpty()) {
-                // This solution is only relevant for AppTP
-                // just temporary pixel to know quantify how many users would be impacted
-                deviceShieldPixels.reportMotoGFix()
-                dnsChangeCallback.register()
-            }
-        }
 
         reportVpnAlwaysOnState()
 
@@ -706,8 +690,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
-
-        dnsChangeCallback.unregister()
 
         stopForeground(true)
         stopSelf()
