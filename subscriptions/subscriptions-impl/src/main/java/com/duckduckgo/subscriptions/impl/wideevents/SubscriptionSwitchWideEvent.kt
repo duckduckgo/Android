@@ -80,9 +80,12 @@ interface SubscriptionSwitchWideEvent {
 
     suspend fun onSwitchConfirmationSuccess()
 
+    suspend fun onSwitchConfirmationFailure(reason: String)
+
     suspend fun onSubscriptionUpdated(
         oldStatus: SubscriptionStatus?,
         newStatus: SubscriptionStatus?,
+        planChanged: Boolean,
     )
 
     fun onUIRefreshed()
@@ -394,13 +397,28 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         }
     }
 
+    override suspend fun onSwitchConfirmationFailure(reason: String) {
+        if (!isFeatureEnabled()) return
+
+        // Kept open so a later refresh can still confirm the switch
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_CONFIRM_SWITCH,
+                success = false,
+                metadata = mapOf(KEY_CONFIRM_FAILURE_REASON to reason),
+            )
+        }
+    }
+
     override suspend fun onSubscriptionUpdated(
         oldStatus: SubscriptionStatus?,
         newStatus: SubscriptionStatus?,
+        planChanged: Boolean,
     ) {
         if (!isFeatureEnabled()) return
 
-        if (oldStatus == SubscriptionStatus.WAITING && newStatus?.isActive() == true) {
+        if ((oldStatus == SubscriptionStatus.WAITING || planChanged) && newStatus?.isActive() == true) {
             val wideEventId = getCurrentWideEventId() ?: return
             wideEventClient.intervalEnd(wideEventId = wideEventId, key = KEY_ACTIVATION_LATENCY)
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Success)
@@ -458,6 +476,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         const val KEY_CHANGE_TYPE = "tier_change_type"
         const val KEY_ACTIVATION_LATENCY = "activation_latency_ms_bucketed"
         const val KEY_PURCHASE_PLATFORM = "purchase_platform"
+        const val KEY_CONFIRM_FAILURE_REASON = "confirm_failure_reason"
 
         const val PURCHASE_PLATFORM_PLAY_STORE = "play_store"
         const val PURCHASE_PLATFORM_STRIPE = "stripe"

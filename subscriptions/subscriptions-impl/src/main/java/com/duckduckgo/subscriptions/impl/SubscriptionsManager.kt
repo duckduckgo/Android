@@ -644,7 +644,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
 
         if (!retryCompleted) {
-            handlePurchaseFailed()
+            handlePurchaseFailed(CONFIRM_REQUEST_FAILED)
         }
     }
 
@@ -713,7 +713,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
                 }
             } else {
-                handlePurchaseFailed()
+                handlePurchaseFailed(CONFIRM_NOT_ACTIVE)
             }
 
             _subscriptionStatus.emit(authRepository.getStatus())
@@ -776,10 +776,14 @@ class RealSubscriptionsManager @Inject constructor(
         )
     }
 
-    private suspend fun handlePurchaseFailed() {
-        if (consumePendingBillingFlow() == BillingFlowType.PURCHASE) {
-            authRepository.purchaseToWaitingStatus()
-            pixelSender.reportPurchaseFailureBackend()
+    private suspend fun handlePurchaseFailed(reason: String) {
+        when (consumePendingBillingFlow()) {
+            BillingFlowType.PURCHASE -> {
+                authRepository.purchaseToWaitingStatus()
+                pixelSender.reportPurchaseFailureBackend()
+            }
+            BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onSwitchConfirmationFailure(reason)
+            BillingFlowType.CANCELLATION_UNDO -> Unit
         }
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
         _subscriptionStatus.emit(authRepository.getStatus())
@@ -1026,8 +1030,16 @@ class RealSubscriptionsManager @Inject constructor(
         val wasFreeTrial = oldSubscription?.activeOffers?.contains(ActiveOfferType.TRIAL) == true
         val isFreeTrial = subscription.activeOffers.any { it.type.toActiveOfferType() == ActiveOfferType.TRIAL }
 
+        val pendingPlanIds = pendingPlans.map { it.productId }
+        val planChanged = oldSubscription != null &&
+            (oldSubscription.productId != subscription.productId || oldSubscription.pendingPlans.map { it.productId } != pendingPlanIds)
+
         subscriptionPurchaseWideEvent.onSubscriptionUpdated(oldStatus = oldSubscription?.status, newStatus = newStatus)
-        subscriptionSwitchWideEvent.onSubscriptionUpdated(oldStatus = oldSubscription?.status, newStatus = newStatus)
+        subscriptionSwitchWideEvent.onSubscriptionUpdated(
+            oldStatus = oldSubscription?.status,
+            newStatus = newStatus,
+            planChanged = planChanged,
+        )
         freeTrialConversionWideEvent.onSubscriptionRefreshed(
             wasFreeTrial = wasFreeTrial,
             isFreeTrial = isFreeTrial,
@@ -1460,6 +1472,8 @@ class RealSubscriptionsManager @Inject constructor(
     companion object {
         const val SUBSCRIPTION_NOT_FOUND_ERROR = "SubscriptionNotFound"
         private const val TOKEN_REFRESH_LOCK_KEY = "auth_token_refresh"
+        private const val CONFIRM_REQUEST_FAILED = "confirm_request_failed"
+        private const val CONFIRM_NOT_ACTIVE = "confirm_not_active"
     }
 }
 

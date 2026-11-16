@@ -588,6 +588,7 @@ class SubscriptionSwitchWideEventTest {
         subscriptionSwitchWideEvent.onSubscriptionUpdated(
             oldStatus = SubscriptionStatus.WAITING,
             newStatus = SubscriptionStatus.AUTO_RENEWABLE,
+            planChanged = false,
         )
 
         verify(wideEventClient).intervalEnd(
@@ -610,19 +611,75 @@ class SubscriptionSwitchWideEventTest {
         subscriptionSwitchWideEvent.onSubscriptionUpdated(
             oldStatus = SubscriptionStatus.AUTO_RENEWABLE,
             newStatus = SubscriptionStatus.GRACE_PERIOD,
+            planChanged = false,
         )
 
         subscriptionSwitchWideEvent.onSubscriptionUpdated(
             oldStatus = SubscriptionStatus.WAITING,
             newStatus = SubscriptionStatus.INACTIVE,
+            planChanged = false,
         )
 
         subscriptionSwitchWideEvent.onSubscriptionUpdated(
             oldStatus = SubscriptionStatus.UNKNOWN,
             newStatus = SubscriptionStatus.AUTO_RENEWABLE,
+            planChanged = false,
         )
 
         verify(wideEventClient, never()).intervalEnd(any(), any())
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `onSwitchConfirmationFailure sends failed step with reason and keeps flow open`() = runTest {
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(listOf(123L)))
+
+        subscriptionSwitchWideEvent.onSwitchConfirmationFailure("confirm_not_active")
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 123L,
+            stepName = "confirm_switch",
+            success = false,
+            metadata = mapOf("confirm_failure_reason" to "confirm_not_active"),
+        )
+        verify(wideEventClient, never()).intervalEnd(any(), any())
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `onSubscriptionUpdated with plan changed and active finishes flow with success`() = runTest {
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(listOf(123L)))
+
+        subscriptionSwitchWideEvent.onSubscriptionUpdated(
+            oldStatus = SubscriptionStatus.AUTO_RENEWABLE,
+            newStatus = SubscriptionStatus.AUTO_RENEWABLE,
+            planChanged = true,
+        )
+
+        verify(wideEventClient).intervalEnd(
+            wideEventId = 123L,
+            key = "activation_latency_ms_bucketed",
+        )
+        verify(wideEventClient).flowFinish(
+            wideEventId = 123L,
+            status = FlowStatus.Success,
+            metadata = emptyMap(),
+        )
+    }
+
+    @Test
+    fun `onSubscriptionUpdated with plan changed but not active does not finish flow`() = runTest {
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(listOf(123L)))
+
+        subscriptionSwitchWideEvent.onSubscriptionUpdated(
+            oldStatus = SubscriptionStatus.AUTO_RENEWABLE,
+            newStatus = SubscriptionStatus.EXPIRED,
+            planChanged = true,
+        )
+
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
 

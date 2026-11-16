@@ -109,6 +109,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
@@ -2575,6 +2576,24 @@ class RealSubscriptionsManagerTest {
         whenever(subscriptionsService.confirm(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
+    private suspend fun givenConfirmPurchaseReturnsNotActive() {
+        whenever(subscriptionsService.confirm(any())).thenReturn(
+            ConfirmationResponse(
+                email = "test@duck.com",
+                entitlements = listOf(),
+                subscription = SubscriptionResponse(
+                    productId = "id",
+                    billingPeriod = "Monthly",
+                    platform = "google",
+                    status = "Expired",
+                    startedAt = 1000000L,
+                    expiresOrRenewsAt = 1000000L,
+                    activeOffers = listOf(),
+                ),
+            ),
+        )
+    }
+
     private suspend fun givenConfirmPurchaseSucceeds() {
         whenever(subscriptionsService.confirm(any())).thenReturn(
             ConfirmationResponse(
@@ -3006,9 +3025,62 @@ class RealSubscriptionsManagerTest {
 
             assertEquals(AUTO_RENEWABLE, authRepository.getSubscription()?.status)
             verify(pixelSender, never()).reportPurchaseFailureBackend()
+            verify(subscriptionSwitchWideEvent).onSwitchConfirmationFailure("confirm_request_failed")
+            verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
 
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanConfirmReturnsNotActiveThenReportsSwitchConfirmationFailure() = runTest {
+        givenConfirmPurchaseReturnsNotActive()
+        givenV2AccessTokenRefreshSucceeds()
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+
+            verify(subscriptionSwitchWideEvent).onSwitchConfirmationFailure("confirm_not_active")
+            verify(subscriptionSwitchWideEvent, never()).onSwitchConfirmationSuccess()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataAndPlanChangedThenReportsPlanChangedToSwitchWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements()
+        subscriptionsManager.refreshSubscriptionData()
+        clearInvocations(subscriptionSwitchWideEvent)
+        givenSubscriptionSucceedsWithPendingPlans()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        verify(subscriptionSwitchWideEvent).onSubscriptionUpdated(
+            oldStatus = eq(AUTO_RENEWABLE),
+            newStatus = eq(AUTO_RENEWABLE),
+            planChanged = eq(true),
+        )
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataAndPlanUnchangedThenReportsPlanNotChangedToSwitchWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements()
+        subscriptionsManager.refreshSubscriptionData()
+        clearInvocations(subscriptionSwitchWideEvent)
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        verify(subscriptionSwitchWideEvent).onSubscriptionUpdated(
+            oldStatus = eq(AUTO_RENEWABLE),
+            newStatus = eq(AUTO_RENEWABLE),
+            planChanged = eq(false),
+        )
     }
 
     @Test
