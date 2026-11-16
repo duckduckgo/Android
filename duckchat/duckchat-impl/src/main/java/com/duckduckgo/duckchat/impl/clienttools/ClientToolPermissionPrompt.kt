@@ -16,8 +16,14 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 interface ClientToolPermissionPrompt {
@@ -29,6 +35,7 @@ data class ClientToolPermissionRequest(
     val origin: String,
     val toolName: String,
     val chatTabId: String,
+    val browserMode: BrowserMode,
     val copy: ClientToolPermissionMode.Ask,
 )
 
@@ -39,8 +46,35 @@ enum class ClientToolPermissionAnswer {
     DISMISSED,
 }
 
-/** Shows nothing, so an ASK tool without a remembered choice settles as cancelled. */
+/** A prompt waiting for the user. Only the first [answer] counts, and answers after it is withdrawn are ignored. */
+class PendingClientToolPermission(
+    val request: ClientToolPermissionRequest,
+    private val reply: CompletableDeferred<ClientToolPermissionAnswer>,
+) {
+    val isOpen: Boolean get() = !reply.isCompleted
+
+    fun answer(answer: ClientToolPermissionAnswer) {
+        reply.complete(answer)
+    }
+}
+
+/** Publishes the open prompt for [ClientToolPermissionDialogPresenter] to show; the gate keeps it to one at a time. */
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class NoUiClientToolPermissionPrompt @Inject constructor() : ClientToolPermissionPrompt {
-    override suspend fun request(request: ClientToolPermissionRequest): ClientToolPermissionAnswer = ClientToolPermissionAnswer.DISMISSED
+class PublishingClientToolPermissionPrompt @Inject constructor() : ClientToolPermissionPrompt {
+
+    private val _pending = MutableStateFlow<PendingClientToolPermission?>(null)
+    val pending: StateFlow<PendingClientToolPermission?> = _pending.asStateFlow()
+
+    override suspend fun request(request: ClientToolPermissionRequest): ClientToolPermissionAnswer {
+        val reply = CompletableDeferred<ClientToolPermissionAnswer>()
+        val prompt = PendingClientToolPermission(request, reply)
+        _pending.value = prompt
+        try {
+            return reply.await()
+        } finally {
+            reply.cancel()
+            _pending.compareAndSet(prompt, null)
+        }
+    }
 }
