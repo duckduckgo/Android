@@ -18,6 +18,7 @@ package com.duckduckgo.adblocking.impl.sponsorblock
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -30,6 +31,7 @@ import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.versionedset.VersionedSetDelta
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -88,12 +90,29 @@ class SponsorBlockDatasetWorker(context: Context, parameters: WorkerParameters) 
 }
 
 @ContributesIntoSet(scope = AppScope::class, binding = binding<MainProcessLifecycleObserver>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
 @SingleIn(AppScope::class)
-class SponsorBlockDatasetScheduler @Inject constructor(private val workManager: WorkManager) : MainProcessLifecycleObserver {
-    override fun onCreate(owner: LifecycleOwner) {
+class SponsorBlockDatasetScheduler @Inject constructor(
+    private val workManager: WorkManager,
+    private val feature: SponsorBlockFeature,
+) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
+    override fun onCreate(owner: LifecycleOwner) = schedule()
+
+    override fun onPrivacyConfigDownloaded() = schedule()
+
+    private fun schedule() {
+        if (!feature.mvpEnabled().isEnabled()) {
+            workManager.cancelUniqueWork(WORK_NAME)
+            return
+        }
         val request = PeriodicWorkRequestBuilder<SponsorBlockDatasetWorker>(24, TimeUnit.HOURS)
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
             .build()
-        workManager.enqueueUniquePeriodicWork("sponsor_block_dataset", ExistingPeriodicWorkPolicy.KEEP, request)
+        workManager.enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
+    }
+
+    companion object {
+        private const val WORK_NAME = "sponsor_block_dataset"
     }
 }
