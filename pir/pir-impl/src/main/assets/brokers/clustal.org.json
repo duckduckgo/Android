@@ -1,7 +1,7 @@
 {
   "name": "Clustal",
   "url": "clustal.org",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "addedDatetime": 1790913600000,
   "optOutUrl": "https://www.clustal.org/privacy-control/",
   "steps": [
@@ -15,23 +15,35 @@
           "id": "bdfd96e9-72f4-4a89-a377-d304f2bcdade"
         },
         {
+          "_comment": "Fails on Cloudflare's block page, so the wall is labelled in telemetry rather than reported as a missing search field.",
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": "#main-search"
+              "selector": "//title[not(contains(., 'Attention Required'))]"
+            }
+          ],
+          "id": "26e1fae5-ca2d-4665-9497-77854ad2eb06"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#header-search input[id$='-name']"
             }
           ],
           "id": "e3a50283-e652-4ca2-9b8d-449e3ed848ce"
         },
         {
           "actionType": "fillForm",
-          "selector": "#main-search form",
+          "_comment": "The header search, not #main-search: #main-search was not working on Android.",
+          "selector": "#header-search form",
           "dataSource": "userProfile",
           "elements": [
             {
               "type": "fullName",
-              "selector": "#main-search-field"
+              "selector": "#header-search input[id$='-name']"
             }
           ],
           "id": "fd5e8638-d83a-4141-9440-8f0cbef72fc8"
@@ -42,7 +54,7 @@
           "expectations": [
             {
               "type": "element",
-              "selector": "//input[@id='main-search-field']/following-sibling::div[contains(@class, 'input-dropdown') and contains(@class, 'visible')]//span"
+              "selector": "//div[@id='header-search']//input[contains(@id, '-name')]/following-sibling::div[contains(@class, 'input-dropdown') and contains(@class, 'visible')]//span"
             }
           ],
           "id": "6e28ea13-8562-4318-ac3a-a71f81923b80"
@@ -53,7 +65,7 @@
           "elements": [
             {
               "type": "button",
-              "selector": "(//input[@id='main-search-field']/following-sibling::div[contains(@class, 'input-dropdown')]//span)[1]"
+              "selector": "(//div[@id='header-search']//input[contains(@id, '-name')]/following-sibling::div[contains(@class, 'input-dropdown')]//span)[1]"
             }
           ],
           "id": "ffacdc89-8fed-4028-aec0-dee313127d37"
@@ -63,7 +75,7 @@
           "elements": [
             {
               "type": "button",
-              "selector": "#main-search button[type='submit']"
+              "selector": "#header-search button[type='submit']"
             }
           ],
           "id": "395a16f4-defd-485f-a48d-e2403d4a30f5"

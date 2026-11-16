@@ -1,7 +1,7 @@
 {
   "name": "Glad I Know",
   "url": "gladiknow.com",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "addedDatetime": 1789516800000,
   "optOutUrl": "https://gladiknow.com/opt-out",
   "steps": [
@@ -25,6 +25,12 @@
             }
           ],
           "id": "1b52a8d7-8f2c-4ea3-8046-3d9be5c1f228"
+        },
+        {
+          "_comment": "The removal form's select lists 19 states, but the search API answers for all of them. Add the rest so fillForm can pick the user's state.",
+          "actionType": "executeScript",
+          "script": "// Adds the states missing from gladiknow.com's removal form state select.\n// The select offers 19 states, but /api/optout/find returns records for any\n// state, so without this fillForm fails with \"could not find matching value\n// for select element\" for users everywhere else.\n//\n// Called as function (userProfile, root). The select is React-controlled and\n// its onChange reads event.target.value, so an added option is enough for\n// fillForm's change event to put the state into the search request.\n\nconst STATES = {\n  AL: \"Alabama\", AK: \"Alaska\", AZ: \"Arizona\", AR: \"Arkansas\", CA: \"California\",\n  CO: \"Colorado\", CT: \"Connecticut\", DE: \"Delaware\", DC: \"District Of Columbia\",\n  FL: \"Florida\", GA: \"Georgia\", HI: \"Hawaii\", ID: \"Idaho\", IL: \"Illinois\",\n  IN: \"Indiana\", IA: \"Iowa\", KS: \"Kansas\", KY: \"Kentucky\", LA: \"Louisiana\",\n  ME: \"Maine\", MD: \"Maryland\", MA: \"Massachusetts\", MI: \"Michigan\",\n  MN: \"Minnesota\", MS: \"Mississippi\", MO: \"Missouri\", MT: \"Montana\",\n  NE: \"Nebraska\", NV: \"Nevada\", NH: \"New Hampshire\", NJ: \"New Jersey\",\n  NM: \"New Mexico\", NY: \"New York\", NC: \"North Carolina\", ND: \"North Dakota\",\n  OH: \"Ohio\", OK: \"Oklahoma\", OR: \"Oregon\", PA: \"Pennsylvania\",\n  RI: \"Rhode Island\", SC: \"South Carolina\", SD: \"South Dakota\",\n  TN: \"Tennessee\", TX: \"Texas\", UT: \"Utah\", VT: \"Vermont\", VA: \"Virginia\",\n  WA: \"Washington\", WV: \"West Virginia\", WI: \"Wisconsin\", WY: \"Wyoming\",\n};\n\n// The removal form is the one with the success-styled submit button. The\n// header search form on the same page also has a select#state.\nfunction removalStateSelect() {\n  for (const form of root.querySelectorAll(\"form\")) {\n    if (form.querySelector(\"button.success\")) {\n      return form.querySelector(\"select#state\");\n    }\n  }\n  return null;\n}\n\nconst select = removalStateSelect();\nif (!select) throw new Error(\"removal form state select not found\");\n\nconst present = new Set([...select.options].map((option) => option.value));\nfor (const [code, name] of Object.entries(STATES)) {\n  if (present.has(code)) continue;\n  const option = root.createElement(\"option\");\n  option.value = code;\n  option.textContent = name;\n  select.appendChild(option);\n}\n",
+          "id": "6e808644-2811-4316-9f54-dd8d722695d7"
         },
         {
           "actionType": "fillForm",
@@ -72,7 +78,7 @@
           "id": "4e85db0a-bc5f-41d6-b379-6cae18f4c55b"
         },
         {
-          "_comment": "The location cell is a street address, so addressFull and not addressCityState.",
+          "_comment": "The location cell is a street address, so addressFull and not addressCityState. Rows have no link or id, and a hash identifier drops the street, so every namesake in one city would share one identifier. The location text as profileUrl gives each row its own.",
           "actionType": "extract",
           "selector": ".optout-record-item",
           "noResultsSelector": "//div[contains(@class, 'optout-status-error')]",
@@ -84,7 +90,7 @@
               "selector": ".//div[contains(@class, 'optout-record-location')]"
             },
             "profileUrl": {
-              "identifierType": "hash"
+              "selector": ".//div[contains(@class, 'optout-record-location')]"
             }
           },
           "id": "5f96ec1b-cd60-42e7-c48a-7dbf29a5d66c"
@@ -109,6 +115,12 @@
             }
           ],
           "id": "7b18ae3d-ef82-44a9-e6ac-9fbd4bc7f88e"
+        },
+        {
+          "_comment": "The removal form's select lists 19 states, but the search API answers for all of them. Add the rest so fillForm can pick the user's state.",
+          "actionType": "executeScript",
+          "script": "// Adds the states missing from gladiknow.com's removal form state select.\n// The select offers 19 states, but /api/optout/find returns records for any\n// state, so without this fillForm fails with \"could not find matching value\n// for select element\" for users everywhere else.\n//\n// Called as function (userProfile, root). The select is React-controlled and\n// its onChange reads event.target.value, so an added option is enough for\n// fillForm's change event to put the state into the search request.\n\nconst STATES = {\n  AL: \"Alabama\", AK: \"Alaska\", AZ: \"Arizona\", AR: \"Arkansas\", CA: \"California\",\n  CO: \"Colorado\", CT: \"Connecticut\", DE: \"Delaware\", DC: \"District Of Columbia\",\n  FL: \"Florida\", GA: \"Georgia\", HI: \"Hawaii\", ID: \"Idaho\", IL: \"Illinois\",\n  IN: \"Indiana\", IA: \"Iowa\", KS: \"Kansas\", KY: \"Kentucky\", LA: \"Louisiana\",\n  ME: \"Maine\", MD: \"Maryland\", MA: \"Massachusetts\", MI: \"Michigan\",\n  MN: \"Minnesota\", MS: \"Mississippi\", MO: \"Missouri\", MT: \"Montana\",\n  NE: \"Nebraska\", NV: \"Nevada\", NH: \"New Hampshire\", NJ: \"New Jersey\",\n  NM: \"New Mexico\", NY: \"New York\", NC: \"North Carolina\", ND: \"North Dakota\",\n  OH: \"Ohio\", OK: \"Oklahoma\", OR: \"Oregon\", PA: \"Pennsylvania\",\n  RI: \"Rhode Island\", SC: \"South Carolina\", SD: \"South Dakota\",\n  TN: \"Tennessee\", TX: \"Texas\", UT: \"Utah\", VT: \"Vermont\", VA: \"Virginia\",\n  WA: \"Washington\", WV: \"West Virginia\", WI: \"Wisconsin\", WY: \"Wyoming\",\n};\n\n// The removal form is the one with the success-styled submit button. The\n// header search form on the same page also has a select#state.\nfunction removalStateSelect() {\n  for (const form of root.querySelectorAll(\"form\")) {\n    if (form.querySelector(\"button.success\")) {\n      return form.querySelector(\"select#state\");\n    }\n  }\n  return null;\n}\n\nconst select = removalStateSelect();\nif (!select) throw new Error(\"removal form state select not found\");\n\nconst present = new Set([...select.options].map((option) => option.value));\nfor (const [code, name] of Object.entries(STATES)) {\n  if (present.has(code)) continue;\n  const option = root.createElement(\"option\");\n  option.value = code;\n  option.textContent = name;\n  select.appendChild(option);\n}\n",
+          "id": "2ceaf1f1-e49c-4249-a350-6e29c5dcea07"
         },
         {
           "_comment": "Re-search from userProfile. An extracted profile carries name as one string, so first and last name selectors fail against it.",
@@ -156,25 +168,18 @@
           "id": "ae4bd160-1cb5-47dc-b9df-2cced7f7cb11"
         },
         {
-          "_comment": "Remove only the user's row. The profile must mirror the scan's extract, addressFull included, or nothing matches.",
+          "_comment": "Mark the row this job's extracted profile came from. A profileMatch on the user profile scores every namesake in the city the same and always picks the first row.",
+          "actionType": "executeScript",
+          "dataSource": "extractedProfile",
+          "script": "// Marks the gladiknow.com result row this opt-out job is for, so the next\n// click removes that record and not the first namesake on the page.\n//\n// Called as function (userProfile, root) with dataSource: extractedProfile,\n// so userProfile is the matched profile. The page shows only name and\n// \"street, city, ST\" per row, so the scan stores the location text as the\n// profileUrl to give every row its own identifier. Newer C-S-S builds resolve\n// that text against the page URL; older builds keep it as raw text. Accept\n// both.\n\nconst MARK = \"data-pir-target\";\n\nfunction normalize(text) {\n  return (text || \"\").replace(/\\s+/g, \" \").trim().toLowerCase();\n}\n\n// The two forms the scan can have stored for a row's location text. The scan\n// reads innerText, which collapses the double spaces the page renders, so\n// collapse them here before resolving.\nfunction storedForms(locationText) {\n  const raw = locationText.replace(/\\s+/g, \" \").trim();\n  const forms = [normalize(raw)];\n  try {\n    forms.push(normalize(new URL(raw, root.location.href).href));\n  } catch (e) {\n    // Text that is not resolvable as a URL can only have been stored raw.\n  }\n  return forms;\n}\n\nconst target = normalize(userProfile && userProfile.profileUrl);\nif (!target) throw new Error(\"extracted profile has no profileUrl\");\n\nconst rows = [...root.querySelectorAll(\".optout-record-item\")];\nconst matches = rows.filter((row) => {\n  const location = row.querySelector(\".optout-record-location\");\n  return location && storedForms(location.textContent).includes(target);\n});\n\n// Clicking a guess would remove someone else's record, so fail instead.\nif (matches.length === 0) throw new Error(\"no result row matches the extracted profile\");\n\nmatches[0].setAttribute(MARK, \"true\");\n",
+          "id": "e9f83494-c266-482d-969c-2bf24ecd33b1"
+        },
+        {
           "actionType": "click",
           "elements": [
             {
               "type": "button",
-              "selector": "button.optout-record-remove-btn",
-              "parent": {
-                "profileMatch": {
-                  "selector": ".optout-record-item",
-                  "profile": {
-                    "name": {
-                      "selector": ".//div[contains(@class, 'optout-record-name')]"
-                    },
-                    "addressFull": {
-                      "selector": ".//div[contains(@class, 'optout-record-location')]"
-                    }
-                  }
-                }
-              }
+              "selector": "//div[contains(@class, 'optout-record-item')][@data-pir-target]//button[contains(@class, 'optout-record-remove-btn')]"
             }
           ],
           "id": "bf5ce271-2cd6-48ed-cae0-3ddef808dc22"
