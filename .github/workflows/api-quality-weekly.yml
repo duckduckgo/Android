@@ -12,8 +12,8 @@ on:
         default: false
 
 env:
-  # TODO: the launch baseline commit (full SHA). Every report also compares develop with it; empty skips that section.
-  API_QUALITY_BASELINE_SHA: ''
+  # The launch baseline commit (full SHA). Every report also compares develop with it; empty skips that section.
+  API_QUALITY_BASELINE_SHA: '39ec2e53ae4e2e5a76e889f11938e2d087261ebc'
   # Asana IDs for the posting script; see scripts/api-quality/README.md.
   GH_API_QUALITY_PROJECT_ID: ${{ vars.GH_API_QUALITY_PROJECT_ID }}
   GH_API_QUALITY_TRIAGE_SECTION_ID: ${{ vars.GH_API_QUALITY_TRIAGE_SECTION_ID }}
