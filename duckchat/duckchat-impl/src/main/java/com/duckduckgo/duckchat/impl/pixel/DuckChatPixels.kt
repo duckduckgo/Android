@@ -320,8 +320,8 @@ interface DuckChatPixels {
     fun fireNewChatShown(hasNewChatHints: Boolean)
 
     /**
-     * The first prompt sent from a New Chat counted by [fireNewChatShown]. [hintsShown] is whether hints showed in that New Chat,
-     * which the flag alone doesn't say once they're hidden by the cap. [hintTapped] is the last hint tapped before it.
+     * The first prompt sent from a New Chat counted by [fireNewChatShown]. [hintsShown] is whether hints showed at any point in that
+     * New Chat; false doesn't say why (capped, not eligible, or behind a promo throughout). [hintTapped] is the last hint tapped before it.
      */
     fun fireNewChatFirstPromptSent(
         hasNewChatHints: Boolean,
@@ -1458,9 +1458,11 @@ class RealDuckChatPixels @Inject constructor(
     override fun fireNewChatHintsShown(hints: List<NewChatHint>) {
         // A hint not shown reports position 0.
         val positions = NewChatHint.entries.associate { hint -> hint.positionParam() to (hints.indexOf(hint) + 1).toString() }
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN, parameters = positions)
-        }
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_COUNT,
+            DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_DAILY,
+            positions,
+        )
     }
 
     override fun fireNewChatHintTapped(hint: NewChatHint, position: Int) = fireCountAndDaily(
@@ -1851,7 +1853,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_NEW_CHAT_SHOWN_DAILY("aichat_new_chat_shown_daily"),
     DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT("aichat_new_chat_first_prompt_sent_count"),
     DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY("aichat_new_chat_first_prompt_sent_daily"),
-    DUCK_CHAT_NEW_CHAT_HINTS_SHOWN("aichat_new_chat_hints_shown"),
+    DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_COUNT("aichat_new_chat_hints_shown_count"),
+    DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_DAILY("aichat_new_chat_hints_shown_daily"),
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT("aichat_new_chat_hint_tapped_count"),
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY("aichat_new_chat_hint_tapped_daily"),
     DUCK_CHAT_NEW_CHAT_HINTS_CAP_REACHED("aichat_new_chat_hints_cap_reached"),

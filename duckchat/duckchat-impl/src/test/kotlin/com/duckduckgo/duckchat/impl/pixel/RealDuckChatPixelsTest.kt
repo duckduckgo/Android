@@ -1121,7 +1121,7 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun whenFireNewChatHintsShownThenFiredWithEachHintsSlotAndZeroForHidden() = runTest {
+    fun whenFireNewChatHintsShownThenCountAndDailyFiredWithEachHintsSlotAndZeroForHidden() = runTest {
         testee.fireNewChatHintsShown(listOf(NewChatHint.IMAGE_GENERATION, NewChatHint.DOCUMENTS))
 
         advanceUntilIdle()
@@ -1131,7 +1131,8 @@ class RealDuckChatPixelsTest {
             DuckChatPixelParameters.PHOTO_HINT_POSITION to "0",
             DuckChatPixelParameters.IMAGE_GENERATION_HINT_POSITION to "1",
         )
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
     }
 
     @Test

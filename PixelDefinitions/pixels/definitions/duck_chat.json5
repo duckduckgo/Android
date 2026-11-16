@@ -2066,7 +2066,7 @@
             {
                 "key": "hints_shown",
                 "type": "boolean",
-                "description": "Whether hints were shown in this New Chat before the prompt; false when the flag is on but hints are hidden (not eligible, capped, or behind a promo)"
+                "description": "Whether hints were shown at any point in this New Chat before the prompt; stays true if a promo hides them afterwards. False when hints were never shown (not eligible, capped, or behind a promo the whole time)"
             },
             {
                 "key": "hint_tapped",
@@ -2088,7 +2088,7 @@
         "description": "New Chat hints are shown above the Duck.ai input. Once per New Chat, with the slot of each hint.",
         "owners": ["karlenDimla"],
         "triggers": ["impression"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["first_daily_count", "form_factor"],
         "parameters": [
             "appVersion",
             {
