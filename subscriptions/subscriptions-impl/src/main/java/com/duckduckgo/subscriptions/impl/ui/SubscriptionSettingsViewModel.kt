@@ -104,6 +104,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private var withdrawalEligibilityRequested = false
     private var withdrawalInProgress = false
     private var undoCancellationInProgress = false
+    private var undoCancellationShownReported = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -143,6 +144,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
     fun onKeepSubscriptionClicked(activity: Activity) {
         if (undoCancellationInProgress) return
         undoCancellationInProgress = true
+        val isFreeTrial = (viewState.value as? Ready)?.activeOffers?.contains(ActiveOfferType.TRIAL) == true
+        pixelSender.reportSubscriptionSettingsUndoCancellationClick(isFreeTrial)
         viewModelScope.launch {
             if (subscriptionsManager.undoSubscriptionCancellation(activity) == UndoCancellationResult.NotEligible) {
                 undoCancellationInProgress = false
@@ -236,7 +239,14 @@ class SubscriptionSettingsViewModel @Inject constructor(
             ),
         )
 
+        reportUndoCancellationShownIfNeeded(subscription)
         loadWithdrawalOptionIfNeeded(subscription)
+    }
+
+    private fun reportUndoCancellationShownIfNeeded(subscription: Subscription) {
+        if (undoCancellationShownReported || !canUndoCancellation(subscription)) return
+        undoCancellationShownReported = true
+        pixelSender.reportSubscriptionSettingsUndoCancellationShown(subscription.activeOffers.contains(ActiveOfferType.TRIAL))
     }
 
     private fun completedWithdrawalState(success: WithdrawalResult.Success): CompletedWithdrawalState {
