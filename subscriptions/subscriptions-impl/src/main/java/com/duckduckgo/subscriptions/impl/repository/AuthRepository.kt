@@ -84,6 +84,9 @@ interface AuthRepository {
     suspend fun clearTokens()
     suspend fun isTokenStoreAvailable(): Boolean
     suspend fun hasRefreshTokenEntry(): Boolean
+    suspend fun getBackupRefreshToken(): BackupRefreshToken?
+    suspend fun saveBackupRefreshToken(backup: BackupRefreshToken): Boolean
+    suspend fun deleteBackupRefreshToken()
 }
 
 @BindingContainer
@@ -428,6 +431,36 @@ internal class RealAuthRepository constructor(
     override suspend fun hasRefreshTokenEntry(): Boolean = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.hasRefreshTokenV2Entry()
     }
+
+    override suspend fun getBackupRefreshToken(): BackupRefreshToken? = withContext(dispatcherProvider.io()) {
+        val jwt = subscriptionsDataStore.backupRefreshToken
+        val expiresAt = subscriptionsDataStore.backupRefreshTokenExpiresAt
+        val accountExternalId = subscriptionsDataStore.backupRefreshTokenExternalId
+        val issuedAt = subscriptionsDataStore.backupRefreshTokenIssuedAt
+        if (jwt == null || expiresAt == null || accountExternalId == null || issuedAt == null) {
+            null
+        } else {
+            BackupRefreshToken(
+                jwt = jwt,
+                expiresAt = expiresAt,
+                accountExternalId = accountExternalId,
+                issuedAt = issuedAt,
+            )
+        }
+    }
+
+    override suspend fun saveBackupRefreshToken(backup: BackupRefreshToken): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.saveBackupRefreshToken(
+            refreshToken = backup.jwt,
+            expiresAt = backup.expiresAt,
+            externalId = backup.accountExternalId,
+            issuedAt = backup.issuedAt,
+        )
+    }
+
+    override suspend fun deleteBackupRefreshToken() {
+        withContext(dispatcherProvider.io()) { subscriptionsDataStore.clearBackupRefreshToken() }
+    }
 }
 
 class TokenStoreException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
@@ -440,6 +473,13 @@ data class AccessToken(
 data class RefreshToken(
     val jwt: String,
     val expiresAt: Instant,
+)
+
+data class BackupRefreshToken(
+    val jwt: String,
+    val expiresAt: Instant,
+    val accountExternalId: String,
+    val issuedAt: Instant,
 )
 
 data class Account(

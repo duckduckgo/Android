@@ -40,6 +40,8 @@ import com.duckduckgo.subscriptions.impl.auth.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.AuthClient
 import com.duckduckgo.subscriptions.impl.auth.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth.BackupTokenManager
+import com.duckduckgo.subscriptions.impl.auth.BackupTokenState
 import com.duckduckgo.subscriptions.impl.auth.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth.PkceGeneratorImpl
@@ -174,6 +176,7 @@ class RealSubscriptionsManagerTest {
     private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
     private val crossProcessLock: CrossProcessLock = mock()
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
+    private val backupTokenManager: BackupTokenManager = mock()
     private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
@@ -205,6 +208,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
     }
 
@@ -1030,6 +1034,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.subscriptionStatus.test {
@@ -1067,6 +1072,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.subscriptionStatus.test {
@@ -1108,6 +1114,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1163,6 +1170,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1213,6 +1221,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1258,6 +1267,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1296,6 +1306,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1807,6 +1818,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
         manager.signOut()
         verify(mockRepo).clearTokens()
@@ -1858,6 +1870,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.subscriptionStatus.test {
@@ -2211,6 +2224,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -2342,6 +2356,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
         givenSubscriptionExists(status = INACTIVE)
         assertTrue(manager.entitlementSet.first().isEmpty())
@@ -2453,15 +2468,66 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenRefreshStartsThenStatusAndPlatformArePassedToWideEvent() = runTest {
-        givenUserIsSignedIn()
+    fun whenRefreshStartsThenStatusPlatformAndBackupStateArePassedToWideEvent() = runTest {
+        givenUserIsSignedIn(accountExternalId = "1234")
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshSucceeds()
+        whenever(backupTokenManager.getState(accountExternalId = "1234")).thenReturn(BackupTokenState.STALE)
 
         subscriptionsManager.getAccessToken()
 
-        verify(tokenRefreshWideEvent).onStart(subscriptionStatus = AUTO_RENEWABLE, subscriptionPlatform = "google")
+        verify(tokenRefreshWideEvent).onStart(
+            subscriptionStatus = AUTO_RENEWABLE,
+            subscriptionPlatform = "google",
+            backupTokenState = BackupTokenState.STALE,
+        )
+    }
+
+    @Test
+    fun whenRefreshSucceedsThenBackupMintIsRequestedWithTheSpentRefreshToken() = runTest {
+        givenUserIsSignedIn(accountExternalId = "1234")
+        givenAccessTokenIsExpired()
+        val spentRefreshToken = authRepository.getRefreshTokenV2()!!
+        givenV2AccessTokenRefreshSucceeds(newRefreshToken = "new refresh token")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(backupTokenManager).mintIfNeeded(spentRefreshToken = spentRefreshToken, accountExternalId = "1234")
+    }
+
+    @Test
+    fun whenRejectedRefreshTokenIsRecoveredThroughStoreLoginThenNoBackupMintIsRequested() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+
+        subscriptionsManager.getAccessToken()
+
+        verify(backupTokenManager, never()).mintIfNeeded(spentRefreshToken = any(), accountExternalId = any())
+    }
+
+    @Test
+    fun whenNewTokensFailToSaveThenNoBackupMintIsRequested() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds()
+        authDataStore.simulateTokenCommitFailure = true
+
+        subscriptionsManager.getAccessToken()
+
+        verify(backupTokenManager, never()).mintIfNeeded(spentRefreshToken = any(), accountExternalId = any())
+    }
+
+    @Test
+    fun whenSigningInThenBackupIsCheckedAgainstTheNewAccount() = runTest {
+        givenValidateV2TokensSucceeds()
+
+        subscriptionsManager.signInV2(accessToken = FAKE_ACCESS_TOKEN_V2, refreshToken = FAKE_REFRESH_TOKEN_V2)
+
+        verify(backupTokenManager).deleteIfAccountChanged(newAccountExternalId = "1234")
     }
 
     @Test
