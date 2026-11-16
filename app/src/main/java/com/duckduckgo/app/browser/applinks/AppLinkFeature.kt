@@ -34,13 +34,13 @@ interface AppLinkFeature {
      * When enabled, the user gesture of a main-frame form POST is carried through its redirects, so an app link
      * reached by the response is treated as user-initiated.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun gesturedPostNavigation(): Toggle
 
     /**
      * When enabled, the app that opened a regular (non Custom Tab) tab through a VIEW intent is a trusted caller,
      * so a user-initiated link back to it launches it directly.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun plainTabTrustedCaller(): Toggle
 }
