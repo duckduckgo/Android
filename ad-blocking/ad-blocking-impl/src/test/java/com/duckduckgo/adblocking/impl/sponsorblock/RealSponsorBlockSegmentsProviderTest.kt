@@ -52,7 +52,7 @@ class RealSponsorBlockSegmentsProviderTest {
         provider.getSegments(VIDEO_ID)
 
         assertEquals(listOf(VIDEO_ID_HASH_PREFIX), service.requestedPrefixes)
-        assertEquals(listOf(VIDEO_ID_HASH_PREFIX), gate.checkedPrefixes)
+        assertEquals(listOf("5f6b0b4e"), gate.checkedPrefixes)
     }
 
     @Test

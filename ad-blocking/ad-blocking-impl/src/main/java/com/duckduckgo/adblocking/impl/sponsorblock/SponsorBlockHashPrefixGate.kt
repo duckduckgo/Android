@@ -25,8 +25,7 @@ interface SponsorBlockHashPrefixGate {
     suspend fun hasSegments(hashPrefix: String): Boolean
 }
 
-// TODO: replace with a gate backed by the local hash prefix list.
 @ContributesBinding(AppScope::class)
-class AlwaysHitSponsorBlockHashPrefixGate @Inject constructor() : SponsorBlockHashPrefixGate {
-    override suspend fun hasSegments(hashPrefix: String): Boolean = true
+class RealSponsorBlockHashPrefixGate @Inject constructor(private val dao: SponsorBlockDatasetDao) : SponsorBlockHashPrefixGate {
+    override suspend fun hasSegments(hashPrefix: String): Boolean = dao.hasSegments(hashPrefix)
 }
