@@ -57,19 +57,23 @@ class RealClientToolsExecutor @Inject constructor(
     private val tools: PluginPoint<ClientTool>,
     private val permissionGate: ClientToolPermissionGate,
     private val duckAiHostProvider: DuckAiHostProvider,
+    private val browserToolsFeature: AiChatBrowserToolsFeature,
 ) : ClientToolsExecutor {
 
     override fun clientToolsConfig(
         pageUrl: String?,
         browserMode: BrowserMode,
     ): JSONObject? {
-        if (callerOrigin(pageUrl, browserMode) == null) return null
+        if (caller(pageUrl, browserMode) == null) return null
         val enabledTools = tools.getPlugins().filter { it.isEnabled() }
         if (enabledTools.isEmpty()) return null
 
         val capabilities = JSONArray()
         enabledTools.forEach { tool ->
             capabilities.put(JSONObject().put(NAME, tool.name).put(VERSION, tool.version))
+        }
+        if (isRequestAccessEnabled()) {
+            capabilities.put(JSONObject().put(NAME, RequestAccess.NAME).put(VERSION, RequestAccess.VERSION))
         }
         return JSONObject()
             .put(PROTOCOL_VERSION, CLIENT_TOOLS_PROTOCOL_VERSION)
@@ -83,16 +87,49 @@ class RealClientToolsExecutor @Inject constructor(
         browserMode: BrowserMode,
     ): JSONObject {
         val parsed = ParsedExecuteClientToolRequest.parse(params)
-        val origin = callerOrigin(pageUrl, browserMode) ?: return failureReply(parsed.callId, ClientToolErrorCode.UNAVAILABLE)
+        val caller = caller(pageUrl, browserMode) ?: return failureReply(parsed.callId, ClientToolErrorCode.UNAVAILABLE)
         val request = when (parsed) {
             is Malformed -> return failureReply(parsed.callId, ClientToolErrorCode.INVALID_ARGUMENTS)
             is Valid -> parsed.request
         }
-        return when (val result = run(request, ClientToolCallContext(chatTabId, browserMode, origin))) {
+        val context = ClientToolCallContext(chatTabId, browserMode, caller.origin, request.chatId ?: caller.pageChatId)
+        val result = if (request.name == RequestAccess.NAME) requestAccess(request, context) else run(request, context)
+        logcat {
+            val chatIdSource = when {
+                request.chatId != null -> "params"
+                caller.pageChatId != null -> "page"
+                else -> "none"
+            }
+            val outcome = if (result is ClientToolResult.Failure) result.code.wireName else "ok"
+            "Client tool ${request.name} replied $outcome, chat ID from $chatIdSource"
+        }
+        return when (result) {
             is ClientToolResult.Success -> JSONObject().put(CALL_ID, request.callId).put(OK, true).put(VALUE, result.value)
             is ClientToolResult.Failure -> failureReply(request.callId, result.code)
         }
     }
+
+    private suspend fun requestAccess(
+        request: ExecuteClientToolRequest,
+        context: ClientToolCallContext,
+    ): ClientToolResult {
+        if (!isRequestAccessEnabled() || request.version != RequestAccess.VERSION.toLong()) {
+            return ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE)
+        }
+        val names = RequestAccess.parseCapabilities(request.input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
+        val chatId = context.chatId ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
+        val enabledTools = tools.getPlugins().filter { it.isEnabled() }.associateBy { it.name }
+        return when (val decision = permissionGate.requestAccess(names.mapNotNull { enabledTools[it] }, chatId, context)) {
+            is ClientToolAccessDecision.Granted -> ClientToolResult.Success(JSONObject().put(GRANTED, JSONArray(decision.toolNames)))
+            ClientToolAccessDecision.Denied -> ClientToolResult.Failure(ClientToolErrorCode.DENIED)
+            ClientToolAccessDecision.Cancelled -> ClientToolResult.Failure(ClientToolErrorCode.CANCELLED)
+        }
+    }
+
+    private fun isRequestAccessEnabled(): Boolean =
+        browserToolsFeature.self().isEnabled() &&
+            browserToolsFeature.requestAccess().isEnabled() &&
+            tools.getPlugins().any { it.isEnabled() }
 
     private suspend fun run(
         request: ExecuteClientToolRequest,
@@ -125,16 +162,21 @@ class RealClientToolsExecutor @Inject constructor(
         permissionGate.cancelPending(chatTabId)
     }
 
-    /** The Duck.ai origin of the calling page, or null when the caller may not use client tools. */
-    private fun callerOrigin(
+    private data class Caller(
+        val origin: String,
+        val pageChatId: String?,
+    )
+
+    /** The calling Duck.ai page, or null when the caller may not use client tools. */
+    private fun caller(
         pageUrl: String?,
         browserMode: BrowserMode,
-    ): String? {
+    ): Caller? {
         if (browserMode == BrowserMode.FIRE) return null
         val url = pageUrl?.toHttpUrlOrNull() ?: return null
         if (url.host != duckAiHostProvider.getHost()) return null
         val port = if (url.port == HttpUrl.defaultPort(url.scheme)) "" else ":${url.port}"
-        return "${url.scheme}://${url.host}$port"
+        return Caller(origin = "${url.scheme}://${url.host}$port", pageChatId = url.queryParameter(CHAT_ID_QUERY)?.takeIf { it.isNotBlank() })
     }
 
     private fun failureReply(
@@ -157,5 +199,7 @@ class RealClientToolsExecutor @Inject constructor(
         const val VALUE = "value"
         const val ERROR = "error"
         const val CODE = "code"
+        const val GRANTED = "granted"
+        const val CHAT_ID_QUERY = "chatID"
     }
 }

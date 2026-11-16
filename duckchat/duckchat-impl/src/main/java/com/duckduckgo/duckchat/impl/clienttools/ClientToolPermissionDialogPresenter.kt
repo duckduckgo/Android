@@ -90,8 +90,21 @@ class ClientToolPermissionDialogPresenter @Inject constructor(
             .setRebrandUpdate(true)
             .setCancellable(true)
             .setHeaderImageResource(R.drawable.duck_ai_color_24)
-            .setTitle(pending.request.copy.promptTitle)
-            .setMessage(pending.request.copy.promptMessage)
+        when (val request = pending.request) {
+            is ClientToolPermissionRequest.RunTool ->
+                dialog
+                    .setTitle(request.tool.copy.promptTitle)
+                    .setMessage(request.tool.copy.promptMessage)
+            is ClientToolPermissionRequest.GrantAccess ->
+                dialog
+                    .setTitle(R.string.duckAiClientToolRequestAccessPromptTitle)
+                    .setMessage(
+                        request.tools.joinToString("\n") {
+                            activity.getString(R.string.duckAiClientToolRequestAccessPromptItem, activity.getString(it.copy.accessLabel))
+                        },
+                    )
+        }
+        dialog
             .setStackedButtons(BUTTONS.map { StackedButton(it.first, SECONDARY) })
             .addEventListener(
                 object : StackedAlertDialogBuilder.EventListener() {
@@ -114,9 +127,8 @@ class ClientToolPermissionDialogPresenter @Inject constructor(
         private const val BROWSER_ACTIVITY = "com.duckduckgo.app.browser.BrowserActivity"
 
         private val BUTTONS = listOf(
-            R.string.duckAiClientToolPromptAlwaysAllow to ClientToolPermissionAnswer.ALWAYS,
-            R.string.duckAiClientToolPromptAllowOnce to ClientToolPermissionAnswer.ALLOW_ONCE,
-            R.string.duckAiClientToolPromptNeverAllow to ClientToolPermissionAnswer.NEVER,
+            R.string.duckAiClientToolPromptAllowForChat to ClientToolPermissionAnswer.ALLOW_FOR_CHAT,
+            R.string.duckAiClientToolPromptDontAllow to ClientToolPermissionAnswer.DONT_ALLOW,
         )
 
         /** The pending prompt while its chat's tab is selected in the chat's mode, or null when nothing should be on screen. */

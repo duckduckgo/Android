@@ -41,21 +41,27 @@ interface ClientTool {
 sealed interface ClientToolPermissionMode {
     data object Auto : ClientToolPermissionMode
 
-    /** Asks the user before running, with the tool's own prompt copy. */
+    /**
+     * Asks the user before running, with the tool's own prompt copy.
+     * @param accessLabel the tool's short line in a prompt that asks for several tools at once.
+     */
     data class Ask(
         @StringRes val promptTitle: Int,
         @StringRes val promptMessage: Int,
+        @StringRes val accessLabel: Int,
     ) : ClientToolPermissionMode
 }
 
 /**
  * @param chatTabId the tab the chat belongs to: the Duck.ai tab itself, or the page tab hosting the contextual sheet.
  * @param origin the calling Duck.ai origin, such as `https://duck.ai`.
+ * @param chatId the Duck.ai conversation, or null when the page has not started one.
  */
 data class ClientToolCallContext(
     val chatTabId: String,
     val browserMode: BrowserMode,
     val origin: String,
+    val chatId: String?,
 )
 
 sealed interface ClientToolResult {

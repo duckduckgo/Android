@@ -33,6 +33,10 @@ interface AiChatBrowserToolsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun listOpenTabs(): Toggle
 
+    /** Advertises the `requestAccess` capability, which asks for several tools in one prompt. */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun requestAccess(): Toggle
+
     /** Only honoured in internal builds: lets ASK tools run without a permission prompt. */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun devSkipPermissionPrompt(): Toggle

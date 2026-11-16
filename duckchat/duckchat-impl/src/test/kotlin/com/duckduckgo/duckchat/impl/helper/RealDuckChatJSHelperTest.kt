@@ -45,6 +45,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
 import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
+import com.duckduckgo.duckchat.impl.clienttools.AiChatBrowserToolsFeature
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionDecision
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionGate
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientTool
@@ -169,6 +170,7 @@ class RealDuckChatJSHelperTest {
         tools = FakeClientToolPluginPoint(fakeClientTool),
         permissionGate = allowingPermissionGate,
         duckAiHostProvider = FakeDuckAiHostProvider(),
+        browserToolsFeature = FakeFeatureToggleFactory.create(AiChatBrowserToolsFeature::class.java),
     )
 
     private val testee = RealDuckChatJSHelper(

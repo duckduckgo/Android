@@ -46,6 +46,7 @@ class DuckAiClientToolsDevViewModel @Inject constructor(
     ) {
         BROWSER_TOOLS("aiChatBrowserTools", FlagGroup.GENERAL, { it.self() }),
         SKIP_PERMISSION_PROMPT("devSkipPermissionPrompt", FlagGroup.GENERAL, { it.devSkipPermissionPrompt() }),
+        REQUEST_ACCESS("requestAccess", FlagGroup.GENERAL, { it.requestAccess() }),
         LIST_OPEN_TABS("listOpenTabs", FlagGroup.TOOLS, { it.listOpenTabs() }),
     }
 

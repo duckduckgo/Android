@@ -45,9 +45,9 @@ class PublishingClientToolPermissionPromptTest {
         val answer = async { testee.request(REQUEST) }
         runCurrent()
 
-        testee.pending.value!!.answer(ClientToolPermissionAnswer.ALWAYS)
+        testee.pending.value!!.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
 
-        assertEquals(ClientToolPermissionAnswer.ALWAYS, answer.await())
+        assertEquals(ClientToolPermissionAnswer.ALLOW_FOR_CHAT, answer.await())
         assertNull(testee.pending.value)
     }
 
@@ -57,10 +57,10 @@ class PublishingClientToolPermissionPromptTest {
         runCurrent()
         val pending = testee.pending.value!!
 
-        pending.answer(ClientToolPermissionAnswer.NEVER)
-        pending.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        pending.answer(ClientToolPermissionAnswer.DONT_ALLOW)
+        pending.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
 
-        assertEquals(ClientToolPermissionAnswer.NEVER, answer.await())
+        assertEquals(ClientToolPermissionAnswer.DONT_ALLOW, answer.await())
     }
 
     @Test
@@ -74,7 +74,7 @@ class PublishingClientToolPermissionPromptTest {
 
         assertNull(testee.pending.value)
         assertFalse(pending.isOpen)
-        pending.answer(ClientToolPermissionAnswer.ALWAYS)
+        pending.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
         assertTrue(answer.isCancelled)
     }
 
@@ -82,7 +82,7 @@ class PublishingClientToolPermissionPromptTest {
     fun whenNextRequestArrivesThenItReplacesTheSettledOne() = runTest {
         val first = async { testee.request(REQUEST) }
         runCurrent()
-        testee.pending.value!!.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        testee.pending.value!!.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
         first.await()
 
         val second = async { testee.request(REQUEST.copy(chatTabId = "other")) }
@@ -93,12 +93,10 @@ class PublishingClientToolPermissionPromptTest {
     }
 
     private companion object {
-        val REQUEST = ClientToolPermissionRequest(
-            origin = "https://duck.ai",
-            toolName = "listOpenTabs",
+        val REQUEST = ClientToolPermissionRequest.RunTool(
             chatTabId = "chat",
             browserMode = BrowserMode.REGULAR,
-            copy = ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2),
+            tool = AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, accessLabel = 3)),
         )
     }
 }
