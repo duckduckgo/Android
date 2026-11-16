@@ -4,7 +4,7 @@
         "owners": ["lmac012", "Kyriakos-Georgiopoulos"],
         "meta": {
             "type": "android-auth-token-refresh",
-            "version": "1.4"
+            "version": "1.5"
         },
         "feature": {
             "name": "auth-token-refresh",
@@ -35,6 +35,11 @@
                         "type": "string",
                         "description": "State of the backup refresh token when the refresh started. 'none' means no backup is stored, 'ok' a backup the app can use, 'stale' a usable backup older than 14 days that is due for renewal, 'expired' a backup past its expiry, 'other_account' a backup that belongs to a different account, 'flag_off' that the backup feature is disabled. Only the main process reads the backup, so the field is absent in every other process. It is also absent in the main process when the token store could not be read, which process_name tells apart.",
                         "enum": ["none", "ok", "stale", "expired", "other_account", "flag_off"]
+                    },
+                    "backup_recovery_result": {
+                        "type": "string",
+                        "description": "What the backup refresh token gave after the backend rejected the main refresh token. 'not_available' means there was no backup the app could use, so it was not sent. 'rejected' means the backend refused the backup, or answered with tokens the app could not accept, and the backup was deleted. 'network_error' means the call did not complete or the backend had an outage, and the backup was kept for the next refresh. 'recovered' means the backup returned a new token pair.",
+                        "enum": ["not_available", "rejected", "network_error", "recovered"]
                     },
                     "verified_install": {
                         "type": "string",
@@ -104,8 +109,8 @@
                     },
                     "recovery_strategy": {
                         "type": "string",
-                        "description": "How the app tried to recover the session after the backend rejected the refresh token. Only present when a recovery ran.",
-                        "enum": ["play_login"]
+                        "description": "How the app tried to recover the session after the backend rejected the refresh token. 'backup_token' means the backup refresh token decided the outcome, 'play_login' the Play store login fallback. Only present when a recovery ran.",
+                        "enum": ["backup_token", "play_login"]
                     },
                     "recovery_outcome": {
                         "type": "string",
@@ -212,6 +217,11 @@
                     "step.token_validation": {
                         "type": "string",
                         "description": "true if the newly fetched tokens passed validation, false if either token failed it. See token_validation_failed_token and token_validation_failure_reason.",
+                        "enum": ["true", "false"]
+                    },
+                    "step.backup_recovery": {
+                        "type": "string",
+                        "description": "true if the backup refresh token recovered the session, false if it did not; see backup_recovery_result",
                         "enum": ["true", "false"]
                     },
                     "step.play_login": {
