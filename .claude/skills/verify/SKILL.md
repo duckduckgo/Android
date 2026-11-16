@@ -122,6 +122,12 @@ $V t shot search-loaded.png        # waits for the UI to settle; writes a .json 
 $V t record stop
 ```
 
+`shot` waits for 200 ms without a redraw. A screen that never stops drawing (a spinner behind a
+permission prompt, a looping animation) fails with `notReady: probe did not pass: DrawQuiet(ms=200)`
+(exit 10) and writes no file, so an older file of the same name stays behind. Take those with
+`$V t shot --unsettled <name>.png`; its sidecar records `"readiness": "interactive"`. Never discard
+`shot`'s output: check its exit code, or a missing screenshot goes unnoticed.
+
 For flows made only of trapdoor commands, `$V t proof <name> -- <cmd> --then <cmd> ...` does the same in
 one go: a screenshot per step, a video, and a README of step results. `--baseline <earlier proof>` adds
 screenshot comparisons against a previous run, and `--theme dark --font-scale 1.3 --language de` before

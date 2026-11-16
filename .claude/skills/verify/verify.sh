@@ -12,7 +12,8 @@ EMULATOR="$SDK/emulator/emulator"
 export JAVA_HOME="${JAVA_HOME_21:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}"
 export PATH="$JAVA_HOME/bin:$HOME/.local/bin:$SDK/platform-tools:$PATH"
 
-PKG="com.duckduckgo.mobile.android.debug"
+# DDG_TRAPDOOR_PACKAGE=com.duckduckgo.dev.android drives a build made with the subscriptions staging patch.
+PKG="${DDG_TRAPDOOR_PACKAGE:-com.duckduckgo.mobile.android.debug}"
 APK_DIR="$REPO/app/build/outputs/apk/internal/debug"
 VERIFY_ROOT="$REPO/build/verify"
 STATE="$VERIFY_ROOT/state"
