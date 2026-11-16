@@ -27,6 +27,7 @@ import com.duckduckgo.subscriptions.impl.wideevents.BillingFlowInitFailureContex
 import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionUndoCancellationWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -37,6 +38,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -57,6 +59,7 @@ class RealPlayBillingManagerTest {
     private lateinit var processLifecycleOwner: TestLifecycleOwner
 
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
+    private val subscriptionUndoCancellationWideEvent: SubscriptionUndoCancellationWideEvent = mock()
 
     private val subject = RealPlayBillingManager(
         coroutineScope = coroutineRule.testScope,
@@ -65,6 +68,7 @@ class RealPlayBillingManagerTest {
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         subscriptionPurchaseWideEvent = subscriptionPurchaseWideEvent,
         subscriptionSwitchWideEvent = subscriptionSwitchWideEvent,
+        subscriptionUndoCancellationWideEvent = subscriptionUndoCancellationWideEvent,
     )
 
     @Before
@@ -441,7 +445,7 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
-    fun `when launch cancellation undo flow then replaces old purchase with base plan without proration or metrics`() = runTest {
+    fun `when launch cancellation undo flow then replaces old purchase without proration and reports undo wide event`() = runTest {
         processLifecycleOwner.currentState = RESUMED
         billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
 
@@ -467,8 +471,29 @@ class RealPlayBillingManagerTest {
             replacementMode = SubscriptionReplacementMode.WITHOUT_PRORATION,
         )
         billingClientAdapter.verifyLaunchBillingFlowNotInvoked()
+        verify(subscriptionUndoCancellationWideEvent).onBillingFlowInitSuccess()
         verify(subscriptionPurchaseWideEvent, never()).onBillingFlowInitSuccess()
         verify(subscriptionSwitchWideEvent, never()).onBillingFlowInitSuccess()
+    }
+
+    @Test
+    fun `when cancellation undo flow fails to launch then reports undo wide event init failure`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure(error = BILLING_UNAVAILABLE)
+
+        subject.purchaseState.test {
+            subject.launchCancellationUndoFlow(
+                activity = mock(),
+                planId = MONTHLY_PLAN_US,
+                externalId = "external_id",
+                oldPurchaseToken = "old_purchase_token",
+            )
+            awaitItem()
+        }
+
+        verify(subscriptionUndoCancellationWideEvent).onBillingFlowInitFailure("BILLING_UNAVAILABLE")
+        verify(subscriptionPurchaseWideEvent, never()).onBillingFlowInitFailure(any(), anyOrNull())
+        verify(subscriptionSwitchWideEvent, never()).onBillingFlowInitFailure(any())
     }
 
     @Test

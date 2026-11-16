@@ -46,6 +46,7 @@ import com.duckduckgo.subscriptions.impl.wideevents.BillingFlowInitFailureContex
 import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionUndoCancellationWideEvent
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -133,6 +134,7 @@ class RealPlayBillingManager @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
+    private val subscriptionUndoCancellationWideEvent: SubscriptionUndoCancellationWideEvent,
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private val connectionMutex = Mutex()
@@ -342,7 +344,7 @@ class RealPlayBillingManager @Inject constructor(
         if (oldPurchaseToken.isEmpty()) {
             val errorMessage = "empty old purchase token"
             logcat { "Billing: $errorMessage" }
-            if (flowType == BillingFlowType.PLAN_SWITCH) subscriptionSwitchWideEvent.onBillingFlowInitFailure(errorMessage)
+            reportReplacementFlowInitFailure(flowType, errorMessage)
             emitLaunchFailure(errorMessage)
             return@withContext
         }
@@ -359,7 +361,7 @@ class RealPlayBillingManager @Inject constructor(
         if (productDetails == null || offerToken == null) {
             val errorMessage = "Missing product details"
             logcat { "Billing: $errorMessage" }
-            if (flowType == BillingFlowType.PLAN_SWITCH) subscriptionSwitchWideEvent.onBillingFlowInitFailure(errorMessage)
+            reportReplacementFlowInitFailure(flowType, errorMessage)
             emitLaunchFailure(errorMessage)
             return@withContext
         }
@@ -375,13 +377,13 @@ class RealPlayBillingManager @Inject constructor(
 
         when (launchBillingFlowResult) {
             LaunchBillingFlowResult.Success -> {
-                if (flowType == BillingFlowType.PLAN_SWITCH) subscriptionSwitchWideEvent.onBillingFlowInitSuccess()
+                reportReplacementFlowInitSuccess(flowType)
                 _purchaseState.emit(InProgress)
                 billingFlowInProgress = true
             }
 
             is LaunchBillingFlowResult.Failure -> {
-                if (flowType == BillingFlowType.PLAN_SWITCH) subscriptionSwitchWideEvent.onBillingFlowInitFailure(launchBillingFlowResult.error.name)
+                reportReplacementFlowInitFailure(flowType, launchBillingFlowResult.error.name)
                 emitLaunchFailure(launchBillingFlowResult.error.name)
             }
         }
@@ -390,6 +392,25 @@ class RealPlayBillingManager @Inject constructor(
     private suspend fun emitLaunchFailure(error: String) {
         currentFlowType = BillingFlowType.PURCHASE
         _purchaseState.emit(PurchaseState.Failure(error))
+    }
+
+    private suspend fun reportReplacementFlowInitSuccess(flowType: BillingFlowType) {
+        when (flowType) {
+            BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onBillingFlowInitSuccess()
+            BillingFlowType.CANCELLATION_UNDO -> subscriptionUndoCancellationWideEvent.onBillingFlowInitSuccess()
+            BillingFlowType.PURCHASE -> Unit
+        }
+    }
+
+    private suspend fun reportReplacementFlowInitFailure(
+        flowType: BillingFlowType,
+        error: String,
+    ) {
+        when (flowType) {
+            BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onBillingFlowInitFailure(error)
+            BillingFlowType.CANCELLATION_UNDO -> subscriptionUndoCancellationWideEvent.onBillingFlowInitFailure(error)
+            BillingFlowType.PURCHASE -> Unit
+        }
     }
 
     private fun onPurchasesUpdated(result: PurchasesUpdateResult) {
