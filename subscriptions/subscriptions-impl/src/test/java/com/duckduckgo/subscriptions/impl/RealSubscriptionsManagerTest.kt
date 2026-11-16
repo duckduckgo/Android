@@ -2970,7 +2970,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchSubscriptionUpdate(any(), any(), any(), anyOrNull(), any(), any())
     }
 
     @Test
@@ -2983,7 +2983,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchSubscriptionUpdate(any(), any(), any(), anyOrNull(), any(), any())
     }
 
     @Test
@@ -2996,7 +2996,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchSubscriptionUpdate(any(), any(), any(), anyOrNull(), any(), any())
     }
 
     @Test
@@ -3009,7 +3009,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchSubscriptionUpdate(any(), any(), any(), anyOrNull(), any(), any())
     }
 
     @Test
@@ -3022,7 +3022,7 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchSubscriptionUpdate(any(), any(), any(), anyOrNull(), any(), any())
     }
 
     @Test
@@ -3035,11 +3035,11 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.NotEligible, result)
-        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchSubscriptionUpdate(any(), any(), any(), anyOrNull(), any(), any())
     }
 
     @Test
-    fun whenUndoCancellationAndEligibleThenLaunchesBillingFlowForBasePlan() = runTest {
+    fun whenUndoCancellationAndEligibleThenReplacesCancelledPurchaseWithoutProration() = runTest {
         givenUndoSubscriptionCancellationEnabled(true)
         givenUserIsSignedIn()
         givenCancelledGoogleSubscription()
@@ -3048,12 +3048,15 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.undoSubscriptionCancellation(mock())
 
         assertEquals(UndoCancellationResult.Launched, result)
-        verify(playBillingManager).launchBillingFlow(
+        verify(playBillingManager).launchSubscriptionUpdate(
             activity = any(),
-            planId = eq(MONTHLY_PLAN_US),
+            newPlanId = eq(MONTHLY_PLAN_US),
             externalId = eq("1234"),
-            offerId = isNull(),
+            newOfferId = isNull(),
+            oldPurchaseToken = eq("owned_purchase_token"),
+            replacementMode = eq(SubscriptionReplacementMode.WITHOUT_PRORATION),
         )
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -3344,6 +3347,7 @@ class RealSubscriptionsManagerTest {
         val purchase: Purchase = mock {
             whenever(it.products).thenReturn(listOf(product))
             whenever(it.accountIdentifiers).thenReturn(identifiers)
+            whenever(it.purchaseToken).thenReturn("owned_purchase_token")
         }
         whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Present(purchase))
     }

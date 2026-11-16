@@ -544,28 +544,26 @@ class RealSubscriptionsManager @Inject constructor(
                 return@withContext UndoCancellationResult.NotEligible
             }
 
-            val ownsPurchase = when (val latestPurchase = playBillingManager.getLatestPurchase()) {
-                is LatestPurchaseResult.Present -> {
-                    val purchase = latestPurchase.purchase
+            val ownedPurchase = (playBillingManager.getLatestPurchase() as? LatestPurchaseResult.Present)
+                ?.purchase
+                ?.takeIf { purchase ->
                     purchase.products.contains(SubscriptionTier.fromPlanId(subscription.productId).productId) &&
                         purchase.accountIdentifiers?.obfuscatedAccountId == account.externalId
                 }
-                else -> false
-            }
-            if (!ownsPurchase) {
-                return@withContext UndoCancellationResult.NotEligible
-            }
+                ?: return@withContext UndoCancellationResult.NotEligible
 
             pendingOnboardingEnrollmentIsFreeTrial = null
             isPlanSwitchPending = false
             isCancellationUndoPending = true
 
             withContext(dispatcherProvider.main()) {
-                playBillingManager.launchBillingFlow(
+                playBillingManager.launchSubscriptionUpdate(
                     activity = activity,
-                    planId = subscription.productId,
+                    newPlanId = subscription.productId,
                     externalId = account.externalId,
-                    offerId = null,
+                    newOfferId = null,
+                    oldPurchaseToken = ownedPurchase.purchaseToken,
+                    replacementMode = SubscriptionReplacementMode.WITHOUT_PRORATION,
                 )
             }
             UndoCancellationResult.Launched
