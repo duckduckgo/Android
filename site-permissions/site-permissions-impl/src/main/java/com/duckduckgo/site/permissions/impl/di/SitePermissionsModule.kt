@@ -24,6 +24,7 @@ import com.duckduckgo.site.permissions.store.ALL_MIGRATIONS
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
+import com.duckduckgo.site.permissions.store.clienttools.ClientToolPermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import dev.zacsweers.metro.BindingContainer
@@ -55,6 +56,12 @@ object SitePermissionsModule {
     @SingleIn(AppScope::class)
     fun providesSitePermissionsAllowedDao(sitePermissionsDatabase: SitePermissionsDatabase): SitePermissionsAllowedDao {
         return sitePermissionsDatabase.sitePermissionsAllowedDao()
+    }
+
+    @Provides
+    @SingleIn(AppScope::class)
+    fun providesClientToolPermissionsDao(sitePermissionsDatabase: SitePermissionsDatabase): ClientToolPermissionsDao {
+        return sitePermissionsDatabase.clientToolPermissionsDao()
     }
 
     @Provides
