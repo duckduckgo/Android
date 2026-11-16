@@ -20,9 +20,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class RealNetPExclusionListRepositoryTest {
@@ -183,7 +181,7 @@ class RealNetPExclusionListRepositoryTest {
 
         repository.isExcluded("com.a.app")
 
-        verify(packageManager, never()).getInstalledApplications(any<Int>())
+        verifyNoInteractions(packageManager)
     }
 
     private fun newAppInfo(
