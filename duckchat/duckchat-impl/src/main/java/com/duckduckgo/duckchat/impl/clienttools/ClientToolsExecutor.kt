@@ -26,6 +26,7 @@ import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
@@ -46,6 +47,9 @@ interface ClientToolsExecutor {
         chatTabId: String,
         browserMode: BrowserMode,
     ): JSONObject
+
+    /** Settles the calls of [chatTabId] still waiting for a permission decision as `cancelled`, so their tools never run. */
+    fun cancelPendingCalls(chatTabId: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -59,7 +63,7 @@ class RealClientToolsExecutor @Inject constructor(
         pageUrl: String?,
         browserMode: BrowserMode,
     ): JSONObject? {
-        if (!isCallerAllowed(pageUrl, browserMode)) return null
+        if (callerOrigin(pageUrl, browserMode) == null) return null
         val enabledTools = tools.getPlugins().filter { it.isEnabled() }
         if (enabledTools.isEmpty()) return null
 
@@ -79,14 +83,12 @@ class RealClientToolsExecutor @Inject constructor(
         browserMode: BrowserMode,
     ): JSONObject {
         val parsed = ParsedExecuteClientToolRequest.parse(params)
-        if (!isCallerAllowed(pageUrl, browserMode)) {
-            return failureReply(parsed.callId, ClientToolErrorCode.UNAVAILABLE)
-        }
+        val origin = callerOrigin(pageUrl, browserMode) ?: return failureReply(parsed.callId, ClientToolErrorCode.UNAVAILABLE)
         val request = when (parsed) {
             is Malformed -> return failureReply(parsed.callId, ClientToolErrorCode.INVALID_ARGUMENTS)
             is Valid -> parsed.request
         }
-        return when (val result = run(request, ClientToolCallContext(chatTabId, browserMode))) {
+        return when (val result = run(request, ClientToolCallContext(chatTabId, browserMode, origin))) {
             is ClientToolResult.Success -> JSONObject().put(CALL_ID, request.callId).put(OK, true).put(VALUE, result.value)
             is ClientToolResult.Failure -> failureReply(request.callId, result.code)
         }
@@ -103,8 +105,11 @@ class RealClientToolsExecutor @Inject constructor(
         if (!tool.isValidInput(request.input)) {
             return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
         }
-        if (permissionGate.decide(tool, context) == ClientToolPermissionDecision.DENIED) {
-            return ClientToolResult.Failure(ClientToolErrorCode.DENIED)
+        when (permissionGate.decide(tool, context)) {
+            ClientToolPermissionDecision.DENIED -> return ClientToolResult.Failure(ClientToolErrorCode.DENIED)
+            ClientToolPermissionDecision.CANCELLED -> return ClientToolResult.Failure(ClientToolErrorCode.CANCELLED)
+            // Remote config can turn the tool off while its prompt is open.
+            ClientToolPermissionDecision.ALLOWED -> if (!tool.isEnabled()) return ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE)
         }
         return try {
             tool.execute(request.input, context)
@@ -116,10 +121,21 @@ class RealClientToolsExecutor @Inject constructor(
         }
     }
 
-    private fun isCallerAllowed(
+    override fun cancelPendingCalls(chatTabId: String) {
+        permissionGate.cancelPending(chatTabId)
+    }
+
+    /** The Duck.ai origin of the calling page, or null when the caller may not use client tools. */
+    private fun callerOrigin(
         pageUrl: String?,
         browserMode: BrowserMode,
-    ): Boolean = browserMode != BrowserMode.FIRE && pageUrl?.toHttpUrlOrNull()?.host == duckAiHostProvider.getHost()
+    ): String? {
+        if (browserMode == BrowserMode.FIRE) return null
+        val url = pageUrl?.toHttpUrlOrNull() ?: return null
+        if (url.host != duckAiHostProvider.getHost()) return null
+        val port = if (url.port == HttpUrl.defaultPort(url.scheme)) "" else ":${url.port}"
+        return "${url.scheme}://${url.host}$port"
+    }
 
     private fun failureReply(
         callId: String?,
