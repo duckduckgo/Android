@@ -378,8 +378,6 @@ interface DeviceShieldPixels {
     fun reportVpnSnoozedStarted()
     fun reportVpnSnoozedEnded()
 
-    fun reportMotoGFix()
-
     fun reportVpnStartAttempt()
 
     fun reportVpnStartAttemptSuccess()
@@ -831,10 +829,6 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportVpnSnoozedEnded() {
         tryToFireDailyPixel(DeviceShieldPixelNames.VPN_SNOOZE_ENDED_DAILY)
         firePixel(DeviceShieldPixelNames.VPN_SNOOZE_ENDED)
-    }
-
-    override fun reportMotoGFix() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_MOTO_G_FIX_DAILY)
     }
 
     override fun reportVpnStartAttempt() {
