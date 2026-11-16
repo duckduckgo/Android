@@ -47,6 +47,7 @@ import com.duckduckgo.subscriptions.impl.auth.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.AuthClient
 import com.duckduckgo.subscriptions.impl.auth.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth.BackupTokenManager
 import com.duckduckgo.subscriptions.impl.auth.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth.RefreshTokenClaims
@@ -309,6 +310,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler,
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
+    private val backupTokenManager: BackupTokenManager,
 ) : SubscriptionsManager {
     private val moshi = Moshi.Builder().build()
     private val adapter = moshi.adapter(ResponseError::class.java)
@@ -874,6 +876,7 @@ class RealSubscriptionsManager @Inject constructor(
                     tokenRefreshWideEvent.onStart(
                         subscriptionStatus = subscriptionStatus(),
                         subscriptionPlatform = authRepository.getSubscription()?.platform,
+                        backupTokenState = backupTokenManager.getState(accountExternalId = authRepository.getAccount()?.externalId),
                     )
 
                     val lockResult = crossProcessLock.acquire(TOKEN_REFRESH_LOCK_KEY)
@@ -916,6 +919,7 @@ class RealSubscriptionsManager @Inject constructor(
             throw TokenStoreException("Refresh token could not be read")
         }
         tokenRefreshWideEvent.onTokenRead()
+        var backendAcceptedRefreshToken = true
 
         /*
             Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
@@ -934,6 +938,7 @@ class RealSubscriptionsManager @Inject constructor(
                 onRefreshTokenInvalid = tokenRefreshWideEvent::onRefreshTokenValidationFailed,
             ).also { tokenRefreshWideEvent.onTokensValidated() }
         } catch (e: HttpException) {
+            backendAcceptedRefreshToken = false
             val parsedError = parseError(e)
                 ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it.error, backendErrorCode = it.errorCode) }
             val backendErrorResponse = parsedError?.error
@@ -1003,6 +1008,9 @@ class RealSubscriptionsManager @Inject constructor(
             throw e
         }
         tokenRefreshWideEvent.onTokensSaved()
+        if (backendAcceptedRefreshToken) {
+            backupTokenManager.mintIfNeeded(spentRefreshToken = refreshToken, accountExternalId = newTokens.accessTokenClaims.accountExternalId)
+        }
         return AccessToken(newTokens.accessToken, newTokens.accessTokenClaims.expiresAt)
     }
 
@@ -1103,6 +1111,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun saveTokens(tokens: ValidatedTokenPair) = with(tokens) {
         try {
+            backupTokenManager.deleteIfAccountChanged(newAccountExternalId = accessTokenClaims.accountExternalId)
             val saved = try {
                 authRepository.saveTokensV2(
                     accessToken = AccessToken(accessToken, accessTokenClaims.expiresAt),

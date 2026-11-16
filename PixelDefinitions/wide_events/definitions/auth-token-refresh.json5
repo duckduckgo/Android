@@ -4,7 +4,7 @@
         "owners": ["lmac012", "Kyriakos-Georgiopoulos"],
         "meta": {
             "type": "android-auth-token-refresh",
-            "version": "1.3"
+            "version": "1.4"
         },
         "feature": {
             "name": "auth-token-refresh",
@@ -30,6 +30,11 @@
                         "type": "string",
                         "description": "App process that last refreshed the token pair successfully on this device, as recorded in the shared token store. 'unknown' before the first successful refresh since sign-in. Compared with process_name it shows which process rotated the token a failing process still holds.",
                         "enum": ["main", ":vpn", ":pir", ":autofill", ":fire", "unknown"]
+                    },
+                    "backup_token_state": {
+                        "type": "string",
+                        "description": "State of the backup refresh token when the refresh started. 'none' means no backup is stored, 'ok' a backup the app can use, 'stale' a usable backup older than 14 days that is due for renewal, 'expired' a backup past its expiry, 'other_account' a backup that belongs to a different account, 'flag_off' that the backup feature is disabled. Only the main process reads the backup, so the field is absent in every other process. It is also absent in the main process when the token store could not be read, which process_name tells apart.",
+                        "enum": ["none", "ok", "stale", "expired", "other_account", "flag_off"]
                     },
                     "verified_install": {
                         "type": "string",
