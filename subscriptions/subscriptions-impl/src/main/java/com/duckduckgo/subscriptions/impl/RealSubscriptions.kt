@@ -428,7 +428,7 @@ interface SubscriptionsFeature {
     fun stripeTierOptionsByCountry(): Toggle
 
     /**
-     * When enabled, Play subscribers can undo a cancellation
+     * When enabled, Play subscribers see an option to undo a cancellation
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun undoSubscriptionCancellation(): Toggle

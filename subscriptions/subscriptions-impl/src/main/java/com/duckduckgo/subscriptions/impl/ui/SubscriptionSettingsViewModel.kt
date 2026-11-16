@@ -126,7 +126,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
-    // Cancelling or restoring in Play happens outside the app, so the cached status can be stale
     private suspend fun refreshIfCancelled() {
         val subscription = subscriptionsManager.getSubscription() ?: return
         if (!canUndoCancellation(subscription)) return

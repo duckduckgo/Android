@@ -544,7 +544,6 @@ class RealSubscriptionsManager @Inject constructor(
                 return@withContext UndoCancellationResult.NotEligible
             }
 
-            // Buying from a Play account that doesn't own the subscription would start a second paid one
             val ownsPurchase = when (val latestPurchase = playBillingManager.getLatestPurchase()) {
                 is LatestPurchaseResult.Present -> {
                     val purchase = latestPurchase.purchase
