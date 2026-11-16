@@ -273,6 +273,8 @@ class DuckChatContextualWebViewFragment :
             }
 
             it.webViewClient = webViewClient
+            // A reload or a new page ends the chat that asked, so its waiting tool calls must not run.
+            webViewClient.onPageStartedListener = { cancelPendingClientToolCalls() }
             webViewClient
                 .onPageFinishedListener = { url ->
                 viewModel.onChatPageLoaded(url)
@@ -1020,10 +1022,15 @@ class DuckChatContextualWebViewFragment :
 
     override fun onDestroyView() {
         bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
+        cancelPendingClientToolCalls()
         super.onDestroyView()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager?.flush()
         }
+    }
+
+    private fun cancelPendingClientToolCalls() {
+        duckChatJSHelper.cancelPendingClientToolCalls(viewModel.viewState.value.tabId)
     }
 
     companion object {
