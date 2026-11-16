@@ -25,6 +25,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
+import com.duckduckgo.adblocking.impl.BuildConfig
 import com.duckduckgo.common.utils.versionedset.VersionedSetDelta
 import com.duckduckgo.common.utils.versionedset.VersionedSetUpdate
 import com.duckduckgo.common.utils.versionedset.updateFrom
@@ -38,10 +39,10 @@ import retrofit2.http.GET
 import retrofit2.http.Query as HttpQuery
 
 interface SponsorBlockDatasetService {
-    @GET("https://duckduckgo.com/sponsorblock/v1/revision")
+    @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/revision")
     suspend fun revision(): SponsorBlockRevisionResponse
 
-    @GET("https://duckduckgo.com/sponsorblock/v1/hashPrefix")
+    @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/hashPrefix")
     suspend fun hashPrefixes(@HttpQuery("revision") revision: Int): SponsorBlockDeltaResponse
 }
 

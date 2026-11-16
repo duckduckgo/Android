@@ -28,6 +28,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
+import retrofit2.http.GET
 import java.io.IOException
 
 class RealSponsorBlockSegmentsProviderTest {
@@ -46,6 +47,12 @@ class RealSponsorBlockSegmentsProviderTest {
         dispatchers = coroutineRule.testDispatcherProvider,
         appScope = coroutineRule.testScope,
     )
+
+    @Test
+    fun whenUsingMockDatasetThenSegmentsStillUseProductionEndpoint() {
+        val method = SponsorBlockService::class.java.declaredMethods.single { it.name == "getSegments" }
+        assertEquals("https://duckduckgo.com/sponsorblock/v1/segments/{hashPrefix}", method.getAnnotation(GET::class.java)?.value)
+    }
 
     @Test
     fun whenLookingUpThenOnlyTheFourCharacterHashPrefixIsSent() = runTest {
