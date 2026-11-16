@@ -101,7 +101,8 @@ class NewChatHintsViewModelTest {
         on { isImageUploadEnabled() } doReturn true
         on { isDuckChatUrl(any()) } doReturn true
     }
-    private val usage: NewChatHintsUsage = mock()
+    private val promoClear = MutableStateFlow(true)
+    private val usage: NewChatHintsUsage = mock { on { isPromoClear(any()) } doReturn promoClear }
     private val activeVoiceSessions = MutableStateFlow(emptySet<String>())
     private val voiceSessions: VoiceSessionStateManager = mock { on { activeVoiceSessions } doReturn activeVoiceSessions }
     private val chats = MutableStateFlow(emptyList<DuckAiChat>())
@@ -416,6 +417,42 @@ class NewChatHintsViewModelTest {
         runCurrent()
 
         assertTrue(deliveries.all { (target, selected) -> target == selected })
+    }
+
+    @Test
+    fun whenAPromoShowsThenTheHintsHideAndReturnOnceItIsGone() = runTest {
+        viewModel().viewState("tab").test {
+            val initial = awaitItem()
+            assertTrue(initial.isNotEmpty())
+            promoClear.value = false
+            assertTrue(awaitItem().isEmpty())
+            promoClear.value = true
+            assertEquals(initial, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenThePromoIsNotYetReportedThenHintsWaitAndUsageIsNotTold() = runTest {
+        promoClear.value = false
+
+        viewModel().viewState("tab").test {
+            assertTrue(awaitItem().isEmpty())
+            promoClear.value = true
+            assertTrue(awaitItem().isNotEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(usage).onHintsDisplayed("tab")
+    }
+
+    @Test
+    fun whenAPromoIsShowingThenTapsSendNothing() = runTest {
+        promoClear.value = false
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab")
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
