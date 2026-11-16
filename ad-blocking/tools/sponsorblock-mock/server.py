@@ -70,6 +70,10 @@ def prefix(video_id):
     return hashlib.sha256(video_id.encode()).hexdigest()[:8]
 
 
+def checksum(prefixes):
+    return hashlib.sha256('\n'.join(sorted(prefixes)).encode()).hexdigest()[:8]
+
+
 def video_id(value):
     value = value.strip()
     url = urlsplit(value)
@@ -97,13 +101,13 @@ def delta(revision):
         latest = max(versions)
         targets = [v for v in versions if revision < v <= min(latest, revision + 500)]
         if revision not in versions or revision <= 0 or latest - revision > 1000 or (revision < latest and not targets):
-            return dict(insert=sorted(versions[latest]), delete=[], replace=True, revision=latest)
+            return dict(insert=sorted(versions[latest]), delete=[], replace=True, revision=latest, checksum=checksum(versions[latest]))
         target = max(targets) if targets else revision
         if any(revision < replaced <= target for replaced in replacement_revisions):
-            return dict(insert=sorted(versions[target]), delete=[], replace=True, revision=target)
+            return dict(insert=sorted(versions[target]), delete=[], replace=True, revision=target, checksum=checksum(versions[target]))
         old = versions[revision]
         new = versions[target]
-        return dict(insert=sorted(new - old), delete=sorted(old - new), replace=False, revision=target)
+        return dict(insert=sorted(new - old), delete=sorted(old - new), replace=False, revision=target, checksum=checksum(new))
 
 
 def update_draft(fields):

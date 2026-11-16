@@ -17,15 +17,20 @@ class DeltaTest(unittest.TestCase):
         server.requests.clear()
 
     def test_full_diff_and_up_to_date(self):
-        self.assertEqual(server.delta(0), {'insert': ['cb1ad2a7'], 'delete': [], 'replace': True, 'revision': 2})
-        self.assertEqual(server.delta(1), {'insert': ['cb1ad2a7'], 'delete': ['0649a8bb'], 'replace': False, 'revision': 2})
-        self.assertEqual(server.delta(2), {'insert': [], 'delete': [], 'replace': False, 'revision': 2})
+        self.assertEqual(server.delta(0), {'insert': ['cb1ad2a7'], 'delete': [], 'replace': True, 'revision': 2, 'checksum': '43f72de2'})
+        self.assertEqual(server.delta(1), {'insert': ['cb1ad2a7'], 'delete': ['0649a8bb'], 'replace': False, 'revision': 2, 'checksum': '43f72de2'})
+        self.assertEqual(server.delta(2), {'insert': [], 'delete': [], 'replace': False, 'revision': 2, 'checksum': '43f72de2'})
+
+    def test_checksum_matches_sample_and_empty_dataset(self):
+        self.assertEqual(server.checksum({'cb1ad2a7', '0a13c480', '0a130329', '2fee55bc'}), 'e2ab92ec')
+        self.assertEqual(server.checksum(set()), 'e3b0c442')
 
     def test_old_diffs_and_fallback(self):
         server.versions.clear()
         server.versions.update({i: {str(i)} for i in range(1, 1201)})
         self.assertEqual(server.delta(700)['revision'], 1200)
         self.assertEqual(server.delta(699)['revision'], 1199)
+        self.assertEqual(server.delta(699)['checksum'], server.checksum({'1199'}))
         self.assertTrue(server.delta(199)['replace'])
 
     def test_video_urls_and_ids(self):
@@ -67,6 +72,7 @@ class DeltaTest(unittest.TestCase):
         server.update_draft({'save': ['1'], 'revision': ['4']})
         self.assertEqual(server.delta(2), {
             'insert': [server.prefix('anotherVideo')], 'delete': [], 'replace': True, 'revision': 4,
+            'checksum': server.checksum({server.prefix('anotherVideo')}),
         })
         self.assertFalse(server.delta(3)['replace'])
         self.assertFalse(server.delta(4)['replace'])

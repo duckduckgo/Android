@@ -5,10 +5,8 @@ The mock serves the proposed prefix dataset API. It keeps revision history in me
 1. Build and install the internal debug app with the mock endpoint enabled (JDK 21):
 
    ```sh
-   mise exec java@temurin-21 -- ./gradlew :app:installInternalDebug -PsponsorBlockMock=true
+   ./gradlew :app:installInternalDebug -PsponsorBlockMock=true
    ```
-
-   The command uses JDK 21 through mise. Install it first with `mise install java@temurin-21` if needed.
 
    This build sends SponsorBlock dataset requests to `http://127.0.0.1:8765`; segment requests still use the normal endpoint. Enable SponsorBlock in the app.
 
@@ -37,6 +35,6 @@ After syncing, videos whose prefixes are in the dataset can request segments fro
 
 Restarting the server clears its revision history. When the device database is available, the server starts from its current revision and prefixes; otherwise it starts with an empty dataset at revision 1.
 
-The mock implements full lists, diffs, current revisions, and the 500/1000 revision retention behavior. It returns the full list directly for expired revisions, as nginx would. Responses are uncompressed JSON and omit checksums.
+The mock returns a diff to the latest revision for clients up to 500 revisions behind. For revisions 501 to 1000 behind, it returns the last available intermediate diff; clients more than 1000 behind receive the full list, as they would through nginx. Missing revisions also receive the full list. Responses are uncompressed JSON and include the checksum of the full dataset at the response's target revision; the Android client currently ignores it.
 
 Run the protocol checks with `python3 -m unittest discover -s ad-blocking/tools/sponsorblock-mock`.
