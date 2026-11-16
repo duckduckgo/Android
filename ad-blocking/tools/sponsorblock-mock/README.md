@@ -29,6 +29,8 @@ The mock serves the proposed prefix dataset API. It keeps revision history in me
 5. **Inspect the device:** the **Device database** section shows its stored revision and prefixes, refreshing approximately every second while the page is open. It shows an error until the app creates the database. Select **Refresh** to read it immediately. If a sync is writing at the same time, the snapshot can temporarily fail or appear stale.
 6. **Inspect requests:** the **Phone requests** column automatically shows the latest 100 dataset requests with local timestamps. Expand a request to see the response; preview requests from the page are excluded. Requests to the normal segment endpoint do not appear here.
 
+To test a sync requiring two diff requests, select **Set up two-request sync** under **Test scenarios**, then select **Force device to request revision**. The helper reads the device's saved dataset and creates two newer revisions so that one sync requires two requests. It replaces the mock's revision history; save or remove any draft changes first. Watch the phone requests and device database to follow the sync.
+
 The web tool uses the device selected by `SERIAL` and the `com.duckduckgo.mobile.android.debug` application ID. Start the app and enable SponsorBlock before requesting a sync. Watch the server log for `/revision` and `/hashPrefix` requests. Mock builds also schedule periodic syncs approximately every 15 minutes; Android may delay them.
 
 After syncing, videos whose prefixes are in the dataset can request segments from the normal endpoint; other videos should not request segments. Restart the app before rechecking a video already looked up, because segment results are cached in the app process.

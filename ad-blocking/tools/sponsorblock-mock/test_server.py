@@ -107,6 +107,26 @@ class DeltaTest(unittest.TestCase):
         server.update_draft({'save': ['1'], 'revision': ['5']})
         self.assertEqual(server.delta(4)['insert'], [server.prefix('anotherVideo')])
 
+    def test_two_step_scenario_starts_from_device_dataset(self):
+        server.setup_two_step_scenario({'revision': 2, 'prefixes': ['cb1ad2a7']})
+        first = server.delta(2)
+        second = server.delta(first['revision'])
+        self.assertEqual(first['revision'], 502)
+        self.assertEqual(second['revision'], 503)
+        self.assertFalse(first['replace'])
+        self.assertFalse(second['replace'])
+        self.assertEqual(len(first['insert']), 1)
+        self.assertEqual(len(second['insert']), 1)
+        self.assertEqual(server.draft, server.versions[503])
+
+    def test_two_step_scenario_preserves_unsaved_draft(self):
+        server.update_draft({'video': ['anotherVideo']})
+        before = server.draft.copy()
+        with self.assertRaisesRegex(ValueError, 'draft changes'):
+            server.setup_two_step_scenario({'revision': 2, 'prefixes': ['cb1ad2a7']})
+        self.assertEqual(server.draft, before)
+        self.assertEqual(max(server.versions), 2)
+
     def test_reads_device_revision_and_prefixes(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'source.db'

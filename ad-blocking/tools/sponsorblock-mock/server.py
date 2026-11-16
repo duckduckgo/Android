@@ -193,6 +193,32 @@ def initialize_from_device(dataset):
         draft.update(prefixes)
 
 
+def setup_two_step_scenario(dataset):
+    revision = dataset['revision']
+    prefixes = set(dataset['prefixes'])
+    if revision is None or not 0 < revision <= 2147483647 - 501:
+        raise ValueError('The device needs a saved revision with room for 501 more revisions')
+    if any(not re.fullmatch(r'[0-9a-f]{8}', value) for value in prefixes):
+        raise ValueError('Invalid device dataset')
+    with state_lock:
+        if draft != versions[max(versions)]:
+            raise ValueError('Save or discard draft changes before setting up the scenario')
+        additions = []
+        index = 0
+        while len(additions) < 2:
+            value = prefix(f'two-step-scenario-{index}')
+            if value not in prefixes and value not in additions:
+                additions.append(value)
+            index += 1
+        versions.clear()
+        replacement_revisions.clear()
+        versions[revision] = prefixes
+        versions[revision + 500] = prefixes | {additions[0]}
+        versions[revision + 501] = prefixes | set(additions)
+        draft.clear()
+        draft.update(versions[revision + 501])
+
+
 class Handler(BaseHTTPRequestHandler):
     def send(self, code, content, content_type):
         self.send_response(code)
@@ -242,6 +268,11 @@ class Handler(BaseHTTPRequestHandler):
 <p id="revision-hint" class="hint"></p></section>
 <section class="card"><div class="card-heading"><h2>Current dataset ({len(saved_videos)})</h2>
 <span class="badge">Revision {revision}</span></div>{saved_contents}</section>
+<section class="card"><h2>Test scenarios</h2>
+<p class="hint">Prepare a dataset that requires the device to make two diff requests in one sync. This replaces the mock revision history with the device's current dataset and two new revisions.</p>
+<p class="hint">Save or remove draft changes first.</p>
+<button id="two-step" type="button"{' disabled' if changed else ''}>Set up two-request sync</button>
+<p id="scenario-status" class="hint" aria-live="polite"></p></section>
 <section class="card"><h2>Preview response</h2><p class="hint">See the response for a client revision.</p>
 <form id="preview-form"><label for="preview-revision">Client revision</label><div class="add-form">
 <input id="preview-revision" type="number" min="0" max="2147483647" value="0" required>
@@ -263,6 +294,21 @@ let revisionEdited = false;
 let previewEdited = false;
 revisionInput.addEventListener('input', () => {{ revisionEdited = true; }});
 previewInput.addEventListener('input', () => {{ previewEdited = true; }});
+document.getElementById('two-step').addEventListener('click', async () => {{
+  const button = document.getElementById('two-step');
+  const status = document.getElementById('scenario-status');
+  button.disabled = true;
+  status.textContent = 'Preparing scenario from the device database…';
+  try {{
+    const response = await fetch('/scenario/two-step', {{ method: 'POST' }});
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error);
+    window.location.reload();
+  }} catch (error) {{
+    status.textContent = 'Unable to prepare scenario: ' + error.message;
+    button.disabled = false;
+  }}
+}});
 
 async function refreshDevice() {{
   const status = document.getElementById('device-status');
@@ -391,6 +437,13 @@ setInterval(refreshRequests, 2000);
             self.send(404, b'Not found', 'text/plain')
 
     def do_POST(self):
+        if urlsplit(self.path).path == '/scenario/two-step':
+            try:
+                setup_two_step_scenario(device_dataset())
+                self.json({'prepared': True})
+            except (OSError, sqlite3.Error, subprocess.TimeoutExpired, RuntimeError, ValueError) as error:
+                self.send(500, json.dumps({'error': str(error)}).encode(), 'application/json')
+            return
         if urlsplit(self.path).path == '/device-sync':
             try:
                 trigger_sync()
