@@ -33,7 +33,7 @@ areas that have one. Commands use `V=.claude/skills/verify/verify.sh` from `../S
 | [tabs.md](tabs.md) | Tab switcher, opening, switching and closing tabs | `tabSwitcher`, `tabs.tab-switcher-menu`, `seed tabs` |
 | [fire-button.md](fire-button.md) | Clearing tabs and site data | `browser.data-clearing`, `fire.*`, `browser.single-tab-fire-sheet` |
 | [browser-menu.md](browser-menu.md) | Browser menu: every entry and where it lands | `browser.menu-sheet` |
-| [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history, and what each subscription tier gets (header, models, reasoning, upsells) | `browser.duckai-view`, `duckai.*`, `duckchat.*`, `seed duckai-chat-history` |
+| [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history, and what each subscription tier gets (header, models, reasoning, upsells) | `browser.duckai-view`, `duckai.*`, `duckchat.*`, `seed duckai-chats` |
 | [ai-settings.md](ai-settings.md) | AI Features settings: Search Only vs Search & Duck.ai, New Tab Toggle Position, Duck.ai on/off, shortcuts, Without AI | `duckai.settings`, `duckai.shortcut.settings` |
 | [subscription.md](subscription.md) | Subscription tier, region and status, and how Duck.ai, VPN, PIR, ITR and AppTP change with it | `ppro.settings`, `vpn.main`, `duckai.paid-settings`, `seed subscription` |
 
