@@ -31,18 +31,34 @@ interface ClientToolPermissionPrompt {
     suspend fun request(request: ClientToolPermissionRequest): ClientToolPermissionAnswer
 }
 
-data class ClientToolPermissionRequest(
-    val origin: String,
-    val toolName: String,
-    val chatTabId: String,
-    val browserMode: BrowserMode,
+/** What the prompt asks for, in the chat of [chatTabId]. */
+sealed interface ClientToolPermissionRequest {
+    val chatTabId: String
+    val browserMode: BrowserMode
+
+    /** Asks to run one tool now. */
+    data class RunTool(
+        override val chatTabId: String,
+        override val browserMode: BrowserMode,
+        val tool: AskingTool,
+    ) : ClientToolPermissionRequest
+
+    /** Asks to use several tools for the rest of the chat. */
+    data class GrantAccess(
+        override val chatTabId: String,
+        override val browserMode: BrowserMode,
+        val tools: List<AskingTool>,
+    ) : ClientToolPermissionRequest
+}
+
+data class AskingTool(
+    val name: String,
     val copy: ClientToolPermissionMode.Ask,
 )
 
 enum class ClientToolPermissionAnswer {
-    ALLOW_ONCE,
-    ALWAYS,
-    NEVER,
+    ALLOW_FOR_CHAT,
+    DONT_ALLOW,
     DISMISSED,
 }
 

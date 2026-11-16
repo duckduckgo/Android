@@ -46,9 +46,11 @@
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
 
     <!-- Duck.ai client tool permission prompt -->
-    <string name="duckAiClientToolPromptAlwaysAllow">Always Allow</string>
-    <string name="duckAiClientToolPromptAllowOnce">Allow Once</string>
-    <string name="duckAiClientToolPromptNeverAllow">Never Allow</string>
+    <string name="duckAiClientToolPromptAllowForChat">Allow for This Chat</string>
+    <string name="duckAiClientToolPromptDontAllow">Don’t Allow</string>
+    <string name="duckAiClientToolRequestAccessPromptTitle">Allow Duck.ai to use these browser features in this chat?</string>
+    <string name="duckAiClientToolRequestAccessPromptItem" instruction="One line of a bulleted list. Placeholder is a short description of a browser feature, such as See your open tabs">• %1$s</string>
     <string name="duckAiClientToolListOpenTabsPromptTitle">Allow Duck.ai to see your open tabs?</string>
     <string name="duckAiClientToolListOpenTabsPromptMessage">Duck.ai will see the titles and addresses of the tabs open in this browser. It won’t see what’s on them.</string>
+    <string name="duckAiClientToolListOpenTabsAccessLabel">See your open tabs</string>
 </resources>

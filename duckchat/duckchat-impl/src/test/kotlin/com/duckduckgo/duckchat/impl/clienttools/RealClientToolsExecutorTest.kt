@@ -20,13 +20,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.site.permissions.api.ClientToolPermission
 import kotlinx.coroutines.async
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -47,20 +50,24 @@ class RealClientToolsExecutorTest {
     private val feature = FakeFeatureToggleFactory.create(AiChatBrowserToolsFeature::class.java)
     private val autoTool = FakeClientTool(name = "autoTool", version = 2)
     private val askTool = FakeClientTool(name = "askTool", permissionMode = ASK_MODE)
+    private val otherAskTool = FakeClientTool(name = "otherAskTool", permissionMode = OTHER_ASK_MODE)
 
     private val store = FakeClientToolPermissionStore()
     private val prompt = FakeClientToolPermissionPrompt()
-    private val permissionGate = RealClientToolPermissionGate(appBuildConfig, feature, store, prompt)
+    private val chatGrants = ClientToolChatGrants()
+    private val permissionGate = RealClientToolPermissionGate(appBuildConfig, feature, store, chatGrants, prompt)
 
-    private fun executor(vararg tools: ClientTool = arrayOf(autoTool, askTool)) = RealClientToolsExecutor(
+    private fun executor(vararg tools: ClientTool = arrayOf(autoTool, askTool, otherAskTool)) = RealClientToolsExecutor(
         tools = FakeClientToolPluginPoint(*tools),
         permissionGate = permissionGate,
         duckAiHostProvider = FakeDuckAiHostProvider(),
+        browserToolsFeature = feature,
     )
 
     @Test
     fun whenPageIsDuckAiAndToolsEnabledThenConfigAdvertisesEnabledTools() {
         askTool.enabled = false
+        otherAskTool.enabled = false
 
         val config = executor().clientToolsConfig(DUCK_AI_URL, BrowserMode.REGULAR)
 
@@ -84,8 +91,10 @@ class RealClientToolsExecutorTest {
 
     @Test
     fun whenNoToolIsEnabledThenConfigIsOmitted() {
+        enableRequestAccess()
         autoTool.enabled = false
         askTool.enabled = false
+        otherAskTool.enabled = false
 
         assertNull(executor().clientToolsConfig(DUCK_AI_URL, BrowserMode.REGULAR))
     }
@@ -96,6 +105,7 @@ class RealClientToolsExecutorTest {
             tools = FakeClientToolPluginPoint(autoTool),
             permissionGate = permissionGate,
             duckAiHostProvider = FakeDuckAiHostProvider("dev.duck.ai"),
+            browserToolsFeature = feature,
         )
 
         assertNull(executor.clientToolsConfig(DUCK_AI_URL, BrowserMode.REGULAR))
@@ -107,7 +117,7 @@ class RealClientToolsExecutorTest {
         val reply = executor().execute(request("autoTool", 2, input = """{"limit":3}"""), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
 
         assertEquals("""{"callId":"call-1","ok":true,"value":{"echo":{"limit":3}}}""", reply.toString())
-        assertEquals(ClientToolCallContext(CHAT_TAB_ID, BrowserMode.REGULAR, DUCK_AI_ORIGIN), autoTool.calls.single().second)
+        assertEquals(ClientToolCallContext(CHAT_TAB_ID, BrowserMode.REGULAR, DUCK_AI_ORIGIN, CHAT_ID), autoTool.calls.single().second)
     }
 
     @Test
@@ -220,6 +230,46 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
+    fun whenChatIdIsInParamsThenCallCarriesIt() = runTest {
+        executor().execute(request("autoTool", 2, chatId = "params-chat"), DUCK_AI_URL_WITH_CHAT, CHAT_TAB_ID, BrowserMode.REGULAR)
+
+        assertEquals("params-chat", autoTool.calls.single().second.chatId)
+    }
+
+    @Test
+    fun whenChatIdIsNotInParamsThenPageChatIdIsUsed() = runTest {
+        executor().execute(request("autoTool", 2, chatId = null), DUCK_AI_URL_WITH_CHAT, CHAT_TAB_ID, BrowserMode.REGULAR)
+
+        assertEquals(PAGE_CHAT_ID, autoTool.calls.single().second.chatId)
+    }
+
+    @Test
+    fun whenNeitherParamsNorPageHaveChatIdThenCallHasNone() = runTest {
+        executor().execute(request("autoTool", 2, chatId = null), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
+
+        assertNull(autoTool.calls.single().second.chatId)
+    }
+
+    @Test
+    fun whenChatIdIsJsonNullThenPageChatIdIsUsed() = runTest {
+        val params = JSONObject("""{"callId":"call-1","chatId":null,"capability":{"name":"autoTool","version":2},"input":{}}""")
+
+        executor().execute(params, DUCK_AI_URL_WITH_CHAT, CHAT_TAB_ID, BrowserMode.REGULAR)
+
+        assertEquals(PAGE_CHAT_ID, autoTool.calls.single().second.chatId)
+    }
+
+    @Test
+    fun whenChatIdIsInvalidThenInvalidArgumentsAndToolNotRun() = runTest {
+        listOf("\"has space\"", "\"\"", "\"${"a".repeat(129)}\"", "5", "{}").forEach { chatId ->
+            val params = JSONObject("""{"callId":"call-1","chatId":$chatId,"capability":{"name":"autoTool","version":2},"input":{}}""")
+
+            assertFailure("invalid_arguments", executor().execute(params, DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR))
+        }
+        assertTrue(autoTool.calls.isEmpty())
+    }
+
+    @Test
     fun whenAutoToolRunsThenNoPromptIsShown() = runTest {
         executor().execute(request("autoTool", 2), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
 
@@ -227,20 +277,23 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenAskToolCalledThenPromptCarriesOriginToolAndChat() = runTest {
+    fun whenAskToolCalledThenPromptAsksToRunThatToolInItsChatTab() = runTest {
         val reply = async { executeAskTool() }
         runCurrent()
 
-        assertEquals(ClientToolPermissionRequest(DUCK_AI_ORIGIN, "askTool", CHAT_TAB_ID, BrowserMode.REGULAR, ASK_MODE), prompt.current.request)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        assertEquals(
+            ClientToolPermissionRequest.RunTool(CHAT_TAB_ID, BrowserMode.REGULAR, AskingTool("askTool", ASK_MODE)),
+            prompt.current.request,
+        )
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
         reply.await()
     }
 
     @Test
-    fun whenAllowOnceThenToolRunsAndNothingIsStored() = runTest {
+    fun whenAllowForChatThenToolRunsAndNothingIsStored() = runTest {
         val reply = async { executeAskTool() }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
 
         assertEquals(true, reply.await().getBoolean("ok"))
         assertEquals(1, askTool.calls.size)
@@ -248,31 +301,122 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenAlwaysThenToolRunsAndNextCallSkipsPrompt() = runTest {
-        val first = async { executeAskTool() }
-        runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.ALWAYS)
-        first.await()
+    fun whenAllowedForChatThenSameChatRunsItAgainWithoutPrompt() = runTest {
+        allowForChat("askTool", CHAT_ID)
 
         val second = executeAskTool()
 
         assertEquals(true, second.getBoolean("ok"))
         assertEquals(1, prompt.prompts.size)
         assertEquals(2, askTool.calls.size)
-        assertEquals(ClientToolPermission.ALWAYS_ALLOW, store.choices[DUCK_AI_ORIGIN to "askTool"])
     }
 
     @Test
-    fun whenNeverThenDeniedAndNextCallDeniedWithoutPrompt() = runTest {
+    fun whenAllowedForChatThenAnotherChatIsAskedAgain() = runTest {
+        allowForChat("askTool", CHAT_ID)
+
+        val other = async { executeAskTool(chatId = OTHER_CHAT_ID) }
+        runCurrent()
+
+        assertEquals(2, prompt.prompts.size)
+        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        assertFailure("cancelled", other.await())
+    }
+
+    @Test
+    fun whenAllowedForChatThenAnotherToolInThatChatIsAskedAgain() = runTest {
+        allowForChat("askTool", CHAT_ID)
+
+        val other = async { executor().execute(request("otherAskTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        runCurrent()
+
+        assertEquals(2, prompt.prompts.size)
+        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        assertFailure("cancelled", other.await())
+    }
+
+    @Test
+    fun whenCallHasNoChatIdThenAllowForChatCoversThatCallOnly() = runTest {
+        val executor = executor()
+        val first = async { executor.execute(request("askTool", 1, chatId = null), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        runCurrent()
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        assertEquals(true, first.await().getBoolean("ok"))
+
+        val second = async { executor.execute(request("askTool", 1, chatId = null), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        runCurrent()
+
+        assertEquals(2, prompt.prompts.size)
+        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        assertFailure("cancelled", second.await())
+    }
+
+    @Test
+    fun whenDontAllowThenDeniedNothingStoredAndNextCallAsksAgain() = runTest {
         val first = async { executeAskTool() }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.NEVER)
-
+        prompt.current.answer(ClientToolPermissionAnswer.DONT_ALLOW)
         assertFailure("denied", first.await())
-        assertFailure("denied", executeAskTool())
-        assertEquals(1, prompt.prompts.size)
+
+        val second = async { executeAskTool() }
+        runCurrent()
+
+        assertEquals(2, prompt.prompts.size)
+        assertTrue(store.choices.isEmpty())
         assertTrue(askTool.calls.isEmpty())
-        assertEquals(ClientToolPermission.NEVER_ALLOW, store.choices[DUCK_AI_ORIGIN to "askTool"])
+        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        second.await()
+    }
+
+    @Test
+    fun whenAlwaysAllowIsStoredThenAskToolRunsWithoutPrompt() = runTest {
+        store.choices[DUCK_AI_ORIGIN to "askTool"] = ClientToolPermission.ALWAYS_ALLOW
+
+        assertEquals(true, executeAskTool().getBoolean("ok"))
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenNeverAllowIsStoredThenDeniedWithoutPromptEvenForAutoTool() = runTest {
+        store.choices[DUCK_AI_ORIGIN to "askTool"] = ClientToolPermission.NEVER_ALLOW
+        store.choices[DUCK_AI_ORIGIN to "autoTool"] = ClientToolPermission.NEVER_ALLOW
+
+        assertFailure("denied", executeAskTool())
+        assertFailure("denied", executor().execute(request("autoTool", 2), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR))
+        assertTrue(prompt.prompts.isEmpty())
+        assertTrue(askTool.calls.isEmpty())
+        assertTrue(autoTool.calls.isEmpty())
+    }
+
+    @Test
+    fun whenNeverAllowIsStoredThenItWinsOverChatGrant() = runTest {
+        allowForChat("askTool", CHAT_ID)
+        store.choices[DUCK_AI_ORIGIN to "askTool"] = ClientToolPermission.NEVER_ALLOW
+
+        assertFailure("denied", executeAskTool())
+    }
+
+    @Test
+    fun whenFireButtonClearsEverythingThenChatGrantsEnd() = runTest {
+        allowForChat("askTool", CHAT_ID)
+
+        ClientToolChatGrantsClearingPlugin(chatGrants).onClearData(setOf(ClearableData.Tabs.AllForMode(BrowserMode.REGULAR)))
+        val next = async { executeAskTool() }
+        runCurrent()
+
+        assertEquals(2, prompt.prompts.size)
+        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        next.await()
+    }
+
+    @Test
+    fun whenOneTabIsClearedThenChatGrantsStay() = runTest {
+        allowForChat("askTool", CHAT_ID)
+
+        ClientToolChatGrantsClearingPlugin(chatGrants).onClearData(setOf(ClearableData.Tabs.SingleForMode("other", BrowserMode.REGULAR)))
+
+        assertEquals(true, executeAskTool().getBoolean("ok"))
+        assertEquals(1, prompt.prompts.size)
     }
 
     @Test
@@ -303,15 +447,15 @@ class RealClientToolsExecutorTest {
     @Test
     fun whenTwoCallsArriveTogetherThenOnlyOnePromptIsOpenAtATime() = runTest {
         val executor = executor()
-        val first = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
-        val second = async { executor.execute(request("askTool", 1), DUCK_AI_URL, OTHER_CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val first = async { executor.execute(request("askTool", 1, chatId = CHAT_ID), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val second = async { executor.execute(request("askTool", 1, chatId = OTHER_CHAT_ID), DUCK_AI_URL, OTHER_CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
         assertEquals(1, prompt.prompts.size)
 
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
         runCurrent()
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
 
         assertEquals(true, first.await().getBoolean("ok"))
         assertEquals(true, second.await().getBoolean("ok"))
@@ -319,13 +463,13 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenQueuedCallGetsItsTurnAfterAlwaysThenItRunsWithoutPrompt() = runTest {
+    fun whenQueuedCallOfSameChatGetsItsTurnAfterAllowForChatThenItRunsWithoutPrompt() = runTest {
         val executor = executor()
         val first = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         val second = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
 
-        prompt.current.answer(ClientToolPermissionAnswer.ALWAYS)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
 
         assertEquals(true, first.await().getBoolean("ok"))
         assertEquals(true, second.await().getBoolean("ok"))
@@ -334,26 +478,28 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenQueuedCallGetsItsTurnAfterNeverThenItIsDeniedWithoutPrompt() = runTest {
+    fun whenQueuedCallGetsItsTurnAfterDontAllowThenItIsAskedItself() = runTest {
         val executor = executor()
         val first = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         val second = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
 
-        prompt.current.answer(ClientToolPermissionAnswer.NEVER)
-
+        prompt.current.answer(ClientToolPermissionAnswer.DONT_ALLOW)
         assertFailure("denied", first.await())
-        assertFailure("denied", second.await())
-        assertEquals(1, prompt.prompts.size)
+        runCurrent()
+
+        assertEquals(2, prompt.prompts.size)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        assertEquals(true, second.await().getBoolean("ok"))
     }
 
     @Test
     fun whenCallWaitedInQueueThenThatTimeCountsAgainstItsDeadline() = runTest {
         val executor = executor()
-        val first = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
-        val second = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val first = async { executor.execute(request("askTool", 1, chatId = CHAT_ID), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val second = async { executor.execute(request("askTool", 1, chatId = OTHER_CHAT_ID), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         advanceTimeBy(100_000)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
         first.await()
         runCurrent()
         val secondPrompt = prompt.current
@@ -371,7 +517,9 @@ class RealClientToolsExecutorTest {
         val executor = executor()
         val prompting = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         val queued = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
-        val otherChat = async { executor.execute(request("askTool", 1), DUCK_AI_URL, OTHER_CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val otherChat = async {
+            executor.execute(request("askTool", 1, chatId = OTHER_CHAT_ID), DUCK_AI_URL, OTHER_CHAT_TAB_ID, BrowserMode.REGULAR)
+        }
         runCurrent()
         val firstPrompt = prompt.current
 
@@ -383,7 +531,7 @@ class RealClientToolsExecutorTest {
         assertTrue(firstPrompt.withdrawn)
         assertFalse(otherChat.isCompleted)
         assertEquals(OTHER_CHAT_TAB_ID, prompt.current.request.chatTabId)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
         assertEquals(true, otherChat.await().getBoolean("ok"))
         assertEquals(listOf(OTHER_CHAT_TAB_ID), askTool.calls.map { it.second.chatTabId })
     }
@@ -394,7 +542,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
         askTool.enabled = false
 
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_ONCE)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
 
         assertFailure("unavailable", reply.await())
         assertTrue(askTool.calls.isEmpty())
@@ -433,14 +581,307 @@ class RealClientToolsExecutorTest {
         assertEquals(1, prompt.prompts.size)
     }
 
-    private suspend fun executeAskTool(): JSONObject =
-        executor().execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
+    @Test
+    fun whenRequestAccessFlagOffThenNotAdvertisedAndUnavailable() = runTest {
+        feature.self().setRawStoredState(Toggle.State(enable = true))
+
+        val config = executor().clientToolsConfig(DUCK_AI_URL, BrowserMode.REGULAR)
+        val reply = requestAccess("askTool")
+
+        assertFalse(config.toString().contains("requestAccess"))
+        assertFailure("unavailable", reply)
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessFlagOnThenAdvertisedAfterTheTools() {
+        enableRequestAccess()
+        askTool.enabled = false
+        otherAskTool.enabled = false
+
+        val config = executor().clientToolsConfig(DUCK_AI_URL, BrowserMode.REGULAR)
+
+        assertEquals(
+            """{"protocolVersion":1,"capabilities":[{"name":"autoTool","version":2},{"name":"requestAccess","version":1}]}""",
+            config.toString(),
+        )
+    }
+
+    @Test
+    fun whenRequestAccessVersionIsUnknownThenUnavailable() = runTest {
+        enableRequestAccess()
+
+        val reply = executor().execute(
+            request("requestAccess", 2, input = """{"capabilities":["askTool"]}"""),
+            DUCK_AI_URL,
+            CHAT_TAB_ID,
+            BrowserMode.REGULAR,
+        )
+
+        assertFailure("unavailable", reply)
+    }
+
+    @Test
+    fun whenRequestAccessInputIsInvalidThenInvalidArgumentsWithoutPrompt() = runTest {
+        enableRequestAccess()
+        val invalidInputs = listOf(
+            """{}""",
+            """{"capabilities":[]}""",
+            """{"capabilities":"askTool"}""",
+            """{"capabilities":["askTool"],"extra":1}""",
+            """{"capabilities":["askTool","askTool"]}""",
+            """{"capabilities":[1]}""",
+            """{"capabilities":[""]}""",
+            """{"capabilities":["${"a".repeat(65)}"]}""",
+            """{"capabilities":["requestAccess"]}""",
+            """{"capabilities":["loadUserSkill"]}""",
+            """{"capabilities":[${(1..13).joinToString(",") { "\"t$it\"" }}]}""",
+        )
+
+        invalidInputs.forEach { input ->
+            assertFailure(
+                "invalid_arguments",
+                executor().execute(request("requestAccess", 1, input = input), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR),
+            )
+        }
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessAsksForTwelveUnknownToolsThenNothingIsGranted() = runTest {
+        enableRequestAccess()
+
+        val reply = requestAccess(*(1..12).map { "t$it" }.toTypedArray())
+
+        assertGranted(reply)
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessHasNoChatIdThenInvalidArguments() = runTest {
+        enableRequestAccess()
+
+        val reply = executor().execute(
+            request("requestAccess", 1, input = """{"capabilities":["askTool"]}""", chatId = null),
+            DUCK_AI_URL,
+            CHAT_TAB_ID,
+            BrowserMode.REGULAR,
+        )
+
+        assertFailure("invalid_arguments", reply)
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessToolsAreAlreadyAllowedThenGrantedWithoutPrompt() = runTest {
+        enableRequestAccess()
+        store.choices[DUCK_AI_ORIGIN to "otherAskTool"] = ClientToolPermission.ALWAYS_ALLOW
+        chatGrants.grant(CHAT_ID, listOf("askTool"))
+
+        val reply = requestAccess("askTool", "autoTool", "otherAskTool")
+
+        assertGranted(reply, "askTool", "autoTool", "otherAskTool")
+        assertTrue(prompt.prompts.isEmpty())
+        assertTrue(askTool.calls.isEmpty() && autoTool.calls.isEmpty() && otherAskTool.calls.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessNamesNeverAllowedUnknownOrDisabledToolsThenTheyAreLeftOut() = runTest {
+        enableRequestAccess()
+        store.choices[DUCK_AI_ORIGIN to "askTool"] = ClientToolPermission.NEVER_ALLOW
+        otherAskTool.enabled = false
+
+        val reply = requestAccess("askTool", "missing", "otherAskTool", "autoTool")
+
+        assertGranted(reply, "autoTool")
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessAllowedForChatThenOnePromptGrantsAllInRequestedOrder() = runTest {
+        enableRequestAccess()
+
+        val reply = async { requestAccess("otherAskTool", "autoTool", "askTool") }
+        runCurrent()
+
+        assertEquals(
+            ClientToolPermissionRequest.GrantAccess(
+                CHAT_TAB_ID,
+                BrowserMode.REGULAR,
+                listOf(AskingTool("otherAskTool", OTHER_ASK_MODE), AskingTool("askTool", ASK_MODE)),
+            ),
+            prompt.current.request,
+        )
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        assertGranted(reply.await(), "otherAskTool", "autoTool", "askTool")
+        assertTrue(askTool.calls.isEmpty() && otherAskTool.calls.isEmpty())
+        assertTrue(store.choices.isEmpty())
+
+        assertEquals(true, executeAskTool().getBoolean("ok"))
+        assertEquals(true, executor().execute(request("otherAskTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR).getBoolean("ok"))
+        assertEquals(1, prompt.prompts.size)
+    }
+
+    @Test
+    fun whenRequestAccessUsesPageChatIdThenGrantsThatChat() = runTest {
+        enableRequestAccess()
+        val reply = async {
+            executor().execute(
+                request("requestAccess", 1, input = """{"capabilities":["askTool"]}""", chatId = null),
+                DUCK_AI_URL_WITH_CHAT,
+                CHAT_TAB_ID,
+                BrowserMode.REGULAR,
+            )
+        }
+        runCurrent()
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        assertGranted(reply.await(), "askTool")
+
+        assertEquals(true, executeAskTool(chatId = PAGE_CHAT_ID).getBoolean("ok"))
+        assertEquals(1, prompt.prompts.size)
+    }
+
+    @Test
+    fun whenRequestAccessDontAllowThenDeniedAndNothingGranted() = runTest {
+        enableRequestAccess()
+
+        val reply = async { requestAccess("askTool") }
+        runCurrent()
+        prompt.current.answer(ClientToolPermissionAnswer.DONT_ALLOW)
+
+        assertFailure("denied", reply.await())
+        assertFalse(chatGrants.isGranted(CHAT_ID, "askTool"))
+        assertTrue(store.choices.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessDismissedThenCancelled() = runTest {
+        enableRequestAccess()
+
+        val reply = async { requestAccess("askTool") }
+        runCurrent()
+        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+
+        assertFailure("cancelled", reply.await())
+        assertFalse(chatGrants.isGranted(CHAT_ID, "askTool"))
+    }
+
+    @Test
+    fun whenRequestAccessUnansweredFor120SecondsThenCancelled() = runTest {
+        enableRequestAccess()
+
+        val reply = async { requestAccess("askTool") }
+        advanceTimeBy(120_001)
+        runCurrent()
+
+        assertFailure("cancelled", reply.await())
+        assertTrue(prompt.current.withdrawn)
+    }
+
+    @Test
+    fun whenRequestAccessChatGoesAwayThenCancelled() = runTest {
+        enableRequestAccess()
+        val executor = executor()
+
+        val reply =
+            async {
+                executor.execute(
+                    request("requestAccess", 1, input = """{"capabilities":["askTool"]}"""),
+                    DUCK_AI_URL,
+                    CHAT_TAB_ID,
+                    BrowserMode.REGULAR,
+                )
+            }
+        runCurrent()
+        executor.cancelPendingCalls(CHAT_TAB_ID)
+        runCurrent()
+
+        assertFailure("cancelled", reply.await())
+        assertTrue(prompt.current.withdrawn)
+    }
+
+    @Test
+    fun whenRequestAccessFromFireModeThenUnavailable() = runTest {
+        enableRequestAccess()
+
+        val reply = executor().execute(
+            request("requestAccess", 1, input = """{"capabilities":["askTool"]}"""),
+            DUCK_AI_URL,
+            CHAT_TAB_ID,
+            BrowserMode.FIRE,
+        )
+
+        assertFailure("unavailable", reply)
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessQueuesBehindToolPromptThenOnePromptAtATimeAndItAsksOnlyForWhatIsStillNeeded() = runTest {
+        enableRequestAccess()
+        val executor = executor()
+        val toolCall = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val access = async {
+            executor.execute(
+                request("requestAccess", 1, input = """{"capabilities":["askTool","otherAskTool"]}"""),
+                DUCK_AI_URL,
+                CHAT_TAB_ID,
+                BrowserMode.REGULAR,
+            )
+        }
+        runCurrent()
+        assertEquals(1, prompt.prompts.size)
+
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        runCurrent()
+
+        assertEquals(true, toolCall.await().getBoolean("ok"))
+        assertEquals(listOf(AskingTool("otherAskTool", OTHER_ASK_MODE)), (prompt.current.request as ClientToolPermissionRequest.GrantAccess).tools)
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        assertGranted(access.await(), "askTool", "otherAskTool")
+        assertEquals(1, prompt.maxOpenAtOnce)
+    }
+
+    private fun enableRequestAccess() {
+        feature.self().setRawStoredState(Toggle.State(enable = true))
+        feature.requestAccess().setRawStoredState(Toggle.State(enable = true))
+    }
+
+    private suspend fun requestAccess(vararg names: String): JSONObject {
+        val input = JSONObject().put("capabilities", JSONArray(names.toList())).toString()
+        return executor().execute(request("requestAccess", 1, input = input), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
+    }
+
+    private suspend fun TestScope.allowForChat(
+        toolName: String,
+        chatId: String,
+    ) {
+        val reply = async { executor().execute(request(toolName, 1, chatId = chatId), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        runCurrent()
+        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        assertEquals(true, reply.await().getBoolean("ok"))
+    }
+
+    private suspend fun executeAskTool(chatId: String? = CHAT_ID): JSONObject =
+        executor().execute(request("askTool", 1, chatId = chatId), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
 
     private fun request(
         name: String,
         version: Int,
         input: String = "{}",
-    ) = JSONObject("""{"callId":"call-1","capability":{"name":"$name","version":$version},"input":$input}""")
+        chatId: String? = CHAT_ID,
+    ): JSONObject {
+        val params = JSONObject("""{"callId":"call-1","capability":{"name":"$name","version":$version},"input":$input}""")
+        chatId?.let { params.put("chatId", it) }
+        return params
+    }
+
+    private fun assertGranted(
+        reply: JSONObject,
+        vararg names: String,
+    ) {
+        val granted = names.joinToString(",") { "\"$it\"" }
+        assertEquals("""{"callId":"call-1","ok":true,"value":{"granted":[$granted]}}""", reply.toString())
+    }
 
     private fun assertFailure(
         code: String,
@@ -451,9 +892,14 @@ class RealClientToolsExecutorTest {
 
     private companion object {
         const val DUCK_AI_URL = "https://duck.ai/chat"
+        const val PAGE_CHAT_ID = "page-chat"
+        const val DUCK_AI_URL_WITH_CHAT = "https://duck.ai/?chatID=$PAGE_CHAT_ID"
         const val DUCK_AI_ORIGIN = "https://duck.ai"
         const val CHAT_TAB_ID = "chat-tab"
         const val OTHER_CHAT_TAB_ID = "other-chat-tab"
-        val ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2)
+        const val CHAT_ID = "chat-1"
+        const val OTHER_CHAT_ID = "chat-2"
+        val ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, accessLabel = 3)
+        val OTHER_ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 4, promptMessage = 5, accessLabel = 6)
     }
 }

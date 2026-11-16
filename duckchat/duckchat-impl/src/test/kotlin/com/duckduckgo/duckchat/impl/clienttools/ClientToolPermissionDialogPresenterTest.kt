@@ -102,7 +102,7 @@ class ClientToolPermissionDialogPresenterTest {
         chatTabId: String,
         browserMode: BrowserMode = BrowserMode.REGULAR,
     ) = PendingClientToolPermission(
-        ClientToolPermissionRequest("https://duck.ai", "listOpenTabs", chatTabId, browserMode, ClientToolPermissionMode.Ask(1, 2)),
+        ClientToolPermissionRequest.RunTool(chatTabId, browserMode, AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(1, 2, 3))),
         CompletableDeferred(),
     )
 

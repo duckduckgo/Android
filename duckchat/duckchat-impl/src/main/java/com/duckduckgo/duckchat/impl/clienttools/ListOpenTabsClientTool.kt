@@ -41,6 +41,7 @@ class ListOpenTabsClientTool @Inject constructor(
     override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.Ask(
         promptTitle = R.string.duckAiClientToolListOpenTabsPromptTitle,
         promptMessage = R.string.duckAiClientToolListOpenTabsPromptMessage,
+        accessLabel = R.string.duckAiClientToolListOpenTabsAccessLabel,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.listOpenTabs().isEnabled()
