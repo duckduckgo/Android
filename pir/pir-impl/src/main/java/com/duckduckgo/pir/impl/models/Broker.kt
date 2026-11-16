@@ -24,6 +24,8 @@ data class Broker(
     val parent: String?,
     val addedDatetime: Long,
     val removedAt: Long,
+    /** Broker-specific user agent override; null means the default PIR user agent. */
+    val userAgent: String? = null,
 ) {
     companion object {
         fun unknown(): Broker {

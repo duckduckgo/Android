@@ -32,6 +32,7 @@ class FakePirDataStore : PirDataStore {
     override var interactionMauLastSentMs: Long = 0L
     override var weeklyStatLastSentMs: Long = 0L
     override var hasBrokerConfigBeenManuallyUpdated: Boolean = false
+    override var brokerJsonsProcessedRevision: Int = 0
     override var latestBackgroundScanRunInMs: Long = 0L
     override var featureReceivedMs: Long = 0L
     override var hasInitialScanEverStarted: Boolean = false
@@ -53,6 +54,7 @@ class FakePirDataStore : PirDataStore {
     override fun reset() {
         mainConfigEtag = null
         hasBrokerConfigBeenManuallyUpdated = false
+        brokerJsonsProcessedRevision = 0
         featureReceivedMs = 0L
         resetUserData()
     }

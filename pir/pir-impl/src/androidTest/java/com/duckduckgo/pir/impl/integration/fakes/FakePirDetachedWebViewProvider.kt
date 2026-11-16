@@ -25,6 +25,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.pir.impl.common.PirDetachedWebViewProvider
+import com.duckduckgo.pir.impl.common.PirWebViewUserAgent
 import java.io.ByteArrayInputStream
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -39,6 +40,7 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
     override fun createInstance(
         context: Context,
         scriptToLoad: String,
+        userAgent: PirWebViewUserAgent,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
@@ -67,6 +69,7 @@ class FakePirDetachedWebViewProvider : PirDetachedWebViewProvider {
     override fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
+        userAgent: PirWebViewUserAgent,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
