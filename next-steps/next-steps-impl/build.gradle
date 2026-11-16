@@ -53,6 +53,8 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
     testImplementation project(path: ':data-store-test')
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.robolectric
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation (KotlinX.coroutines.test) {
@@ -63,5 +65,8 @@ dependencies {
 }
 
 android {
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
     namespace "com.duckduckgo.nextsteps.impl"
 }

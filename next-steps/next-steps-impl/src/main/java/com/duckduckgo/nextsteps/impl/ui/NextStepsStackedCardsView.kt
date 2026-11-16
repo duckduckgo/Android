@@ -73,10 +73,12 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
     private val backElevation = resources.getDimension(R.dimen.nextStepsBackCardElevation)
 
     init {
+        binding.frontCard.applyRmfStyle()
+        binding.backCard.applyRmfStyle()
         binding.frontCard.closeButton.setOnClickListener { dismissFrontCard() }
-        binding.frontCard.primaryAction.setOnClickListener { viewModel.onPrimaryActionClicked() }
+        binding.frontCard.action.setOnClickListener { viewModel.onPrimaryActionClicked() }
         binding.backCard.closeButton.isEnabled = false
-        binding.backCard.primaryAction.isEnabled = false
+        binding.backCard.action.isEnabled = false
         binding.backCard.root.isClickable = false
 
         val itemTitleTextSize = resources.getDimension(R.dimen.nextStepsItemTitleTextSize)
@@ -214,7 +216,7 @@ class NextStepsStackedCardsView @JvmOverloads constructor(
         sectionTitle.text = title
         itemTitle.text = item.titleText
         itemDescription.text = item.descriptionText
-        primaryAction.text = item.primaryActionText
+        action.text = item.primaryActionText
         itemImage.loadNextStepsItemImage(item.imageUrl, imageFilePath)
     }
 

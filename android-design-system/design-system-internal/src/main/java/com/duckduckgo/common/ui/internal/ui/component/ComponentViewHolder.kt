@@ -57,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil3.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
@@ -103,6 +104,7 @@ import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
@@ -371,6 +373,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
         override fun bind(component: Component) {
+            val rebrandEnabled = view.context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
                 topIllustration = CommonR.drawable.announcement_96,
@@ -442,6 +445,16 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<MessageCta>(R.id.big_two_actions_update_remote_message).apply {
                 setMessage(bigTwoActionsUpdateMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.long_primary_remote_message).apply {
+                isVisible = rebrandEnabled
+                if (rebrandEnabled) setMessage(bigTwoActionsMessage.copy(action = "Subscribe to DuckDuckGo Pro", action2 = "No"))
+            }
+
+            view.findViewById<MessageCta>(R.id.long_secondary_remote_message).apply {
+                isVisible = rebrandEnabled
+                if (rebrandEnabled) setMessage(bigTwoActionsMessage.copy(action = "Subscribe to DuckDuckGo Pro", action2 = "Remind me next week"))
             }
 
             view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
