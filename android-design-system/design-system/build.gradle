@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import com.android.build.api.variant.HostTestBuilder
+
 plugins {
     id 'com.android.library'
     id 'dev.zacsweers.metro'
@@ -28,6 +30,8 @@ android {
 }
 
 android {
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+    experimentalProperties["android.experimental.testSuiteSupport"] = true
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
@@ -35,6 +39,15 @@ android {
     testOptions {
         unitTests {
             includeAndroidResources = true
+        }
+        screenshotTests.create("screenshotTest") {
+            engineVersion = "0.0.1-alpha17"
+            targetVariants.add("debug")
+            dependencies {
+                implementation(project.dependencies.platform(AndroidX.compose.bom))
+                implementation(AndroidX.compose.ui.tooling)
+                implementation("com.android.tools.screenshot:screenshot-validation-api:0.0.1-alpha17")
+            }
         }
     }
 
@@ -105,4 +118,15 @@ dependencies {
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+}
+
+// Screenshot tests run through the AGP test suite above, so the legacy per-variant screenshot host test is turned off to avoid
+// duplicate task names. Release keeps unit tests because AGP's generate<Variant>ComposePreviewRunfiles requires one per Compose variant.
+androidComponents {
+    beforeVariants(selector().all()) { variantBuilder ->
+        variantBuilder.hostTests[HostTestBuilder.SCREENSHOT_TEST_TYPE]?.enable = false
+    }
+    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+        variantBuilder.hostTests[HostTestBuilder.UNIT_TEST_TYPE]?.enable = true
+    }
 }
