@@ -17,6 +17,8 @@
 package com.duckduckgo.privacy.config.impl.observers
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.store.AllowlistRuleEntity
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -44,6 +46,7 @@ class PirProcessPrivacyConfigLoaderTest {
     private val mockTrackerAllowlistDao: TrackerAllowlistDao = mock()
     private val mockContentBlockingDao: ContentBlockingDao = mock()
     private val mockUnprotectedTemporaryDao: UnprotectedTemporaryDao = mock()
+    private val feature = FakeFeatureToggleFactory.create(PirProcessPrivacyConfigFeature::class.java)
 
     private lateinit var trackerAllowlistRepository: RealTrackerAllowlistRepository
     private lateinit var contentBlockingRepository: RealContentBlockingRepository
@@ -71,6 +74,7 @@ class PirProcessPrivacyConfigLoaderTest {
             trackerAllowlistRepository,
             contentBlockingRepository,
             unprotectedTemporaryRepository,
+            feature,
             scope,
             dispatcherProvider,
         )
@@ -106,5 +110,16 @@ class PirProcessPrivacyConfigLoaderTest {
         assertEquals(emptySet<String>(), trackerAllowlistRepository.rulesByDomain.keys)
         assertEquals(listOf("example.com"), contentBlockingRepository.exceptions.map { it.domain })
         assertEquals(listOf("example.org"), unprotectedTemporaryRepository.exceptions.map { it.domain })
+    }
+
+    @Test
+    fun whenFeatureDisabledThenNothingLoadedIntoMemory() {
+        feature.self().setRawStoredState(State(enable = false))
+
+        testee.onPirProcessCreated()
+
+        assertEquals(emptySet<String>(), trackerAllowlistRepository.rulesByDomain.keys)
+        assertEquals(emptyList<String>(), contentBlockingRepository.exceptions.map { it.domain })
+        assertEquals(emptyList<String>(), unprotectedTemporaryRepository.exceptions.map { it.domain })
     }
 }

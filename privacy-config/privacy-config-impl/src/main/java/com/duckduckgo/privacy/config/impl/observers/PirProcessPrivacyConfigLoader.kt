@@ -40,6 +40,7 @@ class PirProcessPrivacyConfigLoader @Inject constructor(
     private val trackerAllowlistRepository: TrackerAllowlistRepository,
     private val contentBlockingRepository: ContentBlockingRepository,
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
+    private val pirProcessPrivacyConfigFeature: PirProcessPrivacyConfigFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : PirProcessLifecycleObserver {
@@ -48,6 +49,8 @@ class PirProcessPrivacyConfigLoader @Inject constructor(
         // Repositories only self-load in the main process, but PIR's tracker blocking evaluates requests in :pir,
         // where an empty allowlist would block site-breakage exceptions such as captcha providers.
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!pirProcessPrivacyConfigFeature.self().isEnabled()) return@launch
+
             listOf(
                 trackerAllowlistRepository::loadToMemory,
                 contentBlockingRepository::loadToMemory,
