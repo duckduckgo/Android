@@ -19,6 +19,7 @@ plugins {
     id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'io.github.takahirom.roborazzi'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -105,4 +106,14 @@ dependencies {
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+
+    // Screenshot testing
+    testImplementation "io.github.takahirom.roborazzi:roborazzi:_"
+    testImplementation "io.github.takahirom.roborazzi:roborazzi-compose:_"
+    testImplementation AndroidX.compose.ui.testJunit4
+    testImplementation AndroidX.compose.ui.testManifest
+}
+
+roborazzi {
+    outputDir.set(file("src/test/screenshots"))
 }
