@@ -8,6 +8,8 @@ import time
 import steps
 from prove import Error
 
+LIVE = ["Duck.ai chat"]
+
 
 def window_rows(android):
     """Popup rows from `verify.sh windows` as (x, text)."""

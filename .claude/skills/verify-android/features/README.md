@@ -57,7 +57,7 @@ models, VPN, PIR, ITR): the debug build can't reach a subscribed state through t
 
 ## Proofs
 
-`../prove.py ../proofs/<name>.py` replays a recipe as checks: it refuses to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. Every recipe has a proof in `../proofs/` (`search-and-navigate.md` has `search_and_navigate.py`), with shared paths in `proofs/steps.py`. The video is split into segments of 160 s, because screenrecord stops at 170 s. After changing `prove.py`, run `../prove.py selftest`: it checks that a wrong expectation is FAIL, a broken step and a stale build are ERROR, a proof with no checks isn't a pass, and pixels logged before `mark()` aren't counted.
+`../prove.py ../proofs/<name>.py` replays a recipe as checks: it refuses to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. Every recipe has a proof in `../proofs/` (`search-and-navigate.md` has `search_and_navigate.py`), with shared paths in `proofs/steps.py`. The video is split into segments of 160 s, because screenrecord stops at 170 s. After changing `prove.py`, run `../prove.py selftest`: it checks that a wrong expectation is FAIL, a broken step and a stale build are ERROR, a proof with no checks (or only `unverified` items) isn't a pass, pixels logged before `mark()` aren't counted, and `pr-summary` carries no local path (`selftest --offline` runs only that part, with no device).
 
 ## Adding a feature
 

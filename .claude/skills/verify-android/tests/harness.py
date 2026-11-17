@@ -1,5 +1,5 @@
-"""Must pass: the harness counts only pixels logged after mark(), reads every pixel log format,
-reports what it saw when a wait times out, and reads the layout.
+"""Must pass: the harness counts only pixels logged after mark(), reads every pixel log format and other log
+lines, reports what it saw when a wait times out, reads the layout, and an unverified item doesn't fail the run.
 
 A pixel here is a line written with `log`, not a real event, so this needs no particular screen.
 """
@@ -24,6 +24,8 @@ def run(android):
     for name in ("m_verify_sent", "m_verify_sent_queued", "m_verify_enqueued"):
         android.check(f"reads the {name} log format", name in fired, fired)
     android.check("a pixel that wasn't logged isn't reported", "m_verify_never" not in fired, fired)
+    android.expect_log("expect_log finds a line logged after mark()", r"Pixel enqueued: m_verify_enqueued")
+    android.unverified("an unverified item", "the selftest checks it neither passes nor fails the run")
 
     started = time.monotonic()
     last = android.poll(lambda: "still waiting", lambda v: v == "done", timeout=2)

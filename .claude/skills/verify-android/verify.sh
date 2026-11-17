@@ -65,7 +65,9 @@ evidence_dir() {
   local d="$EVIDENCE_ROOT/$(run_id)/$(label "$s" | tr -c 'A-Za-z0-9._-\n' '_')"
   mkdir -p "$d"; echo "$d"
 }
-a() { "$ADB" -s "$(serial)" "$@"; }
+# prove.py sets VERIFY_UI_LOG to the run's ui.log, so a failed run shows every device command and its exit code.
+uilog() { [[ -z "${VERIFY_UI_LOG:-}" ]] || printf '  %s -> %s\n' "$1" "$2" >> "$VERIFY_UI_LOG"; }
+a() { local rc=0; "$ADB" -s "$(serial)" "$@" || rc=$?; uilog "adb $*" "$rc"; return "$rc"; }
 
 cmd_devices() {
   local s sel; sel="$(selected)"
@@ -254,6 +256,7 @@ cmd_build_base() {
 }
 cmd_install() {
   local record apk want s; record="$BUILDS/build.json"
+  [[ "${1:-}" == "--apk" ]] && { cmd_install_apk "${2:?usage: verify.sh install --apk <path>}"; return; }
   if [[ "${1:-}" == "--base" ]]; then
     record="$BUILDS/base.json"
     [[ -f "$record" ]] || die "no base build: run verify.sh build --base <ref>"
@@ -268,11 +271,36 @@ cmd_install() {
   a shell am force-stop "$PKG"
   echo "installed ${want:0:16}$(jq -r 'if .base then " (base \(.base), \(.head[0:10]))" else "" end' "$record") on $s"
 }
+# An APK this tool didn't build, such as one from CI. Its record has the hash and no source, so doctor and the
+# evidence say the app under test isn't a build of this checkout.
+cmd_install_apk() {
+  local apk="$1" digest s
+  [[ -f "$apk" ]] || die "no APK at $apk"
+  apk="$(cd "$(dirname "$apk")" && pwd)/$(basename "$apk")"
+  digest="$(file_sha256 "$apk")"; s="$(serial)"
+  a install -r -d -t "$apk" >/dev/null || die "install failed; INSTALL_FAILED_UPDATE_INCOMPATIBLE means an internal build signed with another key is installed, and uninstalling it deletes the user's app data, so ask"
+  [[ "$(installed_sha256)" == "$digest" ]] || die "the installed $PKG isn't this APK: it must be an internal debug build ($PKG)"
+  jq -n --arg apk "$apk" --arg sha256 "$digest" --arg serial "$s" --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '{external: true, apk: $apk, sha256: $sha256, serial: $serial, installed_at: $at}' > "$(dstate "$s")/installed.json"
+  a shell am force-stop "$PKG"
+  echo "installed external APK ${digest:0:16} on $s: not a build of this source, and the evidence says so"
+}
 
 # Read-only: the device, the toolchain, and that the app on it is the build of the current source this tool installed.
 cmd_doctor() {
-  local ok=1 s rec; s="$(serial)"
-  "$ADB" devices | grep -q "^$s[[:space:]]*device" && echo "PASS $s online ($(label "$s"))" || { echo "FAIL $s not online"; ok=0; }
+  local ok=1 s rec locale; s="$(serial)"
+  if "$ADB" devices | grep -q "^$s[[:space:]]*device"; then
+    echo "PASS $s online ($(label "$s"))"
+    # Proofs and recipes select by English UI text; on another language they would fail checks the app passes.
+    locale="$(a shell getprop persist.sys.locale 2>/dev/null | tr -d '\r' || true)"
+    [[ -n "$locale" ]] || locale="$(a shell getprop ro.product.locale 2>/dev/null | tr -d '\r' || true)"
+    [[ -n "$locale" ]] || locale="$(a shell getprop persist.sys.language 2>/dev/null | tr -d '\r' || true)"
+    case "$locale" in
+      "") echo "INFO device language unknown (no locale property set); proofs assume English" ;;
+      en|en-*|en_*) echo "PASS device language $locale" ;;
+      *) echo "FAIL device language is $locale: proofs and recipes match English UI text, so set the device language to English"; ok=0 ;;
+    esac
+  else echo "FAIL $s not online"; ok=0; fi
   if owned "$s"; then
     kill -0 "$(cat "$STATE/dev/$s/pid")" 2>/dev/null && echo "INFO emulator started by this run" || { echo "FAIL emulator process gone"; ok=0; }
   else echo "INFO user's device: no reset, uninstall or data clearing without asking"; fi
@@ -283,6 +311,7 @@ cmd_doctor() {
   rec="$(dstate "$s")/installed.json"
   if [[ ! -f "$rec" ]]; then echo "FAIL nothing installed by verify.sh on this device: run verify.sh build, then verify.sh install"; ok=0
   elif [[ "$(installed_sha256)" != "$(jq -r .sha256 "$rec")" ]]; then echo "FAIL the app on the device isn't the APK verify.sh installed; install again"; ok=0
+  elif [[ "$(jq -r '.external // false' "$rec")" == "true" ]]; then echo "PASS installed app is an external APK ($(jq -r '.sha256[0:16]' "$rec")), not a build of this source: the evidence marks it external"
   elif [[ "$(jq -r '.base // empty' "$rec")" != "" ]]; then echo "PASS installed app is the base build of $(jq -r '.base' "$rec") ($(jq -r '.head[0:10]' "$rec")), not this checkout: a before run"
   elif [[ "$(jq -r .fingerprint "$rec")" != "$(source_fingerprint | jq -r .fingerprint)" ]]; then echo "FAIL stale build: the source changed since it was built; build and install again"; ok=0
   else echo "PASS installed app is the build of the current source ($(jq -r '.sha256[0:16]' "$rec"), $(jq -r '.head[0:10]' "$rec")$(jq -r 'if .dirty then " + uncommitted changes" else "" end' "$rec"))"; fi
@@ -293,10 +322,12 @@ cmd_doctor() {
 # Everything a user does on screen goes through `android layout` (the element tree) and `adb shell input`.
 
 layout_json() {
-  local out
-  out="$(android layout --device "$(serial)" 2>/dev/null)" || true
+  local out rc=0
+  out="$(android layout --device "$(serial)" 2>/dev/null)" || rc=$?
+  uilog "android layout" "$rc"
   if [[ -z "$out" || "${out:0:1}" != "[" ]]; then
-    sleep 1; out="$(android layout --device "$(serial)" 2>/dev/null)" || true
+    sleep 1; rc=0; out="$(android layout --device "$(serial)" 2>/dev/null)" || rc=$?
+    uilog "android layout (retry)" "$rc"
   fi
   [[ -n "$out" && "${out:0:1}" == "[" ]] \
     || die "android layout returned nothing (an animation or a WebView can block it); take a shot or use 'android screen capture --annotate'"
@@ -385,6 +416,9 @@ cmd_wait() {
 
 # Tappable elements, one per line: top, id, text, description, interactions and state.
 cmd_ui() { lp ui; }
+
+# The raw element tree from android layout, as JSON.
+cmd_layout() { layout_json; }
 
 # Every element with text (id, text, interactions and state), or one id's text; exit 15 when absent.
 cmd_text() { lp text "$@"; }
@@ -538,12 +572,12 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|windows|text|checked|shot|record|launch|restart|open|reset|web|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|layout|windows|text|checked|shot|record|launch|restart|open|reset|web|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on
        verify.sh boot [<avd>]                 start a user AVD, or the fallback when there are none
-       verify.sh build [--base <ref>] | install [--base] | doctor | cleanup
+       verify.sh build [--base <ref>] | install [--base | --apk <path>] | doctor | cleanup
        verify.sh each <command>...            run a command on every selected device
        verify.sh on <serial> <command>...     run a command on one selected device
    drive (android layout + adb):
@@ -552,7 +586,7 @@ usage: verify.sh devices                      attached devices and AVDs on this 
        verify.sh key back|home|enter|tab      verify.sh scroll up|down [times]
        verify.sh assert visible|not-visible <selector> | text <selector> <expected> | where <Activity>
        verify.sh wait <selector> [secs]       verify.sh where
-       verify.sh ui | windows | text [<id>] | checked <id> [index]
+       verify.sh ui | layout | windows | text [<id>] | checked <id> [index]
        verify.sh shot <name>.png              verify.sh record start <name>.mp4 | stop
        verify.sh launch | restart | open <url>
        verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'

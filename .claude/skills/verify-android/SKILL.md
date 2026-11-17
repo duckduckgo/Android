@@ -45,8 +45,14 @@ ask first.
 $V build     # ./gradlew :app:assembleInternalDebug
 $V install   # installs that build, refusing it if the source changed since, and checks the APK hash on the device
             # (--base installs the build from `build --base <ref>` instead; see Prove)
+$V install --apk <path>   # an APK this skill didn't build, such as one from CI
 $V doctor
 ```
+
+`install --apk` records only the APK's sha256, marked external, with no source. `doctor` passes it, the
+way it passes a base build, and says the app isn't a build of this source; proofs run against it and the
+report and `pr-summary` name it "external APK". It must be an internal debug build
+(`com.duckduckgo.mobile.android.debug`), or the hash check after installing fails.
 
 `build` works the way Android PR #10551 does. It records the source the APK came from
 (the committed tree plus every uncommitted change, outside the agent tooling folders `.claude`, `.agents`
@@ -64,9 +70,12 @@ with another key; uninstalling it deletes the user's app data, so ask.
 
 ## Doctor
 
-`$V doctor` is read-only. It checks the device is online, says whether this run booted it (and so may
-reset it) or it belongs to the user, that the `android` CLI and `node` are there, and that the app on the
-device is the APK `install` put there, built from the current source (else: build and install again). It
+`$V doctor` is read-only. It checks the device is online and set to English (proofs and recipes match
+English UI text, so any other language fails here instead of failing checks; it reads
+`persist.sys.locale`, then `ro.product.locale`, and only notes it when neither is set), says whether this
+run booted it (and so may reset it) or it belongs to the user, that the `android` CLI and `node` are
+there, and that the app on the device is the APK `install` put there, built from the current source
+(else: build and install again), or a base or external APK installed on purpose. It
 prints the branch, commit and dirty file count so the evidence names the code under test. Run it first, and whenever the app does something the code says it should not.
 
 ## Prove
@@ -80,19 +89,37 @@ P=.claude/skills/verify-android/prove.py
 $P .claude/skills/verify-android/proofs/<name>.py           # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
 $V build --base origin/develop                     # the "before" build (git fetch first for the latest)
 $P compare .claude/skills/verify-android/proofs/<name>.py   # runs it on the base build, then on this checkout's
+$P pr-summary [<before>] <after>                   # Markdown for the PR, from runs' proof-<name>.json (or the evidence folder)
 $P selftest                                        # after changing prove.py: the harness still tells pass from fail
+$P selftest --offline                              # only the cases that need no device (pr-summary)
 ```
 
 A run refuses to start unless `doctor` passes, stops with ERROR at the first step that can't be done
-(so a broken path never reads as failed checks), and needs at least one check to pass. `android.mark()`
-before the action under test, then `android.expect_pixel(name)` reads the pixels the debug build logs
-after it, independently of the screen. Each run writes `proof-<name>.md`, `.json` and its video (in 160 s
-segments) to the evidence folder.
+(so a broken path never reads as failed checks), and needs at least one check to pass. Each run writes
+`proof-<name>.md`, `.json` and its video (in 160 s segments) to the evidence folder, and appends every
+`verify.sh` command, with the `adb` and `android` calls it made and their exit codes, to `ui.log`. When a
+step fails it also saves `layout-at-failure.json` (the element tree) and `at-failure.png`; the error names
+them.
+
+The `android` handle a proof gets:
+
+- **Act:** `tap`, `type`, `key`, `scroll`, `open`, `launch`, `reset`, `shot(name)`; a step that fails raises `Error` (ERROR).
+- **Read:** `where`, `text`, `lines`, `checked`, `windows`, `ui`, `web_targets`, `visible`, `wait`, `web_eval`, `poll(read, until, timeout)`.
+- **Check:** `check(what, ok, detail)`; `mark()` right before the action under test, then `expect_pixel(name)` / `expect_no_pixel(name)` (the pixels the debug build logs, independently of the screen) and `expect_log(what, pattern)` (a logcat line matching the regex since the mark).
+- **Report:** `note(text)`, `section(title, markdown)`, and `unverified(what, why)` for something the proof couldn't check: listed in the report and `pr-summary`, never a pass and never a fail (a proof with only those is FAIL, as with no checks).
+- A module-level `LIVE = ["Duck.ai chat"]` names the live services the proof depends on; the report and `pr-summary` list them.
+
+`pr-summary` prints Markdown for a PR's verification section: a verdict line, the device and builds
+(commit, base or branch or external APK), live services, the checks that changed between the runs, every
+check result in a collapsed `<details>`, the proof's source when it isn't committed unchanged, and the
+commands to rerun it. It carries no local paths, logs, screenshots or device serials, so it's safe for
+a public PR. Given one run with a `-base` run of the same proof beside it (as `compare` leaves them), it
+summarises both.
 
 `build --base <ref>` builds the ref in `build/verify/base-worktree`, a worktree this skill owns and moves
 between base commits, and keeps the APK per commit, so the same base is built once. `compare` installs
 it, runs the proof, installs this checkout's build and runs it again (base runs' files are labelled
-`-base`), then writes `compare-<name>.md` with every check side by side. The strongest evidence for a
+`-base`, external APK runs' `-external`), then writes `compare-<name>.md` with every check side by side. The strongest evidence for a
 fix is FAIL before and PASS after; for a refactor or a removal, PASS on both is the expectation, so say
 which one you expect. Its exit code is the after run's.
 
@@ -111,6 +138,7 @@ screen with its text, interactions and state (checked, focused, selected), tappa
 | `$V wait <selector> [secs]` | Polls until the element is on screen |
 | `$V where` | The resumed activity, for example `SettingsActivity`; `-` when the app is not in front |
 | `$V ui` | Tappable elements, one per line: top, id, text, description, interactions and state |
+| `$V layout` | The raw element tree from `android layout`, as JSON |
 | `$V windows` | Text in every window with its centre (`x y`, tab, text), including popups such as the Duck.ai model and reasoning pickers, which `android layout` does not list; tap a row with `adb -s <serial> shell input tap x y` |
 | `$V text [<resource-id>]` | Every element with text, with its state; with an id, that element's text or exit 15 |
 | `$V checked <resource-id> [index]` | `true`/`false` for a switch, checkbox or radio |
@@ -183,6 +211,7 @@ did not boot. Run `$V cleanup` after a failed run too, before retrying.
 ## Gotchas
 
 - An app installed from Android Studio or plain Gradle has no install record, so `doctor` fails. `$V build` and `$V install` fix it.
+- `doctor` fails on a device set to another language. Switching the user's phone to English changes their settings, so ask first.
 - `doctor` fails as stale after any change to app source, committed or not. Changes inside `.claude`, `.agents` and `.codex` don't count. Run `$V build` and `$V install`.
 - `android layout` can come back empty during an animation or on some WebView screens; the helpers retry once and then stop with an error. Take a shot, or use `android screen capture --annotate` and `android screen resolve` (interact.md) to find the element by its label.
 - A page hides its toolbar once it scrolls, so `id:browserMenu` and `id:tabsMenu` vanish from the layout; `$V scroll down` brings them back.
