@@ -34,6 +34,7 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.DaxButtonGhost
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogStackedAlertBinding
 import com.google.android.material.button.MaterialButton
@@ -78,6 +79,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var titleText: CharSequence = ""
     private var messageText: CharSequence = ""
     private var headerImageDrawableId = 0
+    private var content: View? = null
     private var stackedButtonList: MutableList<StackedButtonSpec> = mutableListOf()
     private var isDestructiveVersion: Boolean = false
     private var isRebrandUpdate: Boolean = false
@@ -106,6 +108,15 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     fun setMessage(text: CharSequence): StackedAlertDialogBuilder {
         messageText = text
+        return this
+    }
+
+    /**
+     * Places [view] between the message and the buttons, for content the builder has no slot for.
+     * The same view is moved into the rebuilt dialog on rotation, so any state it holds survives.
+     */
+    fun setContentView(view: View): StackedAlertDialogBuilder {
+        content = view
         return this
     }
 
@@ -307,6 +318,12 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.stackedlertDialogMessage.gone()
         } else {
             binding.stackedlertDialogMessage.text = messageText
+        }
+
+        content?.let { view ->
+            (view.parent as? ViewGroup)?.removeView(view)
+            binding.stackedAlertDialogContent.addView(view)
+            binding.stackedAlertDialogContent.show()
         }
 
         if (isRebrandUpdate) {
