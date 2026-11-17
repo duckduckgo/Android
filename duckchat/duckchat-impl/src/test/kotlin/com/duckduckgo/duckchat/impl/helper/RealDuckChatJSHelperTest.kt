@@ -160,7 +160,7 @@ class RealDuckChatJSHelperTest {
 
     private val fakeClientTool = FakeClientTool(name = "listOpenTabs", enabled = false)
     private val allowingPermissionGate: ClientToolPermissionGate = mock {
-        onBlocking { decide(any(), any()) } doReturn ClientToolPermissionDecision.ALLOWED
+        onBlocking { decide(any(), any(), anyOrNull()) } doReturn ClientToolPermissionDecision.ALLOWED
     }
     private val clientToolsExecutor = RealClientToolsExecutor(
         tools = FakeClientToolPluginPoint(fakeClientTool),

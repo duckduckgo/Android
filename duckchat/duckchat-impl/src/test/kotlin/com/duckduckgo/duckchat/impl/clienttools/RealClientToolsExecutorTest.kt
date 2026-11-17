@@ -50,6 +50,11 @@ class RealClientToolsExecutorTest {
     private val autoTool = FakeClientTool(name = "autoTool", version = 2)
     private val askTool = FakeClientTool(name = "askTool", permissionMode = ASK_MODE)
     private val otherAskTool = FakeClientTool(name = "otherAskTool", permissionMode = OTHER_ASK_MODE)
+    private val onceTool = FakeClientTool(
+        name = "onceTool",
+        permissionMode = ONCE_MODE,
+        detail = { ClientToolPromptDetail.Shown("https://example.com/a?b=c") },
+    )
 
     private val store = FakeClientToolPermissionStore()
     private val prompt = FakeClientToolPermissionPrompt()
@@ -885,6 +890,115 @@ class RealClientToolsExecutorTest {
         assertGranted(again.await(), "askTool", "otherAskTool")
     }
 
+    @Test
+    fun whenAskEveryTimeToolAllowedThenItRunsWithTheShownDetailAndTheNextCallAsksAgain() = runTest {
+        val first = async { executeOnceTool() }
+        runCurrent()
+        assertEquals(
+            ClientToolPermissionRequest.RunToolOnce(CHAT_TAB_ID, BrowserMode.REGULAR, ONCE_MODE, "https://example.com/a?b=c"),
+            prompt.current.request,
+        )
+        prompt.current.answer(ClientToolPermissionAnswer.AllowOnce)
+        assertEquals(true, first.await().getBoolean("ok"))
+        assertEquals("https://example.com/a?b=c", onceTool.calls.single().second.allowedDetail)
+
+        val second = async { executeOnceTool() }
+        runCurrent()
+        assertEquals(2, prompt.prompts.size)
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
+        assertFailure("denied", second.await())
+        assertEquals(1, onceTool.calls.size)
+    }
+
+    @Test
+    fun whenAskEveryTimeToolPromptDismissedThenCancelled() = runTest {
+        val reply = async { executeOnceTool() }
+        runCurrent()
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
+
+        assertFailure("cancelled", reply.await())
+        assertTrue(onceTool.calls.isEmpty())
+    }
+
+    @Test
+    fun whenAskEveryTimeToolIsAlwaysAllowedOrGrantedForChatThenItStillAsks() = runTest {
+        store.choices["onceTool"] = ClientToolPermission.ALWAYS_ALLOW
+        chatGrants.grant(CHAT_ID, listOf("onceTool"))
+
+        val reply = async { executeOnceTool() }
+        runCurrent()
+
+        assertTrue(prompt.current.request is ClientToolPermissionRequest.RunToolOnce)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowOnce)
+        assertEquals(true, reply.await().getBoolean("ok"))
+    }
+
+    @Test
+    fun whenAskEveryTimeToolIsNeverAllowedThenDeniedWithoutPrompt() = runTest {
+        store.choices["onceTool"] = ClientToolPermission.NEVER_ALLOW
+
+        assertFailure("denied", executeOnceTool())
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenDevSkipFlagOnInternalBuildThenAskEveryTimeToolStillAsks() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        feature.devSkipPermissionPrompt().setRawStoredState(Toggle.State(enable = true))
+
+        val reply = async { executeOnceTool() }
+        runCurrent()
+
+        assertEquals(1, prompt.prompts.size)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowOnce)
+        reply.await()
+    }
+
+    @Test
+    fun whenAskEveryTimeToolTargetCannotBeResolvedThenItsCodeIsSentWithoutPrompt() = runTest {
+        onceTool.detail = { ClientToolPromptDetail.Failure(ClientToolErrorCode.NOT_FOUND) }
+
+        assertFailure("not_found", executeOnceTool())
+        assertTrue(prompt.prompts.isEmpty())
+        assertTrue(onceTool.calls.isEmpty())
+    }
+
+    @Test
+    fun whenAskEveryTimeToolDetailThrowsThenExecutionFailedWithoutPrompt() = runTest {
+        onceTool.detail = { throw IllegalStateException("boom") }
+
+        assertFailure("execution_failed", executeOnceTool())
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenRequestAccessNamesAskEveryTimeToolThenItIsNeitherAskedNorGranted() = runTest {
+        enableRequestAccess()
+
+        val reply = async { requestAccess("onceTool", "askTool") }
+        runCurrent()
+        assertEquals(listOf(AskingTool("askTool", ASK_MODE)), (prompt.current.request as ClientToolPermissionRequest.GrantAccess).tools)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
+        assertGranted(reply.await(), "askTool")
+
+        val again = async { executeOnceTool() }
+        runCurrent()
+        assertTrue(prompt.current.request is ClientToolPermissionRequest.RunToolOnce)
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
+        again.await()
+    }
+
+    @Test
+    fun whenRequestAccessNamesOnlyAskEveryTimeToolThenNothingIsGrantedWithoutPrompt() = runTest {
+        enableRequestAccess()
+
+        assertGranted(requestAccess("onceTool"))
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    private suspend fun executeOnceTool(): JSONObject =
+        executor(askTool, onceTool).execute(request("onceTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
+
     private fun enableRequestAccess() {
         feature.self().setRawStoredState(Toggle.State(enable = true))
         feature.requestAccess().setRawStoredState(Toggle.State(enable = true))
@@ -892,7 +1006,12 @@ class RealClientToolsExecutorTest {
 
     private suspend fun requestAccess(vararg names: String): JSONObject {
         val input = JSONObject().put("capabilities", JSONArray(names.toList())).toString()
-        return executor().execute(request("requestAccess", 1, input = input), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
+        return executor(
+            autoTool,
+            askTool,
+            otherAskTool,
+            onceTool,
+        ).execute(request("requestAccess", 1, input = input), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
     }
 
     private suspend fun TestScope.allowForChat(
@@ -944,5 +1063,6 @@ class RealClientToolsExecutorTest {
         const val OTHER_CHAT_ID = "chat-2"
         val ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, name = 3, description = 4)
         val OTHER_ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 5, promptMessage = 6, name = 7, description = 8)
+        val ONCE_MODE = ClientToolPermissionMode.AskEveryTime(promptTitle = 9, promptMessage = 10)
     }
 }

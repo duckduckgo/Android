@@ -48,6 +48,7 @@
     <!-- Duck.ai client tool permission prompt -->
     <string name="duckAiClientToolPromptAllowInChat">Allow in This Chat</string>
     <string name="duckAiClientToolPromptDontAllow">Don’t Allow</string>
+    <string name="duckAiClientToolPromptAllowOnce">Allow</string>
     <string name="duckAiClientToolRequestAccessPromptTitle">Allow Duck.ai to use these in this chat?</string>
     <string name="duckAiClientToolRequestAccessPromptMessage">Duck.ai can use these without asking again in this chat until you close the app.</string>
     <string name="duckAiClientToolRemoveContentDescription" instruction="Label of the button that takes a browser feature out of the request. Placeholder is the feature's name, such as List Open Tabs">Don’t allow %1$s</string>

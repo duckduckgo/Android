@@ -43,6 +43,14 @@ sealed interface ClientToolPermissionRequest {
         val tool: AskingTool,
     ) : ClientToolPermissionRequest
 
+    /** Asks to run an [ClientToolPermissionMode.AskEveryTime] tool for this call only; [detail] is what it acts on, such as a URL. */
+    data class RunToolOnce(
+        override val chatTabId: String,
+        override val browserMode: BrowserMode,
+        val copy: ClientToolPermissionMode.AskEveryTime,
+        val detail: String,
+    ) : ClientToolPermissionRequest
+
     /**
      * Asks to use several tools for the rest of the chat.
      * @param toolsRemovable whether the user may take tools out before allowing the rest.
@@ -66,6 +74,9 @@ sealed interface ClientToolPermissionAnswer {
      * prompt. Those stay unanswered, so the next call or request for them asks again.
      */
     data class AllowForChat(val removedTools: Set<String> = emptySet()) : ClientToolPermissionAnswer
+
+    /** Allows a [ClientToolPermissionRequest.RunToolOnce] call. */
+    data object AllowOnce : ClientToolPermissionAnswer
 
     data object DontAllow : ClientToolPermissionAnswer
 

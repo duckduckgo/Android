@@ -141,20 +141,36 @@ class RealClientToolsExecutor @Inject constructor(
         if (!tool.isValidInput(request.input)) {
             return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
         }
-        when (permissionGate.decide(tool, context)) {
+        val promptDetail = if (tool.permissionMode is ClientToolPermissionMode.AskEveryTime) {
+            when (val detail = failingSafely(tool) { tool.promptDetail(request.input, context) }) {
+                is ClientToolPromptDetail.Shown -> detail.text
+                is ClientToolPromptDetail.Failure -> return ClientToolResult.Failure(detail.code)
+                null -> return ClientToolResult.Failure(ClientToolErrorCode.EXECUTION_FAILED)
+            }
+        } else {
+            null
+        }
+        when (permissionGate.decide(tool, context, promptDetail)) {
             ClientToolPermissionDecision.DENIED -> return ClientToolResult.Failure(ClientToolErrorCode.DENIED)
             ClientToolPermissionDecision.CANCELLED -> return ClientToolResult.Failure(ClientToolErrorCode.CANCELLED)
             // Remote config can turn the tool off while its prompt is open.
             ClientToolPermissionDecision.ALLOWED -> if (!tool.isEnabled()) return ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE)
         }
-        return try {
-            tool.execute(request.input, context)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            logcat(WARN) { "Client tool ${tool.name} failed: ${e.asLog()}" }
-            ClientToolResult.Failure(ClientToolErrorCode.EXECUTION_FAILED)
-        }
+        return failingSafely(tool) { tool.execute(request.input, context.copy(allowedDetail = promptDetail)) }
+            ?: ClientToolResult.Failure(ClientToolErrorCode.EXECUTION_FAILED)
+    }
+
+    /** Runs [block], or gives null when it throws, so a failing tool settles its call as `execution_failed`. */
+    private suspend fun <T> failingSafely(
+        tool: ClientTool,
+        block: suspend () -> T,
+    ): T? = try {
+        block()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        logcat(WARN) { "Client tool ${tool.name} failed: ${e.asLog()}" }
+        null
     }
 
     override fun cancelPendingCalls(chatTabId: String) {

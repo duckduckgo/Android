@@ -103,6 +103,10 @@ class ClientToolPermissionDialogPresenter @Inject constructor(
                 dialog
                     .setTitle(request.tool.copy.promptTitle)
                     .setMessage(request.tool.copy.promptMessage)
+            is ClientToolPermissionRequest.RunToolOnce ->
+                dialog
+                    .setTitle(request.copy.promptTitle)
+                    .setMessage(activity.getString(request.copy.promptMessage, request.detail))
             is ClientToolPermissionRequest.GrantAccess ->
                 dialog
                     .setTitle(R.string.duckAiClientToolRequestAccessPromptTitle)
@@ -112,7 +116,7 @@ class ClientToolPermissionDialogPresenter @Inject constructor(
         dialog
             .setStackedButtons(
                 listOf(
-                    StackedButton(R.string.duckAiClientToolPromptAllowInChat, SECONDARY),
+                    StackedButton(allowButtonText(pending.request), SECONDARY),
                     StackedButton(R.string.duckAiClientToolPromptDontAllow, SECONDARY),
                 ),
             )
@@ -120,7 +124,7 @@ class ClientToolPermissionDialogPresenter @Inject constructor(
                 object : StackedAlertDialogBuilder.EventListener() {
                     override fun onButtonClicked(position: Int) = pending.answer(
                         when (position) {
-                            ALLOW_BUTTON -> ClientToolPermissionAnswer.AllowForChat(selections.of(pending)?.removed.orEmpty())
+                            ALLOW_BUTTON -> allowAnswer(pending)
                             else -> ClientToolPermissionAnswer.DontAllow
                         },
                     )
@@ -130,6 +134,17 @@ class ClientToolPermissionDialogPresenter @Inject constructor(
             )
         shown = ShownDialog(pending, dialog)
         dialog.show()
+    }
+
+    private fun allowButtonText(request: ClientToolPermissionRequest): Int = when (request) {
+        is ClientToolPermissionRequest.RunToolOnce -> R.string.duckAiClientToolPromptAllowOnce
+        is ClientToolPermissionRequest.RunTool, is ClientToolPermissionRequest.GrantAccess -> R.string.duckAiClientToolPromptAllowInChat
+    }
+
+    private fun allowAnswer(pending: PendingClientToolPermission): ClientToolPermissionAnswer = when (pending.request) {
+        is ClientToolPermissionRequest.RunToolOnce -> ClientToolPermissionAnswer.AllowOnce
+        is ClientToolPermissionRequest.RunTool, is ClientToolPermissionRequest.GrantAccess ->
+            ClientToolPermissionAnswer.AllowForChat(selections.of(pending)?.removed.orEmpty())
     }
 
     private fun grantAccessContent(
