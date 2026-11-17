@@ -151,11 +151,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     private fun configureToolbar() {
         setupToolbar(binding.includeToolbar.toolbar)
-
-        if (intent.getBooleanExtra(EXTRA_SHOW_CLOSE_BUTTON, false)) {
-            binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
-            supportActionBar?.title = ""
-        }
+        binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -324,7 +320,6 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        const val EXTRA_SHOW_CLOSE_BUTTON = "extra_show_close_button"
         const val EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION = "extra_from_freemium_scan_complete_notification"
         private const val KEY_FREE_SCAN_ENTRY_POINT = "key_free_scan_entry_point"
     }
