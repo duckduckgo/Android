@@ -85,6 +85,7 @@ screen with its text, interactions and state (checked, focused, selected), tappa
 | `$V wait <selector> [secs]` | Polls until the element is on screen |
 | `$V where` | The resumed activity, for example `SettingsActivity`; `-` when the app is not in front |
 | `$V ui` | Tappable elements, one per line: top, id, text, description, interactions and state |
+| `$V windows` | Text in every window with its centre (`x y`, tab, text), including popups such as the Duck.ai model and reasoning pickers, which `android layout` does not list; tap a row with `adb -s <serial> shell input tap x y` |
 | `$V text [<resource-id>]` | Every element with text, with its state; with an id, that element's text or exit 15 |
 | `$V checked <resource-id> [index]` | `true`/`false` for a switch, checkbox or radio |
 | `$V launch` / `$V restart` | Opens the app from its launcher entry / force-stops and reopens it |

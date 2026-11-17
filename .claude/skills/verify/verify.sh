@@ -293,7 +293,8 @@ layout_json() {
     || die "android layout returned nothing (an animation or a WebView can block it); take a shot or use 'android screen capture --annotate'"
   printf '%s' "$out"
 }
-lp() { layout_json | python3 -I "$HERE/layout.py" "$@"; }
+# Captured first so an empty layout returns non-zero instead of handing layout.py empty input.
+lp() { local j; j="$(layout_json)" || return 1; printf '%s' "$j" | python3 -I "$HERE/layout.py" "$@"; }
 
 # Parses "<selector> [--index N]" into SEL and IDX.
 sel_index() { SEL="${1:?a selector: id:X, text:X, text~:X, desc:X or desc~:X}"; IDX=1; [[ "${2:-}" == "--index" ]] && IDX="${3:?--index needs a number}"; true; }
@@ -354,7 +355,8 @@ cmd_assert() {
   local kind="${1:-}"; shift || true
   case "$kind" in
     visible) sel_index "$@"; lp find "$SEL" "$IDX" >/dev/null && { echo "visible: $SEL"; return; }; echo "not visible: $SEL" >&2; exit 15 ;;
-    not-visible) sel_index "$@"; lp find "$SEL" "$IDX" >/dev/null || { echo "not visible: $SEL"; return; }; echo "visible: $SEL" >&2; exit 15 ;;
+    not-visible) sel_index "$@"; local rc=0; lp find "$SEL" "$IDX" >/dev/null || rc=$?
+          (( rc == 15 )) && { echo "not visible: $SEL"; return; }; (( rc == 0 )) && { echo "visible: $SEL" >&2; exit 15; }; exit 1 ;;
     text) local actual; actual="$(lp get "${1:?selector}" | python3 -c 'import sys,json; n=json.load(sys.stdin); print(n.get("text") or n.get("content-desc") or "")')" || { echo "not on screen: $1" >&2; exit 15; }
           [[ "$actual" == "${2?expected text}" ]] && { echo "text ok: $actual"; return; }; echo "text was: $actual" >&2; exit 15 ;;
     where) local at; at="$(cmd_where)"; [[ "$at" == "${1:?activity}" ]] && { echo "at $at"; return; }; echo "at $at" >&2; exit 15 ;;
@@ -378,6 +380,19 @@ cmd_ui() { lp ui; }
 # Every element with text (id, text, interactions and state), or one id's text; exit 15 when absent.
 cmd_text() { lp text "$@"; }
 
+# Text in every window, popups included (android layout lists only the activity's window), with the
+# centre to tap: "x y<TAB>text". Uses uiautomator, so another UI-automation client on the device kills it.
+cmd_windows() {
+  a shell uiautomator dump --windows /sdcard/verify-windows.xml >/dev/null 2>&1 \
+    || { sleep 1; a shell uiautomator dump --windows /sdcard/verify-windows.xml >/dev/null 2>&1; } || die "uiautomator dump failed"
+  a exec-out cat /sdcard/verify-windows.xml | python3 -Ic '
+import re, sys
+for m in re.finditer(r"<node [^>]*>", sys.stdin.read()):
+    t = re.search(r" text=\"([^\"]+)\"", m.group(0)); b = re.search(r"bounds=\"\[(\d+),(\d+)\]\[(\d+),(\d+)\]\"", m.group(0))
+    if t and b:
+        x1, y1, x2, y2 = map(int, b.groups()); print((x1 + x2) // 2, (y1 + y2) // 2, sep=" ", end="\t"); print(t.group(1))'
+}
+
 # true/false for the Nth (1-based) checkable element with this id.
 cmd_checked() { lp checked "${1:?usage: verify.sh checked <resource-id> [index]}" "${2:-1}" || die "no element with id $1 at index ${2:-1}"; }
 
@@ -386,7 +401,7 @@ cmd_shot() {
   local name="${1:?usage: verify.sh shot <name>.png}" d; d="$(evidence_dir)"
   a exec-out screencap -p > "$d/$name"
   [[ -s "$d/$name" ]] || die "screencap returned nothing"
-  layout_json > "$d/$name.layout.json" 2>/dev/null || true
+  (layout_json) > "$d/$name.layout.json" 2>/dev/null || true
   printf '{"activity":"%s","capturedUtc":"%s","commit":"%s"}\n' "$(cmd_where)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     "$(git -C "$REPO" rev-parse --short HEAD)" > "$d/$name.json"
   echo "$d/$name"
@@ -519,7 +534,7 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|seed|seeds|flag|flags|tap|type|key|scroll|where|assert|wait|ui|text|checked|shot|record|launch|restart|open|reset|web|logcat|cleanup|subscription) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|seed|seeds|flag|flags|tap|type|key|scroll|where|assert|wait|ui|windows|text|checked|shot|record|launch|restart|open|reset|web|logcat|cleanup|subscription) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on
@@ -533,7 +548,7 @@ usage: verify.sh devices                      attached devices and AVDs on this 
        verify.sh key back|home|enter|tab      verify.sh scroll up|down [times]
        verify.sh assert visible|not-visible <selector> | text <selector> <expected> | where <Activity>
        verify.sh wait <selector> [secs]       verify.sh where
-       verify.sh ui | text [<id>] | checked <id> [index]
+       verify.sh ui | windows | text [<id>] | checked <id> [index]
        verify.sh shot <name>.png              verify.sh record start <name>.mp4 | stop
        verify.sh launch | restart | open <url>
        verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'

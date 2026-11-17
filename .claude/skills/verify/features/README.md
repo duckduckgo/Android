@@ -16,6 +16,8 @@ points. Each is driven with the android CLI and adb; trapdoor only seeds state t
 - Reach the starting state through the Common paths below, `open` and `seed`; drive the step under test with `tap`, `type` and `web tap` on the entry points the file lists.
 - Select by `id:` first, then `text:` / `desc:`. When none fits, `android screen capture --annotate` and `android screen resolve` (android-cli `references/interact.md`) find an element by its label.
 - The New Tab Page and a loaded page use different ids for the same toolbar buttons (`inputModeWidgetNavFire` vs `fireIconMenu`); run `$V where` and `$V ui` when unsure.
+- `android layout` does not list `browserWebView`, so prove a page load by polling `$V web eval 'location.host'`, not with `$V wait id:browserWebView`.
+- Popup windows (the Duck.ai model and reasoning pickers) are not in `$V ui` or `$V text`; read them with `$V windows`.
 
 ## Common paths
 

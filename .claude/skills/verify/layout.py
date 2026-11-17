@@ -72,7 +72,9 @@ def main():
         for n in nodes:
             if not set(n.get("interactions", [])) & {"clickable", "long-clickable", "checkable", "scrollable"}:
                 continue
-            top = point(n.get("bounds") or n.get("center"))[1]
+            # Some WebView nodes come without bounds or centre; list them with top "-".
+            coords = point(n.get("bounds") or n.get("center"))
+            top = coords[1] if len(coords) > 1 else "-"
             print(top, rid(n) or "-", n.get("text") or "-", n.get("content-desc") or "-", flags(n), sep="\t")
     elif action == "text":
         if args:

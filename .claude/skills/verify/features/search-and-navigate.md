@@ -19,15 +19,17 @@ autocomplete suggestion or presses enter, and the page or SERP loads in the curr
 
 Preconditions: baseline; the **New tab** path in the README.
 
-- **URL.** `$V record start nav-url.mp4`, `$V type id:inputField privacy-test-pages.site`, `$V wait text:privacy-test-pages.site 10` (the suggestion row), `$V shot nav-typed.png`, `$V key enter`. Then `$V wait id:browserWebView 20`, `$V assert where BrowserActivity`, `$V web eval 'location.host'` returns `"privacy-test-pages.site"`, `$V shot nav-loaded.png`, `$V record stop`. The screenshot shows the "Privacy Test Pages" heading and the URL in the address bar.
-- **Autocomplete.** After typing, `$V ui` lists the suggestion rows; `$V tap text:privacy-test-pages.site`. Same end state.
-- **Query.** Type `what is a car` and `$V key enter`. The shot shows DuckDuckGo results and `$V web eval 'location.host'` is `"duckduckgo.com"`.
-- **From a page.** On a loaded page, `$V tap id:omnibarTextInputClickCatcher`, `$V wait id:inputField`, `$V type id:inputField www.search-company.site`, `$V key enter`. `$V web eval 'location.host'` returns `"www.search-company.site"` and `$V text tabCount` is unchanged.
+- **URL.** `$V record start nav-url.mp4`, `$V type id:inputField privacy-test-pages.site`. The suggestion list fills in about a second: `$V text` shows the domain as a row (`phrase` on a fresh install, `url` under a `title` once the site is in history) and an "Ask Duck.ai" row (`message`). `$V shot nav-typed.png`, `$V key enter`. Poll `$V web eval 'location.host'` until it returns `"privacy-test-pages.site"`; `$V text omnibarTextInput` reads `http://privacy-test-pages.site/` and `$V assert where BrowserActivity` holds. `$V shot nav-loaded.png`, `$V record stop`. The screenshot shows the "Privacy Test Pages" heading and the URL in the address bar.
+- **Autocomplete.** After typing, tap the row: `$V tap id:url` (history row) or `$V tap id:phrase` (fresh install). Same end state.
+- **Query.** Type `what is a car` and `$V key enter`. `$V web eval 'location.host'` reaches `"duckduckgo.com"`, `$V web eval 'new URLSearchParams(location.search).get("q")'` is `"what is a car"`, and the shot shows results with the query in the address bar.
+- **From a page.** On a loaded page, `$V tap id:omnibarTextInputClickCatcher`, `$V wait id:inputField`; the field holds the current URL, or the query on a SERP. `$V type id:inputField www.search-company.site`, `$V key enter`. `$V web eval 'location.host'` reaches `"www.search-company.site"` and `$V text tabCount` is unchanged.
 
 ## Gotchas
 
 - On the New Tab Page the field is `inputField`; on a loaded page tap `omnibarTextInputClickCatcher` to open the input.
-- `$V type` focuses, clears and types; read the field back with `$V text inputField` and assert on its effect (the suggestion rows).
+- `$V type` focuses, clears and types; read the field back with `$V text inputField` and assert on its effect (the suggestion rows). Don't `$V wait text:<the typed domain>`: the field itself carries that text, so it matches at once.
+- `android layout` does not list `browserWebView`, so `$V wait id:browserWebView` times out on a loaded page. Prove the load with `web eval 'location.host'` (poll it) and `$V text omnibarTextInput`.
+- While the New Tab Page input is focused, the nav bar (`inputModeWidgetNavMenu`) is hidden. `$V tap id:inputModeUnifiedBack` (the back arrow) unfocuses it and shows the plain address bar with `browserMenu`.
 - `$V open` is setup only. It skips the input entirely, so it never proves this feature.
 - On a loaded page, `android layout` also lists the page's own content; select toolbar elements by id, not by text, so a word on the page doesn't match first.
-- Driven with trapdoor: `nav-url` (2026-11-13, on the `ddg_verify_api34` emulator and on a Pixel 7 with Android 17); the other sub-features with the earlier android-CLI harness. Not yet re-driven with this version of the commands; on 2026-11-17 `$V type` into `inputField` was checked on its own (it typed `duck ai & privacy` exactly).
+- Driven with the android CLI on 2026-11-17 (ddg_verify_api34, API 34, `$V build` of `cd1cf8877d`): `nav-url`, `nav-autocomplete`, `nav-query`, `nav-from-page`, as 11 scripted checks that all passed. Not driven: none.
