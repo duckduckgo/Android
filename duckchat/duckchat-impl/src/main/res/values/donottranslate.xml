@@ -67,4 +67,8 @@
     <string name="duckAiClientToolCloseTabsDescription">Close tabs you ask it to close.</string>
     <string name="duckAiClientToolCloseTabsPromptTitle">Allow Duck.ai to close tabs?</string>
     <string name="duckAiClientToolCloseTabsPromptMessage">It will close the tabs you asked it to close.</string>
+    <string name="duckAiClientToolSearchBookmarksName">Search Bookmarks</string>
+    <string name="duckAiClientToolSearchBookmarksDescription">Find bookmarks by title, address or folder.</string>
+    <string name="duckAiClientToolSearchBookmarksPromptTitle">Allow Duck.ai to search your bookmarks?</string>
+    <string name="duckAiClientToolSearchBookmarksPromptMessage">It will see the title, address and folder of the bookmarks it finds.</string>
 </resources>
