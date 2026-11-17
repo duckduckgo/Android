@@ -1,5 +1,5 @@
 """The tab switcher lists one card per tab titled with its page, opens a new tab, switches to a tab by its card,
-closes a tab from its card, offers layout/select/close-all in its menu, and counts many tabs.
+closes a tab from its card, and offers layout/select/close-all in its menu.
 
 Recipe: features/tabs.md. Resets the app, so run it on an owned emulator.
 """
@@ -91,15 +91,3 @@ def run(android):
     android.shot("tabs-menu")
     android.key("back")
     time.sleep(1)
-
-    # many tabs (seed)
-    android.seed("tabs", "--count", "20")
-    time.sleep(5)
-    steps.to_browser(android)
-    count = android.text("tabCount")
-    android.check("toolbar count reads 20 or more", (count or "").isdigit() and int(count) >= 20, count)
-    android.tap("id:inputModeWidgetNavTabs" if android.visible("id:inputModeWidgetNavTabs") else "id:tabsMenu")
-    time.sleep(2)
-    count = android.text("regularTabCount")
-    android.check("switcher regular count matches", (count or "").isdigit() and int(count) >= 20, count)
-    android.shot("tabs-many")

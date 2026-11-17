@@ -1,6 +1,5 @@
 """Duck.ai opens in the browser from the New Tab Page and the tab switcher, answers a prompt, lists the chat in
-Chat History, offers model and reasoning pickers, shows seeded text, voice and image chats with pinned ones first,
-and its header and model picker follow the subscription tier (Free Plan, Plus).
+Chat History, and offers model and reasoning pickers.
 
 Recipe: features/duck-ai.md. Resets the app, so run it on an owned emulator.
 """
@@ -8,10 +7,6 @@ import time
 
 import steps
 from prove import Error
-
-
-def body(android):
-    return android.web_eval("document.body.innerText") or ""
 
 
 def window_rows(android):
@@ -37,14 +32,6 @@ def model_rows(android):
 
 def history_titles(android):
     return [line[1] for line in android.lines() if line[0] == "chatHistoryTitle"]
-
-
-def open_model_picker(android):
-    android.tap("id:inputField")
-    if not android.wait("id:modelPickerChip", 5):
-        raise Error("the model chip didn't show")
-    android.tap("id:modelPickerChip")
-    time.sleep(2)
 
 
 def run(android):
@@ -75,9 +62,12 @@ def run(android):
 
     # duckai-ask
     android.type("id:inputField", "Reply with only the word pineapple")
-    android.check("Ask button appears", android.wait("id:nativeInputAskButton", 5))
+    button = steps.send_button(android, 5)
+    android.check("Ask button appears", button, "neither send button showed")
+    if not button:
+        raise Error("no send button to tap")
     android.mark()
-    android.tap("id:nativeInputAskButton")
+    android.tap(f"id:{button}")
     android.check("prompt and reply on the page", steps.wait_reply(android, "pineapple"))
     search = android.web_eval("location.search")
     android.check("URL carries chatID", "chatID=" in (search or ""), search)
@@ -131,56 +121,3 @@ def run(android):
     steps.outside(android)
     time.sleep(1)
     android.check("reasoning popup closed", "Fast" not in {t for _, t in window_rows(android)})
-
-    # seeded chats (seeding is setup: a refused seed is an error, not a failed check)
-    steps.seed_chats(android, "--count", "4", "--pinned", "2", "--title", "Seed")
-    steps.seed_chats(android, "--kind", "voice", "--count", "1", "--title", "Voice")
-    steps.seed_chats(android, "--kind", "image", "--count", "1", "--title", "Image")
-    android.tap("id:duckAiSidebar")
-    time.sleep(2)
-    sections = [line[1] for line in android.lines() if line[0] == "sectionHeaderText"]
-    android.check("Pinned and Recent sections", "Pinned" in sections and "Recent" in sections, sections)
-    titles = history_titles(android)
-    android.check("pinned chats first", titles[:2] == ["Seed 1", "Seed 2"], titles)
-    android.shot("duckai-history-seeded")
-    android.tap("text:Voice 1")
-    header = android.wait("id:duckAIHeader", 25)
-    time.sleep(4)
-    android.check("voice chat opens, answers labelled Voice Chat", header and "Voice Chat" in body(android))
-    android.shot("duckai-voice-chat")
-    android.tap("id:duckAiSidebar")
-    time.sleep(2)
-    android.tap("text:Image 1")
-    header = android.wait("id:duckAIHeader", 25)
-    time.sleep(4)
-    images = android.web_eval('document.querySelectorAll("img").length') or 0
-    android.check("image chat opens with a seeded image", header and "Seeded image" in body(android) and images >= 1,
-                  f"{images} img")
-    android.shot("duckai-image-chat")
-    android.seed("duckai-chats-none")
-    time.sleep(1)
-    android.tap("id:duckAiSidebar")
-    time.sleep(2)
-    titles = history_titles(android)
-    seeded = [t for t in titles if t.split(" ")[0] in ("Seed", "Voice", "Image")]
-    real = any("pineapple" in t.lower() for t in titles)
-    android.check("clearing seeds keeps the real chat", not seeded and real, titles)
-    android.key("back")
-
-    # tier spot-check (plus)
-    android.subscription("--tier", "plus")
-    time.sleep(3)
-    steps.new_chat(android)
-    title = android.text("aiTitle")
-    android.check("Plus header reads Duck.ai", title == "Duck.ai", title)
-    open_model_picker(android)
-    gated = [m for m in model_rows(android) if m.endswith("…")]
-    android.check("gated rows end in …", len(gated) >= 1, gated)
-    android.shot("duckai-plus-model-picker")
-    steps.outside(android)
-    time.sleep(1)
-    android.subscription("none")
-    time.sleep(3)
-    steps.new_chat(android)
-    plan = android.text("duckAIFreePillTitle")
-    android.check("back to Free Plan", plan == "Free Plan", plan)

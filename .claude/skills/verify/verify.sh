@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Verification driver for the DuckDuckGo Android app. Picks the device(s) to verify on, leaves
-# navigation, interaction and capture to trapdoor (github.com/duckduckgo/android-trapdoor), and adds
-# what trapdoor does not do: device selection and emulator lifecycle, and acting inside WebViews.
+# Verification driver for the DuckDuckGo Android app. Picks the device(s) to verify on, builds and installs
+# this checkout, drives the app with the android CLI and adb, acts inside WebViews through DevTools, and
+# captures screenshots and video.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
@@ -12,8 +12,7 @@ EMULATOR="$SDK/emulator/emulator"
 export JAVA_HOME="${JAVA_HOME_21:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}"
 export PATH="$JAVA_HOME/bin:$HOME/.local/bin:$SDK/platform-tools:$PATH"
 
-# DDG_TRAPDOOR_PACKAGE=com.duckduckgo.dev.android drives a build made with the subscriptions staging patch.
-PKG="${DDG_TRAPDOOR_PACKAGE:-com.duckduckgo.mobile.android.debug}"
+PKG="com.duckduckgo.mobile.android.debug"
 APK_DIR="$REPO/app/build/outputs/apk/internal/debug"
 VERIFY_ROOT="$REPO/build/verify"
 STATE="$VERIFY_ROOT/state"
@@ -67,10 +66,6 @@ evidence_dir() {
   mkdir -p "$d"; echo "$d"
 }
 a() { "$ADB" -s "$(serial)" "$@"; }
-td() {
-  command -v trapdoor >/dev/null || die "trapdoor not installed; see github.com/duckduckgo/android-trapdoor INSTALL.md"
-  trapdoor --device "$(serial)" --android-root "$REPO" "$@"
-}
 
 cmd_devices() {
   local s sel; sel="$(selected)"
@@ -177,18 +172,6 @@ $(user_avds | sed 's/^/  /')"
   echo "ready: $s"
 }
 
-# Builds this checkout with the trapdoor bridge, installs it on the device and smoke-tests it.
-# Puts the app in a subscription state and restarts it so every in-memory flow reads the new state.
-# `none` removes a seeded subscription; anything else goes to `seed subscription` (--tier, --region, ...).
-cmd_subscription() {
-  local out
-  if [[ "${1:-}" == "none" ]]; then out="$(td --json seed subscription-none)"
-  else out="$(td --json seed subscription "$@")"; fi  # seeding, like cmd_seed
-  echo "$out"
-  grep -q '"error"' <<<"$out" && die "seed refused"
-  cmd_restart
-}
-
 # --- Build identity, the way verify-android (#10551) does it ------------------------------------------
 # A build records the source it came from (the committed tree plus every uncommitted change, outside the
 # agent tooling folders, so editing this skill does not make a build stale) and the APK's sha256. install refuses a
@@ -223,26 +206,18 @@ installed_sha256() {
   local path; path="$(a shell pm path "$PKG" | tr -d '\r' | sed -n 's/^package://p' | head -1)"
   [[ -n "$path" ]] && a shell sha256sum "$path" | tr -d '\r' | cut -d' ' -f1
 }
-trapdoor_root() { python3 -I -c 'import os,sys; print(os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[1]))))' "$(command -v trapdoor)"; }
-
-# Builds internalDebug with trapdoor's bridge added by its Gradle init script (seed and set flag need it),
-# keeps a copy named by its hash, and records it.
-# Assembles the internal debug app with the trapdoor bridge in checkout $1; prints the APK it produced.
+# Assembles the internal debug app in checkout $1 and prints the APK it produced. The auth properties
+# (app/build.gradle) let automation open Passwords and Sync without the device's screen lock.
 assemble() {
-  local root="$1" bridge newest
-  command -v trapdoor >/dev/null || die "trapdoor not installed (its bridge is what seed and set flag talk to); see github.com/duckduckgo/android-trapdoor INSTALL.md"
-  bridge="$(trapdoor_root)"
-  [[ -f "$bridge/gradle/trapdoor-bridge.init.gradle" ]] || die "no trapdoor-bridge.init.gradle under $bridge"
-  echo "building :app:assembleInternalDebug in $root with the trapdoor bridge ..." >&2
-  (cd "$root" && DDG_ANDROID_ROOT="$root" DDG_TRAPDOOR_BRIDGE="$bridge" ./gradlew -q \
-    --init-script "$bridge/gradle/trapdoor-bridge.init.gradle" :app:assembleInternalDebug \
+  local root="$1" newest
+  echo "building :app:assembleInternalDebug in $root ..." >&2
+  (cd "$root" && ./gradlew -q :app:assembleInternalDebug \
     -Pautofill-disable-auth-requirement -Psync-disable-auth-requirement -Pforce-default-variant >&2) || die "build failed"
   # The file name carries the version, so APKs of earlier versions stay in the folder: the newest is this build.
   newest="$(ls -t "$root/app/build/outputs/apk/internal/debug"/*.apk 2>/dev/null | head -1)"
   [[ -n "$newest" ]] || die "the build produced no internalDebug APK"
   echo "$newest"
 }
-bridge_version() { git -C "$(trapdoor_root)" rev-parse --short HEAD 2>/dev/null || echo unknown; }
 cmd_build() {
   [[ "${1:-}" == "--base" ]] && { cmd_build_base "${2:?usage: verify.sh build --base <ref>, e.g. origin/develop}"; return; }
   local source newest kept digest
@@ -250,8 +225,8 @@ cmd_build() {
   newest="$(assemble "$REPO")"
   digest="$(file_sha256 "$newest")"; mkdir -p "$BUILDS"; kept="$BUILDS/${digest:0:16}.apk"
   cp "$newest" "$kept"
-  python3 -I -c 'import json,sys; r=json.loads(sys.argv[1]); r.update(apk=sys.argv[2], sha256=sys.argv[3], bridge=sys.argv[4], built_at=sys.argv[5]); print(json.dumps(r))' \
-    "$source" "$kept" "$digest" "$(bridge_version)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$BUILDS/build.json"
+  python3 -I -c 'import json,sys; r=json.loads(sys.argv[1]); r.update(apk=sys.argv[2], sha256=sys.argv[3], built_at=sys.argv[4]); print(json.dumps(r))' \
+    "$source" "$kept" "$digest" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$BUILDS/build.json"
   echo "built ${digest:0:16} from $(git -C "$REPO" rev-parse --short HEAD)$(grep -q '"dirty": true' "$BUILDS/build.json" && echo ' (with uncommitted changes)')"
 }
 # The "before" side of a comparison: builds <ref> in a worktree this tool owns. The worktree is moved
@@ -272,8 +247,8 @@ cmd_build_base() {
     cp "$(assemble "$tree")" "$kept"
   fi
   digest="$(file_sha256 "$kept")"
-  jq -n --arg base "$ref" --arg head "$sha" --arg apk "$kept" --arg sha256 "$digest" --arg bridge "$(bridge_version)" \
-    --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{base: $base, head: $head, apk: $apk, sha256: $sha256, bridge: $bridge, built_at: $at}' \
+  jq -n --arg base "$ref" --arg head "$sha" --arg apk "$kept" --arg sha256 "$digest" \
+    --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{base: $base, head: $head, apk: $apk, sha256: $sha256, built_at: $at}' \
     > "$BUILDS/base.json"
   echo "built base $ref (${sha:0:10}) as ${digest:0:16}"
 }
@@ -311,13 +286,11 @@ cmd_doctor() {
   elif [[ "$(jq -r '.base // empty' "$rec")" != "" ]]; then echo "PASS installed app is the base build of $(jq -r '.base' "$rec") ($(jq -r '.head[0:10]' "$rec")), not this checkout: a before run"
   elif [[ "$(jq -r .fingerprint "$rec")" != "$(source_fingerprint | jq -r .fingerprint)" ]]; then echo "FAIL stale build: the source changed since it was built; build and install again"; ok=0
   else echo "PASS installed app is the build of the current source ($(jq -r '.sha256[0:16]' "$rec"), $(jq -r '.head[0:10]' "$rec")$(jq -r 'if .dirty then " + uncommitted changes" else "" end' "$rec"))"; fi
-  if td ping >/dev/null 2>&1; then echo "PASS trapdoor bridge answers (seed, set flag)"; else echo "INFO trapdoor bridge does not answer: seed and set flag won't work until the app is running a verify.sh build"; fi
   [[ $ok == 1 ]] || exit 1
 }
 
 # --- Driving: android CLI layout + adb input -------------------------------------------------------
-# trapdoor stays for state the app cannot be driven into (seed, set flag, reset); everything a user
-# does on screen goes through `android layout` (the element tree) and `adb shell input`.
+# Everything a user does on screen goes through `android layout` (the element tree) and `adb shell input`.
 
 layout_json() {
   local out
@@ -386,7 +359,7 @@ cmd_where() {
 }
 
 # assert visible|not-visible <selector> [--index N], assert text <selector> <expected>, assert where <Activity>.
-# Exit 15 when false, like trapdoor's assert.
+# Exit 15 when false.
 cmd_assert() {
   local kind="${1:-}"; shift || true
   case "$kind" in
@@ -480,25 +453,20 @@ cmd_open() {
   echo "opened $1"
 }
 
-# State setup that cannot be driven through the UI: clears app data and seeds onboarding as done. Only on
-# an emulator this run booted; on the user's device trapdoor itself asks for --yes.
+# A fresh app on the New Tab Page: clears app data, grants notifications up front so their prompt doesn't
+# cover onboarding, and takes the internal build's Skip Onboarding. Only on an emulator this run booted.
 cmd_reset() {
   owned "$(serial)" || die "reset clears app data; this device is not an emulator this run booted, so ask the user first"
-  td reset; cmd_launch
+  a shell pm clear "$PKG" >/dev/null || die "couldn't clear the app's data"
+  a shell pm grant "$PKG" android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
+  cmd_launch >/dev/null
+  cmd_wait id:skipOnboardingButton 30 >/dev/null || die "onboarding didn't show Skip Onboarding"
+  cmd_tap id:skipOnboardingButton >/dev/null
+  cmd_wait id:inputField 20 >/dev/null || die "Skip Onboarding didn't land on the New Tab Page"
+  echo "reset: fresh app on the New Tab Page"
 }
 
-# --- Seeding: the only use of trapdoor -------------------------------------------------------------
-# trapdoor's in-app bridge writes state the UI cannot reach: seeded data, feature flags, a clean app.
-# Nothing else goes through it; driving and evidence use the android CLI and adb above.
-cmd_seed() { local d; d="$(evidence_dir)"; (cd "$d" && td seed "${@:?usage: verify.sh seed <fixture> [--param value ...]}"); }
-cmd_seeds() { td list --fixtures | cut -f1; }
-cmd_flag() {
-  [[ "${1:-}" && "${2:-}" =~ ^(enabled|disabled)$ ]] || die "usage: verify.sh flag <parent.name> enabled|disabled"
-  td set flag --feature "$1" --state "$2"
-}
-cmd_flags() { td flags "$@"; }
-
-# DevTools forward on a free port per device (trapdoor's cdp-forward always uses tcp:9222).
+# DevTools forward on a free port per device, so several devices can be driven at once.
 # Needs Developer Settings > Web Content Debugging on.
 cdp_port() {
   local s pid sock port d; s="$(serial)"; d="$(dstate "$s")"
@@ -570,12 +538,12 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|seed|seeds|flag|flags|tap|type|key|scroll|where|assert|wait|ui|windows|text|checked|shot|record|launch|restart|open|reset|web|logcat|cleanup|subscription) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|windows|text|checked|shot|record|launch|restart|open|reset|web|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on
        verify.sh boot [<avd>]                 start a user AVD, or the fallback when there are none
-       verify.sh build | install | doctor | cleanup
+       verify.sh build [--base <ref>] | install [--base] | doctor | cleanup
        verify.sh each <command>...            run a command on every selected device
        verify.sh on <serial> <command>...     run a command on one selected device
    drive (android layout + adb):
@@ -588,11 +556,7 @@ usage: verify.sh devices                      attached devices and AVDs on this 
        verify.sh shot <name>.png              verify.sh record start <name>.mp4 | stop
        verify.sh launch | restart | open <url>
        verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'
-   seed (trapdoor, the only use of it):
-       verify.sh seed <fixture> [--param value ...]   verify.sh seeds   list the fixtures
-       verify.sh flag <parent.name> enabled|disabled  verify.sh flags   current flag values
-       verify.sh subscription none | [--tier plus|pro] [--region us|row] [--status <s>] [--trial true] [--products <list>]
-       verify.sh reset                        clear app data, onboarding done (emulators this run booted)
+       verify.sh reset                        clear app data and skip onboarding (emulators this run booted)
        verify.sh logcat
 EOF
      exit 2 ;;

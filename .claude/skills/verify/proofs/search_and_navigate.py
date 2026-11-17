@@ -1,7 +1,7 @@
 """Typing in the native input navigates the current tab: a domain loads the site (by enter or by its suggestion),
 a query loads the DuckDuckGo SERP with that query, and the input opened over a loaded page navigates the same tab.
 
-Recipe: features/search-and-navigate.md. Needs Web Content Debugging on.
+Recipe: features/search-and-navigate.md. Resets the app, so run it on an owned emulator.
 """
 import time
 
@@ -18,6 +18,9 @@ def suggestion_rows(android):
 
 
 def run(android):
+    android.reset()
+    steps.web_debugging_on(android)
+
     # nav-url
     steps.new_tab(android)
     android.type("id:inputField", SITE)

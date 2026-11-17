@@ -4,6 +4,20 @@ import time
 from prove import Error
 
 
+def dismiss_cookie_prompt(android):
+    """Declines "Tired of cookie pop-ups?" when it is up; returns whether it was.
+
+    The app shows it once onboarding is done and some days have passed since install
+    (CookiePopupOptInEvaluator.kt:66-109), and clearing data keeps the install date, so a reset app gets it.
+    """
+    if android.where() != "CookiePopupOptInActivity":
+        return False
+    android.note("the cookie pop-up opt-in prompt showed and was declined")
+    android.tap("id:cookiePopupOptInDeclineButton")
+    time.sleep(1)
+    return True
+
+
 def to_browser(android):
     for _ in range(6):
         where = android.where()
@@ -11,6 +25,8 @@ def to_browser(android):
             return
         if where == "-":
             android.launch()
+            continue
+        if dismiss_cookie_prompt(android):
             continue
         android.key("back")
         time.sleep(1)
@@ -116,13 +132,21 @@ def wait_reply(android, word, timeout=30):
     return (android.poll(lambda: android.web_eval(count) or 0, lambda n: n >= 2, timeout) or 0) >= 2
 
 
-def seed_chats(android, *args):
-    """Chat seeds refuse until Duck.ai storage has migrated, so retry for a while."""
-    last = None
-    for _ in range(10):
-        try:
-            return android.seed("duckai-chats", *args)
-        except Error as e:
-            last = e
-            time.sleep(3)
-    raise Error(f"seed duckai-chats kept refusing: {last}")
+
+SEND_BUTTONS = ("nativeInputAskButton", "nativeInputSubmitButton")
+
+
+def send_button(android, timeout=10):
+    """The id of the button that sends what's typed: "Ask" (`nativeInputAskButton`) or the arrow
+    (`nativeInputSubmitButton`); both were seen on Duck.ai on 2026-11-17. None when neither shows."""
+    found = android.poll(lambda: next((b for b in SEND_BUTTONS if android.visible(f"id:{b}")), None), bool, timeout)
+    return found or None
+
+
+def ask(android, prompt):
+    """Types a prompt into the Duck.ai input and sends it."""
+    android.type("id:inputField", prompt)
+    button = send_button(android)
+    if not button:
+        raise Error("no send button appeared after typing")
+    android.tap(f"id:{button}")

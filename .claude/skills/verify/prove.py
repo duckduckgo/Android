@@ -54,14 +54,6 @@ class Android:
     def tap(self, selector, index=None):
         verify("tap", selector, *(["--index", index] if index else []))
 
-    def seed(self, *args):
-        """Puts state the UI can't reach in place through trapdoor (verify.sh seeds lists them); returns its reply."""
-        return verify("seed", *args).stdout.strip()
-
-    def subscription(self, *args):
-        """Seeds a subscription state (or `none`) and restarts the app; see features/subscription.md."""
-        return verify("subscription", *args).stdout.strip()
-
     def type(self, selector, text):
         verify("type", selector, text)
 

@@ -27,7 +27,6 @@ Preconditions: baseline; `$V open https://privacy-test-pages.site/` and poll `$V
 - **Switch.** `$V tap id:inputModeWidgetNavTabs`; the switcher has two `close` buttons and a "New Tab" card. `$V tap "text:Privacy Test Pages - Home"`, `$V assert where BrowserActivity`, `$V web eval 'location.host'` returns `"privacy-test-pages.site"` and `$V text omnibarTextInput` holds the URL.
 - **Close.** `$V tap id:tabsMenu`, `$V tap id:close --index 1`, `$V assert not-visible "text:Privacy Test Pages - Home"`; one `close` is left. Second view: `$V key back` and `$V assert text id:tabCount 1`.
 - **Overflow menu.** In the switcher, `$V tap id:popupMenuToolbarButton`: `gridLayoutMenuItem`, `listLayoutMenuItem`, `selectTabsMenuItem` and `closeAllTabsMenuItem` ("Grid View" ticked, "List View", "Select Tabs", "Close All Tabs"). `$V key back` closes it. `$V record stop`.
-- Many tabs: `$V seed tabs --count 20` before opening the switcher. It adds 20 untitled blank cards (a lone blank New Tab was dropped, so the count went 1 to 20; seeding again went to 40); `$V text tabCount` and `$V text regularTabCount` read it back.
 
 ## Gotchas
 
@@ -36,4 +35,4 @@ Preconditions: baseline; `$V open https://privacy-test-pages.site/` and poll `$V
 - A card's title can stay empty right after its page loads (seen on a Pixel 7 with Android 17: still empty after 10 s, while the emulator showed it). Assert the card count or the selected card rather than only its title text, and look at the screenshot.
 - On the user's device, count tabs before the recipe and close the ones it opened; "New Tab" from a loaded page and `$V open` both add tabs.
 - "New Tab" on a blank New Tab Page reuses that tab instead of adding one; open a page first when the recipe needs a second tab.
-- Driven with the android CLI on 2026-11-17 (ddg_verify_api34, API 34, `$V build` of `cd1cf8877d`): `tabs-open-switcher`, `tabs-card`, `tabs-new`, `tabs-switch`, `tabs-close`, `tabs-menu` (opened and read, no entry tapped), plus the `tabs` seed, as 16 checks that all passed. Not driven: the overflow entries themselves and Fire mode tabs (out of scope here).
+- Driven with the android CLI on 2026-11-17 (ddg_verify_api34, API 34, `$V build` of `725af5b466`): `tabs-open-switcher`, `tabs-card`, `tabs-new`, `tabs-switch`, `tabs-close`, `tabs-menu` (opened and read, no entry tapped), as 17 checks in `proofs/tabs.py` that passed on the second run; the first stopped on the blank card title above. Not driven: the overflow entries themselves and Fire mode tabs (out of scope here).

@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Verifies DuckDuckGo Android changes on the attached device (or an emulator the user picks). Builds this checkout's internal debug app, drives real user paths with the android CLI and adb (plus DevTools for WebView content), and records a video and screenshots per feature as proof; trapdoor is used only to seed state the UI cannot reach, such as subscriptions and Duck.ai chats. Use to verify an app change works on device, reproduce a UI bug, or prove a feature end to end before a PR. Not for unit tests (./gradlew jvm_tests) or Maestro CI suites (.maestro/).
+description: Verifies DuckDuckGo Android changes on the attached device (or an emulator the user picks). Builds this checkout's internal debug app, drives real user paths with the android CLI and adb (plus DevTools for WebView content), records a video and screenshots per feature, and runs Python proofs with a pass/fail verdict, before and after a change. Use to verify an app change works on device, reproduce a UI bug, or prove a feature end to end before a PR. Not for unit tests (./gradlew jvm_tests) or Maestro CI suites (.maestro/).
 ---
 
 # Verify the DuckDuckGo Android app
@@ -11,15 +11,12 @@ One entry point, `.claude/skills/verify/verify.sh` (`V` below, run from the repo
 V=.claude/skills/verify/verify.sh
 ```
 
-- **Driving and evidence** use the `android` CLI and `adb`, as the `android-cli` skill's
-  `references/interact.md` describes: `android layout` for the element tree, `adb shell input` to act,
-  `screencap` and `screenrecord` for evidence, and Chrome DevTools inside WebViews.
-- **Seeding** is the only thing [trapdoor](https://github.com/duckduckgo/android-trapdoor) does: its
-  in-app bridge writes state the UI cannot reach (a subscription, Duck.ai chats, tabs, a feature flag, a
-  clean app with onboarding done). The build adds that bridge; nothing else in a run goes through trapdoor.
+Driving and evidence use the `android` CLI and `adb`, as the `android-cli` skill's
+`references/interact.md` describes: `android layout` for the element tree, `adb shell input` to act,
+`screencap` and `screenrecord` for evidence, and Chrome DevTools inside WebViews. Every state a recipe
+needs is reached through the UI, the way a user gets there.
 
-Prerequisites: the `android` CLI (`~/.local/bin/android`), trapdoor installed per its `INSTALL.md`
-(`~/.local/bin/trapdoor`, for its bridge and seeds), JDK 21 at `/opt/homebrew/opt/openjdk@21` (override
+Prerequisites: the `android` CLI (`~/.local/bin/android`), JDK 21 at `/opt/homebrew/opt/openjdk@21` (override
 with `JAVA_HOME_21`), the Android SDK, `node` 22+, `jq`, `python3`, `local.properties` with `sdk.dir`, and
 submodules (`git submodule update --init --recursive`). The fallback AVD needs
 `system-images;android-34;google_apis_playstore;arm64-v8a`.
@@ -45,7 +42,7 @@ ask first.
 ## Launch
 
 ```bash
-$V build     # ./gradlew :app:assembleInternalDebug, with trapdoor's bridge for seeding
+$V build     # ./gradlew :app:assembleInternalDebug
 $V install   # installs that build, refusing it if the source changed since, and checks the APK hash on the device
             # (--base installs the build from `build --base <ref>` instead; see Prove)
 $V doctor
@@ -54,11 +51,13 @@ $V doctor
 `build` works the way `verify-android` (Android PR #10551) does. It records the source the APK came from
 (the committed tree plus every uncommitted change, outside the agent tooling folders `.claude`, `.agents`
 and `.codex`, so editing this skill does not make a build stale) and the APK's sha256, and keeps the APK
-in `build/verify/builds/` under its hash. trapdoor's `trapdoor-bridge.init.gradle` adds the bridge during
-the build, so the seeds work. `install` uses `adb install -r -d` and keeps the app's data.
+in `build/verify/builds/` under its hash. It passes the app's own `-Pautofill-disable-auth-requirement`
+and `-Psync-disable-auth-requirement` (`app/build.gradle`), so Passwords and Sync open without the
+device's screen lock. `install` uses `adb install -r -d` and keeps the app's data.
 
 A first install on a clean device opens on onboarding. On an emulator this run booted, `$V reset` clears
-the data and seeds onboarding as done; otherwise walk onboarding the way a user does.
+the data, grants the notification permission (so its prompt doesn't cover onboarding) and taps the internal
+build's Skip Onboarding, landing on the New Tab Page; otherwise walk onboarding the way a user does.
 
 If `install` fails with `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, the device has an internal build signed
 with another key; uninstalling it deletes the user's app data, so ask.
@@ -68,8 +67,7 @@ with another key; uninstalling it deletes the user's app data, so ask.
 `$V doctor` is read-only. It checks the device is online, says whether this run booted it (and so may
 reset it) or it belongs to the user, that the `android` CLI and `node` are there, and that the app on the
 device is the APK `install` put there, built from the current source (else: build and install again). It
-prints the branch, commit and dirty file count so the evidence names the code under test, and whether the
-seeding bridge answers. Run it first, and whenever the app does something the code says it should not.
+prints the branch, commit and dirty file count so the evidence names the code under test. Run it first, and whenever the app does something the code says it should not.
 
 ## Prove
 
@@ -117,6 +115,7 @@ screen with its text, interactions and state (checked, focused, selected), tappa
 | `$V text [<resource-id>]` | Every element with text, with its state; with an id, that element's text or exit 15 |
 | `$V checked <resource-id> [index]` | `true`/`false` for a switch, checkbox or radio |
 | `$V launch` / `$V restart` | Opens the app from its launcher entry / force-stops and reopens it |
+| `$V reset` | Clears app data and skips onboarding to the New Tab Page; only on an emulator this run booted |
 | `$V open <url>` | Opens a URL in the app the way another app's link does |
 
 Recipes reach their starting point through the Common paths in [features/README.md](features/README.md):
@@ -145,18 +144,6 @@ $V tap id:trailingSwitch --index 3
 $V checked trailingSwitch 2          # "Start-up tracing" must stay false
 ```
 
-## Seed
-
-The only use of trapdoor. Seeds set up the starting state of a recipe and are never the proof.
-
-| Command | Does |
-|---|---|
-| `$V seeds` | Lists the fixtures this build's bridge offers |
-| `$V seed <fixture> [--param value ...]` | Runs one, for example `seed duckai-chats --count 5 --pinned 2` or `seed tabs --count 20` |
-| `$V subscription none \| [--tier plus\|pro] [--region us\|row] [--status <s>] [--billing yearly\|monthly] [--trial true] [--products <list>]` | Seeds a synthetic subscription (or removes one) and restarts the app into it; see [features/subscription.md](features/subscription.md) |
-| `$V flag <parent.name> enabled\|disabled` / `$V flags` | Sets a feature flag / lists flag values (`--json` for the full record) |
-| `$V reset` | Clears app data and seeds onboarding as done; only on an emulator this run booted |
-
 ## Evidence
 
 Each feature recipe is one video plus screenshots of its key states, all in
@@ -174,7 +161,7 @@ element you expect before shooting, or the picture can show the transition.
 Proof standards:
 
 - Every recipe has a video. The screenshots, `assert` exit codes, `text` output and `web eval` output are what you cite.
-- Drive the real user path for the step under test. `open`, the seeds and Developer Settings are setup only.
+- Drive the real user path for the step under test. `open`, `reset` and Developer Settings are setup only.
 - Capture the action and the resulting state: a shot before the step that matters and one after.
 - Verify side effects through a second view (the tab switcher after opening a tab, the New Tab Page after changing a setting).
 - Look at every PNG you cite; for web content pair it with a `web eval` read of the same state.
@@ -195,8 +182,7 @@ did not boot. Run `$V cleanup` after a failed run too, before retrying.
 
 ## Gotchas
 
-- An app installed from Android Studio or plain Gradle has no seeding bridge and no install record: `doctor` fails and the seeds don't answer. `$V build` and `$V install` fix both.
-- Android 17 devices need trapdoor `d062f99` or later for its bridge (`trapdoor update`, then `$V build`).
+- An app installed from Android Studio or plain Gradle has no install record, so `doctor` fails. `$V build` and `$V install` fix it.
 - `doctor` fails as stale after any change to app source, committed or not. Changes inside `.claude`, `.agents` and `.codex` don't count. Run `$V build` and `$V install`.
 - `android layout` can come back empty during an animation or on some WebView screens; the helpers retry once and then stop with an error. Take a shot, or use `android screen capture --annotate` and `android screen resolve` (interact.md) to find the element by its label.
 - A page hides its toolbar once it scrolls, so `id:browserMenu` and `id:tabsMenu` vanish from the layout; `$V scroll down` brings them back.

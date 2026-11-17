@@ -1,6 +1,6 @@
 """The Fire button asks "Delete tabs and site data?", keeps everything when dismissed, deletes only the current tab
 with Delete This Tab, clears every tab with Delete All while fireproofed sites survive, lists automatic deletion in
-Data Clearing, and on Duck.ai deletes only the current chat.
+Data Clearing, and on Duck.ai deletes only the current chat, keeping the user's other chats.
 
 Recipe: features/fire-button.md. Resets the app, so run it on an owned emulator.
 """
@@ -20,12 +20,15 @@ def run(android):
     if android.visible("text:Not Now"):
         android.tap("text:Not Now")
     steps.web_debugging_on(android)
-    android.seed("fireproof-populated")
     for url, host in (("https://www.search-company.site/", "www.search-company.site"),
                       ("https://privacy-test-pages.site/", "privacy-test-pages.site")):
         android.open(url)
         if steps.page_host(android, host) != host:
             raise Error(f"{url} didn't load")
+        if host == "www.search-company.site":
+            # The site that has to survive Delete All, fireproofed the way a user does it.
+            steps.entry(android, "fireproofWebsiteMenuItem")
+            time.sleep(2)
     tabs0 = android.text("tabCount")
 
     # fire-dialog (loaded page)
@@ -78,6 +81,8 @@ def run(android):
     android.tap("id:deleteAllSecondaryButton")
     time.sleep(1)
     android.shot("fire-animation")
+    # The app can put its cookie pop-up prompt over the fresh New Tab Page; a user declines it first.
+    android.poll(lambda: android.visible("id:inputField") or steps.dismiss_cookie_prompt(android), bool, 15)
     android.check("fresh New Tab Page", android.wait("id:inputField", 15), android.where())
     time.sleep(2)
     count = android.text("tabCount")
@@ -107,8 +112,8 @@ def run(android):
     android.tap("text:Fireproof Sites")
     time.sleep(2)
     where = android.where()
-    android.check("fireproofed site survives Delete All", where == "FireproofWebsitesActivity" and android.visible("text:example.com"),
-                  where)
+    android.check("fireproofed site survives Delete All",
+                  where == "FireproofWebsitesActivity" and android.visible("text~:search-company.site"), where)
     android.shot("fire-fireproof-after")
     android.key("back")
     time.sleep(1)
@@ -124,9 +129,12 @@ def run(android):
     android.tap("id:contextualChatMenuNewChat")
     if not android.wait("id:duckAIHeader", 25) or not steps.duckai_attached(android):
         raise Error("Duck.ai didn't open and attach")
-    steps.seed_chats(android, "--count", "2", "--title", "Keep")
-    android.type("id:inputField", "Reply with only the word pineapple")
-    android.tap("id:nativeInputAskButton")
+    # A chat the user keeps: it must still be listed after the Fire button deletes the other one.
+    steps.ask(android, "Reply with only the word mango")
+    if not steps.wait_reply(android, "mango"):
+        raise Error("Duck.ai didn't answer the first chat")
+    steps.new_chat(android)
+    steps.ask(android, "Reply with only the word pineapple")
     android.check("reply arrived", steps.wait_reply(android, "pineapple"))
     search = android.web_eval("location.search")
     android.check("URL carries chatID", "chatID=" in (search or ""), search)
@@ -134,8 +142,9 @@ def run(android):
     android.tap("id:duckAiSidebar")
     time.sleep(2)
     history = titles(android, "chatHistoryTitle")
-    chat = next((t for t in history if not t.startswith("Keep ")), None)
-    android.check("history before: 2 seeded + the new chat", len(history) == 3 and chat, history)
+    chat = next((t for t in history if "pineapple" in t.lower()), None)
+    android.check("history before: the kept chat + the new chat",
+                  len(history) == 2 and chat and any("mango" in t.lower() for t in history), history)
     android.shot("fire-duckai-history-before")
     android.key("back")
     time.sleep(2)
@@ -157,8 +166,6 @@ def run(android):
     time.sleep(2)
     history = titles(android, "chatHistoryTitle")
     android.check("history after: chat gone", chat not in history, history)
-    kept = [t for t in history if t.startswith("Keep ")]
-    android.check("history after: seeded chats kept", len(kept) == 2, history)
+    android.check("history after: the other chat kept", any("mango" in t.lower() for t in history), history)
     android.shot("fire-duckai-history-after")
     android.key("back")
-    android.seed("duckai-chats-none")

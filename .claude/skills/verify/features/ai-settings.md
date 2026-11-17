@@ -4,8 +4,7 @@ Settings > AI Features is where the user turns Duck.ai on or off and chooses how
 behaves: **Search Only** (one search field with a start-chat button) or **Toggle between Search and Duck.ai**
 (the native input gets Search / Duck.ai tabs). The screen also holds the New Tab Toggle Position, the Duck.ai
 Shortcuts (browser menu, address bar, voice), Search Assist, Hide AI-Generated Images and "Use DuckDuckGo
-Without AI". None of it depends on the subscription tier (nothing in `DuckChatSettingsViewModel` reads it).
-
+Without AI".
 ## Sub-features
 
 - `ai-open` AI Features opens from Settings (`duckai.settings`).
@@ -53,4 +52,4 @@ Recipes, all inside `$V record start ai-<name>.mp4` / `$V record stop`:
 - The address-bar picker sheet only appears under its own conditions (see How to get to it) and can't be opened on demand, so `ai-picker-sheet` was not driven.
 - On a fresh emulator a "Set As Default Browser" sheet can cover the New Tab Page; `$V tap "text:Not Now"`.
 - Not covered here: Search Assist and Hide AI-Generated Images dialogs (values only read), Voice Search and Voice Chat shortcuts, "Automatically Send Page Content" (flag `aiChat.automaticContextAttachment`), the SERP and duck.ai entry points. Flags that gate the screen: `aiChat.self` (screen and hub row), `aiChat.duckAiInputScreen` (the mode choice), `aiChat.aiFeaturesNativeControls` (this layout), `aiChat.nativeInputNavBar` (the nav bar).
-- Driven with the android CLI on 2026-11-17 (ddg_verify_api34, API 34, `$V build` of `cd1cf8877d`): `ai-open`, `ai-search-only`, `ai-search-and-duckai`, `ai-toggle-position`, `ai-duckai-off`, `ai-shortcuts` (Browser Menu, Address Bar), `ai-without-ai`, as 30 checks that all passed. Not driven: `ai-picker-sheet`.
+- Driven with the android CLI on 2026-11-17 (ddg_verify_api34, API 34, `$V build` of `725af5b466`): `ai-open`, `ai-search-only`, `ai-search-and-duckai`, `ai-toggle-position`, `ai-duckai-off`, `ai-shortcuts` (Browser Menu, Address Bar), `ai-without-ai`, as 33 checks in `proofs/ai_settings.py` that all passed. Not driven: `ai-picker-sheet`.
