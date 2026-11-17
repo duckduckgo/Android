@@ -65,8 +65,10 @@ A first install on a clean device opens on onboarding. On an emulator this run b
 the data, grants the notification permission (so its prompt doesn't cover onboarding) and taps the internal
 build's Skip Onboarding, landing on the New Tab Page; otherwise walk onboarding the way a user does.
 
-If `install` fails with `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, the device has an internal build signed
-with another key; uninstalling it deletes the user's app data, so ask.
+`install` reports adb's own reason when it fails. `INSTALL_FAILED_UPDATE_INCOMPATIBLE` means the device
+has an internal build signed with another key; uninstalling it deletes the user's app data, so ask.
+`INSTALL_FAILED_INSUFFICIENT_STORAGE` means the device is out of space: free some, or pick another
+device. Anything else prints adb's last line.
 
 ## Doctor
 
@@ -114,7 +116,8 @@ The `android` handle a proof gets:
 check result in a collapsed `<details>`, the proof's source when it isn't committed unchanged, and the
 commands to rerun it. It carries no local paths, logs, screenshots or device serials, so it's safe for
 a public PR. Given one run with a `-base` run of the same proof beside it (as `compare` leaves them), it
-summarises both.
+summarises both. A run that stopped at `doctor` never read the device or the build, so its summary leaves
+those lines out rather than guessing them.
 
 `build --base <ref>` builds the ref in `build/verify/base-worktree`, a worktree this skill owns and moves
 between base commits, and keeps the APK per commit, so the same base is built once. `compare` installs
@@ -193,7 +196,7 @@ Proof standards:
 - Capture the action and the resulting state: a shot before the step that matters and one after.
 - Verify side effects through a second view (the tab switcher after opening a tab, the New Tab Page after changing a setting).
 - Look at every PNG you cite; for web content pair it with a `web eval` read of the same state.
-- Report the commit from `doctor` with the evidence path. An entry point you could not drive is reported as not verified, with the failing command and its exit code.
+- Report the commit from `doctor` with the evidence path. For a PR, paste the output of `$P pr-summary`, not paths or screenshots. An entry point you could not drive is reported as not verified, with the failing command and its exit code.
 - Use synthetic data only and keep captures on this machine.
 
 ## Cleanup
