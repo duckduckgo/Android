@@ -372,6 +372,21 @@ class InitMessageHandlerPluginTest {
         assertEquals("tier2", initResp!!.config.heuristicMode)
     }
 
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenHeuristicHitTestToggleChangesThenConfigFollowsIt() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+
+        feature.heuristicHitTest().setRawStoredState(Toggle.State(enable = false))
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+        assertFalse(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enableHeuristicHitTest)
+
+        feature.heuristicHitTest().setRawStoredState(Toggle.State(enable = true))
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+        assertTrue(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enableHeuristicHitTest)
+    }
+
     @Test
     fun whenInitProcessedThenUpdateUrlCalledOnDetector() {
         settingsRepository.userSetting = true
