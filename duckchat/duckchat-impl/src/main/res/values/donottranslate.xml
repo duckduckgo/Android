@@ -52,6 +52,7 @@
     <!-- Duck.ai client tool permission prompt -->
     <string name="duckAiClientToolPromptAllowInChat">Allow in This Chat</string>
     <string name="duckAiClientToolPromptDontAllow">Don’t Allow</string>
+    <string name="duckAiClientToolPromptAllowOnce">Allow</string>
     <string name="duckAiClientToolRequestAccessPromptTitle">Allow Duck.ai to do the following:</string>
     <string name="duckAiClientToolRequestAccessPromptMessage">Duck.ai can take these actions without asking again in this chat.</string>
     <string name="duckAiClientToolListOpenTabsName">Open Tabs</string>
