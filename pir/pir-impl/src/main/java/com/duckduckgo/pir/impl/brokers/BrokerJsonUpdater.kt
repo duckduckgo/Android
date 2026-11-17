@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.brokers
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
@@ -50,6 +51,7 @@ class RealBrokerJsonUpdater @Inject constructor(
     private val bundledBrokerDataLoader: BundledBrokerDataLoader,
     private val pixelSender: PirPixelSender,
     private val pirRemoteFeatures: PirRemoteFeatures,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : BrokerJsonUpdater {
 
     /**
@@ -57,6 +59,7 @@ class RealBrokerJsonUpdater @Inject constructor(
      * - Main config is requested with current etag. If config is not modified, we don't do anything.
      * - If the stored broker data predates [BROKER_JSON_FIELDS_REVISION], the main config is requested without an etag and every
      *   broker json is processed again.
+     * - Only brokers listed in active_data_brokers are considered; stored brokers missing from it are marked as removed.
      * - If active brokers AND all json etag did not change, we don't do anything.
      * - If any json etag changed, we download the json zip file.
      * - We extract the json files from the zip. For every json etag that changed, we parse and validate the json file and update the data
@@ -161,13 +164,20 @@ class RealBrokerJsonUpdater @Inject constructor(
         pirMainConfig: PirMainConfig,
         reprocessAllJsons: Boolean,
     ) {
+        // An empty list would deactivate every stored broker, so treat it as a broken config and retry on the next update.
+        check(pirMainConfig.activeBrokers.isNotEmpty()) { "Main config has no active brokers" }
+        // json_etags also lists test brokers, which must never reach users.
+        val activeBrokerFileNames = pirMainConfig.activeBrokers.toHashSet()
+
         val existingEtags = pirRepository.getAllLocalBrokerJsons()
-        val jsonEtagsFromConfig = pirMainConfig.jsonEtags.current.map {
-            BrokerJson(
-                fileName = it.key,
-                etag = it.value,
-            )
-        }
+        val jsonEtagsFromConfig = pirMainConfig.jsonEtags.current
+            .filterKeys { it in activeBrokerFileNames }
+            .map {
+                BrokerJson(
+                    fileName = it.key,
+                    etag = it.value,
+                )
+            }
 
         val updatedJsons = if (reprocessAllJsons) {
             jsonEtagsFromConfig.toSet()
@@ -188,6 +198,7 @@ class RealBrokerJsonUpdater @Inject constructor(
             logcat(ERROR) { "PIR-update: Keeping previous etags for broker json files that were not stored: $notUpdatedFileNames" }
         }
         pirRepository.updateBrokerJsons(jsonEtagsFromConfig.filterNot { it.fileName in notUpdatedFileNames })
+        pirRepository.deactivateBrokersNotIn(activeBrokerFileNames, currentTimeProvider.currentTimeMillis())
     }
 
     private fun String.sanitize(): String? {

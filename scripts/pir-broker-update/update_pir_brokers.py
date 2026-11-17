@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
 Downloads the latest PIR broker bundle and compares it against the bundled JSONs.
+Only brokers listed in the main config's active_data_brokers are bundled: all.zip also
+contains test brokers, which must never ship to users.
 Applies changes (add/update/remove) and writes a summary to --output.
 The output file is empty when there are no changes.
 """
@@ -16,6 +18,7 @@ from pathlib import Path
 
 
 BUNDLE_URL = "https://dbp.duckduckgo.com/dbp/remote/v0?name=all.zip&type=spec"
+MAIN_CONFIG_URL = "https://dbp.duckduckgo.com/dbp/remote/v0/main_config.json"
 
 
 def parse_version(version_str):
@@ -35,6 +38,13 @@ def download_bundle(auth_token, output_path):
     response.raise_for_status()
     with open(output_path, "wb") as f:
         f.write(response.content)
+
+
+def fetch_active_brokers(auth_token):
+    headers = {"Authorization": f"bearer {auth_token}"}
+    response = requests.get(MAIN_CONFIG_URL, headers=headers, timeout=60)
+    response.raise_for_status()
+    return set(response.json().get("active_data_brokers") or [])
 
 
 def load_json_files(directory):
@@ -75,6 +85,12 @@ def main():
         print(f"ERROR: brokers directory not found: {brokers_dir}", file=sys.stderr)
         sys.exit(1)
 
+    print(f"Downloading main config from {MAIN_CONFIG_URL}...")
+    active_brokers = fetch_active_brokers(auth_token)
+    if not active_brokers:
+        print("ERROR: Main config lists no active brokers. Aborting to prevent deleting all existing brokers.", file=sys.stderr)
+        sys.exit(1)
+
     with tempfile.TemporaryDirectory() as tmpdir:
         zip_path = os.path.join(tmpdir, "bundle.zip")
         extract_dir = os.path.join(tmpdir, "extracted")
@@ -90,10 +106,18 @@ def main():
         downloaded, failed_downloads = load_json_files(extract_dir)
         existing, _ = load_json_files(brokers_dir)
 
-        print(f"Downloaded {len(downloaded)} broker files, found {len(existing)} bundled files.")
+        inactive_downloads = sorted(name for name in downloaded if name not in active_brokers)
+        downloaded = {name: info for name, info in downloaded.items() if name in active_brokers}
+
+        print(
+            f"Downloaded {len(downloaded)} active broker files (skipped {len(inactive_downloads)} inactive), "
+            f"found {len(existing)} bundled files."
+        )
+        for name in inactive_downloads:
+            print(f"  [Skipped inactive] {name}")
 
         if not downloaded:
-            print("ERROR: Remote bundle contained no JSON files. Aborting to prevent deleting all existing brokers.", file=sys.stderr)
+            print("ERROR: Remote bundle contained no active broker JSON files. Aborting to prevent deleting all existing brokers.", file=sys.stderr)
             sys.exit(1)
 
         added = []
@@ -124,10 +148,11 @@ def main():
                         f.write(content)
                     print(f"  [Updated] {filename} ({existing_version} → {downloaded_version})")
 
-        # Detect removed — skip files that failed to parse in the download,
-        # since absence from `downloaded` may be due to a parse error, not actual removal.
+        # Detect removed — inactive brokers are always removed. Otherwise skip files that failed to parse
+        # in the download, since absence from `downloaded` may be due to a parse error, not actual removal.
         for filename in existing:
-            if filename not in downloaded and filename not in failed_downloads:
+            is_inactive = filename not in active_brokers
+            if is_inactive or (filename not in downloaded and filename not in failed_downloads):
                 removed.append(filename)
                 existing[filename]["path"].unlink()
                 print(f"  [Removed] {filename}")
