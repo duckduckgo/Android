@@ -55,6 +55,10 @@ Recipes reach their starting point the way a user does. `$V wait` for the first 
 Not covered on purpose (the map is scoped to Duck.ai and its entry points): bookmarks, page forms, the rest of
 Settings, onboarding, sync, autofill, PIR and VPN beyond their entry points in subscription.md, downloads.
 
+## Scripted checks
+
+`../checks/<feature>.sh` replays a recipe as `check "<name>" '<command>'` lines and ends with `RESULT pass=N fail=M`. They act on `VERIFY_SERIAL` or the device chosen with `verify.sh use`, and reset the app first, so run them on an owned emulator. A script always exits 0 and a failed setup step shows up as FAILs in the checks after it; read the RESULT line and the first FAIL.
+
 ## Adding a feature
 
 1. Find the user entry points in code: the screen's `@ContributeToActivityStarter` params, and every `globalActivityStarter.start(..., <Params>)` call site.
