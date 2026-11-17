@@ -52,6 +52,7 @@ class DuckAiClientToolsDevViewModel @Inject constructor(
         SWITCH_TO_TAB("switchToTab", FlagGroup.TOOLS, { it.switchToTab() }),
         OPEN_TAB("openTab", FlagGroup.TOOLS, { it.openTab() }),
         BOOKMARK_TAB("bookmarkTab", FlagGroup.TOOLS, { it.bookmarkTab() }),
+        CLOSE_TABS("closeTabs", FlagGroup.TOOLS, { it.closeTabs() }),
     }
 
     data class FlagRow(

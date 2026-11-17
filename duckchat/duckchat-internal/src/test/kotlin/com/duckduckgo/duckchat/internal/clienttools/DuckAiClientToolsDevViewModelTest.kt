@@ -56,6 +56,7 @@ class DuckAiClientToolsDevViewModelTest {
                 FlagRow(BrowserToolsFlag.SWITCH_TO_TAB, enabled = false),
                 FlagRow(BrowserToolsFlag.OPEN_TAB, enabled = false),
                 FlagRow(BrowserToolsFlag.BOOKMARK_TAB, enabled = false),
+                FlagRow(BrowserToolsFlag.CLOSE_TABS, enabled = false),
             ),
             viewModel.viewState.value.flags,
         )
