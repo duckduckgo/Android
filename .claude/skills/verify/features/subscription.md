@@ -29,12 +29,12 @@ these by putting the app in each state the change touches and driving the featur
 
 ## Driving it with verify.sh
 
-Preconditions: baseline; trapdoor with the `seed subscription` command (see Gotchas). The seed never
+Preconditions: baseline; a `$V build` (it carries the seeding bridge with `seed subscription`, see Gotchas). The seed never
 touches a real subscription: it refuses when the app holds a real account or tokens, so on the user's
 phone it works only if they are not signed in to a subscription in the internal app.
 
 **Put the app in a state.** `$V subscription --tier pro --region us --status active` prints the seed
-reply (`planId`, `products`, `status`) and `app restarted`. Arguments, all optional:
+reply (`planId`, `products`, `status`) and `app in front: …`. Arguments, all optional:
 
 | Argument | Values | Default |
 |---|---|---|
@@ -49,10 +49,10 @@ reply (`planId`, `products`, `status`) and `app restarted`. Arguments, all optio
 PIR or Duck.ai). `$V subscription none` removes the seeded subscription. Every call restarts the app,
 because the subscription flows are read once per process.
 
-**Read the state back.** Status labels are not tappable, so read them with `$V text`, not `$V t assert`.
+**Read the state back.** Status labels are not tappable, so read them with `$V text` (every label, with checked and enabled state).
 
-- Hub: `$V t goto settings`, swipe up once (`adb -s <serial> shell input swipe 540 2000 540 900 600`), then `$V text` lists the section between "DuckDuckGo Subscription" and "Other Settings": each row's `primaryText` and its On/Off `label`, and `secondaryText` "Activating" under Subscription Settings while waiting.
-- Subscription Settings (the step under test): tap `subscriptionSettingContainer`, `$V t assert where ppro.settings`, then `$V text subscriptionActiveStatusTextView`, `$V text tierName`, `$V text subscriptionExpiredStatusText`; `$V t assert visible id:upgradeToProContainer` for Plus.
+- Hub: the **Settings** path in the README, `$V scroll up`, then `$V text` lists the section between "DuckDuckGo Subscription" and "Other Settings": each row's `primaryText` and its On/Off `label`, and `secondaryText` "Activating" under Subscription Settings while waiting.
+- Subscription Settings (the step under test): tap `subscriptionSettingContainer`, `$V assert where SubscriptionSettingsActivity`, then `$V text subscriptionActiveStatusTextView`, `$V text tierName`, `$V text subscriptionExpiredStatusText`; `$V assert visible id:upgradeToProContainer` for Plus.
 
 **Expected, driven on 2026-11-16 (Pixel 7, internal debug):**
 
@@ -65,29 +65,28 @@ because the subscription flows are read once per process.
 | waiting | all rows, every label Off, "Activating" under Subscription Settings | "Subscribed", "expires on ..." |
 | grace / not-renewing | as active | "Subscribed", "expires on ..." |
 | trial (monthly) | as active | "Free Trial Active", "Your free trial ends on ... converts to a monthly paid subscription" |
-| expired / inactive | section hidden | `subscriptionExpiredStatusText` "Your subscription expired on <date>.", View Plans, no tier pill (open with `$V t goto ppro.settings`) |
+| expired / inactive | section hidden | `subscriptionExpiredStatusText` "Your subscription expired on <date>.", View Plans, no tier pill. Not reachable by a user on the debug build (the Settings section is hidden), so not verifiable here; seen 2026-11-16 by opening the screen directly |
 | `--products netp,itr` | VPN, ITR, Subscription Settings | as plus us |
 
 **Duck.ai by tier.** Header, model picker, reasoning picker, upsell routing, downgrade and the
 `privacyPro.duckAiPlus` flag are in [duck-ai.md](duck-ai.md) (By subscription tier). Settings row: hub >
-`duckAiSettings`, `$V t assert where duckai.paid-settings`; `$V text` shows "Chat privately with
+`duckAiSettings`, `$V assert where DuckAiPaidSettingsActivity`; `$V text` shows "Chat privately with
 subscriber-exclusive AI models."
 
-**VPN.** Hub > `netpPSetting`, `$V t assert where vpn.main`, `$V text` shows "DuckDuckGo VPN is Off". Browser menu: `$V t tap id:inputModeWidgetNavMenu`, `$V text` contains a `label` "VPN" with the entitlement and none without it (`--products itr,pir,duckai`) or when expired. Do not toggle `netp_toggle`: connecting needs a real token (it fails with the seed) and asks for the system VPN permission.
+**VPN.** Hub > `netpPSetting`, `$V assert where NetworkProtectionManagementActivity`, `$V text` shows "DuckDuckGo VPN is Off". Browser menu: `$V tap id:inputModeWidgetNavMenu`, `$V text` contains a `label` "VPN" with the entitlement and none without it (`--products itr,pir,duckai`) or when expired. Do not toggle `netp_toggle`: connecting needs a real token (it fails with the seed) and asks for the system VPN permission.
 
 **PIR.** Hub > `pirSettings` opens `PirDashboardWebViewActivity` showing "Personal Information Removal" and Get Started. Not in ROW plans. Read the dashboard with `$V web eval` (Web Content Debugging on); anything past Get Started calls the backend with the token and fails.
 
 **App Tracking Protection.** `vpnSetting` "App Tracking Protection" and its status were identical in every state above. Its subscription upsells on the trackers screen need a signed-out, purchase-eligible user, which this build cannot be (see Gotchas).
 
-Proof per state: `$V t record start sub-<state>.mp4` before tapping into the surface under test, a shot of the hub and of the surface, the `$V text` output, `$V t record stop`. Finish with `$V subscription none`.
+Proof per state: `$V record start sub-<state>.mp4` before tapping into the surface under test, a shot of the hub and of the surface, the `$V text` output, `$V record stop`. Finish with `$V subscription none`.
 
 ## Gotchas
 
-- The seed needs trapdoor with `seed subscription` / `seed subscription-none` (android-trapdoor `android/trapdoor-bridge-surfaces-internal/.../SeedSubscriptionStateTrapdoorCommand.kt`). `$V t list --fixtures | grep subscription` lists them; if missing, update trapdoor and `$V build`.
+- The seed needs trapdoor with `seed subscription` / `seed subscription-none` (android-trapdoor `android/trapdoor-bridge-surfaces-internal/.../SeedSubscriptionStateTrapdoorCommand.kt`). `$V seeds | grep subscription` lists them; if missing, update trapdoor and `$V build`.
 - Why the seed stores fake tokens: without a refresh token `SubscriptionsManager.subscriptionStatus()` returns UNKNOWN (`SubscriptionsManager.kt:740-746`), which hides every subscriber row even with entitlements stored. The access token is set to expire in 2099 so the app never tries to refresh it (the path that signs out, `SubscriptionsManager.kt:826-859`); backend calls with it fail and `SubscriptionsCheckWorker` swallows that (`SubscriptionsChecker.kt:96-120`). Observed 2026-11-16: after 90 s in the background and a return to the foreground, logcat showed `SubscriptionsCheckWorker` calling `/api/subscription` with `Worker result FAILURE`, no sign-out, and the tier still `PLUS`. Anything that needs a real token fails: VPN connect, PIR scans, paid Duck.ai replies, model subtitles.
 - The debug build cannot show purchase or upsell states. Play has no subscription products for `com.duckduckgo.mobile.android.debug`, (logcat: `Subs: Subscription offers after mapping: []`), so `isEligible()` (`RealSubscriptions.kt:97-107`) is false unless the status is active or waiting. With no subscription or an expired one, the whole Settings section, the VPN menu item, the "Upgrade" pill and the gated picker section are hidden. Expired rows that the code greys out are therefore never visible here; expired is only verifiable on Subscription Settings.
-- `$V subscription` relaunches through the launcher. After a force-stop, trapdoor's `goto` is a background activity start that Android blocks (`BAL_BLOCK` in logcat, `goto` returns `notReady: ActivityResumed(...)`).
-- `goto browser.duckai-view` can land on the native input's chat list instead of the chat when a previous state left the input focused; open Duck.ai through the browser menu as above.
+- `$V subscription` restarts the app (force-stop, then `$V launch`) so every in-memory flow reads the new state; navigate from the screen it opens on.
 - Each Duck.ai open adds a tab. On the user's phone, note the tab count before and close the tabs you opened afterwards.
 - Leave the user's own VPN and App Tracking Protection switches alone; read their status, never toggle them.
-- Driven on 2026-11-16 (Pixel 7, Android 17): `sub-state` for every status, both tiers and regions, trial and `--products`; `sub-hub`; `sub-settings` (via `goto ppro.settings` and the hub row); `sub-duckai`, `sub-duckai-settings`; `sub-vpn` (row and menu); `sub-pir` (row to dashboard); `sub-apptp` (row only). Not driven: VPN connect, the expired-VPN dialog (needs an onboarded VPN), PIR past Get Started, the Quick Settings tile, ITR's web page, plan changes in the paywall WebView.
+- Driven with trapdoor's commands on 2026-11-16 (Pixel 7, Android 17): `sub-state` for every status, both tiers and regions, trial and `--products`; `sub-hub`; `sub-settings` (from the hub row, and for expired by opening the screen directly); `sub-duckai`, `sub-duckai-settings`; `sub-vpn` (row and menu); `sub-pir` (row to dashboard); `sub-apptp` (row only). Not driven: VPN connect, the expired-VPN dialog (needs an onboarded VPN), PIR past Get Started, the Quick Settings tile, ITR's web page, plan changes in the paywall WebView. Not yet re-driven with this version of the commands; on 2026-11-17 `$V subscription --tier pro` and `none` ran through this build on the `ddg_verify_api34` emulator.

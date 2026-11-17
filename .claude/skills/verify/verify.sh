@@ -178,91 +178,274 @@ $(user_avds | sed 's/^/  /')"
 }
 
 # Builds this checkout with the trapdoor bridge, installs it on the device and smoke-tests it.
-cmd_build() { td refresh --no-pull; }
-
 # Puts the app in a subscription state and restarts it so every in-memory flow reads the new state.
 # `none` removes a seeded subscription; anything else goes to `seed subscription` (--tier, --region, ...).
-# The relaunch goes through the launcher: after a force-stop, trapdoor's own goto is a background
-# activity start, which Android blocks (BAL_BLOCK in logcat) on recent versions.
 cmd_subscription() {
   local out
   if [[ "${1:-}" == "none" ]]; then out="$(td --json seed subscription-none)"
-  else out="$(td --json seed subscription "$@")"; fi
+  else out="$(td --json seed subscription "$@")"; fi  # seeding, like cmd_seed
   echo "$out"
   grep -q '"error"' <<<"$out" && die "seed refused"
-  a shell am force-stop "$PKG"
-  a shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
-  local i; for i in $(seq 1 20); do
-    td where --json 2>/dev/null | grep -q '"activity":"[A-Za-z]' && { echo "app restarted"; return; }
-    sleep 1
-  done
-  die "app did not come to the foreground after the restart"
+  cmd_restart
 }
 
-# Compact interactive hierarchy: top, id, text, description, and DISABLED for a disabled view.
-cmd_ui() {
-  td hierarchy --interactive-only --json | jq -r '.data.tappable[]
-    | [.bounds.top, (.id // "-"), (.text // "-"), (.description // "-"), (if .enabled then "" else "DISABLED" end)] | @tsv'
+# --- Build identity, the way verify-android (#10551) does it ------------------------------------------
+# A build records the source it came from (the committed tree plus every uncommitted change, outside the
+# agent tooling folders, so editing this skill does not make a build stale) and the APK's sha256. install refuses a
+# stale build and checks the hash on the device; doctor refuses an app this tool did not install.
+
+BUILDS="$VERIFY_ROOT/builds"
+
+source_fingerprint() {
+  python3 -I - "$REPO" <<'PY'
+import hashlib, json, subprocess, sys
+repo = sys.argv[1]
+git = ["git", "-C", repo]
+run = lambda *a: subprocess.run(git + list(a), check=True, capture_output=True).stdout
+head = run("rev-parse", "HEAD").decode().strip()
+# Top-level tree entries hash everything below them, so this covers the whole tree outside .claude.
+# Agent tooling (.claude, .agents, .codex) is not app source: changing it must not make a build stale.
+TOOLING = (".claude", ".agents", ".codex")
+EXCLUDE = [f":(exclude){t}" for t in TOOLING]
+tree = [l for l in run("ls-tree", "HEAD").decode().splitlines() if l.split("\t", 1)[1] not in TOOLING]
+h = hashlib.sha256("\n".join(tree).encode())
+h.update(run("diff", "HEAD", "--binary", "--", ".", *EXCLUDE))
+for name in sorted(n for n in run("ls-files", "-z", "--others", "--exclude-standard", "--", ".", *EXCLUDE).decode().split("\0") if n):
+    h.update(name.encode())
+    h.update(hashlib.sha256(open(f"{repo}/{name}", "rb").read()).hexdigest().encode())
+dirty = bool(run("status", "--porcelain", "--", ".", *EXCLUDE).strip())
+print(json.dumps({"head": head, "dirty": dirty, "fingerprint": h.hexdigest()}))
+PY
 }
 
-# Every on-screen node with text, from uiautomator: id, text, DISABLED. trapdoor's hierarchy and asserts
-# only see tappable views, so status labels (a tier pill, "Subscribed", an expiry line) need this.
-# With an id, prints only that node's text and exits 15 when it is not on screen, like trapdoor's assert.
-cmd_text() {
-  local f="/sdcard/verify-ui.xml"
-  a shell uiautomator dump "$f" >/dev/null 2>&1 || die "uiautomator dump failed"
-  a exec-out cat "$f" | python3 -c '
-import sys, xml.etree.ElementTree as E
-want = sys.argv[1] if len(sys.argv) > 1 else None
-found = False
-for n in E.fromstring(sys.stdin.read()).iter("node"):
-    rid = (n.get("resource-id") or "").split("/")[-1] or "-"
-    text = n.get("text") or n.get("content-desc") or ""
-    if want:
-        if rid == want:
-            print(text); found = True; break
-    elif text:
-        print(rid, text, "" if n.get("enabled") == "true" else "DISABLED", sep="\t")
-sys.exit(15 if want and not found else 0)' "$@"
+file_sha256() { shasum -a 256 "$1" | cut -d' ' -f1; }
+installed_sha256() {
+  local path; path="$(a shell pm path "$PKG" | tr -d '\r' | sed -n 's/^package://p' | head -1)"
+  [[ -n "$path" ]] && a shell sha256sum "$path" | tr -d '\r' | cut -d' ' -f1
+}
+trapdoor_root() { python3 -I -c 'import os,sys; print(os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[1]))))' "$(command -v trapdoor)"; }
+
+# Builds internalDebug with trapdoor's bridge added by its Gradle init script (seed and set flag need it),
+# keeps a copy named by its hash, and records it.
+cmd_build() {
+  command -v trapdoor >/dev/null || die "trapdoor not installed (its bridge is what seed and set flag talk to); see github.com/duckduckgo/android-trapdoor INSTALL.md"
+  local source bridge newest kept digest
+  source="$(source_fingerprint)"; bridge="$(trapdoor_root)"
+  [[ -f "$bridge/gradle/trapdoor-bridge.init.gradle" ]] || die "no trapdoor-bridge.init.gradle under $bridge"
+  echo "building :app:assembleInternalDebug with the trapdoor bridge ..." >&2
+  (cd "$REPO" && DDG_ANDROID_ROOT="$REPO" DDG_TRAPDOOR_BRIDGE="$bridge" ./gradlew -q \
+    --init-script "$bridge/gradle/trapdoor-bridge.init.gradle" :app:assembleInternalDebug \
+    -Pautofill-disable-auth-requirement -Psync-disable-auth-requirement -Pforce-default-variant) || die "build failed"
+  # The file name carries the version, so APKs of earlier versions stay in the folder: the newest is this build.
+  newest="$(ls -t "$APK_DIR"/*.apk 2>/dev/null | head -1)"
+  [[ -n "$newest" ]] || die "the build produced no internalDebug APK"
+  digest="$(file_sha256 "$newest")"; mkdir -p "$BUILDS"; kept="$BUILDS/${digest:0:16}.apk"
+  cp "$newest" "$kept"
+  python3 -I -c 'import json,sys; r=json.loads(sys.argv[1]); r.update(apk=sys.argv[2], sha256=sys.argv[3], bridge=sys.argv[4], built_at=sys.argv[5]); print(json.dumps(r))' \
+    "$source" "$kept" "$digest" "$(git -C "$bridge" rev-parse --short HEAD 2>/dev/null || echo unknown)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$BUILDS/build.json"
+  echo "built ${digest:0:16} from $(git -C "$REPO" rev-parse --short HEAD)$(grep -q '"dirty": true' "$BUILDS/build.json" && echo ' (with uncommitted changes)')"
 }
 
-# Reinstalls the last bridge build without rebuilding, keeping app data.
+# Installs the recorded build, refusing one the source has moved past, and checks the APK on the device.
 cmd_install() {
-  local f; f="$(ls -t "$APK_DIR"/*.apk 2>/dev/null | head -1)"
-  [[ -n "$f" ]] || die "no APK in $APK_DIR; run: verify.sh build"
-  a install -r -t "$f" >/dev/null
+  local record apk want s; record="$BUILDS/build.json"
+  [[ -f "$record" ]] || die "no recorded build: run verify.sh build"
+  [[ "$(jq -r .fingerprint "$record")" == "$(source_fingerprint | jq -r .fingerprint)" ]] || die "stale build: the source changed since verify.sh build; build again"
+  apk="$(jq -r .apk "$record")"; want="$(jq -r .sha256 "$record")"; s="$(serial)"
+  a install -r -d -t "$apk" >/dev/null || die "install failed; INSTALL_FAILED_UPDATE_INCOMPATIBLE means an internal build signed with another key is installed, and uninstalling it deletes the user's app data, so ask"
+  [[ "$(installed_sha256)" == "$want" ]] || die "the installed APK doesn't match the one just installed"
+  jq --arg serial "$s" --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '. + {serial: $serial, installed_at: $at}' "$record" > "$(dstate "$s")/installed.json"
   a shell am force-stop "$PKG"
-  echo "installed $(basename "$f") on $(serial)"
+  echo "installed ${want:0:16} on $s"
 }
 
+# Read-only: the device, the toolchain, and that the app on it is the build of the current source this tool installed.
 cmd_doctor() {
-  local ok=1 s; s="$(serial)"
+  local ok=1 s rec; s="$(serial)"
   "$ADB" devices | grep -q "^$s[[:space:]]*device" && echo "PASS $s online ($(label "$s"))" || { echo "FAIL $s not online"; ok=0; }
   if owned "$s"; then
     kill -0 "$(cat "$STATE/dev/$s/pid")" 2>/dev/null && echo "INFO emulator started by this run" || { echo "FAIL emulator process gone"; ok=0; }
   else echo "INFO user's device: no reset, uninstall or data clearing without asking"; fi
+  command -v android >/dev/null && echo "PASS android CLI for driving" || { echo "FAIL android CLI not on PATH"; ok=0; }
   command -v node >/dev/null && echo "PASS node $(node --version) for web commands" || { echo "FAIL node not on PATH"; ok=0; }
   echo "INFO worktree $(git -C "$REPO" rev-parse --abbrev-ref HEAD)@$(git -C "$REPO" rev-parse --short HEAD), dirty files: $(git -C "$REPO" status --porcelain | wc -l | tr -d ' ')"
   echo "INFO evidence -> $(evidence_dir)"
-  # trapdoor checks the bridge, protocol, catalog and that the installed build matches HEAD.
-  td doctor || ok=0
+  rec="$(dstate "$s")/installed.json"
+  if [[ ! -f "$rec" ]]; then echo "FAIL nothing installed by verify.sh on this device: run verify.sh build, then verify.sh install"; ok=0
+  elif [[ "$(installed_sha256)" != "$(jq -r .sha256 "$rec")" ]]; then echo "FAIL the app on the device isn't the APK verify.sh installed; install again"; ok=0
+  elif [[ "$(jq -r .fingerprint "$rec")" != "$(source_fingerprint | jq -r .fingerprint)" ]]; then echo "FAIL stale build: the source changed since it was built; build and install again"; ok=0
+  else echo "PASS installed app is the build of the current source ($(jq -r '.sha256[0:16]' "$rec"), $(jq -r '.head[0:10]' "$rec")$(jq -r 'if .dirty then " + uncommitted changes" else "" end' "$rec"))"; fi
+  if td ping >/dev/null 2>&1; then echo "PASS trapdoor bridge answers (seed, set flag)"; else echo "INFO trapdoor bridge does not answer: seed and set flag won't work until the app is running a verify.sh build"; fi
   [[ $ok == 1 ]] || exit 1
 }
 
-# trapdoor pinned to the device and checkout. Runs from the device's evidence folder, so relative
-# capture paths (shot, record, proof) land there.
-cmd_t() { local d; d="$(evidence_dir)"; (cd "$d" && td "$@"); }
+# --- Driving: android CLI layout + adb input -------------------------------------------------------
+# trapdoor stays for state the app cannot be driven into (seed, set flag, reset); everything a user
+# does on screen goes through `android layout` (the element tree) and `adb shell input`.
 
-# trapdoor's assert has no wait; this polls it.
+layout_json() {
+  local out
+  out="$(android layout --device "$(serial)" 2>/dev/null)" || true
+  if [[ -z "$out" || "${out:0:1}" != "[" ]]; then
+    sleep 1; out="$(android layout --device "$(serial)" 2>/dev/null)" || true
+  fi
+  [[ -n "$out" && "${out:0:1}" == "[" ]] \
+    || die "android layout returned nothing (an animation or a WebView can block it); take a shot or use 'android screen capture --annotate'"
+  printf '%s' "$out"
+}
+lp() { layout_json | python3 -I "$HERE/layout.py" "$@"; }
+
+# Parses "<selector> [--index N]" into SEL and IDX.
+sel_index() { SEL="${1:?a selector: id:X, text:X, text~:X, desc:X or desc~:X}"; IDX=1; [[ "${2:-}" == "--index" ]] && IDX="${3:?--index needs a number}"; true; }
+
+cmd_tap() {
+  sel_index "$@"; local xy
+  xy="$(lp find "$SEL" "$IDX")" || die "not on screen: $SEL (index $IDX)"
+  a shell input tap $xy; echo "tapped $SEL at $xy"
+}
+
+# Taps the field, waits for focus, clears it and types. adb input text needs spaces as %s and shell
+# characters escaped.
+cmd_type() {
+  local sel="${1:?usage: verify.sh type <selector> <text>}" text="${2:?usage: verify.sh type <selector> <text>}" i
+  cmd_tap "$sel" >/dev/null
+  for i in 1 2 3 4 5 6; do lp get "$sel" 2>/dev/null | grep -q '"focused"' && break; sleep 0.5; done
+  a shell input keycombination 113 29 >/dev/null 2>&1 || true
+  a shell input keyevent 67
+  a shell input text "$(printf '%s' "$text" | sed -e 's/[\\()&<>;|*~"'"'"'$`]/\\&/g' -e 's/ /%s/g')"
+  echo "typed into $sel"
+}
+
+cmd_key() {
+  case "${1:-}" in
+    back) a shell input keyevent 4 ;; home) a shell input keyevent 3 ;;
+    enter) a shell input keyevent 66 ;; tab) a shell input keyevent 61 ;;
+    *) die "usage: verify.sh key back|home|enter|tab" ;;
+  esac
+}
+
+# Scrolls the screen: up shows content further down, as a finger swiping up does.
+cmd_scroll() {
+  local dir="${1:-up}" times="${2:-1}" w h x i
+  read -r w h <<<"$(a shell wm size | tr -d '\r' | sed -n 's/.*: \([0-9]*\)x\([0-9]*\).*/\1 \2/p' | tail -1)"
+  x=$((w / 2))
+  for ((i = 0; i < times; i++)); do
+    case "$dir" in
+      up) a shell input swipe "$x" $((h * 7 / 10)) "$x" $((h * 3 / 10)) 600 ;;
+      down) a shell input swipe "$x" $((h * 3 / 10)) "$x" $((h * 7 / 10)) 600 ;;
+      *) die "usage: verify.sh scroll up|down [times]" ;;
+    esac
+    sleep 0.5
+  done
+}
+
+# The resumed activity's class name, for example SettingsActivity. Prints "-" when another app is in front.
+cmd_where() {
+  local dump top
+  # Read it whole first: grep -m1 on the live pipe makes dumpsys fail with SIGPIPE under pipefail.
+  dump="$(a shell dumpsys activity activities | tr -d '\r')"
+  top="$(grep -m1 'topResumedActivity' <<<"$dump" | grep -o '[A-Za-z0-9_.]*/[A-Za-z0-9_.$]*' | head -1 || true)"
+  if [[ "${top%%/*}" == "$PKG" ]]; then echo "${top##*.}"; else echo "-"; fi
+}
+
+# assert visible|not-visible <selector> [--index N], assert text <selector> <expected>, assert where <Activity>.
+# Exit 15 when false, like trapdoor's assert.
+cmd_assert() {
+  local kind="${1:-}"; shift || true
+  case "$kind" in
+    visible) sel_index "$@"; lp find "$SEL" "$IDX" >/dev/null && { echo "visible: $SEL"; return; }; echo "not visible: $SEL" >&2; exit 15 ;;
+    not-visible) sel_index "$@"; lp find "$SEL" "$IDX" >/dev/null || { echo "not visible: $SEL"; return; }; echo "visible: $SEL" >&2; exit 15 ;;
+    text) local actual; actual="$(lp get "${1:?selector}" | python3 -c 'import sys,json; n=json.load(sys.stdin); print(n.get("text") or n.get("content-desc") or "")')" || { echo "not on screen: $1" >&2; exit 15; }
+          [[ "$actual" == "${2?expected text}" ]] && { echo "text ok: $actual"; return; }; echo "text was: $actual" >&2; exit 15 ;;
+    where) local at; at="$(cmd_where)"; [[ "$at" == "${1:?activity}" ]] && { echo "at $at"; return; }; echo "at $at" >&2; exit 15 ;;
+    *) die "usage: verify.sh assert visible|not-visible <selector> | text <selector> <expected> | where <Activity>" ;;
+  esac
+}
+
 cmd_wait() {
   local selector="${1:?usage: verify.sh wait <selector> [secs]}" secs="${2:-20}" end
   end=$((SECONDS + secs))
   while (( SECONDS < end )); do
-    td assert visible "$selector" >/dev/null 2>&1 && { echo "visible: $selector"; return; }
+    lp find "$selector" >/dev/null 2>&1 && { echo "visible: $selector"; return; }
     sleep 1
   done
   die "not visible after ${secs}s: $selector"
 }
+
+# Tappable elements, one per line: top, id, text, description, interactions and state.
+cmd_ui() { lp ui; }
+
+# Every element with text (id, text, interactions and state), or one id's text; exit 15 when absent.
+cmd_text() { lp text "$@"; }
+
+# true/false for the Nth (1-based) checkable element with this id.
+cmd_checked() { lp checked "${1:?usage: verify.sh checked <resource-id> [index]}" "${2:-1}" || die "no element with id $1 at index ${2:-1}"; }
+
+# Screenshot plus the element tree beside it, and a sidecar naming the activity and commit.
+cmd_shot() {
+  local name="${1:?usage: verify.sh shot <name>.png}" d; d="$(evidence_dir)"
+  a exec-out screencap -p > "$d/$name"
+  [[ -s "$d/$name" ]] || die "screencap returned nothing"
+  layout_json > "$d/$name.layout.json" 2>/dev/null || true
+  printf '{"activity":"%s","capturedUtc":"%s","commit":"%s"}\n' "$(cmd_where)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    "$(git -C "$REPO" rev-parse --short HEAD)" > "$d/$name.json"
+  echo "$d/$name"
+}
+
+# record start <name>.mp4 / record stop. screenrecord stops by itself after 170 s.
+cmd_record() {
+  local s d; s="$(serial)"; d="$(dstate "$s")"
+  case "${1:-}" in
+    start)
+      local name="${2:?usage: verify.sh record start <name>.mp4}"
+      [[ -f "$d/record" ]] && cmd_record stop >/dev/null
+      ( "$ADB" -s "$s" shell screenrecord --time-limit 170 "/sdcard/verify-$name" >/dev/null 2>&1 ) &
+      echo "$! $name" > "$d/record"; echo "recording $name" ;;
+    stop)
+      [[ -f "$d/record" ]] || { echo "not recording"; return; }
+      local pid name; read -r pid name < "$d/record"
+      a shell pkill -INT screenrecord >/dev/null 2>&1 || true
+      for _ in $(seq 1 10); do kill -0 "$pid" 2>/dev/null || break; sleep 0.5; done
+      sleep 1
+      a pull "/sdcard/verify-$name" "$(evidence_dir)/$name" >/dev/null && a shell rm -f "/sdcard/verify-${name:?}"
+      rm -f "${d:?}/record"; echo "$(evidence_dir)/$name" ;;
+    *) die "usage: verify.sh record start <name>.mp4 | stop" ;;
+  esac
+}
+
+# Brings the app to the front through its launcher icon, as a user does. Debug builds have a second
+# launcher entry (LeakCanary's "Leaks"), so start the browser's own one by name rather than with monkey.
+cmd_launch() {
+  a shell am start -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n "$PKG/com.duckduckgo.app.launch.Launcher" >/dev/null 2>&1
+  # The launcher entry is a short-lived "Launcher" activity that hands over to the browser.
+  local i at; for i in $(seq 1 20); do at="$(cmd_where)"; [[ "$at" != "-" && "$at" != "Launcher" ]] && { echo "app in front: $at"; return; }; sleep 1; done
+  die "the app did not come to the front"
+}
+cmd_restart() { a shell am force-stop "$PKG"; cmd_launch; }
+
+# Opens a URL in the app the way another app's link does (setup, not the step under test).
+cmd_open() {
+  a shell am start -a android.intent.action.VIEW -d "${1:?usage: verify.sh open <url>}" -p "$PKG" >/dev/null
+  echo "opened $1"
+}
+
+# State setup that cannot be driven through the UI: clears app data and seeds onboarding as done. Only on
+# an emulator this run booted; on the user's device trapdoor itself asks for --yes.
+cmd_reset() {
+  owned "$(serial)" || die "reset clears app data; this device is not an emulator this run booted, so ask the user first"
+  td reset; cmd_launch
+}
+
+# --- Seeding: the only use of trapdoor -------------------------------------------------------------
+# trapdoor's in-app bridge writes state the UI cannot reach: seeded data, feature flags, a clean app.
+# Nothing else goes through it; driving and evidence use the android CLI and adb above.
+cmd_seed() { local d; d="$(evidence_dir)"; (cd "$d" && td seed "${@:?usage: verify.sh seed <fixture> [--param value ...]}"); }
+cmd_seeds() { td list --fixtures | cut -f1; }
+cmd_flag() {
+  [[ "${1:-}" && "${2:-}" =~ ^(enabled|disabled)$ ]] || die "usage: verify.sh flag <parent.name> enabled|disabled"
+  td set flag --feature "$1" --state "$2"
+}
+cmd_flags() { td flags "$@"; }
 
 # DevTools forward on a free port per device (trapdoor's cdp-forward always uses tcp:9222).
 # Needs Developer Settings > Web Content Debugging on.
@@ -282,7 +465,7 @@ cdp_port() {
 cdp() { node "$HERE/cdp.mjs" "$@"; }
 
 # Screen point for a CSS selector: the element centre in CSS px, scaled by devicePixelRatio and
-# offset by the WebView bounds from trapdoor's hierarchy, so the tap is a real touch.
+# offset by the WebView's position on screen, so the tap is a real touch.
 web_point() {
   local selector="$1" port rect wv
   port="$(cdp_port)"
@@ -290,9 +473,12 @@ web_point() {
     if (!e) return null; e.scrollIntoView({block: 'center'}); const r = e.getBoundingClientRect();
     return {x: r.left + r.width / 2, y: r.top + r.height / 2, dpr: devicePixelRatio}; })()")"
   [[ "$rect" != "null" ]] || die "no element for selector: $selector"
-  wv="$(td hierarchy --json | jq -c '[.data.tappable[] | select(.class | test("WebView")) | select(.visible)] | last | .bounds')"
-  [[ "$wv" != "null" && -n "$wv" ]] || die "no WebView on screen"
-  jq -rn --argjson r "$rect" --argjson b "$wv" '"\(($b.left + $r.x * $r.dpr) | round) \(($b.top + $r.y * $r.dpr) | round)"'
+  # android layout drops the WebView's id once it lists the page's own content, so its position comes
+  # from uiautomator, which keeps the class: the outermost android.webkit.WebView of the app.
+  wv="$(a exec-out uiautomator dump /dev/tty 2>/dev/null | grep -o "<node [^>]*class=\"android.webkit.WebView\" package=\"$PKG\"[^>]*>" \
+    | head -1 | grep -o 'bounds="\[[0-9]*,[0-9]*\]' | grep -o '[0-9]*,[0-9]*' | tr ',' ' ')"
+  [[ -n "$wv" ]] || die "no WebView on screen (or uiautomator was killed by another UI-automation client)"
+  jq -rn --argjson r "$rect" --arg wv "$wv" '($wv | split(" ") | map(tonumber)) as $b | "\(($b[0] + $r.x * $r.dpr) | round) \(($b[1] + $r.y * $r.dpr) | round)"'
 }
 
 cmd_web() {
@@ -302,63 +488,10 @@ cmd_web() {
     eval)    cdp "$(cdp_port)" eval "${1:?usage: verify.sh web eval '<js>' [url-regex]}" "${2:-}" ;;
     tap)     local x y; read -r x y <<<"$(web_point "${1:?usage: verify.sh web tap '<css selector>'}")"
              a shell input tap "$x" "$y"; echo "tapped web $1 at $x,$y" ;;
-    # trapdoor type only targets native editables; web fields take keystrokes into the focused element.
+    # Web fields take keystrokes into the focused element.
     type)    a shell input text "$(printf '%s' "${1:?usage: verify.sh web type '<text>'}" | sed 's/ /%s/g')" ;;
     *) die "usage: verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'" ;;
   esac
-}
-
-# trapdoor's hierarchy has no checked state; uiautomator does. Prints true/false for the Nth (1-based)
-# visible view with this resource id, so a recipe can read a switch before and after tapping it.
-cmd_checked() {
-  local id="${1:?usage: verify.sh checked <resource-id> [index]}" index="${2:-1}" value
-  value="$(a exec-out uiautomator dump /dev/tty 2>/dev/null | grep -o "<node [^>]*resource-id=\"[^\"]*:id/$id\"[^>]*>" \
-    | sed -n "${index}p" | grep -o 'checked="[a-z]*"' | head -1 | cut -d'"' -f2)"
-  [[ -n "$value" ]] || die "no view with id $id at index $index (uiautomator killed? another UI-automation client such as Maestro may be running)"
-  echo "$value"
-}
-
-# Opens every catalog screen and surface whose name matches a regex and saves what each one shows:
-# where, the tappable elements and a screenshot. Raw material for a feature file, not proof of a user path.
-cmd_survey() {
-  local pattern="${1:?usage: verify.sh survey '<name regex>'   e.g. '^settings'}"
-  local out; out="$VERIFY_ROOT/survey/$(printf '%s' "$pattern" | tr -c 'A-Za-z0-9._-' '_')"
-  mkdir -p "$out"
-  local targets
-  targets="$( { td list --screens; td list --surfaces; } | awk -F'\t' -v p="$pattern" '$1 ~ p { print $1 "\t" $2 "\t" $NF }')"
-  [[ -n "$targets" ]] || die "no catalog targets match $pattern; try: verify.sh t find <words>"
-  {
-    echo "# Survey: $pattern"
-    echo
-    echo "$(label "$(serial)"), $(git -C "$REPO" rev-parse --short HEAD), $(date '+%Y-%m-%d %H:%M')"
-    echo
-    echo "| Target | Type | Result | Reached | Tappable |"
-    echo "|---|---|---|---|---|"
-  } > "$out/README.md"
-  local name type drivable reply status where count
-  while IFS=$'\t' read -r name type drivable; do
-    if [[ "$drivable" != "not-drivable: -" ]]; then
-      echo "| \`$name\` | $type | not drivable | ${drivable#not-drivable: } | |" >> "$out/README.md"; continue
-    fi
-    td dismiss >/dev/null 2>&1 || true
-    reply="$(td goto "$name" --json 2>/dev/null || true)"
-    status="$(jq -r '.status // "error"' <<<"$reply" 2>/dev/null || echo error)"
-    if [[ "$status" == "notReady" ]]; then
-      reply="$(td goto "$name" --json 2>/dev/null || true)"; status="$(jq -r '.status // "error"' <<<"$reply" 2>/dev/null || echo error)"
-    fi
-    if [[ "$status" == "ok" ]]; then
-      where="$(td where --json | jq -r '.data | "\(.screenName)\(if .surface then " / " + .surface else "" end)"')"
-      td hierarchy --interactive-only --json > "$out/$name.hierarchy.json" 2>/dev/null || true
-      count="$(jq '.data.tappable | length' "$out/$name.hierarchy.json" 2>/dev/null || echo "?")"
-      (cd "$out" && td shot "$name.png" >/dev/null 2>&1) || true
-      echo "| \`$name\` | $type | ok | $where | $count |" >> "$out/README.md"
-    else
-      echo "| \`$name\` | $type | $status | $(jq -r '.reason // ""' <<<"$reply" 2>/dev/null | tr '|' '/') | |" >> "$out/README.md"
-    fi
-    echo "$name: $status"
-  done <<<"$targets"
-  td dismiss >/dev/null 2>&1 || true
-  echo "survey: $out/README.md"
 }
 
 cmd_logcat() { local d; d="$(evidence_dir)"; a logcat -d > "$d/logcat-$(date +%H%M%S).txt"; echo "$d"; }
@@ -370,7 +503,7 @@ cmd_cleanup() {
   for s in $( { selected; ls "$STATE/dev" 2>/dev/null; } | sort -u); do
     d="$STATE/dev/$s"
     if "$ADB" devices | grep -q "^$s[[:space:]]*device"; then
-      (VERIFY_SERIAL="$s"; cd "$(evidence_dir)" && trapdoor --device "$s" --android-root "$REPO" record stop >/dev/null 2>&1) || true
+      [[ -f "$d/record" ]] && (VERIFY_SERIAL="$s"; cmd_record stop >/dev/null 2>&1) || true
       [[ -f "$d/cdp" ]] && "$ADB" -s "$s" forward --remove "tcp:$(cut -d' ' -f2 "$d/cdp")" >/dev/null 2>&1 || true
     fi
     if [[ -f "$d/pid" ]]; then
@@ -386,7 +519,7 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|t|wait|checked|web|survey|logcat|cleanup|subscription|ui|text) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|seed|seeds|flag|flags|tap|type|key|scroll|where|assert|wait|ui|text|checked|shot|record|launch|restart|open|reset|web|logcat|cleanup|subscription) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on
@@ -394,15 +527,21 @@ usage: verify.sh devices                      attached devices and AVDs on this 
        verify.sh build | install | doctor | cleanup
        verify.sh each <command>...            run a command on every selected device
        verify.sh on <serial> <command>...     run a command on one selected device
-       verify.sh t <trapdoor args>            trapdoor on the device, captures saved to evidence
-       verify.sh wait <selector> [secs]       poll trapdoor assert visible (id:X, text:X, desc:X)
+   drive (android layout + adb):
+       verify.sh tap <selector> [--index N]   selector: id:X, text:X, text~:X, desc:X, desc~:X
+       verify.sh type <selector> <text>       focus, clear and type into a native field
+       verify.sh key back|home|enter|tab      verify.sh scroll up|down [times]
+       verify.sh assert visible|not-visible <selector> | text <selector> <expected> | where <Activity>
+       verify.sh wait <selector> [secs]       verify.sh where
+       verify.sh ui | text [<id>] | checked <id> [index]
+       verify.sh shot <name>.png              verify.sh record start <name>.mp4 | stop
+       verify.sh launch | restart | open <url>
        verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'
-       verify.sh checked <resource-id> [index]  true/false for a switch or checkbox (1-based index)
-       verify.sh survey '<name regex>'       open every matching catalog target, save where/hierarchy/shot
+   seed (trapdoor, the only use of it):
+       verify.sh seed <fixture> [--param value ...]   verify.sh seeds   list the fixtures
+       verify.sh flag <parent.name> enabled|disabled  verify.sh flags   current flag values
        verify.sh subscription none | [--tier plus|pro] [--region us|row] [--status <s>] [--trial true] [--products <list>]
-                                              seed a subscription state, then restart the app into it
-       verify.sh ui                           compact tappable list: top, id, text, description, DISABLED
-       verify.sh text [<resource-id>]         every text node on screen (uiautomator), or one node's text
+       verify.sh reset                        clear app data, onboarding done (emulators this run booted)
        verify.sh logcat
 EOF
      exit 2 ;;
