@@ -69,6 +69,18 @@ evidence_dir() {
 uilog() { [[ -z "${VERIFY_UI_LOG:-}" ]] || printf '  %s -> %s\n' "$1" "$2" >> "$VERIFY_UI_LOG"; }
 a() { local rc=0; "$ADB" -s "$(serial)" "$@" || rc=$?; uilog "adb $*" "$rc"; return "$rc"; }
 
+# adb's own reason decides the advice: only a signing mismatch needs the user, since uninstalling deletes their data.
+adb_install() {
+  local out reason
+  out="$(a install -r -d -t "$1" 2>&1)" && return 0
+  reason="$(grep -o 'INSTALL_[A-Z_]*' <<<"$out" | head -1 || true)"
+  case "$reason" in
+    INSTALL_FAILED_UPDATE_INCOMPATIBLE) die "install failed ($reason): an internal build signed with another key is installed, and uninstalling it deletes the user's app data, so ask" ;;
+    INSTALL_FAILED_INSUFFICIENT_STORAGE) die "install failed ($reason): the device is out of space; free some or pick another device" ;;
+    *) die "install failed: $(grep -v '^[[:space:]]*$' <<<"$out" | tail -1 || true)" ;;
+  esac
+}
+
 cmd_devices() {
   local s sel; sel="$(selected)"
   echo "attached:"
@@ -265,7 +277,7 @@ cmd_install() {
     [[ "$(jq -r .fingerprint "$record")" == "$(source_fingerprint | jq -r .fingerprint)" ]] || die "stale build: the source changed since verify.sh build; build again"
   fi
   apk="$(jq -r .apk "$record")"; want="$(jq -r .sha256 "$record")"; s="$(serial)"
-  a install -r -d -t "$apk" >/dev/null || die "install failed; INSTALL_FAILED_UPDATE_INCOMPATIBLE means an internal build signed with another key is installed, and uninstalling it deletes the user's app data, so ask"
+  adb_install "$apk"
   [[ "$(installed_sha256)" == "$want" ]] || die "the installed APK doesn't match the one just installed"
   jq --arg serial "$s" --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '. + {serial: $serial, installed_at: $at}' "$record" > "$(dstate "$s")/installed.json"
   a shell am force-stop "$PKG"
@@ -278,7 +290,7 @@ cmd_install_apk() {
   [[ -f "$apk" ]] || die "no APK at $apk"
   apk="$(cd "$(dirname "$apk")" && pwd)/$(basename "$apk")"
   digest="$(file_sha256 "$apk")"; s="$(serial)"
-  a install -r -d -t "$apk" >/dev/null || die "install failed; INSTALL_FAILED_UPDATE_INCOMPATIBLE means an internal build signed with another key is installed, and uninstalling it deletes the user's app data, so ask"
+  adb_install "$apk"
   [[ "$(installed_sha256)" == "$digest" ]] || die "the installed $PKG isn't this APK: it must be an internal debug build ($PKG)"
   jq -n --arg apk "$apk" --arg sha256 "$digest" --arg serial "$s" --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     '{external: true, apk: $apk, sha256: $sha256, serial: $serial, installed_at: $at}' > "$(dstate "$s")/installed.json"

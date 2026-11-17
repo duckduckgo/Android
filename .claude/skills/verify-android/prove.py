@@ -434,11 +434,13 @@ def column(build):
 
 
 def build_public(build):
+    head = f"`{build['head'][:10]}`" if build.get("head") else ""
     if build.get("base"):
-        return f"base `{build['base']}` (`{build.get('head', '?')[:10]}`)"
+        return f"base `{build['base']}`" + (f" ({head})" if head else "")
     if build.get("external"):
-        return f"an external APK (sha256 `{build.get('sha256', '?')[:12]}`), not built from this source"
-    return f"this branch (`{build.get('head', '?')[:10]}`{', uncommitted changes' if build.get('dirty') else ''})"
+        return "an external APK" + (f" (sha256 `{build['sha256'][:12]}`)" if build.get("sha256") else "") + ", not built from this source"
+    detail = ", ".join(x for x in (head, "uncommitted changes" if build.get("dirty") else "") if x)
+    return "this branch" + (f" ({detail})" if detail else "")
 
 
 def headline(error):
@@ -484,11 +486,13 @@ def summarize(before, after):
     committed = proof.get("repo_path") if proof.get("committed") else None
     claim = (proof.get("doc") or "").split("\n\n")[0].replace("\n", " ")
     sentence = "; ".join(outcome(r) for r in (before, after) if r)
+    # A run that stopped at doctor never read the device or the build, so those lines are left out, not guessed.
+    device = ", ".join(x for x in (after.get("model"), f"API {after['api']}" if after.get("api") else "") if x)
     lines = [f"**{sentence[0].upper()}{sentence[1:]}.**", "",
-             "- Proof: " + (f"`{committed}`" if committed else "written for this change (source below)") + f": {claim}",
-             f"- Device: {after.get('model') or 'unknown model'}, API {after.get('api') or '?'}",
-             "- Builds: " + (f"{build_public(before['build'])} → " if before else "") + build_public(after["build"]),
-             f"- Live services: {', '.join(after.get('live') or []) or 'none'}"]
+             "- Proof: " + (f"`{committed}`" if committed else "written for this change (source below)") + (f": {claim}" if claim else "")]
+    lines += [f"- Device: {device}"] if device else []
+    lines += ["- Builds: " + (f"{build_public(before['build'])} → " if before else "") + build_public(after["build"]),
+              f"- Live services: {', '.join(after.get('live') or []) or 'none'}"]
     if before:
         differs = [k for k in ("model", "api") if before.get(k) != after.get(k)]
         differs += ["proof source"] if before["proof"].get("source") != proof.get("source") else []
