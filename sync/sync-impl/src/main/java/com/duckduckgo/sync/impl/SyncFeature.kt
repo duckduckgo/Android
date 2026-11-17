@@ -143,15 +143,6 @@ interface SyncFeature {
     fun canUsePatchEndpointForLegacyDeviceRename(): Toggle
 
     /**
-     * When enabled:
-     *   - On-device authentication is moved from the sync settings to the last possible moment before syncing.
-     *   - Camera permission is request upfront when opening barcode scanner.
-     *   - Account deletion flow is explicit about deletion results.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canUseImprovedSyncFlow(): Toggle
-
-    /**
      * Kill switch for refreshing the connected devices count after app-open and background syncs. Syncs after creating or joining
      * an account always refresh it.
      */

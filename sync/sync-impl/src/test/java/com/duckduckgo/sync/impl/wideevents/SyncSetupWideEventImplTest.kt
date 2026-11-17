@@ -281,29 +281,6 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `onUserAuthCancelled aborts the flow`() = runTest {
-        whenever(wideEventClient.getFlowIds(any()))
-            .thenReturn(Result.success(listOf(1L)))
-
-        wideEvent.onUserAuthCancelled()
-
-        verify(wideEventClient).flowFinish(
-            wideEventId = 1L,
-            status = FlowStatus.Cancelled,
-        )
-    }
-
-    @Test
-    fun `onEnrollDeviceAuthDialogShown aborts the flow`() = runTest {
-        whenever(wideEventClient.getFlowIds(any()))
-            .thenReturn(Result.success(listOf(1L)))
-
-        wideEvent.onEnrollDeviceAuthDialogShown()
-
-        verify(wideEventClient).flowAbort(wideEventId = 1L)
-    }
-
-    @Test
     fun `onRecoveryCodeGenerationFailed finishes flow with failure`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(1L)))

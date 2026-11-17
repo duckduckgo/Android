@@ -16,10 +16,6 @@
 
 package com.duckduckgo.sync.impl.auth
 
-import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
@@ -29,32 +25,19 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 
 class RealSyncDeviceAuthenticatorTest {
-    @get:Rule
-    val coroutineTestRule = CoroutineTestRule()
-
     private val deviceAuthenticator = FakeDeviceAuthenticator()
     private val syncPixels = mock<SyncPixels>()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private val testee = RealSyncDeviceAuthenticator(
         authenticator = deviceAuthenticator,
         syncPixels = syncPixels,
-        syncFeature = syncFeature,
-        dispatchers = coroutineTestRule.testDispatcherProvider,
     )
-
-    @Before
-    fun setUp() {
-        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = true))
-    }
 
     @Test
     fun `when user authenticates then fire succeeded pixel`() = runTest {
@@ -104,16 +87,6 @@ class RealSyncDeviceAuthenticatorTest {
     @Test
     fun `when auth is not required for build then do not fire pixel`() = runTest {
         deviceAuthenticator.response = Response.Allowed.NotRequiredForBuild
-
-        testee.authenticate(AuthenticationSource.SETTINGS_NOT_SYNCED, Request())
-
-        verifyNoInteractions(syncPixels)
-    }
-
-    @Test
-    fun `when improved sync flow is disabled then do not fire pixel`() = runTest {
-        syncFeature.canUseImprovedSyncFlow().setRawStoredState(State(enable = false))
-        deviceAuthenticator.response = Response.Allowed.UserAuthenticated
 
         testee.authenticate(AuthenticationSource.SETTINGS_NOT_SYNCED, Request())
 
