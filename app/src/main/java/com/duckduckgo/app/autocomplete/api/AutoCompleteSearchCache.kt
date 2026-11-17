@@ -19,6 +19,8 @@ package com.duckduckgo.app.autocomplete.api
 import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import java.util.Locale
@@ -44,18 +46,23 @@ class RealAutoCompleteSearchCache @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
 ) : AutoCompleteSearchCache {
 
-    private val enabled: Boolean by lazy { autocompleteSpeedFeature.cacheSuggestResults().isEnabled() }
+    // Read once per process, so a remote change applies from the next app start.
+    private val config: Config? by lazy { readConfig() }
 
-    private val entries = object : LinkedHashMap<String, Entry>(MAX_ENTRIES, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Entry>): Boolean = size > MAX_ENTRIES
+    private val settingsAdapter by lazy {
+        Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(CacheSettings::class.java)
+    }
+
+    private val entries = object : LinkedHashMap<String, Entry>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Entry>): Boolean = size > (config?.maxEntries ?: 0)
     }
 
     override fun get(query: String): List<AutoCompleteServiceRawResult>? {
-        if (!enabled) return null
+        val config = config ?: return null
         val key = key(query)
         synchronized(entries) {
             val entry = entries[key] ?: return null
-            if (currentTimeProvider.elapsedRealtime() - entry.storedAtMillis > TTL_MILLIS) {
+            if (currentTimeProvider.elapsedRealtime() - entry.storedAtMillis > config.ttlMillis) {
                 entries.remove(key)
                 return null
             }
@@ -64,7 +71,7 @@ class RealAutoCompleteSearchCache @Inject constructor(
     }
 
     override fun put(query: String, results: List<AutoCompleteServiceRawResult>) {
-        if (!enabled) return
+        if (config == null) return
         synchronized(entries) {
             entries[key(query)] = Entry(results, currentTimeProvider.elapsedRealtime())
         }
@@ -77,13 +84,40 @@ class RealAutoCompleteSearchCache @Inject constructor(
     // The service sends the device language with every request, so a language change must not reuse older responses.
     private fun key(query: String): String = "${Locale.getDefault().language}|$query"
 
+    private fun readConfig(): Config? {
+        val toggle = autocompleteSpeedFeature.cacheSuggestResults()
+        if (!toggle.isEnabled()) return null
+
+        val settings = runCatching {
+            toggle.getSettings()?.let { settingsAdapter.fromJson(it) }
+        }.getOrNull()
+
+        val ttlSeconds = (settings?.ttlSeconds ?: DEFAULT_TTL_SECONDS).coerceIn(MIN_TTL_SECONDS, MAX_TTL_SECONDS)
+        val maxEntries = (settings?.maxEntries ?: DEFAULT_MAX_ENTRIES).coerceIn(MIN_MAX_ENTRIES, MAX_MAX_ENTRIES)
+        return Config(ttlMillis = ttlSeconds * 1000, maxEntries = maxEntries)
+    }
+
+    private data class Config(
+        val ttlMillis: Long,
+        val maxEntries: Int,
+    )
+
+    private data class CacheSettings(
+        val ttlSeconds: Long?,
+        val maxEntries: Int?,
+    )
+
     private data class Entry(
         val results: List<AutoCompleteServiceRawResult>,
         val storedAtMillis: Long,
     )
 
     companion object {
-        private const val MAX_ENTRIES = 50
-        private const val TTL_MILLIS = 10 * 60 * 1000L
+        private const val DEFAULT_TTL_SECONDS = 120L
+        private const val MIN_TTL_SECONDS = 1L
+        private const val MAX_TTL_SECONDS = 600L
+        private const val DEFAULT_MAX_ENTRIES = 50
+        private const val MIN_MAX_ENTRIES = 1
+        private const val MAX_MAX_ENTRIES = 200
     }
 }

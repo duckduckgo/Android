@@ -50,7 +50,7 @@ class RealAutoCompleteSearchCacheTest {
         val testee = createTestee()
         testee.put("foo", results)
 
-        timeProvider.now += 10 * 60 * 1000L + 1
+        timeProvider.now += 2 * 60 * 1000L + 1
 
         assertNull(testee.get("foo"))
     }
@@ -60,7 +60,7 @@ class RealAutoCompleteSearchCacheTest {
         val testee = createTestee()
         testee.put("foo", results)
 
-        timeProvider.now += 10 * 60 * 1000L
+        timeProvider.now += 2 * 60 * 1000L
 
         assertEquals(results, testee.get("foo"))
     }
@@ -96,6 +96,66 @@ class RealAutoCompleteSearchCacheTest {
         testee.put("foo", results)
 
         assertNull(testee.get("foo"))
+    }
+
+    @Test
+    fun whenTtlSetRemotelyThenUsed() {
+        enable(settings = """{"ttlSeconds":30}""")
+        val testee = createTestee()
+        testee.put("foo", results)
+
+        timeProvider.now += 30_000L
+        assertEquals(results, testee.get("foo"))
+
+        timeProvider.now += 1
+        assertNull(testee.get("foo"))
+    }
+
+    @Test
+    fun whenMaxEntriesSetRemotelyThenUsed() {
+        enable(settings = """{"maxEntries":2}""")
+        val testee = createTestee()
+
+        testee.put("first", results)
+        testee.put("second", results)
+        testee.put("third", results)
+
+        assertNull(testee.get("first"))
+        assertEquals(results, testee.get("second"))
+        assertEquals(results, testee.get("third"))
+    }
+
+    @Test
+    fun whenSettingsOutOfRangeThenClamped() {
+        enable(settings = """{"ttlSeconds":100000,"maxEntries":0}""")
+        val testee = createTestee()
+
+        testee.put("first", results)
+        testee.put("second", results)
+        timeProvider.now += 10 * 60 * 1000L
+
+        assertNull(testee.get("first"))
+        assertEquals(results, testee.get("second"))
+
+        timeProvider.now += 1
+        assertNull(testee.get("second"))
+    }
+
+    @Test
+    fun whenSettingsMalformedThenDefaults() {
+        enable(settings = "not json")
+        val testee = createTestee()
+        testee.put("foo", results)
+
+        timeProvider.now += 2 * 60 * 1000L
+        assertEquals(results, testee.get("foo"))
+
+        timeProvider.now += 1
+        assertNull(testee.get("foo"))
+    }
+
+    private fun enable(settings: String) {
+        feature.cacheSuggestResults().setRawStoredState(State(enable = true, settings = settings))
     }
 
     private fun createTestee() = RealAutoCompleteSearchCache(feature, timeProvider)
