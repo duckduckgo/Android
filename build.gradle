@@ -40,6 +40,8 @@ plugins {
     id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
     id 'androidx.baselineprofile' apply false
+    id 'io.github.takahirom.roborazzi' apply false
+    id 'app.cash.paparazzi' apply false
 }
 
 // Proprietary DuckSans font swap. See https://app.asana.com/1/137249556945/project/1207908166761516/task/1213686706814504
@@ -262,13 +264,16 @@ def isCI = System.getenv('CI') != null
 subprojects {
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
+        // Develocity can't re-select tests from Compose's preview-screenshot-test-engine by unique ID, so screenshot
+        // test suites fail during discovery under predictive test selection or retries.
+        def isScreenshotTestSuite = name.endsWith("TestSuite") && name.contains("ScreenshotTest")
         develocity.testRetry {
-            maxRetries = isCI ? 1 : 0
+            maxRetries = (isCI && !isScreenshotTestSuite) ? 1 : 0
             maxFailures = 5
             failOnPassedAfterRetry = true
         }
         develocity.predictiveTestSelection {
-            enabled.set(System.getProperty("pts.enabled", "true").toBoolean())
+            enabled.set(!isScreenshotTestSuite && System.getProperty("pts.enabled", "true").toBoolean())
         }
     }
 }

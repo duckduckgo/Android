@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
+import com.android.build.api.variant.HostTestBuilder
+import com.android.build.api.variant.TestSuiteSourceSet
+
 plugins {
     id 'com.android.library'
     id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'io.github.takahirom.roborazzi'
+    id 'app.cash.paparazzi'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -28,6 +33,8 @@ android {
 }
 
 android {
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+    experimentalProperties["android.experimental.testSuiteSupport"] = true
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
@@ -36,10 +43,26 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+        screenshotTests.create("screenshotTest") {
+            engineVersion = "0.0.1-alpha17"
+            targetVariants.add("debug")
+            dependencies {
+                implementation(project.dependencies.platform(AndroidX.compose.bom))
+                implementation(AndroidX.compose.ui.tooling)
+                implementation("com.android.tools.screenshot:screenshot-validation-api:0.0.1-alpha17")
+            }
+        }
     }
 
     buildFeatures {
         compose true
+    }
+
+    // The screenshot catalog is shared by the Roborazzi and Paparazzi tests (unit tests) and the Compose Preview Screenshot tests,
+    // which get it through the test suite sources below.
+    sourceSets {
+        test.java.srcDir("src/screenshotCatalog/java")
+        test.kotlin.srcDir("src/screenshotCatalog/java")
     }
 }
 
@@ -105,4 +128,39 @@ dependencies {
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+
+    // Screenshot testing
+    testImplementation "io.github.takahirom.roborazzi:roborazzi:_"
+    testImplementation "io.github.takahirom.roborazzi:roborazzi-compose:_"
+    testImplementation AndroidX.compose.ui.testJunit4
+    testImplementation AndroidX.compose.ui.testManifest
+    testImplementation AndroidX.activity.compose
 }
+
+roborazzi {
+    outputDir.set(file("src/test/screenshots"))
+}
+
+// Robolectric and Paparazzi's layoutlib each load a native Android runtime, and only one can be registered per JVM.
+tasks.withType(Test).configureEach {
+    forkEvery = 1
+}
+
+// Screenshot tests run through the AGP test suite above, so the legacy per-variant screenshot host test is turned off to avoid
+// duplicate task names. Release keeps unit tests because AGP's generate<Variant>ComposePreviewRunfiles requires one per Compose variant.
+androidComponents {
+    beforeVariants(selector().all()) { variantBuilder ->
+        variantBuilder.hostTests[HostTestBuilder.SCREENSHOT_TEST_TYPE]?.enable = false
+    }
+    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+        variantBuilder.hostTests[HostTestBuilder.UNIT_TEST_TYPE]?.enable = true
+    }
+    onVariants(selector().all()) { variant ->
+        variant.suites.values().each { suite ->
+            suite.sources.findAll { it instanceof TestSuiteSourceSet.HostJar }.each { hostJar ->
+                hostJar.kotlin.addStaticSourceDirectory(file("src/screenshotCatalog/java").absolutePath)
+            }
+        }
+    }
+}
+
