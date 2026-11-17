@@ -59,7 +59,7 @@ Settings, onboarding, sync, autofill, PIR and VPN beyond their entry points in s
 
 `../checks/<feature>.sh` replays a recipe as `check "<name>" '<command>'` lines and ends with `RESULT pass=N fail=M`. They act on `VERIFY_SERIAL` or the device chosen with `verify.sh use`, and reset the app first, so run them on an owned emulator. A script always exits 0 and a failed setup step shows up as FAILs in the checks after it; read the RESULT line and the first FAIL.
 
-`../prove.py ../proofs/<name>.py` runs the same kind of recipe as a Python proof: it refuses to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. `proofs/search_and_navigate.py` is the port of `checks/search-and-navigate.sh`; shared paths are in `proofs/steps.py`.
+`../prove.py ../proofs/<name>.py` runs the same kind of recipe as a Python proof: it refuses to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. Every recipe has a proof in `../proofs/` (`search-and-navigate.sh` becomes `search_and_navigate.py`), with shared paths in `proofs/steps.py`. The video is split into segments of 160 s, because screenrecord stops at 170 s. After changing `prove.py`, run `../prove.py selftest`: it checks that a wrong expectation is FAIL, a broken step and a stale build are ERROR, a proof with no checks isn't a pass, and pixels logged before `mark()` aren't counted.
 
 ## Adding a feature
 

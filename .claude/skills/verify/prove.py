@@ -2,6 +2,7 @@
 """Runs a proof against the app on the selected device and gives a verdict.
 
   prove.py proofs/<name>.py
+  prove.py selftest            checks the harness itself (run it after changing prove.py); see tests/
 
 A proof is a module with a docstring (the claim) and run(android). It acts through verify.sh and records
 checks with android.check(). Exit 0 PASS (at least one check, all passed), 1 FAIL (a check failed),
@@ -17,6 +18,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 import time
 import traceback
 from pathlib import Path
@@ -46,8 +48,16 @@ class Android:
         self.checks, self.notes, self.sections, self._mark = [], [], [], None
 
     # Driving: a step that fails raises Error, because nothing after it would mean anything.
-    def tap(self, selector):
-        verify("tap", selector)
+    def tap(self, selector, index=None):
+        verify("tap", selector, *(["--index", index] if index else []))
+
+    def seed(self, *args):
+        """Puts state the UI can't reach in place through trapdoor (verify.sh seeds lists them); returns its reply."""
+        return verify("seed", *args).stdout.strip()
+
+    def subscription(self, *args):
+        """Seeds a subscription state (or `none`) and restarts the app; see features/subscription.md."""
+        return verify("subscription", *args).stdout.strip()
 
     def type(self, selector, text):
         verify("type", selector, text)
@@ -55,8 +65,8 @@ class Android:
     def key(self, name):
         verify("key", name)
 
-    def scroll(self, direction):
-        verify("scroll", direction)
+    def scroll(self, direction, times=1):
+        verify("scroll", direction, times)
 
     def open(self, url):
         verify("open", url)
@@ -77,6 +87,26 @@ class Android:
     def text(self, resource_id=None):
         p = verify("text", *([resource_id] if resource_id else []), check=False)
         return p.stdout.rstrip("\n") if p.returncode == 0 else None
+
+    def lines(self):
+        """Every labelled element as [id, text, flags], in layout order; [] when the layout is empty."""
+        # A label with a line break spills onto lines without tabs; those continuation lines are skipped.
+        rows = [line.split("\t") for line in (self.text() or "").splitlines() if "\t" in line]
+        return [row + [""] * (3 - len(row)) for row in rows]
+
+    def checked(self, resource_id, index=1):
+        p = verify("checked", resource_id, index, check=False)
+        return p.stdout.strip() == "true" if p.returncode == 0 else None
+
+    def windows(self):
+        """Text in popups and system windows that android layout doesn't list, as one string."""
+        return verify("windows", check=False).stdout
+
+    def ui(self):
+        return verify("ui", check=False).stdout
+
+    def web_targets(self):
+        return verify("web", "targets", check=False).stdout
 
     def visible(self, selector):
         return verify("assert", "visible", selector, check=False).returncode == 0
@@ -138,10 +168,38 @@ class Android:
         self.sections.append((title, markdown))
 
     def _adb(self, *args):
-        p = subprocess.run(["adb", "-s", self.serial, *args], capture_output=True, text=True)
+        # Logcat carries raw bytes from other apps; decode leniently so one bad byte isn't an error.
+        p = subprocess.run(["adb", "-s", self.serial, *args], capture_output=True, text=True, errors="replace")
         if p.returncode != 0:
             raise Error(f"adb {' '.join(args)} failed: {p.stderr.strip()}")
         return p.stdout
+
+
+class Recording:
+    """Films the whole run: screenrecord stops at 170 s, so a new segment starts every SEGMENT seconds."""
+    SEGMENT = 160
+
+    def __init__(self, name):
+        self.name, self.videos, self._done = name, [], threading.Event()
+        self._start()
+        self._thread = threading.Thread(target=self._rotate, daemon=True)
+        self._thread.start()
+
+    def _start(self):
+        video = f"proof-{self.name}-{len(self.videos) + 1}.mp4"
+        verify("record", "start", video)
+        self.videos.append(video)
+
+    def _rotate(self):
+        while not self._done.wait(self.SEGMENT):
+            verify("record", "stop", check=False)
+            self._start()
+
+    def stop(self):
+        self._done.set()
+        self._thread.join()
+        verify("record", "stop", check=False)
+        return self.videos
 
 
 def load(path):
@@ -161,6 +219,8 @@ def report(m):
              + (" + uncommitted changes" if m["build"].get("dirty") else ""), "",
              "| Check | Result | Detail |", "|---|---|---|"]
     lines += [f"| {c['check']} | {'pass' if c['ok'] else 'FAIL'} | {c['detail']} |" for c in m["checks"]]
+    if m["videos"]:
+        lines += ["", "Video, in order: " + ", ".join(m["videos"])]
     if m["notes"]:
         lines += ["", "Notes:", *[f"- {n}" for n in m["notes"]]]
     for title, body in m["sections"]:
@@ -173,7 +233,7 @@ def prove(path):
     devices = STATE / "devices"
     selected = devices.read_text().split() if devices.exists() else []
     serial = os.environ.get("VERIFY_SERIAL") or (selected[0] if selected else None)
-    error, evidence, build, proof, android = None, None, {}, None, None
+    error, evidence, build, proof, android, videos = None, None, {}, None, None, []
     try:
         if not serial:
             raise Error("no device selected: run verify.sh use <serial>")
@@ -186,11 +246,11 @@ def prove(path):
         build = json.loads((STATE / "dev" / serial / "installed.json").read_text())
         proof = load(path)
         android = Android(serial, evidence)
-        verify("record", "start", f"proof-{name}.mp4")
+        recording = Recording(name)
         try:
             proof.run(android)
         finally:
-            verify("record", "stop", check=False)
+            videos = recording.stop()
     except Error as e:
         error = str(e)
     except Exception:
@@ -201,7 +261,7 @@ def prove(path):
     m = {"verdict": verdict, "error": error,
          "proof": {"name": name, "path": str(Path(path).resolve()), "doc": (proof.__doc__ or "").strip() if proof else ""},
          "device": serial, "build": build, "checks": checks,
-         "notes": android.notes if android else [], "sections": android.sections if android else [],
+         "videos": videos, "notes": android.notes if android else [], "sections": android.sections if android else [],
          "finished": datetime.datetime.now().isoformat(timespec="seconds")}
     if evidence:
         evidence.mkdir(parents=True, exist_ok=True)
@@ -213,9 +273,48 @@ def prove(path):
     return {"PASS": 0, "FAIL": 1}.get(verdict, 2)
 
 
+def selftest():
+    """Runs the tests/ proofs and a stale build, and checks each verdict. Exit 0 when all behave."""
+    tests = SKILL / "tests"
+    stale = REPO / "verify-selftest-stale.txt"
+
+    def case(proof, expected_exit, must_say="", must_not_say=""):
+        p = subprocess.run([sys.executable, __file__, str(tests / proof)], capture_output=True, text=True,
+                           env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
+        out = p.stdout + p.stderr
+        problems = [f"exit {p.returncode}, expected {expected_exit}"] if p.returncode != expected_exit else []
+        problems += [f"output lacks {must_say!r}"] if must_say and must_say not in out else []
+        problems += [f"output has {must_not_say!r}"] if must_not_say and must_not_say in out else []
+        return problems, out
+
+    cases = [
+        ("harness checks pass", "harness.py", 0, "VERDICT PASS", ""),
+        ("a wrong expectation is FAIL", "must_fail.py", 1, "FAIL pixel m_verify_never_fired fired", ""),
+        ("a broken step is ERROR and stops the run", "must_error.py", 2, "VERDICT ERROR", "never reached"),
+        ("a proof with no checks isn't a pass", "no_checks.py", 1, "VERDICT FAIL", ""),
+    ]
+    results = []
+    for name, proof, code, say, not_say in cases:
+        results.append((name, *case(proof, code, say, not_say)))
+    # A source change after the build makes the installed app stale: the run must refuse to start.
+    try:
+        stale.write_text("verify selftest: makes the installed build stale; deleted when the selftest ends\n")
+        results.append(("a stale build is ERROR before anything runs", *case("harness.py", 2, "stale build", "PASS")))
+    finally:
+        stale.unlink(missing_ok=True)
+
+    for name, problems, out in results:
+        print(f"{'ok  ' if not problems else 'BAD '} {name}" + (f": {'; '.join(problems)}" if problems else ""))
+        if problems:
+            print("     " + "\n     ".join(out.strip().splitlines()[-6:]))
+    bad = sum(1 for _, problems, _ in results if problems)
+    print(f"SELFTEST {'PASS' if not bad else 'FAIL'}  {len(results) - bad}/{len(results)} cases behaved")
+    return 1 if bad else 0
+
+
 if __name__ == "__main__":
     # Proofs import Error from here; let them share this module's class instead of loading a second copy.
     sys.modules.setdefault("prove", sys.modules[__name__])
     if len(sys.argv) != 2:
         sys.exit(__doc__)
-    sys.exit(prove(sys.argv[1]))
+    sys.exit(selftest() if sys.argv[1] == "selftest" else prove(sys.argv[1]))
