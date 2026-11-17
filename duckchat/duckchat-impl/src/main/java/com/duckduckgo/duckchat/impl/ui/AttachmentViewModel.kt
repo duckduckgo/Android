@@ -17,15 +17,18 @@
 package com.duckduckgo.duckchat.impl.ui
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Environment
 import android.util.Base64
 import androidx.annotation.VisibleForTesting
 import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -36,6 +39,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
+import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
@@ -54,6 +58,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -62,6 +67,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.max
@@ -373,9 +379,47 @@ class AttachmentViewModel @Inject constructor(
         val textSelectionLimitReached: Boolean,
     )
 
-    fun bindTextSelections(tabId: String, textSelection: String?) {
+    fun addAttachments(tabId: String, attachments: List<Attachment>) {
+        val textSelections = attachments.filterIsInstance<Attachment.Text>()
+        textSelections.forEach { textSelectionRepository.add(tabId, it.text, url = "") }
+        if (textSelections.isNotEmpty()) bindTextSelections(tabId)
+
+        val uris = attachments.filterIsInstance<Attachment.File>().map { it.uri }
+        if (uris.isEmpty()) return
+        viewModelScope.launch {
+            val modelState = modelManager.modelState.first { it.models.isNotEmpty() }
+            val files = withContext(dispatchers.io()) { uris.filter { it.isAllowedSource() && it.isAttachable(modelState) } }
+            if (files.isNotEmpty()) onMixedAttachmentsPicked(files)
+        }
+    }
+
+    // Excludes attachments from the app's providers (or file://), except Downloads.
+    private fun Uri.isAllowedSource(): Boolean {
+        if (scheme != ContentResolver.SCHEME_CONTENT) return false
+        val authority = this.authority?.substringAfterLast('@') ?: return false
+        val isDuckDuckGoProvider = context.packageManager.resolveContentProvider(authority, 0)?.packageName == context.packageName
+        return !isDuckDuckGoProvider || (authority == "${context.packageName}.provider" && isInDownloads())
+    }
+
+    private fun Uri.isInDownloads(): Boolean {
+        if (pathSegments.firstOrNull() != "external_files") return false
+        val root = Environment.getExternalStorageDirectory()
+        val downloads = File(root, Environment.DIRECTORY_DOWNLOADS)
+        val file = File(root, pathSegments.drop(1).joinToString("/"))
+        return runCatching { file.canonicalFile.startsWith(downloads.canonicalFile) }.getOrDefault(false)
+    }
+
+    private fun Uri.isAttachable(modelState: ModelState): Boolean {
+        val type = context.contentResolver.getType(this)?.lowercase() ?: return false
+        val model = modelState.models.find { it.id == modelState.selectedModelId } ?: return false
+        val images = if (model.supportsImageUpload && duckChatInternal.isImageUploadEnabled()) listOf("image/*") else emptyList()
+        return (model.supportedFileTypes + images).map { it.lowercase() }.any { accepted ->
+            accepted == type || (accepted.endsWith("/*") && type.startsWith(accepted.removeSuffix("*")))
+        }
+    }
+
+    fun bindTextSelections(tabId: String) {
         textSelectionsTabId = tabId
-        textSelection?.let { textSelectionRepository.add(tabId, it, url = "") }
         textSelectionsJob?.cancel()
         textSelectionsJob = viewModelScope.launch {
             launch { textSelectionRepository.limitReached(tabId).collect { _textSelectionLimitReached.value = it } }

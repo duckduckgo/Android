@@ -51,6 +51,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
@@ -163,7 +164,7 @@ interface NativeInputManager {
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode? = null,
         forceImageGeneration: Boolean = false,
-        textSelection: String? = null,
+        attachments: List<Attachment> = emptyList(),
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -636,7 +637,7 @@ class RealNativeInputManager @Inject constructor(
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode?,
         forceImageGeneration: Boolean,
-        textSelection: String?,
+        attachments: List<Attachment>,
     ) {
         if (!::rootView.isInitialized) return
 
@@ -706,7 +707,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, textSelection)
+        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, attachments)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -721,9 +722,14 @@ class RealNativeInputManager @Inject constructor(
         )
         syncBackArrowToNavBar()
         if (omnibarController.isDuckAiMode()) {
-            // Image generation and text selection focus the input themselves; arming on attach would let the
+            // Image generation and shared attachments focus the input themselves; arming on attach would let the
             // non-new-chat path close that keyboard again.
-            bindTabInputFocus(widgetView, lifecycleOwner, currentTabUrl, armOnAttach = !forceImageGeneration && textSelection == null)
+            bindTabInputFocus(
+                widgetView,
+                lifecycleOwner,
+                currentTabUrl,
+                armOnAttach = !forceImageGeneration && attachments.isEmpty(),
+            )
         }
         lifecycleOwner.lifecycleScope.launch {
             if (currentTabUrl.firstOrNull()?.toUri()?.isDuckAiSettingsUrl(duckChat) == true) {
@@ -1519,7 +1525,7 @@ class RealNativeInputManager @Inject constructor(
         isBottom: Boolean,
         tabId: String,
         forceImageGeneration: Boolean,
-        textSelection: String?,
+        attachments: List<Attachment>,
     ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
@@ -1554,7 +1560,7 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 forceImageGeneration = forceImageGeneration,
             )
-            textSelection?.let { bindTextSelections(tabId, it) }
+            if (attachments.isNotEmpty()) addAttachments(tabId, attachments)
         }
 
         applyWindowChrome(widgetView, isBottom)
@@ -1568,7 +1574,7 @@ class RealNativeInputManager @Inject constructor(
         // finishes before the enter morph.
         pendingEnterOwnsAnimating = enterStarted
 
-        if (forceImageGeneration) {
+        if (forceImageGeneration || attachments.isNotEmpty()) {
             widgetView.doOnAttach {
                 if (widgetRoot === widgetView) {
                     widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)

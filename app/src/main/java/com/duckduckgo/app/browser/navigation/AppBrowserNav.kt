@@ -16,11 +16,14 @@
 
 package com.duckduckgo.app.browser.navigation
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
+import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -57,9 +60,9 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         duckChatUrl: String,
         forceImageGeneration: Boolean,
         forceLaunchContextual: Boolean,
-        textSelection: String?,
+        attachments: List<Attachment>,
     ): Intent {
-        val isExternal = textSelection != null && !forceLaunchContextual
+        val isExternal = attachments.isNotEmpty() && !forceLaunchContextual
         return BrowserActivity.intent(
             context = context,
             launchSource = if (isExternal) SelectedTextSearch else InAppNavigation,
@@ -68,8 +71,15 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
             duckChatForceImageGeneration = forceImageGeneration,
-            duckChatTextSelection = textSelection,
-        )
+            duckChatTextSelection = attachments.filterIsInstance<Attachment.Text>().firstOrNull()?.text,
+        ).attachFiles(attachments.filterIsInstance<Attachment.File>().map { it.uri })
+    }
+
+    private fun Intent.attachFiles(uris: List<Uri>): Intent = apply {
+        uris.firstOrNull()?.let { firstUri ->
+            clipData = ClipData.newRawUri(null, firstUri).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
     }
 
     override fun closeDuckChat(
