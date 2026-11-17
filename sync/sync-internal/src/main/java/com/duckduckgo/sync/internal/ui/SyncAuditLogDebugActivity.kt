@@ -25,7 +25,9 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogScreenParams
 import com.duckduckgo.sync.internal.databinding.ActivitySyncAuditLogDebugBinding
 import com.duckduckgo.sync.internal.databinding.ItemOtherSyncedDeviceBinding
 import com.duckduckgo.sync.internal.ui.SyncAuditLogDebugViewModel.ViewState
@@ -38,6 +40,9 @@ class SyncAuditLogDebugActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivitySyncAuditLogDebugBinding by viewBinding()
     private val viewModel: SyncAuditLogDebugViewModel by bindViewModel()
@@ -60,6 +65,7 @@ class SyncAuditLogDebugActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.readServerLogButton.setOnClickListener { viewModel.onReadServerLogClicked() }
+        binding.openSyncAuditLogButton.setOnClickListener { globalActivityStarter.start(this, SyncAuditLogScreenParams) }
         binding.findUnseenAuditEntriesButton.setOnClickListener { viewModel.onFindUnseenAuditEntriesClicked() }
         binding.markAllAuditLoginsSeenButton.setOnClickListener { viewModel.onMarkAllAuditLoginsSeenClicked() }
         binding.simulateLoginButton.setOnClickListener { viewModel.onSimulateLoginClicked() }

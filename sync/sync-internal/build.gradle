@@ -29,6 +29,7 @@ android {
 dependencies {
     implementation project(':sync-impl')
     implementation project(':sync-api')
+    implementation project(':navigation-api')
     implementation project(':sync-store')
     implementation project(':sync-lib')
     implementation project(':di')
