@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -97,6 +98,7 @@ class DuckChatContextualWebViewViewModelTest {
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
     private val promoRecordEvents = MutableSharedFlow<SubscriptionEventData>()
     private val promoCampaignJSHelper: PromoCampaignJSHelper = mock()
+    private val sheetCloseRequests = ContextualSheetCloseRequests()
 
     private val serializedPageData =
         """
@@ -861,6 +863,37 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `close request for the sheet's tab hides the sheet`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            sheetCloseRequests.close("tab-1")
+
+            val command = expectMostRecentItem()
+            assertEquals(BottomSheetBehavior.STATE_HIDDEN, (command as DuckChatContextualWebViewViewModel.Command.ChangeSheetState).newState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `close request for another tab leaves the sheet open`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            sheetCloseRequests.close("tab-2")
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            val hidden = cancelAndConsumeRemainingEvents().any {
+                val command = (it as? Event.Item)?.value
+                command is DuckChatContextualWebViewViewModel.Command.ChangeSheetState && command.newState == BottomSheetBehavior.STATE_HIDDEN
+            }
+            assertFalse(hidden)
+        }
+    }
+
+    @Test
     fun `onContextualClose hides the sheet`() = runTest {
         testee.commands.test {
             testee.onContextualClose()
@@ -951,6 +984,7 @@ class DuckChatContextualWebViewViewModelTest {
 
     private fun buildViewModel() = DuckChatContextualWebViewViewModel(
         pdfPageContextResolver = pdfPageContextResolver,
+        sheetCloseRequests = sheetCloseRequests,
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
         duckChatInternal = duckChatInternal,
