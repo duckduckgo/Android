@@ -68,4 +68,7 @@
     <string name="duckAiClientToolSearchBookmarksName">Search Bookmarks</string>
     <string name="duckAiClientToolSearchBookmarksPromptTitle">Allow Duck.ai to search your bookmarks?</string>
     <string name="duckAiClientToolSearchBookmarksPromptMessage">It will see the title, address and folder of the bookmarks it finds.</string>
+    <string name="duckAiClientToolSearchDownloadsName">Search Downloads</string>
+    <string name="duckAiClientToolSearchDownloadsPromptTitle">Allow Duck.ai to search your downloads?</string>
+    <string name="duckAiClientToolSearchDownloadsPromptMessage">It will see the name and download date of the files it finds.</string>
 </resources>
