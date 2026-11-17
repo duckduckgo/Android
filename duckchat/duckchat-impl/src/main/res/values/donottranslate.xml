@@ -62,4 +62,7 @@
     <string name="duckAiClientToolOpenTabPromptMessage" instruction="Placeholder is the full address of the page, such as https://example.com/travel/paris">It will open %1$s in a new tab.</string>
     <string name="duckAiClientToolBookmarkTabPromptTitle">Allow Duck.ai to bookmark this page?</string>
     <string name="duckAiClientToolBookmarkTabPromptMessage" instruction="Placeholder is the full address of the page, such as https://example.com/travel/paris">It will add %1$s to your bookmarks.</string>
+    <string name="duckAiClientToolCloseTabsName">Close Tabs</string>
+    <string name="duckAiClientToolCloseTabsPromptTitle">Allow Duck.ai to close tabs?</string>
+    <string name="duckAiClientToolCloseTabsPromptMessage">It will close the tabs you asked it to close.</string>
 </resources>
