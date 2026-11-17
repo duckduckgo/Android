@@ -1,0 +1,59 @@
+name: Test npm cooldown in native-github-asana-sync
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  npm-cooldown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout native actions repo
+        uses: actions/checkout@v4
+        with:
+          ref: d7ab4c41561f96741366b0436236160fbbca6396 # jmatthews/npm-cooldown-7-days
+          path: native-github-asana-sync
+          repository: duckduckgo/native-github-asana-sync
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: native-github-asana-sync/.nvmrc
+
+      - name: Print npm config
+        working-directory: native-github-asana-sync
+        run: |
+          node --version
+          npm --version
+          cat .npmrc
+          echo "min-release-age=$(npm config get min-release-age)"
+          echo "save-exact=$(npm config get save-exact)"
+          echo "package-lock=$(npm config get package-lock)"
+
+      - name: npm ci
+        working-directory: native-github-asana-sync
+        run: |
+          npm ci
+          git diff --exit-code
+
+      - name: Cooldown canary
+        working-directory: native-github-asana-sync
+        run: |
+          VERSION=1.0.30001826
+          set +e
+          OUTPUT=$(npm pack --dry-run "caniuse-lite@$VERSION" 2>&1)
+          set -e
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q "ETARGET"; then
+            echo "PASS: cooldown refused caniuse-lite@$VERSION"
+          else
+            echo "FAIL: cooldown did not refuse caniuse-lite@$VERSION"
+            exit 1
+          fi
+
+      - name: Run action from the checkout
+        uses: ./native-github-asana-sync
+        continue-on-error: true
+        with:
+          trigger-phrase: ${{ vars.ASANA_TASK_TRIGGER_PHRASE }}
+          action: 'find-asana-task-id'
