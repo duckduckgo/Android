@@ -31,9 +31,11 @@ import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 interface ClientToolPermissionGate {
+    /** @param promptDetail what an [ClientToolPermissionMode.AskEveryTime] prompt shows for this call. */
     suspend fun decide(
         tool: ClientTool,
         context: ClientToolCallContext,
+        promptDetail: String? = null,
     ): ClientToolPermissionDecision
 
     /**
@@ -81,6 +83,8 @@ class RealClientToolPermissionGate @Inject constructor(
         data object Denied : Standing
 
         data class NeedsPrompt(val tool: AskingTool) : Standing
+
+        data class NeedsPromptEveryTime(val copy: ClientToolPermissionMode.AskEveryTime) : Standing
     }
 
     private val promptLock = Mutex()
@@ -89,11 +93,12 @@ class RealClientToolPermissionGate @Inject constructor(
     override suspend fun decide(
         tool: ClientTool,
         context: ClientToolCallContext,
+        promptDetail: String?,
     ): ClientToolPermissionDecision {
         when (standing(tool, context)) {
             Standing.Allowed -> return ClientToolPermissionDecision.ALLOWED
             Standing.Denied -> return ClientToolPermissionDecision.DENIED
-            is Standing.NeedsPrompt -> Unit
+            is Standing.NeedsPrompt, is Standing.NeedsPromptEveryTime -> Unit
         }
         // Re-checked once the lock is ours: the prompt this call queued behind may have settled it.
         return awaitTurn(context.chatTabId, ClientToolPermissionDecision.CANCELLED) {
@@ -101,6 +106,7 @@ class RealClientToolPermissionGate @Inject constructor(
                 Standing.Allowed -> ClientToolPermissionDecision.ALLOWED
                 Standing.Denied -> ClientToolPermissionDecision.DENIED
                 is Standing.NeedsPrompt -> ask(now.tool, context)
+                is Standing.NeedsPromptEveryTime -> askOnce(now.copy, promptDetail.orEmpty(), context)
             }
         }
     }
@@ -127,7 +133,7 @@ class RealClientToolPermissionGate @Inject constructor(
                     chatGrants.grant(chatId, toAsk.map { it.name } - answer.removedTools)
                     grantedNow(tools, accessContext)
                 }
-                ClientToolPermissionAnswer.DontAllow -> ClientToolAccessDecision.Denied
+                ClientToolPermissionAnswer.AllowOnce, ClientToolPermissionAnswer.DontAllow -> ClientToolAccessDecision.Denied
             }
         }
     }
@@ -140,12 +146,19 @@ class RealClientToolPermissionGate @Inject constructor(
     private suspend fun standing(
         tool: ClientTool,
         context: ClientToolCallContext,
-    ): Standing = when (store.get(tool.name)) {
-        ClientToolPermission.ALWAYS_ALLOW -> Standing.Allowed
-        ClientToolPermission.NEVER_ALLOW -> Standing.Denied
-        null -> when (val mode = tool.permissionMode) {
-            ClientToolPermissionMode.Auto -> Standing.Allowed
+    ): Standing {
+        val stored = store.get(tool.name)
+        return when (val mode = tool.permissionMode) {
+            // Always Allow never covers these: the user sees what each call acts on before it runs.
+            is ClientToolPermissionMode.AskEveryTime ->
+                if (stored == ClientToolPermission.NEVER_ALLOW) Standing.Denied else Standing.NeedsPromptEveryTime(mode)
+            ClientToolPermissionMode.Auto -> when (stored) {
+                ClientToolPermission.NEVER_ALLOW -> Standing.Denied
+                ClientToolPermission.ALWAYS_ALLOW, null -> Standing.Allowed
+            }
             is ClientToolPermissionMode.Ask -> when {
+                stored == ClientToolPermission.ALWAYS_ALLOW -> Standing.Allowed
+                stored == ClientToolPermission.NEVER_ALLOW -> Standing.Denied
                 skipsPromptForDevelopment() -> Standing.Allowed
                 context.chatId != null && chatGrants.isGranted(context.chatId, tool.name) -> Standing.Allowed
                 else -> Standing.NeedsPrompt(AskingTool(tool.name, mode))
@@ -171,7 +184,17 @@ class RealClientToolPermissionGate @Inject constructor(
                 context.chatId?.let { chatGrants.grant(it, listOf(tool.name)) }
                 ClientToolPermissionDecision.ALLOWED
             }
-            ClientToolPermissionAnswer.DontAllow -> ClientToolPermissionDecision.DENIED
+            ClientToolPermissionAnswer.AllowOnce, ClientToolPermissionAnswer.DontAllow -> ClientToolPermissionDecision.DENIED
+        }
+
+    private suspend fun askOnce(
+        copy: ClientToolPermissionMode.AskEveryTime,
+        detail: String,
+        context: ClientToolCallContext,
+    ): ClientToolPermissionDecision =
+        when (prompt.request(ClientToolPermissionRequest.RunToolOnce(context.chatTabId, context.browserMode, copy, detail, context.contextual))) {
+            ClientToolPermissionAnswer.AllowOnce -> ClientToolPermissionDecision.ALLOWED
+            is ClientToolPermissionAnswer.AllowForChat, ClientToolPermissionAnswer.DontAllow -> ClientToolPermissionDecision.DENIED
         }
 
     /**
