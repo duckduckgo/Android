@@ -9,6 +9,8 @@ import time
 import steps
 from prove import Error
 
+LIVE = ["Duck.ai chat"]
+
 
 def titles(android, resource_id):
     return [line[1] for line in android.lines() if line[0] == resource_id]
