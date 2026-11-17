@@ -72,10 +72,7 @@ class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {
 
         binding.pirOnboardingStepActivateButton.setOnClickListener {
             activateLaunched = true
-            startActivity(
-                Intent(this, PirDashboardWebViewActivity::class.java)
-                    .putExtra(PirDashboardWebViewActivity.EXTRA_SHOW_CLOSE_BUTTON, true),
-            )
+            startActivity(Intent(this, PirDashboardWebViewActivity::class.java))
         }
 
         setupScrollFade(surfaceColor)
