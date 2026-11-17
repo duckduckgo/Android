@@ -240,6 +240,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -1413,7 +1414,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false, textSelection: String? = null) {
+    private fun showNativeInput(
+        query: String = "",
+        forceImageGeneration: Boolean = false,
+        attachments: List<Attachment> = emptyList(),
+    ) {
         viewModel.onSearchInputOpened(prefill = query.ifEmpty { omnibar.getText() })
         nativeInputManager.showNativeInput(
             tabId = tabId,
@@ -1424,7 +1429,7 @@ class BrowserTabFragment :
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
             forceImageGeneration = forceImageGeneration,
-            textSelection = textSelection,
+            attachments = attachments,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -2505,7 +2510,10 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
-        showNativeInput(forceImageGeneration = forceImageGeneration, textSelection = browserActivity?.consumePendingDuckChatTextSelection())
+        showNativeInput(
+            forceImageGeneration = forceImageGeneration,
+            attachments = browserActivity?.consumePendingDuckChatAttachments().orEmpty(),
+        )
     }
 
     private fun showMaliciousWarning(

@@ -112,6 +112,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -1103,7 +1104,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 currentTab?.launchContextualDuckAi(textSelection)
                 return
             }
-            pendingDuckChatTextSelection = textSelection
+            val files = intent.clipData?.let { clip -> (0 until clip.itemCount).mapNotNull { clip.getItemAt(it).uri } }.orEmpty()
+            pendingDuckChatAttachments = listOfNotNull(textSelection?.let(Attachment::Text)) + files.map(Attachment::File)
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
             pendingDuckChatForceImageGeneration = intent.getBooleanExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, false)
             intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { source ->
@@ -1391,8 +1393,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
     }
 
-    private var pendingDuckChatTextSelection: String? = null
-    fun consumePendingDuckChatTextSelection(): String? = pendingDuckChatTextSelection.also { pendingDuckChatTextSelection = null }
+    private var pendingDuckChatAttachments: List<Attachment> = emptyList()
+    fun consumePendingDuckChatAttachments(): List<Attachment> =
+        pendingDuckChatAttachments.also { pendingDuckChatAttachments = emptyList() }
 
     private fun launchDuckAi(
         url: String?,
