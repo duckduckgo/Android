@@ -58,4 +58,6 @@
     <string name="duckAiClientToolListOpenTabsName">Open Tabs</string>
     <string name="duckAiClientToolListOpenTabsPromptTitle">Allow Duck.ai to see your open tabs?</string>
     <string name="duckAiClientToolListOpenTabsPromptMessage">It will see the title and address of each open tab.</string>
+    <string name="duckAiClientToolOpenTabPromptTitle">Allow Duck.ai to open this page?</string>
+    <string name="duckAiClientToolOpenTabPromptMessage" instruction="Placeholder is the full address of the page, such as https://example.com/travel/paris">It will open %1$s in a new tab.</string>
 </resources>

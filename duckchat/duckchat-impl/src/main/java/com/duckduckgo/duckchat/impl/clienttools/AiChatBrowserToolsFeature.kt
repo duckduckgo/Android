@@ -36,6 +36,9 @@ interface AiChatBrowserToolsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun switchToTab(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun openTab(): Toggle
+
     /** Advertises the `requestAccess` capability, which asks for several tools in one prompt. */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun requestAccess(): Toggle
