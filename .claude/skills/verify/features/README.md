@@ -59,6 +59,8 @@ Settings, onboarding, sync, autofill, PIR and VPN beyond their entry points in s
 
 `../checks/<feature>.sh` replays a recipe as `check "<name>" '<command>'` lines and ends with `RESULT pass=N fail=M`. They act on `VERIFY_SERIAL` or the device chosen with `verify.sh use`, and reset the app first, so run them on an owned emulator. A script always exits 0 and a failed setup step shows up as FAILs in the checks after it; read the RESULT line and the first FAIL.
 
+`../prove.py ../proofs/<name>.py` runs the same kind of recipe as a Python proof: it refuses to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. `proofs/search_and_navigate.py` is the port of `checks/search-and-navigate.sh`; shared paths are in `proofs/steps.py`.
+
 ## Adding a feature
 
 1. Find the user entry points in code: the screen's `@ContributeToActivityStarter` params, and every `globalActivityStarter.start(..., <Params>)` call site.
