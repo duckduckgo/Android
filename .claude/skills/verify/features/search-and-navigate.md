@@ -32,4 +32,4 @@ Preconditions: baseline; the **New tab** path in the README.
 - While the New Tab Page input is focused, the nav bar (`inputModeWidgetNavMenu`) is hidden. `$V tap id:inputModeUnifiedBack` (the back arrow) unfocuses it and shows the plain address bar with `browserMenu`.
 - `$V open` is setup only. It skips the input entirely, so it never proves this feature.
 - On a loaded page, `android layout` also lists the page's own content; select toolbar elements by id, not by text, so a word on the page doesn't match first.
-- Driven with the android CLI on 2026-11-17 (ddg_verify_api34, API 34, `$V build` of `cd1cf8877d`): `nav-url`, `nav-autocomplete`, `nav-query`, `nav-from-page`, as 11 scripted checks that all passed. Not driven: none.
+- Driven with the android CLI on 2026-11-17 (ddg_verify_api34, API 34, `$V build` of `cd1cf8877d`): `nav-url`, `nav-autocomplete`, `nav-query`, `nav-from-page`, as 11 checks that all passed. Not driven: none.

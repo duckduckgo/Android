@@ -2,7 +2,7 @@
 with Delete This Tab, clears every tab with Delete All while fireproofed sites survive, lists automatic deletion in
 Data Clearing, and on Duck.ai deletes only the current chat.
 
-Port of checks/fire-button.sh (features/fire-button.md). Resets the app, so run it on an owned emulator.
+Recipe: features/fire-button.md. Resets the app, so run it on an owned emulator.
 """
 import time
 

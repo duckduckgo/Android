@@ -1,7 +1,7 @@
 """The browser menu has 12 entries on the New Tab Page and 23 on a loaded page, and every loaded-page entry lands
 where its label says (features/browser-menu.md has the table).
 
-Port of checks/browser-menu.sh (features/browser-menu.md). Resets the app, so run it on an owned emulator.
+Recipe: features/browser-menu.md. Resets the app, so run it on an owned emulator.
 """
 import time
 

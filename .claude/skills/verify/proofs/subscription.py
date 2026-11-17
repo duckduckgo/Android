@@ -2,7 +2,7 @@
 item follow the subscription state: hidden with none or expired, one row per entitled product while active (no PIR
 outside the US), "Activating" while waiting, and the tier pill and Upgrade to Pro by tier.
 
-Port of checks/subscription.sh (features/subscription.md). Seeds fake subscription states, so run it only where no real
+Recipe: features/subscription.md. Seeds fake subscription states, so run it only where no real
 subscription is signed in.
 """
 import time

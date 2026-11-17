@@ -2,7 +2,7 @@
 Chat History, offers model and reasoning pickers, shows seeded text, voice and image chats with pinned ones first,
 and its header and model picker follow the subscription tier (Free Plan, Plus).
 
-Port of checks/duck-ai.sh (features/duck-ai.md). Resets the app, so run it on an owned emulator.
+Recipe: features/duck-ai.md. Resets the app, so run it on an owned emulator.
 """
 import time
 

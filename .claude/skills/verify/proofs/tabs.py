@@ -1,7 +1,7 @@
 """The tab switcher lists one card per tab titled with its page, opens a new tab, switches to a tab by its card,
 closes a tab from its card, offers layout/select/close-all in its menu, and counts many tabs.
 
-Port of checks/tabs.sh (features/tabs.md). Resets the app, so run it on an owned emulator.
+Recipe: features/tabs.md. Resets the app, so run it on an owned emulator.
 """
 import time
 

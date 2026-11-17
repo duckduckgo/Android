@@ -2,6 +2,8 @@
 """Runs a proof against the app on the selected device and gives a verdict.
 
   prove.py proofs/<name>.py
+  prove.py compare proofs/<name>.py   runs it on the base build (verify.sh build --base <ref>), then on this
+                                      checkout's build, and lines up the checks: before and after
   prove.py selftest            checks the harness itself (run it after changing prove.py); see tests/
 
 A proof is a module with a docstring (the claim) and run(android). It acts through verify.sh and records
@@ -43,8 +45,9 @@ def verify(*args, check=True):
 
 
 class Android:
-    def __init__(self, serial, evidence):
-        self.serial, self.evidence = serial, evidence
+    def __init__(self, serial, evidence, prefix=""):
+        # prefix keeps a base run's screenshots apart from the after run's in the same evidence folder
+        self.serial, self.evidence, self.prefix = serial, evidence, prefix
         self.checks, self.notes, self.sections, self._mark = [], [], [], None
 
     # Driving: a step that fails raises Error, because nothing after it would mean anything.
@@ -78,7 +81,7 @@ class Android:
         verify("reset")
 
     def shot(self, name):
-        verify("shot", f"{name}.png")
+        verify("shot", f"{self.prefix}{name}.png")
 
     # Reading: these return what they saw, so a proof can check it and report the actual value.
     def where(self):
@@ -212,11 +215,17 @@ def load(path):
     return module
 
 
+def build_label(build):
+    label = f"build {build.get('sha256', '?')[:16]} of {build.get('head', '?')[:10]}"
+    if build.get("base"):
+        return f"base {label} ({build['base']})"
+    return label + (" + uncommitted changes" if build.get("dirty") else "")
+
+
 def report(m):
     lines = [f"# {m['proof']['name']}", "", m["proof"]["doc"], "",
              f"**{m['verdict']}**" + (f": {m['error'].splitlines()[0]}" if m["error"] else ""), "",
-             f"Device {m['device']}, build {m['build'].get('sha256', '?')[:16]} of {m['build'].get('head', '?')[:10]}"
-             + (" + uncommitted changes" if m["build"].get("dirty") else ""), "",
+             f"Device {m['device']}, {build_label(m['build'])}", "",
              "| Check | Result | Detail |", "|---|---|---|"]
     lines += [f"| {c['check']} | {'pass' if c['ok'] else 'FAIL'} | {c['detail']} |" for c in m["checks"]]
     if m["videos"]:
@@ -229,7 +238,8 @@ def report(m):
 
 
 def prove(path):
-    name = Path(path).stem
+    """Runs one proof; returns its manifest, whose "exit" is 0 PASS, 1 FAIL or 2 ERROR."""
+    name = label = Path(path).stem
     devices = STATE / "devices"
     selected = devices.read_text().split() if devices.exists() else []
     serial = os.environ.get("VERIFY_SERIAL") or (selected[0] if selected else None)
@@ -244,9 +254,11 @@ def prove(path):
         if doctor.returncode != 0:
             raise Error("verify.sh doctor failed:\n" + "\n".join(l for l in doctor.stdout.splitlines() if l.startswith("FAIL")))
         build = json.loads((STATE / "dev" / serial / "installed.json").read_text())
+        base = bool(build.get("base"))
+        label = f"{name}-base" if base else name
         proof = load(path)
-        android = Android(serial, evidence)
-        recording = Recording(name)
+        android = Android(serial, evidence, "base-" if base else "")
+        recording = Recording(label)
         try:
             proof.run(android)
         finally:
@@ -262,15 +274,68 @@ def prove(path):
          "proof": {"name": name, "path": str(Path(path).resolve()), "doc": (proof.__doc__ or "").strip() if proof else ""},
          "device": serial, "build": build, "checks": checks,
          "videos": videos, "notes": android.notes if android else [], "sections": android.sections if android else [],
-         "finished": datetime.datetime.now().isoformat(timespec="seconds")}
+         "finished": datetime.datetime.now().isoformat(timespec="seconds"),
+         "exit": {"PASS": 0, "FAIL": 1}.get(verdict, 2), "evidence": str(evidence) if evidence else None}
     if evidence:
         evidence.mkdir(parents=True, exist_ok=True)
-        (evidence / f"proof-{name}.json").write_text(json.dumps({**m, "sections": [list(s) for s in m["sections"]]}, indent=2) + "\n")
-        (evidence / f"proof-{name}.md").write_text(report(m))
+        (evidence / f"proof-{label}.json").write_text(json.dumps({**m, "sections": [list(s) for s in m["sections"]]}, indent=2) + "\n")
+        (evidence / f"proof-{label}.md").write_text(report(m))
     passed = sum(c["ok"] for c in checks)
     print(f"VERDICT {verdict}  checks {passed}/{len(checks)}" + (f"\nERROR {error}" if error else "")
           + (f"\nevidence {evidence}" if evidence else ""))
-    return {"PASS": 0, "FAIL": 1}.get(verdict, 2)
+    return m
+
+
+def paired(checks):
+    """Checks keyed by (name, occurrence), so a name checked twice pairs up in order."""
+    seen, out = {}, {}
+    for c in checks:
+        n = seen[c["check"]] = seen.get(c["check"], 0) + 1
+        out[(c["check"], n)] = c
+    return out
+
+
+def compare(path):
+    """Before and after: the proof on the base build, then on this checkout's build. Exit is the after run's."""
+    name = Path(path).stem
+    runs = {}
+    for side, args in (("before", ["--base"]), ("after", [])):
+        installed = verify("install", *args, check=False)
+        if installed.returncode != 0:
+            print(f"ERROR installing the {side} build: {(installed.stderr or installed.stdout).strip()}")
+            return 2
+        print(f"== {side}: {installed.stdout.strip()}", flush=True)
+        runs[side] = prove(path)
+    before, after = runs["before"], runs["after"]
+
+    b, a = paired(before["checks"]), paired(after["checks"])
+    keys = list(a) + [k for k in b if k not in a]
+    mark = lambda c: "-" if c is None else "pass" if c["ok"] else "FAIL"
+    rows = [(k[0], mark(b.get(k)), mark(a.get(k))) for k in keys]
+    changed = [r for r in rows if r[1] != r[2]]
+    if after["verdict"] == "PASS" and before["verdict"] != "PASS":
+        meaning = "fails before and passes after: the change makes the proof's claim true"
+    elif after["verdict"] == "PASS":
+        meaning = ("passes on both: expected for a refactor or a removal; for a fix, the proof doesn't catch the bug "
+                   "the change fixes")
+    else:
+        meaning = f"the after run is {after['verdict']}: the change doesn't hold up"
+    lines = [f"# {name}: before and after", "", after["proof"]["doc"], "",
+             f"**{before['verdict']} before, {after['verdict']} after**: {meaning}.", "",
+             f"Before: {build_label(before['build'])}. After: {build_label(after['build'])}. Device {after['device']}.", "",
+             "| Check | Before | After |", "|---|---|---|", *[f"| {n} | {x} | {y} |" for n, x, y in rows]]
+    for side in (before, after):
+        if side["error"]:
+            lines += ["", f"{'Before' if side is before else 'After'} stopped with an error: {side['error'].splitlines()[0]}"]
+    if after["evidence"]:
+        Path(after["evidence"], f"compare-{name}.md").write_text("\n".join(lines) + "\n")
+
+    print(f"\nCOMPARE {before['verdict']} before, {after['verdict']} after: {meaning}")
+    for n, x, y in changed:
+        print(f"  {x:>4} -> {y:<4}  {n}")
+    if after["evidence"]:
+        print(f"report {Path(after['evidence'], f'compare-{name}.md')}")
+    return after["exit"]
 
 
 def selftest():
@@ -315,6 +380,8 @@ def selftest():
 if __name__ == "__main__":
     # Proofs import Error from here; let them share this module's class instead of loading a second copy.
     sys.modules.setdefault("prove", sys.modules[__name__])
-    if len(sys.argv) != 2:
+    if len(sys.argv) not in (2, 3):
         sys.exit(__doc__)
-    sys.exit(selftest() if sys.argv[1] == "selftest" else prove(sys.argv[1]))
+    if sys.argv[1:2] == ["compare"] and len(sys.argv) == 3:
+        sys.exit(compare(sys.argv[2]))
+    sys.exit(selftest() if sys.argv[1] == "selftest" else prove(sys.argv[1])["exit"])

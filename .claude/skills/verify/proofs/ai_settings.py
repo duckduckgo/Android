@@ -3,7 +3,7 @@ button; Search & Duck.ai adds Search/Duck.ai tabs and a toggle-position setting 
 on; turning Duck.ai off or its shortcuts off removes its entry points; "Use DuckDuckGo Without AI" sets every AI
 search setting off.
 
-Port of checks/ai-settings.sh (features/ai-settings.md). Resets the app, so run it on an owned emulator.
+Recipe: features/ai-settings.md. Resets the app, so run it on an owned emulator.
 """
 import time
 

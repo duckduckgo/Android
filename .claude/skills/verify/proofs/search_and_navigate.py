@@ -1,7 +1,7 @@
 """Typing in the native input navigates the current tab: a domain loads the site (by enter or by its suggestion),
 a query loads the DuckDuckGo SERP with that query, and the input opened over a loaded page navigates the same tab.
 
-Port of checks/search-and-navigate.sh (features/search-and-navigate.md). Needs Web Content Debugging on.
+Recipe: features/search-and-navigate.md. Needs Web Content Debugging on.
 """
 import time
 

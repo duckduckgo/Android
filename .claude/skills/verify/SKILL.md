@@ -47,6 +47,7 @@ ask first.
 ```bash
 $V build     # ./gradlew :app:assembleInternalDebug, with trapdoor's bridge for seeding
 $V install   # installs that build, refusing it if the source changed since, and checks the APK hash on the device
+            # (--base installs the build from `build --base <ref>` instead; see Prove)
 $V doctor
 ```
 
@@ -69,6 +70,33 @@ reset it) or it belongs to the user, that the `android` CLI and `node` are there
 device is the APK `install` put there, built from the current source (else: build and install again). It
 prints the branch, commit and dirty file count so the evidence names the code under test, and whether the
 seeding bridge answers. Run it first, and whenever the app does something the code says it should not.
+
+## Prove
+
+A proof is a Python file with a docstring stating the claim and `run(android)`, which drives the app
+through this skill's commands and records `android.check(...)` results. Every recipe has one in
+`proofs/` (shared paths in `proofs/steps.py`); for a change, write a proof of what it changes.
+
+```bash
+P=.claude/skills/verify/prove.py
+$P .claude/skills/verify/proofs/<name>.py           # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
+$V build --base origin/develop                     # the "before" build (git fetch first for the latest)
+$P compare .claude/skills/verify/proofs/<name>.py   # runs it on the base build, then on this checkout's
+$P selftest                                        # after changing prove.py: the harness still tells pass from fail
+```
+
+A run refuses to start unless `doctor` passes, stops with ERROR at the first step that can't be done
+(so a broken path never reads as failed checks), and needs at least one check to pass. `android.mark()`
+before the action under test, then `android.expect_pixel(name)` reads the pixels the debug build logs
+after it, independently of the screen. Each run writes `proof-<name>.md`, `.json` and its video (in 160 s
+segments) to the evidence folder.
+
+`build --base <ref>` builds the ref in `build/verify/base-worktree`, a worktree this skill owns and moves
+between base commits, and keeps the APK per commit, so the same base is built once. `compare` installs
+it, runs the proof, installs this checkout's build and runs it again (base runs' files are labelled
+`-base`), then writes `compare-<name>.md` with every check side by side. The strongest evidence for a
+fix is FAIL before and PASS after; for a refactor or a removal, PASS on both is the expectation, so say
+which one you expect. Its exit code is the after run's.
 
 ## Drive
 
