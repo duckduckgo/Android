@@ -39,7 +39,7 @@ interface ClientToolPermissionGate {
     ): ClientToolPermissionDecision
 
     /**
-     * Asks once for every tool in [tools] the user has not allowed yet, and grants them for [chatId] on approval.
+     * Asks once for every tool in [tools] the user has not allowed yet, and grants the ones they allow for [chatId].
      * Never runs a tool.
      */
     suspend fun requestAccess(
@@ -117,13 +117,19 @@ class RealClientToolPermissionGate @Inject constructor(
         return awaitTurn(context.chatTabId, ClientToolAccessDecision.Cancelled) {
             val toAsk = tools.mapNotNull { (standing(it, accessContext) as? Standing.NeedsPrompt)?.tool }
             if (toAsk.isEmpty()) return@awaitTurn grantedNow(tools, accessContext)
-            when (prompt.request(ClientToolPermissionRequest.GrantAccess(context.chatTabId, context.browserMode, toAsk))) {
-                ClientToolPermissionAnswer.ALLOW_FOR_CHAT -> {
-                    chatGrants.grant(chatId, toAsk.map { it.name })
+            val request = ClientToolPermissionRequest.GrantAccess(
+                context.chatTabId,
+                context.browserMode,
+                toAsk,
+                toolsRemovable = browserToolsFeature.requestAccessRemoveTools().isEnabled(),
+            )
+            when (val answer = prompt.request(request)) {
+                is ClientToolPermissionAnswer.AllowForChat -> {
+                    chatGrants.grant(chatId, toAsk.map { it.name } - answer.removedTools)
                     grantedNow(tools, accessContext)
                 }
-                ClientToolPermissionAnswer.DONT_ALLOW -> ClientToolAccessDecision.Denied
-                ClientToolPermissionAnswer.DISMISSED -> ClientToolAccessDecision.Cancelled
+                ClientToolPermissionAnswer.DontAllow -> ClientToolAccessDecision.Denied
+                ClientToolPermissionAnswer.Dismissed -> ClientToolAccessDecision.Cancelled
             }
         }
     }
@@ -162,13 +168,13 @@ class RealClientToolPermissionGate @Inject constructor(
         context: ClientToolCallContext,
     ): ClientToolPermissionDecision =
         when (prompt.request(ClientToolPermissionRequest.RunTool(context.chatTabId, context.browserMode, tool))) {
-            ClientToolPermissionAnswer.ALLOW_FOR_CHAT -> {
+            is ClientToolPermissionAnswer.AllowForChat -> {
                 // Without a chat ID there is no chat to remember the answer for, so it covers this call only.
                 context.chatId?.let { chatGrants.grant(it, listOf(tool.name)) }
                 ClientToolPermissionDecision.ALLOWED
             }
-            ClientToolPermissionAnswer.DONT_ALLOW -> ClientToolPermissionDecision.DENIED
-            ClientToolPermissionAnswer.DISMISSED -> ClientToolPermissionDecision.CANCELLED
+            ClientToolPermissionAnswer.DontAllow -> ClientToolPermissionDecision.DENIED
+            ClientToolPermissionAnswer.Dismissed -> ClientToolPermissionDecision.CANCELLED
         }
 
     /**

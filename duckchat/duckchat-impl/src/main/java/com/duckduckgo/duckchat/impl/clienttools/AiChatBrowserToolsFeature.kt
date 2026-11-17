@@ -37,6 +37,10 @@ interface AiChatBrowserToolsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun requestAccess(): Toggle
 
+    /** Lets the user take tools out of a `requestAccess` prompt for two or more tools before allowing the rest. */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun requestAccessRemoveTools(): Toggle
+
     /** Only honoured in internal builds: lets ASK tools run without a permission prompt. */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun devSkipPermissionPrompt(): Toggle

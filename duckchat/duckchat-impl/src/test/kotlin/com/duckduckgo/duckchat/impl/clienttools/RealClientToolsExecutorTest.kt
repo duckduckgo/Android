@@ -285,7 +285,7 @@ class RealClientToolsExecutorTest {
             ClientToolPermissionRequest.RunTool(CHAT_TAB_ID, BrowserMode.REGULAR, AskingTool("askTool", ASK_MODE)),
             prompt.current.request,
         )
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         reply.await()
     }
 
@@ -293,7 +293,7 @@ class RealClientToolsExecutorTest {
     fun whenAllowForChatThenToolRunsAndNothingIsStored() = runTest {
         val reply = async { executeAskTool() }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
 
         assertEquals(true, reply.await().getBoolean("ok"))
         assertEquals(1, askTool.calls.size)
@@ -319,7 +319,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
         assertFailure("cancelled", other.await())
     }
 
@@ -331,7 +331,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
         assertFailure("cancelled", other.await())
     }
 
@@ -340,14 +340,14 @@ class RealClientToolsExecutorTest {
         val executor = executor()
         val first = async { executor.execute(request("askTool", 1, chatId = null), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         assertEquals(true, first.await().getBoolean("ok"))
 
         val second = async { executor.execute(request("askTool", 1, chatId = null), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
         assertFailure("cancelled", second.await())
     }
 
@@ -355,7 +355,7 @@ class RealClientToolsExecutorTest {
     fun whenDontAllowThenDeniedNothingStoredAndNextCallAsksAgain() = runTest {
         val first = async { executeAskTool() }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.DONT_ALLOW)
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
         assertFailure("denied", first.await())
 
         val second = async { executeAskTool() }
@@ -364,7 +364,7 @@ class RealClientToolsExecutorTest {
         assertEquals(2, prompt.prompts.size)
         assertTrue(store.choices.isEmpty())
         assertTrue(askTool.calls.isEmpty())
-        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
         second.await()
     }
 
@@ -405,7 +405,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
         next.await()
     }
 
@@ -423,7 +423,7 @@ class RealClientToolsExecutorTest {
     fun whenPromptDismissedThenCancelledAndNothingStored() = runTest {
         val reply = async { executeAskTool() }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
 
         assertFailure("cancelled", reply.await())
         assertTrue(askTool.calls.isEmpty())
@@ -452,10 +452,10 @@ class RealClientToolsExecutorTest {
         runCurrent()
         assertEquals(1, prompt.prompts.size)
 
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         runCurrent()
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
 
         assertEquals(true, first.await().getBoolean("ok"))
         assertEquals(true, second.await().getBoolean("ok"))
@@ -469,7 +469,7 @@ class RealClientToolsExecutorTest {
         val second = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
 
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
 
         assertEquals(true, first.await().getBoolean("ok"))
         assertEquals(true, second.await().getBoolean("ok"))
@@ -484,12 +484,12 @@ class RealClientToolsExecutorTest {
         val second = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
 
-        prompt.current.answer(ClientToolPermissionAnswer.DONT_ALLOW)
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
         assertFailure("denied", first.await())
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         assertEquals(true, second.await().getBoolean("ok"))
     }
 
@@ -499,7 +499,7 @@ class RealClientToolsExecutorTest {
         val first = async { executor.execute(request("askTool", 1, chatId = CHAT_ID), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         val second = async { executor.execute(request("askTool", 1, chatId = OTHER_CHAT_ID), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         advanceTimeBy(100_000)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         first.await()
         runCurrent()
         val secondPrompt = prompt.current
@@ -531,7 +531,7 @@ class RealClientToolsExecutorTest {
         assertTrue(firstPrompt.withdrawn)
         assertFalse(otherChat.isCompleted)
         assertEquals(OTHER_CHAT_TAB_ID, prompt.current.request.chatTabId)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         assertEquals(true, otherChat.await().getBoolean("ok"))
         assertEquals(listOf(OTHER_CHAT_TAB_ID), askTool.calls.map { it.second.chatTabId })
     }
@@ -542,7 +542,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
         askTool.enabled = false
 
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
 
         assertFailure("unavailable", reply.await())
         assertTrue(askTool.calls.isEmpty())
@@ -575,7 +575,7 @@ class RealClientToolsExecutorTest {
 
         val reply = async { executeAskTool() }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
 
         assertFailure("cancelled", reply.await())
         assertEquals(1, prompt.prompts.size)
@@ -709,10 +709,11 @@ class RealClientToolsExecutorTest {
                 CHAT_TAB_ID,
                 BrowserMode.REGULAR,
                 listOf(AskingTool("otherAskTool", OTHER_ASK_MODE), AskingTool("askTool", ASK_MODE)),
+                toolsRemovable = false,
             ),
             prompt.current.request,
         )
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         assertGranted(reply.await(), "otherAskTool", "autoTool", "askTool")
         assertTrue(askTool.calls.isEmpty() && otherAskTool.calls.isEmpty())
         assertTrue(store.choices.isEmpty())
@@ -734,7 +735,7 @@ class RealClientToolsExecutorTest {
             )
         }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         assertGranted(reply.await(), "askTool")
 
         assertEquals(true, executeAskTool(chatId = PAGE_CHAT_ID).getBoolean("ok"))
@@ -747,7 +748,7 @@ class RealClientToolsExecutorTest {
 
         val reply = async { requestAccess("askTool") }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.DONT_ALLOW)
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
 
         assertFailure("denied", reply.await())
         assertFalse(chatGrants.isGranted(CHAT_ID, "askTool"))
@@ -760,7 +761,7 @@ class RealClientToolsExecutorTest {
 
         val reply = async { requestAccess("askTool") }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.DISMISSED)
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
 
         assertFailure("cancelled", reply.await())
         assertFalse(chatGrants.isGranted(CHAT_ID, "askTool"))
@@ -831,14 +832,58 @@ class RealClientToolsExecutorTest {
         runCurrent()
         assertEquals(1, prompt.prompts.size)
 
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         runCurrent()
 
         assertEquals(true, toolCall.await().getBoolean("ok"))
         assertEquals(listOf(AskingTool("otherAskTool", OTHER_ASK_MODE)), (prompt.current.request as ClientToolPermissionRequest.GrantAccess).tools)
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         assertGranted(access.await(), "askTool", "otherAskTool")
         assertEquals(1, prompt.maxOpenAtOnce)
+    }
+
+    @Test
+    fun whenRemoveToolsEnabledThenPromptLetsUserRemoveTools() = runTest {
+        enableRequestAccess()
+        feature.requestAccessRemoveTools().setRawStoredState(Toggle.State(enable = true))
+
+        val reply = async { requestAccess("askTool", "otherAskTool") }
+        runCurrent()
+
+        assertTrue((prompt.current.request as ClientToolPermissionRequest.GrantAccess).toolsRemovable)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
+        reply.await()
+    }
+
+    @Test
+    fun whenAllowedWithToolsRemovedThenOnlyTheRestAreGrantedAndRemovedOnesAskAgain() = runTest {
+        enableRequestAccess()
+        feature.requestAccessRemoveTools().setRawStoredState(Toggle.State(enable = true))
+        val executor = executor()
+
+        val reply = async { requestAccess("otherAskTool", "autoTool", "askTool") }
+        runCurrent()
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat(removedTools = setOf("otherAskTool")))
+
+        assertGranted(reply.await(), "autoTool", "askTool")
+        assertTrue(chatGrants.isGranted(CHAT_ID, "askTool"))
+        assertFalse(chatGrants.isGranted(CHAT_ID, "otherAskTool"))
+        assertTrue(store.choices.isEmpty())
+
+        val call = async { executor.execute(request("otherAskTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        runCurrent()
+        assertEquals(
+            ClientToolPermissionRequest.RunTool(CHAT_TAB_ID, BrowserMode.REGULAR, AskingTool("otherAskTool", OTHER_ASK_MODE)),
+            prompt.current.request,
+        )
+        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
+        assertFailure("cancelled", call.await())
+
+        val again = async { requestAccess("askTool", "otherAskTool") }
+        runCurrent()
+        assertEquals(listOf(AskingTool("otherAskTool", OTHER_ASK_MODE)), (prompt.current.request as ClientToolPermissionRequest.GrantAccess).tools)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
+        assertGranted(again.await(), "askTool", "otherAskTool")
     }
 
     private fun enableRequestAccess() {
@@ -857,7 +902,7 @@ class RealClientToolsExecutorTest {
     ) {
         val reply = async { executor().execute(request(toolName, 1, chatId = chatId), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         assertEquals(true, reply.await().getBoolean("ok"))
     }
 
@@ -899,7 +944,7 @@ class RealClientToolsExecutorTest {
         const val OTHER_CHAT_TAB_ID = "other-chat-tab"
         const val CHAT_ID = "chat-1"
         const val OTHER_CHAT_ID = "chat-2"
-        val ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, accessLabel = 3)
-        val OTHER_ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 4, promptMessage = 5, accessLabel = 6)
+        val ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, name = 3, description = 4)
+        val OTHER_ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 5, promptMessage = 6, name = 7, description = 8)
     }
 }

@@ -43,12 +43,13 @@ sealed interface ClientToolPermissionMode {
 
     /**
      * Asks the user before running, with the tool's own prompt copy.
-     * @param accessLabel the tool's short line in a prompt that asks for several tools at once.
+     * @param name the tool's name and [description] its one line summary, shown in a prompt that asks for several tools at once.
      */
     data class Ask(
         @StringRes val promptTitle: Int,
         @StringRes val promptMessage: Int,
-        @StringRes val accessLabel: Int,
+        @StringRes val name: Int,
+        @StringRes val description: Int,
     ) : ClientToolPermissionMode
 }
 

@@ -102,7 +102,7 @@ class ClientToolPermissionDialogPresenterTest {
         chatTabId: String,
         browserMode: BrowserMode = BrowserMode.REGULAR,
     ) = PendingClientToolPermission(
-        ClientToolPermissionRequest.RunTool(chatTabId, browserMode, AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(1, 2, 3))),
+        ClientToolPermissionRequest.RunTool(chatTabId, browserMode, AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(1, 2, 3, 4))),
         CompletableDeferred(),
     )
 

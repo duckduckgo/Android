@@ -43,11 +43,15 @@ sealed interface ClientToolPermissionRequest {
         val tool: AskingTool,
     ) : ClientToolPermissionRequest
 
-    /** Asks to use several tools for the rest of the chat. */
+    /**
+     * Asks to use several tools for the rest of the chat.
+     * @param toolsRemovable whether the user may take tools out before allowing the rest.
+     */
     data class GrantAccess(
         override val chatTabId: String,
         override val browserMode: BrowserMode,
         val tools: List<AskingTool>,
+        val toolsRemovable: Boolean,
     ) : ClientToolPermissionRequest
 }
 
@@ -56,10 +60,16 @@ data class AskingTool(
     val copy: ClientToolPermissionMode.Ask,
 )
 
-enum class ClientToolPermissionAnswer {
-    ALLOW_FOR_CHAT,
-    DONT_ALLOW,
-    DISMISSED,
+sealed interface ClientToolPermissionAnswer {
+    /**
+     * Allows the asked tools for the chat, except [removedTools]: the ones the user took out of a [ClientToolPermissionRequest.GrantAccess]
+     * prompt. Those stay unanswered, so the next call or request for them asks again.
+     */
+    data class AllowForChat(val removedTools: Set<String> = emptySet()) : ClientToolPermissionAnswer
+
+    data object DontAllow : ClientToolPermissionAnswer
+
+    data object Dismissed : ClientToolPermissionAnswer
 }
 
 /** A prompt waiting for the user. Only the first [answer] counts, and answers after it is withdrawn are ignored. */
