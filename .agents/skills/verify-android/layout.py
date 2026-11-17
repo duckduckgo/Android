@@ -19,7 +19,26 @@ NOT_FOUND = 15
 
 def load():
     nodes = json.load(sys.stdin)
-    return nodes if isinstance(nodes, list) else []
+    if not isinstance(nodes, list):
+        return []
+    # android CLI 1.1 wraps the tree in windows (status bar, keyboard, applications) and nests children; the
+    # APPLICATION windows, flattened, are what older versions returned: the app's, its dialogs, and another app's
+    # activity on top, such as Android's VPN consent. Its flags are upper case (LONG_CLICKABLE).
+    if any(isinstance(w, dict) and "content" in w for w in nodes):
+        nodes = flatten(n for w in nodes if isinstance(w, dict) and w.get("type") == "APPLICATION"
+                        for n in w.get("content") or [])
+    for n in nodes:
+        for key in ("interactions", "state"):
+            n[key] = [f.lower().replace("_", "-") for f in n.get(key) or []]
+    return nodes
+
+
+def flatten(nodes):
+    out = []
+    for n in nodes:
+        out.append(n)
+        out.extend(flatten(n.get("children") or []))
+    return out
 
 
 def rid(node):

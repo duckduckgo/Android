@@ -148,6 +148,7 @@ screen with its text, interactions and state (checked, focused, selected), tappa
 | `$V launch` / `$V restart` | Opens the app from its launcher entry / force-stops and reopens it |
 | `$V reset` | Clears app data and skips onboarding to the New Tab Page; only on an emulator this run booted |
 | `$V open <url>` | Opens a URL in the app the way another app's link does |
+| `$V probe <host,...> [mode] [timeout_ms]` | Connects to each host from the probe app, another app App Tracking Protection can block, and prints its outcome per host (features/app-tracking-protection.md) |
 
 Recipes reach their starting point through the Common paths in [features/README.md](features/README.md):
 the browser menu, Settings, AI Features, the developer screens, the tab switcher, a Duck.ai chat. When an
@@ -222,6 +223,7 @@ did not boot. Run `$V cleanup` after a failed run too, before retrying.
 - Debug builds have a second launcher entry (LeakCanary's "Leaks"). `$V launch` opens the browser's own one by name; tapping the wrong icon or `adb shell monkey` can land in LeakCanary (`$V where` prints `LeakLauncherActivity`).
 - `--index` is 1-based. An off-by-one taps the neighbour, so read state with `$V checked` or a screenshot after tapping.
 - Text selectors match the element that carries the text, often a child of the row; tapping it taps the row.
+- android CLI 1.1 returns `android layout` as windows (status bar, keyboard, app) with nested children; `layout.py` reads every `APPLICATION` window (the app's, its dialogs, and another app's activity on top, such as Android's VPN consent), so the notification shade, status bar and keyboard stay out of selectors, but a dialog's text matches alongside the screen under it. Off-screen elements aren't listed (`--full` would mark them `"off-screen": true`). Its on-device server (`com.android.cli.interact.instrumentation`, listed as "Android CLI Instrumentation Server") is a UI-automation client, so `uiautomator dump` is killed (exit 137) and `$V windows` fails while it runs; read popups with `android layout --device <serial> --flat` instead.
 - `$V web tap` reads the WebView's position with `uiautomator dump`, which is killed while another UI-automation client runs on the device, such as a leftover Maestro driver (`dev.mobile.maestro`). On the user's device, ask before stopping it.
 - WebView debugging can appear to work with the switch off: `UrlExtractingWebView` enables it process-wide when created. Still switch it on in the baseline so `web` commands do not depend on that.
 - Booting a wiped Play Store image and launching straight away gets the app killed ("depends on provider ... in dying proc com.google.android.gms") or crashed inside the system WebView. That is why the fallback AVD settles on its first boot (marker file `verify-settled` in its AVD folder). Don't add `fastboot.forceColdBoot` or snapshot flags to its config; snapshots went stale under cold boots and failed to load.

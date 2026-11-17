@@ -217,7 +217,7 @@ PY
 
 file_sha256() { shasum -a 256 "$1" | cut -d' ' -f1; }
 installed_sha256() {
-  local path; path="$(a shell pm path "$PKG" | tr -d '\r' | sed -n 's/^package://p' | head -1)"
+  local path; path="$(a shell pm path "${1:-$PKG}" 2>/dev/null | tr -d '\r' | sed -n 's/^package://p' | head -1 || true)"
   [[ -n "$path" ]] && a shell sha256sum "$path" | tr -d '\r' | cut -d' ' -f1
 }
 # Assembles the internal debug app in checkout $1 and prints the APK it produced. The auth properties
@@ -499,6 +499,89 @@ cmd_open() {
   echo "opened $1"
 }
 
+# --- The probe: another app for App Tracking Protection to block -----------------------------------
+# AppTP never blocks this app's own traffic, so its claim needs a third-party app: probe/ connects to each host
+# and sends a hand-built TLS ClientHello (ProbeActivity.java). It is built with the SDK tools rather than
+# Gradle so it stays out of the app's build, and kept in the builds folder under a hash of its sources.
+
+PROBE_PKG="dev.verifyandroid.probe"
+PROBE_DIR="$HERE/probe"
+
+# Runs inside $(...), where set -e doesn't stop it, so every step dies on its own failure: a half-built APK cached
+# under the source hash would be reused by every later run.
+probe_apk() {
+  local hash apk bt platform out keystore="$HOME/.android/debug.keystore"
+  hash="$(cd "$PROBE_DIR" && find . -type f | LC_ALL=C sort | xargs shasum -a 256 | shasum -a 256 | cut -c1-16)"
+  apk="$BUILDS/probe-$hash.apk"
+  [[ -f "$apk" ]] && { echo "$apk"; return; }
+  # Stable releases only: preview platforms and rc build-tools sort last but may be incomplete.
+  bt="$SDK/build-tools/$(ls "$SDK/build-tools" | grep -E '^[0-9]+(\.[0-9]+)*$' | sort -V | tail -1)"
+  platform="$SDK/platforms/$(ls "$SDK/platforms" | grep -E '^android-[0-9]+$' | sort -V | tail -1)/android.jar"
+  [[ -x "$bt/d8" && -f "$platform" ]] || die "the probe needs SDK build-tools and a platform in $SDK"
+  out="$(mktemp -d)" || die "couldn't make a temporary folder for the probe"
+  echo "building the probe app with $(basename "$bt") and $(basename "$(dirname "$platform")") ..." >&2
+  # -source 11 against android.jar warns about the bootclasspath; only errors matter.
+  javac -nowarn -Xlint:-options -source 11 -target 11 -classpath "$platform" -d "$out/classes" \
+    $(find "$PROBE_DIR/src" -name '*.java') >&2 || die "javac failed on the probe"
+  "$bt/d8" --min-api 26 --lib "$platform" --output "$out" $(find "$out/classes" -name '*.class') >&2 \
+    || die "d8 failed on the probe"
+  "$bt/aapt2" link -o "$out/unaligned.apk" -I "$platform" --manifest "$PROBE_DIR/AndroidManifest.xml" \
+    --min-sdk-version 26 --target-sdk-version 35 --version-code 1 --version-name 1.0 >&2 || die "aapt2 failed on the probe"
+  python3 -I -c 'import sys, zipfile
+with zipfile.ZipFile(sys.argv[1], "a") as apk: apk.write(sys.argv[2], "classes.dex")' "$out/unaligned.apk" "$out/classes.dex" \
+    || die "adding classes.dex to the probe failed"
+  "$bt/zipalign" -f 4 "$out/unaligned.apk" "$out/probe.apk" || die "zipalign failed on the probe"
+  # Gradle creates this key on the first debug build; a machine that never built one has none yet.
+  if [[ ! -f "$keystore" ]]; then
+    mkdir -p "$(dirname "$keystore")"
+    keytool -genkeypair -keystore "$keystore" -storepass android -alias androiddebugkey -keypass android \
+      -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" >/dev/null 2>&1 \
+      || die "keytool couldn't create $keystore"
+  fi
+  "$bt/apksigner" sign --ks "$keystore" --ks-pass pass:android --key-pass pass:android \
+    --ks-key-alias androiddebugkey "$out/probe.apk" >&2 || die "apksigner failed on the probe"
+  "$bt/apksigner" verify "$out/probe.apk" >&2 || die "the signed probe doesn't verify"
+  mkdir -p "$BUILDS" && cp "$out/probe.apk" "$apk.tmp" && mv "$apk.tmp" "$apk" || die "couldn't cache the probe as $apk"
+  rm -rf "$out"
+  echo "$apk"
+}
+
+probe_install() {
+  local apk want out; apk="$(probe_apk)"; want="$(file_sha256 "$apk")"
+  [[ "$(installed_sha256 "$PROBE_PKG")" == "$want" ]] && return
+  if ! out="$(a install -r "$apk" 2>&1)"; then
+    grep -q INSTALL_FAILED_UPDATE_INCOMPATIBLE <<<"$out" || die "installing the probe failed: $out"
+    # Signed with another machine's debug key. The probe is this skill's own app, so replacing it loses nothing.
+    a uninstall "$PROBE_PKG" >/dev/null && a install "$apk" >/dev/null || die "reinstalling the probe failed"
+  fi
+  [[ "$(installed_sha256 "$PROBE_PKG")" == "$want" ]] || die "the installed probe doesn't match $apk"
+  echo "installed the probe ($(basename "$apk"))" >&2
+}
+
+# probe <host,host...> [mode] [timeout_ms]: one "RESULT run=.. host=.. mode=.. outcome=.." line per host.
+# Exit 1 when the run didn't finish, so a host without a result is never read as an outcome.
+cmd_probe() {
+  local usage="usage: verify.sh probe <host,host...> [single|window|split|late-sni] [timeout_ms]"
+  local hosts="${1:?$usage}" mode="${2:-single}" timeout="${3:-3000}" run="$RANDOM$RANDOM" lines="" wait_s n
+  case "$mode" in single|window|split|late-sni) ;; *) die "$usage" ;; esac
+  probe_install
+  a shell am start -S -W -n "$PROBE_PKG/.ProbeActivity" \
+    --es hosts "$hosts" --es mode "$mode" --ei timeout "$timeout" --es run "$run" >/dev/null
+  # One host can take up to 2x timeout (connect + read) before the probe logs DONE.
+  n="$(tr ',' '\n' <<<"$hosts" | grep -c .)"
+  wait_s=$(( timeout * 2 * n / 1000 + 5 ))
+  for _ in $(seq "$wait_s"); do
+    # Captured instead of piped: under pipefail, grep -q closing the pipe early would fail the check.
+    lines="$(a logcat -d -s VerifyProbe:I | tr -d '\r')"
+    grep -qE "DONE run=$run\$" <<<"$lines" && break
+    sleep 1
+  done
+  # Anchored on both sides, so an older run whose id starts with this one's doesn't match.
+  grep -E "RESULT run=$run " <<<"$lines" | sed 's/^.*VerifyProbe: //' || true
+  grep -qE "DONE run=$run\$" <<<"$lines" \
+    || die "probe run $run incomplete: no DONE after ${wait_s}s; hosts without a RESULT line were not probed"
+}
+
 # A fresh app on the New Tab Page: clears app data, grants notifications up front so their prompt doesn't
 # cover onboarding, and takes the internal build's Skip Onboarding. Only on an emulator this run booted.
 cmd_reset() {
@@ -584,7 +667,7 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|layout|windows|text|checked|shot|record|launch|restart|open|reset|web|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|layout|windows|text|checked|shot|record|launch|restart|open|reset|web|probe|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on
@@ -603,6 +686,7 @@ usage: verify.sh devices                      attached devices and AVDs on this 
        verify.sh launch | restart | open <url>
        verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'
        verify.sh reset                        clear app data and skip onboarding (emulators this run booted)
+       verify.sh probe <host,...> [mode] [ms] connect to hosts as another app (App Tracking Protection)
        verify.sh logcat
 EOF
      exit 2 ;;
