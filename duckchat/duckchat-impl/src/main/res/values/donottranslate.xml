@@ -46,11 +46,16 @@
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
 
     <!-- Duck.ai client tool permission prompt -->
-    <string name="duckAiClientToolPromptAllowForChat">Allow for This Chat</string>
+    <string name="duckAiClientToolPromptAllowInChat">Allow in This Chat</string>
     <string name="duckAiClientToolPromptDontAllow">Don’t Allow</string>
-    <string name="duckAiClientToolRequestAccessPromptTitle">Allow Duck.ai to use these browser features in this chat?</string>
-    <string name="duckAiClientToolRequestAccessPromptItem" instruction="One line of a bulleted list. Placeholder is a short description of a browser feature, such as See your open tabs">• %1$s</string>
+    <string name="duckAiClientToolRequestAccessPromptTitle">Allow Duck.ai to use these in this chat?</string>
+    <string name="duckAiClientToolRequestAccessPromptMessage">Duck.ai can use these without asking again in this chat until you close the app.</string>
+    <string name="duckAiClientToolRemoveContentDescription" instruction="Label of the button that takes a browser feature out of the request. Placeholder is the feature's name, such as List Open Tabs">Don’t allow %1$s</string>
+    <string name="duckAiClientToolRemovedStatus" instruction="Placeholder is one or more browser feature names, such as List Open Tabs and Search History">Duck.ai won’t use %1$s this time.</string>
+    <string name="duckAiClientToolNamesPair" instruction="Joins the last two names of a list, such as List Open Tabs and Search History">%1$s and %2$s</string>
+    <string name="duckAiClientToolNamesSeries" instruction="Joins the earlier names of a list of three or more, such as Read Page, List Open Tabs">%1$s, %2$s</string>
+    <string name="duckAiClientToolListOpenTabsName">List Open Tabs</string>
+    <string name="duckAiClientToolListOpenTabsDescription">See the title and address of each open tab.</string>
     <string name="duckAiClientToolListOpenTabsPromptTitle">Allow Duck.ai to see your open tabs?</string>
-    <string name="duckAiClientToolListOpenTabsPromptMessage">Duck.ai will see the titles and addresses of the tabs open in this browser. It won’t see what’s on them.</string>
-    <string name="duckAiClientToolListOpenTabsAccessLabel">See your open tabs</string>
+    <string name="duckAiClientToolListOpenTabsPromptMessage">It will see the title and address of each open tab.</string>
 </resources>

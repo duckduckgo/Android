@@ -45,9 +45,9 @@ class PublishingClientToolPermissionPromptTest {
         val answer = async { testee.request(REQUEST) }
         runCurrent()
 
-        testee.pending.value!!.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        testee.pending.value!!.answer(ClientToolPermissionAnswer.AllowForChat())
 
-        assertEquals(ClientToolPermissionAnswer.ALLOW_FOR_CHAT, answer.await())
+        assertEquals(ClientToolPermissionAnswer.AllowForChat(), answer.await())
         assertNull(testee.pending.value)
     }
 
@@ -57,10 +57,10 @@ class PublishingClientToolPermissionPromptTest {
         runCurrent()
         val pending = testee.pending.value!!
 
-        pending.answer(ClientToolPermissionAnswer.DONT_ALLOW)
-        pending.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        pending.answer(ClientToolPermissionAnswer.DontAllow)
+        pending.answer(ClientToolPermissionAnswer.AllowForChat())
 
-        assertEquals(ClientToolPermissionAnswer.DONT_ALLOW, answer.await())
+        assertEquals(ClientToolPermissionAnswer.DontAllow, answer.await())
     }
 
     @Test
@@ -74,7 +74,7 @@ class PublishingClientToolPermissionPromptTest {
 
         assertNull(testee.pending.value)
         assertFalse(pending.isOpen)
-        pending.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        pending.answer(ClientToolPermissionAnswer.AllowForChat())
         assertTrue(answer.isCancelled)
     }
 
@@ -82,7 +82,7 @@ class PublishingClientToolPermissionPromptTest {
     fun whenNextRequestArrivesThenItReplacesTheSettledOne() = runTest {
         val first = async { testee.request(REQUEST) }
         runCurrent()
-        testee.pending.value!!.answer(ClientToolPermissionAnswer.ALLOW_FOR_CHAT)
+        testee.pending.value!!.answer(ClientToolPermissionAnswer.AllowForChat())
         first.await()
 
         val second = async { testee.request(REQUEST.copy(chatTabId = "other")) }
@@ -96,7 +96,7 @@ class PublishingClientToolPermissionPromptTest {
         val REQUEST = ClientToolPermissionRequest.RunTool(
             chatTabId = "chat",
             browserMode = BrowserMode.REGULAR,
-            tool = AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, accessLabel = 3)),
+            tool = AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, name = 3, description = 4)),
         )
     }
 }
