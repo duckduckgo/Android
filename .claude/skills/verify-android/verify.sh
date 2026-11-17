@@ -172,7 +172,7 @@ $(user_avds | sed 's/^/  /')"
   echo "ready: $s"
 }
 
-# --- Build identity, the way verify-android (#10551) does it ------------------------------------------
+# --- Build identity, the way Android PR #10551 does it ------------------------------------------
 # A build records the source it came from (the committed tree plus every uncommitted change, outside the
 # agent tooling folders, so editing this skill does not make a build stale) and the APK's sha256. install refuses a
 # stale build and checks the hash on the device; doctor refuses an app this tool did not install.

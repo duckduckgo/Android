@@ -1,14 +1,14 @@
 ---
-name: verify
+name: verify-android
 description: Verifies DuckDuckGo Android changes on the attached device (or an emulator the user picks). Builds this checkout's internal debug app, drives real user paths with the android CLI and adb (plus DevTools for WebView content), records a video and screenshots per feature, and runs Python proofs with a pass/fail verdict, before and after a change. Use to verify an app change works on device, reproduce a UI bug, or prove a feature end to end before a PR. Not for unit tests (./gradlew jvm_tests) or Maestro CI suites (.maestro/).
 ---
 
 # Verify the DuckDuckGo Android app
 
-One entry point, `.claude/skills/verify/verify.sh` (`V` below, run from the repo root).
+One entry point, `.claude/skills/verify-android/verify.sh` (`V` below, run from the repo root).
 
 ```bash
-V=.claude/skills/verify/verify.sh
+V=.claude/skills/verify-android/verify.sh
 ```
 
 Driving and evidence use the `android` CLI and `adb`, as the `android-cli` skill's
@@ -48,7 +48,7 @@ $V install   # installs that build, refusing it if the source changed since, and
 $V doctor
 ```
 
-`build` works the way `verify-android` (Android PR #10551) does. It records the source the APK came from
+`build` works the way Android PR #10551 does. It records the source the APK came from
 (the committed tree plus every uncommitted change, outside the agent tooling folders `.claude`, `.agents`
 and `.codex`, so editing this skill does not make a build stale) and the APK's sha256, and keeps the APK
 in `build/verify/builds/` under its hash. It passes the app's own `-Pautofill-disable-auth-requirement`
@@ -76,10 +76,10 @@ through this skill's commands and records `android.check(...)` results. Every re
 `proofs/` (shared paths in `proofs/steps.py`); for a change, write a proof of what it changes.
 
 ```bash
-P=.claude/skills/verify/prove.py
-$P .claude/skills/verify/proofs/<name>.py           # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
+P=.claude/skills/verify-android/prove.py
+$P .claude/skills/verify-android/proofs/<name>.py           # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
 $V build --base origin/develop                     # the "before" build (git fetch first for the latest)
-$P compare .claude/skills/verify/proofs/<name>.py   # runs it on the base build, then on this checkout's
+$P compare .claude/skills/verify-android/proofs/<name>.py   # runs it on the base build, then on this checkout's
 $P selftest                                        # after changing prove.py: the harness still tells pass from fail
 ```
 

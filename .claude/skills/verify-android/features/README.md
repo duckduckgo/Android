@@ -1,7 +1,7 @@
 # DuckDuckGo Android verification map
 
 Recipes for verifying user-facing behaviour of the internal debug build, scoped to Duck.ai and its entry
-points. Each is driven with the android CLI and adb, reaching every state through the UI. Commands use `V=.claude/skills/verify/verify.sh` from `../SKILL.md`.
+points. Each is driven with the android CLI and adb, reaching every state through the UI. Commands use `V=.claude/skills/verify-android/verify.sh` from `../SKILL.md`.
 
 ## Baseline preconditions
 
