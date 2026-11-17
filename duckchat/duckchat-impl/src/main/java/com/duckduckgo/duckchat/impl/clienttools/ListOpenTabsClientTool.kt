@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -58,7 +57,7 @@ class ListOpenTabsClientTool @Inject constructor(
         val tabs = JSONArray()
         tabRepositoryProvider.value.forMode(context.browserMode).getTabs()
             .asSequence()
-            .filter { tab -> tab.url.let { it != null && it.isHttpOrHttps() && !duckChat.isDuckChatUrl(it.toUri()) } }
+            .filter { duckChat.isToolVisible(it) }
             .take(limit)
             .forEach { tab ->
                 tabs.put(
