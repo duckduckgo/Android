@@ -91,6 +91,15 @@ class SyncServiceRemoteAuditLogTest {
     }
 
     @Test
+    fun whenGetBeforeWithLimitThenLimitSent() {
+        whenever(call.execute()).thenReturn(Response.success(AuditLogResponse(PAGE)))
+
+        syncRemote.getAuditLogBefore(TOKEN, cursor = "before-cursor", limit = 5)
+
+        verify(syncService).getAuditLog("Bearer $TOKEN", after = null, before = "before-cursor", limit = 5)
+    }
+
+    @Test
     fun whenRequestSucceedsThenReturnPage() {
         whenever(call.execute()).thenReturn(Response.success(AuditLogResponse(PAGE)))
 

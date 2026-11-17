@@ -65,7 +65,10 @@ class SyncAuditLogDebugActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.readServerLogButton.setOnClickListener { viewModel.onReadServerLogClicked() }
-        binding.openSyncAuditLogButton.setOnClickListener { globalActivityStarter.start(this, SyncAuditLogScreenParams) }
+        binding.openSyncAuditLogButton.setOnClickListener { globalActivityStarter.start(this, SyncAuditLogScreenParams()) }
+        binding.openSyncAuditLogSmallPagesButton.setOnClickListener {
+            globalActivityStarter.start(this, SyncAuditLogScreenParams(entriesPerPage = SMALL_PAGE_SIZE))
+        }
         binding.findUnseenAuditEntriesButton.setOnClickListener { viewModel.onFindUnseenAuditEntriesClicked() }
         binding.markAllAuditLoginsSeenButton.setOnClickListener { viewModel.onMarkAllAuditLoginsSeenClicked() }
         binding.simulateLoginButton.setOnClickListener { viewModel.onSimulateLoginClicked() }
@@ -101,5 +104,9 @@ class SyncAuditLogDebugActivity : DuckDuckGoActivity() {
             row.otherDeviceId.text = device.deviceId
             row.logOutOtherDeviceButton.setOnClickListener { viewModel.onLogOutOtherDeviceClicked(device) }
         }
+    }
+
+    private companion object {
+        const val SMALL_PAGE_SIZE = 5
     }
 }
