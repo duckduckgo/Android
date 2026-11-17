@@ -38,7 +38,7 @@ jobs:
 
       - name: Cooldown canary
         working-directory: native-github-asana-sync
-        run: "! npm pack --dry-run caniuse-lite@1.0.30001826"
+        run: npm pack --dry-run caniuse-lite@1.0.30001826
 
       - name: Run action from the checkout
         uses: ./native-github-asana-sync
