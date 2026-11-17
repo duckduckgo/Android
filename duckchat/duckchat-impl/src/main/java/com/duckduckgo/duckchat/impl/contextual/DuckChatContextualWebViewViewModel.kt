@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -94,6 +95,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val entryWideEvent: DuckAiEntryWideEvent,
     promoCampaignJSHelper: PromoCampaignJSHelper,
     private val pdfPageContextResolver: PdfPageContextResolver,
+    sheetCloseRequests: ContextualSheetCloseRequests,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -195,6 +197,10 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         }
         promoCampaignJSHelper.promoRecordEvents
             .onEach { event -> _subscriptionEventDataChannel.trySend(event) }
+            .launchIn(viewModelScope)
+        sheetCloseRequests.tabIds
+            .filter { it == _viewState.value.tabId }
+            .onEach { onContextualClose() }
             .launchIn(viewModelScope)
     }
 

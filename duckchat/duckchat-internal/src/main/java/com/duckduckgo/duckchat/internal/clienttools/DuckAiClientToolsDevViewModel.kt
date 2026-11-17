@@ -49,6 +49,7 @@ class DuckAiClientToolsDevViewModel @Inject constructor(
         REQUEST_ACCESS("requestAccess", FlagGroup.GENERAL, { it.requestAccess() }),
         REQUEST_ACCESS_REMOVE_TOOLS("requestAccessRemoveTools", FlagGroup.GENERAL, { it.requestAccessRemoveTools() }),
         LIST_OPEN_TABS("listOpenTabs", FlagGroup.TOOLS, { it.listOpenTabs() }),
+        SWITCH_TO_TAB("switchToTab", FlagGroup.TOOLS, { it.switchToTab() }),
     }
 
     data class FlagRow(
