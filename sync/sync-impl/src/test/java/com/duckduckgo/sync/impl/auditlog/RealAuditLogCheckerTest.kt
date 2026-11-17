@@ -70,6 +70,7 @@ class RealAuditLogCheckerTest {
         pendingLoginsUpdater = RealPendingLoginsUpdater(
             RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor),
             deviceInfoDecryptor,
+            coroutineTestRule.testDispatcherProvider,
         ),
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )

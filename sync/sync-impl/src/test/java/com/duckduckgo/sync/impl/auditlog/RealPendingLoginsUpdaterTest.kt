@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.auditlog
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.DeviceFieldDecryptor
 import com.duckduckgo.sync.impl.DeviceInfoDecryptor
 import com.duckduckgo.sync.impl.DeviceInfoPayload
@@ -28,8 +29,10 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGIN
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGOUT
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Skipped
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -38,12 +41,16 @@ import java.time.Instant
 
 class RealPendingLoginsUpdaterTest {
 
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
+
     private val deviceFieldDecryptor: DeviceFieldDecryptor = mock()
     private val deviceInfoDecryptor = FakeDeviceInfoDecryptor()
 
     private val testee = RealPendingLoginsUpdater(
         RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor),
         deviceInfoDecryptor,
+        coroutineTestRule.testDispatcherProvider,
     )
 
     @Before
@@ -52,14 +59,14 @@ class RealPendingLoginsUpdaterTest {
     }
 
     @Test
-    fun whenOwnDeviceLogsInThenItIsNotAdded() {
+    fun whenOwnDeviceLogsInThenItIsNotAdded() = runTest {
         val update = testee.prepare(listOf(login("e1", OWN_DEVICE, info = "info:Me")), OWN_DEVICE, emptyList())
 
         assertEquals(emptyList<PendingLogin>(), update.newLogins)
     }
 
     @Test
-    fun whenEntriesHaveLogoutsDeviceInfoAddedAndSkippedThenOnlyLoginsAreAdded() {
+    fun whenEntriesHaveLogoutsDeviceInfoAddedAndSkippedThenOnlyLoginsAreAdded() = runTest {
         val entries = listOf(
             Skipped("e4", AuditLogEntrySkipReason.UNKNOWN_TYPE),
             logout("e3", OTHER_DEVICE),
@@ -73,7 +80,7 @@ class RealPendingLoginsUpdaterTest {
     }
 
     @Test
-    fun whenLoginHasNoInfoThenNewerDeviceInfoAddedNamesItAndOrderIsOldestFirst() {
+    fun whenLoginHasNoInfoThenNewerDeviceInfoAddedNamesItAndOrderIsOldestFirst() = runTest {
         val entries = listOf(
             infoAdded("e3", OTHER_DEVICE, info = "info:Laptop", at = 3),
             login("e2", THIRD_DEVICE, at = 2),
@@ -86,7 +93,7 @@ class RealPendingLoginsUpdaterTest {
     }
 
     @Test
-    fun whenSameLoginAppearsTwiceThenItIsAddedOnce() {
+    fun whenSameLoginAppearsTwiceThenItIsAddedOnce() = runTest {
         val entries = listOf(login("e1", OTHER_DEVICE, info = "info:Laptop", at = 1), login("e1", OTHER_DEVICE, info = "info:Laptop", at = 1))
 
         val update = testee.prepare(entries, OWN_DEVICE, emptyList())
@@ -95,14 +102,14 @@ class RealPendingLoginsUpdaterTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedIsForPendingDeviceThenItGivesLateName() {
+    fun whenDeviceInfoAddedIsForPendingDeviceThenItGivesLateName() = runTest {
         val update = testee.prepare(listOf(infoAdded("e2", OTHER_DEVICE, info = "info:Laptop")), OWN_DEVICE, listOf(fallback("e1", OTHER_DEVICE)))
 
         assertEquals(mapOf(OTHER_DEVICE to "Laptop"), update.lateNames)
     }
 
     @Test
-    fun whenSeveralDeviceInfoAddedForPendingDeviceThenOldestThatDecryptsIsUsed() {
+    fun whenSeveralDeviceInfoAddedForPendingDeviceThenOldestThatDecryptsIsUsed() = runTest {
         val entries = listOf(
             infoAdded("e4", OTHER_DEVICE, info = "info:Newer"),
             infoAdded("e3", OTHER_DEVICE, info = "info:Older"),
@@ -115,7 +122,7 @@ class RealPendingLoginsUpdaterTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedFollowsLoginOfSameDeviceThenItGivesNoLateName() {
+    fun whenDeviceInfoAddedFollowsLoginOfSameDeviceThenItGivesNoLateName() = runTest {
         val entries = listOf(infoAdded("e3", OTHER_DEVICE, info = "info:Laptop", at = 3), login("e2", OTHER_DEVICE, at = 2))
 
         val update = testee.prepare(entries, OWN_DEVICE, listOf(fallback("e1", OTHER_DEVICE)))
@@ -125,7 +132,7 @@ class RealPendingLoginsUpdaterTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedHasNoPendingRowThenNothingIsDecrypted() {
+    fun whenDeviceInfoAddedHasNoPendingRowThenNothingIsDecrypted() = runTest {
         val update = testee.prepare(listOf(infoAdded("e1", OTHER_DEVICE, info = "info:Laptop")), OWN_DEVICE, emptyList())
 
         assertEquals(emptyMap<String, String>(), update.lateNames)
@@ -133,7 +140,7 @@ class RealPendingLoginsUpdaterTest {
     }
 
     @Test
-    fun whenAppliedThenLateNameGoesOnlyToNewestRowOfThatDevice() {
+    fun whenAppliedThenLateNameGoesOnlyToNewestRowOfThatDevice() = runTest {
         val current = listOf(fallback("e1", OTHER_DEVICE, at = 1), fallback("e2", OTHER_DEVICE, at = 2), fallback("e3", THIRD_DEVICE, at = 3))
 
         val applied = PendingLoginsUpdate(newLogins = emptyList(), lateNames = mapOf(OTHER_DEVICE to "Laptop")).applyTo(current)
@@ -147,7 +154,7 @@ class RealPendingLoginsUpdaterTest {
     }
 
     @Test
-    fun whenAppliedThenLoginsAlreadyInListAreNotAddedAgain() {
+    fun whenAppliedThenLoginsAlreadyInListAreNotAddedAgain() = runTest {
         val current = listOf(pending("e1", OTHER_DEVICE, "Laptop", 1))
         val newLogins = listOf(pending("e1", OTHER_DEVICE, "Laptop", 1), pending("e2", THIRD_DEVICE, "Tablet", 2))
 

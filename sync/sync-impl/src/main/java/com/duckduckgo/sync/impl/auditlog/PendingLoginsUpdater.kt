@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.auditlog
 
-import androidx.annotation.WorkerThread
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.DecryptedDevice
 import com.duckduckgo.sync.impl.DeviceInfoDecryptor
@@ -26,16 +26,16 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.DEVICE_INFO_ADDED
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGIN
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import dev.zacsweers.metro.ContributesBinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /** Finds the new logins and the late device names in one check's entries. */
-@WorkerThread
 interface PendingLoginsUpdater {
     /**
      * [entries] are one check's entries, newest first. [pendingLogins] is the stored list when the check started; it only decides
      * which late names are worth decrypting.
      */
-    fun prepare(
+    suspend fun prepare(
         entries: List<DecodedAuditLogEntry>,
         ownDeviceId: String,
         pendingLogins: List<PendingLogin>,
@@ -90,15 +90,16 @@ data class PendingLoginsUpdate(
 class RealPendingLoginsUpdater @Inject constructor(
     private val deviceNameResolver: AuditLogDeviceNameResolver,
     private val deviceInfoDecryptor: DeviceInfoDecryptor,
+    private val dispatchers: DispatcherProvider,
 ) : PendingLoginsUpdater {
 
-    override fun prepare(
+    override suspend fun prepare(
         entries: List<DecodedAuditLogEntry>,
         ownDeviceId: String,
         pendingLogins: List<PendingLogin>,
-    ): PendingLoginsUpdate {
+    ): PendingLoginsUpdate = withContext(dispatchers.io()) {
         val oldestFirst = entries.filterIsInstance<Decoded>().asReversed()
-        return PendingLoginsUpdate(
+        PendingLoginsUpdate(
             newLogins = newLogins(entries, oldestFirst, ownDeviceId),
             lateNames = lateNames(oldestFirst, pendingDevices = pendingLogins.mapTo(mutableSetOf()) { it.deviceId }),
         )
