@@ -199,6 +199,27 @@ class BrowserMenuBottomSheetTest {
     }
 
     @Test
+    fun whenRenderDuckAiMenuWithVpnMenuItemThenVpnMenuItemIsVisible() {
+        dialog.render(BrowserMenuViewState.DuckAi(vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = false)))
+
+        assertTrue(dialog.vpnMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuWithNotSubscribedVpnStateThenVpnMenuItemIsVisible() {
+        dialog.render(BrowserMenuViewState.DuckAi(vpnMenuState = VpnMenuState.NotSubscribed))
+
+        assertTrue(dialog.vpnMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuWithVpnMenuHiddenStateThenVpnMenuItemIsHidden() {
+        dialog.render(BrowserMenuViewState.DuckAi(vpnMenuState = VpnMenuState.Hidden))
+
+        assertFalse(dialog.vpnMenuItem.isVisible)
+    }
+
+    @Test
     fun whenRenderDuckAiMenuThenInternalFeedbackMenuItemIsHidden() {
         dialog.render(BrowserMenuViewState.DuckAi())
 
