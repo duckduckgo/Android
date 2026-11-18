@@ -429,7 +429,7 @@ class BrowserWebViewClient @Inject constructor(
                     if (isForMainFrame) {
                         if (hasGestureInNavigation) gesturedPost = null
                         webViewClientListener?.let { listener ->
-                            return listener.handleNonHttpAppLink(urlType)
+                            return listener.handleNonHttpAppLink(urlType, hasGestureInNavigation)
                         }
                     }
                     true
