@@ -48,10 +48,12 @@ data class AuditLogCheckState(
     val cursor: String? = null,
     /** Oldest first. */
     val pendingLogins: List<PendingLogin> = emptyList(),
+    /** Id of the newest entry shown the last time Device Activity opened. Entries above it in the log are unseen. */
+    val lastSeenEntryId: String? = null,
 )
 
 /**
- * Stored state of the audit log checker. It lives in [SyncStore], so signing out clears it.
+ * Stored state of the audit log checker and of what Device Activity last showed. It lives in [SyncStore], so signing out clears it.
  * All reads and writes share one lock, so every caller gets an atomic read-modify-write.
  * Unreadable stored data reads as an empty list.
  */
@@ -84,7 +86,8 @@ class RealAuditLogCheckStateStore @Inject constructor(
 
     override suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?) = withContext(dispatchers.io()) {
         mutex.withLock {
-            val updated = transform(readState()) ?: return@withLock
+            val current = readState()
+            val updated = transform(current) ?: return@withLock
             // Sign-out wipes SyncStore outside this lock; without this check a late write would bring back the old account's state.
             if (!syncStore.isSignedIn()) return@withLock
 
@@ -92,10 +95,15 @@ class RealAuditLogCheckStateStore @Inject constructor(
             // and the caller dedupes by entry id. The other order would lose those logins.
             syncStore.auditLogPending = encode(updated.pendingLogins)
             syncStore.auditLogCursor = updated.cursor
+            if (updated.lastSeenEntryId != current.lastSeenEntryId) syncStore.auditLogLastSeenEntryId = updated.lastSeenEntryId
         }
     }
 
-    private fun readState() = AuditLogCheckState(cursor = syncStore.auditLogCursor, pendingLogins = decode(syncStore.auditLogPending))
+    private fun readState() = AuditLogCheckState(
+        cursor = syncStore.auditLogCursor,
+        pendingLogins = decode(syncStore.auditLogPending),
+        lastSeenEntryId = syncStore.auditLogLastSeenEntryId,
+    )
 
     private fun encode(logins: List<PendingLogin>): String? {
         val capped = logins.takeLast(AuditLogCheckStateStore.MAX_PENDING_LOGINS)

@@ -94,6 +94,25 @@ class RealAuditLogCheckStateStoreTest {
     }
 
     @Test
+    fun whenLastSeenEntryIdWrittenThenReadReturnsIt() = runTest {
+        testee.update { it.copy(lastSeenEntryId = "entry-1") }
+
+        assertEquals("entry-1", testee.read().lastSeenEntryId)
+        assertEquals("entry-1", syncStore.auditLogLastSeenEntryId)
+    }
+
+    @Test
+    fun whenLastSeenEntryIdUnchangedThenItIsNotWritten() = runTest {
+        testee.update { it.copy(lastSeenEntryId = "entry-1") }
+        syncStore.writes.clear()
+
+        testee.update { it.copy(cursor = "after-1") }
+
+        assertEquals(listOf(PENDING, CURSOR), syncStore.writes)
+        assertEquals("entry-1", testee.read().lastSeenEntryId)
+    }
+
+    @Test
     fun whenCursorClearedThenItIsNull() = runTest {
         testee.update { AuditLogCheckState(cursor = "after-1", pendingLogins = emptyList()) }
 
@@ -226,10 +245,18 @@ class RealAuditLogCheckStateStoreTest {
                 writes.add(PENDING)
                 field = value
             }
+
+        @Volatile
+        override var auditLogLastSeenEntryId: String? = null
+            set(value) {
+                writes.add(LAST_SEEN)
+                field = value
+            }
     }
 
     private companion object {
         const val CURSOR = "cursor"
         const val PENDING = "pending"
+        const val LAST_SEEN = "lastSeen"
     }
 }

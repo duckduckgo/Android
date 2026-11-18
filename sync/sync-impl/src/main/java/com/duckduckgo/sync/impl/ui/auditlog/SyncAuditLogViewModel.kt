@@ -19,25 +19,30 @@ package com.duckduckgo.sync.impl.ui.auditlog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
+import kotlin.time.Duration.Companion.seconds
 
 data class SyncAuditLogRow(
     val item: SyncAuditLogItem,
     val time: RelativeTime,
+    val highlighted: Boolean = false,
 )
 
 class SyncAuditLogViewModel @AssistedInject constructor(
     @Assisted private val params: SyncAuditLogScreenParams,
     private val loader: SyncAuditLogLoader,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val stateStore: AuditLogCheckStateStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -74,6 +79,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
 
     private var lastLoad: SyncAuditLogLoadResult.Loaded? = null
     private var retryAllowed = false
+    private var unseen = SyncAuditLogUnseen()
 
     init {
         load()
@@ -102,6 +108,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
         _viewState.update { it.copy(status = Status.LOADING) }
         viewModelScope.launch {
             val result = if (previous == null) {
+                unseen = readUnseen()
                 loader.loadLatest(params.entriesPerPage)
             } else {
                 loader.loadOlder(previous, params.entriesPerPage)
@@ -114,21 +121,54 @@ class SyncAuditLogViewModel @AssistedInject constructor(
                 }
                 is SyncAuditLogLoadResult.Loaded -> {
                     lastLoad = result
-                    val newRows = result.items.toRows()
+                    if (previous == null) markSeen(newestEntryId = result.pages.entries.firstOrNull()?.id)
+                    val newRows = result.toRows()
                     _viewState.update { it.copy(rows = it.rows + newRows, status = Status.IDLE, hasMore = result.hasMore) }
                 }
             }
         }
     }
 
+    private suspend fun readUnseen(): SyncAuditLogUnseen {
+        val state = stateStore.read()
+        return SyncAuditLogUnseen(state.pendingLogins.mapTo(HashSet()) { it.entryId }, state.lastSeenEntryId)
+    }
+
+    // Only the logins read at open: a check that runs during the load can add one this screen does not show.
+    private suspend fun markSeen(newestEntryId: String?) {
+        stateStore.update { state ->
+            val updated = state.copy(
+                pendingLogins = state.pendingLogins.filterNot { it.entryId in unseen.pendingLoginIds },
+                lastSeenEntryId = newestEntryId ?: state.lastSeenEntryId,
+            )
+            updated.takeIf { it != state }
+        }
+    }
+
     // Times are fixed when a page loads: the screen does not refresh while it is open.
-    private fun List<SyncAuditLogItem>.toRows(): List<SyncAuditLogRow> {
+    private fun SyncAuditLogLoadResult.Loaded.toRows(): List<SyncAuditLogRow> {
         val now = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis())
-        return map { SyncAuditLogRow(it, RelativeTime.between(it.occurredAt, now)) }
+        val unseenIds = unseen.unseenIds(this)
+        endHighlightLater(unseenIds)
+        return items.map { SyncAuditLogRow(it, RelativeTime.between(it.occurredAt, now), highlighted = it.entryId in unseenIds) }
+    }
+
+    private fun endHighlightLater(ids: Set<String>) {
+        if (ids.isEmpty()) return
+        viewModelScope.launch {
+            delay(HIGHLIGHT_DURATION)
+            _viewState.update { state ->
+                state.copy(rows = state.rows.map { if (it.item.entryId in ids) it.copy(highlighted = false) else it })
+            }
+        }
     }
 
     @AssistedFactory
     interface Factory {
         fun create(params: SyncAuditLogScreenParams): SyncAuditLogViewModel
+    }
+
+    private companion object {
+        val HIGHLIGHT_DURATION = 3.seconds
     }
 }

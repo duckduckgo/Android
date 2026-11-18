@@ -19,6 +19,11 @@ package com.duckduckgo.sync.impl.ui.auditlog
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.impl.DeviceType
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
+import com.duckduckgo.sync.impl.auditlog.AuditLogEntrySkipReason
+import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry
+import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogAction.SYNCED
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Content
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Footer
@@ -41,6 +46,7 @@ class SyncAuditLogViewModelTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val loader = FakeLoader()
+    private val stateStore = FakeStateStore()
     private val timeProvider: CurrentTimeProvider = mock<CurrentTimeProvider>().also {
         whenever(it.currentTimeMillis()).thenReturn(NOW.toEpochMilli())
     }
@@ -267,8 +273,118 @@ class SyncAuditLogViewModelTest {
         assertEquals(listOf<Int?>(5, 5), loader.entriesPerPageRequested)
     }
 
+    @Test
+    fun whenLoadIsRunningThenPendingLoginsAreKept() = runTest {
+        stateStore.state = AuditLogCheckState(cursor = "a1", pendingLogins = listOf(pending("e2")))
+
+        viewModel()
+
+        assertEquals(AuditLogCheckState(cursor = "a1", pendingLogins = listOf(pending("e2"))), stateStore.state)
+    }
+
+    @Test
+    fun whenLoadFailsThenPendingLoginsAreKept() = runTest {
+        stateStore.state = AuditLogCheckState(pendingLogins = listOf(pending("e2")))
+        viewModel()
+
+        loader.result.complete(SyncAuditLogLoadResult.Failed)
+
+        assertEquals(listOf(pending("e2")), stateStore.state.pendingLogins)
+    }
+
+    @Test
+    fun whenLoadedThenOnlyTheLoginsPendingAtOpenAreCleared() = runTest {
+        stateStore.state = AuditLogCheckState(pendingLogins = listOf(pending("e2")))
+        viewModel()
+        stateStore.state = stateStore.state.copy(pendingLogins = listOf(pending("e2"), pending("e9")))
+
+        loader.result.complete(loaded(ITEM_1))
+
+        assertEquals(listOf(pending("e9")), stateStore.state.pendingLogins)
+    }
+
+    @Test
+    fun whenPendingLoginIsLoadedThenItsRowIsHighlighted() = runTest {
+        stateStore.state = AuditLogCheckState(pendingLogins = listOf(pending("e2")))
+        val testee = viewModel()
+
+        loader.result.complete(loaded(ITEM_1, ITEM_2))
+
+        assertEquals(listOf(row(ITEM_1, highlighted = true), row(ITEM_2)), testee.viewState.value.rows)
+    }
+
+    @Test
+    fun whenHighlightTimeHasPassedThenRowsAreNotHighlighted() = runTest {
+        stateStore.state = AuditLogCheckState(pendingLogins = listOf(pending("e2")))
+        val testee = loadedViewModel(loaded(ITEM_1, ITEM_2))
+
+        coroutineTestRule.testDispatcher.scheduler.advanceTimeBy(2_999)
+        assertEquals(true, testee.viewState.value.rows.first().highlighted)
+        coroutineTestRule.testDispatcher.scheduler.advanceTimeBy(2)
+
+        assertEquals(listOf(row(ITEM_1), row(ITEM_2)), testee.viewState.value.rows)
+    }
+
+    @Test
+    fun whenEntriesAreAboveTheLastSeenEntryThenTheyAreHighlighted() = runTest {
+        stateStore.state = AuditLogCheckState(lastSeenEntryId = "e1")
+        val testee = viewModel()
+
+        loader.result.complete(loaded(ITEM_1, ITEM_2))
+
+        assertEquals(listOf(row(ITEM_1, highlighted = true), row(ITEM_2)), testee.viewState.value.rows)
+    }
+
+    @Test
+    fun whenLoadedThenNewestEntryIsStoredAsSeen() = runTest {
+        stateStore.state = AuditLogCheckState(cursor = "a1", lastSeenEntryId = "e0")
+
+        loadedViewModel(loaded(ITEM_1, ITEM_2))
+
+        assertEquals(AuditLogCheckState(cursor = "a1", lastSeenEntryId = "e2"), stateStore.state)
+    }
+
+    @Test
+    fun whenLoadFailsThenLastSeenEntryIsKept() = runTest {
+        stateStore.state = AuditLogCheckState(lastSeenEntryId = "e0")
+        viewModel()
+
+        loader.result.complete(SyncAuditLogLoadResult.Failed)
+
+        assertEquals("e0", stateStore.state.lastSeenEntryId)
+    }
+
+    @Test
+    fun whenOlderPageLoadsThenSeenStateIsNotChangedAgain() = runTest {
+        stateStore.state = AuditLogCheckState(lastSeenEntryId = "e0")
+        val testee = loadedViewModel(loaded(ITEM_1, before = "b1"))
+        stateStore.state = stateStore.state.copy(lastSeenEntryId = "e5")
+
+        testee.onNearListEnd()
+        loader.older.complete(loaded(ITEM_2, before = null))
+
+        assertEquals("e5", stateStore.state.lastSeenEntryId)
+    }
+
+    @Test
+    fun whenOlderUnseenRowsLoadThenTheyAreHighlightedForAWhile() = runTest {
+        stateStore.state = AuditLogCheckState(pendingLogins = listOf(pending("e1")))
+        val first = loaded(ITEM_1, before = "b1")
+        val testee = loadedViewModel(first)
+        coroutineTestRule.testDispatcher.scheduler.advanceTimeBy(10_000)
+
+        testee.onNearListEnd()
+        loader.older.complete(
+            SyncAuditLogLoadResult.Loaded(listOf(ITEM_2), SyncAuditLogPages(first.pages.entries + entry("e1"), before = null)),
+        )
+
+        assertEquals(listOf(row(ITEM_1), row(ITEM_2, highlighted = true)), testee.viewState.value.rows)
+        coroutineTestRule.testDispatcher.scheduler.advanceTimeBy(3_001)
+        assertEquals(listOf(row(ITEM_1), row(ITEM_2)), testee.viewState.value.rows)
+    }
+
     private fun viewModel(entriesPerPage: Int? = null) =
-        SyncAuditLogViewModel(SyncAuditLogScreenParams(entriesPerPage), loader, timeProvider)
+        SyncAuditLogViewModel(SyncAuditLogScreenParams(entriesPerPage), loader, timeProvider, stateStore)
 
     private fun loadedViewModel(first: SyncAuditLogLoadResult.Loaded, entriesPerPage: Int? = null) =
         viewModel(entriesPerPage).also { loader.result.complete(first) }
@@ -280,9 +396,23 @@ class SyncAuditLogViewModelTest {
     }
 
     private fun loaded(vararg items: SyncAuditLogItem, before: String? = null) =
-        SyncAuditLogLoadResult.Loaded(items.toList(), SyncAuditLogPages(entries = emptyList(), before = before))
+        SyncAuditLogLoadResult.Loaded(items.toList(), SyncAuditLogPages(entries = items.map { entry(it.entryId) }, before = before))
 
-    private fun row(item: SyncAuditLogItem) = SyncAuditLogRow(item, RelativeTime.Hours(3))
+    private fun entry(id: String) = DecodedAuditLogEntry.Skipped(id, AuditLogEntrySkipReason.UNKNOWN_TYPE)
+
+    private fun pending(id: String) = PendingLogin(id, "device-$id", "Name", NOW)
+
+    private fun row(item: SyncAuditLogItem, highlighted: Boolean = false) = SyncAuditLogRow(item, RelativeTime.Hours(3), highlighted)
+
+    private class FakeStateStore : AuditLogCheckStateStore {
+        var state = AuditLogCheckState()
+
+        override suspend fun read(): AuditLogCheckState = state
+
+        override suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?) {
+            transform(state)?.let { state = it }
+        }
+    }
 
     private class FakeLoader : SyncAuditLogLoader {
         val result = CompletableDeferred<SyncAuditLogLoadResult>()

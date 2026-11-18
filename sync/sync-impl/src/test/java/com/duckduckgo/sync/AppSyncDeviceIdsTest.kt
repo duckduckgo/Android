@@ -127,6 +127,8 @@ class AppSyncDeviceIdsTest {
 
             override var auditLogPending: String? = null
 
+            override var auditLogLastSeenEntryId: String? = null
+
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
             override fun isSignedIn(): Boolean = primaryKey != null
@@ -170,6 +172,8 @@ class AppSyncDeviceIdsTest {
             override var auditLogCursor: String? = null
 
             override var auditLogPending: String? = null
+
+            override var auditLogLastSeenEntryId: String? = null
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
