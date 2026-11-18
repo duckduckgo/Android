@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.sponsor
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -25,14 +25,14 @@ import javax.inject.Inject
 // Sent on every resume rather than when the config changes, so a change made while the page is on screen applies on the next resume or
 // page load.
 @ContributesIntoSet(AppScope::class)
-class SponsorBlockConfigSubscriptionEventPlugin @Inject constructor(
-    private val sponsorBlock: SponsorBlock,
+class SponsorConfigSubscriptionEventPlugin @Inject constructor(
+    private val sponsor: Sponsor,
 ) : ContentScopeScriptsSubscriptionEventPlugin {
 
     override fun getSubscriptionEventData(): SubscriptionEventData = SubscriptionEventData(
-        featureName = SponsorBlockContentScopeJsMessageHandler.FEATURE_NAME,
+        featureName = SponsorContentScopeJsMessageHandler.FEATURE_NAME,
         subscriptionName = SUBSCRIPTION_CONFIG_CHANGED,
-        params = sponsorBlock.config().toJson(),
+        params = sponsor.config().toJson(),
     )
 
     private companion object {

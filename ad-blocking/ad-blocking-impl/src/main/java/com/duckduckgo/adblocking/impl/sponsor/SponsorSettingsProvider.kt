@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.sponsor
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -29,7 +29,7 @@ import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-data class SponsorBlockSettings(
+data class SponsorSettings(
     val categories: List<String> = DEFAULT_CATEGORIES,
     val actionTypes: List<String> = DEFAULT_ACTION_TYPES,
 ) {
@@ -39,27 +39,27 @@ data class SponsorBlockSettings(
     }
 }
 
-interface SponsorBlockSettingsProvider {
-    /** Settings from the sponsorBlock remote feature, falling back to defaults for anything missing or malformed. */
-    suspend fun settings(): SponsorBlockSettings
+interface SponsorSettingsProvider {
+    /** Settings from the sponsor remote feature, falling back to defaults for anything missing or malformed. */
+    suspend fun settings(): SponsorSettings
 }
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealSponsorBlockSettingsProvider @Inject constructor(
-    private val feature: SponsorBlockFeature,
+class RealSponsorSettingsProvider @Inject constructor(
+    private val feature: SponsorFeature,
     private val dispatchers: DispatcherProvider,
-) : SponsorBlockSettingsProvider {
+) : SponsorSettingsProvider {
 
-    private val settingsAdapter: JsonAdapter<SponsorBlockSettings> by lazy {
-        Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(SponsorBlockSettings::class.java)
+    private val settingsAdapter: JsonAdapter<SponsorSettings> by lazy {
+        Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(SponsorSettings::class.java)
     }
 
-    override suspend fun settings(): SponsorBlockSettings = withContext(dispatchers.io()) {
-        val json = feature.self().getSettings() ?: return@withContext SponsorBlockSettings()
+    override suspend fun settings(): SponsorSettings = withContext(dispatchers.io()) {
+        val json = feature.self().getSettings() ?: return@withContext SponsorSettings()
         runCatching { settingsAdapter.fromJson(json) }
-            .onFailure { logcat(WARN) { "SponsorBlock: failed to parse settings: ${it.asLog()}" } }
+            .onFailure { logcat(WARN) { "Sponsor: failed to parse settings: ${it.asLog()}" } }
             .getOrNull()
-            ?: SponsorBlockSettings()
+            ?: SponsorSettings()
     }
 }

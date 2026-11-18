@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.sponsor
 
 import android.annotation.SuppressLint
 import com.duckduckgo.di.scopes.AppScope
@@ -29,7 +29,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import javax.inject.Named
 
-interface SponsorBlockService {
+interface SponsorService {
     @GET("$SEGMENTS_ENDPOINT/{hashPrefix}")
     suspend fun getSegments(@Path("hashPrefix") hashPrefix: String): Response<List<VideoSegmentsResponse>>
 
@@ -54,11 +54,11 @@ data class SegmentResponse(
 
 @BindingContainer
 @ContributesTo(AppScope::class)
-class SponsorBlockModule {
+class SponsorModule {
     @Provides
     @SingleIn(AppScope::class)
     @SuppressLint("NoRetrofitCreateMethodCallDetector")
-    fun provideSponsorBlockService(@Named("api") retrofit: Retrofit): SponsorBlockService {
-        return retrofit.create(SponsorBlockService::class.java)
+    fun provideSponsorService(@Named("api") retrofit: Retrofit): SponsorService {
+        return retrofit.create(SponsorService::class.java)
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.sponsor
 
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_HOST
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_MOBILE_HOST
@@ -38,8 +38,8 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesIntoSet(AppScope::class)
-class SponsorBlockContentScopeJsMessageHandler @Inject constructor(
-    private val sponsorBlock: SponsorBlock,
+class SponsorContentScopeJsMessageHandler @Inject constructor(
+    private val sponsor: Sponsor,
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
@@ -73,12 +73,12 @@ class SponsorBlockContentScopeJsMessageHandler @Inject constructor(
     private val segmentsAdapter: JsonAdapter<SegmentsResponse> by lazy { moshi.adapter(SegmentsResponse::class.java) }
 
     private suspend fun getSegments(videoId: String): JSONObject =
-        JSONObject(segmentsAdapter.toJson(SegmentsResponse(sponsorBlock.getSegments(videoId))))
+        JSONObject(segmentsAdapter.toJson(SegmentsResponse(sponsor.getSegments(videoId))))
 
-    private fun getConfig(): JSONObject = sponsorBlock.config().toJson()
+    private fun getConfig(): JSONObject = sponsor.config().toJson()
 
     private data class SegmentsResponse(
-        val segments: List<SponsorBlockSegment>,
+        val segments: List<SponsorSegment>,
     )
 
     companion object {
@@ -92,10 +92,10 @@ class SponsorBlockContentScopeJsMessageHandler @Inject constructor(
 private const val CONFIG_CONTRACT_VERSION = 1
 
 /** The config payload C-S-S expects, both as the getConfig response and in onConfigChanged. */
-internal fun SponsorBlockConfig.toJson(): JSONObject {
+internal fun SponsorConfig.toJson(): JSONObject {
     val mode = when (skipMode) {
-        SponsorBlockSkipMode.MANUAL -> "manual"
-        SponsorBlockSkipMode.AUTO -> "auto"
+        SponsorSkipMode.MANUAL -> "manual"
+        SponsorSkipMode.AUTO -> "auto"
     }
     return JSONObject().put("enabled", enabled).put("skipMode", mode).put("version", CONFIG_CONTRACT_VERSION)
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.sponsor
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -34,7 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class RealSponsorBlockUserPreferencesTest {
+class RealSponsorUserPreferencesTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -44,29 +44,36 @@ class RealSponsorBlockUserPreferencesTest {
     private val testDataStore: DataStore<Preferences> =
         PreferenceDataStoreFactory.create(
             scope = coroutineRule.testScope,
-            produceFile = { context.preferencesDataStoreFile("sponsor_block_user_preferences_test") },
+            produceFile = { context.preferencesDataStoreFile("sponsor_user_preferences_test") },
         )
 
-    private val testee = RealSponsorBlockUserPreferences(testDataStore, coroutineRule.testScope)
+    private val testee = RealSponsorUserPreferences(testDataStore, coroutineRule.testScope)
 
     @Test
     fun whenNothingStoredThenModeIsAlwaysAsk() = runTest {
-        assertEquals(SponsorBlockMode.ALWAYS_ASK, testee.modeFlow().first())
+        assertEquals(SponsorMode.ALWAYS_ASK, testee.modeFlow().first())
     }
 
     @Test
     fun whenModeSetThenFlowAndCacheReportIt() = runTest {
-        testee.setMode(SponsorBlockMode.OFF)
+        testee.setMode(SponsorMode.OFF)
 
-        assertEquals(SponsorBlockMode.OFF, testee.modeFlow().first())
+        assertEquals(SponsorMode.OFF, testee.modeFlow().first())
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        assertEquals(SponsorBlockMode.OFF, testee.cachedMode())
+        assertEquals(SponsorMode.OFF, testee.cachedMode())
+    }
+
+    @Test
+    fun whenExistingModeStoredThenItIsRestored() = runTest {
+        testDataStore.edit { it[stringPreferencesKey("sponsor_block_mode")] = "ALWAYS_SKIP" }
+
+        assertEquals(SponsorMode.ALWAYS_SKIP, testee.modeFlow().first())
     }
 
     @Test
     fun whenStoredValueIsUnknownThenModeIsAlwaysAsk() = runTest {
         testDataStore.edit { it[stringPreferencesKey("sponsor_block_mode")] = "SOMETHING_ELSE" }
 
-        assertEquals(SponsorBlockMode.ALWAYS_ASK, testee.modeFlow().first())
+        assertEquals(SponsorMode.ALWAYS_ASK, testee.modeFlow().first())
     }
 }
