@@ -21,6 +21,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
+import com.duckduckgo.adblocking.impl.BuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -87,6 +88,7 @@ class SponsorBlockDatasetSyncTest {
         val service = Retrofit.Builder().baseUrl("https://duckduckgo.com/").build().create(SponsorBlockDatasetService::class.java)
         val url = service.binaryHashPrefixes(42).request().url
         assertEquals("/sponsorblock/v1/hashPrefix", url.encodedPath)
+        assertEquals(BuildConfig.SPONSOR_BLOCK_BASE_URL.startsWith("http://127.0.0.1"), url.host == "127.0.0.1")
         assertEquals("binary", url.queryParameter("format"))
         assertEquals("1", url.queryParameter("version"))
         assertEquals("42", url.queryParameter("revision"))

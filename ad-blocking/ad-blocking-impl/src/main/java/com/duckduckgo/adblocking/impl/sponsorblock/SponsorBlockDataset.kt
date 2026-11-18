@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adblocking.impl.sponsorblock
 
+import com.duckduckgo.adblocking.impl.BuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
@@ -28,10 +29,10 @@ import retrofit2.http.Streaming
 import retrofit2.http.Query as HttpQuery
 
 interface SponsorBlockDatasetService {
-    @GET("https://duckduckgo.com/sponsorblock/v1" + "/revision")
+    @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/revision")
     suspend fun revision(): SponsorBlockRevisionResponse
 
-    @GET("https://duckduckgo.com/sponsorblock/v1" + "/hashPrefix?format=binary&version=1")
+    @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/hashPrefix?format=binary&version=1")
     @Streaming
     fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): Call<ResponseBody>
 }
