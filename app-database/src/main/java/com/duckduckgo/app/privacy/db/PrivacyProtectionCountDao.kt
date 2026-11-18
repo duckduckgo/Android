@@ -47,6 +47,17 @@ abstract class PrivacyProtectionCountDao {
         }
     }
 
+    @Transaction
+    open fun incrementBlockedTrackerCountBy(delta: Int) {
+        val changedRows = incrementBlockedTrackerCountByIfExists(delta)
+        if (changedRows == 0) {
+            initialiseCounts(PrivacyProtectionCountsEntity(blockedTrackerCount = delta.toLong(), upgradeCount = 0))
+        }
+    }
+
+    @Query("UPDATE privacy_protection_count SET blocked_tracker_count = blocked_tracker_count + :delta")
+    protected abstract fun incrementBlockedTrackerCountByIfExists(delta: Int): Int
+
     @Query("UPDATE privacy_protection_count SET blocked_tracker_count = blocked_tracker_count + 1")
     protected abstract fun incrementBlockedTrackerCountIfExists(): Int
 

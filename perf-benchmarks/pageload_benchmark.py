@@ -175,14 +175,13 @@ def check_request_invariants(results_dir: Path, scenarios) -> None:
         raise ValueError("request invariants violated:\n" + "\n".join(violations))
 
 
-def query_durations_ms(trace_path: Path) -> list[float]:
-    """Return positive ddg.pageLoad slice durations in chronological order."""
+def _run_trace_query(trace_path: Path, sql: str) -> list[str]:
+    """Run one SQL statement through trace_processor_shell and return its output lines."""
     if shutil.which("trace_processor_shell") is None:
         raise FileNotFoundError(
             "trace_processor_shell not found on PATH; install the Perfetto trace_processor_shell "
             "binary before running this script"
         )
-    sql = f"SELECT dur FROM slice WHERE name = '{SECTION}' AND dur > 0 ORDER BY ts;"
     out = subprocess.run(
         ["trace_processor_shell", "-q", "/dev/stdin", str(trace_path)],
         input=sql,
@@ -190,12 +189,19 @@ def query_durations_ms(trace_path: Path) -> list[float]:
         text=True,
         check=True,
     ).stdout
-    durations = []
-    for line in out.splitlines():
-        line = line.strip().strip('"')
-        if line.isdigit():
-            durations.append(int(line) / 1e6)
-    return durations
+    return [line.strip().strip('"') for line in out.splitlines()]
+
+
+def query_durations_ms(trace_path: Path) -> list[float]:
+    """Return positive ddg.pageLoad slice durations in chronological order."""
+    sql = f"SELECT dur FROM slice WHERE name = '{SECTION}' AND dur > 0 ORDER BY ts;"
+    return [int(line) / 1e6 for line in _run_trace_query(trace_path, sql) if line.isdigit()]
+
+
+def query_bytes_overwritten(trace_path: Path) -> int:
+    """Return bytes Perfetto's ring buffers overwrote before they were drained, summed over all buffers."""
+    sql = "SELECT COALESCE(SUM(value), 0) FROM stats WHERE name = 'traced_buf_bytes_overwritten';"
+    return sum(int(line) for line in _run_trace_query(trace_path, sql) if line.isdigit())
 
 
 def compute_stats(
@@ -397,10 +403,18 @@ def collect_results(artifacts: list[Artifact], expected_samples: int = DEFAULT_E
         if len(durations) > expected_total:
             durations = merge_reload_interrupted_slices(durations, expected_total)
         if len(durations) != expected_total:
-            raise ValueError(
+            message = (
                 f"scenario {scenario} has {len(durations)} positive slices; expected {expected_total} "
                 f"({DEFAULT_WARMUP_SAMPLES} warmup + {expected_samples} retained + {DEFAULT_TRAILING_SAMPLES} trailing)"
             )
+            # Small overwrites are common on healthy traces, so this only explains a count failure.
+            overwritten = query_bytes_overwritten(artifact.trace)
+            if overwritten > 0:
+                message += (
+                    f": trace buffer overwritten (traced_buf_bytes_overwritten={overwritten} bytes), "
+                    f"the missing slice was likely lost from the trace; re-run the benchmark"
+                )
+            raise ValueError(message)
         stats = compute_stats(durations, settle_window_ms=settle_window_ms_for(scenario))
         if stats.invalid_count > MAX_INVALID_SAMPLES:
             raise ValueError(
