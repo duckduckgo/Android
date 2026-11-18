@@ -259,6 +259,18 @@ subprojects {
     apply plugin: 'com.autonomousapps.dependency-analysis'
 }
 
+dependencyAnalysis {
+    issues {
+        all {
+            onAny {
+                // We report only issues between our own modules. The plugin fully matches this regex against a dependency's identifier and GAV:
+                // project paths always start with ':' (e.g. ':sync-api'), while external libraries start with their group (e.g. 'com.squareup.okio:okio').
+                excludeRegex('[^:].*')
+            }
+        }
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
