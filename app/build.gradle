@@ -552,6 +552,9 @@ dependencies {
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
 
+    implementation project(':page-translation-api')
+    implementation project(':page-translation-impl')
+
     // Widgets
     implementation "androidx.core:core-remoteviews:1.1.0"
 
