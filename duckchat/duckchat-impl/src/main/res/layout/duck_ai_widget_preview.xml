@@ -62,7 +62,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/searchWidgetSearchBarHeight"
             android:layout_weight="1"
             android:background="@drawable/duck_ai_widget_pill_background_daynight"
             android:gravity="center"
@@ -94,7 +94,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/searchWidgetSearchBarHeight"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_2"
             android:background="@drawable/duck_ai_widget_pill_background_daynight"
@@ -127,7 +127,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/searchWidgetSearchBarHeight"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_2"
             android:background="@drawable/duck_ai_widget_pill_background_daynight"
