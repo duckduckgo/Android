@@ -60,7 +60,7 @@ interface SyncStore {
     /** JSON list of logins by other devices that the user has not seen yet. Its format belongs to the caller. */
     var auditLogPending: String?
 
-    /** Id of the newest audit log entry shown the last time Device Activity opened. */
+    /** Id of the newest audit log entry loaded the last time Device Activity opened with no error. */
     var auditLogLastSeenEntryId: String?
 
     /**

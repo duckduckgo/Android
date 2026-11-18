@@ -48,7 +48,7 @@ data class AuditLogCheckState(
     val cursor: String? = null,
     /** Oldest first. */
     val pendingLogins: List<PendingLogin> = emptyList(),
-    /** Id of the newest entry shown the last time Device Activity opened. Entries above it in the log are unseen. */
+    /** Id of the newest entry loaded the last time Device Activity opened with no error. Entries above it in the log are unseen. */
     val lastSeenEntryId: String? = null,
 )
 
