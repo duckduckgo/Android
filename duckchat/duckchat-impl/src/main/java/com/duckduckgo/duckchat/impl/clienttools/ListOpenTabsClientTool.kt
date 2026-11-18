@@ -44,6 +44,12 @@ class ListOpenTabsClientTool @Inject constructor(
         description = R.string.duckAiClientToolListOpenTabsDescription,
     )
 
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.SEE,
+        name = R.string.duckAiClientToolListOpenTabsName,
+        description = R.string.duckAiClientToolListOpenTabsDescription,
+    )
+
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.listOpenTabs().isEnabled()
 
     override fun isValidInput(input: JSONObject): Boolean = parseLimit(input) != null

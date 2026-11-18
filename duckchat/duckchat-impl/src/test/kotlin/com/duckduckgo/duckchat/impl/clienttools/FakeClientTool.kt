@@ -20,7 +20,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -28,6 +29,7 @@ class FakeClientTool(
     override val name: String = "fakeTool",
     override val version: Int = 1,
     override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.Auto,
+    override val settingsListing: ClientToolSettingsListing = ClientToolSettingsListing(ClientToolSettingsSection.SEE, name = 0, description = 0),
     var enabled: Boolean = true,
     var validInput: (JSONObject) -> Boolean = { true },
     var result: suspend (JSONObject) -> ClientToolResult = { ClientToolResult.Success(JSONObject().put("echo", it)) },
@@ -65,6 +67,7 @@ class FakeDuckAiHostProvider(private val host: String = "duck.ai") : DuckAiHostP
 
 class FakeClientToolPermissionStore : ClientToolPermissionStore {
     val choices = mutableMapOf<String, ClientToolPermission>()
+    private val changes = MutableStateFlow(0)
 
     override suspend fun get(toolName: String): ClientToolPermission? = choices[toolName]
 
@@ -73,17 +76,20 @@ class FakeClientToolPermissionStore : ClientToolPermissionStore {
         permission: ClientToolPermission,
     ) {
         choices[toolName] = permission
+        changes.value++
     }
 
     override suspend fun clear(toolName: String) {
         choices.remove(toolName)
+        changes.value++
     }
 
     override suspend fun clearAll() {
         choices.clear()
+        changes.value++
     }
 
-    override fun observe(): Flow<Map<String, ClientToolPermission>> = flowOf(choices.toMap())
+    override fun observe(): Flow<Map<String, ClientToolPermission>> = changes.map { choices.toMap() }
 }
 
 /** Holds each prompt open until the test answers it, recording how many were open at once. */

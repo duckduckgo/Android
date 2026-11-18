@@ -49,6 +49,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessSettingsActivity
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.duckchat.impl.databinding.IncludeDuckAiInputScreenSettingsBinding
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
@@ -208,6 +209,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         )
         inputScreenSettingsBinding.duckAiInputScreenDescription.updatePadding(left = offset)
         inputScreenSettingsBinding.duckAiShortcuts.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiBrowserAccess.updatePadding(left = offset)
         inputScreenSettingsBinding.duckAiWebSettings.updatePadding(left = offset)
         inputScreenSettingsBinding.duckAIAutomaticContext.updatePadding(left = offset)
 
@@ -269,6 +271,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         inputScreenSettingsBinding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
         inputScreenSettingsBinding.duckAiShortcuts.setOnClickListener {
             viewModel.onDuckAiShortcutsClicked()
+        }
+
+        inputScreenSettingsBinding.duckAiBrowserAccess.isVisible = viewState.shouldShowBrowserAccess
+        inputScreenSettingsBinding.duckAiBrowserAccess.setOnClickListener {
+            viewModel.onBrowserAccessClicked()
         }
 
         binding.duckAiWebSettingsItem.isVisible = viewState.isDuckAiWebSettingsVisible && !viewState.isNativeControlsEnabled
@@ -383,6 +390,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             is DuckChatSettingsViewModel.Command.OpenShortcutSettings -> {
                 val intent = Intent(this, DuckAiShortcutSettingsActivity::class.java)
                 startActivity(intent)
+            }
+
+            is DuckChatSettingsViewModel.Command.OpenBrowserAccessSettings -> {
+                startActivity(Intent(this, BrowserAccessSettingsActivity::class.java))
             }
 
             is DuckChatSettingsViewModel.Command.LaunchFeedback -> {

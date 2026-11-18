@@ -45,6 +45,12 @@ class SearchBookmarksClientTool @Inject constructor(
         description = R.string.duckAiClientToolSearchBookmarksDescription,
     )
 
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.SEE,
+        name = R.string.duckAiClientToolSearchBookmarksName,
+        description = R.string.duckAiClientToolSearchBookmarksDescription,
+    )
+
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.searchBookmarks().isEnabled()
 
     override fun isValidInput(input: JSONObject): Boolean = parse(input) != null

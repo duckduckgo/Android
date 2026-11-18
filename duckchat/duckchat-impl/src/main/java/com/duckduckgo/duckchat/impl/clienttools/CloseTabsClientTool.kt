@@ -44,6 +44,12 @@ class CloseTabsClientTool @Inject constructor(
         description = R.string.duckAiClientToolCloseTabsDescription,
     )
 
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.DO,
+        name = R.string.duckAiClientToolCloseTabsName,
+        description = R.string.duckAiClientToolCloseTabsDescription,
+    )
+
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.closeTabs().isEnabled()
 
     override fun isValidInput(input: JSONObject): Boolean = parseTabIds(input) != null

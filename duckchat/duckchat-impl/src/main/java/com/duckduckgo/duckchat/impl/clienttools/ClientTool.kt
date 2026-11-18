@@ -28,6 +28,9 @@ interface ClientTool {
     val version: Int
     val permissionMode: ClientToolPermissionMode
 
+    /** How the Browser Access settings screen lists this tool. */
+    val settingsListing: ClientToolSettingsListing
+
     fun isEnabled(): Boolean
 
     fun isValidInput(input: JSONObject): Boolean
@@ -45,6 +48,20 @@ interface ClientTool {
         input: JSONObject,
         context: ClientToolCallContext,
     ): ClientToolPromptDetail? = null
+}
+
+data class ClientToolSettingsListing(
+    val section: ClientToolSettingsSection,
+    @StringRes val name: Int,
+    @StringRes val description: Int,
+)
+
+enum class ClientToolSettingsSection {
+    /** Tools that let Duck.ai read browser data. */
+    SEE,
+
+    /** Tools that let Duck.ai change something in the browser. */
+    DO,
 }
 
 sealed interface ClientToolPromptDetail {
