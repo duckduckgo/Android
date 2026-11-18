@@ -18,7 +18,7 @@ package com.duckduckgo.adblocking.impl.segmentskip
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -170,7 +170,7 @@ class SegmentSkipBinaryStoreTest {
             store.onUpdateCheckpoint = {
                 if (++calls == checkpoint) job.cancel()
             }
-            job = launch(Dispatchers.IO, start = kotlinx.coroutines.CoroutineStart.LAZY) {
+            job = launch(DefaultDispatcherProvider().io(), start = kotlinx.coroutines.CoroutineStart.LAZY) {
                 store.apply(1, response.inputStream())
             }
             job.start()
@@ -201,7 +201,7 @@ class SegmentSkipBinaryStoreTest {
         store.apply(0, full(1, listOf(1)).inputStream())
         lateinit var job: Job
         store.beforePublish = { job.cancel() }
-        job = launch(Dispatchers.IO, start = kotlinx.coroutines.CoroutineStart.LAZY) {
+        job = launch(DefaultDispatcherProvider().io(), start = kotlinx.coroutines.CoroutineStart.LAZY) {
             store.apply(1, full(2, listOf(2)).inputStream())
         }
         job.start()
