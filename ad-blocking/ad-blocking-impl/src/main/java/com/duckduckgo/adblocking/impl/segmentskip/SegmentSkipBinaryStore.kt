@@ -20,6 +20,10 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -37,8 +41,11 @@ class InvalidSegmentSkipFile : Exception()
 @SingleIn(AppScope::class)
 class SegmentSkipBinaryStore @Inject constructor(context: Context) {
     private val file = File(context.filesDir, "sponsor-prefixes.bin")
+    private val updateMutex = Mutex()
 
     @VisibleForTesting internal var beforePublish: (() -> Unit)? = null
+
+    @VisibleForTesting internal var onUpdateCheckpoint: (() -> Unit)? = null
 
     @Volatile private var snapshot: Snapshot? = if (file.exists()) runCatching { readFull(file) }.getOrNull() else null
 
@@ -60,26 +67,47 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         return false
     }
 
-    @Synchronized
-    fun apply(expected: Long, body: InputStream, requireFull: Boolean = false) {
+    suspend fun apply(
+        expected: Long,
+        body: InputStream,
+        requireFull: Boolean = false,
+        onPublished: () -> Unit = {},
+    ) = updateMutex.withLock {
+        if (revision() > expected) return@withLock
         check(revision() == expected)
+        val coroutineContext = currentCoroutineContext()
+        val checkCancellation = {
+            onUpdateCheckpoint?.invoke()
+            coroutineContext.ensureActive()
+        }
         val download = File(file.parentFile, "sponsor-download.tmp")
         val result = File(file.parentFile, "sponsor-next.tmp")
         val suffixes = File(file.parentFile, "sponsor-suffix.tmp")
         try {
-            FileOutputStream(download).use { body.copyTo(it) }
+            FileOutputStream(download).use { output ->
+                val buffer = ByteArray(8192)
+                while (true) {
+                    checkCancellation()
+                    val count = body.read(buffer)
+                    if (count < 0) break
+                    output.write(buffer, 0, count)
+                }
+            }
+            checkCancellation()
             val data = map(download)
             val header = readHeader(data)
             valid(header.revision > expected)
             valid(!requireFull || header.type == 0)
             if (header.type == 0) {
-                val replacement = readFull(download)
+                val replacement = readFull(download, checkCancellation)
                 FileOutputStream(download, true).use { it.fd.sync() }
-                publish(download, replacement)
+                checkCancellation()
+                publish(download, replacement, checkCancellation, onPublished)
             } else {
                 valid(expected != 0L && snapshot != null)
-                merge(data, header, requireNotNull(snapshot), result, suffixes)
-                publish(result, Snapshot(header.revision, header.count, map(result)))
+                merge(data, header, requireNotNull(snapshot), result, suffixes, checkCancellation)
+                checkCancellation()
+                publish(result, Snapshot(header.revision, header.count, map(result)), checkCancellation, onPublished)
             }
         } finally {
             download.delete()
@@ -88,13 +116,15 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         }
     }
 
-    private fun publish(next: File, replacement: Snapshot) {
+    private fun publish(next: File, replacement: Snapshot, checkCancellation: () -> Unit, onPublished: () -> Unit) {
         beforePublish?.invoke()
+        checkCancellation()
         check(next.renameTo(file))
         snapshot = replacement
+        onPublished()
     }
 
-    private fun merge(diff: ByteBuffer, header: Header, old: Snapshot, result: File, suffixes: File) {
+    private fun merge(diff: ByteBuffer, header: Header, old: Snapshot, result: File, suffixes: File, checkCancellation: () -> Unit) {
         valid(diff.limit().toLong() == HEADER.toLong() + 4L * (header.inserts.toLong() + header.deletes))
         val inserts = PrefixList(diff, HEADER, header.inserts)
         val deletes = PrefixList(diff, HEADER + header.inserts * 4, header.deletes)
@@ -113,7 +143,9 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         }
         var existing = oldNext()
         BufferedOutputStream(FileOutputStream(suffixes)).use { output ->
+            var processed = 0
             while (existing != null || added != null || removed != null) {
+                if (processed++ % 4096 == 0) checkCancellation()
                 val value = minOf(existing ?: Long.MAX_VALUE, added ?: Long.MAX_VALUE, removed ?: Long.MAX_VALUE)
                 valid(added != value || removed != value)
                 val wasAdded = added == value
@@ -146,6 +178,7 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
             suffixes.inputStream().buffered().use { input ->
                 val buffer = ByteArray(8192)
                 while (true) {
+                    checkCancellation()
                     val n = input.read(buffer)
                     if (n < 0) break
                     output.write(buffer, 0, n)
@@ -158,7 +191,7 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         }
     }
 
-    private fun readFull(file: File): Snapshot {
+    private fun readFull(file: File, checkCancellation: () -> Unit = {}): Snapshot {
         val data = map(file)
         val header = readHeader(data)
         valid(header.type == 0 && header.inserts == 0 && header.deletes == 0)
@@ -166,6 +199,7 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         valid(data.getInt(HEADER) == 0 && data.getInt(HEADER + BUCKETS * 4) == header.count)
         var previous = 0
         for (bucket in 0 until BUCKETS) {
+            if (bucket % 256 == 0) checkCancellation()
             val end = data.getInt(HEADER + (bucket + 1) * 4)
             valid(end >= previous && end <= header.count)
             var last = -1
@@ -178,7 +212,13 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         }
         val digest = MessageDigest.getInstance("SHA-256")
         val content = data.asReadOnlyBuffer().apply { position(HEADER) }
-        digest.update(content)
+        while (content.hasRemaining()) {
+            checkCancellation()
+            val end = content.position() + minOf(content.remaining(), 65536)
+            val chunk = content.slice().apply { limit(end - content.position()) }
+            digest.update(chunk)
+            content.position(end)
+        }
         valid(digest.digest().copyOf(4).contentEquals(header.checksum))
         return Snapshot(header.revision, header.count, data)
     }

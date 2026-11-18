@@ -22,6 +22,7 @@ import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Streaming
 import retrofit2.http.Query as HttpQuery
@@ -30,9 +31,9 @@ interface SegmentSkipDatasetService {
     @GET("https://duckduckgo.com/sponsorblock/v1" + "/revision")
     suspend fun revision(): SegmentSkipRevisionResponse
 
-    @GET("https://duckduckgo.com/sponsorblock/v1" + "/hashPrefixBinary?format=binary&version=1")
+    @GET("https://duckduckgo.com/sponsorblock/v1" + "/hashPrefix?format=binary&version=1")
     @Streaming
-    suspend fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): ResponseBody
+    fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): Call<ResponseBody>
 }
 
 data class SegmentSkipRevisionResponse(val revision: Long?)
