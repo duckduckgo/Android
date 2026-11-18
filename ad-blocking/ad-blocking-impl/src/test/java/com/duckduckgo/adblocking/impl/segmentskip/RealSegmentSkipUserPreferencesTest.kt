@@ -26,6 +26,8 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -47,11 +49,29 @@ class RealSegmentSkipUserPreferencesTest {
             produceFile = { context.preferencesDataStoreFile("segment_skip_user_preferences_test") },
         )
 
-    private val testee = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope)
+    private val feature = FakeFeatureToggleFactory.create(SegmentSkipFeature::class.java)
+    private val testee = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
 
     @Test
-    fun whenNothingStoredThenModeIsAlwaysAsk() = runTest {
-        assertEquals(SegmentSkipMode.ALWAYS_ASK, testee.modeFlow().first())
+    fun whenNothingStoredThenDefaultDependsOnBothFlags() = runTest {
+        for (mvp in listOf(false, true)) {
+            for (softLaunch in listOf(false, true)) {
+                feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = mvp))
+                feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = softLaunch))
+                val expected = if (mvp && softLaunch) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+                assertEquals(expected, testee.modeFlow().first())
+            }
+        }
+    }
+
+    @Test
+    fun whenFlagsChangeThenSavedModeIsPreserved() = runTest {
+        testee.setMode(SegmentSkipMode.ALWAYS_SKIP)
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, testee.modeFlow().first())
+        feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = false))
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, testee.modeFlow().first())
     }
 
     @Test
@@ -71,9 +91,9 @@ class RealSegmentSkipUserPreferencesTest {
     }
 
     @Test
-    fun whenStoredValueIsUnknownThenModeIsAlwaysAsk() = runTest {
+    fun whenStoredValueIsUnknownThenModeIsOff() = runTest {
         testDataStore.edit { it[stringPreferencesKey("sponsor_block_mode")] = "SOMETHING_ELSE" }
 
-        assertEquals(SegmentSkipMode.ALWAYS_ASK, testee.modeFlow().first())
+        assertEquals(SegmentSkipMode.OFF, testee.modeFlow().first())
     }
 }

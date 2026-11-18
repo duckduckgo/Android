@@ -29,8 +29,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -57,12 +57,19 @@ interface SegmentSkipUserPreferences {
 class RealSegmentSkipUserPreferences @Inject constructor(
     @AdBlockingPreferences private val dataStore: DataStore<Preferences>,
     @AppCoroutineScope appScope: CoroutineScope,
+    private val feature: SegmentSkipFeature,
 ) : SegmentSkipUserPreferences {
 
-    private val mode: StateFlow<SegmentSkipMode> = modeFlow().stateIn(appScope, SharingStarted.Eagerly, DEFAULT_MODE)
+    private val mode: StateFlow<SegmentSkipMode> = modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode())
 
-    override fun modeFlow(): Flow<SegmentSkipMode> = dataStore.data
-        .map { prefs -> prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } } ?: DEFAULT_MODE }
+    override fun modeFlow(): Flow<SegmentSkipMode> = combine(
+        dataStore.data,
+        feature.mvpEnabled().enabled(),
+        feature.softLaunchEnabled().enabled(),
+    ) { prefs, mvpEnabled, softLaunchEnabled ->
+        prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
+            ?: if (mvpEnabled && softLaunchEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+    }
         .distinctUntilChanged()
 
     override fun cachedMode(): SegmentSkipMode = mode.value
@@ -71,8 +78,10 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         dataStore.edit { prefs -> prefs[KEY_MODE] = mode.name }
     }
 
+    private fun defaultMode(): SegmentSkipMode =
+        if (feature.mvpEnabled().isEnabled() && feature.softLaunchEnabled().isEnabled()) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+
     private companion object {
-        val DEFAULT_MODE = SegmentSkipMode.ALWAYS_ASK
         val KEY_MODE = stringPreferencesKey("sponsor_block_mode")
     }
 }
