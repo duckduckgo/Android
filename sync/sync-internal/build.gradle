@@ -27,50 +27,46 @@ android {
 }
 
 dependencies {
-    implementation project(':sync-impl')
-    implementation project(':sync-lib')
-    implementation project(':sync-api')
-    implementation project(':navigation-api')
-    implementation project(':sync-store')
-    implementation project(':sync-lib')
-    implementation project(':di')
-    implementation project(':internal-features-api')
-    implementation project(':common-utils')
-    implementation project(':design-system')
-    implementation project(':persistent-storage-api')
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
-    implementation project(':data-store-api')
-
-    ksp project(':codegen-ksp')
     implementation project(':codegen-annotations')
-
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.appCompat
-    implementation AndroidX.core.ktx
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-    implementation AndroidX.recyclerView
-
+    implementation project(':common-utils')
+    implementation project(':data-store-api')
+    implementation project(':design-system')
+    implementation project(':di')
+    implementation project(':internal-features-api')
+    implementation project(':navigation-api')
+    implementation project(':persistent-storage-api')
+    implementation project(':sync-api')
+    implementation project(':sync-impl')
+    implementation project(':sync-lib')
+    implementation project(':sync-store')
+    implementation "com.google.zxing:core:_"
     // Barcode scanning
     implementation "com.journeyapps:zxing-android-embedded:_"
-    implementation "com.google.zxing:core:_"
-
-    implementation Square.moshi
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.recyclerView
+    implementation Google.android.material
+    implementation Square.moshi
     implementation Square.retrofit2.converter.moshi
 
-    // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
-    testImplementation AndroidX.archCore.testing
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
+    // Testing dependencies
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.test.ext.junit
+    testImplementation CashApp.turbine
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }

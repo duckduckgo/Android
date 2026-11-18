@@ -23,27 +23,25 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':example-feature-api')
-
     implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
-    ksp AndroidX.room.compiler
-
-    implementation KotlinX.coroutines.android
-    implementation AndroidX.core.ktx
-
+    implementation project(':example-feature-api')
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.core.ktx
+    implementation KotlinX.coroutines.android
 
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation CashApp.turbine
-    testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp AndroidX.room.compiler
 }
 
 android {

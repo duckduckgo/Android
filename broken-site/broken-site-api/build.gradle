@@ -21,8 +21,8 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation AndroidX.appCompat
     implementation project(':feature-toggles-api')
+    implementation AndroidX.appCompat
 }
 android {
     namespace 'com.duckduckgo.brokensite.api'

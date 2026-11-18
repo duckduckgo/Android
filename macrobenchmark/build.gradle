@@ -53,10 +53,10 @@ androidComponents {
 }
 
 dependencies {
-    implementation AndroidX.test.ext.junit
-    implementation AndroidX.test.espresso.core
-    implementation AndroidX.test.uiAutomator
-    implementation AndroidX.benchmark.macroJunit4
-    implementation Square.okHttp3.mockWebServer
     implementation project(":test-seeder-api")
+    implementation AndroidX.benchmark.macroJunit4
+    implementation AndroidX.test.espresso.core
+    implementation AndroidX.test.ext.junit
+    implementation AndroidX.test.uiAutomator
+    implementation Square.okHttp3.mockWebServer
 }

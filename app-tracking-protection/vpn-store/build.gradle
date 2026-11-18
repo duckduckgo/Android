@@ -39,34 +39,30 @@ android {
 }
 
 dependencies {
-
-    implementation project(path: ':common-utils')
-    implementation project(path: ':vpn-api')
-    implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
-
-    implementation AndroidX.core.ktx
-
+    implementation project(path: ':common-utils')
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':vpn-api')
+    implementation("com.frybits.harmony:harmony:_") {
+        because 'multi-process shared preferences'
+    }
     implementation "com.squareup.logcat:logcat:_"
-
-    implementation Square.retrofit2.converter.moshi
-
-    // Room
+    implementation AndroidX.core.ktx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    ksp AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-    // multi-process shared preferences
-    implementation "com.frybits.harmony:harmony:_"
+    implementation Square.retrofit2.converter.moshi
 
-    testImplementation project(':vpn-store-test')
-    testImplementation Testing.junit4
     testImplementation project(path: ':common-test')
+    testImplementation project(':vpn-store-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.robolectric
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
+    testImplementation AndroidX.room.testing
     testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 
     androidTestUtil AndroidX.test.orchestrator
+
+    ksp AndroidX.room.compiler
 }

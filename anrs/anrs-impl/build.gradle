@@ -23,39 +23,37 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-
-    implementation project(':app-build-config-api')
     implementation project(':anrs-api')
     implementation project(':anrs-store')
-    implementation project(':common-utils')
-    implementation project(':di')
+    implementation project(':app-build-config-api')
     implementation project(':browser-api')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
     implementation project(':custom-tabs-api')
+    implementation project(':data-store-api')
+    implementation project(':di')
+    implementation project(':feature-toggles-api')
     implementation project(':statistics-api')
     implementation project(':verified-installation-api')
-    implementation project(':feature-toggles-api')
-    implementation project(':data-store-api')
     implementation "com.duckduckgo.crashkit:android-crashkit:_"
-
-    implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
     implementation "com.squareup.logcat:logcat:_"
-    implementation Square.okio
+    implementation AndroidX.core.ktx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.rxJava2
     implementation AndroidX.webkit
+    implementation KotlinX.coroutines.core
+    implementation Square.okio
 
     testImplementation project(':common-test')
     testImplementation project(':data-store-test')
     testImplementation project(":feature-toggles-test")
-    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.test.ext.junit
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.junit4
     testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }
 
 android {

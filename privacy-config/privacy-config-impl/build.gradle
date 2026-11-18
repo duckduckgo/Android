@@ -23,57 +23,51 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':codegen-ksp')
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':app-store')
+    implementation project(path: ':browser-api')
     implementation project(path: ':codegen-annotations')
-
-    implementation project(path: ':di')
     implementation project(path: ':common-utils')
+    implementation project(path: ':content-scope-scripts-api')
+    implementation project(path: ':di')
+    implementation project(path: ':experiments-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':privacy-config-api')
-    implementation project(path: ':app-store')
-    implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-store')
-    implementation project(path: ':content-scope-scripts-api')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':experiments-api')
     implementation project(path: ':statistics-api')
-
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
     implementation "com.squareup.logcat:logcat:_"
-
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.core.ktx
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
     implementation KotlinX.coroutines.core
+    implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.converter.moshi
 
+    testImplementation project(path: ':common-test')
+    testImplementation project(':feature-toggles-test')
+    testImplementation "androidx.test:runner:_"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.core
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.work.testing
+    testImplementation CashApp.turbine
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.okHttp3.okHttp
-    implementation AndroidX.core.ktx
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.work.runtimeKtx
-
-    // Testing dependencies
-    testImplementation project(path: ':common-test')
-    testImplementation AndroidX.work.testing
-    testImplementation AndroidX.room.testing
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
-    testImplementation AndroidX.core
-    testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
 
     androidTestImplementation project(path: ':common-test')
-    testImplementation project(path: ':common-test')
-    testImplementation project(':feature-toggles-test')
+
+    ksp project(':codegen-ksp')
 }
 
 android {

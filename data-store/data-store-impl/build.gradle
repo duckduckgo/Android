@@ -23,47 +23,40 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-	implementation project(":data-store-api")
 	implementation project(":anrs-api")
+	implementation project(':codegen-annotations')
+	implementation project(':common-utils')
+	implementation project(":data-store-api")
+	implementation project(':di')
+	implementation project(':feature-toggles-api')
+	implementation project(':statistics-api')
+	implementation("com.frybits.harmony:harmony:_") {
+		because 'multi-process shared preferences'
+	}
+	implementation 'com.frybits.harmony:harmony-crypto:_'
+	implementation "com.squareup.logcat:logcat:_"
+	implementation "org.jetbrains.kotlin:kotlin-test:_"
+	implementation AndroidX.core.ktx
+	implementation AndroidX.room.runtime
+	implementation AndroidX.room.rxJava2
+	implementation AndroidX.security.crypto
+	implementation KotlinX.coroutines.android
 
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-    implementation project(':common-utils')
-    implementation project(':di')
-    implementation project(':feature-toggles-api')
-    implementation project(':statistics-api')
-    ksp AndroidX.room.compiler
-
-    implementation KotlinX.coroutines.android
-    implementation AndroidX.core.ktx
-
-    implementation "com.squareup.logcat:logcat:_"
-
-    // multi-process shared preferences
-    implementation "com.frybits.harmony:harmony:_"
-    implementation 'com.frybits.harmony:harmony-crypto:_'
-
-    // Security crypto
-    implementation AndroidX.security.crypto
-
-    // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    ksp AndroidX.room.compiler
-
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation project(':common-test')
-    testImplementation project(':feature-toggles-test')
-    testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation CashApp.turbine
-    testImplementation Testing.robolectric
-    testImplementation(KotlinX.coroutines.test) {
+	testImplementation project(':common-test')
+	testImplementation project(':feature-toggles-test')
+	testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+	testImplementation AndroidX.test.ext.junit
+	testImplementation CashApp.turbine
+	testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    implementation "org.jetbrains.kotlin:kotlin-test:_"
+	testImplementation Testing.junit4
+	testImplementation Testing.robolectric
+
+	ksp project(':codegen-ksp')
+	ksp AndroidX.room.compiler
 }
 
 android {

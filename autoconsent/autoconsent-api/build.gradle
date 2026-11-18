@@ -21,9 +21,8 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation AndroidX.appCompat
-
     implementation project(path: ':navigation-api')
+    implementation AndroidX.appCompat
 }
 
 android {

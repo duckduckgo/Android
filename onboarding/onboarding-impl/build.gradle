@@ -27,17 +27,17 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
     implementation project(':codegen-annotations')
-    implementation project(':onboarding-api')
     implementation project(':di')
-
-    implementation KotlinX.coroutines.core
+    implementation project(':onboarding-api')
     implementation "com.squareup.logcat:logcat:_"
+    implementation KotlinX.coroutines.core
 
-    testImplementation Testing.junit4
     testImplementation(KotlinX.coroutines.test) {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+
+    ksp project(':codegen-ksp')
 }

@@ -22,34 +22,29 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':di')
-    implementation project(':common-utils')
     implementation project(':browser-api')
-    implementation project(':js-messaging-api')
-
     implementation project(':codegen-annotations')
-
+    implementation project(':common-utils')
+    implementation project(':di')
+    implementation project(':js-messaging-api')
     implementation "com.squareup.logcat:logcat:_"
     implementation KotlinX.coroutines.core
     implementation Square.retrofit2.converter.moshi
 
-    // Testing dependencies
+    testImplementation project(path: ':common-test')
+    testImplementation "androidx.test:runner:_"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
-    testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
-
-    testImplementation project(path: ':common-test')
-
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 }
 
 android {

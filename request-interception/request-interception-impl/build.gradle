@@ -23,35 +23,30 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-
-    implementation project(':di')
-    implementation project(':common-utils')
-    implementation project(':request-interception-api')
-    implementation project(':privacy-config-api')
-    implementation project(':feature-toggles-api')
     implementation project(':browser-api')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
+    implementation project(':di')
+    implementation project(':feature-toggles-api')
+    implementation project(':privacy-config-api')
+    implementation project(':request-interception-api')
     implementation project(':user-agent-api')
-
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.core.ktx
+    implementation KotlinX.coroutines.core
+    implementation Square.okHttp3.okHttp
     implementation Square.retrofit2.converter.moshi
 
-    implementation KotlinX.coroutines.core
-
-    implementation AndroidX.core.ktx
-
-    implementation Square.okHttp3.okHttp
-
-    // Testing dependencies
     testImplementation project(path: ':common-test')
+    testImplementation "androidx.test:runner:_"
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
+    testImplementation Testing.junit4
     testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }
 
 android {

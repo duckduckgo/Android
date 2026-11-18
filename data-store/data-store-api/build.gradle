@@ -25,11 +25,11 @@ android {
 }
 
 dependencies {
-    implementation project(':navigation-api')
-
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.appCompat
     api AndroidX.room.runtime
+
+    implementation project(':navigation-api')
+    implementation AndroidX.appCompat
+    implementation KotlinX.coroutines.core
 }
 
 

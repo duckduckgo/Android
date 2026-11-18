@@ -16,16 +16,14 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
     implementation project(':attributed-metrics-api')
     implementation project(':attributed-metrics-impl')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
+    implementation project(':design-system')
     implementation project(':di')
     implementation project(':internal-features-api')
     implementation project(':navigation-api')
-    implementation project(':common-utils')
-    implementation project(':design-system')
-
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
     implementation Google.android.material
@@ -33,4 +31,6 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
+
+    ksp project(':codegen-ksp')
 }

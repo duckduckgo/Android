@@ -27,9 +27,10 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
     implementation project(':codegen-annotations')
     implementation project(':di')
     implementation project(':feature-toggles-api')
     implementation project(':page-translation-api')
+
+    ksp project(':codegen-ksp')
 }

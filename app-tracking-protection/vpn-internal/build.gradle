@@ -31,48 +31,34 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-
-    implementation project(':vpn-impl')
-    implementation project(':vpn-store')
-    implementation project(':vpn-api')
+    implementation project(':app-build-config-api')
     implementation project(':app-tracking-api')
-    implementation project(':di')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
     implementation project(':design-system')
-    implementation project(':app-build-config-api')
+    implementation project(':di')
     implementation project(':feature-toggles-api')
     implementation project(':internal-features-api')
     implementation project(':navigation-api')
-
-    implementation AndroidX.core.ktx
-
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.commonJava8
-    implementation AndroidX.work.runtimeKtx
-    implementation AndroidX.appCompat
-    implementation AndroidX.constraintLayout
-
-    implementation Square.retrofit2.converter.moshi
-
-    implementation KotlinX.coroutines.core
-
+    implementation project(':vpn-api')
+    implementation project(':vpn-impl')
+    implementation project(':vpn-store')
+    implementation "com.frybits.harmony:harmony:_"
     implementation "com.squareup.logcat:logcat:_"
-
-    // Room
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-
-    implementation "com.frybits.harmony:harmony:_"
+    implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
+    implementation KotlinX.coroutines.core
+    implementation Square.retrofit2.converter.moshi
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
@@ -80,4 +66,6 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation Testing.junit4
+
+    ksp project(':codegen-ksp')
 }

@@ -9,23 +9,20 @@ android {
 }
 
 dependencies {
-
-    // Dependencies for this Module
-    implementation project(path: ':common-utils')
-
-    implementation AndroidX.lifecycle.liveDataKtx
-    implementation "io.reactivex.rxjava2:rxjava:_"
-    implementation "io.reactivex.rxjava2:rxandroid:_"
-    implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation Square.okHttp3.okHttp
-    implementation KotlinX.coroutines.core
-    implementation Square.retrofit2.retrofit
-    // api because TestDispatcher is in the CoroutineTestRule public API
     api (KotlinX.coroutines.test) {
+        because 'api since TestDispatcher is in the CoroutineTestRule public API'
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    implementation Testing.junit4
 
+    implementation project(path: ':common-utils')
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation AndroidX.lifecycle.liveDataKtx
+    implementation KotlinX.coroutines.core
+    implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.retrofit
+    implementation Testing.junit4
 }

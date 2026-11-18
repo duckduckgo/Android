@@ -26,9 +26,8 @@ android {
 
 dependencies {
     implementation project(':navigation-api')
-
-    implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
+    implementation KotlinX.coroutines.core
 }
 
 
