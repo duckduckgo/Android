@@ -31,7 +31,7 @@ interface SponsorBlockDatasetService {
     @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/revision")
     suspend fun revision(): SponsorBlockRevisionResponse
 
-    @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/hashPrefixBinary?format=binary&version=1")
+    @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/hashPrefix?format=binary&version=1")
     @Streaming
     suspend fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): ResponseBody
 }

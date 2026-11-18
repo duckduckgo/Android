@@ -128,7 +128,7 @@ class DeltaTest(unittest.TestCase):
                 self.assertNotIn(b'Draft prefixes', page)
             with urlopen(base + '/dataset?page=2') as response:
                 self.assertEqual(json.load(response)['prefixes'][0], '00000064')
-            with urlopen(Request(base + server.BASE + '/hashPrefixBinary?format=binary&version=1&revision=0', headers={'Accept-Encoding': 'gzip'})) as response:
+            with urlopen(Request(base + server.BASE + '/hashPrefix?format=binary&version=1&revision=0', headers={'Accept-Encoding': 'gzip'})) as response:
                 self.assertEqual(response.headers['Content-Encoding'], 'gzip')
                 data = gzip.decompress(response.read())
                 self.assertEqual(struct.unpack_from('<4sBBHI4sIII', data)[:5], (b'SBPL', 1, 0, 0, 2))
@@ -166,7 +166,7 @@ class DeltaTest(unittest.TestCase):
         handler.path = '/preview?revision=1'
         handler.do_GET()
         self.assertFalse(server.requests)
-        handler.path = server.BASE + '/hashPrefixBinary?revision=1'
+        handler.path = server.BASE + '/hashPrefix?revision=1'
         handler.do_GET()
         self.assertEqual(server.requests[-1]['response']['insert'], ['cb1ad2a7'])
         self.assertEqual(server.requests[-1]['response']['delete'], ['0649a8bb'])
@@ -179,7 +179,7 @@ class DeltaTest(unittest.TestCase):
         handler.path = server.BASE + '/revision'
         handler.do_GET()
         self.assertEqual(server.requests[-1]['response'], {'revision': 2})
-        handler.path = server.BASE + '/hashPrefixBinary?revision=bad'
+        handler.path = server.BASE + '/hashPrefix?revision=bad'
         handler.do_GET()
         self.assertEqual(server.requests[-1]['status'], 400)
 

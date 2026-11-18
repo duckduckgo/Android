@@ -473,7 +473,7 @@ document.getElementById('preview-form').addEventListener('submit', async (event)
     const response = await fetch('/preview?revision=' + encodeURIComponent(revision));
     if (!response.ok) throw new Error(await response.text());
     result.textContent = await response.text();
-    document.getElementById('preview-link').href = '/sponsorblock/v1/hashPrefixBinary?format=binary&version=1&revision=' + encodeURIComponent(revision);
+    document.getElementById('preview-link').href = '/sponsorblock/v1/hashPrefix?format=binary&version=1&revision=' + encodeURIComponent(revision);
     document.getElementById('preview-download').hidden = false;
   }} catch (error) {{ result.textContent = 'Unable to load response: ' + error.message; }}
 }});
@@ -552,7 +552,7 @@ setInterval(refreshRequests, 2000);
             response = {'revision': latest}
             record_request(self.path, 200, response)
             self.json(response)
-        elif url.path in (BASE + '/hashPrefixBinary', '/preview'):
+        elif url.path in (BASE + '/hashPrefix', '/preview'):
             try:
                 revision = int(parse_qs(url.query)['revision'][0])
                 if revision < 0:
@@ -562,7 +562,7 @@ setInterval(refreshRequests, 2000);
                     record_request(self.path, 400, 'Invalid revision')
                 self.send(400, b'Invalid revision', 'text/plain')
                 return
-            if url.path.endswith('/hashPrefixBinary'):
+            if url.path.endswith('/hashPrefix'):
                 params = parse_qs(url.query)
                 try:
                     supported = int(params.get('version', ['1'])[0])
