@@ -26,6 +26,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.duckduckgo.adblocking.impl.BuildConfig
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -99,7 +100,8 @@ class SponsorBlockDatasetScheduler @Inject constructor(
             workManager.cancelUniqueWork(WORK_NAME)
             return
         }
-        val request = PeriodicWorkRequestBuilder<SponsorBlockDatasetWorker>(24, TimeUnit.HOURS)
+        val interval = if (BuildConfig.SPONSOR_BLOCK_BASE_URL == "http://127.0.0.1:8765/sponsorblock/v1") 15L else 24L * 60
+        val request = PeriodicWorkRequestBuilder<SponsorBlockDatasetWorker>(interval, TimeUnit.MINUTES)
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
             .build()
