@@ -23,6 +23,7 @@ import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Streaming
 import retrofit2.http.Query as HttpQuery
@@ -33,7 +34,7 @@ interface SponsorBlockDatasetService {
 
     @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/hashPrefix?format=binary&version=1")
     @Streaming
-    suspend fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): ResponseBody
+    fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): Call<ResponseBody>
 }
 
 data class SponsorBlockRevisionResponse(val revision: Long?)

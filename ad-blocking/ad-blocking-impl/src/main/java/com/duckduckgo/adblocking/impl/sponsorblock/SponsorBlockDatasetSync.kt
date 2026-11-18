@@ -36,27 +36,62 @@ import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import retrofit2.await
+import java.io.IOException
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @SingleIn(AppScope::class)
 class SponsorBlockDatasetSync @Inject constructor(
     private val service: SponsorBlockDatasetService,
     private val binary: SponsorBlockBinaryStore,
+    private val segmentsProvider: SponsorBlockSegmentsProvider,
 ) {
-    suspend fun sync() {
+    private val syncMutex = Mutex()
+
+    suspend fun sync() = syncMutex.withLock {
         val latest = requireNotNull(service.revision().revision)
         require(latest in 0..0xffffffffL)
         var current = binary.revision()
         while (current < latest) {
             try {
-                service.binaryHashPrefixes(current).use { binary.apply(current, it.byteStream()) }
+                download(current, current)
             } catch (e: InvalidSponsorBlockFile) {
                 if (current == 0L) throw e
-                service.binaryHashPrefixes(0L).use { binary.apply(current, it.byteStream(), requireFull = true) }
+                download(0L, current, requireFull = true)
             }
             current = binary.revision()
+        }
+    }
+
+    private suspend fun download(revision: Long, expected: Long, requireFull: Boolean = false) = coroutineScope {
+        val call = service.binaryHashPrefixes(revision)
+        val completed = AtomicBoolean(false)
+        val canceller = launch(start = CoroutineStart.UNDISPATCHED) {
+            try {
+                awaitCancellation()
+            } finally {
+                if (!completed.get()) call.cancel()
+            }
+        }
+        try {
+            call.await().use { binary.apply(expected, it.byteStream(), requireFull, segmentsProvider::clearCache) }
+            completed.set(true)
+        } catch (e: IOException) {
+            currentCoroutineContext().ensureActive()
+            throw e
+        } finally {
+            canceller.cancel()
         }
     }
 }
