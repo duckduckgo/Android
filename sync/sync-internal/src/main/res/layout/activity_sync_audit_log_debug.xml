@@ -88,6 +88,13 @@
                 android:layout_margin="10dp"
                 android:text="Read server log" />
 
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                android:id="@+id/openSyncAuditLogButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Open Device Activity screen" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/serverLogResultTextView"
                 android:layout_width="match_parent"

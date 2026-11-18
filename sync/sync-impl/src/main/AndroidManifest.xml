@@ -19,6 +19,12 @@
 
     <application>
         <activity
+            android:name=".ui.auditlog.SyncAuditLogActivity"
+            android:exported="false"
+            android:label="@string/syncAuditLogTitle"
+            android:parentActivityName=".ui.dashboard.SyncActivity" />
+
+        <activity
             android:name=".promotion.SyncGetOnOtherPlatformsActivity"
             android:exported="false"
             android:label="@string/syncGetAppsOnOtherPlatformsActivityTitle"
