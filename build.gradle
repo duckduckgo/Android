@@ -257,6 +257,18 @@ subprojects {
 
 subprojects {
     apply plugin: 'com.autonomousapps.dependency-analysis'
+
+    if (project.name.endsWith('-impl')) {
+        dependencyAnalysis {
+            abi {
+                exclusions {
+                    // -impl classes are public only because Kotlin defaults to public, not because other modules should use them.
+                    // The ABI only decides api vs implementation, so we drop it here and keep unused and transitive dependency checks.
+                    excludeClasses('.*')
+                }
+            }
+        }
+    }
 }
 
 dependencyAnalysis {
