@@ -63,20 +63,11 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canInterceptSyncSetupUrls(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canOverrideThemeSyncSetup(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSync(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useExpandableBarcodeConnectSyncLayout(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun syncAutoRestore(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun recoverDataEasilySetupScreen(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendSyncSetupWideEvent(): Toggle
