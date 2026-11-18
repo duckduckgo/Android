@@ -50,9 +50,10 @@ interface TrackerStatsWriter {
     fun incrementNetworkCount(networkName: String)
 
     /**
-     * Drops history rows that were queued but not yet written.
+     * Drops queued history rows and deletes the persisted ones. A flush already in progress either completes
+     * before the delete or has its history discarded, so no row recorded before this call survives it.
      */
-    fun discardPendingHistory()
+    suspend fun deleteAllHistory()
 }
 
 /**
@@ -96,8 +97,11 @@ class RealTrackerStatsWriter @Inject constructor(
         enqueue { networkCounts.merge(networkName, 1, Int::plus) }
     }
 
-    override fun discardPendingHistory() {
-        synchronized(lock) { pending.history.clear() }
+    override suspend fun deleteAllHistory() {
+        writeMutex.withLock {
+            synchronized(lock) { pending.history.clear() }
+            appDatabase.webTrackersBlockedDao().deleteAll()
+        }
     }
 
     private fun enqueue(update: Pending.() -> Unit) {
@@ -116,11 +120,12 @@ class RealTrackerStatsWriter @Inject constructor(
     }
 
     private suspend fun flush() {
-        val batch = synchronized(lock) {
-            flushScheduled = false
-            pending.also { pending = Pending() }
-        }
         writeMutex.withLock {
+            // Swapped inside the mutex so a concurrent deleteAllHistory can't be followed by a stale batch insert.
+            val batch = synchronized(lock) {
+                flushScheduled = false
+                pending.also { pending = Pending() }
+            }
             appDatabase.runInTransaction {
                 if (batch.history.isNotEmpty()) appDatabase.webTrackersBlockedDao().insertAll(batch.history)
                 if (batch.blockedCount > 0) appDatabase.privacyProtectionCountsDao().incrementBlockedTrackerCountBy(batch.blockedCount)

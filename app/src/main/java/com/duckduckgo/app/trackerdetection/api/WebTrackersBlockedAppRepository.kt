@@ -42,8 +42,7 @@ class WebTrackersBlockedAppRepository @Inject constructor(
     )
 
     override suspend fun deleteAll() {
-        trackerStatsWriter.discardPendingHistory()
-        dao.deleteAll()
+        trackerStatsWriter.deleteAllHistory()
     }
 
     override suspend fun deleteExpiredEntries() {

@@ -26,6 +26,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -133,15 +134,20 @@ class RealTrackerStatsWriterTest {
     }
 
     @Test
-    fun whenPendingHistoryDiscardedThenOnlyHistoryIsDropped() {
+    fun whenAllHistoryDeletedThenQueuedAndPersistedHistoryIsDroppedButCountsAreKept() = coroutineRule.testScope.runTest {
         testee.recordBlockedHistory("https://tracker.com/a.js", "Tracker Inc")
         testee.incrementBlockedCount()
+        testee.incrementNetworkCount("Tracker Inc")
+        advance(FLUSH_WINDOW_MS)
+        testee.recordBlockedHistory("https://tracker.com/b.js", "Tracker Inc")
+        testee.incrementBlockedCount()
 
-        testee.discardPendingHistory()
+        testee.deleteAllHistory()
         advance(FLUSH_WINDOW_MS)
 
         assertTrue(historyRows().isEmpty())
-        assertEquals(1, db.privacyProtectionCountsDao().getTrackersBlockedCount())
+        assertEquals(2, db.privacyProtectionCountsDao().getTrackersBlockedCount())
+        assertEquals(mapOf("Tracker Inc" to 1), leaderboard())
     }
 
     private fun advance(millis: Long) {
