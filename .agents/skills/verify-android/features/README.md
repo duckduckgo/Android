@@ -1,7 +1,6 @@
 # DuckDuckGo Android verification map
 
-Recipes for verifying user-facing behaviour of the internal debug build, scoped to Duck.ai and its entry
-points. Each is driven with the android CLI and adb, reaching every state through the UI. Commands use `V=.agents/skills/verify-android/verify.sh` from `../SKILL.md`.
+Recipes for verifying user-facing behaviour of the internal debug build. Each is driven with the android CLI and adb, reaching every state through the UI. Commands use `V=.agents/skills/verify-android/verify.sh` from `../SKILL.md`.
 
 ## Baseline preconditions
 
@@ -32,6 +31,7 @@ Recipes reach their starting point the way a user does. `$V wait` for the first 
 - **Duck.ai developer settings:** Settings, `$V scroll up 6`, `$V tap "text:Developer settings and tools"` (the subtitle; the title "Duck.ai" repeats), `$V assert where DuckAiDevActivity`. From there `$V tap "text:URL Settings"` (`DuckAiUrlSettingsActivity`) or `$V tap "text:Browser Tools"`.
 - **Tab switcher:** `$V tap id:inputModeWidgetNavTabs` on the New Tab Page or `$V tap id:tabsMenu` on a page, `$V assert where TabSwitcherActivity`.
 - **Duck.ai chat:** browser menu, `$V tap id:newDuckChatMenuItem`, `$V wait id:duckAIHeader 25`.
+- **App Tracking Protection:** Settings, `$V scroll up` until `text:App Tracking Protection` is visible, `$V tap "text:App Tracking Protection"`: `VpnOnboardingActivity` until the user has onboarded, `DeviceShieldTrackerActivity` after (`steps.apptp`).
 
 ## Proof and skip reporting
 
@@ -50,10 +50,12 @@ Recipes reach their starting point the way a user does. `$V wait` for the first 
 | [browser-menu.md](browser-menu.md) | Browser menu: every entry and where it lands | Browser menu |
 | [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history | Duck.ai chat |
 | [ai-settings.md](ai-settings.md) | AI Features settings: Search Only vs Search & Duck.ai, New Tab Toggle Position, Duck.ai on/off, shortcuts, Without AI | AI Features |
+| [app-tracking-protection.md](app-tracking-protection.md) | App Tracking Protection: onboarding and VPN consent, on/off, per-app protection, report forms, dev settings, blocking trackers in another app | App Tracking Protection |
 
-Not covered on purpose (the map is scoped to Duck.ai and its entry points): bookmarks, page forms, the rest of
-Settings, onboarding, sync, autofill, downloads, and anything that depends on a paid plan (Duck.ai's paid
-models, VPN, PIR, ITR): the debug build can't reach a subscribed state through the UI.
+Without a recipe yet: bookmarks, page forms, the rest of Settings, onboarding, sync, autofill and downloads.
+Not covered on purpose: anything that depends on a paid plan (Duck.ai's paid models, the subscription VPN, PIR,
+ITR), because the debug build can't reach a subscribed state through the UI. App Tracking Protection is free and
+has a recipe; the subscription VPN is a different feature.
 
 ## Proofs
 

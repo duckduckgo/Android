@@ -6,6 +6,9 @@
   layout.py ui                          one tab-separated line per tappable element: top, id, text, description, flags
   layout.py text [id]                   every element with text (id, text, flags), or one id's text; exit 15 when absent
   layout.py checked <id> [index]        true/false for a checkable element; exit 15 when absent
+  layout.py rows <label-id> <control-id>  one line per on-screen label: its text, the index (as find counts) of the
+                                        control in the same list row and whether it is checked; "-" for both when
+                                        that row's control isn't on screen
 
 Selectors: id:<resource-id> (the part after ":id/" also matches), text:<exact text>, text~:<substring>,
 desc:<exact content description>, desc~:<substring>.
@@ -19,7 +22,36 @@ NOT_FOUND = 15
 
 def load():
     nodes = json.load(sys.stdin)
-    return nodes if isinstance(nodes, list) else []
+    if not isinstance(nodes, list):
+        return []
+    # android CLI 1.1 wraps the tree in windows (status bar, keyboard, applications) and nests children; the
+    # APPLICATION windows, flattened, are what older versions returned: the app's, its dialogs, and another app's
+    # activity on top, such as Android's VPN consent. Its flags are upper case (LONG_CLICKABLE).
+    if any(isinstance(w, dict) and "content" in w for w in nodes):
+        nodes = flatten(n for w in nodes if isinstance(w, dict) and w.get("type") == "APPLICATION"
+                        for n in w.get("content") or [])
+    for n in nodes:
+        for key in ("interactions", "state"):
+            n[key] = [f.lower().replace("_", "-") for f in n.get(key) or []]
+    return nodes
+
+
+def flatten(nodes):
+    out = []
+    for n in nodes:
+        out.append(n)
+        out.extend(flatten(n.get("children") or []))
+    return out
+
+
+def row_control(label, controls):
+    """The control in the label's own list row: the one whose vertical span holds the label's centre. The layout drops
+    a list's row containers, and a row cut off at the screen's edge can list its control without its label, so
+    pairing the Nth label with the Nth control would cross rows."""
+    top, bottom = point(label.get("bounds"))[1::2]
+    centre = (top + bottom) / 2
+    found = [c for c in controls if point(c.get("bounds"))[1] <= centre <= point(c.get("bounds"))[3]]
+    return found[0] if len(found) == 1 else None
 
 
 def rid(node):
@@ -93,6 +125,17 @@ def main():
         if len(found) < index:
             sys.exit(NOT_FOUND)
         print("true" if "checked" in found[index - 1].get("state", []) else "false")
+    elif action == "rows":
+        controls = [n for n in nodes if matches(n, f"id:{args[1]}") and not n.get("off-screen")]
+        for n in nodes:
+            if rid(n) != args[0] or n.get("off-screen"):
+                continue
+            control = row_control(n, controls)
+            if control is None:
+                print(n.get("text") or "", "-", "-", sep="\t")
+            else:
+                print(n.get("text") or "", next(i for i, c in enumerate(controls, 1) if c is control),
+                      "true" if "checked" in control.get("state", []) else "false", sep="\t")
     else:
         sys.exit(__doc__)
 
