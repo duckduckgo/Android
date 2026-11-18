@@ -40,6 +40,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
 import com.duckduckgo.sync.impl.auth.AuthPrompt
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
@@ -113,6 +114,7 @@ class SyncActivityViewModel @Inject constructor(
     private val syncAutoRestore: SyncAutoRestore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val syncSetupWideEvent: SyncSetupWideEvent,
+    private val loginAuditLogFeature: LoginAuditLogFeature,
 ) : ViewModel() {
 
     private val syncStateObserverJob = ConflatedJob()
@@ -196,6 +198,7 @@ class SyncActivityViewModel @Inject constructor(
         val autoRestoreState = if (initialAutoRestoreEnabled == null) loadAutoRestoreState() else null
         val showAccount = syncAccountRepository.isSignedIn()
         val thisDevice = syncAccountRepository.getThisConnectedDevice()
+        val showDeviceActivity = loginAuditLogFeature.isAuditLogEnabled()
         val signedOutState = signedOutState()
 
         viewState.update { current ->
@@ -208,6 +211,7 @@ class SyncActivityViewModel @Inject constructor(
                 showAutoRestoreToggle = autoRestoreState?.showToggle ?: autoRestoreAvailable,
                 autoRestoreEnabled = autoRestoreState?.enabled ?: current.autoRestoreEnabled,
                 isThisDeviceSyncing = current.isThisDeviceSyncing,
+                showDeviceActivity = showDeviceActivity,
             )
         }
     }
@@ -245,6 +249,7 @@ class SyncActivityViewModel @Inject constructor(
         val autoRestoreEnabled: Boolean = false,
         val isThisDeviceSyncing: Boolean = false,
         val isContentHidden: Boolean = false,
+        val showDeviceActivity: Boolean = false,
     )
 
     sealed class SetupFlows {
@@ -281,6 +286,7 @@ class SyncActivityViewModel @Inject constructor(
         data object ShowDeviceUnsupported : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
+        data object LaunchDeviceActivity : Command()
         data class ShowPreviousSessionReady(val syncEntryPoint: SyncEntryPoint) : Command()
         data class LaunchOriginalFlow(
             val syncEntryPoint: SyncEntryPoint,
@@ -629,6 +635,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onNoDesktopAppSelected() {
         viewModelScope.launch(dispatchers.main()) {
             command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG))
+        }
+    }
+
+    fun onDeviceActivityClicked() {
+        viewModelScope.launch {
+            command.send(Command.LaunchDeviceActivity)
         }
     }
 

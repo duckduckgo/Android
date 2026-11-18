@@ -64,6 +64,7 @@ import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogScreenParams
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
@@ -76,6 +77,7 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.Check
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchDeviceActivity
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
@@ -322,6 +324,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureBookmarksSection()
         configureWarningMessages()
         configureRecoverySection()
+        configureDeviceActivityItem()
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
@@ -385,6 +388,7 @@ class SyncActivity : DuckDuckGoActivity() {
             getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
+            deviceActivitySection.isVisible = viewState.showDeviceActivity
             restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
             if (viewState.showAutoRestoreToggle) {
                 restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, autoRestoreListener)
@@ -483,6 +487,10 @@ class SyncActivity : DuckDuckGoActivity() {
                         isAuthRequired = true,
                     ),
                 )
+            }
+
+            is LaunchDeviceActivity -> {
+                globalActivityStarter.start(this, SyncAuditLogScreenParams())
             }
 
             is LaunchLearnMore -> {
@@ -654,6 +662,12 @@ class SyncActivity : DuckDuckGoActivity() {
                     warningsContainer += plugin.getView(this@SyncActivity)
                 }
             }
+        }
+    }
+
+    private fun configureDeviceActivityItem() {
+        binding.includeEnabledView.deviceActivityItem.setOnClickListener {
+            viewModel.onDeviceActivityClicked()
         }
     }
 
