@@ -21,16 +21,29 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
+@SingleIn(AppScope::class)
 class RealFeatureTogglesInventory @Inject constructor(
     private val toggles: Set<FeatureTogglesInventory>,
     private val dispatcherProvider: DispatcherProvider,
 ) : FeatureTogglesInventory {
-    override suspend fun getAll(): List<Toggle> = withContext(dispatcherProvider.io()) {
-        return@withContext toggles.flatMap { it.getAll() }.distinctBy { it.featureName() }
+    // The toggles each inventory lists are fixed at compile time and read their state live, so the list only needs building once.
+    // Building it calls every toggle method through each feature's reflective proxy, and several startup paths ask for it at once.
+    private val allTogglesMutex = Mutex()
+
+    @Volatile
+    private var allToggles: List<Toggle>? = null
+
+    override suspend fun getAll(): List<Toggle> = allToggles ?: withContext(dispatcherProvider.io()) {
+        allTogglesMutex.withLock {
+            allToggles ?: toggles.flatMap { it.getAll() }.distinctBy { it.featureName() }.also { allToggles = it }
+        }
     }
 
     override suspend fun getAllTogglesForParent(name: String): List<Toggle> = withContext(dispatcherProvider.io()) {
