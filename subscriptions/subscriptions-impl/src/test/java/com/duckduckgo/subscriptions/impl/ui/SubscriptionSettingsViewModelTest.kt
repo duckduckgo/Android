@@ -1234,6 +1234,46 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
+    fun whenResumeDuringInAppUndoThenDoNotRefreshSubscription() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+        viewModel.onCreate(mock())
+        viewModel.onKeepSubscriptionClicked(mock())
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager, never()).refreshSubscriptionData()
+    }
+
+    @Test
+    fun whenResumeAfterInAppUndoConfirmFailsThenRefreshSubscription() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+        viewModel.onCreate(mock())
+        viewModel.onKeepSubscriptionClicked(mock())
+        currentPurchaseState.emit(CurrentPurchase.Waiting)
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager).refreshSubscriptionData()
+    }
+
+    @Test
+    fun whenResumeAfterStoreFallbackThenRefreshSubscription() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.NotEligible)
+        viewModel.onCreate(mock())
+        viewModel.onKeepSubscriptionClicked(mock())
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager).refreshSubscriptionData()
+    }
+
+    @Test
     fun whenKeepSubscriptionClickedThenUndoCancellation() = runTest {
         val activity: Activity = mock()
         whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)

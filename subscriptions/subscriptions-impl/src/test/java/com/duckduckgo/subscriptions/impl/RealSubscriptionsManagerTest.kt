@@ -78,6 +78,7 @@ import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionUndoCancellationWideEvent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
@@ -153,6 +154,7 @@ class RealSubscriptionsManagerTest {
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent = mock()
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent = mock()
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
+    private val subscriptionUndoCancellationWideEvent: SubscriptionUndoCancellationWideEvent = mock()
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent = mock()
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
     private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler = mock()
@@ -196,6 +198,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1006,6 +1009,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1042,6 +1046,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1082,6 +1087,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1136,6 +1142,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1185,6 +1192,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1229,6 +1237,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1266,6 +1275,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1776,6 +1786,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1829,6 +1840,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -2181,6 +2193,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -2311,6 +2324,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -3172,6 +3186,7 @@ class RealSubscriptionsManagerTest {
 
         assertEquals(UndoCancellationResult.NotEligible, result)
         verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any(), any())
+        verify(subscriptionUndoCancellationWideEvent, never()).onFlowStarted(any(), any(), any())
     }
 
     @Test
@@ -3198,6 +3213,8 @@ class RealSubscriptionsManagerTest {
 
         assertEquals(UndoCancellationResult.NotEligible, result)
         verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any(), any())
+        verify(subscriptionUndoCancellationWideEvent).onFlowStarted(planId = MONTHLY_PLAN_US, isFreeTrial = false, expiresAt = 1234L)
+        verify(subscriptionUndoCancellationWideEvent).onEligibilityChecked(canUndoInApp = false)
     }
 
     @Test
@@ -3244,6 +3261,8 @@ class RealSubscriptionsManagerTest {
         )
         verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
         verify(playBillingManager, never()).launchSubscriptionUpdate(any(), any(), any(), anyOrNull(), any(), any())
+        verify(subscriptionUndoCancellationWideEvent).onFlowStarted(planId = MONTHLY_PLAN_US, isFreeTrial = false, expiresAt = 1234L)
+        verify(subscriptionUndoCancellationWideEvent).onEligibilityChecked(canUndoInApp = true)
     }
 
     @Test
@@ -3273,6 +3292,8 @@ class RealSubscriptionsManagerTest {
             verify(subscriptionPurchaseWideEvent, never()).onPurchaseConfirmationSuccess()
             verify(subscriptionSwitchWideEvent, never()).onPlayBillingSwitchSuccess()
             verify(subscriptionSwitchWideEvent, never()).onSwitchConfirmationSuccess()
+            verify(subscriptionUndoCancellationWideEvent).onBillingFlowPurchaseSuccess()
+            verify(subscriptionUndoCancellationWideEvent).onConfirmationSuccess()
             assertEquals(localPurchasedAt, authRepository.getLocalPurchasedAt())
 
             cancelAndConsumeRemainingEvents()
@@ -3322,6 +3343,7 @@ class RealSubscriptionsManagerTest {
 
             verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseFailure(any())
             verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
+            verify(subscriptionUndoCancellationWideEvent).onBillingFlowPurchaseFailure("error")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -3345,6 +3367,7 @@ class RealSubscriptionsManagerTest {
 
             verify(subscriptionPurchaseWideEvent, never()).onPurchaseCancelledByUser()
             verify(subscriptionSwitchWideEvent, never()).onUserCancelled()
+            verify(subscriptionUndoCancellationWideEvent).onUserCancelled()
 
             cancelAndConsumeRemainingEvents()
         }
@@ -3370,6 +3393,47 @@ class RealSubscriptionsManagerTest {
 
             assertEquals(NOT_AUTO_RENEWABLE, authRepository.getSubscription()?.status)
             verify(pixelSender, never()).reportPurchaseFailureBackend()
+            verify(subscriptionUndoCancellationWideEvent).onConfirmationFailure("confirm_request_failed")
+            verify(subscriptionUndoCancellationWideEvent, never()).onConfirmationSuccess()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataThenReportsStatusChangeToUndoCancellationWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenSubscriptionSucceedsWithoutEntitlements()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        verify(subscriptionUndoCancellationWideEvent).onSubscriptionUpdated(
+            oldStatus = NOT_AUTO_RENEWABLE,
+            newStatus = AUTO_RENEWABLE,
+        )
+    }
+
+    @Test
+    fun whenPurchaseConfirmedThenDoesNotReportUndoCancellationWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionUndoCancellationWideEvent, never()).onBillingFlowPurchaseSuccess()
+            verify(subscriptionUndoCancellationWideEvent, never()).onConfirmationSuccess()
 
             cancelAndConsumeRemainingEvents()
         }

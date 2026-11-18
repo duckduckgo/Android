@@ -84,6 +84,7 @@ import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionUndoCancellationWideEvent
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
@@ -301,6 +302,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
+    private val subscriptionUndoCancellationWideEvent: SubscriptionUndoCancellationWideEvent,
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
     private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler,
@@ -535,13 +537,22 @@ class RealSubscriptionsManager @Inject constructor(
                 return@withContext UndoCancellationResult.NotEligible
             }
 
+            subscriptionUndoCancellationWideEvent.onFlowStarted(
+                planId = subscription.productId,
+                isFreeTrial = subscription.activeOffers.contains(ActiveOfferType.TRIAL),
+                expiresAt = subscription.expiresOrRenewsAt,
+            )
+
             val ownedPurchase = (playBillingManager.getLatestPurchase() as? LatestPurchaseResult.Present)
                 ?.purchase
                 ?.takeIf { purchase ->
                     purchase.products.contains(SubscriptionTier.fromPlanId(subscription.productId).productId) &&
                         purchase.accountIdentifiers?.obfuscatedAccountId == account.externalId
                 }
-                ?: return@withContext UndoCancellationResult.NotEligible
+            subscriptionUndoCancellationWideEvent.onEligibilityChecked(canUndoInApp = ownedPurchase != null)
+            if (ownedPurchase == null) {
+                return@withContext UndoCancellationResult.NotEligible
+            }
 
             pendingOnboardingEnrollmentIsFreeTrial = null
             pendingBillingFlow = BillingFlowType.CANCELLATION_UNDO
@@ -783,7 +794,7 @@ class RealSubscriptionsManager @Inject constructor(
                 pixelSender.reportPurchaseFailureBackend()
             }
             BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onSwitchConfirmationFailure(reason)
-            BillingFlowType.CANCELLATION_UNDO -> Unit
+            BillingFlowType.CANCELLATION_UNDO -> subscriptionUndoCancellationWideEvent.onConfirmationFailure(reason)
         }
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
         _subscriptionStatus.emit(authRepository.getStatus())
@@ -796,7 +807,7 @@ class RealSubscriptionsManager @Inject constructor(
         when (billingFlow) {
             BillingFlowType.PURCHASE -> subscriptionPurchaseWideEvent.onBillingFlowPurchaseSuccess()
             BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onPlayBillingSwitchSuccess()
-            BillingFlowType.CANCELLATION_UNDO -> Unit
+            BillingFlowType.CANCELLATION_UNDO -> subscriptionUndoCancellationWideEvent.onBillingFlowPurchaseSuccess()
         }
     }
 
@@ -804,7 +815,7 @@ class RealSubscriptionsManager @Inject constructor(
         when (billingFlow) {
             BillingFlowType.PURCHASE -> subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
             BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onUserCancelled()
-            BillingFlowType.CANCELLATION_UNDO -> Unit
+            BillingFlowType.CANCELLATION_UNDO -> subscriptionUndoCancellationWideEvent.onUserCancelled()
         }
     }
 
@@ -815,7 +826,7 @@ class RealSubscriptionsManager @Inject constructor(
         when (billingFlow) {
             BillingFlowType.PURCHASE -> subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(error)
             BillingFlowType.PLAN_SWITCH -> subscriptionSwitchWideEvent.onSwitchFailed(error)
-            BillingFlowType.CANCELLATION_UNDO -> Unit
+            BillingFlowType.CANCELLATION_UNDO -> subscriptionUndoCancellationWideEvent.onBillingFlowPurchaseFailure(error)
         }
     }
 
@@ -833,7 +844,7 @@ class RealSubscriptionsManager @Inject constructor(
                 pixelSender.reportSubscriptionSwitch()
                 subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
             }
-            BillingFlowType.CANCELLATION_UNDO -> Unit
+            BillingFlowType.CANCELLATION_UNDO -> subscriptionUndoCancellationWideEvent.onConfirmationSuccess()
         }
     }
 
@@ -1040,6 +1051,7 @@ class RealSubscriptionsManager @Inject constructor(
             newStatus = newStatus,
             planChanged = planChanged,
         )
+        subscriptionUndoCancellationWideEvent.onSubscriptionUpdated(oldStatus = oldSubscription?.status, newStatus = newStatus)
         freeTrialConversionWideEvent.onSubscriptionRefreshed(
             wasFreeTrial = wasFreeTrial,
             isFreeTrial = isFreeTrial,

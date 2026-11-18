@@ -4,7 +4,7 @@
         "owners": ["lmac012"],
         "meta": {
             "type": "android-subscription-plan-change",
-            "version": "0.1"
+            "version": "0.2"
         },
         "feature": {
             "name": "subscription-plan-change",
@@ -49,6 +49,11 @@
                         "description": "Duration from the Play billing switch or Stripe redirect to subscription activation",
                         "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
                     },
+                    "confirm_failure_reason": {
+                        "type": "string",
+                        "description": "Why the backend confirmation of the switch failed",
+                        "enum": ["confirm_request_failed", "confirm_not_active"]
+                    },
                     "failure_reason": "failureReason",
                     "step.validate_current_subscription": {
                         "type": "string",
@@ -76,8 +81,8 @@
                     },
                     "step.confirm_switch": {
                         "type": "string",
-                        "description": "Present if the backend confirmed the switch",
-                        "enum": ["true"]
+                        "description": "True if the backend confirmed the switch, false if the confirmation failed",
+                        "enum": ["true", "false"]
                     },
                     "step.ui_refresh": {
                         "type": "string",

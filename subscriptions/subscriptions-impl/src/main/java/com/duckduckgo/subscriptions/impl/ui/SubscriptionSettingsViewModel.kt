@@ -127,6 +127,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     private suspend fun refreshIfCancelled() {
+        if (undoCancellationInProgress) return
         val subscription = subscriptionsManager.getSubscription() ?: return
         if (!canUndoCancellation(subscription)) return
         runCatching { subscriptionsManager.refreshSubscriptionData() }
