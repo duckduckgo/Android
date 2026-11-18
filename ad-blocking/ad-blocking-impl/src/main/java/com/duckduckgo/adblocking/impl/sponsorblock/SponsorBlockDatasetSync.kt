@@ -29,7 +29,6 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.versionedset.VersionedSetDelta
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import dev.zacsweers.metro.ContributesIntoSet
@@ -43,28 +42,21 @@ import javax.inject.Inject
 @SingleIn(AppScope::class)
 class SponsorBlockDatasetSync @Inject constructor(
     private val service: SponsorBlockDatasetService,
-    private val dao: SponsorBlockDatasetDao,
+    private val binary: SponsorBlockBinaryStore,
 ) {
     suspend fun sync() {
         val latest = requireNotNull(service.revision().revision)
-        require(latest >= 0)
-        var current = dao.revision() ?: 0
+        require(latest in 0..0xffffffffL)
+        var current = binary.revision()
         while (current < latest) {
-            val response = service.hashPrefixes(current)
-            val revision = requireNotNull(response.revision)
-            val replace = requireNotNull(response.replace)
-            val insert = requireNotNull(response.insert)
-            val delete = requireNotNull(response.delete)
-            require(revision > current)
-            require(current != 0 || replace)
-            require((insert + delete).all { it.matches(PREFIX) })
-            dao.apply(VersionedSetDelta(insert, delete, revision, replace))
-            current = dao.revision() ?: error("Missing SponsorBlock revision")
+            try {
+                service.binaryHashPrefixes(current).use { binary.apply(current, it.byteStream()) }
+            } catch (e: InvalidSponsorBlockFile) {
+                if (current == 0L) throw e
+                service.binaryHashPrefixes(0L).use { binary.apply(current, it.byteStream(), requireFull = true) }
+            }
+            current = binary.revision()
         }
-    }
-
-    private companion object {
-        val PREFIX = Regex("[0-9a-f]{8}")
     }
 }
 
@@ -80,6 +72,8 @@ class SponsorBlockDatasetWorker(context: Context, parameters: WorkerParameters) 
         if (!feature.mvpEnabled().isEnabled()) return@withContext Result.success()
         try {
             sync.sync()
+            Result.success()
+        } catch (e: UnsupportedSponsorBlockFormat) {
             Result.success()
         } catch (e: CancellationException) {
             throw e

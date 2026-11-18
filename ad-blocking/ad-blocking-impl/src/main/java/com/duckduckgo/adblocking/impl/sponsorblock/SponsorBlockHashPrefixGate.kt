@@ -16,8 +16,10 @@
 
 package com.duckduckgo.adblocking.impl.sponsorblock
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SponsorBlockHashPrefixGate {
@@ -26,6 +28,10 @@ interface SponsorBlockHashPrefixGate {
 }
 
 @ContributesBinding(AppScope::class)
-class RealSponsorBlockHashPrefixGate @Inject constructor(private val dao: SponsorBlockDatasetDao) : SponsorBlockHashPrefixGate {
-    override suspend fun hasSegments(hashPrefix: String): Boolean = dao.hasSegments(hashPrefix)
+class RealSponsorBlockHashPrefixGate @Inject constructor(
+    private val binary: SponsorBlockBinaryStore,
+    private val dispatchers: DispatcherProvider,
+) : SponsorBlockHashPrefixGate {
+    override suspend fun hasSegments(hashPrefix: String): Boolean =
+        withContext(dispatchers.io()) { binary.contains(hashPrefix) }
 }

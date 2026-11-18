@@ -13,78 +13,181 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.duckduckgo.adblocking.impl.sponsorblock
 
-import androidx.room.Room
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.ListenableWorker.Result
+import androidx.work.testing.TestListenableWorkerBuilder
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
+import java.io.IOException
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SponsorBlockDatasetSyncTest {
-    private val database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), SponsorBlockDatasetDatabase::class.java).build()
-    private val dao = database.dao()
+    @get:Rule val coroutineRule = CoroutineTestRule()
+    private val feature = FakeFeatureToggleFactory.create(SponsorBlockFeature::class.java)
+    private val context = ApplicationProvider.getApplicationContext<Context>()
+    private val file = File(context.filesDir, "sponsorblock-prefixes.bin")
+    private lateinit var store: SponsorBlockBinaryStore
     private val service = FakeService()
-    private val sync = SponsorBlockDatasetSync(service, dao)
+    private lateinit var sync: SponsorBlockDatasetSync
 
-    @After fun close() = database.close()
+    @Before fun setup() {
+        file.delete()
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        store = SponsorBlockBinaryStore(context)
+        sync = SponsorBlockDatasetSync(service, store)
+    }
 
-    @Test fun fullDiffAndFallbackAreApplied() = runTest {
-        assertTrue(dao.hasSegments(REMOVED_PREFIX))
+    @After fun clean() { file.delete() }
+
+    @Test fun initialAndMultiStepSync() = runTest {
         service.latest = 1
-        service.responses[0] = SponsorBlockDeltaResponse(setOf(REMOVED_PREFIX, RETAINED_PREFIX), emptySet(), true, 1)
+        service.responses[0L] = full(1, listOf(1))
         sync.sync()
-        assertTrue(dao.hasSegments(REMOVED_PREFIX))
-        assertFalse(dao.hasSegments(ADDED_PREFIX))
+        service.latest = 3
+        service.responses[1L] = diff(2, listOf(2), listOf(1), listOf(2))
+        service.responses[2L] = diff(3, listOf(3), emptyList(), listOf(2, 3))
+        sync.sync()
+        assertEquals(listOf(0L, 1L, 2L), service.requests)
+        assertEquals(3L, store.revision())
+        assertFalse(store.contains("00000001"))
+        assertTrue(store.contains("00000002"))
+        assertTrue(store.contains("00000003"))
+    }
+
+    @Test fun syncsUnsignedRevisionAboveSignedIntRange() = runTest {
+        service.latest = 0xffffffffL
+        service.responses[0L] = full(0xffffffffL, listOf(1))
+        sync.sync()
+        assertEquals(0xffffffffL, store.revision())
+        assertEquals(listOf(0L), service.requests)
+    }
+
+    @Test fun invalidDiffFallsBackToFull() = runTest {
+        store.apply(0, full(1, listOf(1)).inputStream())
         service.latest = 2
-        service.responses[1] = SponsorBlockDeltaResponse(setOf(ADDED_PREFIX), setOf(REMOVED_PREFIX), false, 2)
+        service.responses[1L] = byteArrayOf(1)
+        service.responses[0L] = full(2, listOf(2))
         sync.sync()
-        assertFalse(dao.hasSegments(REMOVED_PREFIX))
-        assertTrue(dao.hasSegments(ADDED_PREFIX))
-        assertEquals(2, dao.revision())
-        service.latest = 4
-        service.responses[2] = SponsorBlockDeltaResponse(setOf(INTERMEDIATE_PREFIX), emptySet(), false, 3)
-        service.responses[3] = SponsorBlockDeltaResponse(setOf(REPLACEMENT_PREFIX), emptySet(), true, 4)
-        sync.sync()
-        assertEquals(listOf(0, 1, 2, 3), service.requests)
-        assertFalse(dao.hasSegments(ADDED_PREFIX))
-        assertTrue(dao.hasSegments(REPLACEMENT_PREFIX))
-        assertEquals(4, dao.revision())
-        sync.sync()
-        assertEquals(4, service.requests.size)
+        assertEquals(listOf(1L, 0L), service.requests)
+        assertEquals(2L, store.revision())
+        assertTrue(store.contains("00000002"))
     }
 
-    @Test fun invalidDeltaDoesNotChangeStoredData() = runTest {
-        service.latest = 1
-        service.responses[0] = SponsorBlockDeltaResponse(setOf("invalid"), emptySet(), true, 1)
-        try { sync.sync() } catch (_: IllegalArgumentException) { }
-        assertEquals(null, dao.revision())
-        assertTrue(dao.hasSegments(REMOVED_PREFIX))
+    @Test fun invalidFallbackPreservesOldFileAndCanRetry() = runTest {
+        store.apply(0, full(1, listOf(1)).inputStream())
+        service.latest = 2
+        service.responses[1L] = byteArrayOf(1)
+        service.responses[0L] = byteArrayOf(1)
+        try {
+            sync.sync()
+            fail("Expected invalid file")
+        } catch (_: InvalidSponsorBlockFile) { }
+        assertEquals(1L, store.revision())
+        assertTrue(store.contains("00000001"))
+        assertEquals(1L, SponsorBlockBinaryStore(context).revision())
+        service.responses[0L] = full(2, listOf(2))
+        sync.sync()
+        assertEquals(2L, store.revision())
     }
 
-    private companion object {
-        const val REMOVED_PREFIX = "0649a8bb"
-        const val RETAINED_PREFIX = "0a130329"
-        const val ADDED_PREFIX = "cb1ad2a7"
-        const val INTERMEDIATE_PREFIX = "2fee55bc"
-        const val REPLACEMENT_PREFIX = "0a13c480"
+    @Test fun fallbackRejectsDiffAndKeepsOldFile() = runTest {
+        store.apply(0, full(1, listOf(1)).inputStream())
+        service.latest = 2
+        service.responses[1L] = byteArrayOf(1)
+        service.responses[0L] = diff(2, listOf(2), emptyList(), listOf(1, 2))
+        try {
+            sync.sync()
+            fail("Expected full response")
+        } catch (_: InvalidSponsorBlockFile) { }
+        assertEquals(listOf(1L, 0L), service.requests)
+        assertEquals(1L, store.revision())
+        assertTrue(store.contains("00000001"))
+    }
+
+    @Test fun failedDownloadPreservesOldFileAndCanRetry() = runTest {
+        store.apply(0, full(1, listOf(1)).inputStream())
+        service.latest = 2
+        service.failure = IOException("network")
+        try {
+            sync.sync()
+            fail("Expected download failure")
+        } catch (_: IOException) { }
+        assertEquals(1L, store.revision())
+        assertTrue(SponsorBlockBinaryStore(context).contains("00000001"))
+        service.failure = null
+        service.responses[1L] = diff(2, listOf(2), emptyList(), listOf(1, 2))
+        sync.sync()
+        assertEquals(2L, store.revision())
+    }
+
+    @Test fun unsupportedVersionDoesNotFallback() = runTest {
+        store.apply(0, full(1, listOf(1)).inputStream())
+        service.latest = 2
+        service.responses[1L] = full(2, listOf(2)).apply { this[4] = 2 }
+        try {
+            sync.sync()
+            fail("Expected unsupported version")
+        } catch (_: UnsupportedSponsorBlockFormat) { }
+        assertEquals(listOf(1L), service.requests)
+        assertEquals(1L, store.revision())
+        assertTrue(store.contains("00000001"))
+    }
+
+    @Test fun workerRetriesFailuresAndDefersUnsupportedVersions() = runTest {
+        store.apply(0, full(1, listOf(1)).inputStream())
+        service.latest = 2
+        service.failure = IOException("network")
+        val worker = TestListenableWorkerBuilder<SponsorBlockDatasetWorker>(context).build().also {
+            it.sync = sync
+            it.feature = feature
+            it.dispatchers = coroutineRule.testDispatcherProvider
+        }
+        assertEquals(Result.retry(), worker.doWork())
+        service.failure = null
+        service.responses[1L] = full(2, listOf(2)).apply { this[4] = 2 }
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(1L, store.revision())
+    }
+
+    @Test fun enabledDatasetRequiresMatchingPrefix() = runTest {
+        val gate = RealSponsorBlockHashPrefixGate(store, coroutineRule.testDispatcherProvider)
+        assertFalse(gate.hasSegments("00000001"))
+        store.apply(0, full(1, listOf(1)).inputStream())
+        assertTrue(gate.hasSegments("00000001"))
+        assertFalse(gate.hasSegments("00000002"))
     }
 
     private class FakeService : SponsorBlockDatasetService {
-        var latest = 0
-        val responses = mutableMapOf<Int, SponsorBlockDeltaResponse>()
-        val requests = mutableListOf<Int>()
-        override suspend fun revision() = SponsorBlockRevisionResponse(latest)
-        override suspend fun hashPrefixes(revision: Int): SponsorBlockDeltaResponse {
+        var revisionRequests = 0
+        var latest = 0L
+        var failure: IOException? = null
+        val responses = mutableMapOf<Long, ByteArray>()
+        val requests = mutableListOf<Long>()
+        override suspend fun revision(): SponsorBlockRevisionResponse {
+            revisionRequests++
+            return SponsorBlockRevisionResponse(latest)
+        }
+        override suspend fun binaryHashPrefixes(revision: Long): ResponseBody {
             requests += revision
-            return responses.getValue(revision)
+            failure?.let { throw it }
+            return responses.getValue(revision).toResponseBody()
         }
     }
 }
