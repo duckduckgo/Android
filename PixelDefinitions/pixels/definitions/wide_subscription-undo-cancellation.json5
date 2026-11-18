@@ -64,7 +64,25 @@
             {
                 "key": "feature.data.ext.failure_reason",
                 "description": "Play billing error. Only present on FAILURE events.",
-                "type": "string"
+                "enum": [
+                    "SERVICE_TIMEOUT",
+                    "FEATURE_NOT_SUPPORTED",
+                    "SERVICE_DISCONNECTED",
+                    "USER_CANCELED",
+                    "SERVICE_UNAVAILABLE",
+                    "BILLING_UNAVAILABLE",
+                    "ITEM_UNAVAILABLE",
+                    "DEVELOPER_ERROR",
+                    "ERROR",
+                    "ITEM_ALREADY_OWNED",
+                    "ITEM_NOT_OWNED",
+                    "NETWORK_ERROR",
+                    "UNKNOWN_ERROR",
+                    "BILLING_CRASH_ERROR",
+                    "UNKNOWN",
+                    "empty old purchase token",
+                    "Missing product details"
+                ]
             },
             {
                 "key": "feature.data.ext.step.check_eligibility",
