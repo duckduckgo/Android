@@ -469,10 +469,11 @@ class BrowserMenuBottomSheet(
             showChatHistory = viewState.showDuckChatHistoryOption,
             showChatSettings = true,
         )
+        renderVpnMenu(viewState.vpnMenuState)
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = false
-        binding.privacyToolsSectionDivider.isVisible = false
+        binding.privacyToolsSectionDivider.isVisible = viewState.vpnMenuState != VpnMenuState.Hidden
         binding.utilitiesSectionDivider.isVisible = true
         binding.customTabsMenuDivider.isVisible = false
     }
