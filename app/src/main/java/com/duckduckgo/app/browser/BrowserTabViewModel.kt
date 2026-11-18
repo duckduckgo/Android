@@ -404,8 +404,8 @@ import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.PromoRecordObserver
+import com.duckduckgo.duckchat.api.isDuckAiConversation
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -6139,6 +6139,10 @@ class BrowserTabViewModel @Inject constructor(
         openNewDuckChatTab(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, fromDuckAiChat = true)
     }
 
+    fun openNewDuckChatFromSwipeUp() {
+        openNewDuckChatTab(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, fromDuckAiChat = true)
+    }
+
     /** New Chat from the browsing menu, which is reachable from any view mode. */
     fun openNewDuckChat(viewMode: ViewMode) {
         val entryPoint = browsingMenuDuckChatEntryPoint(viewMode)
@@ -6158,7 +6162,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val emptyChats = tabRepository.getTabs().filter { tab ->
-                tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && it.toChatIdOrNull(duckChat) == null } == true
+                tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && !it.isDuckAiConversation(duckChat) } == true
             }
             val emptyChat = emptyChats.firstOrNull { it.tabId == tabId } ?: emptyChats.firstOrNull()
             if (emptyChat != null) {

@@ -24,6 +24,7 @@ import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.ActionMode
 import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.view.WindowInsets
 import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
@@ -74,6 +75,12 @@ class DuckDuckGoWebView :
     private var hasGestureFinished = true
     private var canSwipeToRefresh = true
     private var systemAutofillCallback: (() -> Unit)? = null
+    private var bottomPullListener: BottomPullListener? = null
+    private var pullPointerId = MotionEvent.INVALID_POINTER_ID
+    private val bottomPull = BottomPullTracker(
+        touchSlopPx = ViewConfiguration.get(context).scaledTouchSlop,
+        longPressTimeoutMs = ViewConfiguration.getLongPressTimeout().toLong(),
+    )
 
     private var lastY: Int = 0
     private var lastDeltaY: Int = 0
@@ -318,8 +325,11 @@ class DuckDuckGoWebView :
         if (action == MotionEvent.ACTION_DOWN) {
             nestedOffsetY = 0
         }
-        val eventY = event.y.toInt()
-        event.offsetLocation(0f, nestedOffsetY.toFloat())
+        val viewTop = (event.rawY - event.y).toInt()
+        trackBottomPull(event, viewTop)
+        val pullOffset = bottomPull.touchOffset(viewTop)
+        val eventY = event.y.toInt() + pullOffset
+        event.offsetLocation(0f, (nestedOffsetY + pullOffset).toFloat())
 
         when (action) {
             MotionEvent.ACTION_UP -> {
@@ -369,6 +379,38 @@ class DuckDuckGoWebView :
 
         return returnValue
     }
+
+    private fun trackBottomPull(event: MotionEvent, viewTop: Int) {
+        val wasPulling = bottomPull.isPulling
+        val timeMs = event.eventTime
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                pullPointerId = event.getPointerId(0)
+                bottomPull.onDown(event.screenY(0), timeMs)
+            }
+            MotionEvent.ACTION_MOVE -> if (bottomPull.onMove(event.pullPointerScreenY(), timeMs, viewTop)) {
+                bottomPullListener?.onPull(bottomPull.distance)
+            }
+            MotionEvent.ACTION_POINTER_UP -> if (event.getPointerId(event.actionIndex) == pullPointerId) {
+                val nextIndex = if (event.actionIndex == 0) 1 else 0
+                pullPointerId = event.getPointerId(nextIndex)
+                bottomPull.onPointerChanged(event.screenY(nextIndex), timeMs)
+            }
+            MotionEvent.ACTION_UP -> if (wasPulling) {
+                bottomPull.onUp(event.pullPointerScreenY(), timeMs)
+                bottomPullListener?.onPullReleased(bottomPull.releaseVelocity())
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                bottomPull.freeze()
+                if (wasPulling) bottomPullListener?.onPullCancelled()
+            }
+        }
+    }
+
+    private fun MotionEvent.pullPointerScreenY(): Int = screenY(findPointerIndex(pullPointerId).coerceAtLeast(0))
+
+    // every pointer shares the view's offset on screen.
+    private fun MotionEvent.screenY(pointerIndex: Int): Int = (getY(pointerIndex) + rawY - y).toInt()
 
     override fun setNestedScrollingEnabled(enabled: Boolean) {
         nestedScrollHelper.isNestedScrollingEnabled = enabled
@@ -468,7 +510,16 @@ class DuckDuckGoWebView :
         }
 
         enableSwipeRefresh(canSwipeToRefresh && clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
+        bottomPull.onOverScrolled(clampedY, canScrollDown = canScrollVertically(1)) { bottomPullListener?.canStartPull() == true }
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
+    }
+
+    fun setBottomPullListener(listener: BottomPullListener) {
+        bottomPullListener = listener
+    }
+
+    fun removeBottomPullListener() {
+        bottomPullListener = null
     }
 
     fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {

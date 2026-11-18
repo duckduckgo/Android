@@ -14766,6 +14766,41 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnlySharedConversationExistsThenCreateNewChat() = runTest {
+        val url = "https://duck.ai/share/shared-id"
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("shared", url = url)))
+        whenever(mockDuckChat.isDuckChatUrl(url.toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromChatMenu()
+
+        assertCommandNotIssued<Command.SwitchToTab>()
+        assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
+    }
+
+    @Test
+    fun whenNewChatRequestedBySwipingUpThenOpensNewTabWithEmptyChat() = runTest {
+        testee.openNewDuckChatFromSwipeUp()
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
+        }
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
+    fun whenNewChatRequestedBySwipingUpAndCurrentChatIsEmptyThenNothingHappens() = runTest {
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("abc", url = "https://duck.ai/")))
+        whenever(mockDuckChat.isDuckChatUrl("https://duck.ai/".toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromSwipeUp()
+
+        assertCommandNotIssued<Command.OpenInNewTab>()
+        assertCommandNotIssued<Command.SwitchToTab>()
+    }
+
+    @Test
     fun whenNewChatRequestedFromChatMenuThenOpensNewTabWithEmptyChat() = runTest {
         testee.openNewDuckChatFromChatMenu()
 
