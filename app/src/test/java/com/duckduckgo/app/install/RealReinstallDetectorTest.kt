@@ -18,6 +18,7 @@ package com.duckduckgo.app.install
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.InstallSourceInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Environment
@@ -31,7 +32,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
-import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.persistentstorage.api.PersistentStorageKey
@@ -86,7 +86,6 @@ class RealReinstallDetectorTest {
         on { packageName } doReturn PACKAGE_NAME
         on { packageManager } doReturn packageManager
     }
-    private val installSourceExtractor: InstallSourceExtractor = mock()
     private val ddgDownloadsDirectory = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "DuckDuckGo",
@@ -604,7 +603,7 @@ class RealReinstallDetectorTest {
     @Config(sdk = [34])
     fun whenFolderChangedSecondsBeforeGalaxyStoreInstallThenFolderAgePixelIsSentAndAnswerIsUnchanged() = runTest {
         givenFolderChangedRelativeToInstall(offsetMs = -5_000L)
-        whenever(installSourceExtractor.extract()).thenReturn("com.sec.android.app.samsungapps")
+        givenInstaller("com.sec.android.app.samsungapps")
 
         assertTrue(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
 
@@ -615,7 +614,7 @@ class RealReinstallDetectorTest {
     @Config(sdk = [34])
     fun whenFolderChangedAMinuteAfterPlayStoreInstallThenFolderAgePixelReportsUpTo2Minutes() = runTest {
         givenFolderChangedRelativeToInstall(offsetMs = 60_000L)
-        whenever(installSourceExtractor.extract()).thenReturn("com.android.vending")
+        givenInstaller("com.android.vending")
 
         reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
 
@@ -626,7 +625,7 @@ class RealReinstallDetectorTest {
     @Config(sdk = [34])
     fun whenFolderChangedMinutesFromInstallByUnknownInstallerThenFolderAgePixelReportsOther() = runTest {
         givenFolderChangedRelativeToInstall(offsetMs = -5 * 60_000L)
-        whenever(installSourceExtractor.extract()).thenReturn(null)
+        givenInstaller(null)
 
         reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
 
@@ -637,7 +636,7 @@ class RealReinstallDetectorTest {
     @Config(sdk = [34])
     fun whenReadingInstallerFailsThenFolderAgePixelReportsOther() = runTest {
         givenFolderChangedRelativeToInstall(offsetMs = 0L)
-        whenever(installSourceExtractor.extract()).thenThrow(IllegalStateException("not found"))
+        whenever(packageManager.getInstallSourceInfo(PACKAGE_NAME)).thenThrow(PackageManager.NameNotFoundException("not found"))
 
         reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
 
@@ -648,7 +647,7 @@ class RealReinstallDetectorTest {
     @Config(sdk = [34])
     fun whenFolderChangedMoreThan10MinutesFromInstallThenFolderAgePixelReportsOver10Minutes() = runTest {
         givenFolderChangedRelativeToInstall(offsetMs = -10 * 60_000L - 1)
-        whenever(installSourceExtractor.extract()).thenReturn("com.android.vending")
+        givenInstaller("com.android.vending")
 
         assertTrue(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
 
@@ -700,6 +699,11 @@ class RealReinstallDetectorTest {
         )
     }
 
+    private fun givenInstaller(packageName: String?) {
+        val installSourceInfo: InstallSourceInfo = mock { on { installingPackageName } doReturn packageName }
+        whenever(packageManager.getInstallSourceInfo(PACKAGE_NAME)).thenReturn(installSourceInfo)
+    }
+
     private fun reinstallDetectorWith(
         preferences: SharedPreferences,
         dispatcherProvider: DispatcherProvider = this.dispatcherProvider,
@@ -716,7 +720,6 @@ class RealReinstallDetectorTest {
             pixel = pixel,
             currentTimeProvider = currentTimeProvider,
             appBuildConfig = appBuildConfig,
-            installSourceExtractor = installSourceExtractor,
         )
     }
 

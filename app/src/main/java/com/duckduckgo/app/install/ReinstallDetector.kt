@@ -30,7 +30,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageKey
 import com.duckduckgo.persistentstorage.api.PersistentStorageUnavailableException
@@ -83,7 +82,6 @@ class RealReinstallDetector @Inject constructor(
     private val pixel: Pixel,
     private val currentTimeProvider: CurrentTimeProvider,
     private val appBuildConfig: AppBuildConfig,
-    private val installSourceExtractor: InstallSourceExtractor,
 ) : ReinstallDetector, MainProcessLifecycleObserver {
 
     private val sdkInt: Int = Build.VERSION.SDK_INT
@@ -258,10 +256,20 @@ class RealReinstallDetector @Inject constructor(
         )
     }
 
-    private fun installer(): ReinstallFolderInstaller = when (runCatching { installSourceExtractor.extract() }.getOrNull()) {
+    private fun installer(): ReinstallFolderInstaller = when (runCatching { installerPackageName() }.getOrNull()) {
         GALAXY_STORE_PACKAGE -> ReinstallFolderInstaller.GALAXY_STORE
         PLAY_STORE_PACKAGE -> ReinstallFolderInstaller.PLAY_STORE
         else -> ReinstallFolderInstaller.OTHER
+    }
+
+    private fun installerPackageName(): String? {
+        val packageManager = context.packageManager
+        return if (Build.VERSION.SDK_INT >= 30) {
+            packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getInstallerPackageName(context.packageName)
+        }
     }
 
     private fun getDownloadsDirectory(): File {
