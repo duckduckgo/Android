@@ -76,7 +76,6 @@ class DuckAiWidgetConfigurator @Inject constructor(
     private val repository: DuckChatFeatureRepository,
     private val duckChat: DuckChatInternal,
     private val chats: DuckAiChatsWidgetChats,
-    private val widgetPreferences: DuckAiWidgetPreferences,
     private val intents: DuckAiWidgetIntents,
     private val dispatcherProvider: DispatcherProvider,
 ) {
@@ -88,7 +87,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
         heightDp: Int,
         widthDp: Int = Int.MAX_VALUE,
     ): RemoteViews {
-        val loaded = load(appWidgetId)
+        val state = load()
         if (Build.VERSION.SDK_INT >= 31) {
             suspend fun variant(showLabels: Boolean, showChats: Boolean) =
                 RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight).also {
@@ -96,7 +95,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
                         context = context,
                         appWidgetId = appWidgetId,
                         remoteViews = it,
-                        loaded = loaded,
+                        state = state,
                         showChats = showChats,
                         showLabels = showLabels,
                     )
@@ -104,11 +103,11 @@ class DuckAiWidgetConfigurator @Inject constructor(
 
             val variants = buildMap {
                 put(SizeF(MIN_WIDTH_DP, MIN_HEIGHT_DP), variant(showLabels = false, showChats = false))
-                if (loaded.showChats) {
+                if (state.hasChats()) {
                     put(SizeF(MIN_WIDTH_DP, MIN_CHATS_HEIGHT_DP.toFloat()), variant(showLabels = false, showChats = true))
                 }
                 put(SizeF(MIN_LABELS_WIDTH_DP.toFloat(), MIN_HEIGHT_DP), variant(showLabels = true, showChats = false))
-                if (loaded.showChats) {
+                if (state.hasChats()) {
                     put(
                         SizeF(MIN_LABELS_WIDTH_DP.toFloat(), MIN_CHATS_HEIGHT_DP.toFloat()),
                         variant(showLabels = true, showChats = true),
@@ -122,8 +121,8 @@ class DuckAiWidgetConfigurator @Inject constructor(
                 context = context,
                 appWidgetId = appWidgetId,
                 remoteViews = it,
-                loaded = loaded,
-                showChats = loaded.showChats && heightDp >= MIN_CHATS_HEIGHT_DP,
+                state = state,
+                showChats = state.hasChats() && heightDp >= MIN_CHATS_HEIGHT_DP,
                 showLabels = widthDp >= MIN_LABELS_WIDTH_DP,
             )
         }
@@ -136,45 +135,38 @@ class DuckAiWidgetConfigurator @Inject constructor(
         heightDp: Int = Int.MAX_VALUE,
         widthDp: Int = Int.MAX_VALUE,
     ) {
-        val loaded = load(appWidgetId)
+        val state = load()
         render(
             context = context,
             appWidgetId = appWidgetId,
             remoteViews = remoteViews,
-            loaded = loaded,
-            showChats = loaded.showChats && heightDp >= MIN_CHATS_HEIGHT_DP,
+            state = state,
+            showChats = state.hasChats() && heightDp >= MIN_CHATS_HEIGHT_DP,
             showLabels = widthDp >= MIN_LABELS_WIDTH_DP,
         )
     }
 
-    private suspend fun load(appWidgetId: Int): Loaded {
-        val showChats = widgetPreferences.showRecentChats(appWidgetId)
-        val state = withContext(dispatcherProvider.io()) {
-            if (!(duckChatFeature.self().isEnabled() && repository.isDuckChatUserEnabled())) return@withContext null
-            loadState(showChats)
-        }
-        // With no chats the compact layout replaces the chats section, so there is no empty state to render.
-        val hasNoChats = state != null && state.chatHistoryAvailable && state.chats.isEmpty()
-        return Loaded(showChats && !hasNoChats, state)
+    private suspend fun load(): State? = withContext(dispatcherProvider.io()) {
+        if (!(duckChatFeature.self().isEnabled() && repository.isDuckChatUserEnabled())) return@withContext null
+        loadState()
     }
+
+    private fun State?.hasChats() = this != null && chats.isNotEmpty()
 
     private suspend fun render(
         context: Context,
         appWidgetId: Int,
         remoteViews: RemoteViews,
-        loaded: Loaded,
+        state: State?,
         showChats: Boolean,
         showLabels: Boolean,
     ) {
-        val state = loaded.state
         withContext(dispatcherProvider.main()) {
             if (Build.VERSION.SDK_INT >= 31) fitCardToContent(remoteViews, !showChats)
             showActionLabels(context, remoteViews, showLabels)
             remoteViews.setViewVisibility(R.id.chatsSection, if (showChats) View.VISIBLE else View.GONE)
             if (state == null) {
                 logcat { "DuckAiWidgetProvider Duck.ai disabled, click targets not wired" }
-                remoteViews.setViewVisibility(R.id.chatsViewAllContainer, View.GONE)
-                showUnavailableMessage(remoteViews)
                 return@withContext
             }
 
@@ -182,18 +174,13 @@ class DuckAiWidgetConfigurator @Inject constructor(
                 R.id.promptBarContainer,
                 intents.launchDuckAi(context, DuckAiWidgetTarget.PROMPT_BAR.requestCode, null, widgetLaunch),
             )
-            wireActions(context, remoteViews, state)
+            wireActions(context, remoteViews)
             if (showChats) {
-                wireViewAllChats(context, remoteViews, state.chatHistoryAvailable)
-                renderChats(context, appWidgetId, remoteViews, state)
+                wireViewAllChats(context, remoteViews)
+                showChats(context, appWidgetId, remoteViews, state)
             }
         }
     }
-
-    private class Loaded(
-        val showChats: Boolean,
-        val state: State?,
-    )
 
     @RequiresApi(31)
     private fun fitCardToContent(remoteViews: RemoteViews, fit: Boolean) {
@@ -213,11 +200,9 @@ class DuckAiWidgetConfigurator @Inject constructor(
         }
     }
 
-    private suspend fun loadState(showChats: Boolean): State {
-        val historyAvailable = showChats && duckChat.isChatHistoryAvailable()
-        val widgetChats = if (historyAvailable) runCatching { chats.getChats() }.getOrDefault(emptyList()) else emptyList()
+    private suspend fun loadState(): State {
+        val widgetChats = if (duckChat.isChatHistoryAvailable()) runCatching { chats.getChats() }.getOrDefault(emptyList()) else emptyList()
         return State(
-            chatHistoryAvailable = historyAvailable,
             chats = widgetChats,
             chatUrls = widgetChats.associate { it.chatId to duckChat.buildChatUrl(it.chatId) },
         )
@@ -226,7 +211,6 @@ class DuckAiWidgetConfigurator @Inject constructor(
     private fun wireActions(
         context: Context,
         remoteViews: RemoteViews,
-        state: State,
     ) {
         remoteViews.setOnClickPendingIntent(
             R.id.actionVoice,
@@ -260,32 +244,8 @@ class DuckAiWidgetConfigurator @Inject constructor(
     private fun wireViewAllChats(
         context: Context,
         remoteViews: RemoteViews,
-        chatHistoryAvailable: Boolean,
     ) {
-        if (chatHistoryAvailable) {
-            remoteViews.setViewVisibility(R.id.chatsViewAllContainer, View.VISIBLE)
-            remoteViews.setOnClickPendingIntent(R.id.chatsViewAll, intents.openChatHistory(context, DuckAiWidgetTarget.VIEW_ALL_CHATS.requestCode))
-        } else {
-            remoteViews.setViewVisibility(R.id.chatsViewAllContainer, View.GONE)
-        }
-    }
-
-    private fun renderChats(
-        context: Context,
-        appWidgetId: Int,
-        remoteViews: RemoteViews,
-        state: State,
-    ) {
-        if (state.chatHistoryAvailable) {
-            showChats(context, appWidgetId, remoteViews, state)
-        } else {
-            showUnavailableMessage(remoteViews)
-        }
-    }
-
-    private fun showUnavailableMessage(remoteViews: RemoteViews) {
-        remoteViews.setViewVisibility(R.id.chatsList, View.GONE)
-        remoteViews.setViewVisibility(R.id.chatsMessageUnavailable, View.VISIBLE)
+        remoteViews.setOnClickPendingIntent(R.id.chatsViewAll, intents.openChatHistory(context, DuckAiWidgetTarget.VIEW_ALL_CHATS.requestCode))
     }
 
     private fun showChats(
@@ -294,9 +254,6 @@ class DuckAiWidgetConfigurator @Inject constructor(
         remoteViews: RemoteViews,
         state: State,
     ) {
-        remoteViews.setViewVisibility(R.id.chatsMessageUnavailable, View.GONE)
-        remoteViews.setViewVisibility(R.id.chatsList, View.VISIBLE)
-
         val items = RemoteViewsCompat.RemoteCollectionItems.Builder().setHasStableIds(true)
         state.chats.forEach { items.addItem(it.chatId.hashCode().toLong(), chatView(context, it, state.chatUrls.getValue(it.chatId))) }
         RemoteViewsCompat.setRemoteAdapter(context, remoteViews, appWidgetId, R.id.chatsList, items.build())
@@ -317,7 +274,6 @@ class DuckAiWidgetConfigurator @Inject constructor(
     }
 
     private class State(
-        val chatHistoryAvailable: Boolean,
         val chats: List<DuckAiChatsWidgetChat>,
         val chatUrls: Map<String, String>,
     )
