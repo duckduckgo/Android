@@ -427,29 +427,14 @@ class AppSyncAccountRepository @Inject constructor(
             return@withContext Error(reason = "Rename Device: only this device can be renamed").alsoFireUpdateDeviceErrorPixel()
         }
 
-        val withDeviceInfo = syncFeature.canWriteDeviceInfo()
-        val canPatchDevice = withDeviceInfo || syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled()
-        logcat { "Sync-UnifiedDevices: rename via ${if (canPatchDevice) "PATCH" else "login"}, withDeviceInfo=$withDeviceInfo" }
-        if (canPatchDevice) {
-            return@withContext when (
-                val result = deviceInfoUpdater.setThisDeviceName(
-                    name = device.deviceName,
-                    source = DeviceInfoUpdateSource.UPDATE,
-                )
-            ) {
-                is Success -> Success(true)
-                is Error -> result.alsoFireUpdateDeviceErrorPixel()
-            }
-        }
-
-        // Legacy re-registration, which leaves device_info untouched
-        val userId = syncStore.userId
-            ?: return@withContext Error(reason = "Rename Device: Not existing userId").alsoFireUpdateDeviceErrorPixel()
-        val primaryKey = syncStore.primaryKey
-            ?: return@withContext Error(reason = "Rename Device: Not existing primaryKey").alsoFireUpdateDeviceErrorPixel()
-        performLogin(userId, device.deviceId, device.deviceName, primaryKey).onFailure {
-            it.alsoFireUpdateDeviceErrorPixel()
-            return@withContext it.copy(code = LOGIN_FAILED.code)
+        when (
+            val result = deviceInfoUpdater.setThisDeviceName(
+                name = device.deviceName,
+                source = DeviceInfoUpdateSource.UPDATE,
+            )
+        ) {
+            is Success -> Success(true)
+            is Error -> result.alsoFireUpdateDeviceErrorPixel()
         }
     }
 

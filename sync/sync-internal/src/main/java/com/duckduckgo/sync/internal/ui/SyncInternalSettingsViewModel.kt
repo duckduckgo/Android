@@ -162,7 +162,6 @@ constructor(
         val fetchDecryptAuditLogResult: String = "",
         val canWriteUnifiedDeviceListEnabled: Boolean = false,
         val canReadUnifiedDeviceListEnabled: Boolean = false,
-        val canUsePatchEndpointForLegacyDeviceRenameEnabled: Boolean = false,
         val migrationStatusText: String = "",
         val migrationResult: String = "",
         val authenticateResult: String = "",
@@ -379,7 +378,6 @@ constructor(
                 fetchDecryptAuditLogResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptAuditLogResult else "",
                 canWriteUnifiedDeviceListEnabled = syncFeature.canWriteUnifiedDeviceList().isEnabled(),
                 canReadUnifiedDeviceListEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled(),
-                canUsePatchEndpointForLegacyDeviceRenameEnabled = syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled(),
                 migrationStatusText = buildMigrationStatusText(),
                 migrationResult = if (accountInfo.isSignedIn) viewState.value.migrationResult else "",
             ),
@@ -882,14 +880,6 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Sync-UnifiedDevices: setting canReadUnifiedDeviceList flag = $enabled" }
             setRawToggleState(syncFeature.canReadUnifiedDeviceList(), enabled)
-            updateViewState()
-        }
-    }
-
-    fun onCanUsePatchEndpointForLegacyDeviceRenameFlagChanged(enabled: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-UnifiedDevices: setting canUsePatchEndpointForLegacyDeviceRename flag = $enabled" }
-            setRawToggleState(syncFeature.canUsePatchEndpointForLegacyDeviceRename(), enabled)
             updateViewState()
         }
     }

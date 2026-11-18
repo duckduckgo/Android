@@ -119,16 +119,6 @@ interface SyncFeature {
     fun canReadUnifiedDeviceList(): Toggle
 
     /**
-     * Whether to rename this device using new `PATCH /sync/devices` or legacy `login` endpoint
-     * Applies only when [canWriteUnifiedDeviceList] is disabled.
-     *
-     * If this flag is enabled, it will use the `PATCH /sync/devices` endpoint and omit `device_info`
-     * If this flag is disabled, it will fallback to the previous renaming endpoint using `POST /sync/login`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canUsePatchEndpointForLegacyDeviceRename(): Toggle
-
-    /**
      * Kill switch for refreshing the connected devices count after app-open and background syncs. Syncs after creating or joining
      * an account always refresh it.
      */

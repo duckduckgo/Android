@@ -5568,14 +5568,6 @@
       super(`${path}: ${message}`);
     }
   };
-  var FILLS = {
-    number: /* @__PURE__ */ new Set(["number", "value"]),
-    boolean: /* @__PURE__ */ new Set(["boolean", "value"]),
-    value: /* @__PURE__ */ new Set(["value"]),
-    list: /* @__PURE__ */ new Set(["list", "value", "number"]),
-    array: /* @__PURE__ */ new Set(["list", "value"]),
-    any: /* @__PURE__ */ new Set(["boolean", "value", "number", "list"])
-  };
   var NAME_PATTERN2 = /^[a-zA-Z][a-zA-Z0-9_]*$/;
   var DEFINE_NAME_PATTERN = /^(this\.)?[a-zA-Z][a-zA-Z0-9_]*$/;
   var ACTION_KEYS = /* @__PURE__ */ new Set(["fireEvent", "breakageReportData", "define"]);
@@ -5618,18 +5610,7 @@
   function typeName(value) {
     if (value === null) return "null";
     if (isArray(value)) return "array";
-    switch (typeof value) {
-      case "number":
-      case "string":
-      case "boolean":
-      case "undefined":
-        return (
-          /** @type {'number' | 'string' | 'boolean' | 'undefined'} */
-          typeof value
-        );
-      default:
-        return "object";
-    }
+    return typeof value;
   }
   function getOrCreate(map, key, create) {
     let value = map.get(key);
@@ -5658,7 +5639,7 @@
     constructor(iterator, shortcuts = {}) {
       /** @type {unknown[]} */
       __publicField(this, "values", []);
-      /** Whether it is the condition leaf, `element` without `field` or `text`, which holds in boolean position when it has an item */
+      /** Whether it is the condition leaf, `element` without `field` or `text`, which under any / all / none is one boolean, whether it has an item */
       __publicField(this, "leaf", false);
       /** @type {Failure | undefined} */
       __publicField(this, "failure");
@@ -5851,7 +5832,7 @@
   var OPERATORS = /* @__PURE__ */ new Set(["eq", "in", "lt", "lte", "gt", "gte", "fails", "type"]);
   var COMBINATORS = /* @__PURE__ */ new Set(["any", "all", "none"]);
   var FIRST_OPERATORS = ["fails", "type"];
-  var TYPE_NAMES = /* @__PURE__ */ new Set(["number", "string", "boolean", "null", "undefined", "array", "object"]);
+  var TYPE_NAMES = /* @__PURE__ */ new Set(["number", "string", "boolean", "null", "undefined", "array", "object", "function", "symbol", "bigint"]);
   var isTypeName = (name) => TYPE_NAMES.has(name);
   function testPredicate(predicate, subject, ctx) {
     return lowered(predicate)(subject, ctx);
@@ -6074,7 +6055,6 @@
   function* selectItems(items, { where, field }, ctx) {
     for (const item of items) {
       if (where) {
-        if (typeof item !== "object" || item === null) throw new DetectionError("`where` on an item that is not an object");
         const held = testPredicate(where, item, ctx);
         if (isFailure(held)) {
           yield held;
@@ -6115,7 +6095,6 @@
     return {
       key: "api",
       parse: (raw, path, hooks, key) => parseApiBody(raw, path, hooks, key),
-      fills: (body) => body.where ? FILLS.list : FILLS.any,
       read(bodies, ctx) {
         const body = (
           /** @type {ApiBody} */
@@ -6150,7 +6129,6 @@
   init_define_import_meta_trackerLookup();
   function parseRoot(raw, path, hooks) {
     if (raw === void 0) return void 0;
-    if (isArray(raw) && raw.length === 0) throw new ConfigParseError(path, "`root` needs at least one entry");
     return { entries: asArray(raw).map((entry, i) => hooks.expression(entry, isArray(raw) ? `${path}.${i}` : path, "root")) };
   }
   function resolveRoots(root, ctx) {
@@ -6258,7 +6236,6 @@
         ...parseItemKeys(raw, path, hooks)
       };
     },
-    fills: (body) => body.field ? FILLS.list : FILLS.any,
     read(bodies, ctx) {
       return new ItemBuffer(selectElements(bodies, ctx), {
         hasAny() {
@@ -6411,7 +6388,6 @@
         rootIsSource: root !== void 0 && raw.selector === void 0 && xpaths.length === 0
       };
     },
-    fills: () => FILLS.any,
     read(bodies, ctx) {
       return new ItemBuffer(textMatches(bodies, ctx), {
         count: () => countTextMatches(bodies, ctx)
@@ -6473,75 +6449,41 @@
 
   // src/features/web-detection/compile/positions.js
   init_define_import_meta_trackerLookup();
-  function fillsOf(node) {
+  function givesList(node) {
     switch (node.kind) {
-      case "literal":
-        if (typeof node.value === "number") return FILLS.number;
-        return typeof node.value === "boolean" ? FILLS.boolean : FILLS.value;
-      case "source": {
-        const [first, ...rest] = node.bodies.map((body) => node.source.fills(body));
-        return new Set([...first ?? []].filter((position) => rest.every((fills) => fills.has(position))));
-      }
-      case "length":
-      case "only":
-      case "sum":
-      case "mul":
-      case "div":
-        return FILLS.number;
-      case "any":
-      case "all":
-      case "none":
-      case "and":
-        return FILLS.boolean;
-      case "if": {
-        const elseFills = node.else ? occurrenceFills(node.else) : FILLS.value;
-        return new Set([...occurrenceFills(node.then)].filter((p) => elseFills.has(p) && p !== "list"));
-      }
-      case "sequence":
-        return occurrenceFills(
-          /** @type {Node} */
-          node.elements[node.elements.length - 1]
-        );
+      case "source":
       case "ref":
       case "item":
-        return FILLS.any;
+      case "only":
+      case "list":
+        return true;
+      case "if":
+        return occurrenceGivesList(node.then) || node.else !== void 0 && occurrenceGivesList(node.else);
+      case "sequence": {
+        const last2 = node.elements[node.elements.length - 1];
+        return last2 !== void 0 && occurrenceGivesList(last2);
+      }
       case "expr":
       case "using":
-        return occurrenceFills(node.operand);
-      case "list":
-        return FILLS.array;
-      case "define":
-      case "fireEvent":
-      case "breakageReportData":
-        return FILLS.value;
+        return occurrenceGivesList(node.operand);
+      default:
+        return false;
     }
   }
-  function occurrenceFills(node) {
-    return node.is ? FILLS.boolean : fillsOf(node);
+  function occurrenceGivesList(node) {
+    return !node.is && givesList(node);
   }
   function finish(scope) {
     for (const { node, single: single2 } of scope.slots) {
       const leaf = single2 === "boolean" && isPresenceLeaf(node);
-      node.position = fillsOf(node).has("list") && !leaf ? "spread" : single2;
+      node.position = givesList(node) && !leaf ? "spread" : single2;
       node.single = single2;
-    }
-    for (const node of scope.nodes) {
-      if (!fits(fillsOf(node), node.position)) {
-        const what = node.kind === "source" ? `'${node.source.key}'${node.withField ? " with field" : ""}` : `'${node.kind}'`;
-        const hint = node.position === "boolean" && fillsOf(node).has("number") ? "; numbers become booleans only through `is`" : node.kind === "if" && !node.else ? "; without `else` it gives `undefined` when the condition does not hold" : "";
-        throw new ConfigParseError(node.path, `${what} does not fill ${node.position} position${hint}`);
-      }
     }
   }
   function isPresenceLeaf(node) {
     let current = node;
     while ((current.kind === "expr" || current.kind === "using") && !current.operand.is) current = current.operand;
     return current.kind === "source" && current.leaf;
-  }
-  function fits(fills, position) {
-    if (position === "spread") return fills.has("list");
-    if (position === "root") return fills.has("list") || fills.has("value");
-    return fills.has(position);
   }
 
   // src/features/web-detection/compile/compile.js
@@ -6596,7 +6538,6 @@
   }
   function compileBody(raw, position, path, scope) {
     if (!isArray(raw)) return compileExpr(raw, position, path, scope);
-    if (raw.length === 0) throw new ConfigParseError(path, "a sequence holds at least one element");
     const elements = raw.map((element, i) => compileExpr(element, i === raw.length - 1 ? position : "value", `${path}.${i}`, scope));
     return makeNode(scope, { kind: "sequence", elements, path, position });
   }
@@ -6609,45 +6550,28 @@
     }
     if (!isPlainObject(raw)) throw new ConfigParseError(path, "expected an expression");
     const keys = objectKeys(raw);
-    if (keys.some((key) => ACTION_KEYS.has(key))) return compileActions(raw, keys, position, path, scope);
+    if (keys.some((key2) => ACTION_KEYS.has(key2))) return compileActions(raw, keys, position, path, scope);
     const expressionKeys = [];
-    for (const key of keys) {
-      if (EXPRESSION_KEYS.has(key)) expressionKeys.push(key);
-      else if (BRANCH_KEYS.has(key)) {
-        if (raw.if === void 0) throw new ConfigParseError(`${path}.${key}`, `'${key}' sits beside 'if' only`);
-      } else if (!MODIFIER_KEYS.has(key)) throw new ConfigParseError(`${path}.${key}`, `unknown expression key '${key}'`);
+    for (const key2 of keys) {
+      if (EXPRESSION_KEYS.has(key2)) expressionKeys.push(key2);
+      else if (BRANCH_KEYS.has(key2)) {
+        if (raw.if === void 0) throw new ConfigParseError(`${path}.${key2}`, `'${key2}' sits beside 'if' only`);
+      } else if (!MODIFIER_KEYS.has(key2)) throw new ConfigParseError(`${path}.${key2}`, `unknown expression key '${key2}'`);
     }
-    if (raw.if !== void 0 && expressionKeys.length > 1) {
-      throw new ConfigParseError(path, `'if' takes no other expression key beside it`);
+    const [key, ...others] = expressionKeys;
+    if (key === void 0 || others.length > 0) {
+      const found = key === void 0 ? "none" : `${expressionKeys.join(", ")}: \`{"all": [...]}\` ANDs several`;
+      throw new ConfigParseError(path, `an object takes one expression key, and this one has ${found}`);
     }
     const hasIs = raw.is !== void 0;
     const hasUsing = raw.using !== void 0;
-    if (hasIs && position !== "boolean" && position !== "value")
-      throw new ConfigParseError(path, "`is` gives a boolean, in boolean or value position");
     const valuePosition = hasIs ? "value" : position;
     const keyPosition = hasUsing ? "value" : valuePosition;
-    let node;
-    if (expressionKeys.length === 0) {
-      if (hasUsing) throw new ConfigParseError(path, "`using` reads from an expression, and this object has no expression key");
-      if (hasIs || position !== "boolean") throw new ConfigParseError(path, "no expression key");
-      node = makeNode(scope, { kind: "literal", value: true, path, position });
-    } else if (expressionKeys.length > 1) {
-      if (hasIs && !hasUsing || keyPosition !== "boolean" && keyPosition !== "value") {
-        throw new ConfigParseError(path, "several expression keys are their AND, in boolean or value position and never beside `is`");
-      }
-      const operands = expressionKeys.map((key) => compileKey(key, raw[key], "boolean", `${path}.${key}`, scope));
-      node = makeNode(scope, { kind: "and", operands, path, position: keyPosition });
-    } else {
-      const key = (
-        /** @type {string} */
-        expressionKeys[0]
-      );
-      node = key === "if" ? compileIf(raw, keyPosition, path, scope) : compileKey(key, raw[key], keyPosition, `${path}.${key}`, scope);
-    }
+    let node = key === "if" ? compileIf(raw, keyPosition, path, scope) : compileKey(key, raw[key], keyPosition, `${path}.${key}`, scope);
     if (hasUsing) node = compileUsing(raw.using, node, valuePosition, path, scope);
     if (hasIs) {
       node.is = compilePredicate(raw.is, "value", `${path}.is`, scope.hooks);
-      if (position === "value") return makeNode(scope, { kind: "expr", operand: node, path, position });
+      if (position !== "boolean") return makeNode(scope, { kind: "expr", operand: node, path, position });
     }
     return node;
   }
@@ -6676,8 +6600,7 @@
     return node;
   }
   function compileDefine(raw, path, scope) {
-    if (!isPlainObject(raw) || objectKeys(raw).length === 0)
-      throw new ConfigParseError(path, "`define` takes an object of at least one name");
+    if (!isPlainObject(raw)) throw new ConfigParseError(path, "`define` takes an object of names");
     return objectKeys(raw).map((name) => {
       const namePath = `${path}.${name}`;
       if (!DEFINE_NAME_PATTERN.test(name)) throw new ConfigParseError(namePath, `invalid name '${name}'`);
@@ -6746,7 +6669,6 @@
   }
   function compileIf(raw, position, path, scope) {
     const ifPath = `${path}.if`;
-    if (position === "list") throw new ConfigParseError(ifPath, `'if' does not fill list position`);
     if (raw.then === void 0) throw new ConfigParseError(ifPath, `'if' needs 'then'`);
     const test2 = compileExpr(raw.if, "boolean", ifPath, scope);
     const then = compileBody(raw.then, position, `${path}.then`, scope);
@@ -6785,7 +6707,6 @@
     const source = scope.sources[key];
     if (key === "api" && isArray(body)) throw new ConfigParseError(path, "`api` takes one body");
     const bodies = asArray(body).map((raw, i) => source.parse(raw, isArray(body) ? `${path}.${i}` : path, scope.hooks));
-    if (bodies.length === 0) throw new ConfigParseError(path, "no bodies");
     const withField = bodies.some(hasField);
     const leaf = key === "text" || key === "element" && !withField;
     return makeNode(scope, { kind: "source", source, bodies, withField, leaf, path, position });
@@ -6839,9 +6760,6 @@
       }
     ]
   );
-  function isValidName(name) {
-    return NAME_PATTERN2.test(name);
-  }
   function normalizeDetector(config) {
     return {
       // Detectors are enabled by default
@@ -6863,10 +6781,14 @@
             /** @type {ConditionBlockOrArray} */
             config.triggers?.auto?.runConditions ?? DEFAULT_RUN_CONDITIONS
           ),
-          when: config.triggers?.auto?.when ?? { intervalMs: [] }
+          when: { intervalMs: intervalsOf(config.triggers?.auto?.when) }
         }
       }
     };
+  }
+  function intervalsOf(when) {
+    const intervals = isPlainObject(when) ? when.intervalMs : void 0;
+    return isArray(intervals) ? intervals.filter((interval) => typeof interval === "number") : [];
   }
   function compileDetectorConfig(config, global) {
     try {
@@ -6881,12 +6803,12 @@
       return detectors;
     }
     for (const [groupName, groupConfig] of Object.entries(detectorsConfig)) {
-      if (!isValidName(groupName) || !isPlainObject(groupConfig)) {
+      if (!isPlainObject(groupConfig)) {
         continue;
       }
       const groupDetectors = {};
       for (const [detectorId, detectorConfig] of Object.entries(groupConfig)) {
-        if (!isValidName(detectorId) || !isPlainObject(detectorConfig)) {
+        if (!isPlainObject(detectorConfig)) {
           continue;
         }
         groupDetectors[detectorId] = normalizeDetector(detectorConfig);
@@ -7016,14 +6938,13 @@
         case "any":
         case "all":
         case "none":
-        case "and":
           result = computeLogic(node, ctx);
           break;
         case "if":
-          result = computeIf(node, ctx);
+          result = computeIf(node, position, ctx);
           break;
         case "sequence":
-          result = computeSequence(node, ctx);
+          result = computeSequence(node, position, ctx);
           break;
         case "define":
         case "fireEvent":
@@ -7044,15 +6965,12 @@
     return error;
   }
   function checkType(value, position) {
-    if (isItemBuffer(value) && position === "boolean") {
-      throw new DetectionError("a list is read through any, all, none or only, or its length through using");
-    }
     if (position === "number" && typeof value !== "number") throw new DetectionError(`expected a number, got ${typeName(value)}`);
     if (position === "boolean" && typeof value !== "boolean") throw new DetectionError(`expected a boolean, got ${typeName(value)}`);
   }
   function positioned(value, position) {
     if (!isItemBuffer(value)) return value;
-    if (position === "boolean" && value.leaf) return presence(value);
+    if (position === "boolean") return presence(value);
     if (position === "number") return single(value);
     return value;
   }
@@ -7117,19 +7035,23 @@
     if (values.length > 1) throw new DetectionError(`'only' over several items`);
     return values[0];
   }
-  function computeIf(node, ctx) {
+  function computeIf(node, position, ctx) {
     const test2 = evaluateOccurrence(node.test, ctx);
     if (isFailure(test2)) return test2;
     const branch = test2 ? node.then : node.else;
-    return branch ? evaluateOccurrence(branch, ctx) : void 0;
+    return branch ? evaluateResult(branch, position, ctx) : void 0;
   }
-  function computeSequence(node, ctx) {
+  function computeSequence(node, position, ctx) {
     let value;
+    const last2 = node.elements[node.elements.length - 1];
     for (const element of node.elements) {
-      value = evaluateOccurrence(element, ctx);
+      value = element === last2 ? evaluateResult(element, position, ctx) : evaluateOccurrence(element, ctx);
       if (isFailure(value)) return value;
     }
     return value;
+  }
+  function evaluateResult(node, position, ctx) {
+    return position === "spread" && !node.is ? evaluate(node, "spread", ctx) : evaluateOccurrence(node, ctx);
   }
   function runAction(node, ctx) {
     try {
@@ -16733,7 +16655,7 @@ img { display: block; width: 16px; height: 16px; }
     const importConfig = {
       trackerLookup: define_import_meta_trackerLookup_default,
       injectName: "android",
-      contentScopeScriptsVersion: "21.5.0"
+      contentScopeScriptsVersion: "22.0.0"
     };
     const bundledFeatureNames = typeof importConfig.injectName === "string" ? platformSupport[importConfig.injectName] ?? [] : [];
     const featuresToLoad = isGloballyDisabled(args) ? platformSpecificFeatures : args.site.enabledFeatures || bundledFeatureNames;
