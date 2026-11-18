@@ -18,9 +18,9 @@ package com.duckduckgo.duckchat.impl.clienttools
 
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
-import com.duckduckgo.site.permissions.api.ClientToolPermission
-import com.duckduckgo.site.permissions.api.ClientToolPermissionStore
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.json.JSONObject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -58,28 +58,26 @@ class FakeDuckAiHostProvider(private val host: String = "duck.ai") : DuckAiHostP
 }
 
 class FakeClientToolPermissionStore : ClientToolPermissionStore {
-    val choices = mutableMapOf<Pair<String, String>, ClientToolPermission>()
+    val choices = mutableMapOf<String, ClientToolPermission>()
 
-    override suspend fun get(
-        origin: String,
-        toolName: String,
-    ): ClientToolPermission? = choices[origin to toolName]
+    override suspend fun get(toolName: String): ClientToolPermission? = choices[toolName]
 
     override suspend fun set(
-        origin: String,
         toolName: String,
         permission: ClientToolPermission,
     ) {
-        choices[origin to toolName] = permission
+        choices[toolName] = permission
     }
 
     override suspend fun clear(toolName: String) {
-        choices.keys.removeAll { it.second == toolName }
+        choices.remove(toolName)
     }
 
     override suspend fun clearAll() {
         choices.clear()
     }
+
+    override fun observe(): Flow<Map<String, ClientToolPermission>> = flowOf(choices.toMap())
 }
 
 /** Holds each prompt open until the test answers it, recording how many were open at once. */

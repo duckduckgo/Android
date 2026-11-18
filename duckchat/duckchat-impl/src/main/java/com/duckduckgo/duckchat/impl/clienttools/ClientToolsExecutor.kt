@@ -26,7 +26,6 @@ import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
@@ -92,7 +91,7 @@ class RealClientToolsExecutor @Inject constructor(
             is Malformed -> return failureReply(parsed.callId, ClientToolErrorCode.INVALID_ARGUMENTS)
             is Valid -> parsed.request
         }
-        val context = ClientToolCallContext(chatTabId, browserMode, caller.origin, request.chatId ?: caller.pageChatId)
+        val context = ClientToolCallContext(chatTabId, browserMode, request.chatId ?: caller.pageChatId)
         val result = if (request.name == RequestAccess.NAME) requestAccess(request, context) else run(request, context)
         logcat {
             val chatIdSource = when {
@@ -162,10 +161,7 @@ class RealClientToolsExecutor @Inject constructor(
         permissionGate.cancelPending(chatTabId)
     }
 
-    private data class Caller(
-        val origin: String,
-        val pageChatId: String?,
-    )
+    private data class Caller(val pageChatId: String?)
 
     /** The calling Duck.ai page, or null when the caller may not use client tools. */
     private fun caller(
@@ -175,8 +171,7 @@ class RealClientToolsExecutor @Inject constructor(
         if (browserMode == BrowserMode.FIRE) return null
         val url = pageUrl?.toHttpUrlOrNull() ?: return null
         if (url.host != duckAiHostProvider.getHost()) return null
-        val port = if (url.port == HttpUrl.defaultPort(url.scheme)) "" else ":${url.port}"
-        return Caller(origin = "${url.scheme}://${url.host}$port", pageChatId = url.queryParameter(CHAT_ID_QUERY)?.takeIf { it.isNotBlank() })
+        return Caller(pageChatId = url.queryParameter(CHAT_ID_QUERY)?.takeIf { it.isNotBlank() })
     }
 
     private fun failureReply(

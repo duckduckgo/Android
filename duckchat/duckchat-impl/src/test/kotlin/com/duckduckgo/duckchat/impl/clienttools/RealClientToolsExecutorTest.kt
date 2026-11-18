@@ -23,7 +23,6 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.site.permissions.api.ClientToolPermission
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -117,7 +116,7 @@ class RealClientToolsExecutorTest {
         val reply = executor().execute(request("autoTool", 2, input = """{"limit":3}"""), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
 
         assertEquals("""{"callId":"call-1","ok":true,"value":{"echo":{"limit":3}}}""", reply.toString())
-        assertEquals(ClientToolCallContext(CHAT_TAB_ID, BrowserMode.REGULAR, DUCK_AI_ORIGIN, CHAT_ID), autoTool.calls.single().second)
+        assertEquals(ClientToolCallContext(CHAT_TAB_ID, BrowserMode.REGULAR, CHAT_ID), autoTool.calls.single().second)
     }
 
     @Test
@@ -370,7 +369,7 @@ class RealClientToolsExecutorTest {
 
     @Test
     fun whenAlwaysAllowIsStoredThenAskToolRunsWithoutPrompt() = runTest {
-        store.choices[DUCK_AI_ORIGIN to "askTool"] = ClientToolPermission.ALWAYS_ALLOW
+        store.choices["askTool"] = ClientToolPermission.ALWAYS_ALLOW
 
         assertEquals(true, executeAskTool().getBoolean("ok"))
         assertTrue(prompt.prompts.isEmpty())
@@ -378,8 +377,8 @@ class RealClientToolsExecutorTest {
 
     @Test
     fun whenNeverAllowIsStoredThenDeniedWithoutPromptEvenForAutoTool() = runTest {
-        store.choices[DUCK_AI_ORIGIN to "askTool"] = ClientToolPermission.NEVER_ALLOW
-        store.choices[DUCK_AI_ORIGIN to "autoTool"] = ClientToolPermission.NEVER_ALLOW
+        store.choices["askTool"] = ClientToolPermission.NEVER_ALLOW
+        store.choices["autoTool"] = ClientToolPermission.NEVER_ALLOW
 
         assertFailure("denied", executeAskTool())
         assertFailure("denied", executor().execute(request("autoTool", 2), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR))
@@ -391,7 +390,7 @@ class RealClientToolsExecutorTest {
     @Test
     fun whenNeverAllowIsStoredThenItWinsOverChatGrant() = runTest {
         allowForChat("askTool", CHAT_ID)
-        store.choices[DUCK_AI_ORIGIN to "askTool"] = ClientToolPermission.NEVER_ALLOW
+        store.choices["askTool"] = ClientToolPermission.NEVER_ALLOW
 
         assertFailure("denied", executeAskTool())
     }
@@ -675,7 +674,7 @@ class RealClientToolsExecutorTest {
     @Test
     fun whenRequestAccessToolsAreAlreadyAllowedThenGrantedWithoutPrompt() = runTest {
         enableRequestAccess()
-        store.choices[DUCK_AI_ORIGIN to "otherAskTool"] = ClientToolPermission.ALWAYS_ALLOW
+        store.choices["otherAskTool"] = ClientToolPermission.ALWAYS_ALLOW
         chatGrants.grant(CHAT_ID, listOf("askTool"))
 
         val reply = requestAccess("askTool", "autoTool", "otherAskTool")
@@ -688,7 +687,7 @@ class RealClientToolsExecutorTest {
     @Test
     fun whenRequestAccessNamesNeverAllowedUnknownOrDisabledToolsThenTheyAreLeftOut() = runTest {
         enableRequestAccess()
-        store.choices[DUCK_AI_ORIGIN to "askTool"] = ClientToolPermission.NEVER_ALLOW
+        store.choices["askTool"] = ClientToolPermission.NEVER_ALLOW
         otherAskTool.enabled = false
 
         val reply = requestAccess("askTool", "missing", "otherAskTool", "autoTool")
@@ -939,7 +938,6 @@ class RealClientToolsExecutorTest {
         const val DUCK_AI_URL = "https://duck.ai/chat"
         const val PAGE_CHAT_ID = "page-chat"
         const val DUCK_AI_URL_WITH_CHAT = "https://duck.ai/?chatID=$PAGE_CHAT_ID"
-        const val DUCK_AI_ORIGIN = "https://duck.ai"
         const val CHAT_TAB_ID = "chat-tab"
         const val OTHER_CHAT_TAB_ID = "other-chat-tab"
         const val CHAT_ID = "chat-1"
