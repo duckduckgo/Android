@@ -1,0 +1,17 @@
+// WebView renderer process termination, reported from BrowserWebViewClient.onRenderProcessGone
+{
+    "m_web_view_renderer_gone_crash": {
+        "description": "The WebView renderer process crashed (RenderProcessGoneDetail.didCrash() is true). Fires once for each browser tab WebView the renderer served, so one crash can fire it several times.",
+        "owners": ["marcosholgado"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_web_view_renderer_gone_killed": {
+        "description": "The system killed the WebView renderer process without it crashing (RenderProcessGoneDetail.didCrash() is false), usually to reclaim memory. Fires once for each browser tab WebView the renderer served, so one kill can fire it several times.",
+        "owners": ["marcosholgado"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
