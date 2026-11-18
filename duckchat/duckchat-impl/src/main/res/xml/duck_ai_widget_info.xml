@@ -25,11 +25,9 @@
     android:minResizeHeight="142dp"
     android:targetCellWidth="4"
     android:targetCellHeight="4"
-    android:configure="com.duckduckgo.duckchat.impl.widget.DuckAiWidgetConfigurationActivity"
     android:previewImage="@drawable/duck_ai_widget_preview"
     android:previewLayout="@layout/duck_ai_widget_preview"
     android:description="@string/duckAiWidgetDescription"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
-    android:widgetCategory="home_screen"
-    android:widgetFeatures="reconfigurable|configuration_optional" />
+    android:widgetCategory="home_screen" />

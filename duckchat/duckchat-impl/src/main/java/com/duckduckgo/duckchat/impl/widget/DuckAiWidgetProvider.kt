@@ -42,9 +42,6 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
     lateinit var duckAiWidgetUpdater: DuckAiWidgetUpdater
 
     @Inject
-    lateinit var widgetPreferences: DuckAiWidgetPreferences
-
-    @Inject
     lateinit var pixel: Pixel
 
     @Inject
@@ -104,14 +101,6 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
             appWidgetManager.updateAppWidget(appWidgetId, views)
             logcat { "DuckAiWidgetProvider updateAppWidget completed for widget id = $appWidgetId" }
         }
-    }
-
-    override fun onDeleted(
-        context: Context,
-        appWidgetIds: IntArray,
-    ) {
-        super.onDeleted(context, appWidgetIds)
-        appCoroutineScope.launch { widgetPreferences.remove(appWidgetIds) }
     }
 
     override fun onDisabled(context: Context?) {

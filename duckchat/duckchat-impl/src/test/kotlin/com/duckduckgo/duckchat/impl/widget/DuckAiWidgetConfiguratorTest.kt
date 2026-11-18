@@ -44,7 +44,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -64,9 +63,6 @@ class DuckAiWidgetConfiguratorTest {
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val duckChat: DuckChatInternal = mock()
     private val chatStore: DuckAiChatStore = mock()
-    private val widgetPreferences: DuckAiWidgetPreferences = mock<DuckAiWidgetPreferences> {
-        onBlocking { showRecentChats(any()) } doReturn true
-    }
     private val remoteViews: RemoteViews = mock()
     private val stringContext: Context = mock<Context>().also { whenever(it.getString(any())).thenReturn("Untitled chat") }
     private val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
@@ -76,7 +72,6 @@ class DuckAiWidgetConfiguratorTest {
         repository = repository,
         duckChat = duckChat,
         chats = DuckAiChatsWidgetChats(stringContext, chatStore),
-        widgetPreferences = widgetPreferences,
         intents = fakeDuckAiWidgetIntents(),
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
@@ -118,48 +113,24 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     @Test
-    fun whenChatHistoryAvailableThenViewAllShownAndOpensChatHistory() = runTest {
+    fun whenChatsShownThenViewAllOpensChatHistory() = runTest {
         stubDuckAi(enabled = true, historyAvailable = true)
 
         val launched = populateAndCaptureClickIntent(R.id.chatsViewAll)
 
         assertLaunch(launched, launch = DuckChatLaunch.ChatHistory::class)
-        verify(remoteViews).setViewVisibility(R.id.chatsViewAllContainer, View.VISIBLE)
     }
 
     @Test
-    fun whenShowRecentChatsOnThenChatsSectionVisible() = runTest {
-        stubDuckAi(enabled = true, historyAvailable = true)
-
-        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
-
-        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.VISIBLE)
-    }
-
-    @Test
-    fun whenShowRecentChatsOffThenChatsSectionHiddenAndChatsNotLoadedOrWired() = runTest {
-        stubDuckAi(enabled = true, historyAvailable = true)
-        whenever(widgetPreferences.showRecentChats(APP_WIDGET_ID)).thenReturn(false)
+    fun whenChatHistoryUnavailableThenCompactAndChatsNotLoadedOrWired() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = false)
 
         val launched = populateAndCaptureClickIntent(R.id.promptBarContainer)
 
         assertLaunch(launched, url = null)
         verify(remoteViews).setViewVisibility(R.id.chatsSection, View.GONE)
         verify(remoteViews, never()).setOnClickPendingIntent(eq(R.id.chatsViewAll), any())
-        verify(remoteViews, never()).setRemoteAdapter(eq(R.id.chatsList), any<RemoteViews.RemoteCollectionItems>())
-        verify(chatStore, never()).getChats()
-    }
-
-    @Test
-    fun whenChatHistoryUnavailableThenViewAllHiddenNotWiredAndUnavailableMessageShown() = runTest {
-        stubDuckAi(enabled = true, historyAvailable = false)
-
-        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
-
-        verify(remoteViews).setViewVisibility(R.id.chatsViewAllContainer, View.GONE)
-        verify(remoteViews, never()).setOnClickPendingIntent(eq(R.id.chatsViewAll), any())
-        verify(remoteViews).setViewVisibility(R.id.chatsList, View.GONE)
-        verify(remoteViews).setViewVisibility(R.id.chatsMessageUnavailable, View.VISIBLE)
+        verify(remoteViews, never()).setPendingIntentTemplate(any(), any())
         verify(chatStore, never()).getChats()
     }
 
@@ -172,8 +143,7 @@ class DuckAiWidgetConfiguratorTest {
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
-        verify(remoteViews).setViewVisibility(R.id.chatsList, View.VISIBLE)
-        verify(remoteViews).setViewVisibility(R.id.chatsMessageUnavailable, View.GONE)
+        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.VISIBLE)
         val captor = argumentCaptor<PendingIntent>()
         verify(remoteViews).setPendingIntentTemplate(eq(R.id.chatsList), captor.capture())
         assertEquals(null, shadowOf(captor.firstValue).savedIntent.extras)
@@ -320,14 +290,14 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     @Test
-    fun whenDuckAiDisabledThenNoClickTargetsWiredAndUnavailableMessageShown() = runTest {
+    fun whenDuckAiDisabledThenCompactAndNoClickTargetsWired() = runTest {
         stubDuckAi(enabled = false, historyAvailable = false)
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
         verify(remoteViews, never()).setOnClickPendingIntent(any(), any())
         verify(remoteViews, never()).setPendingIntentTemplate(any(), any())
-        verify(remoteViews).setViewVisibility(R.id.chatsMessageUnavailable, View.VISIBLE)
+        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.GONE)
         verify(chatStore, never()).getChats()
     }
 
@@ -363,16 +333,6 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     @Test
-    fun whenPrefOffAndLargeHeightThenChatsHidden() = runTest {
-        stubDuckAi(enabled = true, historyAvailable = true)
-        whenever(widgetPreferences.showRecentChats(APP_WIDGET_ID)).thenReturn(false)
-
-        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews, heightDp = 400)
-
-        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.GONE)
-    }
-
-    @Test
     @Config(sdk = [30])
     fun whenBelowApi31ThenSingleVariantFollowsHeight() = runTest {
         stubDuckAi(enabled = true, historyAvailable = true)
@@ -383,7 +343,7 @@ class DuckAiWidgetConfiguratorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenApi31AndPrefOnThenSizeMapHasWidthAndHeightVariantsAllWired() = runTest {
+    fun whenApi31AndChatsThenSizeMapHasWidthAndHeightVariantsAllWired() = runTest {
         stubDuckAi(enabled = true, historyAvailable = true)
 
         val views = testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 50)
@@ -412,13 +372,11 @@ class DuckAiWidgetConfiguratorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenApi31AndPrefOffThenOnlyNarrowAndWideCompactVariants() = runTest {
-        stubDuckAi(enabled = true, historyAvailable = true)
-        whenever(widgetPreferences.showRecentChats(APP_WIDGET_ID)).thenReturn(false)
+    fun whenChatHistoryUnavailableThenOnlyNarrowAndWideCompactVariants() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = false)
 
-        val views = testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400)
+        val variants = sizedVariantsByKey(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400))
 
-        val variants = sizedVariantsByKey(views)
         assertEquals(setOf(SizeF(180f, 142f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 142f)), variants.keys)
         variants.values.forEach { assertEquals(View.GONE, chatsSectionVisibility(it)) }
     }
