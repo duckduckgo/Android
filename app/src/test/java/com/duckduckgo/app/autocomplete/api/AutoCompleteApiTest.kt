@@ -43,6 +43,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -59,6 +60,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -77,6 +79,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -141,7 +144,71 @@ class AutoCompleteApiTest {
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        fakeAutocompleteSpeedFeature.self().setRawStoredState(State(enable = true))
         testee = createTestee()
+    }
+
+    @Test
+    fun whenSameQueryRequestedAgainThenLastResponseReused() = runTest {
+        stubSearchResponses()
+
+        val first = testee.autoComplete("foo").first()
+        val second = testee.autoComplete("foo").first()
+
+        verify(mockAutoCompleteService, times(1)).autoComplete("foo")
+        assertEquals(first, second)
+    }
+
+    @Test
+    fun whenOmnibarListsLocalSuggestionsFirstAndSameQueryRequestedAgainThenLastResponseReused() = runTest {
+        testee = createTestee(isOmnibar = true)
+        stubSearchResponses()
+
+        val first = testee.autoComplete("foo").toList().last()
+        val second = testee.autoComplete("foo").toList().last()
+
+        verify(mockAutoCompleteService, times(1)).autoComplete("foo")
+        assertEquals(first, second)
+    }
+
+    @Test
+    fun whenAnotherQueryRequestedInBetweenThenEarlierQueryRequestedAgain() = runTest {
+        stubSearchResponses()
+
+        testee.autoComplete("foo").first()
+        testee.autoComplete("fo").first()
+        testee.autoComplete("foo").first()
+
+        verify(mockAutoCompleteService, times(2)).autoComplete("foo")
+    }
+
+    @Test
+    fun whenSearchRequestFailsThenSameQueryRequestedAgain() = runTest {
+        stubSearchResponses()
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenThrow(RuntimeException())
+
+        testee.autoComplete("foo").first()
+        testee.autoComplete("foo").first()
+
+        verify(mockAutoCompleteService, times(2)).autoComplete("foo")
+    }
+
+    @Test
+    fun whenAutocompleteSpeedDisabledThenSameQueryRequestedAgain() = runTest {
+        fakeAutocompleteSpeedFeature.self().setRawStoredState(State(enable = false))
+        testee = createTestee()
+        stubSearchResponses()
+
+        testee.autoComplete("foo").first()
+        testee.autoComplete("foo").first()
+
+        verify(mockAutoCompleteService, times(2)).autoComplete("foo")
+    }
+
+    private suspend fun stubSearchResponses() {
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(listOf(AutoCompleteServiceRawResult("foo bar", isNav = false)))
     }
 
     @Test
@@ -154,7 +221,6 @@ class AutoCompleteApiTest {
 
     @Test
     fun whenOmnibarListsLocalSuggestionsFirstThenLocalMatchesEmittedBeforeSearchResultsArrive() = runTest {
-        fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
         val searchResults = CompletableDeferred<List<AutoCompleteServiceRawResult>>()
         whenever(mockAutoCompleteService.autoComplete("title")).doSuspendableAnswer { searchResults.await() }
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(listOf(bookmark(url = "https://bar.com"))))
@@ -176,7 +242,6 @@ class AutoCompleteApiTest {
 
     @Test
     fun whenOmnibarListsLocalSuggestionsFirstThenSearchResultsKeepTheirPlaceBetweenTopHitsAndOtherLocalMatches() = runTest {
-        fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
             listOf(AutoCompleteServiceRawResult("nav.com", isNav = true)),
         )
@@ -209,9 +274,10 @@ class AutoCompleteApiTest {
             flowOf(listOf(bookmark(url = "https://bar.com"), bookmark(url = "https://baz.com"), bookmark(url = "https://foo.com"))),
         )
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite(url = "https://example.com"))))
+        fakeAutocompleteSpeedFeature.self().setRawStoredState(State(enable = false))
         val expected = createTestee(isOmnibar = true).autoComplete("title").first().suggestions
 
-        fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
+        fakeAutocompleteSpeedFeature.self().setRawStoredState(State(enable = true))
         val result = createTestee(isOmnibar = true).autoComplete("title")
             .first { result -> result.suggestions.any { it is AutoCompleteSearchSuggestion } }
 
@@ -220,7 +286,6 @@ class AutoCompleteApiTest {
 
     @Test
     fun whenOmnibarListsLocalSuggestionsFirstAndNothingMatchesYetThenDefaultSuggestionShownUntilSearchResultsArrive() = runTest {
-        fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
         val searchResults = CompletableDeferred<List<AutoCompleteServiceRawResult>>()
         whenever(mockAutoCompleteService.autoComplete("title")).doSuspendableAnswer { searchResults.await() }
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
@@ -240,8 +305,7 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenOmnibarListsLocalSuggestionsFirstThenPreviousSearchResultsStillMatchingStandInWhileWaiting() = runTest {
-        fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
+    fun whenOmnibarListsLocalSuggestionsFirstAndUserTypesOnThenPreviousSearchResultsStandInWhileWaiting() = runTest {
         whenever(mockAutoCompleteService.autoComplete("ti")).thenReturn(
             listOf(AutoCompleteServiceRawResult("title search", isNav = false), AutoCompleteServiceRawResult("tiger", isNav = false)),
         )
@@ -253,7 +317,7 @@ class AutoCompleteApiTest {
         testee.autoComplete("ti").first { result -> result.suggestions.any { it is AutoCompleteSearchSuggestion } }
 
         testee.autoComplete("tit").test {
-            assertEquals(listOf("title search"), awaitItem().suggestions.map { it.phrase })
+            assertEquals(listOf("title search", "tiger"), awaitItem().suggestions.map { it.phrase })
 
             searchResults.complete(listOf(AutoCompleteServiceRawResult("titanic", isNav = false)))
 
@@ -263,8 +327,86 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenOmnibarListsLocalSuggestionsFirstAndEarlierQueryReturnsAfterUserTypedOnThenItsMatchingResultsShown() = runTest {
-        fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
+    fun whenOmnibarListsLocalSuggestionsFirstAndNoPreviousSearchResultStartsWithQueryThenPreviousResultsStillStandIn() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("qu")).thenReturn(
+            listOf(AutoCompleteServiceRawResult("queen", isNav = false), AutoCompleteServiceRawResult("quote", isNav = false)),
+        )
+        val searchResults = CompletableDeferred<List<AutoCompleteServiceRawResult>>()
+        whenever(mockAutoCompleteService.autoComplete("quer")).doSuspendableAnswer { searchResults.await() }
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        val testee = createTestee(isOmnibar = true)
+        testee.autoComplete("qu").first { result -> result.suggestions.any { it is AutoCompleteSearchSuggestion } }
+
+        testee.autoComplete("quer").test {
+            assertEquals(listOf("queen", "quote"), awaitItem().suggestions.map { it.phrase })
+
+            searchResults.complete(listOf(AutoCompleteServiceRawResult("query", isNav = false)))
+
+            assertEquals(listOf("query"), awaitItem().suggestions.map { it.phrase })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarListsLocalSuggestionsFirstAndUserDeletesBackThenPreviousSearchResultsStandIn() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("quer")).thenReturn(listOf(AutoCompleteServiceRawResult("query", isNav = false)))
+        val searchResults = CompletableDeferred<List<AutoCompleteServiceRawResult>>()
+        whenever(mockAutoCompleteService.autoComplete("que")).doSuspendableAnswer { searchResults.await() }
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        val testee = createTestee(isOmnibar = true)
+        testee.autoComplete("quer").first { result -> result.suggestions.any { it is AutoCompleteSearchSuggestion } }
+
+        testee.autoComplete("que").test {
+            assertEquals(listOf("query"), awaitItem().suggestions.map { it.phrase })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarListsLocalSuggestionsFirstAndOlderQueryReturnsAfterNewerOneThenNewerResultsStandIn() = runTest {
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        val olderResults = CompletableDeferred<List<AutoCompleteServiceRawResult>>()
+        whenever(mockAutoCompleteService.autoComplete("ama")).doSuspendableAnswer { olderResults.await() }
+        whenever(mockAutoCompleteService.autoComplete("amazon")).thenReturn(listOf(AutoCompleteServiceRawResult("amazon prime", isNav = false)))
+        whenever(
+            mockAutoCompleteService.autoComplete("amazonp"),
+        ).doSuspendableAnswer { CompletableDeferred<List<AutoCompleteServiceRawResult>>().await() }
+        val testee = createTestee(isOmnibar = true, dispatchers = coroutineTestRule.testDispatcherProvider)
+
+        val olderQuery = launch { testee.autoComplete("ama").collect {} }
+        runCurrent()
+        olderQuery.cancel()
+        testee.autoComplete("amazon").first { result -> result.suggestions.any { it is AutoCompleteSearchSuggestion } }
+        olderResults.complete(listOf(AutoCompleteServiceRawResult("amazing", isNav = false)))
+        runCurrent()
+
+        testee.autoComplete("amazonp").test {
+            assertEquals(listOf("amazon prime"), awaitItem().suggestions.map { it.phrase })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarListsLocalSuggestionsFirstAndPreviousQueryUnrelatedThenOnlyItsMatchingResultsStandIn() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("cats")).thenReturn(listOf(AutoCompleteServiceRawResult("cats video", isNav = false)))
+        val searchResults = CompletableDeferred<List<AutoCompleteServiceRawResult>>()
+        whenever(mockAutoCompleteService.autoComplete("dogs")).doSuspendableAnswer { searchResults.await() }
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        val testee = createTestee(isOmnibar = true)
+        testee.autoComplete("cats").first { result -> result.suggestions.any { it is AutoCompleteSearchSuggestion } }
+
+        testee.autoComplete("dogs").test {
+            assertEquals(listOf(AutoCompleteDefaultSuggestion("dogs")), awaitItem().suggestions)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarListsLocalSuggestionsFirstAndEarlierQueryReturnsAfterUserTypedOnThenItsResultsShown() = runTest {
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
         val earlierResults = CompletableDeferred<List<AutoCompleteServiceRawResult>>()
@@ -283,7 +425,7 @@ class AutoCompleteApiTest {
             earlierResults.complete(
                 listOf(AutoCompleteServiceRawResult("title search", isNav = false), AutoCompleteServiceRawResult("tiger", isNav = false)),
             )
-            assertEquals(listOf("title search"), awaitItem().suggestions.map { it.phrase })
+            assertEquals(listOf("title search", "tiger"), awaitItem().suggestions.map { it.phrase })
 
             laterResults.complete(listOf(AutoCompleteServiceRawResult("titanic", isNav = false)))
             assertEquals(listOf("titanic"), awaitItem().suggestions.map { it.phrase })
@@ -293,7 +435,6 @@ class AutoCompleteApiTest {
 
     @Test
     fun whenNotOmnibarThenFirstEmissionWaitsForSearchResultsEvenWithLocalSuggestionsFirstEnabled() = runTest {
-        fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
         val searchResults = CompletableDeferred<List<AutoCompleteServiceRawResult>>()
         whenever(mockAutoCompleteService.autoComplete("title")).doSuspendableAnswer { searchResults.await() }
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(listOf(bookmark(url = "https://bar.com"))))
@@ -2331,6 +2472,7 @@ class AutoCompleteApiTest {
     private fun createTestee(
         config: AutoComplete.Config = AutoComplete.Config(),
         isOmnibar: Boolean = false,
+        dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     ): AutoCompleteApi {
         return AutoCompleteApi(
             mockAutoCompleteService,
@@ -2343,7 +2485,7 @@ class AutoCompleteApiTest {
             fakeAutocompleteSpeedFeature,
             mockDuckChat,
             mockHistory,
-            DefaultDispatcherProvider(),
+            dispatchers,
             mockPixel,
             mockDeviceAppLookup,
             coroutineTestRule.testScope,

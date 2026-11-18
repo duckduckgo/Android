@@ -26,12 +26,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "autocompleteSpeed",
 )
 interface AutocompleteSpeedFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    /**
+     * Covers the omnibar's suggestion speed work: local suggestions first, the two-phase suggest query timing and reuse of
+     * the last suggest response. Settings: {"phase1Marks": [150, 450], "debounceMillis": 300}. See [SuggestQueryTiming].
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun throttleSuggestQueries(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun localSuggestionsFirst(): Toggle
 }

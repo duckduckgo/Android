@@ -65,6 +65,8 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
+import com.duckduckgo.app.autocomplete.SuggestQueryTiming
+import com.duckduckgo.app.autocomplete.SuggestQueryTimingProvider
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
@@ -772,6 +774,7 @@ class BrowserTabViewModelTest {
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
     private val fakeAutocompleteSpeedFeature = FakeFeatureToggleFactory.create(AutocompleteSpeedFeature::class.java)
+    private var suggestQueryTiming: SuggestQueryTiming? = null
     private val fakeCurrentTimeProvider = object : CurrentTimeProvider {
         override fun elapsedRealtime(): Long = coroutineRule.testDispatcher.scheduler.currentTime
         override fun currentTimeMillis(): Long = coroutineRule.testDispatcher.scheduler.currentTime
@@ -1137,9 +1140,11 @@ class BrowserTabViewModelTest {
                 duckAiSessionCallback = mockDuckAiSessionCallback,
                 duckAiEntryCallback = lazy { mockDuckAiEntryCallback },
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
-                autocompleteSpeedFeature = fakeAutocompleteSpeedFeature,
                 currentTimeProvider = fakeCurrentTimeProvider,
                 trackerStatsWriter = mockTrackerStatsWriter,
+                suggestQueryTimingProvider = object : SuggestQueryTimingProvider {
+                    override fun timing(): SuggestQueryTiming? = suggestQueryTiming
+                },
             )
 
         if (loadData) {
@@ -3974,7 +3979,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSuggestQueriesNotThrottledThenQueryWaitsForTypingPause() = runTest {
+    fun whenNoSuggestQueryTimingThenQueryWaitsForTypingPause() = runTest {
         stubAutoCompleteSourcesForQuery()
 
         testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
@@ -3986,44 +3991,124 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSuggestQueriesThrottledThenFirstQuerySentImmediately() = runTest {
-        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
-        stubAutoCompleteSourcesForQuery()
-
-        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
-
-        assertEquals("query", autoCompleteViewState().searchResults.query)
-    }
-
-    @Test
-    fun whenSuggestQueriesThrottledAndUserKeepsTypingThenQueriesSentEveryThrottlePeriod() = runTest {
-        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
-        stubAutoCompleteSourcesForQuery()
-        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(emptyList())
+    fun whenTwoPhaseTimingThenQueriesSentAtPhase1MarksWhateverTheTypingSpeed() = runTest {
+        useTwoPhaseTiming()
 
         testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
         advanceTimeBy(100)
         testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
-        advanceTimeBy(50)
-        testee.triggerAutocomplete("que", hasFocus = true, hasQueryChanged = true)
-        advanceTimeBy(40)
-        assertEquals("q", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(99)
+        assertEquals("", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
 
-        advanceTimeBy(20)
-        assertEquals("que", autoCompleteViewState().searchResults.query)
+        testee.triggerAutocomplete("que", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(100)
+        testee.triggerAutocomplete("quer", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(98)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("quer", autoCompleteViewState().searchResults.query)
     }
 
     @Test
-    fun whenSuggestQueriesThrottledAndUserPausesThenNextQuerySentImmediately() = runTest {
-        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
-        stubAutoCompleteSourcesForQuery()
-        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(emptyList())
+    fun whenTwoPhaseTimingAndPhase1OverThenQueriesDebounced() = runTest {
+        useTwoPhaseTiming()
 
         testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
-        advanceTimeBy(300)
+        advanceTimeBy(500)
         testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(299)
+        assertEquals("q", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndQueryClearedThenPhase1StartsAgain() = runTest {
+        useTwoPhaseTiming()
+
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("x", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(199)
+        assertEquals("", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("x", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndOmnibarRefocusedThenPhase1StartsAgain() = runTest {
+        useTwoPhaseTiming()
+
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("q", hasFocus = false, hasQueryChanged = false)
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = false)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(199)
+        assertEquals("q", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndUserKeepsTypingThenPhase1ResultsShownWhenTheyArrive() = runTest {
+        useTwoPhaseTiming()
+        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).doSuspendableAnswer {
+            delay(100)
+            emptyList()
+        }
+
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(150)
+        testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(100)
+        testee.triggerAutocomplete("que", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(100)
+        testee.triggerAutocomplete("quer", hasFocus = true, hasQueryChanged = true)
 
         assertEquals("qu", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndInputOpensWithPrefilledTextThenPhase1StartsAtFirstKeystroke() = runTest {
+        useTwoPhaseTiming()
+
+        testee.onSearchInputOpened(prefill = "query")
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("query x", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(199)
+        assertEquals("query", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("query x", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndInputReopenedThenPhase1StartsAgain() = runTest {
+        useTwoPhaseTiming()
+
+        testee.onSearchInputOpened(prefill = "")
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.onSearchInputOpened(prefill = "q")
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(199)
+        assertEquals("q", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
+    }
+
+    private suspend fun useTwoPhaseTiming() {
+        suggestQueryTiming = SuggestQueryTiming(phase1MarksMillis = listOf(200L, 400L), debounceMillis = 300L)
+        stubAutoCompleteSourcesForQuery()
+        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(emptyList())
     }
 
     /** Stubs every autocomplete source so the AutoCompleteApi produces a non-empty result for "query". */

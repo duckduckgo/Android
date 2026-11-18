@@ -1372,6 +1372,7 @@ class BrowserTabFragment :
     }
 
     private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false, textSelection: String? = null) {
+        viewModel.onSearchInputOpened(prefill = query.ifEmpty { omnibar.getText() })
         nativeInputManager.showNativeInput(
             tabId = tabId,
             layoutInflater = layoutInflater,
