@@ -76,17 +76,23 @@ def protect(android, app):
         if android.visible(f"text:{app}"):
             break
         android.scroll("up")
-    names = labels(android, "deviceShieldAppEntryName")
-    if app not in names:
-        return False
-    index = names.index(app) + 1
-    if android.checked("deviceShieldAppEntryShieldEnabled", index) is False:
+    index, on = steps.app_switch(android, app)
+    if on is False:
         android.tap("id:deviceShieldAppEntryShieldEnabled", index=index)
         time.sleep(2)
-    return android.checked("deviceShieldAppEntryShieldEnabled", index) is True
+        on = steps.app_switch(android, app)[1]
+    return on is True
 
 
 def run(android):
+    steps.require_netp_off(android)
+    try:
+        drive(android)
+    finally:
+        steps.leave_apptp_off(android)
+
+
+def drive(android):
     steps.settings(android)
     for _ in range(3):
         if android.visible(f"text:{ROW}"):
@@ -168,19 +174,16 @@ def run(android):
     steps.apptp(android)
     disabled_before = unprotected_apps(android)
     my_apps(android)
-    names = labels(android, "deviceShieldAppEntryName")
-    switches = [android.checked("deviceShieldAppEntryShieldEnabled", i) for i in range(1, len(names) + 1)]
+    rows = android.rows(*steps.MY_APPS_ROW)
     # The first protected app, other than the android CLI's on-device server, which drives this proof.
-    index = next((i + 1 for i, (name, on) in enumerate(zip(names, switches))
-                  if on and not name.startswith("Android CLI")), None)
-    if not index:
-        raise Error(f"no protected app on screen to toggle among {len(names)}")
+    app = next((name for name, (_, on) in rows.items() if on and not name.startswith("Android CLI")), None)
+    if not app:
+        raise Error(f"no protected app on screen to toggle among {len(rows)}")
     # The user's own app: its name stays out of check names and details, which go into a public PR.
-    app = names[index - 1]
     android.note(f"toggled: {app}")
     restored = False
     try:
-        android.tap("id:deviceShieldAppEntryShieldEnabled", index=index)
+        android.tap("id:deviceShieldAppEntryShieldEnabled", index=steps.app_switch(android, app)[0])
         if not android.wait("id:trackingProtectionExcludeAppDialogReport", 5):
             raise Error("turning a protected app off didn't ask to report an issue")
         label = android.text("trackingProtectionAppLabel")
@@ -209,7 +212,7 @@ def run(android):
         android.key("back")
         if not android.wait("text:My Apps", 10):
             raise Error("back from the report form didn't return to My Apps")
-        android.check("the app's protection off", android.checked("deviceShieldAppEntryShieldEnabled", index) is False)
+        android.check("the app's protection off", steps.app_switch(android, app)[1] is False)
         reasons = [line[1] for line in android.lines() if line[0] in ("deviceShieldAppEntryName",
                                                                      "deviceShieldAppExclusionReason")]
         after = reasons[reasons.index(app) + 1] if app in reasons[:-1] else None
@@ -221,9 +224,9 @@ def run(android):
         android.check("tracker screen counts one more unprotected app", disabled_now == disabled_before + 1,
                       f"{disabled_before} -> {disabled_now}")
         my_apps(android)
-        android.tap("id:deviceShieldAppEntryShieldEnabled", index=index)
+        android.tap("id:deviceShieldAppEntryShieldEnabled", index=steps.app_switch(android, app)[0])
         time.sleep(2)
-        restored = android.checked("deviceShieldAppEntryShieldEnabled", index) is True
+        restored = steps.app_switch(android, app)[1] is True
         android.check("the app's protection back on", restored)
     finally:
         if not restored:
@@ -244,10 +247,11 @@ def run(android):
     where = android.poll(android.where, lambda w: w == "ReportBreakageAppListActivity", 10)
     android.check("menu opens the app picker", where == "ReportBreakageAppListActivity", where)
     android.expect_pixel("m_atp_imp_report_breakage_c")
-    picks = labels(android, "deviceShieldInstalledAppEntryName")
-    if app not in picks:
-        raise Error(f"the toggled app isn't among the {len(picks)} apps in the picker")
-    android.tap("id:deviceShieldInstalledAppSelector", index=picks.index(app) + 1)
+    picks = android.rows("deviceShieldInstalledAppEntryName", "deviceShieldInstalledAppSelector")
+    index = picks.get(app, (None, None))[0]
+    if index is None:
+        raise Error(f"the toggled app's selector isn't on screen among the {len(picks)} apps in the picker")
+    android.tap("id:deviceShieldInstalledAppSelector", index=index)
     android.tap("id:ctaSubmitAppBreakage")
     where = android.poll(android.where, lambda w: w == "ReportBreakageCategorySingleChoiceActivity", 10)
     android.check("Next opens the report form", where == "ReportBreakageCategorySingleChoiceActivity", where)

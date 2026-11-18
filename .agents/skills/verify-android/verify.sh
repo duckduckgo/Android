@@ -449,6 +449,7 @@ for m in re.finditer(r"<node [^>]*>", sys.stdin.read()):
 }
 
 # true/false for the Nth (1-based) checkable element with this id.
+cmd_rows() { lp rows "${1:?usage: verify.sh rows <label-id> <control-id>}" "${2:?usage: verify.sh rows <label-id> <control-id>}"; }
 cmd_checked() { lp checked "${1:?usage: verify.sh checked <resource-id> [index]}" "${2:-1}" || die "no element with id $1 at index ${2:-1}"; }
 
 # Screenshot plus the element tree beside it, and a sidecar naming the activity and commit.
@@ -667,7 +668,7 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|layout|windows|text|checked|shot|record|launch|restart|open|reset|web|probe|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|layout|windows|text|checked|rows|shot|record|launch|restart|open|reset|web|probe|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on

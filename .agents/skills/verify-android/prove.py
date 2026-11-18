@@ -109,6 +109,16 @@ class Android:
         p = verify("checked", resource_id, index, check=False)
         return p.stdout.strip() == "true" if p.returncode == 0 else None
 
+    def rows(self, label_id, control_id):
+        """{label text: (index, checked)} for each list row on screen, pairing the label with the control in its own
+        row; (None, None) when that row's control isn't on screen. The index is the one tap(..., index=) takes."""
+        p = verify("rows", label_id, control_id, check=False)
+        out = {}
+        for line in p.stdout.splitlines() if p.returncode == 0 else []:
+            text, index, checked = (line.split("\t") + ["-", "-"])[:3]
+            out.setdefault(text, (None, None) if index == "-" else (int(index), checked == "true"))
+        return out
+
     def windows(self):
         """Text in popups and system windows that android layout doesn't list, as one string."""
         return verify("windows", check=False).stdout

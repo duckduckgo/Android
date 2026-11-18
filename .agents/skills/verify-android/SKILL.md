@@ -106,7 +106,7 @@ them.
 The `android` handle a proof gets:
 
 - **Act:** `tap`, `type`, `key`, `scroll`, `open`, `launch`, `reset`, `shot(name)`; a step that fails raises `Error` (ERROR).
-- **Read:** `where`, `text`, `lines`, `checked`, `windows`, `ui`, `web_targets`, `visible`, `wait`, `web_eval`, `poll(read, until, timeout)`.
+- **Read:** `where`, `text`, `lines`, `checked`, `rows(label_id, control_id)` (each list row's label with the control in that same row, for a switch beside an app's name), `windows`, `ui`, `web_targets`, `visible`, `wait`, `web_eval`, `poll(read, until, timeout)`.
 - **Check:** `check(what, ok, detail)`; `mark()` right before the action under test, then `expect_pixel(name)` / `expect_no_pixel(name)` (the pixels the debug build logs, independently of the screen) and `expect_log(what, pattern)` (a logcat line matching the regex since the mark).
 - **Report:** `note(text)`, `section(title, markdown)`, and `unverified(what, why)` for something the proof couldn't check: listed in the report and `pr-summary`, never a pass and never a fail (a proof with only those is FAIL, as with no checks).
 - A module-level `LIVE = ["Duck.ai chat"]` names the live services the proof depends on; the report and `pr-summary` list them.

@@ -183,11 +183,41 @@ def uid(android, package):
 
 
 def vpn_up(android):
-    """Whether this app's VPN is up: AppTP's, or NetP's, which the app also runs. Another app's VPN doesn't count."""
+    """Whether this app's VPN is up: AppTP's, or NetP's, which the app also runs (require_netp_off rules NetP's out).
+    Another app's VPN doesn't count."""
     # ConnectivityService prints one network agent per line; a VPN's names the app that established it.
     owner = re.compile(rf"OwnerUid: {uid(android, APP)}\b")
     return any("ni{VPN" in line and owner.search(line)
                for line in android._adb("shell", "dumpsys", "connectivity").splitlines())
+
+
+def netp_row(android):
+    """On Settings: the label under its VPN row, "On" or "Off"; None when there is no VPN row (no subscription)."""
+    lines = android.lines()
+    for i, line in enumerate(lines):
+        if line[:2] == ["primaryText", "VPN"]:
+            return next((l[1] for l in lines[i + 1:i + 3] if l[0] == "label"), None)
+    return None
+
+
+def require_netp_off(android):
+    """App Tracking Protection's proofs read it as the app's VPN network, which NetP's also is."""
+    settings(android)
+    if netp_row(android) == "On":
+        raise Error("the VPN (NetP) is on, so the app's VPN network can't tell App Tracking Protection's state; "
+                    "turn it off in Settings > VPN first")
+
+
+# My Apps: each row's app name, and its protection switch.
+MY_APPS_ROW = ("deviceShieldAppEntryName", "deviceShieldAppEntryShieldEnabled")
+
+
+def app_switch(android, app):
+    """In My Apps, (index, checked) of the app's own protection switch; raises Error when it isn't on screen."""
+    index, on = android.rows(*MY_APPS_ROW).get(app, (None, None))
+    if index is None:
+        raise Error("the app's protection switch isn't on screen in My Apps")
+    return index, on
 
 
 def apptp_disable_all(android):
@@ -233,6 +263,16 @@ def apptp_off(android):
     if android.poll(lambda: vpn_up(android), lambda up: not up, 15):
         raise Error("App Tracking Protection's VPN stayed up after Disable for All Apps")
     return True
+
+
+def leave_apptp_off(android):
+    """For a proof's finally: a run that stopped half-way would leave App Tracking Protection's VPN up. Never raises,
+    so the error that stopped the run is the one reported."""
+    try:
+        if apptp_off(android):
+            android.note("App Tracking Protection was still on when the run stopped, and was turned off")
+    except Exception as e:
+        android.note(f"couldn't turn App Tracking Protection off after the run: {e}")
 
 
 PROBE_OUTCOMES = {"ALLOWED", "TIMEOUT", "CLOSED", "RESET", "NO_ADDRESS"}

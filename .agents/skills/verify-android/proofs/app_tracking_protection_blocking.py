@@ -77,16 +77,13 @@ def protect_probe(android):
         if android.visible(f"text:{PROBE}"):
             break
         android.scroll("up")
-    names = [line[1] for line in android.lines() if line[0] == "deviceShieldAppEntryName"]
-    if PROBE not in names:
-        raise Error(f"My Apps doesn't list {PROBE} among the {len(names)} apps on screen")
-    index = names.index(PROBE) + 1
-    if android.checked("deviceShieldAppEntryShieldEnabled", index) is False:
+    index, on = steps.app_switch(android, PROBE)
+    if on is False:
         android.note(f"{PROBE} had its protection off in My Apps and it was turned back on first")
         android.mark()
         android.tap("id:deviceShieldAppEntryShieldEnabled", index=index)
         time.sleep(2)
-        if android.checked("deviceShieldAppEntryShieldEnabled", index) is not True:
+        if steps.app_switch(android, PROBE)[1] is not True:
             raise Error(f"couldn't turn {PROBE}'s protection back on")
         # My Apps applies the change when the user leaves it (ManageAppsProtectionViewModel.onPause), by restarting
         # the VPN, which cuts any connection open at the time. Leave it here, not when the probe comes to the front.
@@ -115,6 +112,14 @@ def like_moto(android, uid):
 
 
 def run(android):
+    steps.require_netp_off(android)
+    try:
+        drive(android)
+    finally:
+        steps.leave_apptp_off(android)
+
+
+def drive(android):
     if steps.apptp_off(android):
         android.note("App Tracking Protection was on at the start and was turned off first")
     baseline = steps.probe(android, HOSTS, "single")
