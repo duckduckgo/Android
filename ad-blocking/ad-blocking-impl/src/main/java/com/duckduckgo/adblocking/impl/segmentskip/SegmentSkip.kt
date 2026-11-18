@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adblocking.impl.segmentskip
 
+import com.duckduckgo.common.utils.sha256
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
@@ -54,6 +55,7 @@ interface SegmentSkip {
 class RealSegmentSkip @Inject constructor(
     private val segmentSkipFeature: SegmentSkipFeature,
     private val segmentsProvider: SegmentSkipSegmentsProvider,
+    private val hashPrefixGate: SegmentSkipHashPrefixGate,
     private val userPreferences: SegmentSkipUserPreferences,
 ) : SegmentSkip {
 
@@ -68,7 +70,9 @@ class RealSegmentSkip @Inject constructor(
     override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> {
         if (videoId.isBlank() || !isEnabled() || userPreferences.modeFlow().firstOrNull() == SegmentSkipMode.OFF) return emptyList()
         return try {
-            segmentsProvider.getSegments(videoId).sortedBy { it.start }
+            val hash = videoId.sha256
+            if (!hashPrefixGate.hasSegments(hash.take(DATASET_PREFIX_LENGTH))) return emptyList()
+            segmentsProvider.getSegments(videoId, hash.take(HASH_PREFIX_LENGTH)).sortedBy { it.start }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -84,4 +88,9 @@ class RealSegmentSkip @Inject constructor(
     }
 
     private fun isEnabled(): Boolean = segmentSkipFeature.mvpEnabled().isEnabled()
+
+    private companion object {
+        const val HASH_PREFIX_LENGTH = 4
+        const val DATASET_PREFIX_LENGTH = 8
+    }
 }

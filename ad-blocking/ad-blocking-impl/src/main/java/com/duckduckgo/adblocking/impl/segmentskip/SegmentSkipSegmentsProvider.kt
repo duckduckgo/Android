@@ -18,16 +18,14 @@ package com.duckduckgo.adblocking.impl.segmentskip
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.sha256
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -43,48 +41,58 @@ data class SegmentSkipSegment(
 
 interface SegmentSkipSegmentsProvider {
     /** Segments for [videoId], or an empty list when there are none or the lookup fails. */
-    suspend fun getSegments(videoId: String): List<SegmentSkipSegment>
+    suspend fun getSegments(videoId: String, hashPrefix: String): List<SegmentSkipSegment>
+
+    fun clearCache()
 }
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSegmentSkipSegmentsProvider @Inject constructor(
     private val service: SegmentSkipService,
-    private val hashPrefixGate: SegmentSkipHashPrefixGate,
     private val settingsProvider: SegmentSkipSettingsProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
 ) : SegmentSkipSegmentsProvider {
 
-    private val mutex = Mutex()
+    private var cacheGeneration = 0L
 
     private val lookups = object : LinkedHashMap<String, Deferred<List<SegmentSkipSegment>?>>(CACHE_SIZE, LOAD_FACTOR, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Deferred<List<SegmentSkipSegment>?>>): Boolean =
             size > CACHE_SIZE
     }
 
-    override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> {
-        val segments = lookup(videoId).await() ?: return emptyList()
+    override suspend fun getSegments(videoId: String, hashPrefix: String): List<SegmentSkipSegment> {
+        val segments = lookup(videoId, hashPrefix).await() ?: return emptyList()
         val settings = settingsProvider.settings()
         return segments.filter { it.category in settings.categories && it.actionType in settings.actionTypes }
     }
 
-    private suspend fun lookup(videoId: String): Deferred<List<SegmentSkipSegment>?> = mutex.withLock {
+    override fun clearCache() {
+        synchronized(lookups) {
+            cacheGeneration++
+            lookups.clear()
+        }
+    }
+
+    private fun lookup(videoId: String, hashPrefix: String): Deferred<List<SegmentSkipSegment>?> = synchronized(lookups) {
         lookups.getOrPut(videoId) {
-            appScope.async(dispatchers.io()) {
-                fetch(videoId).also { segments ->
-                    if (segments == null) mutex.withLock { lookups.remove(videoId) }
+            val generation = cacheGeneration
+            appScope.async(dispatchers.io(), start = CoroutineStart.LAZY) {
+                fetch(videoId, hashPrefix).also { segments ->
+                    if (segments == null) {
+                        synchronized(lookups) {
+                            if (generation == cacheGeneration) lookups.remove(videoId)
+                        }
+                    }
                 }
             }
         }
     }
 
     /** Null when the lookup failed, so the failure isn't cached. */
-    private suspend fun fetch(videoId: String): List<SegmentSkipSegment>? {
-        val hash = videoId.sha256
-        val hashPrefix = hash.take(HASH_PREFIX_LENGTH)
+    private suspend fun fetch(videoId: String, hashPrefix: String): List<SegmentSkipSegment>? {
         return try {
-            if (!hashPrefixGate.hasSegments(hash.take(DATASET_PREFIX_LENGTH))) return null
             val response = service.getSegments(hashPrefix)
             when {
                 response.code() == HTTP_NOT_FOUND -> emptyList()
@@ -122,8 +130,6 @@ class RealSegmentSkipSegmentsProvider @Inject constructor(
     }
 
     private companion object {
-        const val HASH_PREFIX_LENGTH = 4
-        const val DATASET_PREFIX_LENGTH = 8
         const val HTTP_NOT_FOUND = 404
         const val CACHE_SIZE = 50
         const val LOAD_FACTOR = 0.75f
