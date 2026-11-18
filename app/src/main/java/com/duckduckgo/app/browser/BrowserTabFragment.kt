@@ -2512,7 +2512,7 @@ class BrowserTabFragment :
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
         showNativeInput(
             forceImageGeneration = forceImageGeneration,
-            attachments = browserActivity?.consumePendingDuckChatAttachments().orEmpty(),
+            attachments = browserActivity?.consumeDuckChatAttachmentsForTab(tabId).orEmpty(),
         )
     }
 
