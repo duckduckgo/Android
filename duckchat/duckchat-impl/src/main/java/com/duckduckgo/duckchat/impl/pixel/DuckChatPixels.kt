@@ -319,9 +319,13 @@ interface DuckChatPixels {
     /** A full-screen Duck.ai New Chat showed. [hasNewChatHints] is the hints flag. */
     fun fireNewChatShown(hasNewChatHints: Boolean)
 
-    /** The first prompt sent from a New Chat counted by [fireNewChatShown]. [hintTapped] is the last hint tapped before it. */
+    /**
+     * The first prompt sent from a New Chat counted by [fireNewChatShown]. [hintsShown] is whether hints showed at any point in that
+     * New Chat; false doesn't say why (capped, not eligible, or behind a promo throughout). [hintTapped] is the last hint tapped before it.
+     */
     fun fireNewChatFirstPromptSent(
         hasNewChatHints: Boolean,
+        hintsShown: Boolean,
         hintTapped: NewChatHint?,
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
@@ -333,6 +337,9 @@ interface DuckChatPixels {
 
     /** [position] is the hint's 1-based slot in the row. */
     fun fireNewChatHintTapped(hint: NewChatHint, position: Int)
+
+    /** Once per install, when ignored New Chats first reach the cap that hides the hints. */
+    fun fireNewChatHintsCapReached()
 }
 
 @ContributesBinding(AppScope::class)
@@ -1430,6 +1437,7 @@ class RealDuckChatPixels @Inject constructor(
 
     override fun fireNewChatFirstPromptSent(
         hasNewChatHints: Boolean,
+        hintsShown: Boolean,
         hintTapped: NewChatHint?,
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
@@ -1439,6 +1447,7 @@ class RealDuckChatPixels @Inject constructor(
         DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY,
         mapOf(
             DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to hasNewChatHints.toString(),
+            DuckChatPixelParameters.HINTS_SHOWN to hintsShown.toString(),
             DuckChatPixelParameters.HINT_TAPPED to (hintTapped?.pixelValue() ?: "none"),
             DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to hasImageAttachment.toString(),
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to hasFileAttachment.toString(),
@@ -1449,9 +1458,11 @@ class RealDuckChatPixels @Inject constructor(
     override fun fireNewChatHintsShown(hints: List<NewChatHint>) {
         // A hint not shown reports position 0.
         val positions = NewChatHint.entries.associate { hint -> hint.positionParam() to (hints.indexOf(hint) + 1).toString() }
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN, parameters = positions)
-        }
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_COUNT,
+            DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_DAILY,
+            positions,
+        )
     }
 
     override fun fireNewChatHintTapped(hint: NewChatHint, position: Int) = fireCountAndDaily(
@@ -1459,6 +1470,12 @@ class RealDuckChatPixels @Inject constructor(
         DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY,
         newChatHintParams(hint, position),
     )
+
+    override fun fireNewChatHintsCapReached() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_CAP_REACHED, type = Pixel.PixelType.Unique())
+        }
+    }
 
     private fun newChatHintParams(hint: NewChatHint, position: Int): Map<String, String> = mapOf(
         DuckChatPixelParameters.HINT to hint.pixelValue(),
@@ -1836,9 +1853,11 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_NEW_CHAT_SHOWN_DAILY("aichat_new_chat_shown_daily"),
     DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT("aichat_new_chat_first_prompt_sent_count"),
     DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY("aichat_new_chat_first_prompt_sent_daily"),
-    DUCK_CHAT_NEW_CHAT_HINTS_SHOWN("aichat_new_chat_hints_shown"),
+    DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_COUNT("aichat_new_chat_hints_shown_count"),
+    DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_DAILY("aichat_new_chat_hints_shown_daily"),
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT("aichat_new_chat_hint_tapped_count"),
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY("aichat_new_chat_hint_tapped_daily"),
+    DUCK_CHAT_NEW_CHAT_HINTS_CAP_REACHED("aichat_new_chat_hints_cap_reached"),
 }
 
 object DuckChatPixelParameters {
@@ -1895,6 +1914,7 @@ object DuckChatPixelParameters {
     const val HINT = "hint"
     const val HINT_POSITION = "position"
     const val HINT_TAPPED = "hint_tapped"
+    const val HINTS_SHOWN = "hints_shown"
     const val DOCUMENTS_HINT_POSITION = "documents_position"
     const val PHOTO_HINT_POSITION = "photo_position"
     const val IMAGE_GENERATION_HINT_POSITION = "image_generation_position"

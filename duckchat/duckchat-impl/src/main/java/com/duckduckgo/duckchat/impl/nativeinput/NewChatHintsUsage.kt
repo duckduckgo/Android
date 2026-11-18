@@ -26,6 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -57,6 +58,7 @@ class NewChatHintsUsage @Inject constructor(
     @DuckChat private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val duckChatPixels: DuckChatPixels,
 ) {
     private val interactions = ConcurrentHashMap<String, HintInteraction>()
     private val promoVisibility = MutableStateFlow<Map<String, Boolean>>(emptyMap())
@@ -94,7 +96,11 @@ class NewChatHintsUsage @Inject constructor(
         if (!isNewChat) return
         when (interaction) {
             HintInteraction.TAPPED -> edit { preferences -> preferences.remove(DUCK_AI_NEW_CHAT_HINTS_IGNORED_CHATS) }
-            HintInteraction.DISPLAYED -> edit { preferences ->
+            HintInteraction.DISPLAYED -> edit(
+                onWritten = { preferences ->
+                    if (preferences[DUCK_AI_NEW_CHAT_HINTS_IGNORED_CHATS] == HIDE_AFTER_IGNORED_CHATS) duckChatPixels.fireNewChatHintsCapReached()
+                },
+            ) { preferences ->
                 preferences[DUCK_AI_NEW_CHAT_HINTS_IGNORED_CHATS] = (preferences[DUCK_AI_NEW_CHAT_HINTS_IGNORED_CHATS] ?: 0) + 1
             }
             null -> Unit
@@ -107,17 +113,18 @@ class NewChatHintsUsage @Inject constructor(
     }
 
     // Undispatched so writes queue on the fair mutex in call order; otherwise a reset and an increment could land swapped.
-    private fun edit(transform: (MutablePreferences) -> Unit) {
+    private fun edit(onWritten: (Preferences) -> Unit = {}, transform: (MutablePreferences) -> Unit) {
         appCoroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            writeMutex.withLock { withContext(dispatchers.io()) { editIgnoringIoFailure(transform) } }
+            writeMutex.withLock { withContext(dispatchers.io()) { editIgnoringIoFailure(transform) } }?.let(onWritten)
         }
     }
 
-    private suspend fun editIgnoringIoFailure(transform: (MutablePreferences) -> Unit) {
-        try {
+    private suspend fun editIgnoringIoFailure(transform: (MutablePreferences) -> Unit): Preferences? {
+        return try {
             store.edit(transform)
         } catch (e: IOException) {
             logcat(WARN) { "Duck.ai new chat hints: usage write failed: ${e.message}" }
+            null
         }
     }
 

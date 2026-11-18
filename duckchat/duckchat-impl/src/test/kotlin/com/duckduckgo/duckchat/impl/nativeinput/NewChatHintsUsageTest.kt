@@ -26,6 +26,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage.Companion.HIDE_AFTER_IGNORED_CHATS
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FailingPreferencesDataStore
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -34,6 +35,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
@@ -43,6 +48,7 @@ class NewChatHintsUsageTest {
     val coroutineRule = CoroutineTestRule()
 
     private val context: Context = ApplicationProvider.getApplicationContext()
+    private val duckChatPixels: DuckChatPixels = mock()
     private lateinit var testee: NewChatHintsUsage
 
     @Before
@@ -218,6 +224,47 @@ class NewChatHintsUsageTest {
     }
 
     @Test
+    fun whenTheCapIsReachedThenCapReachedPixelFired() = runTest {
+        repeat(HIDE_AFTER_IGNORED_CHATS - 1) { ignoreHints() }
+        verify(duckChatPixels, never()).fireNewChatHintsCapReached()
+
+        ignoreHints()
+
+        verify(duckChatPixels).fireNewChatHintsCapReached()
+    }
+
+    @Test
+    fun whenPromptedAgainAfterTheCapThenCapReachedPixelNotFiredAgain() = runTest {
+        repeat(HIDE_AFTER_IGNORED_CHATS + 2) { ignoreHints() }
+
+        verify(duckChatPixels, times(1)).fireNewChatHintsCapReached()
+    }
+
+    @Test
+    fun whenATapStartsTheCountOverBeforeTheCapThenCapReachedPixelNotFired() = runTest {
+        repeat(HIDE_AFTER_IGNORED_CHATS - 1) { ignoreHints() }
+
+        testee.onHintsDisplayed(TAB)
+        testee.onHintTapped(TAB)
+        testee.onPromptSubmitted(TAB, isNewChat = true)
+        repeat(HIDE_AFTER_IGNORED_CHATS - 1) { ignoreHints() }
+
+        verify(duckChatPixels, never()).fireNewChatHintsCapReached()
+    }
+
+    @Test
+    fun whenTheWriteFailsThenCapReachedPixelNotFired() = runTest {
+        val failing = usage(FailingPreferencesDataStore())
+
+        repeat(HIDE_AFTER_IGNORED_CHATS) {
+            failing.onHintsDisplayed(TAB)
+            failing.onPromptSubmitted(TAB, isNewChat = true)
+        }
+
+        verify(duckChatPixels, never()).fireNewChatHintsCapReached()
+    }
+
+    @Test
     fun whenResetThenNotExhausted() = runTest {
         repeat(HIDE_AFTER_IGNORED_CHATS) { ignoreHints() }
 
@@ -245,7 +292,7 @@ class NewChatHintsUsageTest {
     }
 
     private fun usage(dataStore: DataStore<Preferences>) =
-        NewChatHintsUsage(dataStore, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        NewChatHintsUsage(dataStore, coroutineRule.testDispatcherProvider, coroutineRule.testScope, duckChatPixels)
 
     private companion object {
         const val TAB = "tab"
