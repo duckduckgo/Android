@@ -25,9 +25,6 @@ import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
 import com.duckduckgo.sync.TestSyncFixtures.accountKeysFailed
-import com.duckduckgo.sync.TestSyncFixtures.connectDeviceKeysGoneError
-import com.duckduckgo.sync.TestSyncFixtures.connectDeviceKeysNotFoundError
-import com.duckduckgo.sync.TestSyncFixtures.connectDeviceSuccess
 import com.duckduckgo.sync.TestSyncFixtures.connectKeys
 import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.decryptedSecretKey
@@ -64,7 +61,6 @@ import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
-import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
@@ -77,7 +73,6 @@ import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.ScopedPassword
@@ -128,7 +123,6 @@ class AppSyncAccountRepositoryTest {
 
     private lateinit var syncRepo: SyncAccountRepository
 
-    private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper = mock()
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
@@ -152,7 +146,6 @@ class AppSyncAccountRepositoryTest {
             coroutineTestRule.testDispatcherProvider,
             syncFeature,
             deviceKeyGenerator,
-            syncCodeUrlWrapper = syncCodeUrlWrapper,
             syncSetupWideEvent = syncSetupWideEvent,
             syncJweCrypto = syncJweCrypto,
             thirdPartyCredentialManager = thirdPartyCredentialManager,
@@ -166,7 +159,6 @@ class AppSyncAccountRepositoryTest {
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
         // passthrough by default (no modifications)
-        whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenAnswer { it.arguments[0] as String }
     }
 
     @Test
@@ -620,16 +612,6 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenGetConnectQRThenReturnExpectedJson() {
-        whenever(nativeLib.prepareForConnect()).thenReturn(connectKeys)
-        prepareToProvideDeviceIds()
-
-        val result = syncRepo.getConnectQR() as Success
-
-        assertEquals(jsonConnectKeyEncoded, result.data.rawCode)
-    }
-
-    @Test
     fun whenProcessConnectCodeFromAuthenticatedDeviceThenConnectsDevice() {
         givenAuthenticatedDevice()
         whenever(nativeLib.seal(jsonRecoveryKey, primaryKey)).thenReturn(encryptedRecoveryCode)
@@ -657,89 +639,6 @@ class AppSyncAccountRepositoryTest {
 
         verify(syncApi).connect(token, deviceId, encryptedRecoveryCode)
         assertTrue(result is Success)
-    }
-
-    @Test
-    fun whenPollingConnectionKeysAndKeysFoundThenPerformLogin() {
-        prepareForLoginSuccess()
-        whenever(syncStore.userId).thenReturn(userId)
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.secretKey).thenReturn(secretKey)
-        whenever(syncApi.connectDevice(deviceId)).thenReturn(connectDeviceSuccess)
-        whenever(nativeLib.sealOpen(encryptedRecoveryCode, primaryKey, secretKey)).thenReturn(jsonRecoveryKey)
-
-        val result = syncRepo.pollConnectionKeys()
-
-        assertTrue(result is Success)
-    }
-
-    @Test
-    fun whenPollingConnectionAndLoginFailsThenReturnLoginError() {
-        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
-        whenever(syncStore.userId).thenReturn(userId)
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.secretKey).thenReturn(secretKey)
-        whenever(syncApi.connectDevice(deviceId)).thenReturn(connectDeviceSuccess)
-        whenever(nativeLib.sealOpen(encryptedRecoveryCode, primaryKey, secretKey)).thenReturn(jsonRecoveryKey)
-        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginFailed)
-
-        val result = syncRepo.pollConnectionKeys() as Error
-
-        assertEquals(LOGIN_FAILED.code, result.code)
-    }
-
-    @Test
-    fun whenPollingConnectionAndKeysNotFoundThenReturnSuccessFalse() {
-        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
-        whenever(syncStore.userId).thenReturn(userId)
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.secretKey).thenReturn(secretKey)
-        whenever(syncApi.connectDevice(deviceId)).thenReturn(connectDeviceKeysNotFoundError)
-
-        val result = syncRepo.pollConnectionKeys() as Success
-
-        assertFalse(result.data)
-    }
-
-    @Test
-    fun whenPollingConnectionAndSealOpenFailsThenReturnConnectError() {
-        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
-        whenever(syncStore.userId).thenReturn(userId)
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.secretKey).thenReturn(secretKey)
-        whenever(syncApi.connectDevice(deviceId)).thenReturn(connectDeviceSuccess)
-        whenever(nativeLib.sealOpen(encryptedRecoveryCode, primaryKey, secretKey)).thenThrow(RuntimeException())
-
-        val result = syncRepo.pollConnectionKeys() as Error
-
-        assertEquals(CONNECT_FAILED.code, result.code)
-    }
-
-    @Test
-    fun whenPollingConnectionAndKeysExpiredThenReturnConnectFailedError() {
-        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
-        whenever(syncStore.userId).thenReturn(userId)
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.secretKey).thenReturn(secretKey)
-        whenever(syncApi.connectDevice(deviceId)).thenReturn(connectDeviceKeysGoneError)
-
-        val result = syncRepo.pollConnectionKeys() as Error
-
-        assertEquals(CONNECT_FAILED.code, result.code)
-    }
-
-    @Test
-    fun whenPollingConnectionAndKeysReceivesMalformedJsonThenReturnConnectFailedError() {
-        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
-        whenever(syncStore.userId).thenReturn(userId)
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.secretKey).thenReturn(secretKey)
-        whenever(syncApi.connectDevice(deviceId)).thenReturn(connectDeviceSuccess)
-        whenever(nativeLib.sealOpen(connectDeviceSuccess.data, primaryKey, secretKey)).thenReturn("{ malformed json")
-
-        val result = syncRepo.pollConnectionKeys() as Error
-
-        assertEquals(CONNECT_FAILED.code, result.code)
     }
 
     @Test
@@ -854,48 +753,6 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenConnectCodeRetrievedItRespectsUrlBasedFeatureFlag() {
-        whenever(nativeLib.prepareForConnect()).thenReturn(connectKeys)
-        prepareToProvideDeviceIds()
-        val decoratedCode = "decorated"
-        whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenReturn(decoratedCode)
-
-        configureUrlWrappedCodeFeatureFlagState(enabled = true).also {
-            val result = syncRepo.getConnectQR() as Success
-            assertEquals(jsonConnectKeyEncoded, result.data.rawCode)
-            assertEquals(decoratedCode, result.data.qrCode)
-        }
-
-        configureUrlWrappedCodeFeatureFlagState(enabled = false).also {
-            val result = syncRepo.getConnectQR() as Success
-            assertEquals(jsonConnectKeyEncoded, result.data.rawCode)
-            assertEquals(jsonConnectKeyEncoded, result.data.qrCode)
-        }
-    }
-
-    @Test
-    fun whenRecoveryCodeRetrievedItRespectsUrlBasedFeatureFlag() {
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.userId).thenReturn(userId)
-
-        val decoratedCode = "decorated"
-        whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenReturn(decoratedCode)
-
-        // even feature is enabled, recovery codes don't have their QR codes decorated
-        configureUrlWrappedCodeFeatureFlagState(enabled = true).also {
-            val result = syncRepo.getRecoveryCode() as Success
-            assertEquals(jsonRecoveryKeyEncoded, result.data.rawCode)
-            assertEquals(jsonRecoveryKeyEncoded, result.data.qrCode)
-        }
-
-        configureUrlWrappedCodeFeatureFlagState(enabled = false).also {
-            val result = syncRepo.getRecoveryCode() as Success
-            assertEquals(jsonRecoveryKeyEncoded, result.data.rawCode)
-            assertEquals(jsonRecoveryKeyEncoded, result.data.qrCode)
-        }
-    }
-
-    @Test
     fun whenAccountDeletedWithASingleConnectedDeviceThenPixelFired() {
         prepareForExchangeSuccess()
         whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
@@ -919,10 +776,6 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
         syncRepo.deleteAccount()
         verify(syncPixels).fireUserConfirmedToTurnOffSyncAndDelete(eq(0))
-    }
-
-    private fun configureUrlWrappedCodeFeatureFlagState(enabled: Boolean) {
-        syncFeature.syncSetupBarcodeIsUrlBased().setRawStoredState(State(enable = enabled))
     }
 
     private fun prepareForLoginSuccess() {

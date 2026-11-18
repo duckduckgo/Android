@@ -59,6 +59,7 @@ import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.promotion.InternalSyncPromotionDataStore
 import com.duckduckgo.sync.internal.TestSyncWarningPlugin
+import com.duckduckgo.sync.internal.connect.V1ConnectCode
 import com.duckduckgo.sync.internal.promotion.InternalSyncPromotionAppInstall
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
@@ -108,6 +109,7 @@ constructor(
     private val gracePeriod: DeviceAuthorizationGracePeriod,
     private val promotionDataStore: InternalSyncPromotionDataStore,
     private val promotionAppInstall: InternalSyncPromotionAppInstall,
+    private val v1ConnectCode: V1ConnectCode,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -435,7 +437,7 @@ constructor(
 
     fun onConnectStart() {
         viewModelScope.launch(dispatchers.io()) {
-            val qrCode = when (val qrCodeResult = syncAccountRepository.getConnectQR()) {
+            val qrCode = when (val qrCodeResult = v1ConnectCode.getConnectQR()) {
                 is Error -> {
                     command.send(ShowMessage("$qrCodeResult"))
                     return@launch
@@ -450,12 +452,13 @@ constructor(
             var polling = true
             while (polling) {
                 delay(7000)
-                when (val result = syncAccountRepository.pollConnectionKeys()) {
+                when (val result = v1ConnectCode.pollConnectionKeys()) {
                     is Error -> {
                         command.send(Command.ShowMessage("$result"))
+                        polling = false
                     }
 
-                    is Success -> {
+                    is Success -> if (result.data) {
                         command.send(Command.ShowMessage(result.data.toString()))
                         polling = false
                         updateViewState()

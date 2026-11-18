@@ -139,9 +139,9 @@ interface SyncPixels {
     fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
         launchSource: SyncLaunchSource,
-        path: SetupPath? = null,
-        myRole: SetupRole? = null,
-        peerKind: PeerKind? = null,
+        path: SetupPath?,
+        myRole: SetupRole?,
+        peerKind: PeerKind?,
     )
     fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: SyncLaunchSource, reason: CancellationReason? = null)
     fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType)

@@ -411,7 +411,7 @@ class RealSyncPixelsTest {
     fun `when setup finished without a path then the pixel is fired`(
         @TestParameter screenType: ScreenType,
     ) {
-        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other)
+        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other, path = null, myRole = null, peerKind = null)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
@@ -429,7 +429,7 @@ class RealSyncPixelsTest {
     fun `when setup finished then the pixel carries the launch source`(
         @TestParameter launchSource: SyncLaunchSource,
     ) {
-        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT, launchSource)
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT, launchSource, path = null, myRole = null, peerKind = null)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
@@ -458,7 +458,7 @@ class RealSyncPixelsTest {
     fun `when setup finished for a recovery path then the pixel carries the path`(
         @TestParameter screenType: ScreenType,
     ) {
-        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other, SetupPath.RECOVERY)
+        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other, SetupPath.RECOVERY, myRole = null, peerKind = null)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,

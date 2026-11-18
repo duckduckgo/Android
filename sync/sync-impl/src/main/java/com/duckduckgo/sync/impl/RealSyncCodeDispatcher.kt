@@ -142,10 +142,6 @@ class RealSyncCodeDispatcher @Inject constructor(
     }
 
     override fun route(pastedCode: String): RouteDecision {
-        return classifyV2(pastedCode)
-    }
-
-    private fun classifyV2(pastedCode: String): RouteDecision {
         val parsed = qrCode.parse(pastedCode)
         logcat { "$TAG: v2 parse=${parsed::class.simpleName}" }
         return when (parsed) {

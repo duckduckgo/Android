@@ -53,7 +53,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyCreateFailureReason
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
@@ -92,8 +91,6 @@ interface SyncAccountRepository {
     fun getRecoveryCode(): Result<AuthCode>
     fun getThisConnectedDevice(): ConnectedDevice?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
-    fun getConnectQR(): Result<AuthCode>
-    fun pollConnectionKeys(): Result<Boolean>
     fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
 
     /**
@@ -177,7 +174,6 @@ class AppSyncAccountRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val syncFeature: SyncFeature,
     private val deviceKeyGenerator: DeviceKeyGenerator,
-    private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val syncJweCrypto: SyncJweCrypto,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
@@ -461,31 +457,6 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun getConnectQR(): Result<AuthCode> {
-        val prepareForConnect = kotlin.runCatching {
-            nativeLib.prepareForConnect().also {
-                it.checkResult("Creating ConnectQR code failed")
-            }
-        }.getOrElse { return it.asErrorResult().alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code) }
-
-        val deviceId = syncDeviceIds.deviceId()
-        syncStore.deviceId = deviceId
-        syncStore.primaryKey = prepareForConnect.publicKey
-        syncStore.secretKey = prepareForConnect.secretKey
-
-        val linkingQRCode = Adapters.recoveryCodeAdapter.toJson(
-            LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
-        ) ?: return Error(reason = "Error generating Linking Code").alsoFireAccountErrorPixel()
-
-        val b64Encoded = linkingQRCode.encodeB64()
-        val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
-            syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
-        } else {
-            b64Encoded
-        }
-        return Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
-    }
-
     private fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
         if (!isSignedIn()) {
             performCreateAccount().onFailure {
@@ -497,41 +468,6 @@ class AppSyncAccountRepository @Inject constructor(
         return performConnect(connectKeys).onFailure {
             it.alsoFireLoginErrorPixel()
             return it.copy(code = CONNECT_FAILED.code)
-        }
-    }
-
-    override fun pollConnectionKeys(): Result<Boolean> {
-        val deviceId = syncDeviceIds.deviceId()
-
-        return when (val result = syncApi.connectDevice(deviceId)) {
-            is Error -> {
-                if (result.code == NOT_FOUND.code) {
-                    return Success(false)
-                } else if (result.code == GONE.code) {
-                    return Error(code = CONNECT_FAILED.code, reason = "Connect: keys expired").alsoFireAccountErrorPixel()
-                }
-                result.alsoFireAccountErrorPixel()
-            }
-
-            is Success -> {
-                val sealOpen = kotlin.runCatching {
-                    nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
-                }.getOrElse { throwable ->
-                    throwable.asErrorResult().alsoFireAccountErrorPixel()
-                    return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal")
-                }
-                val recoveryCode = kotlin.runCatching {
-                    Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery
-                }.getOrNull() ?: return Error(
-                    code = CONNECT_FAILED.code,
-                    reason = "Connect: Error reading received recovery code",
-                ).alsoFireAccountErrorPixel()
-                syncStore.userId = recoveryCode.userId
-                syncStore.primaryKey = recoveryCode.primaryKey
-                return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey).onFailure {
-                    return it.copy(code = LOGIN_FAILED.code)
-                }
-            }
         }
     }
 
@@ -910,7 +846,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
 
         // Unified device list: mint the account_info key locally and encrypt device_info so both are included in the signup request.
-        // Best-effort — null means we sign up without them because mint/encrypt failed and migration/login backfills later.
+        // Best-effort: null means we sign up without them (writing disabled, or mint/encrypt failed) and migration/login backfills later.
         val unifiedDeviceInfo = signupAccountInfoBuilder.build(account.secretKey, deviceName, deviceType.deviceFactor)
 
         val result = try {

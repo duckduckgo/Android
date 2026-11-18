@@ -103,7 +103,7 @@ class RealConnectedDevicesRepository @Inject constructor(
             ?: return Error(reason = "PrimaryKey not found")
 
         val userId = syncStore.userId
-        val result = getConnectedDevicesV2(token, primaryKey, reportAccountErrorPixel)
+        val result = fetchConnectedDevices(token, primaryKey, reportAccountErrorPixel)
         // A fetch can still be in flight when the user signs out or switches account. Comparing the user id covers both: sign-out clears
         // it and a switch replaces it, so we never undo the reset to 0 or write the old account's count over the new one.
         if (result is Success && userId != null && syncStore.userId == userId) {
@@ -113,7 +113,7 @@ class RealConnectedDevicesRepository @Inject constructor(
         return result
     }
 
-    private fun getConnectedDevicesV2(
+    private fun fetchConnectedDevices(
         token: String,
         primaryKey: String,
         reportAccountErrorPixel: Boolean,
