@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.sponsor
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -34,45 +34,45 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-enum class SponsorBlockMode {
+enum class SponsorMode {
     ALWAYS_ASK,
     ALWAYS_SKIP,
     OFF,
 }
 
-interface SponsorBlockUserPreferences {
-    fun modeFlow(): Flow<SponsorBlockMode>
+interface SponsorUserPreferences {
+    fun modeFlow(): Flow<SponsorMode>
 
     /**
      * The last mode read from storage, for callers that can't suspend. It holds the default until the first read completes, so
      * callers that can suspend should read [modeFlow] instead.
      */
-    fun cachedMode(): SponsorBlockMode
+    fun cachedMode(): SponsorMode
 
-    suspend fun setMode(mode: SponsorBlockMode)
+    suspend fun setMode(mode: SponsorMode)
 }
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealSponsorBlockUserPreferences @Inject constructor(
+class RealSponsorUserPreferences @Inject constructor(
     @AdBlockingPreferences private val dataStore: DataStore<Preferences>,
     @AppCoroutineScope appScope: CoroutineScope,
-) : SponsorBlockUserPreferences {
+) : SponsorUserPreferences {
 
-    private val mode: StateFlow<SponsorBlockMode> = modeFlow().stateIn(appScope, SharingStarted.Eagerly, DEFAULT_MODE)
+    private val mode: StateFlow<SponsorMode> = modeFlow().stateIn(appScope, SharingStarted.Eagerly, DEFAULT_MODE)
 
-    override fun modeFlow(): Flow<SponsorBlockMode> = dataStore.data
-        .map { prefs -> prefs[KEY_MODE]?.let { stored -> SponsorBlockMode.entries.firstOrNull { it.name == stored } } ?: DEFAULT_MODE }
+    override fun modeFlow(): Flow<SponsorMode> = dataStore.data
+        .map { prefs -> prefs[KEY_MODE]?.let { stored -> SponsorMode.entries.firstOrNull { it.name == stored } } ?: DEFAULT_MODE }
         .distinctUntilChanged()
 
-    override fun cachedMode(): SponsorBlockMode = mode.value
+    override fun cachedMode(): SponsorMode = mode.value
 
-    override suspend fun setMode(mode: SponsorBlockMode) {
+    override suspend fun setMode(mode: SponsorMode) {
         dataStore.edit { prefs -> prefs[KEY_MODE] = mode.name }
     }
 
     private companion object {
-        val DEFAULT_MODE = SponsorBlockMode.ALWAYS_ASK
+        val DEFAULT_MODE = SponsorMode.ALWAYS_ASK
         val KEY_MODE = stringPreferencesKey("sponsor_block_mode")
     }
 }
