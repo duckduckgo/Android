@@ -23,6 +23,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.duckduckgo.adblocking.impl.BuildConfig
 import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -52,7 +53,12 @@ class SponsorBlockDatasetSchedulerTest {
 
         val request = argumentCaptor<PeriodicWorkRequest>()
         verify(workManager).enqueueUniquePeriodicWork(eq("sponsor_block_dataset"), eq(ExistingPeriodicWorkPolicy.UPDATE), request.capture())
-        assertEquals(TimeUnit.HOURS.toMillis(24), request.firstValue.workSpec.intervalDuration)
+        val expectedInterval = if (BuildConfig.SPONSOR_BLOCK_BASE_URL == "http://127.0.0.1:8765/sponsorblock/v1") {
+            TimeUnit.MINUTES.toMillis(15)
+        } else {
+            TimeUnit.HOURS.toMillis(24)
+        }
+        assertEquals(expectedInterval, request.firstValue.workSpec.intervalDuration)
         assertEquals(NetworkType.CONNECTED, request.firstValue.workSpec.constraints.requiredNetworkType)
         assertEquals(BackoffPolicy.EXPONENTIAL, request.firstValue.workSpec.backoffPolicy)
         assertEquals(TimeUnit.MINUTES.toMillis(1), request.firstValue.workSpec.backoffDelayDuration)

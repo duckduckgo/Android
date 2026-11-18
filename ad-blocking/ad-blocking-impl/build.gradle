@@ -24,6 +24,16 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.adblocking.impl'
+    buildFeatures { buildConfig = true }
+    buildTypes {
+        debug {
+            def mockServer = providers.gradleProperty('sponsorBlockMock').map { it == 'true' }.getOrElse(false)
+            buildConfigField 'String', 'SPONSOR_BLOCK_BASE_URL', mockServer ? '"http://127.0.0.1:8765/sponsorblock/v1"' : '"https://protection.duckduckgo.com/api/protection/segments/v1/android"'
+        }
+        release {
+            buildConfigField 'String', 'SPONSOR_BLOCK_BASE_URL', '"https://protection.duckduckgo.com/api/protection/segments/v1/android"'
+        }
+    }
     testOptions {
         unitTests {
             includeAndroidResources = true
