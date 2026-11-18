@@ -37,13 +37,14 @@ Adding or changing a pixel or the pixel registry also requires privacy triage �
 ## Read these when the situation applies
 
 These files are not in context. Read the whole file before doing the work it covers — don't rely on
-what you remember of it.
+what you remember of it. Claude Code loads the `.claude/rules/` files on its own when you touch the paths
+they cover, so don't read one again if it's already in your context; other agents read them from this table.
 
 | Read | When |
 |---|---|
 | `.claude/docs/architecture.md` | **planning or implementing** any new code, refactoring, or module changes — `-api`/`-impl` structure, DI scopes, navigation, coroutine job patterns |
 | `.claude/docs/android-design-system.md` | **planning or implementing** any UI — which ADS component to use, colors, spacing; raw Android/Material widgets are lint-blocked |
-| `.claude/docs/contributions.md` | **planning** a change that touches a `-api` surface or spans multiple modules — it needs an approved API Proposal and/or Tech Design, and that has to be raised before implementation, not at PR time. Also read it when naming a branch, writing a commit, or opening a PR |
+| `.claude/docs/contributions.md` | **planning** a change that touches a `-api` surface or spans multiple modules (it may need an API Proposal or Tech Design first). Also read it when naming a branch, writing a commit, or opening a PR |
 | `.claude/docs/lateinit-hazards.md` | writing or reviewing any `lateinit var`, especially `@Inject lateinit var` in a View |
 | `.claude/docs/plugin-system.md` | declaring a plugin point or contributing a plugin (`PluginPoint` / `ActivePluginPoint`) |
 | `.claude/docs/native-input.md` | **changing** the native input (`NativeInputModeWidget`, its plugins and footers, `NativeInputManager`, the contextual sheet or the edit screen) — adding a control, state-store rules, host gotchas, and the refactor still in flight |
@@ -53,6 +54,9 @@ what you remember of it.
 | `.claude/docs/url-classification.md` | routing typed input to navigation vs search — use `QueryUrlPredictor`, not `UriString.isWebUrl()` |
 | `.claude/docs/icons.md` | the change needs an icon the project doesn't have yet — it must be fetched from the internal Icons repository, never invented |
 | `.claude/docs/translations.md` | adding or changing any user-facing string — `donottranslate.xml` vs `strings-<module>.xml`, placeholder/`instruction` rules, how to change or remove already-translated copy |
+| `.claude/rules/maestro-ui-tests.md` | writing or running a Maestro flow under `.maestro/`: build type, onboarding, shared flows |
+| `.claude/rules/pixel-definitions.md` | adding or editing a pixel or wide event definition under `PixelDefinitions/pixels/` |
+| `.claude/rules/wide-events.md` | working on a wide event (`**/wideevents/**`, `*WideEvent*.kt`), including when to use one instead of a pixel |
 
 ---
 

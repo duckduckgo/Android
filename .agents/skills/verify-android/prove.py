@@ -560,7 +560,7 @@ def summary_fixtures(folder):
             "sha256": "75e3e4a9" * 8, "serial": "emulator-5580"}
     external = {"external": True, "apk": f"{home}/Downloads/app-internal-debug.apk", "sha256": "9c0ffee1" * 8,
                 "serial": "emulator-5580"}
-    committed = {"name": "tabs", "path": str(SKILL / "proofs" / "tabs.py"), "repo_path": ".claude/skills/verify-android/proofs/tabs.py",
+    committed = {"name": "tabs", "path": str(SKILL / "proofs" / "tabs.py"), "repo_path": ".agents/skills/verify-android/proofs/tabs.py",
                  "committed": True, "doc": "The tab switcher lists one card per tab.\n\nRecipe: features/tabs.md.",
                  "source": "def run(android):\n    pass\n"}
     scratch = {**committed, "name": "fix", "path": f"{home}/scratch/fix.py", "repo_path": None, "committed": False,
@@ -613,7 +613,7 @@ def selftest(offline=False):
             ("pr-summary pairs a compare's runs and shows what changed", *case(
                 ["pr-summary", compare_dir], 0,
                 ("**Fails on the base (1 of 3 checks); passes on this branch.**", "| card titled with the page | FAIL | pass |",
-                 "`.claude/skills/verify-android/proofs/tabs.py`", "<details><summary>All checks", "$P compare", "API 34"),
+                 "`.agents/skills/verify-android/proofs/tabs.py`", "<details><summary>All checks", "$P compare", "API 34"),
                 leaks)),
             ("pr-summary of an uncommitted proof that errored carries its source and no local paths", *case(
                 ["pr-summary", folder / "error.json"], 0,

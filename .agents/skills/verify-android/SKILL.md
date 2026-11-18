@@ -5,10 +5,10 @@ description: Verifies DuckDuckGo Android changes on the attached device (or an e
 
 # Verify the DuckDuckGo Android app
 
-One entry point, `.claude/skills/verify-android/verify.sh` (`V` below, run from the repo root).
+One entry point, `.agents/skills/verify-android/verify.sh` (`V` below, run from the repo root).
 
 ```bash
-V=.claude/skills/verify-android/verify.sh
+V=.agents/skills/verify-android/verify.sh
 ```
 
 Driving and evidence use the `android` CLI and `adb`, as the `android-cli` skill's
@@ -87,10 +87,10 @@ through this skill's commands and records `android.check(...)` results. Every re
 `proofs/` (shared paths in `proofs/steps.py`); for a change, write a proof of what it changes.
 
 ```bash
-P=.claude/skills/verify-android/prove.py
-$P .claude/skills/verify-android/proofs/<name>.py           # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
+P=.agents/skills/verify-android/prove.py
+$P .agents/skills/verify-android/proofs/<name>.py           # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
 $V build --base origin/develop                     # the "before" build (git fetch first for the latest)
-$P compare .claude/skills/verify-android/proofs/<name>.py   # runs it on the base build, then on this checkout's
+$P compare .agents/skills/verify-android/proofs/<name>.py   # runs it on the base build, then on this checkout's
 $P pr-summary [<before>] <after>                   # Markdown for the PR, from runs' proof-<name>.json (or the evidence folder)
 $P selftest                                        # after changing prove.py: the harness still tells pass from fail
 $P selftest --offline                              # only the cases that need no device (pr-summary)
