@@ -1,17 +1,49 @@
-// WebView renderer process termination, reported from BrowserWebViewClient.onRenderProcessGone
+// WebView renderer process termination, reported from BrowserWebViewClient.onRenderProcessGone.
+// WebViews in the same profile share a renderer process, and Android notifies each WebView it served,
+// so the callbacks of one termination are collected and reported as a single pixel.
 {
     "m_web_view_renderer_gone_crash": {
-        "description": "The WebView renderer process crashed (RenderProcessGoneDetail.didCrash() is true). Fires once for each browser tab WebView the renderer served, so one crash can fire it several times.",
+        "description": "The WebView renderer process crashed (RenderProcessGoneDetail.didCrash() is true). Fires once per renderer termination. Versions before the parameters existed fired it once for each WebView the renderer served, without parameters.",
         "owners": ["marcosholgado"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "app_state",
+                "description": "Whether any app activity was started when the app was notified of the termination. A renderer that died while the app was frozen in the background is reported when the app thaws, which can be after it reopens.",
+                "type": "string",
+                "enum": ["foreground", "background"]
+            },
+            {
+                "key": "affected_webviews",
+                "description": "Bucketed number of WebViews using the browser WebView client (browser tabs and the in-app WebView screen) that lost their page to this termination",
+                "type": "string",
+                "enum": ["1", "2-3", "4-5", "6-10", "11+"]
+            },
+            "deviceRamBucket"
+        ]
     },
     "m_web_view_renderer_gone_killed": {
-        "description": "The system killed the WebView renderer process without it crashing (RenderProcessGoneDetail.didCrash() is false), usually to reclaim memory. Fires once for each browser tab WebView the renderer served, so one kill can fire it several times.",
+        "description": "The system killed the WebView renderer process without it crashing (RenderProcessGoneDetail.didCrash() is false), usually to reclaim memory. Fires once per renderer termination. Versions before the parameters existed fired it once for each WebView the renderer served, without parameters.",
         "owners": ["marcosholgado"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "app_state",
+                "description": "Whether any app activity was started when the app was notified of the termination. A renderer that died while the app was frozen in the background is reported when the app thaws, which can be after it reopens.",
+                "type": "string",
+                "enum": ["foreground", "background"]
+            },
+            {
+                "key": "affected_webviews",
+                "description": "Bucketed number of WebViews using the browser WebView client (browser tabs and the in-app WebView screen) that lost their page to this termination",
+                "type": "string",
+                "enum": ["1", "2-3", "4-5", "6-10", "11+"]
+            },
+            "deviceRamBucket"
+        ]
     }
 }

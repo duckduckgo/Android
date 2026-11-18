@@ -22,12 +22,7 @@
                 "description": "Time from process start to first frame state measured manually in milliseconds",
                 "type": "integer"
             },
-            {
-                "key": "device_ram_bucket",
-                "description": "Device memory capacity bucket for classification",
-                "type": "string",
-                "enum": ["<1GB", "1GB", "2GB", "4GB", "6GB", "8GB", "12GB", "16GB+"]
-            },
+            "deviceRamBucket",
             {
                 "key": "api_level",
                 "description": "Android API level of the device",
