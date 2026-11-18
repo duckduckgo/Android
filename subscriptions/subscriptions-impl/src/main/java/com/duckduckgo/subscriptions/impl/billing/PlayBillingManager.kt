@@ -283,7 +283,7 @@ class RealPlayBillingManager @Inject constructor(
                     ),
                 )
             }
-            _purchaseState.emit(PurchaseState.Failure(error))
+            emitLaunchFailure(error)
             return@withContext
         }
 
@@ -308,7 +308,7 @@ class RealPlayBillingManager @Inject constructor(
                 if (flowType == BillingFlowType.PURCHASE) {
                     subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error)
                 }
-                _purchaseState.emit(PurchaseState.Failure(error))
+                emitLaunchFailure(error)
             }
         }
     }
@@ -343,7 +343,7 @@ class RealPlayBillingManager @Inject constructor(
             val errorMessage = "empty old purchase token"
             logcat { "Billing: $errorMessage" }
             if (flowType == BillingFlowType.PLAN_SWITCH) subscriptionSwitchWideEvent.onBillingFlowInitFailure(errorMessage)
-            _purchaseState.emit(PurchaseState.Failure(errorMessage))
+            emitLaunchFailure(errorMessage)
             return@withContext
         }
 
@@ -360,7 +360,7 @@ class RealPlayBillingManager @Inject constructor(
             val errorMessage = "Missing product details"
             logcat { "Billing: $errorMessage" }
             if (flowType == BillingFlowType.PLAN_SWITCH) subscriptionSwitchWideEvent.onBillingFlowInitFailure(errorMessage)
-            _purchaseState.emit(PurchaseState.Failure(errorMessage))
+            emitLaunchFailure(errorMessage)
             return@withContext
         }
 
@@ -382,9 +382,14 @@ class RealPlayBillingManager @Inject constructor(
 
             is LaunchBillingFlowResult.Failure -> {
                 if (flowType == BillingFlowType.PLAN_SWITCH) subscriptionSwitchWideEvent.onBillingFlowInitFailure(launchBillingFlowResult.error.name)
-                _purchaseState.emit(PurchaseState.Failure(launchBillingFlowResult.error.name))
+                emitLaunchFailure(launchBillingFlowResult.error.name)
             }
         }
+    }
+
+    private suspend fun emitLaunchFailure(error: String) {
+        currentFlowType = BillingFlowType.PURCHASE
+        _purchaseState.emit(PurchaseState.Failure(error))
     }
 
     private fun onPurchasesUpdated(result: PurchasesUpdateResult) {
