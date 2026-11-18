@@ -20,7 +20,8 @@ import java.io.File
 
 /**
  * Single place deciding where Compose hosts (ComposeView, setContent) are allowed
- * while Compose adoption is limited to the Phase 2 scenarios.
+ * while Compose adoption is limited to the Phase 2 Scenario 3 reference contribution,
+ * a new surface built fully in Compose.
  */
 internal object ComposeHostingPolicy {
 

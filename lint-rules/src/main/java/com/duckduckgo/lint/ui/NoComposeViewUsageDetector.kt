@@ -75,7 +75,7 @@ class NoComposeViewUsageDetector : LayoutDetector(), SourceCodeScanner {
             .create(
                 id = "NoComposeViewUsage",
                 briefDescription = "ComposeView should not be used in XML layouts or custom views",
-                explanation = "Compose hosts are limited to the Compose integration Phase 2 scenarios. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml.",
+                explanation = "Compose hosts are limited to the Compose integration Phase 2 Scenario 3, a new surface built fully in Compose. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. The production reference contribution approved in the Scenario 3 tech design is listed per file in that module's lint.xml.",
                 moreInfo = "https://app.asana.com/1/137249556945/task/1219547140965597",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,

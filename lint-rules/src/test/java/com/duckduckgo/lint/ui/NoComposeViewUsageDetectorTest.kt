@@ -66,7 +66,7 @@ class NoComposeViewUsageDetectorTest {
             .run()
             .expect(
                 """
-                res/layout/activity_main.xml:7: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
+                res/layout/activity_main.xml:7: Error: Compose hosts are limited to the Compose integration Phase 2 Scenario 3, a new surface built fully in Compose. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. The production reference contribution approved in the Scenario 3 tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
                     <androidx.compose.ui.platform.ComposeView
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
@@ -127,7 +127,7 @@ class NoComposeViewUsageDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/MyActivity.kt:8: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
+                src/com/example/test/MyActivity.kt:8: Error: Compose hosts are limited to the Compose integration Phase 2 Scenario 3, a new surface built fully in Compose. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. The production reference contribution approved in the Scenario 3 tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
                         val composeView = ComposeView(context)
                                           ~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
@@ -159,7 +159,7 @@ class NoComposeViewUsageDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/CustomView.kt:7: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
+                src/com/example/test/CustomView.kt:7: Error: Compose hosts are limited to the Compose integration Phase 2 Scenario 3, a new surface built fully in Compose. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. The production reference contribution approved in the Scenario 3 tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
                 class CustomView(context: Context, attrs: AttributeSet?) : ComposeView(context, attrs) {
                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
@@ -229,10 +229,10 @@ class NoComposeViewUsageDetectorTest {
             .run()
             .expect(
                 """
-                res/layout/multiple_compose.xml:7: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
+                res/layout/multiple_compose.xml:7: Error: Compose hosts are limited to the Compose integration Phase 2 Scenario 3, a new surface built fully in Compose. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. The production reference contribution approved in the Scenario 3 tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
                     <androidx.compose.ui.platform.ComposeView
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                res/layout/multiple_compose.xml:13: Error: Compose hosts are limited to the Compose integration Phase 2 scenarios. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. A production reference contribution approved in a scenario tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
+                res/layout/multiple_compose.xml:13: Error: Compose hosts are limited to the Compose integration Phase 2 Scenario 3, a new surface built fully in Compose. ComposeView is allowed in the design system modules, in -internal modules and in src/internal source sets. The production reference contribution approved in the Scenario 3 tech design is listed per file in that module's lint.xml. [NoComposeViewUsage]
                     <androidx.compose.ui.platform.ComposeView
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 2 errors, 0 warnings
