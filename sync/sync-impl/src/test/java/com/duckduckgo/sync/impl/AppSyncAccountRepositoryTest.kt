@@ -99,6 +99,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.check
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -1381,7 +1382,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7aPostUpgradeLoginFailsWithNon401ThenAbortsWithoutAtomicStore() = runTest {
+    fun whenStep7aPostUpgradeLoginFailsWithNon401ThenFailsWithoutAtomicStore() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginServerError)
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1526,7 +1527,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7PostRateLimitedBeyondRetryLimitThenAbortsWithoutStore() = runTest {
+    fun whenStep7PostRateLimitedBeyondRetryLimitThenFailsWithoutStore() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
         whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
             .thenReturn(Error(code = API_CODE.TOO_MANY_REQUESTS_1.code, reason = "rate limited"))
@@ -1537,6 +1538,96 @@ class AppSyncAccountRepositoryTest {
         verify(syncApi, times(AppSyncAccountRepository.MAX_UPGRADE_RETRIES + 1))
             .createAccessCredential(anyString(), eq("ddg"), any())
         verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenJoinAccountFromThirdPartyThenDeviceIdIsSavedBeforeThirdPartyLogin() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        inOrder(syncStore, syncApi) {
+            verify(syncStore).deviceId = deviceId
+            verify(syncApi).login(eq(userId), any(), eq(deviceId), any(), any(), eq("ai_chats"))
+        }
+    }
+
+    @Test
+    fun whenUpgradeSucceedsThenSavedDeviceIdIsKept() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncStore, never()).deviceId = null
+    }
+
+    @Test
+    fun whenThirdPartyLoginFailsThenSavedDeviceIdIsKeptAndNoLogout() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.login(eq(userId), any(), eq(deviceId), any(), any(), eq("ai_chats")))
+            .thenReturn(Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "invalid credentials"))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(syncStore, never()).deviceId = null
+        verify(syncApi, never()).logout(anyString(), anyString())
+    }
+
+    @Test
+    fun whenUpgradeAbortedAfterThirdPartyLoginThenSavedDeviceIdIsCleared() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(accountAlreadyHasDdg = true)
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        inOrder(syncApi, syncStore) {
+            verify(syncApi).logout("scoped_token_step2", deviceId)
+            verify(syncStore).deviceId = null
+        }
+    }
+
+    @Test
+    fun whenStep7Post409AlreadyExistsThenSavedDeviceIdIsCleared() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = API_CODE.COUNT_LIMIT.code, reason = "already exists"))
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncStore).deviceId = null
+    }
+
+    @Test
+    fun whenStep7aLogin401ThenSavedDeviceIdIsCleared() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginUnauthorized)
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncStore).deviceId = null
+    }
+
+    @Test
+    fun whenStep7PostTransientErrorBeyondRetryLimitThenNoLogoutAndSavedDeviceIdIsKept() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = 503, reason = "unavailable"))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(AccountErrorCodes.ACCOUNT_UPGRADE_FAILED.code, (result as Error).code)
+        verify(syncApi, never()).logout(anyString(), anyString())
+        verify(syncStore, never()).deviceId = null
+    }
+
+    @Test
+    fun whenStep7aLoginTransientErrorBeyondRetryLimitThenNoLogoutAndSavedDeviceIdIsKept() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginTransportError)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(syncApi, never()).logout(anyString(), anyString())
+        verify(syncStore, never()).deviceId = null
     }
 
     @Test
