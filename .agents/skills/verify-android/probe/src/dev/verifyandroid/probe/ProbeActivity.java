@@ -4,15 +4,19 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ConnectException;
+import java.net.HttpURLConnection;
 import java.net.NoRouteToHostException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -33,6 +37,7 @@ import java.security.SecureRandom;
  *            no larger than the receive window AppTP advertised in its SYN-ACK, so a too-small window cuts the SNI
  *   split    two writes, cut right after the SNI: the SNI is complete in the first segment
  *   late-sni two writes, cut right before the SNI: the SNI only arrives in the second segment
+ *   ip       an HTTPS GET of https://host/cdn-cgi/trace (Cloudflare), logging the public IP the server saw
  *
  * The tunnel MTU carries a whole hello in one segment, so split and late-sni cut it with explicit writes.
  */
@@ -64,6 +69,10 @@ public class ProbeActivity extends Activity {
     }
 
     private void probe(String run, String host, String mode, int timeoutMs) {
+        if (mode.equals("ip")) {
+            publicIp(run, host, timeoutMs);
+            return;
+        }
         long start = System.currentTimeMillis();
         String outcome;
         int replyBytes = 0;
@@ -123,6 +132,35 @@ public class ProbeActivity extends Activity {
         }
         Log.i(TAG, "RESULT run=" + run + " host=" + host + " mode=" + mode + " outcome=" + outcome
                 + " reply_bytes=" + replyBytes + " ms=" + (System.currentTimeMillis() - start));
+    }
+
+    private void publicIp(String run, String host, int timeoutMs) {
+        long start = System.currentTimeMillis();
+        String outcome;
+        String ip = "";
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) new URL("https://" + host + "/cdn-cgi/trace").openConnection();
+            connection.setConnectTimeout(timeoutMs);
+            connection.setReadTimeout(timeoutMs);
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream(), StandardCharsets.US_ASCII))) {
+                for (String line; (line = reader.readLine()) != null; ) {
+                    if (line.startsWith("ip=")) ip = line.substring(3);
+                }
+            }
+            outcome = ip.isEmpty() ? "ERROR:no-ip" : "ALLOWED";
+        } catch (UnknownHostException e) {
+            outcome = "NO_ADDRESS";
+        } catch (SocketTimeoutException e) {
+            outcome = "TIMEOUT";
+        } catch (IOException e) {
+            outcome = "ERROR:" + e.getClass().getSimpleName();
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+        Log.i(TAG, "RESULT run=" + run + " host=" + host + " mode=ip outcome=" + outcome + " ip=" + ip
+                + " ms=" + (System.currentTimeMillis() - start));
     }
 
     private static byte[] sniExtension(String host) {
