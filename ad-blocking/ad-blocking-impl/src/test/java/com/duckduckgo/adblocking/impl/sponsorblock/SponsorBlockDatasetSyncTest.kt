@@ -26,7 +26,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -237,9 +237,9 @@ class SponsorBlockDatasetSyncTest {
                 releaseFirst.await()
             }
         }
-        val first = async(Dispatchers.IO) { sync.sync() }
+        val first = async(DefaultDispatcherProvider().io()) { sync.sync() }
         firstStarted.await()
-        val second = async(Dispatchers.IO, start = CoroutineStart.UNDISPATCHED) { sync.sync() }
+        val second = async(DefaultDispatcherProvider().io(), start = CoroutineStart.UNDISPATCHED) { sync.sync() }
         releaseFirst.complete(Unit)
         withTimeout(5000) {
             first.await()
@@ -259,9 +259,9 @@ class SponsorBlockDatasetSyncTest {
             firstStarted.complete(Unit)
             releaseFirst.await()
         }
-        val first = async(Dispatchers.IO) { sync.sync() }
+        val first = async(DefaultDispatcherProvider().io()) { sync.sync() }
         firstStarted.await()
-        val waiting = launch(Dispatchers.IO, start = CoroutineStart.UNDISPATCHED) { sync.sync() }
+        val waiting = launch(DefaultDispatcherProvider().io(), start = CoroutineStart.UNDISPATCHED) { sync.sync() }
         withTimeout(5000) { waiting.cancelAndJoin() }
         assertEquals(1, service.revisionRequests)
         releaseFirst.complete(Unit)
@@ -297,7 +297,7 @@ class SponsorBlockDatasetSyncTest {
             null
         }.whenever(call).cancel()
         service.overrideCall = call
-        val job = launch(Dispatchers.IO, start = CoroutineStart.DEFAULT) { sync.sync() }
+        val job = launch(DefaultDispatcherProvider().io(), start = CoroutineStart.DEFAULT) { sync.sync() }
         assertTrue(readStarted.await(5, TimeUnit.SECONDS))
         withTimeout(5000) { job.cancelAndJoin() }
         verify(call).cancel()
