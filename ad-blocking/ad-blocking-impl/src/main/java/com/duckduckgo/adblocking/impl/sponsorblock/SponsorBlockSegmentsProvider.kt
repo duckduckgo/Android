@@ -81,9 +81,10 @@ class RealSponsorBlockSegmentsProvider @Inject constructor(
 
     /** Null when the lookup failed, so the failure isn't cached. */
     private suspend fun fetch(videoId: String): List<SponsorBlockSegment>? {
-        val hashPrefix = videoId.sha256.take(HASH_PREFIX_LENGTH)
+        val hash = videoId.sha256
+        val hashPrefix = hash.take(HASH_PREFIX_LENGTH)
         return try {
-            if (!hashPrefixGate.hasSegments(hashPrefix)) return emptyList()
+            if (!hashPrefixGate.hasSegments(hash.take(DATASET_PREFIX_LENGTH))) return null
             val response = service.getSegments(hashPrefix)
             when {
                 response.code() == HTTP_NOT_FOUND -> emptyList()
@@ -122,6 +123,7 @@ class RealSponsorBlockSegmentsProvider @Inject constructor(
 
     private companion object {
         const val HASH_PREFIX_LENGTH = 4
+        const val DATASET_PREFIX_LENGTH = 8
         const val HTTP_NOT_FOUND = 404
         const val CACHE_SIZE = 50
         const val LOAD_FACTOR = 0.75f
