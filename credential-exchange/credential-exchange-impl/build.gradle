@@ -33,26 +33,25 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
     implementation project(path: ':credential-exchange-api')
     implementation project(path: ':di')
     implementation project(path: ':feature-toggles-api')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':codegen-annotations')
-
-    implementation KotlinX.coroutines.core
-    implementation Square.logcat
-    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "androidx.appcompat:appcompat:_"
-
     implementation "androidx.credentials.providerevents:providerevents:_"
     implementation "androidx.credentials.providerevents:providerevents-play-services:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation KotlinX.coroutines.core
+    implementation Square.logcat
 
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-    testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation (KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+
+    ksp project(':codegen-ksp')
 }

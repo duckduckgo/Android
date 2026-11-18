@@ -30,25 +30,21 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':di')
-    implementation project(path: ':common-utils')
     implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':di')
     implementation project(path: ':persistent-storage-api')
-
+    implementation "com.google.android.gms:play-services-auth-blockstore:_"
     implementation "com.squareup.logcat:logcat:_"
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.playServices
 
-    // Block Store API
-    implementation "com.google.android.gms:play-services-auth-blockstore:_"
-
-    // Testing dependencies
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
     testImplementation (KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
 }

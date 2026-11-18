@@ -293,411 +293,330 @@ fladle {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
-	implementation project(":duckchat-api")
-	implementation project(":duckchat-impl")
-	implementation project(":widget-api")
-	implementation project(":duckchat-store")
-	implementation project(":onboarding-api")
-	implementation project(":onboarding-impl")
-	implementation project(":test-seeder-api")
-	internalImplementation project(":test-seeder-internal")
-	implementation project(":data-clearing-api")
-	implementation project(":data-clearing-impl")
-	internalImplementation project(":duckchat-internal")
-	implementation project(":malicious-site-protection-impl")
-	implementation project(":malicious-site-protection-api")
-	implementation project(":custom-tabs-impl")
-	implementation project(":custom-tabs-api")
-	implementation project(":ad-blocking-api")
-	implementation project(":history-impl")
-	implementation project(":history-api")
-	implementation project(":data-store-impl")
-	implementation project(":data-store-api")
-
+    implementation project(":ad-blocking-api")
     implementation project (":ad-blocking-impl")
-
-	implementation project(":new-tab-page-impl")
-	implementation project(":new-tab-page-api")
-
-	implementation project(":verified-installation-impl")
-	implementation project(":verified-installation-api")
-
-	implementation project(':referral-api')
-	implementation project(':referral-impl')
-
-	implementation project(":prompts-coordinator-impl")
-	implementation project(":prompts-coordinator-api")
-	internalImplementation project(":prompts-coordinator-internal")
-
-    implementation project(':navigation-api')
-    implementation project(':navigation-impl')
-
-    implementation project(path: ':vpn-network-api')
-    implementation project(path: ':vpn-network-impl')
-
-    implementation project(':library-loader-api')
-
-    implementation project(':autofill-api')
-    implementation project(':autofill-impl')
-    internalImplementation project(':autofill-internal')
-    testImplementation project(':autofill-test')
-
-    implementation project(':codegen-annotations')
-
-    implementation project(':app-build-config-api')
-    implementation project(':browser-api')
-    implementation project(':browser-feature-toggles')
-    implementation project(':browser-ui')
-    implementation project(":statistics-api")
-    implementation project(':statistics-impl')
-    implementation project(':experiments-api')
-    implementation project(':experiments-impl')
-    implementation project(':common-utils')
-    implementation project(':app-store')
-    implementation project(':app-database')
-    internalImplementation project(':design-system-internal')
-    implementation project(':design-system')
-    implementation project(':di')
-    implementation project(':app-tracking-api')
-    implementation project(':vpn-impl')
-    implementation project(':vpn-api')
-    implementation project(':vpn-store')
-    internalImplementation project(':vpn-internal')
-
-    implementation project(':feature-toggles-api')
-    implementation project(':feature-toggles-internal-api')
-    testImplementation project(':feature-toggles-test')
-    implementation project(':feature-toggles-impl')
-    internalImplementation project(":feature-toggles-internal")
-    implementation project(':privacy-config-api')
-    implementation project(':privacy-config-impl')
-    implementation project(':privacy-config-store')
-    implementation project(':request-interception-api')
-    implementation project(':request-interception-impl')
-    implementation project(':sqlcipher-loader-api')
-    implementation project(':sqlcipher-loader-impl')
-    implementation project(':tracker-detection-api')
-    implementation project(':tracker-detection-impl')
-    internalImplementation project(':privacy-config-internal')
-
-    implementation project(':anrs-api')
-    implementation project(':anrs-store')
-    implementation project(':anrs-impl')
-    internalImplementation project(':anrs-internal')
-    implementation project(':macos-api')
-    implementation project(':macos-impl')
-
-    implementation project(":pir-api")
-    implementation project(":pir-impl")
-    internalImplementation project(':pir-internal')
-
-    implementation project(':privacy-dashboard-api')
-    implementation project(':privacy-dashboard-impl')
-
-    implementation project(':remote-messaging-api')
-    implementation project(':remote-messaging-impl')
-    implementation project(':remote-messaging-store')
-    internalImplementation project(":remote-messaging-internal")
-
-    implementation project(':voice-search-api')
-    implementation project(':voice-search-impl')
-    implementation project(':voice-search-store')
-
-    implementation project(':downloads-api')
-    implementation project(':downloads-impl')
-    implementation project(':downloads-store')
-
-    internalImplementation project(':traces-api')
-    internalImplementation project(':traces-impl')
-
-    implementation project(':site-permissions-api')
-    implementation project(':site-permissions-impl')
-
-    implementation project(':site-preferences-api')
-    implementation project(':site-preferences-impl')
-
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
-
+    implementation project(':anrs-api')
+    implementation project(':anrs-impl')
+    implementation project(':anrs-store')
+    implementation project(':app-build-config-api')
+    implementation project(':app-database')
+    implementation project(':app-store')
+    implementation project(':app-tracking-api')
+    implementation project(':attributed-metrics-api')
+    implementation project(':attributed-metrics-impl')
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
-
-    implementation project(':cookies-api')
-    implementation project(':cookies-impl')
-    implementation project(':cookies-store')
-
-    implementation project(':content-scope-scripts-api')
-    implementation project(':content-scope-scripts-impl')
-
-    implementation project(':content-scope-privacy-features-impl')
-
-    implementation project(':network-protection-api')
-    implementation project(':network-protection-impl')
-    internalImplementation project(':network-protection-internal')
-    implementation project(':network-protection-store')
-
-    implementation project(':fingerprint-protection-api')
-    implementation project(':fingerprint-protection-impl')
-    implementation project(':fingerprint-protection-store')
-
-    implementation project(':browser-mode-api')
-    implementation project(':browser-mode-impl')
-
-    implementation project(':element-hiding-impl')
-    implementation project(':element-hiding-store')
-
-    implementation project(':httpsupgrade-api')
-    implementation project(':httpsupgrade-impl')
-    implementation project(':httpsupgrade-store')
-
-    implementation project(':sync-api')
-    implementation project(':sync-impl')
-    internalImplementation project(':sync-internal')
-    implementation project(':sync-store')
-    implementation project(':sync-lib')
-    implementation project(':sync-settings-api')
-    implementation project(':sync-settings-impl')
-
-    // temporary inclusion to ensure blockstore integration
-    implementation project(':persistent-storage-api')
-    internalImplementation project(':persistent-storage-impl')
-    playImplementation project(':persistent-storage-impl')
-    fdroidImplementation project(':persistent-storage-dummy-impl')
-
-    implementation project(':device-migration-api')
-    implementation project(':device-migration-impl')
-
-    implementation project(':request-filterer-api')
-    implementation project(':request-filterer-impl')
-    implementation project(':request-filterer-store')
-
-    implementation project(':windows-api')
-    implementation project(':windows-impl')
-
-    implementation project(':feedback-api')
-    implementation project(':feedback-impl')
-    implementation project(':saved-sites-api')
-    implementation project(':saved-sites-impl')
-    implementation project(':saved-sites-store')
-    internalImplementation project(':saved-sites-internal')
-
-    implementation project(':runtime-checks-impl')
-    implementation project(':runtime-checks-store')
-
-    implementation project(':installation-impl')
-
-    implementation project(':internal-features-api')
-
-    implementation project(':web-compat-impl')
-    implementation project(':web-compat-store')
-
-    implementation project(':event-hub-impl')
-
-    implementation project(':credential-exchange-api')
-
-    internalImplementation project(':credential-exchange-impl')
-    playImplementation project(':credential-exchange-impl')
-    fdroidImplementation project(':credential-exchange-dummy-impl')
-
-    implementation project(':subscriptions-api')
-
-    internalImplementation project(':subscriptions-impl')
-    playImplementation project(':subscriptions-impl')
-    fdroidImplementation project(':subscriptions-dummy-impl')
-
-    implementation project(':persistent-storage-api')
-
-    internalImplementation project(':persistent-storage-impl')
-    playImplementation project(':persistent-storage-impl')
-    fdroidImplementation project(':persistent-storage-dummy-impl')
-
-    internalImplementation project(':subscriptions-internal')
-
-    implementation project(':user-agent-api')
-    implementation project(':user-agent-impl')
-    implementation project(':user-agent-store')
-
-    implementation project(':js-messaging-api')
-    implementation project(':js-messaging-impl')
-
-    implementation project(':settings-api')
-    implementation project(':settings-impl')
-
-    implementation project(':desktop-app-promotion-api')
-    implementation project(':desktop-app-promotion-impl')
-
+    implementation project(':autofill-api')
+    implementation project(':autofill-impl')
+    implementation project(':breakage-reporting-impl')
     implementation project(':broken-site-api')
     implementation project(':broken-site-impl')
     implementation project(':broken-site-store')
-
-    implementation project(':survey-api')
-    implementation project(':survey-impl')
-
-    implementation project(':attributed-metrics-api')
-    implementation project(':attributed-metrics-impl')
-    internalImplementation project(':attributed-metrics-internal')
-
-    implementation project(':breakage-reporting-impl')
-
-    implementation project(':web-interference-detection-impl')
-
-    implementation project(':web-detection-impl')
-
+    implementation project(':browser-api')
+    implementation project(':browser-feature-toggles')
+    implementation project(':browser-mode-api')
+    implementation project(':browser-mode-impl')
+    implementation project(':browser-ui')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
+    implementation project(':content-scope-privacy-features-impl')
+    implementation project(':content-scope-scripts-api')
+    implementation project(':content-scope-scripts-impl')
+    implementation project(':cookies-api')
+    implementation project(':cookies-impl')
+    implementation project(':cookies-store')
+    implementation project(':credential-exchange-api')
+    implementation project(":custom-tabs-api")
+    implementation project(":custom-tabs-impl")
+    implementation project(":data-clearing-api")
+    implementation project(":data-clearing-impl")
+    implementation project(":data-store-api")
+    implementation project(":data-store-impl")
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
-
+    implementation project(':design-system')
+    implementation project(':desktop-app-promotion-api')
+    implementation project(':desktop-app-promotion-impl')
+    implementation project(':device-migration-api')
+    implementation project(':device-migration-impl')
+    implementation project(':di')
+    implementation project(':downloads-api')
+    implementation project(':downloads-impl')
+    implementation project(':downloads-store')
+    implementation project(":duckchat-api")
+    implementation project(":duckchat-impl")
+    implementation project(":duckchat-store")
+    implementation project(':element-hiding-impl')
+    implementation project(':element-hiding-store')
+    implementation project(':event-hub-impl')
+    implementation project(':experiments-api')
+    implementation project(':experiments-impl')
+    implementation project(':feature-toggles-api')
+    implementation project(':feature-toggles-impl')
+    implementation project(':feature-toggles-internal-api')
+    implementation project(':feedback-api')
+    implementation project(':feedback-impl')
+    implementation project(':fingerprint-protection-api')
+    implementation project(':fingerprint-protection-impl')
+    implementation project(':fingerprint-protection-store')
+    implementation project(":history-api")
+    implementation project(":history-impl")
+    implementation project(':httpsupgrade-api')
+    implementation project(':httpsupgrade-impl')
+    implementation project(':httpsupgrade-store')
+    implementation project(':installation-impl')
+    implementation project(':internal-features-api')
+    implementation project(':js-messaging-api')
+    implementation project(':js-messaging-impl')
+    implementation project(':library-loader-api')
+    implementation project(':macos-api')
+    implementation project(':macos-impl')
+    implementation project(":malicious-site-protection-api")
+    implementation project(":malicious-site-protection-impl")
+    implementation project(':navigation-api')
+    implementation project(':navigation-impl')
+    implementation project(':network-protection-api')
+    implementation project(':network-protection-impl')
+    implementation project(':network-protection-store')
+    implementation project(":new-tab-page-api")
+    implementation project(":new-tab-page-impl")
     implementation project(':next-steps-api')
     implementation project(':next-steps-impl')
-
-    implementation project(':serp-logos-api')
-    implementation project(':serp-logos-impl')
-
+    implementation project(":onboarding-api")
+    implementation project(":onboarding-impl")
     implementation project(':page-translation-api')
     implementation project(':page-translation-impl')
-
+    // temporary inclusion to ensure blockstore integration
+    implementation project(':persistent-storage-api')
+    implementation project(':persistent-storage-api')
+    implementation project(":pir-api")
+    implementation project(":pir-impl")
+    implementation project(':privacy-config-api')
+    implementation project(':privacy-config-impl')
+    implementation project(':privacy-config-store')
+    implementation project(':privacy-dashboard-api')
+    implementation project(':privacy-dashboard-impl')
+    implementation project(":prompts-coordinator-api")
+    implementation project(":prompts-coordinator-impl")
+    implementation project(':referral-api')
+    implementation project(':referral-impl')
+    implementation project(':remote-messaging-api')
+    implementation project(':remote-messaging-impl')
+    implementation project(':remote-messaging-store')
+    implementation project(':request-filterer-api')
+    implementation project(':request-filterer-impl')
+    implementation project(':request-filterer-store')
+    implementation project(':request-interception-api')
+    implementation project(':request-interception-impl')
+    implementation project(':runtime-checks-impl')
+    implementation project(':runtime-checks-store')
+    implementation project(':saved-sites-api')
+    implementation project(':saved-sites-impl')
+    implementation project(':saved-sites-store')
+    implementation project(':serp-logos-api')
+    implementation project(':serp-logos-impl')
+    implementation project(':settings-api')
+    implementation project(':settings-impl')
+    implementation project(':site-permissions-api')
+    implementation project(':site-permissions-impl')
+    implementation project(':site-preferences-api')
+    implementation project(':site-preferences-impl')
+    implementation project(':sqlcipher-loader-api')
+    implementation project(':sqlcipher-loader-impl')
+    implementation project(":statistics-api")
+    implementation project(':statistics-impl')
+    implementation project(':subscriptions-api')
+    implementation project(':survey-api')
+    implementation project(':survey-impl')
+    implementation project(':sync-api')
+    implementation project(':sync-impl')
+    implementation project(':sync-lib')
+    implementation project(':sync-settings-api')
+    implementation project(':sync-settings-impl')
+    implementation project(':sync-store')
+    implementation project(":test-seeder-api")
+    implementation project(':tracker-detection-api')
+    implementation project(':tracker-detection-impl')
+    implementation project(':user-agent-api')
+    implementation project(':user-agent-impl')
+    implementation project(':user-agent-store')
+    implementation project(":verified-installation-api")
+    implementation project(":verified-installation-impl")
+    implementation project(':voice-search-api')
+    implementation project(':voice-search-impl')
+    implementation project(':voice-search-store')
+    implementation project(':vpn-api')
+    implementation project(':vpn-impl')
+    implementation project(path: ':vpn-network-api')
+    implementation project(path: ':vpn-network-impl')
+    implementation project(':vpn-store')
+    implementation project(':web-compat-impl')
+    implementation project(':web-compat-store')
+    implementation project(':web-detection-impl')
+    implementation project(':web-interference-detection-impl')
+    implementation project(":widget-api")
+    implementation project(':windows-api')
+    implementation project(':windows-impl')
+    // Browser
+    implementation "androidx.browser:browser:_"
     // Widgets
     implementation "androidx.core:core-remoteviews:_"
-
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
-    debugImplementation Square.leakCanary.android
-
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation KotlinX.coroutines.core
-    implementation KotlinX.coroutines.android
-    androidTestImplementation(KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-    }
-
-    implementation AndroidX.appCompat
-    implementation AndroidX.activity.compose
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-    implementation AndroidX.recyclerView
-    implementation AndroidX.swipeRefreshLayout
-    implementation AndroidX.webkit
-    // Backs the internal-flavor PageLoadTracer (src/internal); other flavors bind a no-op instead.
-    internalImplementation AndroidX.tracing
-    implementation Square.okHttp3.okHttp
-    implementation "com.squareup.okhttp3:okhttp-tls:_"
-    implementation Square.retrofit2.retrofit
-    implementation Square.retrofit2.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation Square.retrofit2.adapter.rxJava2
-    implementation Square.retrofit2.converter.scalars
-    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
-    implementation "io.reactivex.rxjava2:rxjava:_"
-    implementation "io.reactivex.rxjava2:rxandroid:_"
-    implementation "com.squareup.logcat:logcat:_"
-    implementation "com.facebook.shimmer:shimmer:_"
-    implementation 'nl.dionsegijn:konfetti:1.2.5'
-    implementation("io.github.pcmind:leveldb:_") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
-
-    // Required by LevelDB
-    implementation("org.iq80.snappy:snappy:_")
-    implementation("com.google.guava:guava:_")
-
-    // RxRelay
-    implementation "com.jakewharton.rxrelay2:rxrelay:_"
-
-    implementation "com.duckduckgo.urlpredictor:url-predictor-android:_"
-
-    // Android KTX
-    implementation AndroidX.core.ktx
-    implementation AndroidX.core.splashscreen
-    baselineProfile project(':macrobenchmark')
-    implementation AndroidX.fragment.ktx
-
-    // ViewModel and LiveData
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.liveDataKtx
-    implementation AndroidX.lifecycle.process
-
-    implementation AndroidX.lifecycle.commonJava8
-    testImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.archCore.testing
-
-    // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    ksp AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-    androidTestImplementation AndroidX.room.testing
-
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
+    // PDF Viewer
+    implementation "androidx.pdf:pdf-viewer-fragment:_"
     implementation "androidx.work:work-multiprocess:_"
-    androidTestImplementation AndroidX.work.testing
-    testImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
-
+    // Lottie
+    implementation "com.airbnb.android:lottie:_"
+    implementation "com.duckduckgo.urlpredictor:url-predictor-android:_"
+    implementation "com.facebook.shimmer:shimmer:_"
     // Glide
     implementation "com.github.bumptech.glide:glide:_"
     implementation "com.github.bumptech.glide:okhttp3-integration:_"
-    ksp "com.github.bumptech.glide:ksp:_"
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:_"
-
-    // Security crypto
-    implementation AndroidX.security.crypto
-
+    implementation("com.google.guava:guava:_")
+    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
+    // RxRelay
+    implementation "com.jakewharton.rxrelay2:rxrelay:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.okhttp3:okhttp-tls:_"
+    implementation("io.github.pcmind:leveldb:_") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation 'nl.dionsegijn:konfetti:1.2.5'
+    // Required by LevelDB
+    implementation("org.iq80.snappy:snappy:_")
     // HTML
     implementation 'org.jsoup:jsoup:_'
+    implementation AndroidX.activity.compose
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
+    // Android KTX
+    implementation AndroidX.core.ktx
+    implementation AndroidX.core.splashscreen
+    implementation AndroidX.fragment.ktx
+    implementation AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.liveDataKtx
+    implementation AndroidX.lifecycle.process
+    // ViewModel and LiveData
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.recyclerView
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    // Security crypto
+    implementation AndroidX.security.crypto
+    implementation AndroidX.swipeRefreshLayout
+    implementation AndroidX.webkit
+    // WorkManager
+    implementation AndroidX.work.runtimeKtx
+    implementation AndroidX.work.rxJava2
+    implementation Google.android.material
+    implementation KotlinX.coroutines.android
+    implementation KotlinX.coroutines.core
+    implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.adapter.rxJava2
+    implementation Square.retrofit2.converter.moshi
+    implementation Square.retrofit2.converter.scalars
+    implementation Square.retrofit2.retrofit
 
-    // Browser
-    implementation "androidx.browser:browser:_"
+    debugImplementation Square.leakCanary.android
 
-    // PDF Viewer
-    implementation "androidx.pdf:pdf-viewer-fragment:_"
+    fdroidImplementation project(':credential-exchange-dummy-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
+    fdroidImplementation project(':subscriptions-dummy-impl')
 
-    // Testing dependencies
-    androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
-    androidTestImplementation "org.mockito:mockito-android:_"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    androidTestImplementation Square.okHttp3.mockWebServer
-    testImplementation Square.okHttp3.mockWebServer
-    androidTestImplementation CashApp.turbine
-    androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation AndroidX.test.ext.junit
-    androidTestImplementation "androidx.test.ext:junit-ktx:_"
-    androidTestImplementation "androidx.test.espresso:espresso-core:_"
-    androidTestImplementation "androidx.test.espresso:espresso-web:_"
+    internalImplementation project(':anrs-internal')
+    internalImplementation project(':attributed-metrics-internal')
+    internalImplementation project(':autofill-internal')
+    internalImplementation project(':credential-exchange-impl')
+    internalImplementation project(':design-system-internal')
+    internalImplementation project(":duckchat-internal")
+    internalImplementation project(":feature-toggles-internal")
+    internalImplementation project(':network-protection-internal')
+    internalImplementation project(':persistent-storage-impl')
+    internalImplementation project(':pir-internal')
+    internalImplementation project(':privacy-config-internal')
+    internalImplementation project(":prompts-coordinator-internal")
+    internalImplementation project(":remote-messaging-internal")
+    internalImplementation project(':saved-sites-internal')
+    internalImplementation project(':subscriptions-impl')
+    internalImplementation project(':subscriptions-internal')
+    internalImplementation project(':sync-internal')
+    internalImplementation project(":test-seeder-internal")
+    internalImplementation project(':traces-api')
+    internalImplementation project(':traces-impl')
+    internalImplementation project(':vpn-internal')
+    // Backs the internal-flavor PageLoadTracer (src/internal); other flavors bind a no-op instead.
+    internalImplementation AndroidX.tracing
 
+    playImplementation project(':credential-exchange-impl')
+    playImplementation project(':persistent-storage-impl')
+    playImplementation project(':subscriptions-impl')
+
+    testImplementation project(':autofill-test')
+    testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation project(':vpn-api-test')
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation "androidx.test:runner:_"
     testImplementation 'org.junit.vintage:junit-vintage-engine:_'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
-    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
+    testImplementation AndroidX.room.testing
     testImplementation AndroidX.test.ext.junit
-    testImplementation Testing.robolectric
+    testImplementation AndroidX.work.testing
     testImplementation CashApp.turbine
-    testImplementation "androidx.test:runner:_"
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Square.okHttp3.mockWebServer
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
 
     androidTestImplementation project(':common-test')
-    testImplementation project(':common-test')
-    testImplementation project(':feature-toggles-test')
     androidTestImplementation project(':feature-toggles-test')
-    lintChecks project(":lint-rules")
+    androidTestImplementation "androidx.test.espresso:espresso-core:_"
+    androidTestImplementation "androidx.test.espresso:espresso-web:_"
+    androidTestImplementation "androidx.test.ext:junit-ktx:_"
+    androidTestImplementation "org.mockito:mockito-android:_"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.room.testing
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.work.testing
+    androidTestImplementation CashApp.turbine
+    androidTestImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    androidTestImplementation Square.okHttp3.mockWebServer
+
+    // Testing dependencies
+    androidTestUtil AndroidX.test.orchestrator
+    androidTestUtil AndroidX.test.orchestrator
+
+    baselineProfile project(':macrobenchmark')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+
+    ksp project(':codegen-ksp')
+    ksp "com.github.bumptech.glide:ksp:_"
+    ksp AndroidX.room.compiler
+
+    lintChecks project(":lint-rules")
 }
 
 // Export Android connected test results to Develocity

@@ -34,23 +34,10 @@ android {
 dependencies {
     api AndroidX.dataStore.preferences
 
-    implementation AndroidX.core.ktx
-    implementation AndroidX.work.runtimeKtx
-    implementation AndroidX.room.runtime
-    implementation AndroidX.appCompat
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation Google.android.material
-    implementation KotlinX.coroutines.android
-    implementation KotlinX.coroutines.core
-
-    ksp AndroidX.room.compiler
-    ksp project(':codegen-ksp')
-
-    implementation project(path: ':codegen-annotations')
     implementation project(path: ':ad-blocking-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':common-utils')
     implementation project(':content-scope-scripts-api')
     implementation project(path: ':data-store-api')
@@ -63,18 +50,25 @@ dependencies {
     implementation project(':remote-messaging-api')
     implementation project(':settings-api')
     implementation project(path: ':statistics-api')
-
-    implementation Square.retrofit2.retrofit
-    implementation "com.squareup.logcat:logcat:_"
     implementation "com.airbnb.android:lottie:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.appCompat
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.room.runtime
+    implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
+    implementation KotlinX.coroutines.android
+    implementation KotlinX.coroutines.core
+    implementation Square.retrofit2.retrofit
 
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')
-
-    testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.work.testing
-    testImplementation Testing.robolectric
     testImplementation CashApp.turbine
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
@@ -82,5 +76,8 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }

@@ -25,6 +25,6 @@ android {
 }
 
 dependencies {
-    implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
+    implementation KotlinX.coroutines.core
 }

@@ -27,56 +27,56 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-    implementation project(':di')
-    implementation project(':privacy-dashboard-api')
-    implementation project(':privacy-config-api')
-    implementation project(':statistics-api')
-    implementation project(':common-utils')
-    implementation project(':design-system')
-    implementation project(':browser-api')
-    implementation project(':feedback-api')
-    implementation project(':autoconsent-api')
-    implementation project(':app-build-config-api')
-    implementation project(':navigation-api')
-    implementation project(':feature-toggles-api')
-    implementation project(':broken-site-api')
     api AndroidX.dataStore.preferences
 
+    implementation project(':app-build-config-api')
+    implementation project(':autoconsent-api')
+    implementation project(':broken-site-api')
+    implementation project(':browser-api')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
+    implementation project(':design-system')
+    implementation project(':di')
+    implementation project(':feature-toggles-api')
+    implementation project(':feedback-api')
+    implementation project(':navigation-api')
+    implementation project(':privacy-config-api')
+    implementation project(':privacy-dashboard-api')
+    implementation project(':statistics-api')
+    implementation "com.airbnb.android:lottie:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
     implementation AndroidX.appCompat
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
-
-    implementation "com.squareup.logcat:logcat:_"
     implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-adapters:_"
-    implementation "com.airbnb.android:lottie:_"
     implementation Square.okHttp3.okHttp
 
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')
-    testImplementation Testing.junit4
+    testImplementation "androidx.test:runner:_"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.test.ext.junit
     testImplementation CashApp.turbine
-    testImplementation Testing.mockito.kotlin
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation "androidx.test:runner:_"
-    testImplementation Testing.robolectric
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.mockito.kotlin
+    testImplementation Testing.robolectric
 
     androidTestImplementation project(':common-test')
-    androidTestImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
-    androidTestImplementation CashApp.turbine
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation CashApp.turbine
+
+    ksp project(':codegen-ksp')
 }
 
 android {

@@ -30,11 +30,9 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':traces-api')
     implementation project(path: ':di')
-
+    implementation project(path: ':traces-api')
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
-
-    implementation "com.squareup.logcat:logcat:_"
 }

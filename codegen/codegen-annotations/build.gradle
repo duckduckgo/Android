@@ -31,11 +31,18 @@ kotlin {
 }
 
 dependencies {
-    implementation "dev.zacsweers.metro:runtime:_"
-    api Square.retrofit2.converter.moshi
+    api(project(':app-build-config-api')) {
+        because 'needed for Active Plugins'
+    }
+    api(project(':feature-toggles-api')) {
+        because 'needed for Active Plugins'
+    }
+    api(project(':privacy-config-api')) {
+        because 'needed for ContributesRemoteFeature'
+    }
     api "com.squareup.moshi:moshi-kotlin:_"
-    api project(':privacy-config-api') // needed for ContributesRemoteFeature
-    api project(':feature-toggles-api') // needed for Active Plugins
-    api project(':app-build-config-api') // needed for Active Plugins
+    api Square.retrofit2.converter.moshi
+
+    implementation "dev.zacsweers.metro:runtime:_"
 }
 
