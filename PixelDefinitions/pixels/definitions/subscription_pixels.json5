@@ -453,5 +453,19 @@
         "triggers": ["user_interaction"],
         "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "subscription_settings_undo_cancellation_shown": {
+        "description": "Subscription Settings showed the Expiring state with the Keep Subscription button for a cancelled Google Play subscription. Sent once per screen.",
+        "owners": ["nalcalag"],
+        "triggers": ["impression"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_settings_undo_cancellation_click": {
+        "description": "The user tapped Keep Subscription in Subscription Settings to undo a cancellation.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial"]
     }
 }

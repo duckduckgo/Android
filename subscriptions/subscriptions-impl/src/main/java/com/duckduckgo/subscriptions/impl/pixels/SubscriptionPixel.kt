@@ -213,6 +213,16 @@ enum class SubscriptionPixel(
         type = Count,
         includedParameters = setOf(APP_VERSION),
     ),
+    SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_SHOWN(
+        baseName = "subscription_settings_undo_cancellation_shown",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_CLICK(
+        baseName = "subscription_settings_undo_cancellation_click",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
     SUBSCRIPTION_PRICE_MONTHLY_CLICK(
         baseName = "m_privacy-pro_offer_monthly-price_click",
         type = Count,

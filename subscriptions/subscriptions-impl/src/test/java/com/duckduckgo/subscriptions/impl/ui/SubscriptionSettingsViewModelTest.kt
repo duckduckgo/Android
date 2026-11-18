@@ -1320,6 +1320,39 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
+    fun whenUndoCancellationShownThenReportShownPixelOnce() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google", activeOffers = listOf(ActiveOfferType.TRIAL))
+
+        viewModel.onCreate(mock())
+        viewModel.onResume(mock())
+
+        verify(pixelSender, times(1)).reportSubscriptionSettingsUndoCancellationShown(isFreeTrial = true)
+    }
+
+    @Test
+    fun whenUndoCancellationNotShownThenDoNotReportShownPixel() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        verify(pixelSender, never()).reportSubscriptionSettingsUndoCancellationShown(any())
+    }
+
+    @Test
+    fun whenKeepSubscriptionClickedThenReportClickPixel() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+        viewModel.onCreate(mock())
+
+        viewModel.onKeepSubscriptionClicked(mock())
+
+        verify(pixelSender).reportSubscriptionSettingsUndoCancellationClick(isFreeTrial = false)
+    }
+
+    @Test
     fun whenPurchaseFailsWithoutKeepSubscriptionClickThenDoNotGoToPlayStore() = runTest {
         stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
         viewModel.onCreate(mock())
