@@ -2064,6 +2064,11 @@
                 "description": "Whether the New Chat hints feature flag is enabled"
             },
             {
+                "key": "hints_shown",
+                "type": "boolean",
+                "description": "Whether hints were shown at any point in this New Chat before the prompt; stays true if a promo hides them afterwards. False when hints were never shown (not eligible, capped, or behind a promo the whole time)"
+            },
+            {
                 "key": "hint_tapped",
                 "type": "string",
                 "description": "The last hint tapped in this New Chat before the prompt was sent",
@@ -2083,7 +2088,7 @@
         "description": "New Chat hints are shown above the Duck.ai input. Once per New Chat, with the slot of each hint.",
         "owners": ["karlenDimla"],
         "triggers": ["impression"],
-        "suffixes": ["form_factor"],
+        "suffixes": ["first_daily_count", "form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -2126,5 +2131,12 @@
                 "enum": [1, 2, 3]
             }
         ]
+    },
+    "aichat_new_chat_hints_cap_reached": {
+        "description": "The user has ignored New Chat hints in enough New Chats that the hints stop showing. Once per install, the first time the cap is reached.",
+        "owners": ["karlenDimla"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

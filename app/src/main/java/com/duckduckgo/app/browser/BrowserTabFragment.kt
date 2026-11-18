@@ -525,6 +525,7 @@ class BrowserTabFragment :
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
     private val customTabClientPackage get() = requireArguments().getString(CLIENT_PACKAGE_ARG)
     private val customTabReferrerPackage get() = requireArguments().getString(REFERRER_PACKAGE_ARG)
+    private val launchingAppPackage get() = requireArguments().getString(LAUNCHING_APP_PACKAGE_ARG)
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
@@ -1238,6 +1239,7 @@ class BrowserTabFragment :
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen, customTabClientPackage, customTabReferrerPackage)
+            viewModel.setLaunchingAppPackage(launchingAppPackage)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
@@ -2938,8 +2940,9 @@ class BrowserTabFragment :
 
             is Command.OpenAppLink -> {
                 val launched = openAppLink(it.appLink)
-                if (it.finishCustomTabOnLaunch && launched) {
-                    finishCustomTab()
+                if (launched) {
+                    if (it.finishCustomTabOnLaunch) finishCustomTab()
+                    if (it.closeTabOnLaunch) viewModel.closeCurrentTab()
                 }
             }
 
@@ -2954,6 +2957,7 @@ class BrowserTabFragment :
                     trustedCallerPackage = it.trustedCallerPackage,
                     finishCustomTabOnTrustedCallerLaunch = it.finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly = it.trustedCallerOnly,
+                    closeTabOnTrustedCallerLaunch = it.closeTabOnTrustedCallerLaunch,
                 )
             }
 
@@ -3516,6 +3520,7 @@ class BrowserTabFragment :
         trustedCallerPackage: String? = null,
         finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
+        closeTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         context?.let {
             val pm = it.packageManager
@@ -3592,6 +3597,7 @@ class BrowserTabFragment :
                     finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly,
                     fallbackUrl,
+                    closeTabOnTrustedCallerLaunch,
                 )
             }
         }
@@ -3609,6 +3615,7 @@ class BrowserTabFragment :
         finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
         fallbackUrl: String? = null,
+        closeTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
@@ -3629,7 +3636,7 @@ class BrowserTabFragment :
                 useFirstActivityFound = useFirstActivityFound,
                 showConfirmation = showConfirmation,
                 trustedCallerIntent = trustedCallerIntent,
-                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch,
+                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch || closeTabOnTrustedCallerLaunch,
             )
 
             val resolvedIntent = if (launch.useChooser) {
@@ -3645,7 +3652,7 @@ class BrowserTabFragment :
             } else {
                 context.startActivity(resolvedIntent)
                 if (launch.finishCustomTab) {
-                    finishCustomTab()
+                    if (isActiveCustomTab()) finishCustomTab() else viewModel.closeCurrentTab()
                 }
             }
         }.onFailure { exception ->
@@ -5634,6 +5641,7 @@ class BrowserTabFragment :
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val CLIENT_PACKAGE_ARG = "CLIENT_PACKAGE_ARG"
         private const val REFERRER_PACKAGE_ARG = "REFERRER_PACKAGE_ARG"
+        private const val LAUNCHING_APP_PACKAGE_ARG = "LAUNCHING_APP_PACKAGE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -6026,12 +6034,16 @@ class BrowserTabFragment :
             query: String? = null,
             skipHome: Boolean,
             isExternal: Boolean,
+            launchingAppPackage: String? = null,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             args.putBoolean(SKIP_HOME_ARG, skipHome)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            launchingAppPackage?.let {
+                args.putString(LAUNCHING_APP_PACKAGE_ARG, it)
+            }
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }

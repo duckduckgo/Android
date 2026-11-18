@@ -190,6 +190,7 @@ class NewChatHintsPixelsTest {
 
         verify(duckChatPixels).fireNewChatFirstPromptSent(
             hasNewChatHints = false,
+            hintsShown = false,
             hintTapped = null,
             hasImageAttachment = true,
             hasFileAttachment = false,
@@ -203,7 +204,7 @@ class NewChatHintsPixelsTest {
 
         repeat(2) { submitNewChatPrompt() }
 
-        verify(duckChatPixels, times(1)).fireNewChatFirstPromptSent(any(), anyOrNull(), any(), any(), any())
+        verify(duckChatPixels, times(1)).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any())
     }
 
     @Test
@@ -213,14 +214,14 @@ class NewChatHintsPixelsTest {
         testee.onPromptSubmitted("tab", isNewChat = false, hasImageAttachment = false, hasFileAttachment = false, selectedTool = "none")
         submitNewChatPrompt()
 
-        verify(duckChatPixels, never()).fireNewChatFirstPromptSent(any(), anyOrNull(), any(), any(), any())
+        verify(duckChatPixels, never()).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any())
     }
 
     @Test
     fun whenAPromptIsSentInAnUncountedNewChatThenNothingIsReported() {
         submitNewChatPrompt()
 
-        verify(duckChatPixels, never()).fireNewChatFirstPromptSent(any(), anyOrNull(), any(), any(), any())
+        verify(duckChatPixels, never()).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any())
     }
 
     @Test
@@ -233,6 +234,42 @@ class NewChatHintsPixelsTest {
 
         verify(duckChatPixels).fireNewChatFirstPromptSent(
             hasNewChatHints = true,
+            hintsShown = false,
+            hintTapped = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+        )
+    }
+
+    @Test
+    fun whenHintsShowedBeforeThePromptThenTheFirstPromptSaysSo() = runTest {
+        track()
+        testee.onHintsShown("tab", listOf(NewChatHint.PHOTO))
+
+        submitNewChatPrompt()
+
+        verify(duckChatPixels).fireNewChatFirstPromptSent(
+            hasNewChatHints = true,
+            hintsShown = true,
+            hintTapped = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+        )
+    }
+
+    @Test
+    fun whenHintsShowedInAnEarlierNewChatThenTheNextFirstPromptSaysTheyDidNot() = runTest {
+        track()
+        testee.onHintsShown("tab", listOf(NewChatHint.PHOTO))
+        leaveAndStartAnotherNewChat()
+
+        submitNewChatPrompt()
+
+        verify(duckChatPixels).fireNewChatFirstPromptSent(
+            hasNewChatHints = true,
+            hintsShown = false,
             hintTapped = null,
             hasImageAttachment = false,
             hasFileAttachment = false,

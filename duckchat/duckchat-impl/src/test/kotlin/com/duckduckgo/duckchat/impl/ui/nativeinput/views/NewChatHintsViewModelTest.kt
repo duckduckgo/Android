@@ -709,6 +709,7 @@ class NewChatHintsViewModelTest {
 
         verify(duckChatPixels).fireNewChatFirstPromptSent(
             hasNewChatHints = eq(true),
+            hintsShown = eq(true),
             hintTapped = eq(NewChatHint.DOCUMENTS),
             hasImageAttachment = eq(false),
             hasFileAttachment = eq(true),
