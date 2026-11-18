@@ -22,21 +22,12 @@ RETRANSMIT_WAIT = 10
 KEPT = re.compile(r"GoBackend: (shouldAllowDomain for|Owner of|\S+ \([^)]*\) already blocked)|TLS server \S+ \(\S+\) found")
 
 
-def vpn_row(android):
-    """The label under Settings' VPN row, "On" or "Off"; None when Settings has no VPN row."""
-    lines = android.lines()
-    for i, line in enumerate(lines):
-        if line[:2] == ["primaryText", "VPN"]:
-            return next((l[1] for l in lines[i + 1:i + 3] if l[0] == "label"), None)
-    return None
-
-
 def netp_on(android):
     """Turns NetP on from Settings > VPN unless it is on already, accepting Android's VPN consent if it asks; ends
     on Settings."""
     steps.settings(android)
     # A reinstall restarts a VPN that was on; give it the time before treating it as off.
-    state = android.poll(lambda: vpn_row(android), lambda s: s == "On", 15)
+    state = android.poll(lambda: steps.netp_row(android), lambda s: s == "On", 15)
     if state is None:
         raise Error("Settings has no VPN row: the app isn't signed in to a subscription with the VPN")
     if state != "On":
@@ -50,7 +41,7 @@ def netp_on(android):
         if android.wait("text:Connection request", 5):
             android.tap("id:button1")
         android.key("back")
-        state = android.poll(lambda: vpn_row(android), lambda s: s == "On", 30)
+        state = android.poll(lambda: steps.netp_row(android), lambda s: s == "On", 30)
     android.check("NetP on: Settings' VPN row reads On and Android has a VPN network",
                   state == "On" and steps.vpn_up(android), state)
 
