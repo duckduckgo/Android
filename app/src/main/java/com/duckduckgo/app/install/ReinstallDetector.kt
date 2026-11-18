@@ -234,8 +234,8 @@ class RealReinstallDetector @Inject constructor(
         return CheckOutcome(ddgDirectoryExists, saved)
     }
 
-    // We've observed Samsung Galaxy Store install launches the app out of sight and then wipes its data, but the folder that launch created survives.
-    // That can affect first real launch and reinstall metrics. We add observability to measure these events.
+    // Some stores (Galaxy Store is one we have seen) launch the app out of sight while installing it and then wipe its data, but the
+    // folder that launch created survives and makes the first real launch look like a reinstall. The folder age shows how often.
     private fun reportFolderAge(directory: File) {
         val modifiedAt = directory.lastModified()
         val installedAt = context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
