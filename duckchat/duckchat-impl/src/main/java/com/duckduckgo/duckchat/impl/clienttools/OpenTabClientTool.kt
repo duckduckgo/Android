@@ -41,6 +41,12 @@ class OpenTabClientTool @Inject constructor(
         promptMessage = R.string.duckAiClientToolOpenTabPromptMessage,
     )
 
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.DO,
+        name = R.string.duckAiClientToolOpenTabName,
+        description = R.string.duckAiClientToolOpenTabDescription,
+    )
+
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.openTab().isEnabled()
 
     // A schema-valid URL with another scheme is still invalid_arguments, and fails before the prompt.
