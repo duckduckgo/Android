@@ -45,7 +45,7 @@ class RealLoginDeviceInfoWriter @Inject constructor(
 ) : LoginDeviceInfoWriter {
 
     override suspend fun onLogin(loginResponseKeys: List<ProtectedKeyEntry>?): Result<Unit> = withContext(dispatchers.io()) {
-        if (!syncFeature.canWriteDeviceInfo()) return@withContext Success(Unit)
+        if (!syncFeature.canWriteUnifiedDeviceList().isEnabled()) return@withContext Success(Unit)
         val accountInfoKeys = loginResponseKeys.orEmpty().filter { it.purpose == SYNC_PURPOSE_ACCOUNT_INFO }
         if (accountInfoKeys.isEmpty()) {
             logcat { "Sync-UnifiedDevices: no account_info key in login response; migration will create it" }

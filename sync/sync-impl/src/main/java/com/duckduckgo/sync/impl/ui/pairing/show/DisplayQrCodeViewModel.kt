@@ -303,7 +303,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     }
 
     private suspend fun protocolVersion(): ProtocolVersion = withContext(dispatchers.io()) {
-        if (syncFeature.canUseV2ConnectFlow().isEnabled() && syncFeature.canShowV2ConnectCode().isEnabled()) {
+        if (syncFeature.canShowV2ConnectCode().isEnabled()) {
             ProtocolVersion.V2
         } else {
             ProtocolVersion.V1

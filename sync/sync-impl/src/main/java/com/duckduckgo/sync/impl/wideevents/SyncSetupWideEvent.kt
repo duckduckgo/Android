@@ -23,7 +23,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V1
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2_1
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
@@ -223,13 +222,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     private fun uiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
 
     private fun flowMetadata(): Map<String, String> = buildMap {
-        val feature = syncFeature.value
-        val flowVersion = if (feature.canUseV2ConnectFlow().isEnabled()) {
-            FLOW_VERSION_V2_1
-        } else {
-            FLOW_VERSION_V1
-        }
-        put(SYNC_SETUP_FLOW_VERSION, flowVersion)
+        put(SYNC_SETUP_FLOW_VERSION, FLOW_VERSION_V2_1)
     }
 
     private companion object {

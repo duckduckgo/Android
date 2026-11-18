@@ -16,11 +16,8 @@
 
 package com.duckduckgo.sync.impl
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.NEGOTIATION_ABORTED
@@ -70,11 +67,9 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RealSyncCodeDispatcherTest {
 
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val qrCode: ExchangeV2QrCode = mock()
 
@@ -90,69 +85,12 @@ class RealSyncCodeDispatcherTest {
     }
 
     private val dispatcher = RealSyncCodeDispatcher(
-        syncFeature = syncFeature,
         syncAccountRepository = syncAccountRepository,
         qrCode = qrCode,
         runner = runner,
     )
 
-    private fun configureFeatureFlag(canUseV2Code: Boolean) {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(Toggle.State(enable = canUseV2Code))
-    }
-
-    @Test fun `v2 flag off - returns Legacy with whatever parseSyncAuthCode returned, and never touches qrCode parse`() {
-        configureFeatureFlag(canUseV2Code = false)
-        val expectedAuthCode = SyncAuthCode.Recovery(RecoveryCode(primaryKey = "pk", userId = "u"))
-        whenever(syncAccountRepository.parseSyncAuthCode("the-code")).thenReturn(expectedAuthCode)
-
-        val decision = dispatcher.route("the-code") as RouteDecision.Legacy
-
-        assertSame(expectedAuthCode, decision.authCode)
-        verify(qrCode, never()).parse(any())
-    }
-
-    @Test fun `v2 flag off - v1 Connect codes return Legacy(Connect) unchanged`() {
-        configureFeatureFlag(canUseV2Code = false)
-        val connect = SyncAuthCode.Connect(mock())
-        whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(connect)
-
-        val decision = dispatcher.route("connect-shape-code") as RouteDecision.Legacy
-
-        assertSame(connect, decision.authCode)
-    }
-
-    @Test fun `v2 flag off - v1 Exchange codes return Legacy(Exchange) unchanged`() {
-        configureFeatureFlag(canUseV2Code = false)
-        val exchange = SyncAuthCode.Exchange(mock())
-        whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(exchange)
-
-        val decision = dispatcher.route("exchange-shape-code") as RouteDecision.Legacy
-
-        assertSame(exchange, decision.authCode)
-    }
-
-    @Test fun `v2 flag off - Unknown codes still bubble back as Legacy(Unknown)`() {
-        configureFeatureFlag(canUseV2Code = false)
-        val unknown = SyncAuthCode.Unknown("garbage")
-        whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(unknown)
-
-        val decision = dispatcher.route("garbage") as RouteDecision.Legacy
-
-        assertSame(unknown, decision.authCode)
-    }
-
-    @Test fun `v2 flag off - even a v2-shaped code is routed via legacy parseSyncAuthCode (no v2 parser touched)`() {
-        configureFeatureFlag(canUseV2Code = false)
-        whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Unknown("v2-shaped-input"))
-
-        dispatcher.route("https://duckduckgo.com/sync/pairing/#&code2=anything")
-
-        verify(qrCode, never()).parse(any())
-        verify(syncAccountRepository).parseSyncAuthCode("https://duckduckgo.com/sync/pairing/#&code2=anything")
-    }
-
-    @Test fun `v2 flag on but v2 parser returns LinkingV1 - falls back to legacy stack`() {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 parser returns LinkingV1 - falls back to legacy stack`() {
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.LinkingV1)
         val connect = SyncAuthCode.Connect(mock())
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(connect)
@@ -162,8 +100,7 @@ class RealSyncCodeDispatcherTest {
         assertSame(connect, decision.authCode)
     }
 
-    @Test fun `v2 flag on but v2 parser returns Unknown - falls back to legacy stack`() {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 parser returns Unknown - falls back to legacy stack`() {
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.Unknown)
         val recovery = SyncAuthCode.Recovery(RecoveryCode(primaryKey = "pk", userId = "u"))
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(recovery)
@@ -173,8 +110,7 @@ class RealSyncCodeDispatcherTest {
         assertSame(recovery, decision.authCode)
     }
 
-    @Test fun `v2 flag on, v2 LinkingV2 - returns V2InProgress and does NOT call parseSyncAuthCode`() {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 LinkingV2 - returns V2InProgress and does NOT call parseSyncAuthCode`() {
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
@@ -197,8 +133,7 @@ class RealSyncCodeDispatcherTest {
         assertTrue(dispatcher.isV2ExchangeUnderway())
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - flow emits LoggedIn after processCode succeeds`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=ddg - flow emits LoggedIn after processCode succeeds`() = runTest {
         val rawJson = JSONObject().apply {
             put("user_id", "u-1")
             put("secret", "s-1")
@@ -215,9 +150,8 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.LoggedIn(SetupPath.RECOVERY), outcomes.single())
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - base64url secret is normalised to standard base64 for v1 login`() = runTest {
+    @Test fun `v2 RecoveryCode cid=ddg - base64url secret is normalised to standard base64 for v1 login`() = runTest {
         // Spec 1214802412121967: the v2 wire `secret` is base64url; v1 login decodes as standard base64.
-        configureFeatureFlag(canUseV2Code = true)
         val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
         val expectedBytes = java.util.Base64.getUrlDecoder().decode(base64urlSecret)
         val rawJson = JSONObject().apply {
@@ -238,8 +172,7 @@ class RealSyncCodeDispatcherTest {
         assertArrayEquals(expectedBytes, java.util.Base64.getDecoder().decode(primaryKey))
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg with missing user_id - emits Failed without calling processCode`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=ddg with missing user_id - emits Failed without calling processCode`() = runTest {
         val rawJson = JSONObject().apply {
             put("secret", "s-1")
             put("cid", "ddg")
@@ -253,8 +186,7 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=3party - flow calls joinAccountFromThirdPartyRecoveryCode`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=3party - flow calls joinAccountFromThirdPartyRecoveryCode`() = runTest {
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
             put("secret", "s-3p")
@@ -271,8 +203,7 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=3party - re-encoded code is canonical JSON without escaped slashes`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=3party - re-encoded code is canonical JSON without escaped slashes`() = runTest {
         val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
@@ -296,8 +227,7 @@ class RealSyncCodeDispatcherTest {
         assertEquals("2.0", recovery.getString("v"))
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN triggers logoutAndJoinNewAccount and emits LoggedIn`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN triggers logoutAndJoinNewAccount and emits LoggedIn`() = runTest {
         val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
         val rawJson = JSONObject().apply {
             put("user_id", "u-other")
@@ -328,8 +258,7 @@ class RealSyncCodeDispatcherTest {
         assertEquals("u-other", recovery.getString("user_id"))
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - account-switch code is canonical v1 JSON without escaped slashes`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=ddg - account-switch code is canonical v1 JSON without escaped slashes`() = runTest {
         val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
         val rawJson = JSONObject().apply {
             put("user_id", "u-other")
@@ -356,8 +285,7 @@ class RealSyncCodeDispatcherTest {
         assertEquals("u-other", recovery.getString("user_id"))
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN then logoutAndJoinNewAccount failure surfaces as Failed`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN then logoutAndJoinNewAccount failure surfaces as Failed`() = runTest {
         val rawJson = JSONObject().apply {
             put("user_id", "u-other")
             put("secret", "s-other")
@@ -382,8 +310,7 @@ class RealSyncCodeDispatcherTest {
         )
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=3party - ALREADY_SIGNED_IN does NOT trigger transparent switch (fails as Failed)`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=3party - ALREADY_SIGNED_IN does NOT trigger transparent switch (fails as Failed)`() = runTest {
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
             put("secret", "s-3p")
@@ -410,8 +337,7 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).logoutAndJoinNewAccount(any())
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=ddg - non-ALREADY_SIGNED_IN error still becomes Failed`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=ddg - non-ALREADY_SIGNED_IN error still becomes Failed`() = runTest {
         val rawJson = JSONObject().apply {
             put("user_id", "u")
             put("secret", "AQID") // valid base64 so decoding succeeds and processCode is reached
@@ -427,8 +353,7 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.Failed("Some other error", path = SetupPath.RECOVERY), outcome)
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode cid=3party - repository error becomes Failed with reason preserved`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode cid=3party - repository error becomes Failed with reason preserved`() = runTest {
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
             put("secret", "s-3p")
@@ -444,8 +369,7 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.Failed("BE rejected", path = SetupPath.RECOVERY), outcome)
     }
 
-    @Test fun `v2 flag on, v2 RecoveryCode with unknown cid - emits Failed with the cid in the reason`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `v2 RecoveryCode with unknown cid - emits Failed with the cid in the reason`() = runTest {
         val rawJson = JSONObject().apply {
             put("user_id", "u")
             put("secret", "s")
@@ -460,7 +384,7 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Legacy path - dispatcher never invokes processCode (caller owns that)`() = runTest {
-        configureFeatureFlag(canUseV2Code = false)
+        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.LinkingV1)
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Recovery(mock()))
 
         dispatcher.route("any")
@@ -470,7 +394,7 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Legacy path - dispatcher does not start the v2 runner`() {
-        configureFeatureFlag(canUseV2Code = false)
+        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.LinkingV1)
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Unknown("x"))
 
         dispatcher.route("any")
@@ -478,8 +402,7 @@ class RealSyncCodeDispatcherTest {
         verify(runner, never()).startScan(any())
     }
 
-    @Test fun `v2 flag on, LinkingV2 - ignores stale terminal events from prior sessions in the replay cache`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `LinkingV2 - ignores stale terminal events from prior sessions in the replay cache`() = runTest {
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
@@ -507,8 +430,7 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `v2 flag on, LinkingV2 - runner_startScan deferred until Flow is collected (cold)`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
+    @Test fun `LinkingV2 - runner_startScan deferred until Flow is collected (cold)`() = runTest {
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
@@ -521,9 +443,8 @@ class RealSyncCodeDispatcherTest {
         verify(runner).startScan(eq("v2-url"))
     }
 
-    @Test fun `v2 flag on, LinkingV2 exchange - base64url recovery secret is normalised to standard base64 for v1 login`() = runTest {
+    @Test fun `LinkingV2 exchange - base64url recovery secret is normalised to standard base64 for v1 login`() = runTest {
         // Spec 1214802412121967: the v2 wire `secret` is base64url; v1 login decodes as standard base64.
-        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
@@ -771,7 +692,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Scanner maps a version-too-new SessionError to UpgradeRequired`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
@@ -789,7 +709,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Scanner - Host_Aborted with UserDeniedHost maps to Failed PAIRING_CANCELLED`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
@@ -811,7 +730,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Scanner - Host_Aborted with HostUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
@@ -1253,7 +1171,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Scanner cancels runner when collecting coroutine is cancelled`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(
                 channelId = "c",
@@ -1290,7 +1207,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Scanner terminates silently when another SessionStarted with different channel arrives`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(
                 channelId = "peer-channel",
@@ -1331,7 +1247,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `Scanner emits Failed when runner reaches Aborted (hello during negotiating)`() = runTest {
-        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
@@ -1368,7 +1283,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     private fun startLinking(): kotlinx.coroutines.flow.Flow<DispatchOutcome> {
-        configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )

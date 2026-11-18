@@ -785,10 +785,6 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override suspend fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean> {
-        if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            return Error(reason = "JoinFrom3party: canUseV2ConnectFlow is disabled")
-        }
-
         logcat { "Sync-ScopedToken: joining account via 3party recovery code" }
 
         val parsed = parseThirdPartyRecoveryCode(pastedCode)
@@ -1045,15 +1041,9 @@ class AppSyncAccountRepository @Inject constructor(
             return throwable.asErrorResult()
         }
 
-        val credentialId = if (syncFeature.canUseV2ConnectFlow().isEnabled()) CREDENTIAL_ID_DDG else null
-
         // Unified device list: mint the account_info key locally and encrypt device_info so both are included in the signup request.
-        // Best-effort — null means we sign up without them (if feature flag is off, or mint/encrypt failed) and migration/login backfills later.
-        val unifiedDeviceInfo = if (credentialId == CREDENTIAL_ID_DDG) {
-            signupAccountInfoBuilder.build(account.secretKey, deviceName, deviceType.deviceFactor)
-        } else {
-            null
-        }
+        // Best-effort — null means we sign up without them because mint/encrypt failed and migration/login backfills later.
+        val unifiedDeviceInfo = signupAccountInfoBuilder.build(account.secretKey, deviceName, deviceType.deviceFactor)
 
         val result = try {
             runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
@@ -1064,7 +1054,7 @@ class AppSyncAccountRepository @Inject constructor(
                 deviceId,
                 encryptedDeviceName,
                 encryptedDeviceType,
-                credentialId,
+                CREDENTIAL_ID_DDG,
                 deviceInfo = unifiedDeviceInfo?.deviceInfo,
                 keys = unifiedDeviceInfo?.keys,
             )
@@ -1084,10 +1074,8 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
-                if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
-                    logcat { "Sync-ScopedToken: setting credentialId=ddg after account creation" }
-                    syncStore.credentialId = CREDENTIAL_ID_DDG
-                }
+                logcat { "Sync-ScopedToken: setting credentialId=ddg after account creation" }
+                syncStore.credentialId = CREDENTIAL_ID_DDG
                 unifiedDeviceInfo?.let {
                     syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyCreateSuccess)
                     syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowDeviceInfoFirstWriteSuccess)
@@ -1223,36 +1211,34 @@ class AppSyncAccountRepository @Inject constructor(
 
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
 
-                if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
-                    logcat { "Sync-ScopedToken: login response has v2 data, storing" }
-                    syncStore.credentialId = CREDENTIAL_ID_DDG
-                    result.data.accessCredentials?.let { credentials ->
-                        logcat { "Sync-ScopedToken: ${credentials.size} access credential(s) in response" }
-                        val thirdParty = credentials.find { it.id == CREDENTIAL_ID_3PARTY }
-                        val encryptedSp = thirdParty?.encryptedCredential
-                        if (encryptedSp != null) {
-                            // Decrypt with the DDG MEK; convert wire base64url to standard base64 for storage.
-                            val decryptedSp = kotlin.runCatching {
-                                val ddgMek = syncJweCrypto.hkdfDeriveBytes(preLogin.primaryKey, userId.toByteArray(Charsets.UTF_8), "Main Key", 32)
-                                val b64Url = String(syncJweCrypto.jweDecryptSymmetric(encryptedSp, ddgMek), Charsets.UTF_8)
-                                base64UrlStringToStandardBase64(b64Url)
-                            }.getOrElse {
-                                logcat(ERROR) { "Sync-ScopedToken: failed to decrypt SP from server: ${it.message}" }
-                                null
-                            }
-                            if (decryptedSp != null) {
-                                syncStore.scopedPassword = ScopedPassword(decryptedSp)
-                            }
+                logcat { "Sync-ScopedToken: login response has v2 data, storing" }
+                syncStore.credentialId = CREDENTIAL_ID_DDG
+                result.data.accessCredentials?.let { credentials ->
+                    logcat { "Sync-ScopedToken: ${credentials.size} access credential(s) in response" }
+                    val thirdParty = credentials.find { it.id == CREDENTIAL_ID_3PARTY }
+                    val encryptedSp = thirdParty?.encryptedCredential
+                    if (encryptedSp != null) {
+                        // Decrypt with the DDG MEK; convert wire base64url to standard base64 for storage.
+                        val decryptedSp = kotlin.runCatching {
+                            val ddgMek = syncJweCrypto.hkdfDeriveBytes(preLogin.primaryKey, userId.toByteArray(Charsets.UTF_8), "Main Key", 32)
+                            val b64Url = String(syncJweCrypto.jweDecryptSymmetric(encryptedSp, ddgMek), Charsets.UTF_8)
+                            base64UrlStringToStandardBase64(b64Url)
+                        }.getOrElse {
+                            logcat(ERROR) { "Sync-ScopedToken: failed to decrypt SP from server: ${it.message}" }
+                            null
+                        }
+                        if (decryptedSp != null) {
+                            syncStore.scopedPassword = ScopedPassword(decryptedSp)
                         }
                     }
-                    result.data.keys?.let { keys ->
-                        logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
-                    }
+                }
+                result.data.keys?.let { keys ->
+                    logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
+                }
 
-                    // Best-effort unified-device-list write; gated internally and never fails the login.
-                    appCoroutineScope.launch(dispatcherProvider.io()) {
-                        loginDeviceInfoWriter.onLogin(result.data.keys)
-                    }
+                // Best-effort unified-device-list write; gated internally and never fails the login.
+                appCoroutineScope.launch(dispatcherProvider.io()) {
+                    loginDeviceInfoWriter.onLogin(result.data.keys)
                 }
 
                 appCoroutineScope.launch(dispatcherProvider.io()) {

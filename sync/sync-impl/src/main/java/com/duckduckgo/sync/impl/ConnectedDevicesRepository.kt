@@ -103,11 +103,7 @@ class RealConnectedDevicesRepository @Inject constructor(
             ?: return Error(reason = "PrimaryKey not found")
 
         val userId = syncStore.userId
-        val result = if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            getConnectedDevicesV2(token, primaryKey, reportAccountErrorPixel)
-        } else {
-            getConnectedDevicesLegacy(token, primaryKey, reportAccountErrorPixel)
-        }
+        val result = getConnectedDevicesV2(token, primaryKey, reportAccountErrorPixel)
         // A fetch can still be in flight when the user signs out or switches account. Comparing the user id covers both: sign-out clears
         // it and a switch replaces it, so we never undo the reset to 0 or write the old account's count over the new one.
         if (result is Success && userId != null && syncStore.userId == userId) {
@@ -188,7 +184,7 @@ class RealConnectedDevicesRepository @Inject constructor(
      */
     private fun republishThisDeviceInfo() {
         // an ungated repair would omit device_info and so delete the blob it is trying to restore
-        if (!syncFeature.canWriteDeviceInfo()) return
+        if (!syncFeature.canWriteUnifiedDeviceList().isEnabled()) return
         val userId = syncStore.userId ?: return
         // keyed by account rather than latched outright, so signing into a different account in the same process can still repair
         if (republishedDeviceInfoForUserId.getAndSet(userId) == userId) return
@@ -242,15 +238,6 @@ class RealConnectedDevicesRepository @Inject constructor(
         deviceIds.forEach { id ->
             if (id != thisDeviceId) remoteDeviceLogout.logout(id, reportAccountErrorPixel)
         }
-    }
-
-    private fun getConnectedDevicesLegacy(
-        token: String,
-        primaryKey: String,
-        reportAccountErrorPixel: Boolean,
-    ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
-        is Error -> result.alsoFireAccountErrorPixel(reportAccountErrorPixel)
-        is Success -> finishWith(decryptLegacyEntries(result.data.entries, primaryKey, reportAccountErrorPixel))
     }
 
     private fun decryptLegacyEntries(

@@ -1071,33 +1071,10 @@ class AppSyncAccountRepositoryTest {
         connectedDevicesCount = size
     }
 
-    // A3: Login with scoped access credentials flag
+    // A3: Login with scoped access credentials
 
     @Test
-    fun whenLoginWithScopedCredentialsFlagOffThenV2DataNotStored() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
-        prepareToProvideDeviceIds()
-        prepareForEncryption()
-        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
-
-        val loginResponseWithV2 = LoginResponse(
-            token = token,
-            protected_encryption_key = protectedEncryptionKey,
-            devices = emptyList(),
-            accessCredentials = listOf(AccessCredentialEntry(id = "ddg", scope = null)),
-            keys = listOf(ProtectedKeyEntry(kid = "k1", purpose = "ai_chats", encryptedWith = "ddg", encryptedPrivateKey = "jwe_data")),
-        )
-        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())).thenReturn(Success(loginResponseWithV2))
-
-        val result = syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
-
-        assertEquals(Success(true), result)
-        verify(syncStore, times(0)).credentialId = any()
-    }
-
-    @Test
-    fun whenLoginWithScopedCredentialsFlagOnThenV2DataStored() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun whenLoginThenV2DataStored() {
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
@@ -1130,8 +1107,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenLoginWithScopedCredentialsFlagOnButNoV2DataThenOnlyCredentialIdStored() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun whenLoginWithoutV2DataThenOnlyCredentialIdStored() {
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
@@ -1146,7 +1122,6 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenV2LoginSucceedsThenLoginDeviceInfoWriterIsNotified() = runTest {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
@@ -1157,24 +1132,10 @@ class AppSyncAccountRepositoryTest {
         verify(loginDeviceInfoWriter).onLogin(anyOrNull())
     }
 
-    @Test
-    fun whenLegacyLoginSucceedsThenLoginDeviceInfoWriterNotNotified() = runTest {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
-        prepareToProvideDeviceIds()
-        prepareForEncryption()
-        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
-        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())).thenReturn(loginSuccess)
-
-        syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
-
-        verify(loginDeviceInfoWriter, never()).onLogin(anyOrNull())
-    }
-
-    // A3: Signup with scoped access credentials flag
+    // A3: Signup with scoped access credentials
 
     @Test
-    fun whenCreateAccountWithScopedCredentialsFlagOnThenCredentialIdIncluded() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun whenCreateAccountThenCredentialIdIncluded() {
         prepareToProvideDeviceIds()
         prepareForCreateAccountSuccess()
 
@@ -1186,23 +1147,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenCreateAccountWithScopedCredentialsFlagOffThenCredentialIdNull() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
-        prepareToProvideDeviceIds()
-        prepareForCreateAccountSuccess()
-
-        syncRepo.createAccount()
-
-        verify(syncApi).createAccount(
-            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq(null), anyOrNull(), anyOrNull(),
-        )
-        // Unified device_info is only built on the v2/ddg signup path.
-        verify(signupAccountInfoBuilder, never()).build(any(), any(), any())
-    }
-
-    @Test
     fun whenSignupAccountInfoBuilderReturnsAdditionsThenIncludedInSignupAndCached() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         prepareToProvideDeviceIds()
         prepareForCreateAccountSuccess()
         val publicKey = AccountInfoPublicKey(keyId = "kid-1", modulus = "n", exponent = "AQAB")
@@ -1228,7 +1173,6 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenSignupPostWithUnifiedDataFailsThenOnlyCreateFailedPixelFires() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         prepareToProvideDeviceIds()
         prepareForCreateAccountSuccess()
         whenever(signupAccountInfoBuilder.build(any(), any(), any())).thenReturn(
@@ -1252,7 +1196,6 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenSignupAccountInfoBuilderReturnsNullThenNoDeviceInfoOrKeysAndSignupStillSucceeds() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         prepareToProvideDeviceIds()
         prepareForCreateAccountSuccess()
         whenever(signupAccountInfoBuilder.build(any(), any(), any())).thenReturn(null)
@@ -1607,7 +1550,6 @@ class AppSyncAccountRepositoryTest {
         version: String = "2.0",
         cid: String = "3party",
     ): String {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
         whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)

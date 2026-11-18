@@ -145,7 +145,6 @@ constructor(
         val blockStoreE2eText: String = "",
         val blockStoreInferredBackupText: String = "",
         val blockStoreCurrentValueText: String = "Loading...",
-        val canUseV2ConnectFlowEnabled: Boolean = false,
         val canShowV2ConnectCodeEnabled: Boolean = false,
         val checkLinkingCodeResult: String = "",
         val accessCredentialsText: String = "",
@@ -277,15 +276,6 @@ constructor(
     }
 
     @SuppressLint("DenyListedApi")
-    fun onCanUseV2ConnectFlowFlagChanged(enabled: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-ScopedToken: setting canUseV2ConnectFlow flag = $enabled" }
-            setRawToggleState(syncFeature.canUseV2ConnectFlow(), enabled)
-            updateViewState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
     fun onCanShowV2ConnectCodeFlagChanged(enabled: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Sync-ScopedToken: setting canShowV2ConnectCode flag = $enabled" }
@@ -364,7 +354,6 @@ constructor(
                 thirdPartyRecoveryCode = thirdPartyRecoveryCode,
                 useDevEnvironment = syncEnvDataStore.useSyncDevEnvironment,
                 environment = syncEnvDataStore.syncEnvironmentUrl,
-                canUseV2ConnectFlowEnabled = syncFeature.canUseV2ConnectFlow().isEnabled(),
                 canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
                 v2StoreFieldsText = buildV2StoreFieldsText(),
                 // Clear per-session dev-tool results once signed out so stale keys aren't shown.
@@ -489,24 +478,9 @@ constructor(
 
     fun onCheckLinkingCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val useV2 = syncFeature.canUseV2ConnectFlow().isEnabled() && syncFeature.canShowV2ConnectCode().isEnabled()
-            viewState.update { it.copy(checkLinkingCodeResult = "Fetching ${if (useV2) "v2" else "v1"} linking code…") }
-            val result = if (useV2) fetchV2LinkingCode() else fetchV1LinkingCode()
+            viewState.update { it.copy(checkLinkingCodeResult = "Fetching v2 linking code…") }
+            val result = fetchV2LinkingCode()
             viewState.update { it.copy(checkLinkingCodeResult = result) }
-        }
-    }
-
-    private fun fetchV1LinkingCode(): String {
-        val signedIn = syncAccountRepository.isSignedIn()
-        val result = if (signedIn) {
-            syncAccountRepository.generateExchangeInvitationCode()
-        } else {
-            syncAccountRepository.getConnectQR()
-        }
-        val label = if (signedIn) "invitation" else "connect"
-        return when (result) {
-            is Success -> describeQrCode(result.data.qrCode)
-            is Error -> "Failed to fetch v1 $label code: $result"
         }
     }
 

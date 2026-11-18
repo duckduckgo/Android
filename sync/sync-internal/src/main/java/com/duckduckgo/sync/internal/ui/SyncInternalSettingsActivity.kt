@@ -366,9 +366,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.syncInternalEnvironment.setSecondaryText(viewState.environment)
 
-        binding.canUseV2ConnectFlowToggle.quietlySetIsChecked(viewState.canUseV2ConnectFlowEnabled) { _, enabled ->
-            viewModel.onCanUseV2ConnectFlowFlagChanged(enabled)
-        }
         binding.canShowV2ConnectCodeToggle.quietlySetIsChecked(viewState.canShowV2ConnectCodeEnabled) { _, enabled ->
             viewModel.onCanShowV2ConnectCodeFlagChanged(enabled)
         }

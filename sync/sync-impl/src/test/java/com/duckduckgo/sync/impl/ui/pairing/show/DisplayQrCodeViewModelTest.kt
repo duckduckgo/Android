@@ -211,7 +211,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when only the v2 connect flow flag is enabled then the v1 connect code is shown`() = runTest {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canShowV2ConnectCode().setRawStoredState(State(false))
         whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
 
@@ -853,12 +852,10 @@ class DisplayQrCodeViewModelTest {
     }
 
     private fun givenV2Enabled() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canShowV2ConnectCode().setRawStoredState(State(true))
     }
 
     private fun givenV2Disabled() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
         syncFeature.canShowV2ConnectCode().setRawStoredState(State(false))
     }
 }
