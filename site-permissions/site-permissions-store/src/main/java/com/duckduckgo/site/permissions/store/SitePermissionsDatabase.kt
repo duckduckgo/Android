@@ -20,8 +20,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.site.permissions.store.clienttools.ClientToolPermissionEntity
-import com.duckduckgo.site.permissions.store.clienttools.ClientToolPermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
@@ -29,17 +27,15 @@ import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissi
 
 @Database(
     exportSchema = true,
-    version = 7,
+    version = 6,
     entities = [
         SitePermissionsEntity::class,
         SitePermissionAllowedEntity::class,
-        ClientToolPermissionEntity::class,
     ],
 )
 abstract class SitePermissionsDatabase : RoomDatabase() {
     abstract fun sitePermissionsDao(): SitePermissionsDao
     abstract fun sitePermissionsAllowedDao(): SitePermissionsAllowedDao
-    abstract fun clientToolPermissionsDao(): ClientToolPermissionsDao
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -82,13 +78,4 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
     }
 }
 
-val MIGRATION_6_7 = object : Migration(6, 7) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
-            "CREATE TABLE IF NOT EXISTS `client_tool_permissions` (`origin` TEXT NOT NULL, `toolName` TEXT NOT NULL, " +
-                "`permission` TEXT NOT NULL, PRIMARY KEY(`origin`, `toolName`))",
-        )
-    }
-}
-
-val ALL_MIGRATIONS = listOf(MIGRATION_1_2, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+val ALL_MIGRATIONS = listOf(MIGRATION_1_2, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)

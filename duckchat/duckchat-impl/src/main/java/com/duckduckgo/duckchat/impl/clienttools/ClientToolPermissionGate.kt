@@ -19,8 +19,6 @@ package com.duckduckgo.duckchat.impl.clienttools
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.site.permissions.api.ClientToolPermission
-import com.duckduckgo.site.permissions.api.ClientToolPermissionStore
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CompletableDeferred
@@ -142,7 +140,7 @@ class RealClientToolPermissionGate @Inject constructor(
     private suspend fun standing(
         tool: ClientTool,
         context: ClientToolCallContext,
-    ): Standing = when (store.get(context.origin, tool.name)) {
+    ): Standing = when (store.get(tool.name)) {
         ClientToolPermission.ALWAYS_ALLOW -> Standing.Allowed
         ClientToolPermission.NEVER_ALLOW -> Standing.Denied
         null -> when (val mode = tool.permissionMode) {
