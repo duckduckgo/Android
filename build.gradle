@@ -41,6 +41,7 @@ plugins {
     id 'com.diffplug.spotless' apply false
     id 'com.squareup.sort-dependencies' apply false
     id 'androidx.baselineprofile' apply false
+    id 'com.autonomousapps.dependency-analysis'
 }
 
 // Proprietary DuckSans font swap. See https://app.asana.com/1/137249556945/project/1207908166761516/task/1213686706814504
@@ -252,6 +253,10 @@ subprojects {
             implementation "javax.inject:javax.inject:_"
         }
     }
+}
+
+subprojects {
+    apply plugin: 'com.autonomousapps.dependency-analysis'
 }
 
 task clean(type: Delete) {
