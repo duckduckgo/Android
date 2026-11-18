@@ -767,7 +767,9 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
-    private val fakeAutocompleteSpeedFeature = FakeFeatureToggleFactory.create(AutocompleteSpeedFeature::class.java)
+    private val fakeAutocompleteSpeedFeature = FakeFeatureToggleFactory.create(AutocompleteSpeedFeature::class.java).apply {
+        self().setRawStoredState(State(enable = true))
+    }
     private val fakeCurrentTimeProvider = object : CurrentTimeProvider {
         override fun elapsedRealtime(): Long = coroutineRule.testDispatcher.scheduler.currentTime
         override fun currentTimeMillis(): Long = coroutineRule.testDispatcher.scheduler.currentTime

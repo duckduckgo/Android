@@ -26,7 +26,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "autocompleteSpeed",
 )
 interface AutocompleteSpeedFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
@@ -34,7 +34,4 @@ interface AutocompleteSpeedFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun localSuggestionsFirst(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun reuseLastSuggestResponse(): Toggle
 }

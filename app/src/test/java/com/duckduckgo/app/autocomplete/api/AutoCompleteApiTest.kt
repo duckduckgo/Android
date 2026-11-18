@@ -143,6 +143,7 @@ class AutoCompleteApiTest {
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        fakeAutocompleteSpeedFeature.self().setRawStoredState(State(enable = true))
         testee = createTestee()
     }
 
@@ -193,8 +194,8 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenReuseDisabledThenSameQueryRequestedAgain() = runTest {
-        fakeAutocompleteSpeedFeature.reuseLastSuggestResponse().setRawStoredState(State(enable = false))
+    fun whenAutocompleteSpeedDisabledThenSameQueryRequestedAgain() = runTest {
+        fakeAutocompleteSpeedFeature.self().setRawStoredState(State(enable = false))
         testee = createTestee()
         stubSearchResponses()
 

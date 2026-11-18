@@ -125,7 +125,7 @@ class AutoCompleteApi constructor(
     private val searchRequestsInFlight = mutableMapOf<String, Deferred<List<AutoCompleteSearchSuggestion>>>()
     private val latestSearchResults = MutableStateFlow<SearchResults?>(null)
 
-    private val reuseLastSearchResponse: Boolean by lazy { autocompleteSpeedFeature.reuseLastSuggestResponse().isEnabled() }
+    private val reuseLastSearchResponse: Boolean by lazy { autocompleteSpeedFeature.self().isEnabled() }
 
     // The query the omnibar shows is often asked for again: by the omnibar's own pipeline as well as the typing one, and
     // when the omnibar is focused again after a search. Only the latest response is kept, so any other query is requested.
