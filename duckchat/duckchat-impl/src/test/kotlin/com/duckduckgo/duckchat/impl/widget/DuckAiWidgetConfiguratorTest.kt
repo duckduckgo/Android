@@ -285,7 +285,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val variants = sizedVariantsByKey(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400))
 
-        assertEquals(setOf(SizeF(180f, 142f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 142f)), variants.keys)
+        assertEquals(setOf(SizeF(180f, 110f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 110f)), variants.keys)
         variants.values.forEach { assertEquals(View.GONE, chatsSectionVisibility(it)) }
     }
 
@@ -351,9 +351,9 @@ class DuckAiWidgetConfiguratorTest {
         val variants = sizedVariantsByKey(views)
         assertEquals(
             setOf(
-                SizeF(180f, 142f),
+                SizeF(180f, 110f),
                 SizeF(180f, MIN_CHATS_HEIGHT_DP.toFloat()),
-                SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 142f),
+                SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 110f),
                 SizeF(MIN_LABELS_WIDTH_DP.toFloat(), MIN_CHATS_HEIGHT_DP.toFloat()),
             ),
             variants.keys,
@@ -377,7 +377,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val variants = sizedVariantsByKey(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400))
 
-        assertEquals(setOf(SizeF(180f, 142f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 142f)), variants.keys)
+        assertEquals(setOf(SizeF(180f, 110f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 110f)), variants.keys)
         variants.values.forEach { assertEquals(View.GONE, chatsSectionVisibility(it)) }
     }
 

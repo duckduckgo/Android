@@ -69,7 +69,7 @@ private val ACTION_PILLS = listOf(
 )
 
 private const val MIN_WIDTH_DP = 180f
-private const val MIN_HEIGHT_DP = 142f
+private const val MIN_HEIGHT_DP = 110f
 
 class DuckAiWidgetConfigurator @Inject constructor(
     private val duckChatFeature: DuckChatFeature,

@@ -198,22 +198,9 @@
                 android:divider="@null"
                 android:dividerHeight="0dp" />
 
-            <TextView
-                android:id="@+id/chatsMessageUnavailable"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:text="@string/duckAiWidgetUnavailable"
-                android:textSize="14sp"
-                android:textColor="@color/duckAiWidgetHintColor"
-                android:visibility="gone" />
-
         </FrameLayout>
 
         <LinearLayout
-            android:id="@+id/chatsViewAllContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
