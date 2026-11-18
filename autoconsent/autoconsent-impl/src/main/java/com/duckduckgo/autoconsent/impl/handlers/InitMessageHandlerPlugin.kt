@@ -97,7 +97,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     )
 
                     val settings = settingsCache.getSettings() ?: return@launch
-                    val config = buildConfig(settings.disabledCMPs, webView)
+                    val config = buildConfig(settings.disabledCMPs, settings.heuristicPopupSearchTimeout, webView)
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
                         InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
                     } else {
@@ -129,6 +129,7 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     private fun buildConfig(
         disabledCmps: List<String>,
+        heuristicPopupSearchTimeout: Any?,
         webView: WebView,
     ): Config {
         return Config(
@@ -142,7 +143,15 @@ class InitMessageHandlerPlugin @Inject constructor(
             enableHeuristicDetection = true,
             heuristicMode = heuristicModeProvider.getHeuristicMode(),
             enableHeuristicHitTest = autoconsentFeature.heuristicHitTest().isEnabled(),
+            enablePopupMutationObserver = autoconsentFeature.popupMutationObserver().isEnabled(),
+            heuristicPopupSearchTimeout = toHeuristicPopupSearchTimeout(heuristicPopupSearchTimeout),
         )
+    }
+
+    private fun toHeuristicPopupSearchTimeout(value: Any?): Int {
+        val timeout = value as? Double ?: return DEFAULT_HEURISTIC_POPUP_SEARCH_TIMEOUT_MS
+        val isPositiveInt = timeout > 0 && timeout <= Int.MAX_VALUE && timeout % 1.0 == 0.0
+        return if (isPositiveInt) timeout.toInt() else DEFAULT_HEURISTIC_POPUP_SEARCH_TIMEOUT_MS
     }
 
     private fun parseMessage(jsonString: String): InitMessage? {
@@ -248,6 +257,8 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableHeuristicDetection: Boolean,
         val heuristicMode: String,
         val enableHeuristicHitTest: Boolean,
+        val enablePopupMutationObserver: Boolean,
+        val heuristicPopupSearchTimeout: Int,
     )
 
     data class AutoconsentRuleset(val compact: Any?)
@@ -260,5 +271,6 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     companion object {
         const val MAX_SUPPORTED_RULES_VERSION = 1
+        const val DEFAULT_HEURISTIC_POPUP_SEARCH_TIMEOUT_MS = 100
     }
 }

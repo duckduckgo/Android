@@ -387,6 +387,54 @@ class InitMessageHandlerPluginTest {
         assertTrue(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enableHeuristicHitTest)
     }
 
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenPopupMutationObserverToggleChangesThenConfigFollowsIt() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+
+        feature.popupMutationObserver().setRawStoredState(Toggle.State(enable = false))
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+        assertFalse(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enablePopupMutationObserver)
+
+        feature.popupMutationObserver().setRawStoredState(Toggle.State(enable = true))
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+        assertTrue(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enablePopupMutationObserver)
+    }
+
+    @Test
+    fun whenHeuristicPopupSearchTimeoutIsSetThenConfigUsesIt() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings(settingsWithTimeoutField("\"heuristicPopupSearchTimeout\": 250,"))
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        assertEquals(250, jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.heuristicPopupSearchTimeout)
+    }
+
+    @Test
+    fun whenHeuristicPopupSearchTimeoutIsMissingOrInvalidThenConfigUsesDefault() {
+        settingsRepository.userSetting = true
+        listOf(
+            "",
+            "\"heuristicPopupSearchTimeout\": null,",
+            "\"heuristicPopupSearchTimeout\": 0,",
+            "\"heuristicPopupSearchTimeout\": -5,",
+            "\"heuristicPopupSearchTimeout\": 12.5,",
+            "\"heuristicPopupSearchTimeout\": \"250\",",
+        ).forEach { timeoutField ->
+            settingsCache.updateSettings(settingsWithTimeoutField(timeoutField))
+
+            initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+            assertEquals(
+                timeoutField,
+                InitMessageHandlerPlugin.DEFAULT_HEURISTIC_POPUP_SEARCH_TIMEOUT_MS,
+                jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.heuristicPopupSearchTimeout,
+            )
+        }
+    }
+
     @Test
     fun whenInitProcessedThenUpdateUrlCalledOnDetector() {
         settingsRepository.userSetting = true
@@ -599,6 +647,10 @@ class InitMessageHandlerPluginTest {
         return """
             {"type":"${initHandlerPlugin.supportedTypes.first()}", "url": "http://www.example.com"}
         """.trimIndent()
+    }
+
+    private fun settingsWithTimeoutField(timeoutField: String): String {
+        return "{\"disabledCMPs\": [], $timeoutField \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"
     }
 
     private fun jsonToInitResp(json: String): InitResp? {

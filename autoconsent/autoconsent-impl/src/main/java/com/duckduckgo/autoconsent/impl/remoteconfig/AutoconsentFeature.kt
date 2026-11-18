@@ -68,6 +68,13 @@ interface AutoconsentFeature {
     fun heuristicHitTest(): Toggle
 
     /**
+     * Makes autoconsent also wait for DOM changes while it checks whether a popup is open,
+     * so that popups that render late are found.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun popupMutationObserver(): Toggle
+
+    /**
      * Gate for the new Cookie Pop-up Preference settings UI and behavior.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
