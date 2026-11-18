@@ -366,9 +366,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.syncInternalEnvironment.setSecondaryText(viewState.environment)
 
-        binding.canShowV2ConnectCodeToggle.quietlySetIsChecked(viewState.canShowV2ConnectCodeEnabled) { _, enabled ->
-            viewModel.onCanShowV2ConnectCodeFlagChanged(enabled)
-        }
         binding.accessCredentialsTextView.text = viewState.accessCredentialsText
         binding.scopedTokenResultTextView.text = viewState.scopedTokenResult
         binding.v2StoreFieldsTextView.text = viewState.v2StoreFieldsText

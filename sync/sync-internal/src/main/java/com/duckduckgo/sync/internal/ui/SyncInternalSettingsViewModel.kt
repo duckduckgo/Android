@@ -145,7 +145,6 @@ constructor(
         val blockStoreE2eText: String = "",
         val blockStoreInferredBackupText: String = "",
         val blockStoreCurrentValueText: String = "Loading...",
-        val canShowV2ConnectCodeEnabled: Boolean = false,
         val checkLinkingCodeResult: String = "",
         val accessCredentialsText: String = "",
         val scopedTokenResult: String = "",
@@ -276,15 +275,6 @@ constructor(
     }
 
     @SuppressLint("DenyListedApi")
-    fun onCanShowV2ConnectCodeFlagChanged(enabled: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-ScopedToken: setting canShowV2ConnectCode flag = $enabled" }
-            setRawToggleState(syncFeature.canShowV2ConnectCode(), enabled)
-            updateViewState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
     private fun setRawToggleState(
         toggle: Toggle,
         enabled: Boolean,
@@ -354,7 +344,6 @@ constructor(
                 thirdPartyRecoveryCode = thirdPartyRecoveryCode,
                 useDevEnvironment = syncEnvDataStore.useSyncDevEnvironment,
                 environment = syncEnvDataStore.syncEnvironmentUrl,
-                canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
                 v2StoreFieldsText = buildV2StoreFieldsText(),
                 // Clear per-session dev-tool results once signed out so stale keys aren't shown.
                 keysText = if (accountInfo.isSignedIn) viewState.value.keysText else "",

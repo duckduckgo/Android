@@ -184,32 +184,6 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun `when signup connect pixel is called with other source then fired pixel includes other source`() {
-        testee.fireSignupConnectPixel(launchSource = SyncLaunchSource.Other)
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SIGNUP_CONNECT,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "other",
-            ),
-        )
-    }
-
-    @Test
-    fun `when signup connect pixel is called with source then fired pixel includes source`() {
-        testee.fireSignupConnectPixel(launchSource = SyncLaunchSource.PromotionBookmarks)
-
-        verify(pixel).fire(
-            SyncPixelName.SYNC_SIGNUP_CONNECT,
-            mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
-                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "promotion_bookmarks",
-            ),
-        )
-    }
-
-    @Test
     fun `when barcode screen is shown the pixel is fired`(
         @TestParameter screenType: ScreenType,
     ) {

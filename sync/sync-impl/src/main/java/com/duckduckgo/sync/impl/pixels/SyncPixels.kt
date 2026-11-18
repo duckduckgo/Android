@@ -106,12 +106,6 @@ interface SyncPixels {
     fun fireLoginPixel()
 
     /**
-     * Fired when user sets up a sync account from connect flow
-     * @param launchSource: the entry point that opened Sync.
-     */
-    fun fireSignupConnectPixel(launchSource: SyncLaunchSource)
-
-    /**
      * Fired when user sets up a sync account directly.
      * @param launchSource: the entry point that opened Sync.
      */
@@ -424,16 +418,6 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(
             SyncPixelName.SYNC_LOGIN,
             parameters = setupUiMetadata(),
-        )
-    }
-
-    override fun fireSignupConnectPixel(launchSource: SyncLaunchSource) {
-        pixel.fire(
-            SyncPixelName.SYNC_SIGNUP_CONNECT,
-            parameters = buildMap {
-                putAll(buildSourceMap(launchSource.value))
-                putAll(setupUiMetadata())
-            },
         )
     }
 
@@ -1142,7 +1126,6 @@ enum class SyncPixelName(override val pixelName: String) : PixelName {
     SYNC_TIMESTAMP_RESOLUTION_TRIGGERED("m_sync_%s_local_timestamp_resolution_triggered"),
     SYNC_LOGIN("m_sync_login"),
     SYNC_SIGNUP_DIRECT("m_sync_signup_direct"),
-    SYNC_SIGNUP_CONNECT("m_sync_signup_connect"),
     SYNC_ACCOUNT_FAILURE("m_sync_account_failure"),
     SYNC_SIGN_UP_FAILURE("m_sync_signup_error"),
     SYNC_LOGIN_FAILURE("m_sync_login_error"),

@@ -121,7 +121,6 @@ class AppSyncAccountRepositoryTest {
     private var connectedDevicesCount = 0
     private val moshi = Moshi.Builder().build()
     private val invitationCodeWrapperAdapter = moshi.adapter(InvitationCodeWrapper::class.java)
-    private val invitedDeviceDetailsAdapter = moshi.adapter(InvitedDeviceDetails::class.java)
     private val recoveryCodeAdapter = moshi.adapter(LinkCode::class.java)
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
@@ -334,33 +333,6 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
 
         assertTrue(result is Error)
-    }
-
-    @Test
-    fun whenGettingExchangeCodeThenFormatIsCorrect() {
-        prepareForExchangeSuccess()
-        whenever(deviceKeyGenerator.generate()).thenReturn(primaryDeviceKeyId)
-        val resultJson = syncRepo.generateExchangeInvitationCode()
-        val result = parseInvitationCodeJson(resultJson)
-        assertEquals(validLoginKeys.primaryKey, result.exchangeKey.publicKey)
-        assertEquals(primaryDeviceKeyId, result.exchangeKey.keyId)
-    }
-
-    @Test
-    fun whenAttemptingPollForOtherDeviceExchangeBeforeInvitationCodeGeneratedThenIsError() {
-        prepareForExchangeSuccess()
-        val result = syncRepo.pollSecondDeviceExchangeAcknowledgement()
-        assert(result is Error)
-    }
-
-    @Test
-    fun whenPollingForOtherDeviceExchangeAndResponseReceivedThenRecoveryCodeSentSuccessfully() {
-        givenAuthenticatedDevice()
-        prepareForExchangeSuccess()
-        initiateInvitationAsPrimaryDevice()
-
-        val result = syncRepo.pollSecondDeviceExchangeAcknowledgement()
-        assertTrue(result is Success)
     }
 
     @Test
@@ -902,28 +874,6 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenExchangeCodeRetrievedItRespectsUrlBasedFeatureFlag() {
-        prepareForExchangeSuccess()
-        whenever(deviceKeyGenerator.generate()).thenReturn(primaryDeviceKeyId)
-
-        val encodedJsonExchange = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey).encodeB64()
-        val decoratedCode = "decorated"
-        whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenReturn(decoratedCode)
-
-        configureUrlWrappedCodeFeatureFlagState(enabled = true).also {
-            val result = syncRepo.generateExchangeInvitationCode() as Success
-            assertEquals(encodedJsonExchange, result.data.rawCode)
-            assertEquals(decoratedCode, result.data.qrCode)
-        }
-
-        configureUrlWrappedCodeFeatureFlagState(enabled = false).also {
-            val result = syncRepo.generateExchangeInvitationCode() as Success
-            assertEquals(encodedJsonExchange, result.data.rawCode)
-            assertEquals(encodedJsonExchange, result.data.qrCode)
-        }
-    }
-
-    @Test
     fun whenRecoveryCodeRetrievedItRespectsUrlBasedFeatureFlag() {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.userId).thenReturn(userId)
@@ -994,22 +944,6 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(nativeLib.prepareForConnect()).thenReturn(connectKeys)
         whenever(nativeLib.seal(any(), eq(primaryKey))).thenReturn(encryptedExchangeCode)
-    }
-
-    private fun initiateInvitationAsPrimaryDevice() {
-        whenever(deviceKeyGenerator.generate()).thenReturn(primaryDeviceKeyId)
-        syncRepo.generateExchangeInvitationCode()
-        val otherDeviceDetails = InvitedDeviceDetails(keyId = otherDeviceKeyId, publicKey = "otherDevicePublicKey", deviceName = "otherDeviceName")
-        val json = invitedDeviceDetailsAdapter.toJson(otherDeviceDetails)
-        whenever(nativeLib.sealOpen(any(), eq(primaryKey), eq(secretKey))).thenReturn(json)
-        whenever(nativeLib.seal(any(), eq("otherDevicePublicKey"))).thenReturn(encryptedExchangeCode)
-        whenever(syncApi.getEncryptedMessage(primaryDeviceKeyId)).thenReturn(Success(json))
-        whenever(syncApi.sendEncryptedMessage(eq(otherDeviceKeyId), eq(encryptedExchangeCode))).thenReturn(Success(true))
-    }
-
-    private fun parseInvitationCodeJson(resultJson: Result<AuthCode>): InvitationCodeWrapper {
-        assertTrue(resultJson is Success)
-        return invitationCodeWrapperAdapter.fromJson(resultJson.getOrNull()?.rawCode!!.decodeB64())!!
     }
 
     private fun givenAuthenticatedDevice() {

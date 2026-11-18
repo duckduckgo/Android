@@ -94,8 +94,6 @@ interface SyncAccountRepository {
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
     fun getConnectQR(): Result<AuthCode>
     fun pollConnectionKeys(): Result<Boolean>
-    fun generateExchangeInvitationCode(): Result<AuthCode>
-    fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
     fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
 
     /**
@@ -194,13 +192,9 @@ class AppSyncAccountRepository @Inject constructor(
     internal var upgradeRetryDelayMillis: Long = DEFAULT_UPGRADE_RETRY_DELAY_MILLIS
 
     /**
-     * If there is a key-exchange flow in progress, we need to keep a reference to them
-     * There are separate device details for the inviter and the receiver
-     *
-     * Inviter is reset every time a new exchange invitation code is created.
-     * Receiver is reset every time an exchange invitation is received.
+     * If there is a key-exchange flow in progress, we need to keep a reference to this device's details.
+     * Reset every time an exchange invitation is received.
      */
-    private var exchangeDeviceDetailsAsInviter: DeviceDetailsForKeyExchange? = null
     private var exchangeDeviceDetailsAsReceiver: DeviceDetailsForKeyExchange? = null
 
     override fun isSyncSupported(): Boolean {
@@ -467,33 +461,6 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun generateExchangeInvitationCode(): Result<AuthCode> {
-        // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
-        logcat { "Sync-exchange: InviteFlow - A. Generating invitation code" }
-
-        // generate new ID and and public/private key-pair for inviter device
-        val deviceDetailsAsInviter = kotlin.runCatching {
-            generateInviterDeviceDetails()
-        }.getOrElse {
-            return Error(code = EXCHANGE_FAILED.code, reason = "Error generating inviter key-pair").alsoFireAccountErrorPixel()
-        }
-
-        val invitationCode = InvitationCode(keyId = deviceDetailsAsInviter.keyId, publicKey = deviceDetailsAsInviter.publicKey)
-        val invitationWrapper = InvitationCodeWrapper(invitationCode)
-
-        return kotlin.runCatching {
-            val b64Encoded = Adapters.invitationCodeAdapter.toJson(invitationWrapper).encodeB64()
-            val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
-                syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
-            } else {
-                b64Encoded
-            }
-            Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
-        }.getOrElse {
-            Error(code = EXCHANGE_FAILED.code, reason = "Error generating invitation code").alsoFireAccountErrorPixel()
-        }
-    }
-
     override fun getConnectQR(): Result<AuthCode> {
         val prepareForConnect = kotlin.runCatching {
             nativeLib.prepareForConnect().also {
@@ -563,89 +530,6 @@ class AppSyncAccountRepository @Inject constructor(
                 syncStore.primaryKey = recoveryCode.primaryKey
                 return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey).onFailure {
                     return it.copy(code = LOGIN_FAILED.code)
-                }
-            }
-        }
-    }
-
-    override fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean> {
-        // Sync: InviteFlow - C (https://app.asana.com/0/72649045549333/1209571867429615)
-        logcat { "Sync-exchange: InviteFlow - C" }
-
-        val keyId = exchangeDeviceDetailsAsInviter?.keyId ?: return Error(reason = "No pending invitation initialized")
-
-        return when (val result = syncApi.getEncryptedMessage(keyId)) {
-            is Error -> {
-                if (result.code == NOT_FOUND.code) {
-                    return Success(false)
-                } else if (result.code == GONE.code) {
-                    return Error(
-                        code = EXCHANGE_FAILED.code,
-                        reason = "Connect: keys expired",
-                    ).alsoFireAccountErrorPixel()
-                }
-                result.alsoFireAccountErrorPixel()
-            }
-
-            is Success -> {
-                logcat(VERBOSE) { "Sync-exchange: Found invitation acceptance for keyId: $keyId} ${result.data}" }
-
-                val decrypted = kotlin.runCatching {
-                    val pending = exchangeDeviceDetailsAsInviter
-                        ?: return Error(code = EXCHANGE_FAILED.code, reason = "Exchange: No pending invitation initialized")
-                            .alsoFireAccountErrorPixel()
-
-                    nativeLib.sealOpen(result.data, pending.publicKey, pending.privateKey)
-                }.getOrElse { throwable ->
-                    throwable.asErrorResult().alsoFireAccountErrorPixel()
-                    return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error opening seal")
-                }
-
-                logcat(VERBOSE) { "Sync-exchange: invitation acceptance received: $decrypted" }
-
-                val response = Adapters.invitedDeviceAdapter.fromJson(decrypted)
-                    ?: return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error reading invitation response").alsoFireAccountErrorPixel()
-
-                val otherDevicePublicKey = response.publicKey
-                val otherDeviceKeyId = response.keyId
-
-                logcat(VERBOSE) {
-                    """
-                    Sync-exchange: We have received the other device's details.
-                    name:${response.deviceName},
-                    keyId:${response.keyId},
-                    public key: ${response.publicKey}
-                    """.trimIndent()
-                }
-
-                // we encrypt our secrets with otherDevicePublicKey, and send them to the backend endpoint
-                return sendSecrets(otherDeviceKeyId, otherDevicePublicKey).onFailure {
-                    logcat(WARN) { "Sync-exchange: failed to send secrets. error code: ${it.code} ${it.reason}" }
-                    return it.copy(code = EXCHANGE_FAILED.code)
-                }
-            }
-        }
-    }
-
-    private fun sendSecrets(keyId: String, publicKey: String): Result<Boolean> {
-        // Sync: InviteFlow - D (https://app.asana.com/0/72649045549333/1209571867429615)
-        logcat { "Sync-exchange: InviteFlow - D" }
-
-        when (val recoveryCode = getRecoveryCode()) {
-            is Error -> {
-                logcat(ERROR) { "Sync-exchange: failed to get recovery code. error code: ${recoveryCode.code} ${recoveryCode.reason}" }
-                return Error(code = GENERIC_ERROR.code, reason = "Connect: Error getting recovery code").alsoFireAccountErrorPixel()
-            }
-            is Success -> {
-                logcat(VERBOSE) { "Sync-exchange: Got recovery code, ready to share encrypted data for key ID: $keyId" }
-
-                // recovery code comes b64 encoded, so we need to decode it, then encrypt, which automatically b64 encodes the encrypted form
-                return kotlin.runCatching {
-                    val json = recoveryCode.data.rawCode.decodeB64()
-                    val encryptedJson = nativeLib.seal(json, publicKey)
-                    syncApi.sendEncryptedMessage(keyId, encryptedJson)
-                }.getOrElse {
-                    it.asErrorResult()
                 }
             }
         }
@@ -976,22 +860,6 @@ class AppSyncAccountRepository @Inject constructor(
                 }
                 Success(true)
             }
-        }
-    }
-
-    private fun generateInviterDeviceDetails(): DeviceDetailsForKeyExchange {
-        logcat(INFO) { "Sync-exchange: Generating inviter device details" }
-        val keyId = deviceKeyGenerator.generate()
-        val prepareForConnect = nativeLib.prepareForConnect()
-
-        return DeviceDetailsForKeyExchange(
-            keyId = keyId,
-            privateKey = prepareForConnect.secretKey,
-            publicKey = prepareForConnect.publicKey,
-        ).also {
-            exchangeDeviceDetailsAsInviter = it
-            logcat(WARN) { "Sync-exchange: this (inviter) device's key ID is $keyId" }
-            logcat(WARN) { "Sync-exchange: this (inviter) device's public key is ${it.publicKey}" }
         }
     }
 
