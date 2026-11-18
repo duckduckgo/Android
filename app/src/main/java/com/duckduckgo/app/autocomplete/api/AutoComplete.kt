@@ -96,7 +96,6 @@ class DefaultAutoComplete @Inject constructor(
 
 class AutoCompleteApi constructor(
     private val autoCompleteService: AutoCompleteService,
-    private val searchCache: AutoCompleteSearchCache,
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
@@ -125,6 +124,13 @@ class AutoCompleteApi constructor(
 
     private val searchRequestsInFlight = mutableMapOf<String, Deferred<List<AutoCompleteSearchSuggestion>>>()
     private val latestSearchResults = MutableStateFlow<SearchResults?>(null)
+
+    private val reuseLastSearchResponse: Boolean by lazy { autocompleteSpeedFeature.reuseLastSuggestResponse().isEnabled() }
+
+    // The query the omnibar shows is often asked for again: by the omnibar's own pipeline as well as the typing one, and
+    // when the omnibar is focused again after a search. Only the latest response is kept, so any other query is requested.
+    @Volatile
+    private var lastSearchResponse: SearchResponse? = null
 
     init {
         if (config.showInstalledApps) {
@@ -453,8 +459,12 @@ class AutoCompleteApi constructor(
         }.getOrElse { emit(searchSuggestionsList.toList()) }
     }
 
-    private suspend fun fetchSearchResults(query: String): List<AutoCompleteServiceRawResult> =
-        searchCache.get(query) ?: autoCompleteService.autoComplete(query).also { searchCache.put(query, it) }
+    private suspend fun fetchSearchResults(query: String): List<AutoCompleteServiceRawResult> {
+        if (reuseLastSearchResponse) {
+            lastSearchResponse?.takeIf { it.query == query }?.let { return it.results }
+        }
+        return autoCompleteService.autoComplete(query).also { lastSearchResponse = SearchResponse(query, it) }
+    }
 
     private fun AutoCompleteServiceRawResult.toSearchSuggestion() = AutoCompleteSearchSuggestion(
         phrase = phrase.formatIfUrl(),
@@ -662,6 +672,11 @@ class AutoCompleteApi constructor(
     private data class SearchResults(
         val query: String,
         val suggestions: List<AutoCompleteSearchSuggestion>,
+    )
+
+    private data class SearchResponse(
+        val query: String,
+        val results: List<AutoCompleteServiceRawResult>,
     )
 
     private data class RankedSuggestion<T : AutoCompleteSuggestion>(

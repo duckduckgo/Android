@@ -75,10 +75,8 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -129,8 +127,6 @@ class AutoCompleteApiTest {
 
     private val fakeAutocompleteSpeedFeature = FakeFeatureToggleFactory.create(AutocompleteSpeedFeature::class.java)
 
-    private var searchCache: AutoCompleteSearchCache = NoOpAutoCompleteSearchCache
-
     private lateinit var testee: AutoCompleteApi
 
     @Before
@@ -151,9 +147,8 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSameQueryRequestedAgainThenSearchResultsServedFromCache() = runTest {
-        useCachingSearchCache()
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(listOf(AutoCompleteServiceRawResult("foo bar", isNav = false)))
+    fun whenSameQueryRequestedAgainThenLastResponseReused() = runTest {
+        stubSearchResponses()
 
         val first = testee.autoComplete("foo").first()
         val second = testee.autoComplete("foo").first()
@@ -163,10 +158,10 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenOmnibarListsLocalSuggestionsFirstAndSameQueryRequestedAgainThenSearchResultsServedFromCache() = runTest {
+    fun whenOmnibarListsLocalSuggestionsFirstAndSameQueryRequestedAgainThenLastResponseReused() = runTest {
         fakeAutocompleteSpeedFeature.localSuggestionsFirst().setRawStoredState(State(enable = true))
-        useCachingSearchCache(isOmnibar = true)
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(listOf(AutoCompleteServiceRawResult("foo bar", isNav = false)))
+        testee = createTestee(isOmnibar = true)
+        stubSearchResponses()
 
         val first = testee.autoComplete("foo").toList().last()
         val second = testee.autoComplete("foo").toList().last()
@@ -176,8 +171,19 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSearchRequestFailsThenNextRequestForSameQueryHitsTheService() = runTest {
-        useCachingSearchCache()
+    fun whenAnotherQueryRequestedInBetweenThenEarlierQueryRequestedAgain() = runTest {
+        stubSearchResponses()
+
+        testee.autoComplete("foo").first()
+        testee.autoComplete("fo").first()
+        testee.autoComplete("foo").first()
+
+        verify(mockAutoCompleteService, times(2)).autoComplete("foo")
+    }
+
+    @Test
+    fun whenSearchRequestFailsThenSameQueryRequestedAgain() = runTest {
+        stubSearchResponses()
         whenever(mockAutoCompleteService.autoComplete("foo")).thenThrow(RuntimeException())
 
         testee.autoComplete("foo").first()
@@ -186,11 +192,22 @@ class AutoCompleteApiTest {
         verify(mockAutoCompleteService, times(2)).autoComplete("foo")
     }
 
-    private fun useCachingSearchCache(isOmnibar: Boolean = false) {
+    @Test
+    fun whenReuseDisabledThenSameQueryRequestedAgain() = runTest {
+        fakeAutocompleteSpeedFeature.reuseLastSuggestResponse().setRawStoredState(State(enable = false))
+        testee = createTestee()
+        stubSearchResponses()
+
+        testee.autoComplete("foo").first()
+        testee.autoComplete("foo").first()
+
+        verify(mockAutoCompleteService, times(2)).autoComplete("foo")
+    }
+
+    private suspend fun stubSearchResponses() {
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
-        searchCache = RealAutoCompleteSearchCache(fakeAutocompleteSpeedFeature, mock { on { elapsedRealtime() } doReturn 0L })
-        testee = createTestee(isOmnibar = isOmnibar)
+        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(listOf(AutoCompleteServiceRawResult("foo bar", isNav = false)))
     }
 
     @Test
@@ -2383,7 +2400,6 @@ class AutoCompleteApiTest {
     ): AutoCompleteApi {
         return AutoCompleteApi(
             mockAutoCompleteService,
-            searchCache,
             mockSavedSitesRepository,
             mockNavigationHistory,
             RealAutoCompleteScorer(),

@@ -21,7 +21,6 @@ import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
 import androidx.core.content.getSystemService
-import com.duckduckgo.app.autocomplete.api.AutoCompleteSearchCache
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
@@ -138,7 +137,6 @@ class ClearPersonalDataAction(
     duckAiHostProvider: DuckAiHostProvider,
     private val siteDataCleaner: SiteDataCleaner,
     private val sitePreferencesDataClearer: SitePreferencesDataClearer,
-    private val autoCompleteSearchCache: AutoCompleteSearchCache,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int, query: String?) {
@@ -182,7 +180,6 @@ class ClearPersonalDataAction(
 
             navigationHistory.clearHistory()
             tabVisitedSitesRepository.clearAll()
-            autoCompleteSearchCache.clear()
         }
 
         clearDataGranularlyAsync(shouldFireDataClearPixel)

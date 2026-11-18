@@ -38,7 +38,6 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class AutoCompleteFactoryImpl @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
-    private val searchCache: AutoCompleteSearchCache,
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
@@ -61,7 +60,6 @@ class AutoCompleteFactoryImpl @Inject constructor(
     private fun create(config: AutoComplete.Config, browserMode: BrowserMode, isOmnibar: Boolean): AutoComplete {
         return AutoCompleteApi(
             autoCompleteService = autoCompleteService,
-            searchCache = searchCache,
             savedSitesRepository = savedSitesRepository,
             navigationHistory = navigationHistory,
             autoCompleteScorer = autoCompleteScorer,
