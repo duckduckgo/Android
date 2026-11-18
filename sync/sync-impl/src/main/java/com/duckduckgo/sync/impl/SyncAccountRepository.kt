@@ -811,7 +811,7 @@ class AppSyncAccountRepository @Inject constructor(
             is ThirdPartyUpgrade.Aborted -> {
                 // The login above registered this device. The account will never be joined, so remove the device and let the next attempt use a new id.
                 logoutTemporaryThirdPartyDevice(loginResponse.token, deviceId)
-                syncStore.deviceId = null
+                if (!syncStore.isSignedIn()) syncStore.deviceId = null
                 upgrade.error
             }
         }

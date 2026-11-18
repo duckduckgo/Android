@@ -1587,6 +1587,16 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
+    fun whenUpgradeAbortedWhileSignedInThenDeviceIdIsNotCleared() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(accountAlreadyHasDdg = true)
+        whenever(syncStore.isSignedIn()).thenReturn(true)
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncStore, never()).deviceId = null
+    }
+
+    @Test
     fun whenStep7Post409AlreadyExistsThenSavedDeviceIdIsCleared() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
         whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
