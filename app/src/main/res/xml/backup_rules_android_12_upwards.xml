@@ -25,11 +25,36 @@
     </cloud-backup>
 
     <device-transfer>
-        <exclude domain="file" path="."/>
-        <exclude domain="database" path="."/>
-        <exclude domain="sharedpref" path="."/>
-        <exclude domain="external" path="."/>
-        <exclude domain="root" path="."/>
+        <include domain="database" path="app.db"/>
+        <include domain="database" path="history.db"/>
+        <include domain="database" path="tab_visited_sites.db"/>
+        <include domain="database" path="site_permissions.db"/>
+        <include domain="database" path="site_preferences.db"/>
+        <include domain="database" path="duck_ai_bridge.db"/>
+        <include domain="database" path="vpn.db"/>
+        <include domain="database" path="vpn-netp.db"/>
+        <include domain="database" path="downloads.db"/>
+        <include domain="database" path="remote_messaging.db"/>
+        <include domain="sharedpref" path="com.duckduckgo.devicemigration.transferred.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.app.statistics.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.app.install.settings.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.app.global.migrations.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.app.settings_activity.settings.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.app.onboarding.settings.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.site.permissions.settings.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.privacy.config.impl.features.gpc.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.app.voice.xml"/>
+        <include domain="sharedpref" path="com.duckduckgo.savedsites.settings.xml"/>
+        <include domain="file" path="datastore/duck_chat.preferences_pb"/>
+        <include domain="file" path="datastore/duck_player.preferences_pb"/>
+        <include domain="file" path="datastore/show_on_app_launch.preferences_pb"/>
+        <include domain="file" path="datastore/tab_switcher.preferences_pb"/>
+        <include domain="file" path="datastore/new_address_bar_picker.preferences_pb"/>
+        <include domain="file" path="datastore/default_browser_prompts_datastore.preferences_pb"/>
+        <include domain="file" path="datastore/com.duckduckgo.sync.auto_restore.preferences_pb"/>
+        <include domain="file" path="duck_ai_bridge_files"/>
+        <include domain="file" path="harmony_prefs/com.duckduckgo.networkprotection.store.prefs.v1"/>
+        <include domain="root" path="app_webview/Default"/>
     </device-transfer>
 
 </data-extraction-rules>

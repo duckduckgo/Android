@@ -35,7 +35,6 @@ import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
@@ -106,7 +105,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        setupCloseToolbarIfNeeded()
+        configureToolbar()
         configureEdgeToEdgeInsets()
 
         // set before the web view loads, so the handshake always waits on this visit's entry point
@@ -150,21 +149,14 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         super.onDestroy()
     }
 
-    private fun setupCloseToolbarIfNeeded() {
-        if (!intent.getBooleanExtra(EXTRA_SHOW_CLOSE_BUTTON, false)) return
-
-        binding.includeToolbar.appBarLayout.isVisible = true
+    private fun configureToolbar() {
         setupToolbar(binding.includeToolbar.toolbar)
         binding.includeToolbar.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
-        supportActionBar?.title = ""
-
-        val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
-        binding.includeToolbar.appBarLayout.setBackgroundColor(toolbarColor)
-        binding.includeToolbar.toolbar.setBackgroundColor(toolbarColor)
     }
 
     private fun configureEdgeToEdgeInsets() {
-        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.webViewContainer, drawBehindGestureNav = true)
     }
 
@@ -328,7 +320,6 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        const val EXTRA_SHOW_CLOSE_BUTTON = "extra_show_close_button"
         const val EXTRA_FROM_FREEMIUM_SCAN_COMPLETE_NOTIFICATION = "extra_from_freemium_scan_complete_notification"
         private const val KEY_FREE_SCAN_ENTRY_POINT = "key_free_scan_entry_point"
     }

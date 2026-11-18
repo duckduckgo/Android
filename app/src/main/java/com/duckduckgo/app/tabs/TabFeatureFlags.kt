@@ -69,6 +69,6 @@ interface TabManagerFeatureFlags {
     /**
      * Whether to animate the new tabs opened from the browser or the tab manager with the new transitions.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun newTabTransitions(): Toggle
 }

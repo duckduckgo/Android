@@ -61,6 +61,7 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -166,6 +167,8 @@ class CtaViewModelTest {
 
     private val fakeContextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit()
 
+    private val fakeSyncAfterDeviceTransferPrompt = FakeSyncAfterDeviceTransferPrompt()
+
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
@@ -244,6 +247,7 @@ class CtaViewModelTest {
             },
             onboardingPixelSender = mockOnboardingPixelSender,
             contextualOnboardingTimeLimit = fakeContextualOnboardingTimeLimit,
+            syncAfterDeviceTransferPrompt = fakeSyncAfterDeviceTransferPrompt,
         )
     }
 
@@ -1474,6 +1478,119 @@ class CtaViewModelTest {
 
         assertNull(value)
     }
+
+    @Test
+    fun whenSyncSuggestionIsDueAndNoOnboardingDialogThenNewTabShowsTheSyncSuggestion() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+
+        val value = refreshHomeCta()
+
+        assertTrue(value is SyncAfterDeviceTransferBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionIsNotDueThenNewTabShowsNoCta() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = false
+
+        assertNull(refreshHomeCta())
+    }
+
+    @Test
+    fun whenSyncSuggestionIsDueAndAnOnboardingDialogIsDueThenTheOnboardingDialogWins() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
+        fakeSyncAfterDeviceTransferPrompt.due = true
+
+        assertTrue(refreshHomeCta() is DaxTryASearchBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionIsDueAndTipsAreHiddenThenItStillShows() = runTest {
+        givenDaxOnboardingCompleted()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        fakeSyncAfterDeviceTransferPrompt.due = true
+
+        assertTrue(refreshHomeCta() is SyncAfterDeviceTransferBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionIsDueOnAWebPageThenItIsNotShown() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site(url = "http://www.cnn.com", trackerCount = 1),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertFalse(value is SyncAfterDeviceTransferBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionDismissedThenItIsDismissedForGoodWithoutOnboardingSideEffects() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onUserDismissedCta(cta, viaCloseBtn = true)
+
+        assertTrue(fakeSyncAfterDeviceTransferPrompt.dismissed)
+        assertNull(refreshHomeCta())
+        verify(mockDismissedCtaDao, never()).insert(any())
+        verifyNoInteractions(mockPixel)
+        verifyNoInteractions(mockOnboardingPixelSender)
+    }
+
+    @Test
+    fun whenSyncSuggestionShownThenOnlyItsOnceEverShownPixelIsSentAndItStaysDue() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onCtaShown(cta)
+
+        verify(mockDismissedCtaDao, never()).insert(any())
+        verify(mockPixel).fire(DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
+        verifyNoMoreInteractions(mockPixel)
+        verifyNoInteractions(mockOnboardingPixelSender)
+        assertTrue(refreshHomeCta() is SyncAfterDeviceTransferBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionAcceptedThenItIsNotDismissed() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onUserClickCtaOkButton(cta)
+
+        assertFalse(fakeSyncAfterDeviceTransferPrompt.dismissed)
+    }
+
+    @Test
+    fun whenSyncSuggestionAcceptedThenOnlyItsOnceEverClickPixelIsSent() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockPixel).fire(DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
+        verifyNoMoreInteractions(mockPixel)
+        verifyNoInteractions(mockOnboardingPixelSender)
+    }
+
+    private suspend fun refreshHomeCta(): Cta? = testee.refreshCta(
+        coroutineRule.testDispatcher,
+        isBrowserShowing = false,
+        detectedRefreshPatterns = detectedRefreshPatterns,
+        brokenSitePromptUrl = null,
+    )
 
     private suspend fun givenOnboardingEndedByTimeLimit() {
         givenUserIsEstablished()

@@ -27,6 +27,28 @@ interface DeviceMigration {
     fun sourceDeviceIsNewInstall(): Boolean?
 
     /**
+     * On a migrated install, whether DuckDuckGo was the default browser on the previous phone when that phone last recorded it.
+     * Null when this install is not migrated, or when the previous phone never recorded it.
+     */
+    suspend fun sourceDeviceWasDefaultBrowser(): Boolean?
+
+    /**
+     * True on a migrated install until [markMigrationFlowCompleted] is called. Only installs first detected by a version that has
+     * the migration flow are pending, so an install migrated before it shipped never gets the flow late.
+     */
+    suspend fun isMigrationFlowPending(): Boolean
+
+    /** Records that the migration flow ended, completed or skipped, so [isMigrationFlowPending] stays false from now on. */
+    suspend fun markMigrationFlowCompleted()
+
+    /**
+     * True when the previous phone's Sync account was found to restore silently, or when that is not known yet, so callers never
+     * offer to set up Sync while it is being restored. False when the install is not migrated, or when nothing was found to
+     * restore, even if the previous phone was signed in.
+     */
+    suspend fun previousDeviceHadSync(): Boolean
+
+    /**
      * Remote kill switch for what a migrated install adds on the new phone: silent restores, the migration pixels and resets that
      * only improve the experience. While it is false, callers do none of it and record none of it as done, so turning it on later
      * still runs each piece once. Detection, [isMigratedInstall] and cleanups that keep a feature correct do not depend on it.

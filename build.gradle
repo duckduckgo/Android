@@ -289,7 +289,7 @@ fladle {
             ])
             devices.set([
                     ["model": "MediumPhone.arm", "version": "30"],
-                    ["model": "Pixel2.arm", "version": "28"]
+                    ["model": "SmallPhone.arm", "version": "28"]
             ])
             localResultsDir.set("fladleResults")
             // retry once, if it succeeds it will be reported as a flaky test

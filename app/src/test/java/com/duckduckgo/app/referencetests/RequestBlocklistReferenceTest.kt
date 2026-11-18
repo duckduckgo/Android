@@ -76,6 +76,8 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.impl.RealRequestBlocklist
 import com.duckduckgo.request.interception.impl.RequestBlocklistFeature
+import com.duckduckgo.request.interception.impl.RequestExemptions
+import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
@@ -219,8 +221,10 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = resourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
-            gpc = mockGpc,
-            userAgentProvider = userAgentProvider,
+            requestRewriteDecision = RequestRewriteDecision(
+                gpc = mockGpc,
+                userAgentProvider = userAgentProvider,
+            ),
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = CloakedCnameDetectorImpl(
                 tdsCnameEntityDao,
@@ -229,10 +233,12 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
                 cachedCnameLookupEnabled,
             ),
             requestFilterer = mockRequestFilterer,
-            requestBlocklist = requestBlocklist,
-            contentBlocking = contentBlocking,
-            trackerAllowlist = trackerAllowlist,
-            userAllowListRepository = userAllowListRepository,
+            requestExemptions = RequestExemptions(
+                requestBlocklist = requestBlocklist,
+                contentBlocking = contentBlocking,
+                trackerAllowlist = trackerAllowlist,
+                userAllowListRepository = userAllowListRepository,
+            ),
             duckPlayer = mockDuckPlayer,
             maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             dispatchers = coroutinesTestRule.testDispatcherProvider,

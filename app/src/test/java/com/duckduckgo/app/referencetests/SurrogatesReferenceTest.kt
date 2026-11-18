@@ -65,6 +65,8 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.request.interception.impl.RequestExemptions
+import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
@@ -178,15 +180,19 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = resourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
-            gpc = mockGpc,
-            userAgentProvider = userAgentProvider,
+            requestRewriteDecision = RequestRewriteDecision(
+                gpc = mockGpc,
+                userAgentProvider = userAgentProvider,
+            ),
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
-            requestBlocklist = mockRequestBlocklist,
-            contentBlocking = mockContentBlocking,
-            trackerAllowlist = mockTrackerAllowlist,
-            userAllowListRepository = mockUserAllowListRepository,
+            requestExemptions = RequestExemptions(
+                requestBlocklist = mockRequestBlocklist,
+                contentBlocking = mockContentBlocking,
+                trackerAllowlist = mockTrackerAllowlist,
+                userAllowListRepository = mockUserAllowListRepository,
+            ),
             duckPlayer = mockDuckPlayer,
             maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             dispatchers = coroutinesTestRule.testDispatcherProvider,

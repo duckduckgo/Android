@@ -327,6 +327,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
 
+    // Only meaningful for the tab the external intent created, so it is not persisted in the tab model.
+    private val launchingAppPackages = mutableMapOf<String, String>()
+
     private val pendingInputModeTargets = mutableMapOf<String, InputMode>()
 
     private lateinit var renderer: BrowserStateRenderer
@@ -856,9 +859,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         url: String? = null,
         skipHome: Boolean,
         isExternal: Boolean,
+        launchingAppPackage: String? = null,
     ): BrowserTabFragment {
         logcat(INFO) { "Opening new tab, url: $url, tabId: $tabId" }
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
+        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal, launchingAppPackage)
         fragment.inputModeTarget = consumeInputModeTargetForTab(tabId)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
@@ -887,6 +891,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return externalLaunchTabIds.remove(tabId)
     }
 
+    fun consumeLaunchingAppForTab(tabId: String): String? {
+        return launchingAppPackages.remove(tabId)
+    }
+
     fun consumeInputModeTargetForTab(tabId: String): InputMode? {
         return pendingInputModeTargets.remove(tabId)
     }
@@ -905,7 +913,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         newTabTransitionCoordinator.onTabShowing(tab.tabId, binding.fragmentContainer)
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome, isExternal = consumeExternalLaunchForTab(tab.tabId))
+            openNewTab(
+                tab.tabId,
+                tab.url,
+                tab.skipHome,
+                isExternal = consumeExternalLaunchForTab(tab.tabId),
+                launchingAppPackage = consumeLaunchingAppForTab(tab.tabId),
+            )
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
@@ -1154,6 +1168,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             } else {
                 val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
+                val launchingAppPackage = intent.getStringExtra(LAUNCHING_APP_PACKAGE_EXTRA).takeIf { isExternal }
                 val interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
                 if (isExternal && duckChat.isDuckChatUrl(sharedText.toUri())) {
                     duckChat.reportDuckChatEntry(
@@ -1179,7 +1194,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         } else {
                             sharedText
                         }
-                    openNewTabInCurrentMode(query, sourceTabId, skipHome, isExternal, newTabTransition = newTabTransition)
+                    openNewTabInCurrentMode(
+                        query,
+                        sourceTabId,
+                        skipHome,
+                        isExternal,
+                        newTabTransition = newTabTransition,
+                        launchingAppPackage = launchingAppPackage,
+                    )
                 } else {
                     val landingId = onIntentOpening()
                     lifecycleScope.launch {
@@ -1188,6 +1210,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         newTabTransition?.let { registerNewTabTransition(tabId, it) }
                         if (isExternal) {
                             externalLaunchTabIds.add(tabId)
+                            launchingAppPackage?.let { launchingAppPackages[tabId] = it }
                         }
                     }
                 }
@@ -1604,6 +1627,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             duckChatSessionActive: Boolean = false,
             duckChatForceImageGeneration: Boolean = false,
             deletedTabCount: Int = 0,
+            launchingAppPackage: String? = null,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -1613,6 +1637,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
             intent.putExtra(SOURCE_TAB_ID_EXTRA, sourceTabId)
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            intent.putExtra(LAUNCHING_APP_PACKAGE_EXTRA, launchingAppPackage)
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
@@ -1643,6 +1668,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 
         const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+
+        const val LAUNCHING_APP_PACKAGE_EXTRA = "LAUNCHING_APP_PACKAGE_EXTRA"
 
         /**
          * Stamped by entry points that must reach BrowserActivity in [BrowserMode.REGULAR].
@@ -1913,6 +1940,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             // Resolved at post time because the adapter may already hold a newer tab list than the one the selection was combined with.
             val index = tabPagerAdapter.getPositionOfTab(tabId).takeIf { it != -1 } ?: return@post
             tabPagerAdapter.currentTabIndex = index
+            newTabTransitionCoordinator.onTabShowing(tabId, tabPager)
             tabPager.setCurrentItem(index, false)
         }
     }
@@ -1955,13 +1983,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         browserMode: BrowserMode = currentBrowserMode,
         inputModeTarget: InputMode? = null,
         animated: Boolean = false,
+        launchingAppPackage: String? = null,
     ) {
         if (inputModeTarget == InputMode.SEARCH) {
             isDuckChatVisible = false
         }
         switchModeThen(
             browserMode,
-            PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal, inputModeTarget),
+            PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal, inputModeTarget, launchingAppPackage),
             BrowserModeSwitchSource.NEW_TAB,
             animated,
         )
@@ -2017,6 +2046,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 action.isExternal,
                 action.inputModeTarget,
                 newTabTransition = if (animated) startNewTabTransition() else null,
+                launchingAppPackage = action.launchingAppPackage,
             )
             is PendingAction.OpenExistingTab -> openExistingTab(action.tabId)
         }
@@ -2029,6 +2059,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
         inputModeTarget: InputMode? = null,
         newTabTransition: PendingNewTabTransition? = null,
+        launchingAppPackage: String? = null,
     ) {
         val landingId = onIntentOpening()
         lifecycleScope.launch {
@@ -2038,6 +2069,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 newTabTransition?.let { registerNewTabTransition(tabId, it) }
                 if (isExternal) {
                     externalLaunchTabIds.add(tabId)
+                    launchingAppPackage?.let { launchingAppPackages[tabId] = it }
                 }
                 // Stash before the tab-list observer fires and TabPagerAdapter builds the fragment, so
                 // the target is available at createFragment (mirrors externalLaunchTabIds above).

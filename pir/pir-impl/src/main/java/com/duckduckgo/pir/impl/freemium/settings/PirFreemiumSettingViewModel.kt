@@ -22,12 +22,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
 import com.duckduckgo.pir.impl.freemium.PirFreemium
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState
 import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +38,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver")
@@ -43,9 +46,12 @@ import javax.inject.Inject
 class PirFreemiumSettingViewModel @Inject constructor(
     private val pirFreemium: PirFreemium,
     private val pixelSender: PirPixelSender,
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState(val freemiumState: PirFreemiumState = PirFreemiumState.NOT_ELIGIBLE)
+    /** [cta] is null when the entry point must be hidden. */
+    data class ViewState(val cta: PirFreemiumCtaState? = null)
 
     sealed class Command {
         data class OpenPirDashboard(val entryPoint: PirFreeScanEntryPoint) : Command()
@@ -62,10 +68,10 @@ class PirFreemiumSettingViewModel @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch {
-            val freemiumState = pirFreemium.getPirFreemiumState()
-            _viewState.update { it.copy(freemiumState = freemiumState) }
+            val cta = resolveCta(pirFreemium.getPirFreemiumState())
+            _viewState.update { it.copy(cta = cta) }
 
-            if (freemiumState != PirFreemiumState.NOT_ELIGIBLE && !impressionFired) {
+            if (cta != null && !impressionFired) {
                 impressionFired = true
                 pixelSender.reportFreemiumSettingsEntryPointImpression()
             }
@@ -73,13 +79,22 @@ class PirFreemiumSettingViewModel @Inject constructor(
     }
 
     fun onEntryPointClicked() {
-        val (ctaState, entryPoint) = when (_viewState.value.freemiumState) {
-            PirFreemiumState.NOT_ELIGIBLE -> return
-            PirFreemiumState.ELIGIBLE -> PirFreemiumCtaState.START_FREE_SCAN to PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN
-            PirFreemiumState.USED -> PirFreemiumCtaState.VIEW_SCAN_RESULTS to PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN
+        val cta = _viewState.value.cta ?: return
+        val entryPoint = when (cta) {
+            PirFreemiumCtaState.START_FREE_SCAN -> PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN
+            PirFreemiumCtaState.VIEW_SCAN_RESULTS -> PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN
         }
 
-        pixelSender.reportFreemiumSettingsEntryPointClicked(ctaState)
+        pixelSender.reportFreemiumSettingsEntryPointClicked(cta)
         viewModelScope.launch { command.send(Command.OpenPirDashboard(entryPoint)) }
     }
+
+    // a saved profile means a scan is underway, and the dashboard shows its results as they arrive
+    private suspend fun resolveCta(freemiumState: PirFreemiumState): PirFreemiumCtaState? = when (freemiumState) {
+        PirFreemiumState.NOT_ELIGIBLE -> null
+        PirFreemiumState.USED -> PirFreemiumCtaState.VIEW_SCAN_RESULTS
+        PirFreemiumState.ELIGIBLE -> if (hasSavedProfile()) PirFreemiumCtaState.VIEW_SCAN_RESULTS else PirFreemiumCtaState.START_FREE_SCAN
+    }
+
+    private suspend fun hasSavedProfile(): Boolean = withContext(dispatcherProvider.io()) { pirFreemiumDataStore.didActivate }
 }

@@ -142,6 +142,7 @@ class InitMessageHandlerPlugin @Inject constructor(
             enableCosmeticRules = true,
             enableHeuristicDetection = true,
             heuristicMode = heuristicModeProvider.getHeuristicMode(),
+            enableHeuristicHitTest = autoconsentFeature.heuristicHitTest().isEnabled(),
             enablePopupMutationObserver = autoconsentFeature.popupMutationObserver().isEnabled(),
             heuristicPopupSearchTimeout = toHeuristicPopupSearchTimeout(heuristicPopupSearchTimeout),
         )
@@ -256,6 +257,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
         val enableHeuristicDetection: Boolean,
         val heuristicMode: String,
+        val enableHeuristicHitTest: Boolean,
         val enablePopupMutationObserver: Boolean,
         val heuristicPopupSearchTimeout: Int,
     )

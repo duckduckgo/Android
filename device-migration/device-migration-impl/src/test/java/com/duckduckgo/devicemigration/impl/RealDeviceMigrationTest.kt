@@ -27,6 +27,8 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_DEFAULT_BROWSER
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_IS_NEW_INSTALL
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_LAUNCHED
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_MIGRATED
+import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_PREVIOUS_DEVICE_HAD_SYNC
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_RESTORED_FROM_BACKUP
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SEEN
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_SIGNED_IN_TO_SYNC
@@ -94,6 +96,8 @@ class RealDeviceMigrationTest {
 
     private fun onResume() = testee.onResume(mock<LifecycleOwner>())
 
+    private fun onStop() = testee.onStop(mock<LifecycleOwner>())
+
     @Test
     fun whenKeyNotMarkedThenNotDoneOnThisInstall() {
         assertFalse(testee.isDoneOnThisInstall("feature.step"))
@@ -123,6 +127,12 @@ class RealDeviceMigrationTest {
     }
 
     @Test
+    fun transferredFileNameMatchesTheBackupRulesInclude() {
+        // :app's backup rules include this exact file in a device transfer; renaming it would stop it transferring.
+        assertEquals("com.duckduckgo.devicemigration.transferred", TRANSFERRED_FILE)
+    }
+
+    @Test
     fun whenNoMarkersThenNotMigratedAndMarkersWritten() = runTest {
         assertFalse(testee.isMigratedInstall())
 
@@ -147,6 +157,51 @@ class RealDeviceMigrationTest {
 
         assertFalse(testee.isMigratedInstall())
         assertNull(testee.sourceDeviceIsNewInstall())
+    }
+
+    @Test
+    fun whenMigratedThenFlowPendingUntilCompleted() = runTest {
+        transferred.edit().putBoolean(KEY_SEEN, true).commit()
+
+        assertTrue(testee.isMigrationFlowPending())
+        testee.markMigrationFlowCompleted()
+
+        assertFalse(testee.isMigrationFlowPending())
+        assertFalse(newInstance().isMigrationFlowPending())
+    }
+
+    @Test
+    fun whenNotMigratedThenFlowNotPending() = runTest {
+        assertFalse(testee.isMigrationFlowPending())
+    }
+
+    @Test
+    fun whenMigratedBeforeTheFlowExistedThenFlowNotPending() = runTest {
+        local.edit().putBoolean(KEY_LAUNCHED, true).putBoolean(KEY_MIGRATED, true).commit()
+
+        assertTrue(testee.isMigratedInstall())
+        assertFalse(testee.isMigrationFlowPending())
+    }
+
+    @Test
+    fun whenPreviousPhoneRecordedDefaultBrowserThenReported() = runTest {
+        transferred.edit().putBoolean(KEY_SEEN, true).putBoolean(KEY_DEFAULT_BROWSER, true).commit()
+
+        assertEquals(true, testee.sourceDeviceWasDefaultBrowser())
+    }
+
+    @Test
+    fun whenPreviousPhoneNeverRecordedDefaultBrowserThenUnknown() = runTest {
+        transferred.edit().putBoolean(KEY_SEEN, true).commit()
+
+        assertNull(testee.sourceDeviceWasDefaultBrowser())
+    }
+
+    @Test
+    fun whenNotMigratedThenSourceDefaultBrowserUnknown() = runTest {
+        transferred.edit().putBoolean(KEY_DEFAULT_BROWSER, true).commit()
+
+        assertNull(testee.sourceDeviceWasDefaultBrowser())
     }
 
     @Test
@@ -284,6 +339,65 @@ class RealDeviceMigrationTest {
         newInstance().onCreate(mock())
 
         assertFalse(transferred.getBoolean(KEY_SIGNED_IN_TO_SYNC, true))
+    }
+
+    @Test
+    fun whenSyncTurnedOnAfterStartThenStampRefreshedWhenAppGoesToBackground() = runTest {
+        onCreate()
+        assertFalse(transferred.getBoolean(KEY_SIGNED_IN_TO_SYNC, true))
+
+        signedInToSync = true
+        onStop()
+
+        assertTrue(transferred.getBoolean(KEY_SIGNED_IN_TO_SYNC, false))
+    }
+
+    @Test
+    fun whenNotMigratedThenPreviousDeviceHadNoSync() = runTest {
+        assertFalse(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenPreviousPhoneSignedInButNothingToRestoreThenHadNoSync() = runTest {
+        transferFromPhone(signedInToSync = true)
+        assertTrue(testee.isMigratedInstall())
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
+
+        assertFalse(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenSyncFoundToRestoreThenHadSync() = runTest {
+        transferFromPhone(signedInToSync = true)
+        assertTrue(testee.isMigratedInstall())
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, true).commit()
+
+        assertTrue(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenPreviousPhoneSignedInAndRestoreNotCheckedYetThenCountsAsHadSync() = runTest {
+        transferFromPhone(signedInToSync = true)
+        assertTrue(testee.isMigratedInstall())
+
+        assertTrue(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenPreviousPhoneNotSignedInAndRestoreNotCheckedYetThenCountsAsHadSync() = runTest {
+        transferFromPhone(signedInToSync = false)
+        assertTrue(testee.isMigratedInstall())
+
+        assertTrue(testee.previousDeviceHadSync())
+    }
+
+    @Test
+    fun whenPreviousPhoneNotSignedInAndNothingToRestoreThenHadNoSync() = runTest {
+        transferFromPhone(signedInToSync = false)
+        assertTrue(testee.isMigratedInstall())
+        local.edit().putBoolean(KEY_PREVIOUS_DEVICE_HAD_SYNC, false).commit()
+
+        assertFalse(testee.previousDeviceHadSync())
     }
 
     @Test

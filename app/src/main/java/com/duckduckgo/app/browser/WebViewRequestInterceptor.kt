@@ -32,8 +32,6 @@ import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegra
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
@@ -48,13 +46,11 @@ import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
-import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.request.interception.impl.BlocklistVerdict
+import com.duckduckgo.request.interception.impl.RequestExemptions
+import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.tracker.detection.api.TrackerDetector
-import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -93,15 +89,11 @@ class WebViewRequestInterceptor(
     private val trackerDetector: TrackerDetector,
     private val httpsUpgrader: HttpsUpgrader,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao,
-    private val gpc: Gpc,
-    private val userAgentProvider: UserAgentProvider,
     private val adClickManager: AdClickManager,
     private val cloakedCnameDetector: CloakedCnameDetector,
     private val requestFilterer: RequestFilterer,
-    private val requestBlocklist: RequestBlocklist,
-    private val contentBlocking: ContentBlocking,
-    private val trackerAllowlist: TrackerAllowlist,
-    private val userAllowListRepository: UserAllowListRepository,
+    private val requestExemptions: RequestExemptions,
+    private val requestRewriteDecision: RequestRewriteDecision,
     private val duckPlayer: DuckPlayer,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
@@ -165,7 +157,7 @@ class WebViewRequestInterceptor(
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(dispatchers.main()) {
                 webView.settings?.userAgentString = it
-                webView.loadUrl(urlString, getHeaders(request))
+                webView.loadUrl(urlString, requestRewriteDecision.getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -178,7 +170,7 @@ class WebViewRequestInterceptor(
             withContext(dispatchers.main()) {
                 // Must run before loadUrl: the cancelled http request's callbacks must see the upgrade
                 webViewClientListener?.upgradedToHttps()
-                webView.loadUrl(newUri.toString(), getHeaders(request))
+                webView.loadUrl(newUri.toString(), requestRewriteDecision.getHeaders(request))
             }
 
             appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementUpgradeCount() }
@@ -197,17 +189,17 @@ class WebViewRequestInterceptor(
             duckPlayer.intercept(request, url, webView)?.let { return it }
         }
 
-        if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
+        if (url != null && requestRewriteDecision.shouldAddGpcHeaders(request) && !requestWasInTheStack(url, webView)) {
             withContext(dispatchers.main()) {
                 webViewClientListener?.redirectTriggeredByGpc()
-                webView.loadUrl(urlString, getHeaders(request))
+                webView.loadUrl(urlString, requestRewriteDecision.getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
 
         if (documentUri == null) return null
 
-        if (TrustedSites.isTrusted(documentUri)) {
+        if (requestExemptions.isTrusted(documentUri)) {
             return null
         }
 
@@ -215,16 +207,10 @@ class WebViewRequestInterceptor(
             webViewClientListener?.pageHasHttpResources(documentUri)
         }
 
-        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri, url)) {
-            val isContentBlockingException = contentBlocking.isAnException(documentUrlString)
-            val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
-            val isUserAllowlisted = userAllowListRepository.isUriInUserAllowList(documentUri)
-
-            if (!isContentBlockingException && !isInTrackerAllowList && !isUserAllowlisted) {
-                logcat { "Blocking request $url by request blocklist" }
-                return WebResourceResponse(null, null, null)
-            }
-            return null
+        when (requestExemptions.blocklistVerdict(request.isForMainFrame, documentUri, url)) {
+            BlocklistVerdict.BLOCKED -> return WebResourceResponse(null, null, null)
+            BlocklistVerdict.EXEMPTED -> return null
+            BlocklistVerdict.NOT_LISTED -> Unit
         }
 
         return getWebResourceResponse(request, documentUri, webViewClientListener)
@@ -253,7 +239,7 @@ class WebViewRequestInterceptor(
         if (documentUrl == null) return null
         if (request == null) return null
 
-        if (TrustedSites.isTrusted(documentUrl)) {
+        if (requestExemptions.isTrusted(documentUrl)) {
             return null
         }
 
@@ -389,17 +375,6 @@ class WebViewRequestInterceptor(
         return WebResourceResponse(null, null, null)
     }
 
-    private fun getHeaders(request: WebResourceRequest): Map<String, String> {
-        return request.requestHeaders.apply {
-            putAll(gpc.getHeaders(request.url.toString()))
-        }
-    }
-
-    private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
-        val existingHeaders = request.requestHeaders
-        return (request.isForMainFrame && request.method == "GET" && gpc.canUrlAddHeaders(request.url.toString(), existingHeaders))
-    }
-
     private suspend fun requestWasInTheStack(
         url: Uri,
         webView: WebView,
@@ -420,7 +395,7 @@ class WebViewRequestInterceptor(
             if (requestWasInTheStack(url, webView)) return null
             val desktopSiteEnabled = webViewClientListener?.isDesktopSiteEnabled(url.toString()) == true
             val currentAgent = withContext(dispatchers.main()) { webView.settings.userAgentString }
-            val newAgent = userAgentProvider.userAgent(url.toString(), desktopSiteEnabled)
+            val newAgent = requestRewriteDecision.userAgent(url.toString(), desktopSiteEnabled)
             if (currentAgent != newAgent) {
                 newAgent
             } else {

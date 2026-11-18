@@ -20,6 +20,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -134,6 +135,12 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
         } else {
             viewModel.onQuickSetupDefaultBrowserNotSet()
         }
+    }
+
+    // Shared by the role dialog and the system settings fallback: either way the step moves on once the user is
+    // back, whatever they chose there.
+    private val migrationDefaultBrowserPrompt = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        viewModel.onMigrationDefaultBrowserPromptFinished()
     }
 
     private val passwordImportFlow = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -334,6 +341,10 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
             WelcomePageViewModel.Command.LaunchPasswordImport -> passwordImportFlow.launch(
                 globalActivityStarter.startIntent(requireContext(), AutofillImportPasswordsScreen(Onboarding)),
             )
+            is WelcomePageViewModel.Command.ShowMigrationDefaultBrowserDialog -> launchMigrationDefaultBrowserPrompt(command.intent)
+            WelcomePageViewModel.Command.OpenMigrationDefaultBrowserSettings ->
+                launchMigrationDefaultBrowserPrompt(DefaultBrowserSystemSettings.intent())
+            WelcomePageViewModel.Command.FinishToBrowser -> (activity as? OnboardingActivity)?.handOffToBrowserActivity()
         }
     }
 
@@ -377,6 +388,22 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
             // No activity launches, so the resume-driven resync never arrives for this attempt.
             viewModel.syncQuickSetupSwitches()
         }
+    }
+
+    private fun launchMigrationDefaultBrowserPrompt(intent: Intent) {
+        try {
+            migrationDefaultBrowserPrompt.launch(intent)
+        } catch (e: ActivityNotFoundException) {
+            onMigrationDefaultBrowserPromptNotLaunched(e)
+        } catch (e: SecurityException) {
+            onMigrationDefaultBrowserPromptNotLaunched(e)
+        }
+    }
+
+    private fun onMigrationDefaultBrowserPromptNotLaunched(e: Exception) {
+        logcat(WARN) { "Cannot open the default browser prompt: ${e.asLog()}" }
+        // Nothing launched, so no result will arrive to move the step on.
+        viewModel.onMigrationDefaultBrowserPromptFinished()
     }
 
     @SuppressLint("InlinedApi")

@@ -52,8 +52,7 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
 
     private val viewModel by viewModels<PreviousSessionReadyViewModel> {
         val launchSource = syncEntryPoint.toAutoRestorePixelSource()
-        val isAuthRequired = intent.getBooleanExtra(AUTH_REQUIRED_EXTRA_KEY, false)
-        Provider(vmFactory, launchSource, isAuthRequired)
+        Provider(vmFactory, launchSource)
     }
 
     @Inject
@@ -152,16 +151,13 @@ class PreviousSessionReadyActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val ORIGINAL_FLOW_EXTRA_KEY = "original_flow"
-        private const val AUTH_REQUIRED_EXTRA_KEY = "auth_required"
 
         fun intent(
             context: Context,
             syncEntryPoint: SyncEntryPoint,
-            isAuthRequired: Boolean,
         ): Intent {
             return Intent(context, PreviousSessionReadyActivity::class.java).apply {
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
-                putExtra(AUTH_REQUIRED_EXTRA_KEY, isAuthRequired)
             }
         }
     }

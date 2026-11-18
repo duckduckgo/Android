@@ -17,7 +17,6 @@
 package com.duckduckgo.networkprotection.impl.exclusion
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
@@ -34,6 +33,8 @@ import javax.inject.Inject
 
 interface NetPExclusionListRepository {
     suspend fun getExcludedAppPackages(): List<String>
+
+    suspend fun isExcluded(packageName: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -49,17 +50,28 @@ class RealNetPExclusionListRepository @Inject constructor(
     override suspend fun getExcludedAppPackages(): List<String> {
         return withContext(dispatcherProvider.io()) {
             val manuallyExcludedApps = manualExclusionListRepository.getManualAppExclusionList()
-            val autoExcludeApps = if (isAutoExcludeEnabled()) {
-                autoExcludeAppsRepository.getAllIncompatibleApps()
-            } else {
-                emptyList()
-            }
+            val autoExcludeApps = getAutoExcludeApps()
 
             packageManager.safeGetInstalledApplications(context).asSequence()
-                .filter { isExcludedFromVpn(it, manuallyExcludedApps, autoExcludeApps) }
+                .filter { isExcludedFromVpn(it.packageName, manuallyExcludedApps, autoExcludeApps) }
                 .sortedBy { it.name }
                 .map { it.packageName }
                 .toList()
+        }
+    }
+
+    // Callers check one package at a time (often once per installed app), so this must not enumerate installed apps
+    override suspend fun isExcluded(packageName: String): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            isExcludedFromVpn(packageName, manualExclusionListRepository.getManualAppExclusionList(), getAutoExcludeApps())
+        }
+    }
+
+    private suspend fun getAutoExcludeApps(): List<VpnIncompatibleApp> {
+        return if (isAutoExcludeEnabled()) {
+            autoExcludeAppsRepository.getAllIncompatibleApps()
+        } else {
+            emptyList()
         }
     }
 
@@ -68,15 +80,15 @@ class RealNetPExclusionListRepository @Inject constructor(
     }
 
     private fun isExcludedFromVpn(
-        appInfo: ApplicationInfo,
+        packageName: String,
         manualExclusionList: List<NetPManuallyExcludedApp>,
         autoExcludeList: List<VpnIncompatibleApp>,
     ): Boolean {
-        val userExcludedApp = manualExclusionList.find { it.packageId == appInfo.packageName }
+        val userExcludedApp = manualExclusionList.find { it.packageId == packageName }
         if (userExcludedApp != null) {
             return !userExcludedApp.isProtected
         }
 
-        return autoExcludeList.isNotEmpty() && autoExcludeList.any { it.packageName == appInfo.packageName }
+        return autoExcludeList.any { it.packageName == packageName }
     }
 }

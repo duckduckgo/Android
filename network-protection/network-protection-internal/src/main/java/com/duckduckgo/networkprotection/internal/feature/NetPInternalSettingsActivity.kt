@@ -46,20 +46,15 @@ import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInterna
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
 import com.duckduckgo.networkprotection.internal.network.NetPInternalEnvDataStore
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
-import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
-import com.duckduckgo.networkprotection.internal.network.netpGetPcapFile
-import com.duckduckgo.networkprotection.internal.network.netpPcapFileHasContent
 import com.duckduckgo.networkprotection.internal.rekey.DebugRekeyReceiver
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
-import com.google.android.material.snackbar.Snackbar
 import com.wireguard.crypto.KeyPair
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -93,25 +88,6 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val job = ConflatedJob()
-
-    private val exportPcapFile = registerForActivityResult(ExportPcapContract()) { data ->
-        data?.let { uri ->
-            lifecycleScope.launch(dispatcherProvider.io()) {
-                contentResolver.openOutputStream(uri)?.let { out ->
-                    if (netpGetPcapFile().length() > 0) {
-                        val input = FileInputStream(netpGetPcapFile())
-
-                        input.copyTo(out)
-                        out.flush()
-                        out.close()
-                        Snackbar.make(binding.root, "PCAP file exported successfully", Snackbar.LENGTH_LONG).show()
-                    } else {
-                        Snackbar.make(binding.root, "Error: Empty PCAP file", Snackbar.LENGTH_LONG).show()
-                    }
-                } ?: Snackbar.make(binding.root, "Error exporting PCAP file", Snackbar.LENGTH_LONG).show()
-            }
-        } ?: Snackbar.make(binding.root, "Error exporting PCAP file", Snackbar.LENGTH_LONG).show()
-    }
 
     private val binding: ActivityNetpInternalSettingsBinding by viewBinding()
 
@@ -156,9 +132,6 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 val isEnabled = networkProtectionState.isEnabled()
 
                 binding.excludeSystemAppsToggle.isEnabled = isEnabled
-                binding.netpPcapRecordingToggle.isEnabled = isEnabled
-                binding.netpDevSettingHeaderPCAPDeleteItem.isEnabled = isEnabled && !netPInternalFeatureToggles.enablePcapRecording().isEnabled()
-                binding.netpSharePcapFileItem.isEnabled = isEnabled && !netPInternalFeatureToggles.enablePcapRecording().isEnabled()
                 binding.systemAppsItem.isEnabled = isEnabled && !netPInternalFeatureToggles.excludeSystemApps().isEnabled()
                 binding.overrideMtuSelector.isEnabled = isEnabled
                 binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
@@ -222,28 +195,6 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.systemAppsItem.setOnClickListener {
             startActivity(NetPSystemAppsExclusionListActivity.intent(this))
-        }
-
-        with(netPInternalFeatureToggles.enablePcapRecording()) {
-            binding.netpPcapRecordingToggle.setIsChecked(this.isEnabled())
-            binding.netpPcapRecordingToggle.setOnCheckedChangeListener { _, isChecked ->
-                this.setRawStoredState(Toggle.State(enable = isChecked))
-                networkProtectionState.restart()
-            }
-        }
-        binding.netpDevSettingHeaderPCAPDeleteItem.setOnClickListener {
-            if (this.netpDeletePcapFile()) {
-                Snackbar.make(binding.root, "Pcap file deleted", Snackbar.LENGTH_LONG).show()
-            } else {
-                Snackbar.make(binding.root, "Pcap file doesn't exist", Snackbar.LENGTH_LONG).show()
-            }
-        }
-        binding.netpSharePcapFileItem.setOnClickListener {
-            if (this.netpPcapFileHasContent()) {
-                exportPcapFile.launch(null)
-            } else {
-                Snackbar.make(binding.root, "Pcap file doesn't exist", Snackbar.LENGTH_LONG).show()
-            }
         }
 
         binding.forceRekey.setClickListener {

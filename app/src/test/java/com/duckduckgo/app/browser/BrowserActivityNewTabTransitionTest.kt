@@ -124,6 +124,7 @@ class BrowserActivityNewTabTransitionTest {
         setField("newTabTransitionConfig", NewTabTransitionConfig.DEFAULT)
         whenever(adapter.itemCount).thenAnswer { listed.size }
         whenever(adapter.getTabIdAtPosition(any())).thenAnswer { listed.getOrNull(it.getArgument(0)) }
+        whenever(adapter.getPositionOfTab(any())).thenAnswer { listed.indexOf(it.getArgument<String>(0)) }
         coordinator.onBrowserResumed()
     }
 
@@ -363,6 +364,17 @@ class BrowserActivityNewTabTransitionTest {
         pending.register(ADDED, readyTransition())
 
         invoke("onMoveToTabRequested", Int::class.javaPrimitiveType!! to listed.indexOf(ADDED))
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(player).play(eq(pager), any(), any(), any())
+    }
+
+    @Test
+    fun movingThePagerToTheNewTabByIdPlaysItsTransition() {
+        host.setContentView(pager)
+        pending.register(ADDED, readyTransition())
+
+        invoke("onMoveToTabRequested", String::class.java to ADDED)
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(player).play(eq(pager), any(), any(), any())

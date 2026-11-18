@@ -196,6 +196,7 @@ class PirWebGetDataBrokersMessageHandlerTest {
     fun whenProcessWithRemovedMirrorSitesThenExcludesRemovedSites() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_DATA_BROKERS)
+        val parentBroker = createBrokerObject("ParentBroker", "https://parent.com", null)
         val activeMirror =
             createMirrorSite("ActiveMirror", "https://active.com", "ParentBroker", removedAt = 0L)
         val removedMirror = createMirrorSite(
@@ -204,7 +205,7 @@ class PirWebGetDataBrokersMessageHandlerTest {
             "ParentBroker",
             removedAt = 123456L,
         )
-        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker))
         whenever(mockRepository.getAllMirrorSites()).thenReturn(listOf(activeMirror, removedMirror))
         whenever(mockRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
 
@@ -214,13 +215,40 @@ class PirWebGetDataBrokersMessageHandlerTest {
         // Then
         val expectedBrokers = listOf(
             ExpectedDataBroker(
+                url = "https://parent.com",
+                name = "ParentBroker",
+                parentURL = null,
+                optOutUrl = null,
+            ),
+            ExpectedDataBroker(
                 url = "https://active.com",
                 name = "ActiveMirror",
-                parentURL = null, // No parent broker object, so parentURL will be null
+                parentURL = "https://parent.com",
                 optOutUrl = null,
             ),
         )
         verifyDataBrokersResponse(jsMessage, expectedBrokers = expectedBrokers)
+    }
+
+    @Test
+    fun whenScanAndOptOutAndMirrorParentIsNotActiveThenMirrorIsOmitted() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_DATA_BROKERS)
+        val activeBroker = createBrokerObject("ActiveBroker", "https://active.com", null)
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(activeBroker))
+        whenever(mockRepository.getAllMirrorSites()).thenReturn(
+            listOf(
+                createMirrorSite("ActiveMirror", "https://activemirror.com", "ActiveBroker", removedAt = 0L),
+                createMirrorSite("OrphanedMirror", "https://orphanedmirror.com", "RemovedBroker", removedAt = 0L),
+            ),
+        )
+        whenever(mockRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verifyDataBrokerNames(listOf("ActiveBroker", "ActiveMirror"))
     }
 
     @Test

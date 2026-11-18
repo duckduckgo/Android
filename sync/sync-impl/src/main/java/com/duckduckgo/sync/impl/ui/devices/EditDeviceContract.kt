@@ -30,7 +30,6 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
         return EditDeviceActivity.intent(
             context = context,
             device = ParcelableDevice.fromConnectedDevice(input.device),
-            isImprovedSyncFlow = input.isImprovedSyncFlow,
         )
     }
 
@@ -53,7 +52,6 @@ class EditDeviceContract : ActivityResultContract<EditDeviceContract.Input, Edit
 
     data class Input(
         val device: ConnectedDevice,
-        val isImprovedSyncFlow: Boolean,
     )
 
     sealed interface Output {

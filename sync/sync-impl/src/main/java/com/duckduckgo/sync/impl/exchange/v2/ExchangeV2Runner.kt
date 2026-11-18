@@ -1071,14 +1071,7 @@ class RealExchangeV2Runner @Inject constructor(
         return negotiatedVersion
     }
 
-    /**
-     * Null when this device does not authenticate exchange endpoints. The decision is made once per session, at
-     * bootstrap: a channel created without a secret can never start presenting one, since the relay would reject
-     * a header the channel was not claimed with.
-     */
-    private fun generateChannelSecret(): String? {
-        val authenticate = advertisedVersion >= ExchangeProtocolVersion.V2_1 || syncFeature.canSendExchangeChannelSecret().isEnabled()
-        if (!authenticate) return null
+    private fun generateChannelSecret(): String {
         return Base64.getUrlEncoder()
             .withoutPadding()
             .encodeToString(jweCrypto.generateSecureBytes(CHANNEL_SECRET_SIZE))

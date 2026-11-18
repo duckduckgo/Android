@@ -61,6 +61,13 @@ interface AutoconsentFeature {
     fun heuristicAction(): Toggle
 
     /**
+     * Enables autoconsent heuristic hit-testing, which probes the viewport for cookie popups
+     * that aren't fixed, sticky or dialog-like. Only applies when heuristic detection is active.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun heuristicHitTest(): Toggle
+
+    /**
      * Makes autoconsent also wait for DOM changes while it checks whether a popup is open,
      * so that popups that render late are found.
      */

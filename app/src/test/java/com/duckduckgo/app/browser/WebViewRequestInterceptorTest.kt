@@ -53,6 +53,8 @@ import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.request.interception.impl.RequestExemptions
+import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -114,15 +116,19 @@ class WebViewRequestInterceptorTest {
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
-            gpc = mockGpc,
-            userAgentProvider = mockUserAgentProvider,
+            requestRewriteDecision = RequestRewriteDecision(
+                gpc = mockGpc,
+                userAgentProvider = mockUserAgentProvider,
+            ),
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
-            requestBlocklist = mockRequestBlocklist,
-            contentBlocking = mockContentBlocking,
-            trackerAllowlist = mockTrackerAllowlist,
-            userAllowListRepository = mockUserAllowListRepository,
+            requestExemptions = RequestExemptions(
+                requestBlocklist = mockRequestBlocklist,
+                contentBlocking = mockContentBlocking,
+                trackerAllowlist = mockTrackerAllowlist,
+                userAllowListRepository = mockUserAllowListRepository,
+            ),
             duckPlayer = mockDuckPlayer,
             maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteBlockerWebViewIntegration,
             dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -262,15 +268,19 @@ class WebViewRequestInterceptorTest {
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
-            gpc = mockGpc,
-            userAgentProvider = mockUserAgentProvider,
+            requestRewriteDecision = RequestRewriteDecision(
+                gpc = mockGpc,
+                userAgentProvider = mockUserAgentProvider,
+            ),
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
-            requestBlocklist = mockRequestBlocklist,
-            contentBlocking = mockContentBlocking,
-            trackerAllowlist = mockTrackerAllowlist,
-            userAllowListRepository = mockUserAllowListRepository,
+            requestExemptions = RequestExemptions(
+                requestBlocklist = mockRequestBlocklist,
+                contentBlocking = mockContentBlocking,
+                trackerAllowlist = mockTrackerAllowlist,
+                userAllowListRepository = mockUserAllowListRepository,
+            ),
             duckPlayer = mockDuckPlayer,
             maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteBlockerWebViewIntegration,
             dispatchers = coroutineTestRule.testDispatcherProvider,

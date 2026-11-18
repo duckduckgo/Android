@@ -15,7 +15,6 @@
   -->
 
 <resources>
-    <string name="activityPirDashboard" translatable="false">PIR</string>
     <string name="pirFeatureName" translatable="false">Personal Information Removal</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>

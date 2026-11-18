@@ -1,7 +1,7 @@
 {
   "name": "United States Phone Book",
   "url": "unitedstatesphonebook.com",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "addedDatetime": 1790121600000,
   "optOutUrl": "https://www.unitedstatesphonebook.com/search.php",
   "steps": [
@@ -13,6 +13,17 @@
           "actionType": "navigate",
           "id": "d26cada7-9968-4285-a909-ed95bbfbdff0",
           "url": "https://www.unitedstatesphonebook.com/search.php?first=${firstName}&last=${lastName}&city=${city}&state=${state}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for the Cloudflare managed challenge to clear; the negative selector passes only once the challenge scripts are gone",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-fe550519-6bd6-4521-906b-0e22ca6ca837"
         },
         {
           "_comment": "guard on the results row shape or the explicit no-results banner, not something present on every page state",
@@ -55,6 +66,17 @@
           "actionType": "navigate",
           "id": "35751f3d-27db-49c9-8242-5a31d848f9e8",
           "url": "https://www.unitedstatesphonebook.com/search.php?first=${firstName}&last=${lastName}&city=${city}&state=${state}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for the Cloudflare managed challenge to clear; the negative selector passes only once the challenge scripts are gone",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-be666461-753e-41e0-a7c1-34dfa6e9558c"
         },
         {
           "_comment": "guard on the results row shape or the explicit no-results banner, not something present on every page state",
@@ -140,7 +162,7 @@
     }
   ],
   "schedulingConfig": {
-    "retryError": 168,
+    "retryError": 96,
     "confirmOptOutScan": 72,
     "maintenanceScan": 240,
     "maxAttempts": -1

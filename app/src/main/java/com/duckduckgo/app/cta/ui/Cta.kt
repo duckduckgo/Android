@@ -25,6 +25,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
@@ -32,8 +33,10 @@ import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
@@ -1016,6 +1019,73 @@ abstract class DaxBubbleCta(
         container.post { applyFit() }
     }
 
+    /**
+     * The bubble's views are shared by every CTA shown in it, so styles and spacing a CTA changes in
+     * [configureContentViews] are put back to what the layout gave them before the next CTA configures them.
+     */
+    @VisibleForTesting
+    internal fun resetContentStyle(container: View) {
+        @Suppress("UNCHECKED_CAST")
+        val restore = container.getTag(R.id.brandDesignCardContainer) as? () -> Unit
+            ?: captureContentStyle(container).also { container.setTag(R.id.brandDesignCardContainer, it) }
+        restore()
+    }
+
+    private fun captureContentStyle(container: View): () -> Unit {
+        val titleView = container.findViewById<TextView>(R.id.brandDesignTitle)
+        val restorers = buildList {
+            listOfNotNull(
+                titleView,
+                container.findViewById<TextView>(R.id.brandDesignHiddenTitle),
+                container.findViewById<TextView>(R.id.brandDesignDescription),
+            ).forEach { add(it.captureTextStyle()) }
+            listOfNotNull(
+                titleView?.parent as? View,
+                container.findViewById(R.id.brandDesignDescription),
+                container.findViewById(R.id.primaryCta),
+                container.findViewById<View>(R.id.brandDesignDismissButton),
+            ).forEach { view -> view.captureMargins()?.let { add(it) } }
+            container.findViewById<View>(R.id.brandDesignCardContainer)?.let { add(it.capturePadding()) }
+        }
+        return { restorers.forEach { it() } }
+    }
+
+    private fun TextView.captureTextStyle(): () -> Unit {
+        val size = textSize
+        val face = typeface
+        val extra = lineSpacingExtra
+        val multiplier = lineSpacingMultiplier
+        return {
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
+            typeface = face
+            setLineSpacing(extra, multiplier)
+        }
+    }
+
+    private fun View.captureMargins(): (() -> Unit)? {
+        val params = layoutParams as? ViewGroup.MarginLayoutParams ?: return null
+        val start = params.marginStart
+        val top = params.topMargin
+        val end = params.marginEnd
+        val bottom = params.bottomMargin
+        return {
+            updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                marginStart = start
+                topMargin = top
+                marginEnd = end
+                bottomMargin = bottom
+            }
+        }
+    }
+
+    private fun View.capturePadding(): () -> Unit {
+        val start = paddingStart
+        val top = paddingTop
+        val end = paddingEnd
+        val bottom = paddingBottom
+        return { setPaddingRelative(start, top, end, bottom) }
+    }
+
     private fun resetAllIncludesExcept(view: View, active: List<View>) {
         getAllContentIncludes(view).forEach { include ->
             if (active.contains(include)) {
@@ -1190,6 +1260,7 @@ abstract class DaxBubbleCta(
                         resetAllIncludesExcept(container, activeIncludes)
                         resetHeaderState()
                         resetTextAlignment()
+                        resetContentStyle(container)
                         configureContentViews(container)
                         applyWavingDaxState(container, wavingDax)
                         // Blank the title so typing (or snapped settled state) shows new text, not stale.
@@ -1210,6 +1281,7 @@ abstract class DaxBubbleCta(
             descriptionView.text = descriptionText
             resetHeaderState()
             resetTextAlignment()
+            resetContentStyle(container)
             configureContentViews(container)
             applyWavingDaxState(container, wavingDax)
             cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
