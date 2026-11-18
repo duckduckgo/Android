@@ -192,7 +192,8 @@ android {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
         unitTests.all {
-            jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1'
+            // TieredStopAtLevel=1 on its own shrinks the code cache to 48 MB, and Robolectric sandboxes can fill that.
+            jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1', '-XX:ReservedCodeCacheSize=256m'
             maxHeapSize = "2g"
             forkEvery = 100
         }
