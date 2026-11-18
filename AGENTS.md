@@ -37,7 +37,8 @@ Adding or changing a pixel or the pixel registry also requires privacy triage �
 ## Read these when the situation applies
 
 These files are not in context. Read the whole file before doing the work it covers — don't rely on
-what you remember of it.
+what you remember of it. Claude Code loads the `.claude/rules/` files on its own when you touch the paths
+they cover, so don't read one again if it's already in your context; other agents read them from this table.
 
 | Read | When |
 |---|---|
@@ -53,6 +54,9 @@ what you remember of it.
 | `.claude/docs/url-classification.md` | routing typed input to navigation vs search — use `QueryUrlPredictor`, not `UriString.isWebUrl()` |
 | `.claude/docs/icons.md` | the change needs an icon the project doesn't have yet — it must be fetched from the internal Icons repository, never invented |
 | `.claude/docs/translations.md` | adding or changing any user-facing string — `donottranslate.xml` vs `strings-<module>.xml`, placeholder/`instruction` rules, how to change or remove already-translated copy |
+| `.claude/rules/maestro-ui-tests.md` | writing or running a Maestro flow under `.maestro/`: build type, onboarding, shared flows |
+| `.claude/rules/pixel-definitions.md` | adding or editing a pixel or wide event definition under `PixelDefinitions/pixels/` |
+| `.claude/rules/wide-events.md` | working on a wide event (`**/wideevents/**`, `*WideEvent*.kt`), including when to use one instead of a pixel |
 
 ---
 
