@@ -107,13 +107,11 @@ class RealReinstallDetector @Inject constructor(
         }.getOrDefault(CheckOutcome(isReinstall = false, answerSaved = false))
     }
 
-    // Keeps the two marker writers (after a new-install check, and on app start) from writing at once
     private val markerWriteMutex = Mutex()
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sdkInt >= 30) {
-                // An earlier launch may have ended after its check but before the user saw the app, with the folder still to create
                 createDownloadsFolderIfPending()
             } else {
                 // Below Android 11 a later reinstall is only detected if this install wrote the Block Store flag. Installs from
@@ -181,10 +179,10 @@ class RealReinstallDetector @Inject constructor(
         else -> "10+"
     }
 
-    // Both markers outlive a wipe of the app's data, so they are only written once the user has seen the app. Samsung's Galaxy
-    // Store launches the app out of sight while installing it and then wipes its data: a marker written by that launch would
-    // make the user's first real launch look like a reinstall.
-    // Checked again after waiting: the other writer may have written the marker in the meantime
+    // Both markers outlive a wipe of the app's data, so they are only written once the user has seen the app. Some stores (Galaxy
+    // Store is one we have seen) launch the app out of sight while installing it and then wipe its data, and a marker written by
+    // that launch would make the first real launch look like a reinstall. Re-checked after waiting: the other writer may have
+    // written the marker in the meantime.
     private suspend fun writeMarkerOnceLaunchIsVisible(isPending: suspend () -> Boolean, write: suspend () -> Unit) {
         if (!isPending()) return
         visibleLaunchDetector.awaitVisibleLaunch()
