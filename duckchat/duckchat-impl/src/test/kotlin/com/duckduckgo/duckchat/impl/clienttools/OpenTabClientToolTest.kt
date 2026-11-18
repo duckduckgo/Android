@@ -109,7 +109,7 @@ class OpenTabClientToolTest {
 
     @Test
     fun whenAllowedThenOpensTheAllowedUrlInANewSelectedTabAndClosesTheChatSheet() = runTest {
-        whenever(regularTabs.add(url = "https://example.com/a?b=c", skipHome = false)).thenReturn(NEW_TAB)
+        whenever(regularTabs.add(url = "https://example.com/a?b=c", skipHome = true)).thenReturn(NEW_TAB)
         val closed = mutableListOf<String>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { sheetCloseRequests.tabIds.toList(closed) }
         val input = JSONObject().put("url", "https://example.com/a?b=c")
