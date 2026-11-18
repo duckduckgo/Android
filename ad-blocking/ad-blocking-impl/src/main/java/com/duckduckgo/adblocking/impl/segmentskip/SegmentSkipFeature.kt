@@ -31,4 +31,7 @@ interface SegmentSkipFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun mvpEnabled(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun softLaunchEnabled(): Toggle
 }
