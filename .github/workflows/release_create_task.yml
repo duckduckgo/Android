@@ -84,6 +84,15 @@ jobs:
           mattermost-message: ${{env.emoji_info}} Release task created successfully ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
           action: 'send-mattermost-message'
 
+      - name: Find GitHub actor's Asana ID
+        if: ${{ failure() }}
+        id: get-asana-user-id
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
+        with:
+          action: 'get-asana-user-id'
+          github-username: ${{ github.actor }}
+          github-pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
+
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         uses: duckduckgo/native-github-asana-sync@v2.8.0
@@ -93,6 +102,7 @@ jobs:
           asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Create Android App Release Task
           asana-task-description: The Create Android App Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-assignee: ${{ steps.get-asana-user-id.outputs.asanaUserId }}
           action: 'create-asana-task'
 
       - name: Notify Mattermost when workflow failed

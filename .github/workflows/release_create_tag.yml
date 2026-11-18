@@ -61,14 +61,14 @@ jobs:
             echo "::error::No LGC tag found. Ensure the nightly orchestrator has completed successfully at least once."
             exit 1
           fi
-          echo "lgc_tag=$output" >> $GITHUB_OUTPUT
+          echo "lgc_tag=$output" >> "$GITHUB_OUTPUT"
 
       - name: Check for production release on LGC commit
         id: check_production_release
         run: |
-          lgc_commit=$(git rev-list -n 1 ${{ steps.get_lgc_tag.outputs.lgc_tag }})
+          lgc_commit=$(git rev-list -n 1 "${{ steps.get_lgc_tag.outputs.lgc_tag }}")
           
-          all_tags=$(git tag --points-at $lgc_commit)
+          all_tags=$(git tag --points-at "$lgc_commit")
           
           # Find production release tag (X.Y.Z format only)
           release_tag=$(echo "$all_tags" | grep -E "^[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1 || true)
@@ -109,6 +109,15 @@ jobs:
           mattermost-message: ${{env.emoji_info}} Release ${{ inputs.app-version }}. Tag created https://github.com/duckduckgo/Android/releases/tag/${{ inputs.app-version }}
           action: 'send-mattermost-message'
 
+      - name: Find GitHub actor's Asana ID
+        if: ${{ failure() }}
+        id: get-asana-user-id
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
+        with:
+          action: 'get-asana-user-id'
+          github-username: ${{ github.actor }}
+          github-pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
+
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
@@ -119,6 +128,7 @@ jobs:
           asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Tag Android Release
           asana-task-description: Tag Android Release has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-assignee: ${{ steps.get-asana-user-id.outputs.asanaUserId }}
           action: 'create-asana-task'
 
       - name: Notify Mattermost when workflow failed
