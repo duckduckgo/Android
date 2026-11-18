@@ -24,9 +24,9 @@ import com.duckduckgo.app.trackerdetection.api.RealTrackerStatsWriter.Companion.
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
-import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -134,7 +134,7 @@ class RealTrackerStatsWriterTest {
     }
 
     @Test
-    fun whenAllHistoryDeletedThenQueuedAndPersistedHistoryIsDroppedButCountsAreKept() = coroutineRule.testScope.runTest {
+    fun whenAllHistoryDeletedThenQueuedAndPersistedHistoryIsDroppedButCountsAreKept() {
         testee.recordBlockedHistory("https://tracker.com/a.js", "Tracker Inc")
         testee.incrementBlockedCount()
         testee.incrementNetworkCount("Tracker Inc")
@@ -142,7 +142,7 @@ class RealTrackerStatsWriterTest {
         testee.recordBlockedHistory("https://tracker.com/b.js", "Tracker Inc")
         testee.incrementBlockedCount()
 
-        testee.deleteAllHistory()
+        runBlocking { testee.deleteAllHistory() }
         advance(FLUSH_WINDOW_MS)
 
         assertTrue(historyRows().isEmpty())
