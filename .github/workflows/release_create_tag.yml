@@ -61,14 +61,14 @@ jobs:
             echo "::error::No LGC tag found. Ensure the nightly orchestrator has completed successfully at least once."
             exit 1
           fi
-          echo "lgc_tag=$output" >> $GITHUB_OUTPUT
+          echo "lgc_tag=$output" >> "$GITHUB_OUTPUT"
 
       - name: Check for production release on LGC commit
         id: check_production_release
         run: |
-          lgc_commit=$(git rev-list -n 1 ${{ steps.get_lgc_tag.outputs.lgc_tag }})
+          lgc_commit=$(git rev-list -n 1 "${{ steps.get_lgc_tag.outputs.lgc_tag }}")
           
-          all_tags=$(git tag --points-at $lgc_commit)
+          all_tags=$(git tag --points-at "$lgc_commit")
           
           # Find production release tag (X.Y.Z format only)
           release_tag=$(echo "$all_tags" | grep -E "^[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1 || true)
