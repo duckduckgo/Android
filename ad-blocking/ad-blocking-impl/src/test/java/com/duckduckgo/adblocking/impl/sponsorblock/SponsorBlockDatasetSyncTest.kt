@@ -86,9 +86,9 @@ class SponsorBlockDatasetSyncTest {
     @Test fun binaryRequestUsesHashPrefixEndpoint() {
         val service = Retrofit.Builder().baseUrl("https://duckduckgo.com/").build().create(SponsorBlockDatasetService::class.java)
         val url = service.binaryHashPrefixes(42).request().url
-        assertEquals("/sponsorblock/v1/hashPrefix", url.encodedPath)
-        assertEquals("binary", url.queryParameter("format"))
-        assertEquals("1", url.queryParameter("version"))
+        assertEquals("protection.duckduckgo.com", url.host)
+        assertEquals("/api/protection/segments/v1/android/hashPrefix", url.encodedPath)
+        assertEquals(setOf("revision"), url.queryParameterNames)
         assertEquals("42", url.queryParameter("revision"))
     }
 

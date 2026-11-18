@@ -28,10 +28,10 @@ import retrofit2.http.Streaming
 import retrofit2.http.Query as HttpQuery
 
 interface SponsorBlockDatasetService {
-    @GET("https://duckduckgo.com/sponsorblock/v1" + "/revision")
+    @GET("https://protection.duckduckgo.com/api/protection/segments/v1/android" + "/revision")
     suspend fun revision(): SponsorBlockRevisionResponse
 
-    @GET("https://duckduckgo.com/sponsorblock/v1" + "/hashPrefix?format=binary&version=1")
+    @GET("https://protection.duckduckgo.com/api/protection/segments/v1/android" + "/hashPrefix")
     @Streaming
     fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): Call<ResponseBody>
 }
