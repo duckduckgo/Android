@@ -2535,6 +2535,10 @@ class BrowserTabFragment :
         (activity as? CustomTabActivity)?.finish()
     }
 
+    private fun leaveTabAfterHandoff() {
+        if (tabDisplayedInCustomTabScreen) finishCustomTab() else viewModel.closeCurrentTab()
+    }
+
     private fun onBypassMaliciousWarning(
         url: Uri,
         feed: Feed,
@@ -2941,8 +2945,7 @@ class BrowserTabFragment :
             is Command.OpenAppLink -> {
                 val launched = openAppLink(it.appLink)
                 if (launched) {
-                    if (it.finishCustomTabOnLaunch) finishCustomTab()
-                    if (it.closeTabOnLaunch) viewModel.closeCurrentTab()
+                    if (it.leaveTabOnLaunch) leaveTabAfterHandoff()
                 }
             }
 
@@ -2955,9 +2958,8 @@ class BrowserTabFragment :
                     headers = it.headers,
                     showConfirmation = it.showConfirmation,
                     trustedCallerPackage = it.trustedCallerPackage,
-                    finishCustomTabOnTrustedCallerLaunch = it.finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly = it.trustedCallerOnly,
-                    closeTabOnTrustedCallerLaunch = it.closeTabOnTrustedCallerLaunch,
+                    leaveTabOnTrustedCallerLaunch = it.leaveTabOnTrustedCallerLaunch,
                 )
             }
 
@@ -3518,9 +3520,8 @@ class BrowserTabFragment :
         headers: Map<String, String> = emptyMap(),
         showConfirmation: Boolean = true,
         trustedCallerPackage: String? = null,
-        finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
-        closeTabOnTrustedCallerLaunch: Boolean = false,
+        leaveTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         context?.let {
             val pm = it.packageManager
@@ -3594,10 +3595,9 @@ class BrowserTabFragment :
                     viewModel.linkOpenedInNewTab(),
                     showConfirmation,
                     trustedCallerPackage,
-                    finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly,
                     fallbackUrl,
-                    closeTabOnTrustedCallerLaunch,
+                    leaveTabOnTrustedCallerLaunch,
                 )
             }
         }
@@ -3612,10 +3612,9 @@ class BrowserTabFragment :
         isOpenedInNewTab: Boolean,
         showConfirmation: Boolean = true,
         trustedCallerPackage: String? = null,
-        finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
         fallbackUrl: String? = null,
-        closeTabOnTrustedCallerLaunch: Boolean = false,
+        leaveTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
@@ -3636,7 +3635,7 @@ class BrowserTabFragment :
                 useFirstActivityFound = useFirstActivityFound,
                 showConfirmation = showConfirmation,
                 trustedCallerIntent = trustedCallerIntent,
-                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch || closeTabOnTrustedCallerLaunch,
+                finishCustomTabOnTrustedCallerLaunch = leaveTabOnTrustedCallerLaunch,
             )
 
             val resolvedIntent = if (launch.useChooser) {
@@ -3651,9 +3650,7 @@ class BrowserTabFragment :
                 launchExternalAppDialog(context) { context.startActivity(resolvedIntent) }
             } else {
                 context.startActivity(resolvedIntent)
-                if (launch.finishCustomTab) {
-                    if (isActiveCustomTab()) finishCustomTab() else viewModel.closeCurrentTab()
-                }
+                if (launch.finishCustomTab) leaveTabAfterHandoff()
             }
         }.onFailure { exception ->
             logcat(ERROR) { "Failed to launch external app: ${exception.asLog()}" }

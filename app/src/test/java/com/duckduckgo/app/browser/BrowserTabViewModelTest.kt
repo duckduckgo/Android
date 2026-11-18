@@ -7399,7 +7399,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
         assertCommandNotIssued<Command.ShowAppLinkPrompt>()
     }
@@ -7922,7 +7922,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.example.origin"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertTrue(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertTrue(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7933,7 +7933,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.example.origin"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertFalse(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertFalse(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7944,7 +7944,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.google.android.youtube"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertFalse(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertFalse(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7955,7 +7955,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -7965,7 +7965,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -7976,7 +7976,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertFalse(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertFalse(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -8121,7 +8121,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8135,7 +8135,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertTrue(finishCustomTabOnLaunch)
+            assertTrue(leaveTabOnLaunch)
         }
     }
 
@@ -8149,7 +8149,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8164,7 +8164,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8314,7 +8314,7 @@ class BrowserTabViewModelTest {
             mockAppLinksHandler,
         ).handleAppLink(eq(true), eq(urlType), eq(false), eq("com.example.app"), eq(false), any(), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink> { assertTrue(finishCustomTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertTrue(leaveTabOnLaunch) }
         assertCommandNotIssued<Command.ShowAppLinkPrompt>()
     }
 
@@ -8399,7 +8399,7 @@ class BrowserTabViewModelTest {
             assertTrue(trustedCallerOnly)
             assertFalse(showConfirmation)
             assertEquals("com.example.app", trustedCallerPackage)
-            assertTrue(finishCustomTabOnTrustedCallerLaunch)
+            assertTrue(leaveTabOnTrustedCallerLaunch)
         }
         assertCommandNotIssued<NavigationCommand.Navigate>()
     }
@@ -8585,7 +8585,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType, hasGesture = false))
         assertCommandIssued<Command.HandleNonHttpAppLink> {
-            assertTrue(this.finishCustomTabOnTrustedCallerLaunch)
+            assertTrue(this.leaveTabOnTrustedCallerLaunch)
         }
     }
 
@@ -8598,7 +8598,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType, hasGesture = false))
         assertCommandIssued<Command.HandleNonHttpAppLink> {
-            assertFalse(this.finishCustomTabOnTrustedCallerLaunch)
+            assertFalse(this.leaveTabOnTrustedCallerLaunch)
         }
     }
 
