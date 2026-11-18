@@ -240,9 +240,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
         listOf(R.id.labelVoice, R.id.labelCreateImage, R.id.labelTakePhoto).forEach {
             remoteViews.tintText(it, colors.onContainer)
         }
-        listOf(R.id.promptBarHint, R.id.chatsMessageEmpty).forEach {
-            remoteViews.tintText(it, colors.hint)
-        }
+        remoteViews.tintText(R.id.promptBarHint, colors.hint)
         remoteViews.tintText(R.id.chatsViewAll, colors.text)
         listOf(R.id.dividerTop, R.id.dividerBottom).forEach {
             remoteViews.tint(it, colors.divider)

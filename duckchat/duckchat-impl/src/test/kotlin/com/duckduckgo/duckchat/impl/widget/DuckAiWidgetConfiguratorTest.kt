@@ -433,9 +433,7 @@ class DuckAiWidgetConfiguratorTest {
         listOf(R.id.labelVoice, R.id.labelCreateImage, R.id.labelTakePhoto).forEach {
             verify(remoteViews).setColorStateList(it, TEXT_COLOR, onContainer)
         }
-        listOf(R.id.promptBarHint, R.id.chatsMessageUnavailable).forEach {
-            verify(remoteViews).setColorStateList(it, TEXT_COLOR, hint)
-        }
+        verify(remoteViews).setColorStateList(R.id.promptBarHint, TEXT_COLOR, hint)
         verify(remoteViews).setColorStateList(R.id.chatsViewAll, TEXT_COLOR, text)
         listOf(R.id.dividerTop, R.id.dividerBottom).forEach {
             verifyBackgroundTint(it, divider)
