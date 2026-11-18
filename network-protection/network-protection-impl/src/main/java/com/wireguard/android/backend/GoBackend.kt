@@ -91,17 +91,25 @@ class GoBackend @Inject constructor(
         @Suppress("ktlint:standard:comment-wrapping")
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return true
 
+        val flow = FlowOwners.Flow(protocol, saddr, sport, daddr, dport)
+        if (flowOwners.isBlocked(flow, sni)) {
+            logcat { "$sni ($saddr:$sport > $daddr:$dport) already blocked on this connection" }
+            return false
+        }
+
         val lookedUp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             getUidQ(protocol, saddr, sport, daddr, dport)
         } else {
             uid
         }
-        val owner = flowOwners.ownerOf(FlowOwners.Flow(protocol, saddr, sport, daddr, dport), lookedUp)
+        val owner = flowOwners.ownerOf(flow, lookedUp)
         if (owner != lookedUp) {
             logcat { "Owner of $sni ($saddr:$sport > $daddr:$dport) is gone (uid $lookedUp), using uid $owner" }
         }
 
-        return shouldAllowDomain(sni, owner)
+        return shouldAllowDomain(sni, owner).also { allowed ->
+            if (!allowed) flowOwners.block(flow, sni)
+        }
     }
 
     // Called from native code

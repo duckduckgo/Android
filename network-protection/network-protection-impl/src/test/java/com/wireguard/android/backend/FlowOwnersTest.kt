@@ -18,6 +18,8 @@ package com.wireguard.android.backend
 
 import com.wireguard.android.backend.FlowOwners.Flow
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FlowOwnersTest {
@@ -53,6 +55,40 @@ class FlowOwnersTest {
 
         assertEquals(0, flowOwners.ownerOf(flow, 0))
         assertEquals(10195, flowOwners.ownerOf(flow.copy(sport = 40002), 0))
+    }
+
+    @Test
+    fun whenAConnectionIsBlockedThenItsRetransmittedHelloIsBlocked() {
+        flowOwners.ownerOf(flow, 10193)
+        flowOwners.block(flow, "app.adjust.com")
+
+        assertTrue(flowOwners.isBlocked(flow, "app.adjust.com"))
+    }
+
+    @Test
+    fun whenAConnectionIsNotBlockedThenItsHelloIsJudged() {
+        flowOwners.ownerOf(flow, 10193)
+
+        assertFalse(flowOwners.isBlocked(flow, "app.adjust.com"))
+    }
+
+    @Test
+    fun whenAConnectionIsBlockedThenAnotherServerNameOnItIsJudged() {
+        flowOwners.ownerOf(flow, 10193)
+        flowOwners.block(flow, "app.adjust.com")
+
+        assertFalse(flowOwners.isBlocked(flow, "example.com"))
+        assertFalse(flowOwners.isBlocked(flow.copy(sport = 40001), "app.adjust.com"))
+    }
+
+    @Test
+    fun whenABlockedConnectionIsForgottenThenItsHelloIsJudgedAgain() {
+        flowOwners.ownerOf(flow, 10193)
+        flowOwners.block(flow, "app.adjust.com")
+        flowOwners.ownerOf(flow.copy(sport = 40001), 10194)
+        flowOwners.ownerOf(flow.copy(sport = 40002), 10195)
+
+        assertFalse(flowOwners.isBlocked(flow, "app.adjust.com"))
     }
 
     private companion object {

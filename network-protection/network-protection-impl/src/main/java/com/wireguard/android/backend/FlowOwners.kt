@@ -17,23 +17,35 @@
 package com.wireguard.android.backend
 
 /**
- * Remembers which app owns each connection. Once an app closes its socket the kernel can no longer name the owner
- * (uid 0, or -1 when not found), yet it still retransmits the unacknowledged ClientHello; that packet must be judged
- * as the app's, like the ones before it.
+ * Remembers which app owns each connection, and the server name it was blocked for. Once an app closes its socket
+ * the kernel can no longer name the owner (uid 0, or -1 when not found), yet it still retransmits the unacknowledged
+ * ClientHello; that packet must be judged as the app's, like the ones before it. A retransmitted hello on a connection
+ * already blocked is the same tracking attempt, so it is dropped without being judged, and counted, again.
  */
 internal class FlowOwners(private val capacity: Int = 512) {
     data class Flow(val protocol: Int, val saddr: String, val sport: Int, val daddr: String, val dport: Int)
 
-    private val owners = object : LinkedHashMap<Flow, Int>(capacity, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Flow, Int>) = size > capacity
+    private class Seen(var owner: Int, var blockedSni: String? = null)
+
+    private val flows = object : LinkedHashMap<Flow, Seen>(capacity, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Flow, Seen>) = size > capacity
     }
 
     @Synchronized
     fun ownerOf(flow: Flow, lookedUp: Int): Int {
         if (lookedUp > 0) {
-            owners[flow] = lookedUp
+            flows.getOrPut(flow) { Seen(lookedUp) }.owner = lookedUp
             return lookedUp
         }
-        return owners[flow] ?: lookedUp
+        return flows[flow]?.owner ?: lookedUp
+    }
+
+    @Synchronized
+    fun isBlocked(flow: Flow, sni: String): Boolean = flows[flow]?.blockedSni == sni
+
+    /** Only a connection with a known owner can be blocked, so it is already remembered. */
+    @Synchronized
+    fun block(flow: Flow, sni: String) {
+        flows[flow]?.blockedSni = sni
     }
 }
