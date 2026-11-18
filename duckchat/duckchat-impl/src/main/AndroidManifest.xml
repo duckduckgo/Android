@@ -63,7 +63,7 @@
         </activity>
 
         <!--
-          Adds "Ask Duck.ai" to the system share sheet for text, links, images and files, and to "Open with" for images and files.
+          Adds "Ask Duck.ai" to the system share sheet and to "Open with" for images and files.
         -->
         <activity
             android:name=".ui.nativeinput.share.ShareToDuckAiActivity"
@@ -74,7 +74,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
                 <data android:mimeType="image/*" />
                 <data android:mimeType="application/pdf" />
             </intent-filter>
