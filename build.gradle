@@ -39,6 +39,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose' apply false
     id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
+    id 'com.squareup.sort-dependencies' apply false
     id 'androidx.baselineprofile' apply false
 }
 
