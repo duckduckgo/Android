@@ -59,7 +59,9 @@ class OpenTabClientTool @Inject constructor(
         val url = context.allowedDetail ?: return ClientToolResult.Failure(ClientToolErrorCode.EXECUTION_FAILED)
         // The new tab takes the user away from a contextual chat, as switchToTab does.
         sheetCloseRequests.close(context.chatTabId)
-        val tabId = tabRepositoryProvider.value.forMode(context.browserMode).add(url = url, skipHome = true)
+        // With the chat's tab as source, Back from the new tab closes it and returns to the chat.
+        val tabId = tabRepositoryProvider.value.forMode(context.browserMode)
+            .addFromSourceTab(url = url, skipHome = true, sourceTabId = context.chatTabId)
         return ClientToolResult.Success(JSONObject().put(TAB_ID, tabId))
     }
 
