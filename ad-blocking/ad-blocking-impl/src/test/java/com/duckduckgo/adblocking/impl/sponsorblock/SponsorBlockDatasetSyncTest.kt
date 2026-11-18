@@ -24,17 +24,43 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
+import okhttp3.MediaType
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
+import okio.BufferedSource
+import okio.buffer
+import okio.source
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -45,16 +71,40 @@ class SponsorBlockDatasetSyncTest {
     private val file = File(context.filesDir, "sponsorblock-prefixes.bin")
     private lateinit var store: SponsorBlockBinaryStore
     private val service = FakeService()
+    private val segmentsProvider: SponsorBlockSegmentsProvider = mock()
     private lateinit var sync: SponsorBlockDatasetSync
 
     @Before fun setup() {
         file.delete()
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
         store = SponsorBlockBinaryStore(context)
-        sync = SponsorBlockDatasetSync(service, store)
+        sync = SponsorBlockDatasetSync(service, store, segmentsProvider)
     }
 
     @After fun clean() { file.delete() }
+
+    @Test fun binaryRequestUsesHashPrefixEndpoint() {
+        val service = Retrofit.Builder().baseUrl("https://duckduckgo.com/").build().create(SponsorBlockDatasetService::class.java)
+        val url = service.binaryHashPrefixes(42).request().url
+        assertEquals("/sponsorblock/v1/hashPrefix", url.encodedPath)
+        assertEquals("binary", url.queryParameter("format"))
+        assertEquals("1", url.queryParameter("version"))
+        assertEquals("42", url.queryParameter("revision"))
+    }
+
+    @Test fun invalidLatestRevisionIsRejectedWithoutRequestingDataset() = runTest {
+        for (revision in listOf(-1L, 0x100000000L)) {
+            service.latest = revision
+            try {
+                sync.sync()
+                fail("Expected invalid revision")
+            } catch (_: IllegalArgumentException) { }
+            assertTrue(service.requests.isEmpty())
+        }
+        service.latest = 0
+        sync.sync()
+        assertTrue(service.requests.isEmpty())
+    }
 
     @Test fun initialAndMultiStepSync() = runTest {
         service.latest = 1
@@ -65,6 +115,7 @@ class SponsorBlockDatasetSyncTest {
         service.responses[2L] = diff(3, listOf(3), emptyList(), listOf(2, 3))
         sync.sync()
         assertEquals(listOf(0L, 1L, 2L), service.requests)
+        verify(segmentsProvider, times(3)).clearCache()
         assertEquals(3L, store.revision())
         assertFalse(store.contains("00000001"))
         assertTrue(store.contains("00000002"))
@@ -102,6 +153,7 @@ class SponsorBlockDatasetSyncTest {
         assertEquals(1L, store.revision())
         assertTrue(store.contains("00000001"))
         assertEquals(1L, SponsorBlockBinaryStore(context).revision())
+        verify(segmentsProvider, never()).clearCache()
         service.responses[0L] = full(2, listOf(2))
         sync.sync()
         assertEquals(2L, store.revision())
@@ -174,20 +226,110 @@ class SponsorBlockDatasetSyncTest {
         assertFalse(gate.hasSegments("00000002"))
     }
 
+    @Test fun overlappingSyncsDoNotRetryAnAlreadyAppliedRevision() = runBlocking {
+        service.latest = 1
+        service.responses[0L] = full(1, listOf(1))
+        val firstStarted = CompletableDeferred<Unit>()
+        val releaseFirst = CompletableDeferred<Unit>()
+        service.onRevision = {
+            if (service.revisionRequests == 1) {
+                firstStarted.complete(Unit)
+                releaseFirst.await()
+            }
+        }
+        val first = async(Dispatchers.IO) { sync.sync() }
+        firstStarted.await()
+        val second = async(Dispatchers.IO, start = CoroutineStart.UNDISPATCHED) { sync.sync() }
+        releaseFirst.complete(Unit)
+        withTimeout(5000) {
+            first.await()
+            second.await()
+        }
+        assertEquals(2, service.revisionRequests)
+        assertEquals(listOf(0L), service.requests)
+        assertEquals(1L, store.revision())
+    }
+
+    @Test fun waitingSyncCanBeCancelledWithoutStartingARequest() = runBlocking {
+        service.latest = 1
+        service.responses[0L] = full(1, listOf(1))
+        val firstStarted = CompletableDeferred<Unit>()
+        val releaseFirst = CompletableDeferred<Unit>()
+        service.onRevision = {
+            firstStarted.complete(Unit)
+            releaseFirst.await()
+        }
+        val first = async(Dispatchers.IO) { sync.sync() }
+        firstStarted.await()
+        val waiting = launch(Dispatchers.IO, start = CoroutineStart.UNDISPATCHED) { sync.sync() }
+        withTimeout(5000) { waiting.cancelAndJoin() }
+        assertEquals(1, service.revisionRequests)
+        releaseFirst.complete(Unit)
+        withTimeout(5000) { first.await() }
+        assertEquals(listOf(0L), service.requests)
+    }
+
+    @Test fun cancellationAbortsBlockedResponseAndKeepsPreviousFile() = runBlocking {
+        store.apply(0, full(1, listOf(1)).inputStream())
+        service.latest = 2
+        val readStarted = CountDownLatch(1)
+        val cancelled = CountDownLatch(1)
+        val input = object : InputStream() {
+            override fun read(): Int {
+                readStarted.countDown()
+                check(cancelled.await(5, TimeUnit.SECONDS))
+                throw IOException("call cancelled")
+            }
+        }
+        val body = object : ResponseBody() {
+            private val buffered = input.source().buffer()
+            override fun contentType(): MediaType? = null
+            override fun contentLength(): Long = -1
+            override fun source(): BufferedSource = buffered
+        }
+        val call: Call<ResponseBody> = mock()
+        doAnswer {
+            it.getArgument<Callback<ResponseBody>>(0).onResponse(call, Response.success(body))
+            null
+        }.whenever(call).enqueue(any())
+        doAnswer {
+            cancelled.countDown()
+            null
+        }.whenever(call).cancel()
+        service.overrideCall = call
+        val job = launch(Dispatchers.IO, start = CoroutineStart.DEFAULT) { sync.sync() }
+        assertTrue(readStarted.await(5, TimeUnit.SECONDS))
+        withTimeout(5000) { job.cancelAndJoin() }
+        verify(call).cancel()
+        assertEquals(1L, store.revision())
+        assertTrue(SponsorBlockBinaryStore(context).contains("00000001"))
+        assertFalse(File(context.filesDir, "sponsorblock-download.tmp").exists())
+    }
+
     private class FakeService : SponsorBlockDatasetService {
         var revisionRequests = 0
+        var onRevision: suspend () -> Unit = {}
+        var overrideCall: Call<ResponseBody>? = null
         var latest = 0L
         var failure: IOException? = null
         val responses = mutableMapOf<Long, ByteArray>()
         val requests = mutableListOf<Long>()
         override suspend fun revision(): SponsorBlockRevisionResponse {
             revisionRequests++
+            onRevision()
             return SponsorBlockRevisionResponse(latest)
         }
-        override suspend fun binaryHashPrefixes(revision: Long): ResponseBody {
+        override fun binaryHashPrefixes(revision: Long): Call<ResponseBody> {
             requests += revision
             failure?.let { throw it }
-            return responses.getValue(revision).toResponseBody()
+            overrideCall?.let { return it }
+            val body = responses.getValue(revision).toResponseBody()
+            val call: Call<ResponseBody> = mock()
+            doAnswer {
+                it.getArgument<Callback<ResponseBody>>(0).onResponse(call, Response.success(body))
+                null
+            }.whenever(call).enqueue(any())
+            return call
         }
     }
 }

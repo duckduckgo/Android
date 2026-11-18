@@ -18,6 +18,10 @@ package com.duckduckgo.adblocking.impl.sponsorblock
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Test
@@ -44,7 +48,7 @@ class SponsorBlockBinaryStoreTest {
         File(context.filesDir, "sponsorblock-next.tmp").delete()
     }
 
-    @Test fun fullDiffAndInvalidUpdates() {
+    @Test fun fullDiffAndInvalidUpdates() = runBlocking {
         clean()
         store.apply(0, full(1, listOf(0x0a130329, 0x0a13c480)).inputStream())
         assertTrue(store.contains("0a130329"))
@@ -67,7 +71,7 @@ class SponsorBlockBinaryStoreTest {
         assertEquals(2L, store.revision())
     }
 
-    @Test fun acceptsUnsignedRevisionsAcrossSignedIntBoundary() {
+    @Test fun acceptsUnsignedRevisionsAcrossSignedIntBoundary() = runBlocking {
         clean()
         store.apply(0, full(0x80000000L, listOf(1)).inputStream())
         assertEquals(0x80000000L, store.revision())
@@ -76,7 +80,7 @@ class SponsorBlockBinaryStoreTest {
         assertTrue(store.contains("00000002"))
     }
 
-    @Test fun rejectsInvalidHeadersOffsetsAndVersions() {
+    @Test fun rejectsInvalidHeadersOffsetsAndVersions() = runBlocking {
         clean()
         val valid = full(1, listOf(1, 2))
         val malformed = listOf(
@@ -103,7 +107,7 @@ class SponsorBlockBinaryStoreTest {
         assertEquals(0L, store.revision())
     }
 
-    @Test fun interruptedDownloadKeepsSavedFileAcrossRestart() {
+    @Test fun interruptedDownloadKeepsSavedFileAcrossRestart() = runBlocking {
         clean()
         store.apply(0, full(1, listOf(1)).inputStream())
         val interrupted = object : InputStream() {
@@ -122,7 +126,7 @@ class SponsorBlockBinaryStoreTest {
         assertFalse(File(context.filesDir, "sponsorblock-download.tmp").exists())
     }
 
-    @Test fun lookupsUseOldFileUntilPublication() {
+    @Test fun lookupsUseOldFileUntilPublication() = runBlocking {
         clean()
         store.apply(0, full(1, listOf(1)).inputStream())
         val atPublish = CountDownLatch(1)
@@ -134,7 +138,7 @@ class SponsorBlockBinaryStoreTest {
         var failure: Throwable? = null
         val writer = thread {
             try {
-                store.apply(1, diff(2, listOf(2), listOf(1), listOf(2)).inputStream())
+                runBlocking { store.apply(1, diff(2, listOf(2), listOf(1), listOf(2)).inputStream()) }
             } catch (e: Throwable) {
                 failure = e
             }
@@ -157,7 +161,57 @@ class SponsorBlockBinaryStoreTest {
         assertTrue(SponsorBlockBinaryStore(context).contains("00000002"))
     }
 
-    @Test fun lookupsContinueWhileUpdateIsBeingDownloaded() {
+    @Test fun cancelledValidationAndMergeKeepPreviousFile() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        suspend fun cancelAtCheckpoint(response: ByteArray, checkpoint: Int) {
+            var calls = 0
+            lateinit var job: Job
+            store.onUpdateCheckpoint = {
+                if (++calls == checkpoint) job.cancel()
+            }
+            job = launch(Dispatchers.IO, start = kotlinx.coroutines.CoroutineStart.LAZY) {
+                store.apply(1, response.inputStream())
+            }
+            job.start()
+            job.join()
+            assertTrue(job.isCancelled)
+            assertEquals(1L, store.revision())
+            assertTrue(SponsorBlockBinaryStore(context).contains("00000001"))
+            assertFalse(File(context.filesDir, "sponsorblock-download.tmp").exists())
+            assertFalse(File(context.filesDir, "sponsorblock-next.tmp").exists())
+            assertFalse(File(context.filesDir, "sponsorblock-suffix.tmp").exists())
+            store.onUpdateCheckpoint = null
+        }
+        cancelAtCheckpoint(full(2, listOf(2)), 40)
+        cancelAtCheckpoint(diff(2, listOf(2), emptyList(), listOf(1, 2)), 4)
+    }
+
+    @Test fun staleConcurrentUpdateIsIgnored() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        store.apply(1, full(2, listOf(2)).inputStream())
+        store.apply(1, full(2, listOf(3)).inputStream())
+        assertEquals(2L, store.revision())
+        assertTrue(store.contains("00000002"))
+    }
+
+    @Test fun cancellationBeforePublicationLeavesOldFile() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        lateinit var job: Job
+        store.beforePublish = { job.cancel() }
+        job = launch(Dispatchers.IO, start = kotlinx.coroutines.CoroutineStart.LAZY) {
+            store.apply(1, full(2, listOf(2)).inputStream())
+        }
+        job.start()
+        job.join()
+        assertTrue(job.isCancelled)
+        assertEquals(1L, store.revision())
+        assertTrue(SponsorBlockBinaryStore(context).contains("00000001"))
+    }
+
+    @Test fun lookupsContinueWhileUpdateIsBeingDownloaded() = runBlocking {
         clean()
         store.apply(0, full(1, listOf(1)).inputStream())
         val started = CountDownLatch(1)
@@ -169,7 +223,7 @@ class SponsorBlockBinaryStoreTest {
                 return super.read(b, off, len)
             }
         }
-        val writer = thread { store.apply(1, input) }
+        val writer = thread { runBlocking { store.apply(1, input) } }
         assertTrue(started.await(5, TimeUnit.SECONDS))
         try {
             assertTrue(store.contains("00000001"))

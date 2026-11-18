@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adblocking.impl.sponsorblock
 
+import com.duckduckgo.common.utils.sha256
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
@@ -54,6 +55,7 @@ interface SponsorBlock {
 class RealSponsorBlock @Inject constructor(
     private val sponsorBlockFeature: SponsorBlockFeature,
     private val segmentsProvider: SponsorBlockSegmentsProvider,
+    private val hashPrefixGate: SponsorBlockHashPrefixGate,
     private val userPreferences: SponsorBlockUserPreferences,
 ) : SponsorBlock {
 
@@ -68,7 +70,9 @@ class RealSponsorBlock @Inject constructor(
     override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
         if (videoId.isBlank() || !isEnabled() || userPreferences.modeFlow().firstOrNull() == SponsorBlockMode.OFF) return emptyList()
         return try {
-            segmentsProvider.getSegments(videoId).sortedBy { it.start }
+            val hash = videoId.sha256
+            if (!hashPrefixGate.hasSegments(hash.take(DATASET_PREFIX_LENGTH))) return emptyList()
+            segmentsProvider.getSegments(videoId, hash.take(HASH_PREFIX_LENGTH)).sortedBy { it.start }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -84,4 +88,9 @@ class RealSponsorBlock @Inject constructor(
     }
 
     private fun isEnabled(): Boolean = sponsorBlockFeature.mvpEnabled().isEnabled()
+
+    private companion object {
+        const val HASH_PREFIX_LENGTH = 4
+        const val DATASET_PREFIX_LENGTH = 8
+    }
 }
