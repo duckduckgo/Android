@@ -54,6 +54,12 @@ class BookmarkTabClientTool @Inject constructor(
         promptMessage = R.string.duckAiClientToolBookmarkTabPromptMessage,
     )
 
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.DO,
+        name = R.string.duckAiClientToolBookmarkTabName,
+        description = R.string.duckAiClientToolBookmarkTabDescription,
+    )
+
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.bookmarkTab().isEnabled()
 
     override fun isValidInput(input: JSONObject): Boolean = parse(input) != null
