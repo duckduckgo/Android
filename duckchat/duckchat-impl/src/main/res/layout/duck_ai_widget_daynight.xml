@@ -199,18 +199,6 @@
                 android:dividerHeight="0dp" />
 
             <TextView
-                android:id="@+id/chatsMessageEmpty"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:text="@string/duck_ai_chat_history_empty_title"
-                android:textSize="14sp"
-                android:textColor="@color/duckAiWidgetHintColor"
-                android:visibility="gone" />
-
-            <TextView
                 android:id="@+id/chatsMessageUnavailable"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

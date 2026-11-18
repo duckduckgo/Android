@@ -160,7 +160,6 @@ class DuckAiWidgetConfiguratorTest {
         verify(remoteViews, never()).setOnClickPendingIntent(eq(R.id.chatsViewAll), any())
         verify(remoteViews).setViewVisibility(R.id.chatsList, View.GONE)
         verify(remoteViews).setViewVisibility(R.id.chatsMessageUnavailable, View.VISIBLE)
-        verify(remoteViews).setViewVisibility(R.id.chatsMessageEmpty, View.GONE)
         verify(chatStore, never()).getChats()
     }
 
@@ -174,7 +173,6 @@ class DuckAiWidgetConfiguratorTest {
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
         verify(remoteViews).setViewVisibility(R.id.chatsList, View.VISIBLE)
-        verify(remoteViews).setViewVisibility(R.id.chatsMessageEmpty, View.GONE)
         verify(remoteViews).setViewVisibility(R.id.chatsMessageUnavailable, View.GONE)
         val captor = argumentCaptor<PendingIntent>()
         verify(remoteViews).setPendingIntentTemplate(eq(R.id.chatsList), captor.capture())
@@ -291,17 +289,34 @@ class DuckAiWidgetConfiguratorTest {
             .get(target)
 
     @Test
-    fun whenNoChatsThenEmptyMessageShownAndActionsStillWired() = runTest {
-        stubDuckAi(enabled = true, historyAvailable = true)
-        whenever(chatStore.getChats()).thenReturn(emptyList())
+    fun whenNoChatsThenChatsSectionHiddenAndActionsStillWired() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true, chats = emptyList())
 
-        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
+        val launched = populateAndCaptureClickIntent(R.id.promptBarContainer)
 
-        verify(remoteViews).setViewVisibility(R.id.chatsList, View.GONE)
-        verify(remoteViews).setViewVisibility(R.id.chatsMessageEmpty, View.VISIBLE)
-        verify(remoteViews).setViewVisibility(R.id.chatsMessageUnavailable, View.GONE)
-        verify(remoteViews).setOnClickPendingIntent(eq(R.id.chatsViewAll), any())
+        assertLaunch(launched, url = null)
+        verify(remoteViews).setViewVisibility(R.id.chatsSection, View.GONE)
+        verify(remoteViews, never()).setOnClickPendingIntent(eq(R.id.chatsViewAll), any())
         verify(remoteViews, never()).setPendingIntentTemplate(any(), any())
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun whenNoChatsBelowApi31ThenCompactEvenWhenTall() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true, chats = emptyList())
+
+        assertEquals(View.GONE, chatsSectionVisibility(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400)))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenNoChatsThenOnlyNarrowAndWideCompactVariants() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true, chats = emptyList())
+
+        val variants = sizedVariantsByKey(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400))
+
+        assertEquals(setOf(SizeF(180f, 142f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 142f)), variants.keys)
+        variants.values.forEach { assertEquals(View.GONE, chatsSectionVisibility(it)) }
     }
 
     @Test
@@ -313,7 +328,6 @@ class DuckAiWidgetConfiguratorTest {
         verify(remoteViews, never()).setOnClickPendingIntent(any(), any())
         verify(remoteViews, never()).setPendingIntentTemplate(any(), any())
         verify(remoteViews).setViewVisibility(R.id.chatsMessageUnavailable, View.VISIBLE)
-        verify(remoteViews).setViewVisibility(R.id.chatsMessageEmpty, View.GONE)
         verify(chatStore, never()).getChats()
     }
 
@@ -477,11 +491,13 @@ class DuckAiWidgetConfiguratorTest {
     private suspend fun stubDuckAi(
         enabled: Boolean,
         historyAvailable: Boolean,
+        chats: List<DuckAiChat> = listOf(chat("default")),
     ) {
         duckChatFeature.self().setRawStoredState(State(true))
         whenever(repository.isDuckChatUserEnabled()).thenReturn(enabled)
         whenever(duckChat.isChatHistoryAvailable()).thenReturn(historyAvailable)
-        if (historyAvailable) whenever(chatStore.getChats()).thenReturn(emptyList())
+        whenever(duckChat.buildChatUrl(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
+        if (historyAvailable) whenever(chatStore.getChats()).thenReturn(chats)
     }
 
     private suspend fun populateAndCaptureClickIntent(viewId: Int): Intent {

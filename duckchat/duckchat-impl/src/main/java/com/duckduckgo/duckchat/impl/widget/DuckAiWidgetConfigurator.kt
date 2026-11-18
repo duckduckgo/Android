@@ -153,7 +153,9 @@ class DuckAiWidgetConfigurator @Inject constructor(
             if (!(duckChatFeature.self().isEnabled() && repository.isDuckChatUserEnabled())) return@withContext null
             loadState(showChats)
         }
-        return Loaded(showChats, state)
+        // With no chats the compact layout replaces the chats section, so there is no empty state to render.
+        val hasNoChats = state != null && state.chatHistoryAvailable && state.chats.isEmpty()
+        return Loaded(showChats && !hasNoChats, state)
     }
 
     private suspend fun render(
@@ -172,7 +174,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
             if (state == null) {
                 logcat { "DuckAiWidgetProvider Duck.ai disabled, click targets not wired" }
                 remoteViews.setViewVisibility(R.id.chatsViewAllContainer, View.GONE)
-                showMessage(remoteViews, R.id.chatsMessageUnavailable)
+                showUnavailableMessage(remoteViews)
                 return@withContext
             }
 
@@ -274,20 +276,16 @@ class DuckAiWidgetConfigurator @Inject constructor(
         remoteViews: RemoteViews,
         state: State,
     ) {
-        when {
-            !state.chatHistoryAvailable -> showMessage(remoteViews, R.id.chatsMessageUnavailable)
-            state.chats.isEmpty() -> showMessage(remoteViews, R.id.chatsMessageEmpty)
-            else -> showChats(context, appWidgetId, remoteViews, state)
+        if (state.chatHistoryAvailable) {
+            showChats(context, appWidgetId, remoteViews, state)
+        } else {
+            showUnavailableMessage(remoteViews)
         }
     }
 
-    private fun showMessage(
-        remoteViews: RemoteViews,
-        messageViewId: Int,
-    ) {
+    private fun showUnavailableMessage(remoteViews: RemoteViews) {
         remoteViews.setViewVisibility(R.id.chatsList, View.GONE)
-        remoteViews.setViewVisibility(R.id.chatsMessageEmpty, if (messageViewId == R.id.chatsMessageEmpty) View.VISIBLE else View.GONE)
-        remoteViews.setViewVisibility(R.id.chatsMessageUnavailable, if (messageViewId == R.id.chatsMessageUnavailable) View.VISIBLE else View.GONE)
+        remoteViews.setViewVisibility(R.id.chatsMessageUnavailable, View.VISIBLE)
     }
 
     private fun showChats(
@@ -296,7 +294,6 @@ class DuckAiWidgetConfigurator @Inject constructor(
         remoteViews: RemoteViews,
         state: State,
     ) {
-        remoteViews.setViewVisibility(R.id.chatsMessageEmpty, View.GONE)
         remoteViews.setViewVisibility(R.id.chatsMessageUnavailable, View.GONE)
         remoteViews.setViewVisibility(R.id.chatsList, View.VISIBLE)
 
