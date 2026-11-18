@@ -37,6 +37,38 @@ After syncing, videos whose prefixes are in the dataset can request segments fro
 
 Restarting the server clears its revision history. When the device database is available, the server starts from its current revision and prefixes; otherwise it starts with an empty dataset at revision 1.
 
-The mock returns a diff to the latest revision for clients up to 500 revisions behind. For revisions 501 to 1000 behind, it returns the last available intermediate diff; clients more than 1000 behind receive the full list, as they would through nginx. Missing revisions also receive the full list. Responses are uncompressed JSON and include the checksum of the full dataset at the response's target revision; the Android client currently ignores it.
+The mock returns a diff to the latest revision for clients up to 500 revisions behind. For revisions 501 to 1000 behind, it returns the last available intermediate diff; clients more than 1000 behind receive the full list, as they would through nginx. Missing revisions also receive the full list. Responses use bucketed JSON with concatenated four-character suffixes, and include the checksum of the full dataset at the response's target revision; the Android client currently ignores it.
 
 Run the protocol checks with `python3 -m unittest discover -s ad-blocking/tools/sponsorblock-mock`.
+
+## Bucketed dataset experiment
+
+Run the editable mock preloaded with a sorted file of unique, lowercase eight-character hex prefixes:
+
+```sh
+python3 ad-blocking/tools/sponsorblock-mock/bucketed_server.py /path/to/prefixes_unique.txt
+```
+
+It loads the file as revision 1 and opens the same editing and device controls at [http://127.0.0.1:8766/](http://127.0.0.1:8766/). To direct the mock-enabled app to this server, run:
+
+```sh
+adb reverse tcp:8765 tcp:8766
+```
+
+Use `adb -s <device-id> reverse tcp:8765 tcp:8766` and set `SERIAL=<device-id>` when working with multiple devices. The server starts from the file even if a device has a newer revision; clear app data or save a newer revision before syncing. Restarting reloads revision 1 and discards edits. The page shows the first 100 prefixes in each list; remove any prefix by entering its value or video URL/ID. Large phone responses are summarized in the request log; the response preview still shows the full response. API responses support gzip.
+
+See the [download format experiments](download-formats.md), [storage format experiments](storage-formats.md), and [Android profiling results](android-profiling.md) for measured sizes and partial-update tradeoffs.
+
+## Binary file experiment
+
+Install the mock-only binary build and start the bucketed mock with device-file inspection:
+
+```sh
+./gradlew :app:installInternalDebug -PsponsorBlockMock=true -PsponsorBlockBinary=true
+python3 ad-blocking/tools/sponsorblock-mock/bucketed_server.py /path/to/prefixes_unique.txt --port 8767 --binary-device
+adb reverse tcp:8765 tcp:8767
+```
+
+Open [the binary mock](http://127.0.0.1:8767/). The device panel reads the binary file instead of Room; revision editing, forced sync and request history work as above. The two stores are separate. This mock starts at revision 1 on every restart, so choose a higher revision than the device when necessary.
+
+The experimental `/hashPrefixBinary?revision=0&format=binary&version=1` response uses the `SBPL` version 1 format. Full lists contain a little-endian offset table and sorted two-byte remainders; diffs contain sorted four-byte insert and delete lists. Both include the resulting revision, entry count and checksum. The app validates the response, memory-maps the full list, and atomically replaces the old file after a successful update. Lookups can continue against the previous file while an update is prepared. The format is experimental and is not a production API.

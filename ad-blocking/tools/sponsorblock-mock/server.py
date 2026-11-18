@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Local SponsorBlock mock. State is reset when the server restarts."""
 import hashlib
+import gzip
 import html
 import json
 import os
 import re
 import sqlite3
+import struct
 import subprocess
 import tempfile
 from collections import deque
@@ -20,10 +22,13 @@ BASE = '/sponsorblock/v1'
 versions = {1: set()}
 replacement_revisions = set()
 draft = set()
+draft_labels = {}
+dataset_cache = {"source": None, "size": None, "sorted": []}
 state_lock = Lock()
 requests = deque(maxlen=100)
 PACKAGE = 'com.duckduckgo.mobile.android.debug'
 DATABASE = 'databases/sponsor_block_dataset.db'
+BINARY_DEVICE = False
 RECEIVER = PACKAGE + '/com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMockSyncReceiver'
 
 STYLE = '''
@@ -52,6 +57,11 @@ STYLE = '''
   button:disabled { background: #ddd; color: #666; cursor: default; }
   input:disabled { background: #f1f1f1; color: #888; }
   :focus-visible { outline: 3px solid #85a7ff; outline-offset: 2px; }
+  .prefix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px 16px; margin: 16px 0; }
+  .pagination { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .pagination input { flex: none; width: 95px; padding: 8px; }
+  .pending { list-style: none; padding: 0; margin: 12px 0; }
+  .pending li { display: flex; align-items: center; gap: 8px; overflow-wrap: anywhere; }
   .remove { background: transparent; color: #bd3434; padding: 8px; }
   .remove:hover { background: #fff1f1; }
   table { width: 100%; border-collapse: collapse; margin-top: 16px; text-align: left; }
@@ -72,6 +82,53 @@ def prefix(video_id):
 
 def checksum(prefixes):
     return hashlib.sha256('\n'.join(sorted(prefixes)).encode()).hexdigest()[:8]
+
+
+def bucketed(response):
+    result = dict(response)
+    for field in ('insert', 'delete'):
+        buckets = {}
+        for value in response[field]:
+            buckets[value[:4]] = buckets.get(value[:4], '') + value[4:]
+        result[field] = buckets
+    return result
+
+
+def binary_full(prefixes, revision):
+    values = sorted(int(value, 16) for value in prefixes)
+    offsets = [0] * 65537
+    suffixes = bytearray()
+    for value in values:
+        offsets[(value >> 16) + 1] += 1
+        suffixes.extend(struct.pack('<H', value & 0xffff))
+    for index in range(1, len(offsets)):
+        offsets[index] += offsets[index - 1]
+    body = struct.pack('<65537I', *offsets) + suffixes
+    digest = hashlib.sha256(body).digest()[:4]
+    header = struct.pack('<4sBBHI4sIII', b'SBPL', 1, 0, 0, revision, digest, len(values), 0, 0)
+    return header + body
+
+
+def binary_delta(response, prefixes):
+    full = binary_full(prefixes, response['revision'])
+    if response['replace']:
+        return full
+    inserts = sorted(int(value, 16) for value in response['insert'])
+    deletes = sorted(int(value, 16) for value in response['delete'])
+    header = struct.pack('<4sBBHI4sIII', b'SBPL', 1, 1, 0, response['revision'], full[12:16],
+                         len(prefixes), len(inserts), len(deletes))
+    return header + b''.join(struct.pack('<I', value) for value in inserts + deletes)
+
+
+def binary_preview(content):
+    magic, version, kind, reserved, revision, digest, count, inserts, deletes = struct.unpack_from('<4sBBHI4sIII', content)
+    shown = content[:256]
+    lines = [f'{offset:08x}  {shown[offset:offset + 16].hex(" ")}' for offset in range(0, len(shown), 16)]
+    omitted = f'\n… {len(content) - len(shown):,} bytes omitted' if len(content) > len(shown) else ''
+    return (f'Binary response (decompressed): {len(content):,} bytes\n'
+            f'Type: {"full list" if kind == 0 else "diff"} · Format version: {version} · Revision: {revision}\n'
+            f'Entries: {count:,} · Inserts: {inserts:,} · Deletes: {deletes:,} · Checksum: {digest.hex()}\n'
+            f'\nHex bytes (offset on the left):\n' + '\n'.join(lines) + omitted)
 
 
 def video_id(value):
@@ -114,9 +171,20 @@ def update_draft(fields):
     with state_lock:
         if 'video' in fields:
             video = video_id(fields['video'][0])
-            draft.add(prefix(video))
+            value = prefix(video)
+            draft.add(value)
+            draft_labels[value] = video
+        elif 'remove_video' in fields:
+            value = prefix(video_id(fields['remove_video'][0]))
+            draft.discard(value)
+            draft_labels.pop(value, None)
         elif 'remove' in fields:
             draft.discard(fields['remove'][0])
+            draft_labels.pop(fields['remove'][0], None)
+        elif 'undo_remove' in fields:
+            value = fields['undo_remove'][0]
+            if value in versions[max(versions)]:
+                draft.add(value)
         elif 'save' in fields:
             if draft == versions[max(versions)]:
                 raise ValueError('There are no draft changes to save')
@@ -127,14 +195,34 @@ def update_draft(fields):
             if not max(versions) < revision <= 2147483647:
                 raise ValueError('New revision must be greater than the current revision and at most 2147483647')
             versions[revision] = draft.copy()
+            draft_labels.clear()
             if 'replace' in fields:
                 replacement_revisions.add(revision)
         else:
             raise ValueError('Missing action')
 
 
+def dataset_page(page):
+    with state_lock:
+        revision = max(versions)
+        values = versions[revision]
+        if dataset_cache['source'] is not values or dataset_cache['size'] != len(values):
+            dataset_cache.update(source=values, size=len(values), sorted=sorted(values))
+        ordered = dataset_cache['sorted']
+        pages = max(1, (len(ordered) + 99) // 100)
+        page = max(1, min(page, pages))
+        return {'revision': revision, 'page': page, 'pages': pages, 'total': len(ordered),
+                'prefixes': ordered[(page - 1) * 100:page * 100]}
+
+
 def record_request(path, status, response):
     with state_lock:
+        if isinstance(response, dict):
+            response = response.copy()
+            for field in ('insert', 'delete'):
+                buckets = response.get(field, {})
+                if sum(len(v) for v in buckets.values()) > 40000:
+                    response[field] = f'{sum(len(v) // 4 for v in buckets.values())} prefixes (omitted)'
         requests.append({'time': datetime.now().astimezone().isoformat(timespec='seconds'),
                          'path': path, 'status': status, 'response': response})
 
@@ -153,10 +241,36 @@ def trigger_sync():
         raise RuntimeError(output or 'Could not send the sync broadcast')
 
 
-def device_dataset():
+def device_dataset(limit=None):
 
     def run(*args):
         return subprocess.run(adb_command() + list(args), capture_output=True, timeout=15)
+
+    if BINARY_DEVICE:
+        result = run('exec-out', 'run-as', PACKAGE, 'cat', 'files/sponsorblock-prefixes.bin')
+        if result.returncode:
+            error = result.stderr.decode(errors='replace').strip()
+            if 'No such file or directory' in error:
+                return {'revision': None, 'prefixes': [], 'count': 0}
+            raise RuntimeError(error or 'Could not read the binary dataset')
+        raw = result.stdout
+        if len(raw) < 28 + 65537 * 4:
+            raise ValueError('Incomplete binary dataset')
+        revision = struct.unpack_from('<I', raw, 8)[0]
+        offsets = struct.unpack_from('<65537I', raw, 28)
+        count = offsets[-1]
+        if raw[:4] != b'SBPL' or len(raw) != 28 + 65537 * 4 + count * 2:
+            raise ValueError('Invalid binary dataset size')
+        prefixes = []
+        for bucket in range(65536):
+            if offsets[bucket] > offsets[bucket + 1]:
+                raise ValueError('Invalid binary dataset offsets')
+            for index in range(offsets[bucket], offsets[bucket + 1]):
+                if limit is not None and len(prefixes) >= limit:
+                    return {'revision': revision, 'prefixes': prefixes, 'count': count}
+                suffix = struct.unpack_from('<H', raw, 28 + 65537 * 4 + index * 2)[0]
+                prefixes.append(f'{bucket:04x}{suffix:04x}')
+        return {'revision': revision, 'prefixes': prefixes, 'count': count}
 
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / 'dataset.db'
@@ -174,8 +288,13 @@ def device_dataset():
             raise RuntimeError(wal_exists.stderr.decode(errors='replace').strip() or 'Could not check the database WAL')
         with sqlite3.connect(f'{path.as_uri()}?mode=ro', uri=True) as connection:
             revision = connection.execute('SELECT revision FROM sponsor_revision WHERE id = 0').fetchone()
-            prefixes = [row[0] for row in connection.execute('SELECT prefix FROM sponsor_prefixes ORDER BY prefix')]
-        return {'revision': revision[0] if revision else None, 'prefixes': prefixes}
+            count = connection.execute('SELECT COUNT(*) FROM sponsor_prefixes').fetchone()[0] if limit is not None else None
+            query = 'SELECT prefix FROM sponsor_prefixes ORDER BY prefix' + (' LIMIT ?' if limit is not None else '')
+            prefixes = [f'{row[0]:08x}' for row in connection.execute(query, (limit,) if limit is not None else ())]
+        result = {'revision': revision[0] if revision else None, 'prefixes': prefixes}
+        if count is not None:
+            result['count'] = count
+        return result
 
 
 def initialize_from_device(dataset):
@@ -187,6 +306,7 @@ def initialize_from_device(dataset):
         raise ValueError('Invalid device dataset')
     with state_lock:
         versions.clear()
+        draft_labels.clear()
         replacement_revisions.clear()
         versions[revision] = prefixes
         draft.clear()
@@ -211,6 +331,7 @@ def setup_two_step_scenario(dataset):
                 additions.append(value)
             index += 1
         versions.clear()
+        draft_labels.clear()
         replacement_revisions.clear()
         versions[revision] = prefixes
         versions[revision + 500] = prefixes | {additions[0]}
@@ -221,8 +342,14 @@ def setup_two_step_scenario(dataset):
 
 class Handler(BaseHTTPRequestHandler):
     def send(self, code, content, content_type):
+        compressed = (len(content) > 1024 or content_type == 'application/octet-stream') and 'gzip' in self.headers.get('Accept-Encoding', '').lower()
+        if compressed:
+            content = gzip.compress(content)
         self.send_response(code)
         self.send_header('Content-Type', content_type)
+        if compressed:
+            self.send_header('Content-Encoding', 'gzip')
+        self.send_header('Vary', 'Accept-Encoding')
         self.send_header('Content-Length', str(len(content)))
         self.end_headers()
         self.wfile.write(content)
@@ -232,42 +359,53 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         url = urlsplit(self.path)
-        if url.path == '/':
+        if url.path in ('/', BASE, BASE + '/'):
             with state_lock:
-                draft_videos = draft.copy()
                 revision = max(versions)
-                saved_videos = versions[revision].copy()
-            rows = ''.join(
-                f'<tr><td><code>{html.escape(video)}</code></td>'
-                f'<td><form method="post"><button class="remove" name="remove" value="{html.escape(video, quote=True)}" '
-                f'aria-label="Remove {html.escape(video, quote=True)}">Remove</button></form></td></tr>'
-                for video in sorted(draft_videos)
+                saved_videos = versions[revision]
+                added = sorted(draft - saved_videos)
+                removed = sorted(saved_videos - draft)
+                labels = draft_labels.copy()
+            added_items = ''.join(
+                f'<li><span>{html.escape(labels.get(value, value))} · <code>{value}</code></span>'
+                f'<form method="post"><button class="remove" name="remove" value="{value}">Remove</button></form></li>'
+                for value in added
             )
-            contents = (f'<table><thead><tr><th>Hash prefix</th><th></th></tr></thead>'
-                        f'<tbody>{rows}</tbody></table>' if rows else '<p class="empty">No prefixes added yet.</p>')
-            saved = ''.join(f'<tr><td><code>{html.escape(video)}</code></td></tr>'
-                            for video in sorted(saved_videos))
-            saved_contents = (f'<table><thead><tr><th>Hash prefix</th></tr></thead>'
-                              f'<tbody>{saved}</tbody></table>' if saved else '<p class="empty">No prefixes in this revision.</p>')
-            changed = draft_videos != saved_videos
+            removed_items = ''.join(
+                f'<li><code>{value}</code><form method="post"><button class="remove" name="undo_remove" '
+                f'value="{value}">Undo</button></form></li>' for value in removed
+            )
+            added_contents = f'<ul class="pending">{added_items}</ul>' if added else '<p class="hint">No videos added.</p>'
+            removed_contents = f'<ul class="pending">{removed_items}</ul>' if removed else '<p class="hint">No prefixes removed.</p>'
+            changed = bool(added or removed)
             disabled = '' if changed else ' disabled'
             body = f'''<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>SponsorBlock mock</title>
 <style>{STYLE}</style></head><body><main>
 <div class="eyebrow">DuckDuckGo · Local testing</div><h1>SponsorBlock mock</h1>
 <div class="layout"><div class="controls">
-<section class="card"><label for="video">YouTube video URL or ID</label>
+<section class="card"><div class="card-heading"><h2>Update current revision</h2>
+<span class="badge">{'Unsaved changes' if changed else 'No changes'}</span></div>
+<label for="video">YouTube video URL or ID</label>
 <form class="add-form" method="post"><input id="video" name="video" required placeholder="Paste a video URL or ID">
-<button>Add video</button></form></section>
-<section class="card"><div class="card-heading"><h2>Draft prefixes ({len(draft_videos)})</h2>
-<span class="badge">{'Unsaved changes' if changed else 'No changes'}</span></div>{contents}
+<button>Add video</button></form>{added_contents}
+<label for="remove-video">Remove video URL or ID</label><form class="add-form" method="post">
+<input id="remove-video" name="remove_video" required placeholder="Paste a video URL or ID"><button>Remove video</button></form>
+<label for="remove-prefix">Remove hash prefix</label><form class="add-form" method="post">
+<input id="remove-prefix" name="remove" pattern="[0-9a-f]{{8}}" required placeholder="8 lowercase hex characters"><button>Remove prefix</button></form>
+{removed_contents}
 <form method="post"><label for="revision">New revision number</label><div class="add-form">
 <input id="revision" name="revision" type="number" min="{revision + 1}" max="2147483647" value="{revision + 1}" required{disabled}>
 <button name="save" value="1"{disabled}>Save revision</button></div>
 <label class="checkbox"><input type="checkbox" name="replace" value="1"{disabled}> Force clients to replace their dataset</label></form>
 <p id="revision-hint" class="hint"></p></section>
-<section class="card"><div class="card-heading"><h2>Current dataset ({len(saved_videos)})</h2>
-<span class="badge">Revision {revision}</span></div>{saved_contents}</section>
+<section class="card"><div class="card-heading"><h2>Current dataset ({len(saved_videos):,})</h2>
+<span class="badge">Revision {revision}</span></div>
+<div id="dataset-grid" class="prefix-grid" aria-live="polite">Loading prefixes…</div>
+<div class="pagination"><button id="dataset-prev" type="button">Previous</button>
+<label for="dataset-page">Page</label><input id="dataset-page" type="number" min="1" value="1">
+<span id="dataset-pages"></span><button id="dataset-go" type="button">Go</button>
+<button id="dataset-next" type="button">Next</button></div></section>
 <section class="card"><h2>Test scenarios</h2>
 <p class="hint">Prepare a dataset that requires the device to make two diff requests in one sync. This replaces the mock revision history with the device's current dataset and two new revisions.</p>
 <p class="hint">Save or remove draft changes first.</p>
@@ -276,7 +414,7 @@ class Handler(BaseHTTPRequestHandler):
 <section class="card"><h2>Preview response</h2><p class="hint">See the response for a client revision.</p>
 <form id="preview-form"><label for="preview-revision">Client revision</label><div class="add-form">
 <input id="preview-revision" type="number" min="0" max="2147483647" value="0" required>
-<button>Show response</button></div></form><pre id="preview-result" aria-live="polite"></pre></section>
+<button>Show response</button></div></form><p id="preview-download" class="hint" hidden><a id="preview-link" download="sponsorblock.bin">Download binary response</a></p><pre id="preview-result" aria-live="polite"></pre></section>
 </div><aside class="request-column">
 <section class="card"><div class="card-heading"><h2>Device database</h2>
 <button id="inspect" type="button">Refresh</button></div>
@@ -288,10 +426,40 @@ class Handler(BaseHTTPRequestHandler):
 <div id="requests" aria-live="polite">No requests yet.</div></section>
 </aside></div></main><script>
 const serverRevision = {revision};
+const binaryDevice = {str(BINARY_DEVICE).lower()};
 const revisionInput = document.getElementById('revision');
 const previewInput = document.getElementById('preview-revision');
 let revisionEdited = false;
 let previewEdited = false;
+let datasetPage = 1;
+let datasetPages = 1;
+async function showDataset(page) {{
+  const grid = document.getElementById('dataset-grid');
+  grid.textContent = 'Loading prefixes…';
+  try {{
+    const response = await fetch('/dataset?page=' + encodeURIComponent(page));
+    if (!response.ok) throw new Error(await response.text());
+    const result = await response.json();
+    datasetPage = result.page;
+    datasetPages = result.pages;
+    document.getElementById('dataset-page').value = datasetPage;
+    document.getElementById('dataset-page').max = datasetPages;
+    document.getElementById('dataset-pages').textContent = 'of ' + datasetPages.toLocaleString();
+    document.getElementById('dataset-prev').disabled = datasetPage <= 1;
+    document.getElementById('dataset-next').disabled = datasetPage >= datasetPages;
+    grid.replaceChildren();
+    if (!result.prefixes.length) grid.textContent = 'No prefixes in this revision.';
+    for (const prefix of result.prefixes) {{
+      const code = document.createElement('code');
+      code.textContent = prefix;
+      grid.append(code);
+    }}
+  }} catch (error) {{ grid.textContent = 'Unable to load dataset: ' + error.message; }}
+}}
+document.getElementById('dataset-prev').addEventListener('click', () => showDataset(datasetPage - 1));
+document.getElementById('dataset-next').addEventListener('click', () => showDataset(datasetPage + 1));
+document.getElementById('dataset-go').addEventListener('click', () => showDataset(document.getElementById('dataset-page').value));
+showDataset(1);
 revisionInput.addEventListener('input', () => {{ revisionEdited = true; }});
 previewInput.addEventListener('input', () => {{ previewEdited = true; }});
 document.getElementById('two-step').addEventListener('click', async () => {{
@@ -316,7 +484,8 @@ async function refreshDevice() {{
   const response = await fetch('/device-dataset');
   const result = await response.json();
   if (!response.ok) throw new Error(result.error);
-  status.textContent = result.revision === null ? 'No revision saved yet.' : `Revision: ${{result.revision}}`;
+  status.textContent = result.revision === null ? 'No revision saved yet.' : `Revision: ${{result.revision}} · ${{result.count}} prefixes`;
+  if (result.count > result.prefixes.length) status.textContent += ' (showing first 100)';
   prefixes.textContent = result.prefixes.length ? 'Prefixes\\n---\\n' + result.prefixes.join('\\n') : 'No prefixes saved.';
   if (!previewEdited) previewInput.value = result.revision ?? 0;
   if (result.revision !== null && result.revision > serverRevision) {{
@@ -348,7 +517,11 @@ document.getElementById('preview-form').addEventListener('submit', async (event)
     const revision = document.getElementById('preview-revision').value;
     const response = await fetch('/preview?revision=' + encodeURIComponent(revision));
     if (!response.ok) throw new Error(await response.text());
-    result.textContent = JSON.stringify(await response.json(), null, 2);
+    result.textContent = binaryDevice ? await response.text() : JSON.stringify(await response.json(), null, 2);
+    if (binaryDevice) {{
+      document.getElementById('preview-link').href = '/sponsorblock/v1/hashPrefixBinary?format=binary&version=1&revision=' + encodeURIComponent(revision);
+      document.getElementById('preview-download').hidden = false;
+    }}
   }} catch (error) {{ result.textContent = 'Unable to load response: ' + error.message; }}
 }});
 document.getElementById('inspect').addEventListener('click', async () => {{
@@ -404,10 +577,18 @@ refreshRequests();
 setInterval(refreshRequests, 2000);
 </script></body></html>'''
             self.send(200, body.encode(), 'text/html; charset=utf-8')
+        elif url.path == '/dataset':
+            try:
+                page = int(parse_qs(url.query).get('page', ['1'])[0])
+                if page < 1:
+                    raise ValueError()
+                self.json(dataset_page(page))
+            except ValueError:
+                self.send(400, b'Invalid page', 'text/plain')
         elif url.path == '/device-dataset':
             try:
-                self.json(device_dataset())
-            except (OSError, sqlite3.Error, subprocess.TimeoutExpired, RuntimeError) as error:
+                self.json(device_dataset(limit=100))
+            except (OSError, sqlite3.Error, subprocess.TimeoutExpired, RuntimeError, ValueError) as error:
                 self.send(500, json.dumps({'error': str(error)}).encode(), 'application/json')
         elif url.path == '/requests':
             with state_lock:
@@ -419,7 +600,7 @@ setInterval(refreshRequests, 2000);
             response = {'revision': latest}
             record_request(self.path, 200, response)
             self.json(response)
-        elif url.path in (BASE + '/hashPrefix', '/preview'):
+        elif url.path in (BASE + '/hashPrefix', BASE + '/hashPrefixBinary', '/preview'):
             try:
                 revision = int(parse_qs(url.query)['revision'][0])
                 if revision < 0:
@@ -429,10 +610,29 @@ setInterval(refreshRequests, 2000);
                     record_request(self.path, 400, 'Invalid revision')
                 self.send(400, b'Invalid revision', 'text/plain')
                 return
-            response = delta(revision)
+            if url.path.endswith('/hashPrefixBinary'):
+                params = parse_qs(url.query)
+                try:
+                    supported = int(params.get('version', ['1'])[0])
+                    if params.get('format', ['binary'])[0] != 'binary' or supported < 1:
+                        raise ValueError()
+                except ValueError:
+                    self.send(400, b'Unsupported format', 'text/plain')
+                    return
+            raw = delta(revision)
+            response = bucketed(raw)
             if url.path != '/preview':
                 record_request(self.path, 200, response)
-            self.json(response)
+            if url.path.endswith('/hashPrefixBinary') or (url.path == '/preview' and BINARY_DEVICE):
+                with state_lock:
+                    target = versions[raw['revision']].copy()
+                content = binary_delta(raw, target)
+                if url.path == '/preview':
+                    self.send(200, binary_preview(content).encode(), 'text/plain; charset=utf-8')
+                else:
+                    self.send(200, content, 'application/octet-stream')
+            else:
+                self.json(response)
         else:
             self.send(404, b'Not found', 'text/plain')
 
