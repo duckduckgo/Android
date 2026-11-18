@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Intent
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -70,6 +71,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -121,6 +124,7 @@ class BrowserViewModel @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
     private val browserMode: BrowserMode,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val duckChat: DuckChat,
 ) : ViewModel(), CoroutineScope {
 
     // Mode-switch orchestrator: observes the mode it also writes via switchTo().
@@ -334,6 +338,16 @@ class BrowserViewModel @Inject constructor(
 
     private suspend fun selectByUrlOrNewTab(url: String): String =
         tabRepository.getTabId(url)?.also { tabRepository.select(it) } ?: tabRepository.add(url = url, skipHome = true)
+
+    suspend fun findEmptyDuckAiTabId(): String? {
+        val emptyTabIds = tabRepository.getTabs().filter { tab ->
+            tab.url?.toUri()?.let {
+                duckChat.isDuckChatUrl(it) && it.toChatIdOrNull(duckChat) == null && it.getQueryParameter("mode") != "voice-mode"
+            } == true
+        }.map { it.tabId }
+        val selectedTabId = tabRepository.getSelectedTab()?.tabId
+        return emptyTabIds.firstOrNull { it == selectedTabId } ?: emptyTabIds.firstOrNull()
+    }
 
     fun launchFromThirdParty() {
         pixel.fire(

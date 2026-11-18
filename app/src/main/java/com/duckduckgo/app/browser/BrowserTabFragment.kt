@@ -2620,6 +2620,14 @@ class BrowserTabFragment :
         viewModel.onUserSubmittedQuery(url, QueryOrigin.FromBookmark)
     }
 
+    fun applyNativeInputLaunch(launch: NativeInputLaunch) {
+        if (nativeInputManager.isNativeInputShown()) {
+            nativeInputManager.applyLaunch(tabId = tabId, launch = launch.toDuckChatLaunch())
+        } else {
+            nativeInputLaunch = launch
+        }
+    }
+
     fun submitQuery(query: String) {
         nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
         viewModel.onUserSubmittedQuery(query)

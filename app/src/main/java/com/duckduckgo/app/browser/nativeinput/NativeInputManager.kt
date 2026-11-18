@@ -167,6 +167,9 @@ interface NativeInputManager {
         textSelection: String? = null,
     )
 
+    /** Applies [launch] to the Duck.ai input already shown, which [showNativeInput] ignores. */
+    fun applyLaunch(tabId: String, launch: DuckChatLaunch)
+
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
@@ -1581,6 +1584,12 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun applyLaunch(tabId: String, launch: DuckChatLaunch) {
+        val widget = omnibarWidget() ?: return
+        widget.configure(tabId = tabId, isDuckAiMode = true, isBottom = widget.isWidgetBottom(), launch = launch)
+        if (launch is DuckChatLaunch.ImageGeneration) widget.focusInput(rootView.context as? Activity)
     }
 
     override fun setInteractionLock(lock: InteractionLock) {

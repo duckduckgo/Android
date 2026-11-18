@@ -1131,11 +1131,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             pendingDuckChatTextSelection = textSelection
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
             pendingDuckChatForceImageGeneration = intent.getBooleanExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, false)
-            intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { source ->
-                runCatching { DuckChatEntryPoint.valueOf(source) }
-                    .getOrNull()
-                    ?.let { duckChat.reportDuckChatEntry(it, opensNewTab = true, hasPrompt = false) }
-            }
+            val entryPoint = intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { runCatching { DuckChatEntryPoint.valueOf(it) }.getOrNull() }
+            val duckChatUrl = intent.getStringExtra(DUCK_CHAT_URL)
             // Only in-app launches animate, so a widget or another app beside the browser doesn't.
             val newTabTransition = if (intent.getBooleanExtra(IN_APP_NAVIGATION_EXTRA, false)) {
                 startIntentNewTabTransition(intent, fromTabId = currentTab?.tabId)
@@ -1143,10 +1140,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 null
             }
             launchDuckAi(
-                url = intent.getStringExtra(DUCK_CHAT_URL),
+                url = duckChatUrl,
                 sourceTabId = sourceTabId,
                 newTabTransition = newTabTransition,
                 nativeInputLaunch = intent.nativeInputLaunch(),
+                entryPoint = entryPoint,
+                reuseEmptyTab = duckChatUrl == null && entryPoint == DuckChatEntryPoint.WIDGET_DUCK_AI,
             )
             return
         }
@@ -1431,7 +1430,29 @@ open class BrowserActivity : DuckDuckGoActivity() {
         sourceTabId: String? = null,
         newTabTransition: PendingNewTabTransition? = null,
         nativeInputLaunch: NativeInputLaunch? = null,
+        entryPoint: DuckChatEntryPoint? = null,
+        reuseEmptyTab: Boolean = false,
     ) {
+        if (reuseEmptyTab) {
+            // Held open so the first-frame gate waits for the reused tab instead of settling on the current one.
+            val landingId = onIntentOpening()
+            lifecycleScope.launch {
+                val emptyTabId = viewModel.findEmptyDuckAiTabId()
+                if (emptyTabId == null) {
+                    launchDuckAi(url, sourceTabId, newTabTransition, nativeInputLaunch, entryPoint, reuseEmptyTab = false)
+                    return@launch
+                }
+                isDuckChatVisible = true
+                // Swiping tabs tag their fragments by adapter id, so the tab id is matched on the fragment itself.
+                val fragment = supportFragmentManager.fragments.filterIsInstance<BrowserTabFragment>().firstOrNull { it.tabId == emptyTabId }
+                if (nativeInputLaunch != null && fragment == null) pendingNativeInputLaunches[emptyTabId] = nativeInputLaunch
+                openExistingTab(emptyTabId).join()
+                onIntentLanded(emptyTabId, landingId)
+                if (nativeInputLaunch != null) fragment?.applyNativeInputLaunch(nativeInputLaunch)
+            }
+            return
+        }
+        entryPoint?.let { duckChat.reportDuckChatEntry(it, opensNewTab = true, hasPrompt = false) }
         isDuckChatVisible = true
         // The tab to return to when this Duck.ai tab is closed.
         // Use to the current tab if no explicit tab id is passed.
