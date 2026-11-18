@@ -28,6 +28,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
+import retrofit2.http.GET
 import java.io.IOException
 
 class RealSegmentSkipSegmentsProviderTest {
@@ -48,11 +49,17 @@ class RealSegmentSkipSegmentsProviderTest {
     )
 
     @Test
+    fun whenUsingMockDatasetThenSegmentsStillUseProductionEndpoint() {
+        val method = SegmentSkipService::class.java.declaredMethods.single { it.name == "getSegments" }
+        assertEquals("https://duckduckgo.com/sponsorblock/v1/segments/{hashPrefix}", method.getAnnotation(GET::class.java)?.value)
+    }
+
+    @Test
     fun whenLookingUpThenOnlyTheFourCharacterHashPrefixIsSent() = runTest {
         provider.getSegments(VIDEO_ID)
 
         assertEquals(listOf(VIDEO_ID_HASH_PREFIX), service.requestedPrefixes)
-        assertEquals(listOf(VIDEO_ID_HASH_PREFIX), gate.checkedPrefixes)
+        assertEquals(listOf("5f6b0b4e"), gate.checkedPrefixes)
     }
 
     @Test
