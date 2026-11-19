@@ -17,7 +17,6 @@
 package com.duckduckgo.adblocking.impl.segmentskip
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.SingleIn
@@ -27,6 +26,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -48,10 +48,6 @@ class SegmentSkipBinaryStore @Inject constructor(
 ) {
     private val file = File(context.filesDir, "sponsor-prefixes.bin")
     private val updateMutex = Mutex()
-
-    @VisibleForTesting internal var beforePublish: (() -> Unit)? = null
-
-    @VisibleForTesting internal var onUpdateCheckpoint: (() -> Unit)? = null
 
     @Volatile private var loaded: Loaded? = null
 
@@ -84,7 +80,6 @@ class SegmentSkipBinaryStore @Inject constructor(
         check(current == expected)
         val coroutineContext = currentCoroutineContext()
         val checkCancellation = {
-            onUpdateCheckpoint?.invoke()
             coroutineContext.ensureActive()
         }
         val download = File(file.parentFile, "sponsor-download.tmp")
@@ -149,15 +144,15 @@ class SegmentSkipBinaryStore @Inject constructor(
         return snapshot
     }
 
-    private fun publish(next: File, replacement: Snapshot, checkCancellation: () -> Unit, onPublished: () -> Unit) {
-        beforePublish?.invoke()
+    private suspend fun publish(next: File, replacement: Snapshot, checkCancellation: () -> Unit, onPublished: () -> Unit) {
+        yield()
         checkCancellation()
         check(next.renameTo(file))
         loaded = Loaded(replacement)
         onPublished()
     }
 
-    private fun merge(diff: ByteBuffer, header: Header, old: Snapshot, result: File, suffixes: File, checkCancellation: () -> Unit) {
+    private suspend fun merge(diff: ByteBuffer, header: Header, old: Snapshot, result: File, suffixes: File, checkCancellation: () -> Unit) {
         valid(diff.limit().toLong() == HEADER.toLong() + 4L * (header.inserts.toLong() + header.deletes))
         val inserts = PrefixList(diff, HEADER, header.inserts)
         val deletes = PrefixList(diff, HEADER + header.inserts * 4, header.deletes)
@@ -179,6 +174,7 @@ class SegmentSkipBinaryStore @Inject constructor(
             var processed = 0
             while (existing != null || added != null || removed != null) {
                 if (processed++ % 4096 == 0) checkCancellation()
+                if (processed == maxOf(1, old.count / 2)) yield()
                 val value = minOf(existing ?: Long.MAX_VALUE, added ?: Long.MAX_VALUE, removed ?: Long.MAX_VALUE)
                 valid(added != value || removed != value)
                 val wasAdded = added == value
@@ -224,7 +220,7 @@ class SegmentSkipBinaryStore @Inject constructor(
         }
     }
 
-    private fun readFull(file: File, checkCancellation: () -> Unit = {}): Snapshot {
+    private suspend fun readFull(file: File, checkCancellation: () -> Unit = {}): Snapshot {
         val data = map(file)
         val header = readHeader(data)
         valid(header.type == 0 && header.inserts == 0 && header.deletes == 0)
@@ -233,6 +229,7 @@ class SegmentSkipBinaryStore @Inject constructor(
         var previous = 0
         for (bucket in 0 until BUCKETS) {
             if (bucket % 256 == 0) checkCancellation()
+            if (bucket == BUCKETS / 2) yield()
             val end = data.getInt(HEADER + (bucket + 1) * 4)
             valid(end >= previous && end <= header.count)
             var last = -1
