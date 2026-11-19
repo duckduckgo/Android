@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">İaden işleme alınıyor.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Cayma işlemini otomatik olarak gerçekleştiremedik. Cayma işlemini tamamlamak için <annotation type="withdrawal_help_link">bu sayfayı</annotation> ziyaret et.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Süresi doluyor</string>
+    <string name="subscriptionExpiringIconContentDescription">Abonelik süresi doluyor</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Aboneliğin %1$s tarihinde sona erecek.</string>
+    <string name="subscriptionKeepSubscription">Aboneliği Sürdür</string>
+
 </resources>
