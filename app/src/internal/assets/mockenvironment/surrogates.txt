@@ -1,0 +1,2 @@
+# Pinned for the page-load benchmark: no surrogate rules, so every blocked tracker request is a plain block.
+# The production app ships no bundled surrogates to copy from.

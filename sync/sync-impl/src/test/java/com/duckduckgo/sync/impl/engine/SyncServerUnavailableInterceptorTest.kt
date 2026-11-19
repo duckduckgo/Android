@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.engine
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.sync.impl.API_CODE.TOO_MANY_REQUESTS_1
+import com.duckduckgo.sync.impl.API_CODE.TOO_MANY_REQUESTS_2
 import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.impl.error.SyncUnavailableRepository
 import okhttp3.Interceptor.Chain
@@ -29,6 +30,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 @RunWith(AndroidJUnit4::class)
 class SyncServerUnavailableInterceptorTest {
@@ -73,6 +75,24 @@ class SyncServerUnavailableInterceptorTest {
         verify(syncUnavailableRepository).onServerAvailable()
     }
 
+    @Test
+    fun whenInterceptingAuditLogResponseTooManyRequestsThenServerNotMarkedUnavailable() {
+        val chain = givenGetRequest(AUDIT_LOG_URL, TOO_MANY_REQUESTS_2.code)
+
+        serverUnavailableInterceptor.intercept(chain)
+
+        verifyNoInteractions(syncUnavailableRepository)
+    }
+
+    @Test
+    fun whenInterceptingAuditLogResponseSuccessfulThenServerNotMarkedAvailable() {
+        val chain = givenGetRequest(AUDIT_LOG_URL)
+
+        serverUnavailableInterceptor.intercept(chain)
+
+        verifyNoInteractions(syncUnavailableRepository)
+    }
+
     private fun givenGetRequest(
         url: String,
         expectedResponseCode: Int? = null,
@@ -89,5 +109,9 @@ class SyncServerUnavailableInterceptorTest {
         return object : FakeChain(url, expectedResponseCode) {
             override fun request() = Request.Builder().url(url).method("PATCH", "".toRequestBody()).build()
         }
+    }
+
+    private companion object {
+        const val AUDIT_LOG_URL = "${SyncService.SYNC_PROD_ENVIRONMENT_URL}${SyncService.AUDIT_LOG_PATH}?after=cursor"
     }
 }

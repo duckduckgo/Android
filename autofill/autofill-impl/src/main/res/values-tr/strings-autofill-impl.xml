@@ -312,4 +312,24 @@
     <string name="importBookmarksErrorGenericMessage">Bir hata oluştu</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Lütfen internete bağlı olduğunuzdan emin olun ve tekrar deneyin.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">İçe aktarma tamamlandı!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Biraz bekle — bu pencereyi açık tut. Bir iki dakikadan fazla sürmez.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google şifreni isteyebilir.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google, verilerinin dışa aktarıldığını onaylayan bir e-posta gönderecek. Hiçbir şey yapmana gerek yok.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">İçe aktarma tamamlandı!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[İçe aktarılan yer işaretleri: <b>%1$d</b>]]></string>
+
+    <!-- Passwords import promo on the bookmarks import result screen -->
+    <string name="passwords_import_promo_in_bookmarks_import_title">Şifrelerinizi Google\'dan DuckDuckGo\'ya taşıyın.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_button">Google\'dan Şifreleri İçe Aktar</string>
+
+    <!-- Bookmarks import promo on the passwords import result screen -->
+    <string name="bookmarks_import_promo_in_passwords_import_title">Yer işaretlerinizi Google\'dan DuckDuckGo\'ya taşıyın.</string>
+    <string name="bookmarks_import_promo_in_passwords_import_button">Google\'dan Yer İşaretlerini İçe Aktar</string>
+
 </resources>

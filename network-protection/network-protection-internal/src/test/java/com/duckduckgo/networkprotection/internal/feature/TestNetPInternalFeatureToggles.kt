@@ -41,6 +41,5 @@ class TestNetPInternalFeatureToggles {
     fun testDefaultValues() {
         assertTrue(toggles.self().isEnabled())
         assertFalse(toggles.excludeSystemApps().isEnabled())
-        assertFalse(toggles.enablePcapRecording().isEnabled())
     }
 }

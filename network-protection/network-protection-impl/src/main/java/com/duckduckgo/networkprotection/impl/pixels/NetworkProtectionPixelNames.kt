@@ -111,6 +111,8 @@ enum class NetworkProtectionPixelNames(
         "m_netp_ev_failure_recovery_completed_new_tun_address_server_healthy_d",
         enqueue = true,
     ),
+    NETP_SWITCHED_TO_FALLBACK_PORT("m_netp_ev_switched_to_fallback_port_c"),
+    NETP_SWITCHED_TO_FALLBACK_PORT_DAILY("m_netp_ev_switched_to_fallback_port_d"),
     NETP_ACCESS_REVOKED_DIALOG_SHOWN("m_netp_ev_vpn_access_revoked_dialog_shown_c", enqueue = true),
     NETP_ACCESS_REVOKED_DIALOG_SHOWN_DAILY("m_netp_ev_vpn_access_revoked_dialog_shown_d", enqueue = true),
     NETP_ACCESS_REVOKED_DIALOG_SUBSCRIBE_CLICKED("m_netp_ev_vpn_access_revoked_dialog_subscribe_clicked_c", enqueue = true),

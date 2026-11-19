@@ -94,7 +94,6 @@
     <string name="purchaseError">Mums ir problēmas ar savienojuma izveidi. Lūdzu, mēģini vēlreiz vēlāk.</string>
 
     <!-- PIR Settings-->
-    <string name="pirSettingTitle" translatable="false">Personal Information Removal</string>
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
@@ -102,12 +101,6 @@
     <!-- Change Plan -->
     <string name="changePlanTitle">Atjaunināt plānu vai atcelt</string>
     <string name="changePlanDescription">Tavs abonements tika iegādāts Apple App Store veikalā. Lai mainītu plāna vai norēķinu iestatījumus, atver sadaļu Iestatījumi &gt; Apple konts &gt; Abonementi ierīcē, kas pierakstīta tajā pašā Apple kontā, kas izmantots abonementa iegādei.</string>
-
-    <!-- PIR Activity-->
-    <string name="pirTitle">Aktivizē DuckDuckGo abonementu datorā, lai iestatītu Personal Information Removal</string>
-    <string name="pirDescription">DuckDuckGo pārlūkprogrammā datora versijā atver <b>Iestatījumi &gt; Abonēt DuckDuckGo</b> un noklikšķini uz <b>Man ir abonements</b>, lai sāktu.</string>
-    <string name="pirWindowsButton" translatable="false">Windows</string>
-    <string name="pirMacOsButton" translatable="false">Mac</string>
 
     <string name="downloadsDownloadFinishedActionName">Atvērt</string>
     <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
@@ -202,5 +195,18 @@
     <!-- Content Descriptions -->
     <string name="subscriptionExpiredStatusIconContentDescription">Abonementa derīguma termiņš beidzies</string>
     <string name="subscriptionActiveStatusIconContentDescription">Abonements ir aktīvs</string>
+
+    <!-- Right of withdrawal -->
+    <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Atkāpties no līguma</string>
+    <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Vari atteikties un saņemt pilnu atmaksu līdz %1$s</string>
+    <string name="subscriptionWithdrawDialogTitle">Vai atteikties no abonementa?</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Tavs %1$s abonements tiks nekavējoties izbeigts, un 14 dienu laikā mēs tev atmaksāsim %2$s, izmantojot sākotnējo maksājuma veidu.\n\nVPN, Personal Information Removal un uzlabotie Duck.ai modeļi vairs nedarbosies, tiklīdz apstiprināsi.</string>
+    <string name="subscriptionWithdrawDialogConfirm">Apstiprināt atteikšanos</string>
+    <string name="subscriptionWithdrawDialogKeep">Paturēt abonementu</string>
+    <string name="subscriptionStatusNotSubscribed">Nav abonēts</string>
+    <string name="subscriptionWithdrawnTitle" instruction="Placeholder is the date the user withdrew from their subscription, e.g. October 6, 2026">Tu atteicies no abonementa šajā datumā: %1$s.</string>
+    <string name="subscriptionWithdrawnRefund" instruction="Placeholder is the refund amount with currency, e.g. €9.99">Tava %1$s atmaksa tiek apstrādāta.</string>
+    <string name="subscriptionWithdrawnRefundWithoutAmount">Tava atmaksa tiek apstrādāta.</string>
+    <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Mums neizdevās automātiski apstrādāt tavu atteikšanās pieprasījumu. Lūdzu, apmeklē <annotation type="withdrawal_help_link">šo lapu</annotation>, lai pabeigtu atteikšanos.</string>
 
 </resources>

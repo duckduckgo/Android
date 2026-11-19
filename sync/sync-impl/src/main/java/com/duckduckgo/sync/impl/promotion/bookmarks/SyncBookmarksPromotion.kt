@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.browser.ui.promo.PromoMessageView.ActionStyle
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.show
@@ -53,13 +54,16 @@ import javax.inject.Inject
 @ContributesIntoSet(scope = AppScope::class)
 class SyncBookmarksPromotion @Inject constructor(
     private val syncPromotions: SyncPromotions,
+    private val setUpPromotion: SyncBookmarksSetUpPromotion,
 ) : BookmarksScreenPromotionPlugin {
 
     override suspend fun getView(context: Context, numberSavedBookmarks: Int): View? {
-        return if (syncPromotions.canShowBookmarksPromotion(numberSavedBookmarks)) {
-            SyncBookmarksPromotionView(context)
-        } else {
-            null
+        return when {
+            setUpPromotion.canShowPromotion(numberSavedBookmarks) -> SyncBookmarksSetUpPromotionView(context).apply {
+                actionStyle = if (setUpPromotion.shouldUseToggle()) ActionStyle.Toggle else ActionStyle.Buttons
+            }
+            syncPromotions.canShowBookmarksPromotion(numberSavedBookmarks) -> SyncBookmarksPromotionView(context)
+            else -> null
         }
     }
 }
@@ -119,7 +123,7 @@ class SyncBookmarksPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarks.value))
+            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarks))
             context.startActivity(intent)
         }
     }

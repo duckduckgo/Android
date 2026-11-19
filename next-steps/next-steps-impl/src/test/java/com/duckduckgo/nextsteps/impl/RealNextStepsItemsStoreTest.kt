@@ -60,6 +60,15 @@ class RealNextStepsItemsStoreTest {
     }
 
     @Test
+    fun `when ids are completed then they are read back in completion order`() {
+        testee.addCompletedItemIds(setOf("c"))
+        testee.addCompletedItemIds(setOf("a"))
+        testee.addCompletedItemIds(setOf("b"))
+
+        assertEquals(listOf("c", "a", "b"), aStore().completedItemIds().toList())
+    }
+
+    @Test
     fun `when order is saved then a new instance reads it back`() {
         testee.saveItemOrder(listOf("b", "a", "c"))
 

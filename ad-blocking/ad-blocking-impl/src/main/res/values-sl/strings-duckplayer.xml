@@ -35,6 +35,6 @@
     <string name="duck_player_info_modal_button">Razumem!</string>
     <string name="duck_player_unavailable">Predvajalnik Duck Player ni na voljo</string>
     <string name="duck_player_unavailable_learn_more">Več</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Videoposnetke v YouTubu odpri s predvajalnikom Duck Player</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Odpri Duck Player v novem zavihku</string>
+    <string name="duck_player_open_videos_setting">Videoposnetke v YouTubu odpri s predvajalnikom Duck Player</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Odpri Duck Player v novem zavihku</string>
 </resources>

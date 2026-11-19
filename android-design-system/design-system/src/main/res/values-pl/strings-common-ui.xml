@@ -32,6 +32,8 @@
     <string name="removeAll">Usuń wszystko</string>
     <string name="undo">Cofnij</string>
     <string name="cancel">Anuluj</string>
+    <string name="done">Gotowe</string>
+    <string name="search">Szukaj</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Zawsze włączone</string>

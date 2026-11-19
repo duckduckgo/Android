@@ -63,7 +63,6 @@ import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.Base64
@@ -951,29 +950,29 @@ class RealExchangeV2RunnerTest {
 
     // ---- Channel authentication ----
 
-    @Test fun `the channel is claimed, polled and written to with a secret only when a flag calls for it`(
+    @Test fun `the channel is claimed, polled and written to with a secret`(
         @TestParameter case: ExchangeAuthCase,
     ) = runTest {
-        configure(case)
+        givenOurVersion(case.advertisedVersion)
         val utf8Secret = "channel-secret"
-        val expectedSecret = utf8Secret.toBase64Url().takeIf { case.isAuthenticated }
+        val expectedSecret = utf8Secret.toBase64Url()
         whenever(jweCrypto.generateSecureBytes(any())).thenReturn(utf8Secret.toByteArray())
 
         val runner = newRunner()
         runner.startScan("")
 
-        verify(jweCrypto, times(if (case.isAuthenticated) 1 else 0)).generateSecureBytes(any())
+        verify(jweCrypto).generateSecureBytes(any())
         verify(channel).createChannel(any(), eq(expectedSecret))
         verify(channel).poll(any(), any(), eq(expectedSecret))
         verify(channel, atLeastOnce()).sendMessage(any(), any(), any(), any(), eq(expectedSecret))
     }
 
-    @Test fun `cancel deletes the channel with whatever secret it was created with`(
+    @Test fun `cancel deletes the channel with the secret it was created with`(
         @TestParameter case: ExchangeAuthCase,
     ) = runTest {
-        configure(case)
+        givenOurVersion(case.advertisedVersion)
         val utf8Secret = "channel-secret"
-        val expectedSecret = utf8Secret.toBase64Url().takeIf { case.isAuthenticated }
+        val expectedSecret = utf8Secret.toBase64Url()
         whenever(jweCrypto.generateSecureBytes(any())).thenReturn(utf8Secret.toByteArray())
 
         val runner = newRunner()
@@ -1438,33 +1437,8 @@ class RealExchangeV2RunnerTest {
 
     enum class ExchangeAuthCase(
         val advertisedVersion: ExchangeProtocolVersion.V2,
-        val canSendExchangeChannelSecret: Boolean,
-        val isAuthenticated: Boolean,
     ) {
-        V20WithoutSecretFlag(
-            advertisedVersion = ExchangeProtocolVersion.V2_0,
-            canSendExchangeChannelSecret = false,
-            isAuthenticated = false,
-        ),
-        V20WithSecretFlag(
-            advertisedVersion = ExchangeProtocolVersion.V2_0,
-            canSendExchangeChannelSecret = true,
-            isAuthenticated = true,
-        ),
-        V21WithoutSecretFlag(
-            advertisedVersion = ExchangeProtocolVersion.V2_1,
-            canSendExchangeChannelSecret = false,
-            isAuthenticated = true,
-        ),
-        V21WithSecretFlag(
-            advertisedVersion = ExchangeProtocolVersion.V2_1,
-            canSendExchangeChannelSecret = true,
-            isAuthenticated = true,
-        ),
-    }
-
-    private fun configure(case: ExchangeAuthCase) {
-        givenOurVersion(case.advertisedVersion)
-        syncFeature.canSendExchangeChannelSecret().setRawStoredState(State(case.canSendExchangeChannelSecret))
+        V20(advertisedVersion = ExchangeProtocolVersion.V2_0),
+        V21(advertisedVersion = ExchangeProtocolVersion.V2_1),
     }
 }

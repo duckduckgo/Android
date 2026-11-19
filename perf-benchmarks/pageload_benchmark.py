@@ -4,11 +4,12 @@
 import argparse
 import json
 import os
+import re
 import shutil
 import statistics
 import subprocess
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
 from urllib.parse import urlencode
@@ -54,6 +55,12 @@ def settle_window_ms_for(scenario: str) -> float:
     return SETTLE_WINDOW_MS_OVERRIDES.get(scenario, SETTLE_WINDOW_MS)
 
 
+# Scenarios loaded with protections off: tracker hosts are answered by the fixture server instead of being blocked.
+PROTECTIONS_OFF_SCENARIOS = frozenset({"all-protections-off"})
+# Written by RequestLedger in the benchmark: one line per host, CONNECT target and unknown host, between `begin` and `end`.
+REQUEST_LINE = re.compile(r"PageLoadRequests\W+scenario=(\S+) (\w+)(?: (.*?))?\s*$")
+
+
 @dataclass
 class Stats:
     count: int = 0
@@ -94,14 +101,87 @@ class ScenarioResult:
     benchmark_data: Optional[Path]
 
 
-def query_durations_ms(trace_path: Path) -> list[float]:
-    """Return positive ddg.pageLoad slice durations in chronological order."""
+@dataclass
+class RequestReport:
+    """What the fixture server saw during one scenario."""
+
+    tracker_hits: int = 0
+    connects: dict = field(default_factory=dict)
+    unknown: dict = field(default_factory=dict)
+    complete: bool = False
+
+
+def parse_request_reports(text: str) -> dict[str, RequestReport]:
+    """Parse the PageLoadRequests logcat lines. A repeated `begin` for a scenario discards the earlier block."""
+    reports: dict[str, RequestReport] = {}
+    for line in text.splitlines():
+        match = REQUEST_LINE.search(line)
+        if not match:
+            continue
+        scenario, kind = match.group(1), match.group(2)
+        fields = dict(part.split("=", 1) for part in (match.group(3) or "").split() if "=" in part)
+        if kind == "begin":
+            reports[scenario] = RequestReport()
+            continue
+        report = reports.get(scenario)
+        if report is None:
+            continue
+        if kind == "end":
+            report.complete = True
+        elif kind == "host" and fields.get("tracker") == "true":
+            report.tracker_hits += int(fields["count"])
+        elif kind == "connect":
+            report.connects[fields["target"]] = int(fields["count"])
+        elif kind == "unknown":
+            report.unknown[fields["host"]] = int(fields["count"])
+    return reports
+
+
+def load_request_reports(results_dir: Path) -> dict[str, RequestReport]:
+    reports: dict[str, RequestReport] = {}
+    for path in sorted(results_dir.rglob("*")):
+        if path.is_file() and "logcat" in path.name.lower():
+            reports.update(parse_request_reports(path.read_text(errors="replace")))
+    return reports
+
+
+def request_violations(scenario: str, report: Optional[RequestReport]) -> list[str]:
+    """Hermeticity checks for one scenario."""
+    if report is None or not report.complete:
+        return [f"scenario {scenario}: no complete request report in the logcat; cannot prove the run was hermetic"]
+    violations = []
+    if scenario in PROTECTIONS_OFF_SCENARIOS:
+        if report.tracker_hits == 0:
+            violations.append(f"scenario {scenario}: no tracker request reached the server (proxy not active)")
+    elif report.tracker_hits > 0:
+        violations.append(
+            f"scenario {scenario}: {report.tracker_hits} tracker requests reached the server, expected 0 "
+            "(protections are on, so blocking did not run)"
+        )
+    for target, count in sorted(report.connects.items()):
+        violations.append(f"scenario {scenario}: CONNECT to {target} seen {count} times, expected 0")
+    for host, count in sorted(report.unknown.items()):
+        violations.append(f"scenario {scenario}: request to unknown host {host} seen {count} times, expected 0")
+    return violations
+
+
+def check_request_invariants(results_dir: Path, scenarios) -> None:
+    """Raise ValueError listing every violated check across the given scenarios."""
+    reports = load_request_reports(results_dir)
+    violations = []
+    for scenario in sorted(scenarios):
+        violations.extend(request_violations(scenario, reports.get(scenario)))
+    if violations:
+        raise ValueError("request invariants violated:\n" + "\n".join(violations))
+
+
+def _run_trace_query(trace_path: Path, sql: str) -> list[str]:
+    """Run one SQL statement through trace_processor_shell and return its output lines."""
     if shutil.which("trace_processor_shell") is None:
         raise FileNotFoundError(
             "trace_processor_shell not found on PATH; install the Perfetto trace_processor_shell "
             "binary before running this script"
         )
-    sql = f"SELECT dur FROM slice WHERE name = '{SECTION}' AND dur > 0 ORDER BY ts;"
     out = subprocess.run(
         ["trace_processor_shell", "-q", "/dev/stdin", str(trace_path)],
         input=sql,
@@ -109,12 +189,19 @@ def query_durations_ms(trace_path: Path) -> list[float]:
         text=True,
         check=True,
     ).stdout
-    durations = []
-    for line in out.splitlines():
-        line = line.strip().strip('"')
-        if line.isdigit():
-            durations.append(int(line) / 1e6)
-    return durations
+    return [line.strip().strip('"') for line in out.splitlines()]
+
+
+def query_durations_ms(trace_path: Path) -> list[float]:
+    """Return positive ddg.pageLoad slice durations in chronological order."""
+    sql = f"SELECT dur FROM slice WHERE name = '{SECTION}' AND dur > 0 ORDER BY ts;"
+    return [int(line) / 1e6 for line in _run_trace_query(trace_path, sql) if line.isdigit()]
+
+
+def query_bytes_overwritten(trace_path: Path) -> int:
+    """Return bytes Perfetto's ring buffers overwrote before they were drained, summed over all buffers."""
+    sql = "SELECT COALESCE(SUM(value), 0) FROM stats WHERE name = 'traced_buf_bytes_overwritten';"
+    return sum(int(line) for line in _run_trace_query(trace_path, sql) if line.isdigit())
 
 
 def compute_stats(
@@ -316,10 +403,18 @@ def collect_results(artifacts: list[Artifact], expected_samples: int = DEFAULT_E
         if len(durations) > expected_total:
             durations = merge_reload_interrupted_slices(durations, expected_total)
         if len(durations) != expected_total:
-            raise ValueError(
+            message = (
                 f"scenario {scenario} has {len(durations)} positive slices; expected {expected_total} "
                 f"({DEFAULT_WARMUP_SAMPLES} warmup + {expected_samples} retained + {DEFAULT_TRAILING_SAMPLES} trailing)"
             )
+            # Small overwrites are common on healthy traces, so this only explains a count failure.
+            overwritten = query_bytes_overwritten(artifact.trace)
+            if overwritten > 0:
+                message += (
+                    f": trace buffer overwritten (traced_buf_bytes_overwritten={overwritten} bytes), "
+                    f"the missing slice was likely lost from the trace; re-run the benchmark"
+                )
+            raise ValueError(message)
         stats = compute_stats(durations, settle_window_ms=settle_window_ms_for(scenario))
         if stats.invalid_count > MAX_INVALID_SAMPLES:
             raise ValueError(
@@ -413,6 +508,11 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--scenario", help="Benchmark method or canonical scenario name; required with --trace")
     ap.add_argument("--device", help="Override the device definition (otherwise artifact directory name, or local)")
     ap.add_argument("--expected-samples", type=int, default=DEFAULT_EXPECTED_SAMPLES)
+    ap.add_argument(
+        "--skip-request-invariants",
+        action="store_true",
+        help="Do not require the fixture server's PageLoadRequests logcat report (artifacts from before it existed)",
+    )
     ap.add_argument("--report-pixel", action="store_true")
     ap.add_argument("--github-action-run-id")
     ap.add_argument("--git-commit-sha")
@@ -440,6 +540,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             if args.results_dir
             else [single_trace_artifact(args.trace, args.scenario, args.benchmark_data, args.device)]
         )
+        if args.results_dir and not args.skip_request_invariants:
+            check_request_invariants(args.results_dir, [artifact.scenario for artifact in artifacts])
         result = collect_results(artifacts, args.expected_samples)
         urls = pixel_urls(result, args.github_action_run_id, args.git_commit_sha, args.endpoint) if args.report_pixel else []
     except (OSError, ValueError, json.JSONDecodeError, subprocess.CalledProcessError) as error:

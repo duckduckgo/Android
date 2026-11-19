@@ -128,12 +128,11 @@ class AndroidInjection {
         }
 
         /**
-         * Injects the [fragment] if an associated [AndroidInjector] implementation is found, otherwise [IllegalArgumentException]
-         * is thrown.
+         * Returns the [HasInjector] that should inject the [fragment], otherwise [IllegalArgumentException] is thrown.
          *
          * The algorithm is the following:
-         * * walks the parent fragment hierarchy until if finds one that implements [HasInjector], else
-         * * uses the [fragment]'s and returns it if it implements [HasInjector], else
+         * * walks the parent fragment hierarchy until it finds one that implements [HasInjector], else
+         * * uses the [fragment]'s activity and returns it if it implements [HasInjector], else
          * * uses the [Application] and returns it if it implements [HasInjector], else
          * * throws [IllegalArgumentException]
          */
@@ -157,20 +156,27 @@ class AndroidInjection {
         }
 
         /**
-         * Injects the [view] if an associated [AndroidInjector] implementation is found, otherwise [IllegalArgumentException]
-         * is thrown.
+         * Returns the [HasInjector] that should inject the [view], otherwise [IllegalArgumentException] is thrown.
          *
          * The algorithm is the following:
-         * 1. Locate the [InjectableFragment] fragment where this view is attached. If found, return it.
-         * 2. If the view is not attached to a [InjectableFragment] fragment, find the activity where this view is attached. If the activity
-         * implements [HasInjector] the return it.
+         * 1. Starting from the fragment where this view is attached, walk the parent fragment hierarchy and return the first
+         * [InjectableFragment] found.
+         * 2. If there is no such fragment, find the activity where this view is attached. If the activity implements [HasInjector],
+         * return it.
          * 3. If above steps are unsuccessful throw [IllegalArgumentException].
          */
         fun findInjectorForView(view: View): HasInjector {
-            try {
-                return view.findFragment<InjectableFragment>()
+            var fragment: Fragment? = try {
+                view.findFragment()
             } catch (e: IllegalStateException) {
-                // This view is not attached to a [InjectableFragment] fragment.
+                // This view is not attached to a fragment.
+                null
+            }
+            while (fragment != null) {
+                if (fragment is InjectableFragment) {
+                    return fragment
+                }
+                fragment = fragment.parentFragment
             }
 
             var context = view.context

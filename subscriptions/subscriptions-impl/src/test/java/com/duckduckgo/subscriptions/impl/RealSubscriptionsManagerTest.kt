@@ -3,6 +3,7 @@ package com.duckduckgo.subscriptions.impl
 import android.annotation.SuppressLint
 import android.content.Context
 import app.cash.turbine.test
+import com.android.billingclient.api.AccountIdentifiers
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
@@ -21,6 +22,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.model.Entitlement
@@ -76,9 +78,12 @@ import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionUndoCancellationWideEvent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -105,6 +110,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
@@ -148,6 +154,7 @@ class RealSubscriptionsManagerTest {
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent = mock()
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent = mock()
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
+    private val subscriptionUndoCancellationWideEvent: SubscriptionUndoCancellationWideEvent = mock()
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent = mock()
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
     private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler = mock()
@@ -191,6 +198,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -420,6 +428,18 @@ class RealSubscriptionsManagerTest {
         verify(authClient).getTokens(any(), any(), any())
 
         assertNotEquals(accountExternalId, authDataStore.externalId)
+    }
+
+    @Test
+    fun whenPurchaseFlowIfSubscriptionFailsWith401ThenDoNotRequestLogout() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionFails(httpResponseCode = 401)
+        givenCreateAccountSucceeds()
+
+        purchase()
+        advanceUntilIdle()
+
+        verify(authClient, never()).tryLogout(any())
     }
 
     @Test
@@ -989,6 +1009,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1025,6 +1046,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1065,6 +1087,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1119,6 +1142,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1168,6 +1192,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1212,6 +1237,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1249,6 +1275,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1343,6 +1370,10 @@ class RealSubscriptionsManagerTest {
         assertNull(authRepository.getSubscription())
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender).reportAuthV2InvalidRefreshTokenSignedOut()
+
+        // Access token is invalid, so call to /logout can't succeed anyway.
+        advanceUntilIdle()
+        verify(authClient, never()).tryLogout(any())
     }
 
     @Test
@@ -1364,6 +1395,10 @@ class RealSubscriptionsManagerTest {
         assertNull(authRepository.getRefreshTokenV2())
         assertNull(authRepository.getAccount())
         assertNull(authRepository.getSubscription())
+
+        // Account doesn't exist, so there is no point in notifying BE about logout.
+        advanceUntilIdle()
+        verify(authClient, never()).tryLogout(any())
 
         // Store login has 0 chance of success when account doesn't exist, so there should be no attempt.
         verify(authClient, never()).authorize(any())
@@ -1497,6 +1532,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenTokenRefreshesRunConcurrentlyThenTheyDoNotOverlap() = runTest {
         givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
         givenValidateV2TokensSucceeds()
         whenever(authClient.getJwks()).thenReturn("fake jwks")
 
@@ -1521,6 +1557,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenCallerIsCancelledMidRefreshThenRefreshCompletes() = runTest {
         givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
         givenValidateV2TokensSucceeds()
         whenever(authClient.getJwks()).thenReturn("fake jwks")
 
@@ -1541,6 +1578,97 @@ class RealSubscriptionsManagerTest {
 
         assertEquals("refreshed access token", authRepository.getAccessTokenV2()?.jwt)
         verify(tokenRefreshWideEvent).onSuccess()
+    }
+
+    @Test
+    fun whenRefreshAccessTokenAndStoredTokenIsUsableThenReturnsStoredTokenWithoutRotating() = runTest {
+        val lockHandle = FakeLockHandle()
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(lockHandle))
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+        val storedAccessToken = authRepository.getAccessTokenV2()
+
+        val result = subscriptionsManager.refreshAccessToken()
+
+        assertEquals(storedAccessToken, result)
+        verify(authClient, never()).getTokens(any<String>())
+        verify(crossProcessLock).acquire(any(), any())
+        assertTrue(lockHandle.closed)
+        verify(tokenRefreshWideEvent).onSkipped()
+        verify(tokenRefreshWideEvent, never()).onSuccess()
+        verify(tokenRefreshWideEvent, never()).onFailure(any())
+    }
+
+    @Test
+    fun whenCrossProcessLockAcquisitionFailsAndStoredTokenIsUsableThenRefreshAccessTokenSkips() = runTest {
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.failure(timeoutCancellationException()))
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+        val storedAccessToken = authRepository.getAccessTokenV2()
+
+        val result = subscriptionsManager.refreshAccessToken()
+
+        assertEquals(storedAccessToken, result)
+        verify(authClient, never()).getTokens(any<String>())
+        verify(tokenRefreshWideEvent).onSkipped()
+        verify(tokenRefreshWideEvent, never()).onSuccess()
+    }
+
+    @Test
+    fun whenRefreshAccessTokenForcedAndStoredTokenIsUsableThenRotates() = runTest {
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token", newRefreshToken = "new refresh token")
+
+        val result = subscriptionsManager.refreshAccessToken(force = true)
+
+        assertEquals("new access token", result.jwt)
+        assertEquals("new refresh token", authRepository.getRefreshTokenV2()?.jwt)
+        verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
+        verify(tokenRefreshWideEvent).onSuccess()
+    }
+
+    @Test
+    fun whenConcurrentRefreshesWithExpiredTokenThenRotatesOnceAndBothReturnNewToken() = runTest {
+        givenSkipValidAccessTokenRefreshEnabled(true)
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val results = listOf(
+            async { subscriptionsManager.refreshAccessToken() },
+            async { subscriptionsManager.refreshAccessToken() },
+        ).awaitAll()
+
+        assertEquals(listOf("new access token", "new access token"), results.map { it.jwt })
+        verify(authClient, times(1)).getTokens(any<String>())
+    }
+
+    @Test
+    fun whenSkipValidAccessTokenRefreshDisabledAndStoredTokenIsUsableThenRefreshAccessTokenRotates() = runTest {
+        givenSkipValidAccessTokenRefreshEnabled(false)
+        givenUserIsSignedIn()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.refreshAccessToken()
+
+        assertEquals("new access token", result.jwt)
+        verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
+        verify(tokenRefreshWideEvent).onSuccess()
+    }
+
+    @Test
+    fun whenGetAccessTokenAndStoredTokenIsExpiredThenReturnsRefreshedToken() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+        verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
     }
 
     @Test
@@ -1627,6 +1755,16 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenSignOutThenRequestLogoutWithAccessToken() = runTest {
+        givenUserIsSignedIn()
+
+        subscriptionsManager.signOut()
+        advanceUntilIdle()
+
+        verify(authClient).tryLogout(FAKE_ACCESS_TOKEN_V2)
+    }
+
+    @Test
     fun whenSignOutThenCallRepositorySignOut() = runTest {
         val mockRepo: AuthRepository = mock()
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
@@ -1648,6 +1786,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -1701,6 +1840,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -2053,6 +2193,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -2183,6 +2324,7 @@ class RealSubscriptionsManagerTest {
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
+            subscriptionUndoCancellationWideEvent,
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
@@ -2448,6 +2590,24 @@ class RealSubscriptionsManagerTest {
         whenever(subscriptionsService.confirm(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
+    private suspend fun givenConfirmPurchaseReturnsNotActive() {
+        whenever(subscriptionsService.confirm(any())).thenReturn(
+            ConfirmationResponse(
+                email = "test@duck.com",
+                entitlements = listOf(),
+                subscription = SubscriptionResponse(
+                    productId = "id",
+                    billingPeriod = "Monthly",
+                    platform = "google",
+                    status = "Expired",
+                    startedAt = 1000000L,
+                    expiresOrRenewsAt = 1000000L,
+                    activeOffers = listOf(),
+                ),
+            ),
+        )
+    }
+
     private suspend fun givenConfirmPurchaseSucceeds() {
         whenever(subscriptionsService.confirm(any())).thenReturn(
             ConfirmationResponse(
@@ -2661,6 +2821,28 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenSwitchSubscriptionPlanWithChangeThenPassChangeToWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+
+        subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = YEARLY_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+            origin = "origin",
+            change = "crossgrade",
+        )
+
+        verify(subscriptionSwitchWideEvent).onSwitchFlowStarted(
+            context = eq("origin"),
+            fromPlan = any(),
+            toPlan = eq(YEARLY_PLAN_US),
+            change = eq("crossgrade"),
+        )
+    }
+
+    @Test
     fun whenSwitchSubscriptionPlanWithNoPurchaseTokenThenEmitFailure() = runTest {
         givenUserIsSignedIn()
         givenActiveSubscription()
@@ -2802,9 +2984,456 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertEquals(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = true), awaitItem())
 
+            verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
             verify(pixelSender).reportSubscriptionSwitch()
             verify(pixelSender, never()).reportPurchaseSuccess(any())
             verify(pixelSender, never()).reportSubscriptionActivated()
+            verify(subscriptionSwitchWideEvent).onPlayBillingSwitchSuccess()
+            verify(subscriptionSwitchWideEvent).onSwitchConfirmationSuccess()
+            verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseSuccess()
+            verify(subscriptionPurchaseWideEvent, never()).onPurchaseConfirmationSuccess()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanFailsThenDoesNotReportPurchaseWideEvent() = runTest {
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Failure("error"))
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(subscriptionSwitchWideEvent).onSwitchFailed("error")
+            verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseFailure(any())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanCancelledThenDoesNotReportPurchaseWideEvent() = runTest {
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+
+            verify(subscriptionSwitchWideEvent).onUserCancelled()
+            verify(subscriptionPurchaseWideEvent, never()).onPurchaseCancelledByUser()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanConfirmFailsThenKeepsStatusAndDoesNotReportPurchaseFailure() = runTest {
+        givenConfirmPurchaseFails()
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+
+            assertEquals(AUTO_RENEWABLE, authRepository.getSubscription()?.status)
+            verify(pixelSender, never()).reportPurchaseFailureBackend()
+            verify(subscriptionSwitchWideEvent).onSwitchConfirmationFailure("confirm_request_failed")
+            verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanConfirmReturnsNotActiveThenReportsSwitchConfirmationFailure() = runTest {
+        givenConfirmPurchaseReturnsNotActive()
+        givenV2AccessTokenRefreshSucceeds()
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+
+            verify(subscriptionSwitchWideEvent).onSwitchConfirmationFailure("confirm_not_active")
+            verify(subscriptionSwitchWideEvent, never()).onSwitchConfirmationSuccess()
+            assertNotEquals(WAITING, authRepository.getSubscription()?.status)
+            verify(pixelSender, never()).reportPurchaseFailureBackend()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseCancelledThenDoesNotReportSwitchWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+
+            verify(subscriptionPurchaseWideEvent).onPurchaseCancelledByUser()
+            verify(subscriptionSwitchWideEvent, never()).onUserCancelled()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseFailsThenDoesNotReportSwitchWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Failure("error"))
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(subscriptionPurchaseWideEvent).onBillingFlowPurchaseFailure("error")
+            verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanCancelledThenNextBillingResultIsReportedAsPurchase() = runTest {
+        val purchaseStateFlow = givenPlanSwitchStarted()
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchaseStateFlow.emit(Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+
+            purchaseStateFlow.emit(Failure("error"))
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(subscriptionSwitchWideEvent).onUserCancelled()
+            verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
+            verify(subscriptionPurchaseWideEvent).onBillingFlowPurchaseFailure("error")
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataAndPlanChangedThenReportsPlanChangedToSwitchWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements()
+        subscriptionsManager.refreshSubscriptionData()
+        clearInvocations(subscriptionSwitchWideEvent)
+        givenSubscriptionSucceedsWithPendingPlans()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        verify(subscriptionSwitchWideEvent).onSubscriptionUpdated(
+            oldStatus = eq(AUTO_RENEWABLE),
+            newStatus = eq(AUTO_RENEWABLE),
+            planChanged = eq(true),
+        )
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataAndPlanUnchangedThenReportsPlanNotChangedToSwitchWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements()
+        subscriptionsManager.refreshSubscriptionData()
+        clearInvocations(subscriptionSwitchWideEvent)
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        verify(subscriptionSwitchWideEvent).onSubscriptionUpdated(
+            oldStatus = eq(AUTO_RENEWABLE),
+            newStatus = eq(AUTO_RENEWABLE),
+            planChanged = eq(false),
+        )
+    }
+
+    @Test
+    fun whenUndoCancellationAndFlagDisabledThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(false)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenUndoCancellationAndSubscriptionAutoRenewableThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription(status = AUTO_RENEWABLE)
+        givenOwnedPurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any(), any())
+        verify(subscriptionUndoCancellationWideEvent, never()).onFlowStarted(any(), any(), any())
+    }
+
+    @Test
+    fun whenUndoCancellationAndPlatformNotGoogleThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription(platform = "stripe")
+        givenOwnedPurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenUndoCancellationAndNoPlayPurchaseThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenNoActivePurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any(), any())
+        verify(subscriptionUndoCancellationWideEvent).onFlowStarted(planId = MONTHLY_PLAN_US, isFreeTrial = false, expiresAt = 1234L)
+        verify(subscriptionUndoCancellationWideEvent).onEligibilityChecked(canUndoInApp = false)
+    }
+
+    @Test
+    fun whenUndoCancellationAndPlayPurchaseFromOtherAccountThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase(externalId = "other")
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenUndoCancellationAndPlayPurchaseForOtherProductThenNotEligible() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase(product = SubscriptionsConstants.ADVANCED_SUBSCRIPTION)
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.NotEligible, result)
+        verify(playBillingManager, never()).launchCancellationUndoFlow(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenUndoCancellationAndEligibleThenReplacesCancelledPurchaseWithoutProration() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+
+        val result = subscriptionsManager.undoSubscriptionCancellation(mock())
+
+        assertEquals(UndoCancellationResult.Launched, result)
+        verify(playBillingManager).launchCancellationUndoFlow(
+            activity = any(),
+            planId = eq(MONTHLY_PLAN_US),
+            externalId = eq("1234"),
+            oldPurchaseToken = eq("owned_purchase_token"),
+        )
+        verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), anyOrNull())
+        verify(playBillingManager, never()).launchSubscriptionUpdate(any(), any(), any(), anyOrNull(), any(), any())
+        verify(subscriptionUndoCancellationWideEvent).onFlowStarted(planId = MONTHLY_PLAN_US, isFreeTrial = false, expiresAt = 1234L)
+        verify(subscriptionUndoCancellationWideEvent).onEligibilityChecked(canUndoInApp = true)
+    }
+
+    @Test
+    fun whenUndoCancellationConfirmedThenEmitsCancellationUndoSuccessWithoutPurchasePixels() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+        val localPurchasedAt = authRepository.getLocalPurchasedAt()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertEquals(CurrentPurchase.Success(isFreeTrial = false, isCancellationUndo = true), awaitItem())
+
+            verify(pixelSender, never()).reportPurchaseSuccess(any())
+            verify(pixelSender, never()).reportSubscriptionActivated()
+            verify(pixelSender, never()).reportSubscriptionSwitch()
+            verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseSuccess()
+            verify(subscriptionPurchaseWideEvent, never()).onPurchaseConfirmationSuccess()
+            verify(subscriptionSwitchWideEvent, never()).onPlayBillingSwitchSuccess()
+            verify(subscriptionSwitchWideEvent, never()).onSwitchConfirmationSuccess()
+            verify(subscriptionUndoCancellationWideEvent).onBillingFlowPurchaseSuccess()
+            verify(subscriptionUndoCancellationWideEvent).onConfirmationSuccess()
+            assertEquals(localPurchasedAt, authRepository.getLocalPurchasedAt())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUndoCancellationConfirmedWithFreeTrialThenDoesNotStartFreeTrial() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+        givenConfirmPurchaseSucceedsWithFreeTrial()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertEquals(CurrentPurchase.Success(isFreeTrial = true, isCancellationUndo = true), awaitItem())
+
+            verify(freeTrialConversionWideEvent, never()).onFreeTrialStarted(any())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUndoCancellationFailsThenDoesNotReportPurchaseOrSwitchWideEvents() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Failure("error"))
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(subscriptionPurchaseWideEvent, never()).onBillingFlowPurchaseFailure(any())
+            verify(subscriptionSwitchWideEvent, never()).onSwitchFailed(any())
+            verify(subscriptionUndoCancellationWideEvent).onBillingFlowPurchaseFailure("error")
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUndoCancellationCancelledThenDoesNotReportPurchaseOrSwitchWideEvents() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+
+            verify(subscriptionPurchaseWideEvent, never()).onPurchaseCancelledByUser()
+            verify(subscriptionSwitchWideEvent, never()).onUserCancelled()
+            verify(subscriptionUndoCancellationWideEvent).onUserCancelled()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUndoCancellationConfirmFailsThenKeepsStatusAndDoesNotReportPurchaseFailure() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenOwnedPurchase()
+        givenConfirmPurchaseFails()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.undoSubscriptionCancellation(mock())
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+
+            assertEquals(NOT_AUTO_RENEWABLE, authRepository.getSubscription()?.status)
+            verify(pixelSender, never()).reportPurchaseFailureBackend()
+            verify(subscriptionUndoCancellationWideEvent).onConfirmationFailure("confirm_request_failed")
+            verify(subscriptionUndoCancellationWideEvent, never()).onConfirmationSuccess()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataThenReportsStatusChangeToUndoCancellationWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenCancelledGoogleSubscription()
+        givenSubscriptionSucceedsWithoutEntitlements()
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        verify(subscriptionUndoCancellationWideEvent).onSubscriptionUpdated(
+            oldStatus = NOT_AUTO_RENEWABLE,
+            newStatus = AUTO_RENEWABLE,
+        )
+    }
+
+    @Test
+    fun whenPurchaseConfirmedThenDoesNotReportUndoCancellationWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionUndoCancellationWideEvent, never()).onBillingFlowPurchaseSuccess()
+            verify(subscriptionUndoCancellationWideEvent, never()).onConfirmationSuccess()
 
             cancelAndConsumeRemainingEvents()
         }
@@ -2829,9 +3458,14 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertEquals(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = false), awaitItem())
 
+            verify(authClient).getTokens(FAKE_REFRESH_TOKEN_V2)
             verify(pixelSender, never()).reportSubscriptionSwitch()
             verify(pixelSender).reportPurchaseSuccess(isFreeTrial = false)
             verify(pixelSender).reportSubscriptionActivated()
+            verify(subscriptionPurchaseWideEvent).onBillingFlowPurchaseSuccess()
+            verify(subscriptionPurchaseWideEvent).onPurchaseConfirmationSuccess()
+            verify(subscriptionSwitchWideEvent, never()).onPlayBillingSwitchSuccess()
+            verify(subscriptionSwitchWideEvent, never()).onSwitchConfirmationSuccess()
 
             cancelAndConsumeRemainingEvents()
         }
@@ -2861,6 +3495,11 @@ class RealSubscriptionsManagerTest {
     }
 
     @SuppressLint("DenyListedApi")
+    private fun givenSkipValidAccessTokenRefreshEnabled(value: Boolean) {
+        subscriptionsFeature.skipValidAccessTokenRefresh().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    @SuppressLint("DenyListedApi")
     private fun givenSubscriptionConcurrentExperimentsEnabled(value: Boolean) {
         subscriptionsFeature.subscriptionConcurrentExperiments().setRawStoredState(State(remoteEnableState = value))
     }
@@ -2878,6 +3517,27 @@ class RealSubscriptionsManagerTest {
         assertEquals("ddg-privacy-pro-yearly-renews-us", subscription.pendingPlans[0].productId)
         assertEquals(SubscriptionTier.PLUS, subscription.pendingPlans[0].tier)
         assertTrue(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenRefreshSubscriptionDataWithPlanCountryThenStoresPlanCountry() = runTest {
+        givenUserIsSignedIn()
+        whenever(subscriptionsService.subscription()).thenReturn(
+            SubscriptionResponse(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1234,
+                platform = "stripe",
+                status = "Auto-Renewable",
+                activeOffers = listOf(),
+                planCountry = "DE",
+            ),
+        )
+
+        subscriptionsManager.refreshSubscriptionData()
+
+        assertEquals("DE", subscriptionsManager.getSubscription()!!.planCountry)
     }
 
     @Test
@@ -2983,6 +3643,65 @@ class RealSubscriptionsManagerTest {
                 activeOffers = emptyList(),
             ),
         )
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenUndoSubscriptionCancellationEnabled(value: Boolean) {
+        subscriptionsFeature.undoSubscriptionCancellation().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    private suspend fun givenPlanSwitchStarted(): MutableSharedFlow<PurchaseState> {
+        givenUserIsSignedIn()
+        givenActiveSubscription(productId = MONTHLY_PLAN_US)
+        givenPurchaseStored()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(Account("test@test.com", "1234"))
+        authRepository.setFeatures(MONTHLY_PRO_PLAN_US, setOf(NETP))
+        givenAllowProTierPurchase(true)
+        givenPlansAvailable(MONTHLY_PRO_PLAN_US)
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = MONTHLY_PRO_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+        )
+        return purchaseStateFlow
+    }
+
+    private suspend fun givenCancelledGoogleSubscription(
+        status: SubscriptionStatus = NOT_AUTO_RENEWABLE,
+        platform: String = "google",
+    ) {
+        authRepository.setSubscription(
+            Subscription(
+                productId = MONTHLY_PLAN_US,
+                billingPeriod = "P1M",
+                startedAt = 1234L,
+                expiresOrRenewsAt = 1234L,
+                status = status,
+                platform = platform,
+                activeOffers = emptyList(),
+            ),
+        )
+    }
+
+    private suspend fun givenOwnedPurchase(
+        externalId: String = "1234",
+        product: String = SubscriptionsConstants.BASIC_SUBSCRIPTION,
+    ) {
+        val identifiers: AccountIdentifiers = mock {
+            whenever(it.obfuscatedAccountId).thenReturn(externalId)
+        }
+        val purchase: Purchase = mock {
+            whenever(it.products).thenReturn(listOf(product))
+            whenever(it.accountIdentifiers).thenReturn(identifiers)
+            whenever(it.purchaseToken).thenReturn("owned_purchase_token")
+        }
+        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Present(purchase))
     }
 
     private suspend fun givenNoActiveSubscription() {

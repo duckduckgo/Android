@@ -51,8 +51,6 @@ dependencies {
     implementation project(path: ':settings-api')
     implementation project(path: ':network-protection-api')
     implementation project(path: ':internal-features-api')
-    implementation project(path: ':macos-api')
-    implementation project(path: ':windows-api')
     implementation project(path: ':downloads-api')
     implementation project(path: ':statistics-api')
     implementation project(':privacy-config-api') // remote feature flag
@@ -112,8 +110,6 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation AndroidX.work.testing
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -121,9 +117,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.subscriptions.impl'
 }

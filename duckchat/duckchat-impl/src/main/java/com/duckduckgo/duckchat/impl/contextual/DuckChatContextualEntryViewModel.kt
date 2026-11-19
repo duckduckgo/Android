@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -26,6 +27,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.InputOutcomeTracker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -51,6 +53,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val selectionPayloadBuilder: TextSelectionPayloadBuilder,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
     private val inputOutcomeTracker: InputOutcomeTracker,
+    private val entryWideEvent: DuckAiEntryWideEvent,
 ) : ViewModel() {
 
     data class ViewState(
@@ -62,6 +65,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         val serialized: String,
         val title: String,
         val url: String,
+        val mimeType: String = "",
     )
 
     sealed class Command {
@@ -89,7 +93,13 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     }
 
     fun onPageContextReceived(serializedPageContext: String) {
-        if (!isContextValid(serializedPageContext)) return
+        if (!isContextValid(serializedPageContext)) {
+            if (PdfPageContextResolver.isPdf(serializedPageContext)) {
+                latestValidPageContext = null
+                _viewState.update { it.copy(attachedContext = null, latestPageContext = serializedPageContext) }
+            }
+            return
+        }
         latestValidPageContext = serializedPageContext
         _viewState.update { it.copy(latestPageContext = serializedPageContext) }
         // The dialog is only shown from "Ask about page", so attach regardless of the auto-attach feature
@@ -125,8 +135,8 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         submit(prompt, carriesTermsConsent = false)
     }
 
-    fun onPromptSubmitted(prompt: NativeInputPrompt) {
-        submit(prompt)
+    fun onPromptSubmitted(prompt: NativeInputPrompt, voice: Boolean = false) {
+        submit(prompt, voice = voice)
     }
 
     private fun fireUnifiedInputPromptSubmitted() {
@@ -148,6 +158,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private fun submit(
         prompt: NativeInputPrompt,
         carriesTermsConsent: Boolean = true,
+        voice: Boolean = false,
     ) {
         val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
         selectionsJson?.length()?.takeIf { it > 0 }?.let {
@@ -161,6 +172,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
                 serializedPageContext = _viewState.value.attachedContext?.serialized,
                 selectionsJson = selectionsJson,
                 carriesTermsConsent = carriesTermsConsent,
+                voice = voice,
             ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()
@@ -178,6 +190,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
                     serialized = serializedPageContext,
                     title = json.optString("title"),
                     url = json.optString("url"),
+                    mimeType = json.optString("mimeType"),
                 ),
             )
         }
@@ -185,11 +198,13 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     private fun isContextValid(serializedPageContext: String): Boolean {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return false
-        return json.optString("title").isNotBlank() && json.optString("content").isNotBlank()
+        return json.optString("title").isNotBlank() && json.optBoolean("attachable", true) &&
+            (json.optString("content").isNotBlank() || json.optString("mimeType") == PDF_MIME_TYPE)
     }
 
     fun onDismiss() {
         duckChatPixels.reportContextualFloatingInputDismissedWithoutSubmission()
         selectionJourney.onSurfaceDismissed(tabId)
+        entryWideEvent.onContextualSheetClosed(tabId)
     }
 }

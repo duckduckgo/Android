@@ -312,4 +312,24 @@
     <string name="importBookmarksErrorGenericMessage">Възникна някаква грешка</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Моля, увери се, че имаш връзка с интернет и опитай отново.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Импортирането е завършено!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Изчакайте – оставете този прозорец отворен. Не би трябвало да отнеме повече от минута-две.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google може да поиска да въведете парола.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google ще изпрати имейл с потвърждение, че данните Ви са експортирани. Не е нужно да правите нищо.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Импортирането е завършено!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Импортирани отметки: <b>%1$d</b>]]></string>
+
+    <!-- Passwords import promo on the bookmarks import result screen -->
+    <string name="passwords_import_promo_in_bookmarks_import_title">Прехвърлете паролите си от Google в DuckDuckGo.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_button">Импортиране на пароли от Google</string>
+
+    <!-- Bookmarks import promo on the passwords import result screen -->
+    <string name="bookmarks_import_promo_in_passwords_import_title">Прехвърлете отметките си от Google в DuckDuckGo.</string>
+    <string name="bookmarks_import_promo_in_passwords_import_button">Импортиране на отметки от Google</string>
+
 </resources>

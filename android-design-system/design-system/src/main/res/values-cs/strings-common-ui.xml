@@ -32,6 +32,8 @@
     <string name="removeAll">Odstranit vše</string>
     <string name="undo">Vrátit</string>
     <string name="cancel">Zrušit</string>
+    <string name="done">Hotovo</string>
+    <string name="search">Vyhledávání</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Vždycky zapnuté</string>

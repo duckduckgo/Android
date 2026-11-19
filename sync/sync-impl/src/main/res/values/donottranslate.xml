@@ -15,14 +15,35 @@
   -->
 
 <resources>
-    <!-- Sync promo on passwords import success screen -->
-    <string name="sync_passwords_import_promo_title">Access your passwords across Mobile&#160;and&#160;Desktop.</string>
-    <string name="sync_passwords_import_promo_primary_button">Turn on Sync&#160;&amp;&#160;Backup</string>
-
-    <!-- Sync promo on bookmarks import success screen -->
-    <string name="sync_bookmarks_import_promo_title">Access your bookmarks across Mobile&#160;and&#160;Desktop.</string>
-    <string name="sync_bookmarks_import_promo_primary_button">Turn on Sync&#160;&amp;&#160;Backup</string>
-
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
+
+    <string name="syncAuditLogTitle">Device Activity</string>
+    <string name="syncAuditLogListLabel">Most recently synced or removed devices:</string>
+    <string name="syncAuditLogError">Device activity is temporarily unavailable.</string>
+    <string name="syncAuditLogEmpty">You have no recent activity.</string>
+    <string name="syncAuditLogSynced">Synced</string>
+    <string name="syncAuditLogRemoved">Removed</string>
+    <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity. First placeholder is how long ago it happened, for example 3 days ago. Second placeholder is Synced or Removed">%1$s · %2$s</string>
+    <string name="syncAuditLogJustNow">Just now</string>
+    <plurals name="syncAuditLogMinutesAgo" instruction="Placeholder is the number of minutes since a device was synced or removed">
+        <item quantity="one">%1$d minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
+    </plurals>
+    <plurals name="syncAuditLogHoursAgo" instruction="Placeholder is the number of hours since a device was synced or removed">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
+    <plurals name="syncAuditLogDaysAgo" instruction="Placeholder is the number of days since a device was synced or removed">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+    <plurals name="syncAuditLogMonthsAgo" instruction="Placeholder is the number of months since a device was synced or removed">
+        <item quantity="one">%1$d month ago</item>
+        <item quantity="other">%1$d months ago</item>
+    </plurals>
+    <plurals name="syncAuditLogYearsAgo" instruction="Placeholder is the number of years since a device was synced or removed">
+        <item quantity="one">%1$d year ago</item>
+        <item quantity="other">%1$d years ago</item>
+    </plurals>
 </resources>

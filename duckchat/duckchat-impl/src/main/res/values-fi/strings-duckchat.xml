@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Avaa Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Lue lisää</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Kysy Duck.ai:lta</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Haluatko helpomman pääsyn\nyksityiseen tekoäly-chatiin?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Hae tai anna osoite</string>
@@ -234,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Viimeaikaiset</string>
     <string name="duck_ai_chat_history_untitled">Nimetön keskustelu</string>
     <string name="duck_ai_chat_history_empty_title">Ei vielä yhtään keskustelua</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Avaa Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Lisää vaihtoehtoja</string>
     <string name="duck_ai_chat_history_action_select">Valitse</string>
     <string name="duck_ai_chat_history_action_pin">Kiinnitä</string>
@@ -394,6 +390,7 @@
         <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d tunti</item>
         <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d tuntia</item>
     </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Tee yhteenveto tästä asiakirjasta</string>
 
     <!-- Duck.ai ToS consent submit button -->
     <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Kysy</string>
@@ -405,4 +402,10 @@
     <string name="duckAiTabCardListeningTitle" instruction="Header on a tab switcher card for a Duck.ai tab with a voice chat in progress, shown while Duck.ai is listening to the user.">Kuunnellaan…</string>
     <string name="duckAiTabCardVoiceChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a voice chat, as opposed to a text chat.">Äänikeskustelu</string>
     <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Transkriptio</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Tiedostot tarkistetaan automaattisesti laittoman sisällön varalta. Merkittyjen keskustelujen tietojen säilytysaika on rajoitettu. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <!-- Duck.ai new chat hints -->
+    <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Analysoi tiedostoja</string>
+    <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Kysy kuvista</string>
+    <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Luo kuva</string>
 </resources>

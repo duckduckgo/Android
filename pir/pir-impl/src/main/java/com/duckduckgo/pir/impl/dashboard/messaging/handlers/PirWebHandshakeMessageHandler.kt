@@ -23,6 +23,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirUserUtils
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirDashboardFreeScanEntryPointHolder
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -43,6 +44,7 @@ import javax.inject.Inject
 class PirWebHandshakeMessageHandler @Inject constructor(
     private val subscriptions: Subscriptions,
     private val pirUserUtils: PirUserUtils,
+    private val freeScanEntryPointHolder: PirDashboardFreeScanEntryPointHolder,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirWebJsMessageHandler() {
@@ -75,6 +77,7 @@ class PirWebHandshakeMessageHandler @Inject constructor(
         return PirWebMessageResponse.HandshakeResponse.UserData(
             isAuthenticatedUser = pirUserUtils.hasPirSubscription(),
             isUserEligibleForFreeTrial = subscriptions.isFreeTrialEligible(),
+            freeScanEntryPoint = freeScanEntryPointHolder.freeScanEntryPoint.await()?.token,
         )
     }
 }

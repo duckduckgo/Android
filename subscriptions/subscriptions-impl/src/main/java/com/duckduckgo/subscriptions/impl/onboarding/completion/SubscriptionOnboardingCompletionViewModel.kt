@@ -25,6 +25,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
+import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController.Event.StepFinished
@@ -32,7 +33,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLE
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionOnboardingStepPixels.Step
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -53,6 +57,8 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val pirFeature: PirFeature,
     private val handoffState: SubscriptionOnboardingHandoffState,
+    private val pixelSender: SubscriptionPixelSender,
+    private val subscriptionsManager: SubscriptionsManager,
 ) : ViewModel() {
 
     data class ViewState(
@@ -107,6 +113,10 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
 
     fun onPirRowClicked() {
         _commands.trySend(Command.LaunchPirStep)
+        viewModelScope.launch {
+            val isFreeTrial = subscriptionsManager.getSubscription()?.activeOffers?.contains(ActiveOfferType.TRIAL) == true
+            pixelSender.reportOnboardingStepShown(Step.PIR, isFreeTrial)
+        }
     }
 
     private fun rebuild() {

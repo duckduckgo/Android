@@ -61,32 +61,22 @@ interface AutoconsentFeature {
     fun heuristicAction(): Toggle
 
     /**
+     * Enables autoconsent heuristic hit-testing, which probes the viewport for cookie popups
+     * that aren't fixed, sticky or dialog-like. Only applies when heuristic detection is active.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun heuristicHitTest(): Toggle
+
+    /**
+     * Makes autoconsent also wait for DOM changes while it checks whether a popup is open,
+     * so that popups that render late are found.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun popupMutationObserver(): Toggle
+
+    /**
      * Gate for the new Cookie Pop-up Preference settings UI and behavior.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun cookiePopUpPreferenceSetting(): Toggle
-
-    /**
-     * Gate for the Cookie Pop-up Protection opt-in prompt shown through the prompts coordinator.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun cookiePopUpOptInPrompt(): Toggle
-
-    /**
-     * Allows the Cookie Pop-up Protection opt-in prompt to be dismissed with the back button.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun cookiePopUpOptInPromptDismissible(): Toggle
-
-    /**
-     * Shows a close button on the Cookie Pop-up Protection opt-in prompt.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun cookiePopUpOptInPromptCloseButton(): Toggle
-
-    /**
-     * Gate for the V2 copy variant of the Cookie Pop-up Protection opt-in prompt shown when protection is already on.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun cookiePopUpOptInPromptPrimaryButtonV2(): Toggle
 }

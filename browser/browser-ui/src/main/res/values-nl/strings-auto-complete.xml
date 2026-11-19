@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Annuleren</string>
     <string name="autocompleteRemoveItemRemove">Verwijderen</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Overschakelen naar tabblad · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Vraag stellen aan Duck.ai</string>
 </resources>

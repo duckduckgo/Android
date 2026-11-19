@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 import android.content.Context
 import android.view.View
 import app.cash.turbine.test
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.Command.Exit
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksViewModel.ViewMode
@@ -249,8 +250,53 @@ class ImportGoogleBookmarksViewModelTest {
         }
     }
 
-    private fun createViewModel(isRedesignEnabled: Boolean) = ImportGoogleBookmarksViewModel(
-        launchSource = "bookmarks_screen",
+    @Test
+    fun `when back pressed after success then exit with success`() = runTest {
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Success(importedCount = 10))
+
+        testee.commands.test {
+            testee.onBackPressed()
+
+            assertEquals(Exit(ImportGoogleBookmarkResult.Success(importedCount = 10)), awaitItem())
+        }
+    }
+
+    @Test
+    fun `when back pressed after error then exit with error`() = runTest {
+        testee.onWebFlowFinished(ImportGoogleBookmarkResult.Error(DownloadError))
+
+        testee.commands.test {
+            testee.onBackPressed()
+
+            assertEquals(Exit(ImportGoogleBookmarkResult.Error(DownloadError)), awaitItem())
+        }
+    }
+
+    @Test
+    fun `when back pressed during web flow loading then exit as cancelled`() = runTest {
+        testee.commands.test {
+            testee.onBackPressed()
+
+            assertEquals(Exit(ImportGoogleBookmarkResult.UserCancelled(stage = "uninitialized")), awaitItem())
+        }
+        verify(mockImportJourney).cancelled("uninitialized")
+    }
+
+    @Test
+    fun `when back pressed while waiting for export then exit as cancelled`() = runTest {
+        testee.onWaitingForExportStarted()
+
+        testee.commands.test {
+            testee.onBackPressed()
+
+            assertEquals(Exit(ImportGoogleBookmarkResult.UserCancelled(stage = "uninitialized")), awaitItem())
+        }
+    }
+
+    private fun createViewModel(
+        isRedesignEnabled: Boolean,
+    ) = ImportGoogleBookmarksViewModel(
+        params = BookmarksImportParams(launchSource = "bookmarks_screen"),
         isRedesignEnabled = isRedesignEnabled,
         importJourney = mockImportJourney,
         promotionPlugins = object : PluginPoint<BookmarksImportScreenPromotionPlugin> {

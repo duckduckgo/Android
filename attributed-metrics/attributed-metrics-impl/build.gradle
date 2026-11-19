@@ -69,8 +69,6 @@ dependencies {
 
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -79,9 +77,6 @@ android {
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     namespace 'com.duckduckgo.app.attributed.metrics'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     buildFeatures {
         buildConfig = true
     }

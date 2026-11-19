@@ -1,0 +1,109 @@
+// Wide event pixel for the subscription undo-cancellation flow
+{
+    "wide_subscription-undo-cancellation": {
+        "description": "Sent when the undo-cancellation flow started from Keep Subscription in Subscription Settings ends",
+        "owners": ["nalcalag"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["subscription-undo-cancellation"]
+            },
+            {
+                "key": "feature.data.ext.plan",
+                "description": "Plan ID of the cancelled subscription",
+                "enum": [
+                    "ddg-privacy-pro-monthly-renews-us",
+                    "ddg-privacy-pro-monthly-renews-row",
+                    "ddg-privacy-pro-yearly-renews-us",
+                    "ddg-privacy-pro-yearly-renews-row",
+                    "ddg-subscription-pro-yearly-renews-us",
+                    "ddg-subscription-pro-monthly-renews-us",
+                    "ddg-subscription-pro-yearly-renews-row",
+                    "ddg-subscription-pro-monthly-renews-row"
+                ]
+            },
+            {
+                "key": "feature.data.ext.free_trial",
+                "description": "Whether the subscription is in a free trial",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.days_to_expiry",
+                "description": "Days left until the subscription expires, bucketed",
+                "enum": ["d0", "d1_to_d3", "d4_to_d7", "d8_plus"]
+            },
+            {
+                "key": "feature.data.ext.method",
+                "description": "How the undo is done: in the app, or in the Play Store when the Play account on the device doesn't own the subscription",
+                "enum": ["in_app", "store"]
+            },
+            {
+                "key": "feature.data.ext.activation_latency_ms_bucketed",
+                "description": "Duration from the Play purchase (or the Play Store fallback) to renewal being back on, in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.confirm_failure_reason",
+                "description": "Why the backend confirm failed. Only present when step.confirm_purchase is false",
+                "enum": ["confirm_request_failed", "confirm_not_active"]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Play billing error. Only present on FAILURE events.",
+                "enum": [
+                    "SERVICE_TIMEOUT",
+                    "FEATURE_NOT_SUPPORTED",
+                    "SERVICE_DISCONNECTED",
+                    "USER_CANCELED",
+                    "SERVICE_UNAVAILABLE",
+                    "BILLING_UNAVAILABLE",
+                    "ITEM_UNAVAILABLE",
+                    "DEVELOPER_ERROR",
+                    "ERROR",
+                    "ITEM_ALREADY_OWNED",
+                    "ITEM_NOT_OWNED",
+                    "NETWORK_ERROR",
+                    "UNKNOWN_ERROR",
+                    "BILLING_CRASH_ERROR",
+                    "UNKNOWN",
+                    "empty old purchase token",
+                    "Missing product details"
+                ]
+            },
+            {
+                "key": "feature.data.ext.step.check_eligibility",
+                "description": "True if the undo can be done in the app, false if the user is sent to the Play Store",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.billing_flow_init",
+                "description": "Whether the Play billing sheet opened",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.billing_flow_purchase",
+                "description": "Whether the user confirmed in the Play billing sheet",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.confirm_purchase",
+                "description": "Whether the backend confirmed the renewal is back on",
+                "type": "boolean"
+            }
+        ]
+    }
+}

@@ -83,6 +83,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val tabId: String = "",
         val currentTabId: String = "",
         val shouldShow: Boolean = false,
+        val isIdleReturnSettled: Boolean = false,
         val mode: BrowserMode = BrowserMode.REGULAR,
         val isDuckChat: Boolean = false,
         val isSerp: Boolean = false,
@@ -106,7 +107,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     // The target the hatch offers to return to, captured once when the app returns from idle. Driving
     // the hatch from this snapshot (instead of the live last-accessed flow) keeps the displayed tab
     // stable: it never switches to another tab while up, and survives the close/undo toggle.
-    private val snapshotTarget = MutableStateFlow<EscapeHatchTarget?>(null)
+    private val snapshot = MutableStateFlow(IdleReturnSnapshot())
 
     // The mode of the tab being closed, captured when close begins so undo/commit route to the same
     // repo even if the active snapshot changes (e.g. a fresh idle-return) while the snackbar is up.
@@ -118,16 +119,16 @@ class NewTabReturnHatchViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             ntpAfterIdleManager.isAfterIdleReturn.collect { afterIdle ->
                 if (afterIdle) {
-                    snapshotTarget.value = escapeHatchTargetResolver.resolve()
+                    snapshot.value = IdleReturnSnapshot(target = escapeHatchTargetResolver.resolve(), isSettled = true)
                     pendingClose.value = false
                 } else {
-                    snapshotTarget.value = null
+                    snapshot.value = IdleReturnSnapshot()
                 }
             }
         }
     }
 
-    // Driven by the captured [snapshotTarget] (not the live last-accessed flow) so the displayed tab
+    // Driven by the captured [snapshot] target (not the live last-accessed flow) so the displayed tab
     // is stable across the close/undo toggle. For a Regular target, flowTabs both supplies the live
     // tabs count and gates visibility: the hatch hides as soon as the snapshot tab leaves the
     // repository (burned, closed, or purged), so every live ViewModel instance stays in sync without
@@ -143,7 +144,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
         capability != NativeInputState.InputMode.SEARCH_ONLY && !navBarEnabled
     }
 
-    val viewState = snapshotTarget.flatMapLatest { target ->
+    val viewState = snapshot.flatMapLatest { (target, isSettled) ->
         if (target == null) {
             combine(
                 currentTabRepository.flowTabs,
@@ -152,6 +153,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
             ) { tabs, showTabs, afterInactivitySettings ->
                 ViewState(
                     shouldShow = false,
+                    isIdleReturnSettled = isSettled,
                     tabs = tabs.size,
                     showTabsButton = showTabs,
                     showAfterInactivityEntry = newTabReturnHatchFeature.afterInactivityEntry().isEnabled(),
@@ -178,6 +180,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
                         tabId = tab.tabId,
                         currentTabId = tab.tabId,
                         shouldShow = true,
+                        isIdleReturnSettled = isSettled,
                         mode = target.mode,
                         isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
                         isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
@@ -189,6 +192,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
                 } else {
                     ViewState(
                         shouldShow = false,
+                        isIdleReturnSettled = isSettled,
                         tabs = activityTabs.size,
                         showTabsButton = showTabs,
                         showAfterInactivityEntry = newTabReturnHatchFeature.afterInactivityEntry().isEnabled(),
@@ -215,7 +219,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
         ntpAfterIdleManager.onCloseTabTapped()
         val tabId = viewState.value.currentTabId
         if (tabId.isEmpty()) return
-        pendingCloseMode = snapshotTarget.value?.mode ?: BrowserMode.REGULAR
+        pendingCloseMode = snapshot.value.target?.mode ?: BrowserMode.REGULAR
         val repo = targetRepository
         // Mark the tab deletable now so it disappears from the tab list/switcher immediately
         // (recoverable via undo); the actual delete is committed when the snackbar is dismissed.
@@ -280,3 +284,9 @@ class NewTabReturnHatchViewModel @Inject constructor(
         is AfterInactivitySettings.SpecificPage -> AfterInactivityDestinationSummary.Url(url)
     }
 }
+
+// Target and settled flag change together so no emission pairs a settled flag with a stale target.
+private data class IdleReturnSnapshot(
+    val target: EscapeHatchTarget? = null,
+    val isSettled: Boolean = false,
+)

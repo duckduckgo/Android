@@ -16,15 +16,28 @@
 
 package com.duckduckgo.experiments.impl.reinstalls
 
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.yield
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -40,6 +53,8 @@ class ReinstallAtbListenerTest {
     private val mockReinstallerVariantProtectionFeature: ReinstallerVariantProtectionFeature = mock()
     private val mockSelfToggle: Toggle = mock()
     private val mockProtectVariantsToggle: Toggle = mock()
+    private val mockPixel: Pixel = mock()
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val moshi: Moshi = Moshi.Builder().build()
 
     @get:Rule
@@ -51,6 +66,8 @@ class ReinstallAtbListenerTest {
         whenever(mockReinstallerVariantProtectionFeature.protectVariants()).thenReturn(mockProtectVariantsToggle)
         whenever(mockSelfToggle.isEnabled()).thenReturn(false)
         whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(false)
+        whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(34)
 
         testee = ReinstallAtbListener(
             mockBackupDataStore,
@@ -58,6 +75,8 @@ class ReinstallAtbListenerTest {
             mockAppBuildConfig,
             coroutineTestRule.testDispatcherProvider,
             mockReinstallerVariantProtectionFeature,
+            mockPixel,
+            mockCurrentTimeProvider,
             moshi,
         )
     }
@@ -178,5 +197,189 @@ class ReinstallAtbListenerTest {
         testee.beforeAtbInit()
 
         verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenReinstallCheckRunsPastTheTimeLimitThenVariantForReturningUserIsStillSet() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).doSuspendableAnswer {
+            delay(testee.beforeAtbInitTimeoutMillis() * 2)
+            true
+        }
+
+        val result = withTimeoutOrNull(testee.beforeAtbInitTimeoutMillis()) { testee.beforeAtbInit() }
+
+        assertNull(result)
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenTimeLimitIsReachedBeforeTheReinstallCheckStartsThenCheckStillRunsAndVariantIsSet() = runBlocking {
+        val realDispatcherTestee = ReinstallAtbListener(
+            mockBackupDataStore,
+            mockStatisticsDataStore,
+            mockAppBuildConfig,
+            DefaultDispatcherProvider(),
+            mockReinstallerVariantProtectionFeature,
+            mockPixel,
+            mockCurrentTimeProvider,
+            moshi,
+        )
+        whenever(mockBackupDataStore.clearBackupPreferences()).doAnswer { Thread.sleep(SLOW_BLOCKING_WORK_MS) }
+        // Like the real implementation, which switches context, the check notices cancellation as soon as it starts
+        whenever(mockAppBuildConfig.isAppReinstall()).doSuspendableAnswer {
+            yield()
+            true
+        }
+
+        val result = withTimeoutOrNull(SHORT_TIME_LIMIT_MS) { realDispatcherTestee.beforeAtbInit() }
+
+        assertNull(result)
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenReinstallStepIsWithinTheTimeLimitThenSlowCheckPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L, 1_500L)
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+    }
+
+    @Test
+    fun whenReinstallStepRunsPastTheTimeLimitForReturningUserThenSlowCheckPixelIsFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L, 4_000L)
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel).fire(
+            eq(ReinstallPixelName.REINSTALL_CHECK_SLOW),
+            eq(mapOf("returning_user" to "true", "ru_applied" to "true", "duration" to "3-5")),
+            any(),
+            eq(Unique()),
+        )
+    }
+
+    @Test
+    fun whenReinstallStepRunsPastTheTimeLimitForReturningUserWithProtectedVariantThenSlowCheckPixelSaysRuWasNotApplied() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+        whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L, 4_000L)
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel).fire(
+            eq(ReinstallPixelName.REINSTALL_CHECK_SLOW),
+            eq(mapOf("returning_user" to "true", "ru_applied" to "false", "duration" to "3-5")),
+            any(),
+            eq(Unique()),
+        )
+    }
+
+    @Test
+    fun whenReinstallStepRunsPastTheTimeLimitForNewUserThenSlowCheckPixelIsFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L, 1_501L)
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel).fire(
+            eq(ReinstallPixelName.REINSTALL_CHECK_SLOW),
+            eq(mapOf("returning_user" to "false", "ru_applied" to "false", "duration" to "1.5-3")),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenReinstallStepRunsPastTheTimeLimitBelowAndroid11ThenSlowCheckPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(29)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L, 4_000L)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+        verify(mockPixel, never()).fire(eq(ReinstallPixelName.REINSTALL_CHECK_SLOW), any(), any(), any())
+    }
+
+    @Test
+    fun whenRuIsAppliedBelowAndroid11ThenBlockStoreRuAppliedPixelIsFired() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(29)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+        verify(mockPixel).fire(eq(ReinstallPixelName.BLOCK_STORE_RU_APPLIED), eq(emptyMap()), any(), eq(Unique()))
+    }
+
+    @Test
+    fun whenNewUserBelowAndroid11ThenBlockStoreRuAppliedPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(29)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel, never()).fire(eq(ReinstallPixelName.BLOCK_STORE_RU_APPLIED), any(), any(), any())
+    }
+
+    @Test
+    fun whenReturningUserBelowAndroid11KeepsAProtectedVariantThenBlockStoreRuAppliedPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(29)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockPixel, never()).fire(eq(ReinstallPixelName.BLOCK_STORE_RU_APPLIED), any(), any(), any())
+    }
+
+    @Test
+    fun whenRuIsAppliedOnAndroid11OrAboveThenBlockStoreRuAppliedPixelIsNotFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+        verify(mockPixel, never()).fire(eq(ReinstallPixelName.BLOCK_STORE_RU_APPLIED), any(), any(), any())
+    }
+
+    @Test
+    fun whenReinstallStepIsSlowThenDurationIsBucketed() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        val expectedBuckets = mapOf(
+            3_000L to "1.5-3",
+            3_001L to "3-5",
+            5_001L to "5-10",
+            10_001L to "10-30",
+            30_001L to "30+",
+        )
+
+        expectedBuckets.forEach { (durationMillis, bucket) ->
+            whenever(mockCurrentTimeProvider.elapsedRealtime()).thenReturn(0L, durationMillis)
+
+            testee.beforeAtbInit()
+
+            verify(mockPixel).fire(
+                eq(ReinstallPixelName.REINSTALL_CHECK_SLOW),
+                eq(mapOf("returning_user" to "true", "ru_applied" to "true", "duration" to bucket)),
+                any(),
+                any(),
+            )
+        }
+    }
+
+    private companion object {
+        const val SHORT_TIME_LIMIT_MS = 50L
+        const val SLOW_BLOCKING_WORK_MS = 300L
     }
 }

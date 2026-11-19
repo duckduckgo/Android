@@ -24,11 +24,8 @@ import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelParameters
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Command
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Variant
-import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -50,7 +47,6 @@ class CookiePopupOptInViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val autoconsent: Autoconsent = mock()
-    private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
     private val settingsRepository = FakeSettingsRepository()
     private val now = System.currentTimeMillis()
     private val currentTimeProvider: CurrentTimeProvider = mock {
@@ -65,7 +61,6 @@ class CookiePopupOptInViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             currentTimeProvider = currentTimeProvider,
             pixel = pixel,
-            autoconsentFeature = feature,
         )
     }
 
@@ -81,68 +76,6 @@ class CookiePopupOptInViewModelTest {
         whenever(autoconsent.isSettingEnabled()).thenReturn(false)
 
         assertEquals(Variant.PROTECTION_OFF, testee.viewState.value.variant)
-    }
-
-    @Test
-    fun whenCloseButtonFlagEnabledThenCloseButtonIsVisible() {
-        feature.cookiePopUpOptInPromptCloseButton().setRawStoredState(Toggle.State(enable = true))
-
-        assertTrue(testee.viewState.value.isCloseButtonVisible)
-    }
-
-    @Test
-    fun whenCloseButtonFlagDisabledThenCloseButtonIsHidden() {
-        feature.cookiePopUpOptInPromptCloseButton().setRawStoredState(Toggle.State(enable = false))
-
-        assertFalse(testee.viewState.value.isCloseButtonVisible)
-    }
-
-    @Test
-    fun whenBackDismissFlagEnabledThenBackDismissIsEnabled() {
-        feature.cookiePopUpOptInPromptDismissible().setRawStoredState(Toggle.State(enable = true))
-
-        assertTrue(testee.viewState.value.isBackDismissEnabled)
-    }
-
-    @Test
-    fun whenBackDismissFlagDisabledThenBackDismissIsDisabled() {
-        feature.cookiePopUpOptInPromptDismissible().setRawStoredState(Toggle.State(enable = false))
-
-        assertFalse(testee.viewState.value.isBackDismissEnabled)
-    }
-
-    @Test
-    fun whenPrimaryButtonV2FlagEnabledAndProtectionOnThenUseV2PrimaryButtonCopyIsTrue() {
-        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
-        feature.cookiePopUpOptInPromptPrimaryButtonV2().setRawStoredState(Toggle.State(enable = true))
-
-        assertTrue(testee.viewState.value.useV2PrimaryButtonCopy)
-    }
-
-    @Test
-    fun whenPrimaryButtonV2FlagDisabledThenUseV2PrimaryButtonCopyIsFalse() {
-        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
-        feature.cookiePopUpOptInPromptPrimaryButtonV2().setRawStoredState(Toggle.State(enable = false))
-
-        assertFalse(testee.viewState.value.useV2PrimaryButtonCopy)
-    }
-
-    @Test
-    fun whenPrimaryButtonV2FlagEnabledButProtectionOffThenUseV2PrimaryButtonCopyIsFalse() {
-        whenever(autoconsent.isSettingEnabled()).thenReturn(false)
-        feature.cookiePopUpOptInPromptPrimaryButtonV2().setRawStoredState(Toggle.State(enable = true))
-
-        assertFalse(testee.viewState.value.useV2PrimaryButtonCopy)
-    }
-
-    @Test
-    fun whenCloseButtonClickedThenCloseCommandEmitted() = runTest {
-        testee.commands().test {
-            testee.onCloseClicked()
-
-            assertEquals(Command.Close, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     @Test

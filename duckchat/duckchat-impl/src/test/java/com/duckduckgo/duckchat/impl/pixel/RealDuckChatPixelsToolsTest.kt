@@ -473,7 +473,7 @@ class RealDuckChatPixelsToolsTest {
     }
 
     @Test
-    fun whenPromptSubmittedFromAddressBarWithVoiceEntryPointThenSourceIsVoice() = runTest {
+    fun whenPromptSubmittedFromAddressBarWithEntryPointThenSourceIsThatEntryPoint() = runTest {
         testee.firePromptSubmitted(
             selectedTool = "none",
             modelId = null,
@@ -485,12 +485,12 @@ class RealDuckChatPixelsToolsTest {
             defaultMode = null,
             tabId = "tab1",
             pageType = DuckChatPixelPageType.NTP,
-            addressBarEntryPoint = DuckChatEntryPoint.VOICE,
+            addressBarEntryPoint = DuckChatEntryPoint.SYSTEM_SEARCH,
         )
 
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
-            parameters = promptSubmittedAddressBarParams(pageType = "ntp", source = "voice"),
+            parameters = promptSubmittedAddressBarParams(pageType = "ntp", source = "system_search"),
         )
     }
 

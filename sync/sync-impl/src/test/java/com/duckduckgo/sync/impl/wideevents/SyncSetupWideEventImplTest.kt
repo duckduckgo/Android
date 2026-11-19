@@ -19,35 +19,24 @@ package com.duckduckgo.sync.impl.wideevents
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
-import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncBuildConfig
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(TestParameterInjector::class)
 class SyncSetupWideEventImplTest {
 
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
-
     private val wideEventClient: WideEventClient = mock()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     var isAuthRequired = true
     private val buildConfig = mock<SyncBuildConfig> {
@@ -58,21 +47,14 @@ class SyncSetupWideEventImplTest {
 
     @Before
     fun setup() {
-        syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(true))
-
         wideEvent = SyncSetupWideEventImpl(
             wideEventClient = wideEventClient,
-            syncFeature = lazy { syncFeature },
-            dispatchers = coroutineRule.testDispatcherProvider,
             buildConfig = buildConfig,
         )
     }
 
     @Test
-    fun `onFlowStarted starts a new flow with correct ui and flow parameters`(
-        @TestParameter protocol: ProtocolVersion,
-    ) = runTest {
-        protocol.configure(syncFeature)
+    fun `onFlowStarted starts a new flow with correct ui and flow parameters`() = runTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
@@ -81,16 +63,13 @@ class SyncSetupWideEventImplTest {
         verify(wideEventClient).flowStart(
             name = "sync-setup",
             flowEntryPoint = "other",
-            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to protocol.value),
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to "v2.1"),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
 
     @Test
-    fun `onFlowStarted passes source as flowEntryPoint`(
-        @TestParameter protocol: ProtocolVersion,
-    ) = runTest {
-        protocol.configure(syncFeature)
+    fun `onFlowStarted passes source as flowEntryPoint`() = runTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
@@ -99,7 +78,7 @@ class SyncSetupWideEventImplTest {
         verify(wideEventClient).flowStart(
             name = "sync-setup",
             flowEntryPoint = "promotion_passwords",
-            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to protocol.value),
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to "v2.1"),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
@@ -115,16 +94,6 @@ class SyncSetupWideEventImplTest {
             wideEventId = 99L,
             status = FlowStatus.Unknown,
         )
-    }
-
-    @Test
-    fun `feature disabled results in no interactions`() = runTest {
-        syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(false))
-
-        wideEvent.onFlowStarted()
-        wideEvent.onIntroScreenShown()
-
-        verifyNoInteractions(wideEventClient)
     }
 
     @Test
@@ -281,29 +250,6 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `onUserAuthCancelled aborts the flow`() = runTest {
-        whenever(wideEventClient.getFlowIds(any()))
-            .thenReturn(Result.success(listOf(1L)))
-
-        wideEvent.onUserAuthCancelled()
-
-        verify(wideEventClient).flowFinish(
-            wideEventId = 1L,
-            status = FlowStatus.Cancelled,
-        )
-    }
-
-    @Test
-    fun `onEnrollDeviceAuthDialogShown aborts the flow`() = runTest {
-        whenever(wideEventClient.getFlowIds(any()))
-            .thenReturn(Result.success(listOf(1L)))
-
-        wideEvent.onEnrollDeviceAuthDialogShown()
-
-        verify(wideEventClient).flowAbort(wideEventId = 1L)
-    }
-
-    @Test
     fun `onRecoveryCodeGenerationFailed finishes flow with failure`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(1L)))
@@ -349,21 +295,5 @@ class SyncSetupWideEventImplTest {
 
         verify(wideEventClient, org.mockito.kotlin.times(2)).getFlowIds("sync-setup")
         verifyNoMoreInteractions(wideEventClient)
-    }
-
-    enum class ProtocolVersion(
-        val value: String,
-    ) {
-        ProtocolV1("v1"),
-        ProtocolV2("v2"),
-        ProtocolV2Point1("v2.1"),
-        ;
-
-        fun configure(syncFeature: SyncFeature) {
-            val v2Enabled = this != ProtocolV1
-            val v2Point1Enabled = this == ProtocolV2Point1
-            syncFeature.canUseV2ConnectFlow().setRawStoredState(State(v2Enabled))
-            syncFeature.canUseExchangeV2Point1().setRawStoredState(State(v2Point1Enabled))
-        }
     }
 }

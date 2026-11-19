@@ -1,7 +1,7 @@
 {
   "name": "America Phone Book",
   "url": "americaphonebook.com",
-  "version": "0.1.3",
+  "version": "0.2.2",
   "addedDatetime": 1790121600000,
   "optOutUrl": "https://www.americaphonebook.com/search.php",
   "steps": [
@@ -13,6 +13,17 @@
           "actionType": "navigate",
           "id": "34dc3b70-1783-4a47-bdbd-784213fb83b7",
           "url": "https://www.americaphonebook.com/search.php?first=${firstName}&last=${lastName}&city=${city}&state=${state}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for the Cloudflare managed challenge to clear; the negative selector passes only once the challenge scripts are gone",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-b75628f5-9d07-4209-b311-7889ec6abcca"
         },
         {
           "_comment": "guard on the results row shape or the explicit no-results banner, not something present on every page state",
@@ -55,6 +66,17 @@
           "actionType": "navigate",
           "id": "bfab633f-3a88-43dd-84b4-1d3638ae1089",
           "url": "https://www.americaphonebook.com/search.php?first=${firstName}&last=${lastName}&city=${city}&state=${state}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for the Cloudflare managed challenge to clear; the negative selector passes only once the challenge scripts are gone",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-77a5cccb-fca2-4e54-a212-bc01700c425a"
         },
         {
           "_comment": "guard on the results row shape or the explicit no-results banner, not something present on every page state",
@@ -140,9 +162,9 @@
     }
   ],
   "schedulingConfig": {
-    "retryError": 48,
+    "retryError": 96,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 120,
+    "maintenanceScan": 240,
     "maxAttempts": -1
   },
   "removedAt": null

@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Prekliči</string>
     <string name="autocompleteRemoveItemRemove">Odstrani</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Preklopi na zavihek · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Vprašajte Duck.ai</string>
 </resources>

@@ -23,6 +23,7 @@ buildscript {
     dependencies {
         classpath(Android.tools.build.gradlePlugin)
         classpath "com.android.tools.build:gradle-kotlin:${versionFor(project, Android.tools.build.gradlePlugin)}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:_"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -38,6 +39,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose' apply false
     id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
+    id 'androidx.baselineprofile' apply false
 }
 
 // Proprietary DuckSans font swap. See https://app.asana.com/1/137249556945/project/1207908166761516/task/1213686706814504
@@ -196,10 +198,9 @@ subprojects {
                     .because("Use guava's bundled ListenableFuture to avoid duplicate classes")
         }
         resolutionStrategy.eachDependency { details ->
-            // kotlinx-serialization runtime must match Kotlin 2.3.x compiler plugin output
             if (details.requested.group == 'org.jetbrains.kotlinx' && details.requested.name.startsWith('kotlinx-serialization')) {
                 details.useVersion '1.8.1'
-                details.because 'Kotlin 2.3.20 serialization compiler plugin requires runtime >= 1.8.x'
+                details.because 'Keep kotlinx-serialization runtime artifacts aligned'
             }
         }
     }
@@ -288,7 +289,7 @@ fladle {
             ])
             devices.set([
                     ["model": "MediumPhone.arm", "version": "30"],
-                    ["model": "Pixel2.arm", "version": "28"]
+                    ["model": "SmallPhone.arm", "version": "28"]
             ])
             localResultsDir.set("fladleResults")
             // retry once, if it succeeds it will be reported as a flaky test
@@ -311,11 +312,10 @@ fladle {
             instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
             additionalTestApks.set([])
             testTargets.set(["class com.duckduckgo.macrobenchmark.PageLoadBenchmark"])
-            devices.set([["model": "MediumPhone.arm", "version": "31"]])
+            devices.set([["model": "tokay", "version": "36"]])
             environmentVariables.set([
                     "additionalTestOutputDir"        : "/sdcard/Download",
                     "no-isolated-storage"            : "true",
-                    "androidx.benchmark.suppressErrors": "EMULATOR",
             ])
             directoriesToPull.set(["/sdcard/Download"])
             localResultsDir.set("perfResults")
@@ -345,7 +345,7 @@ afterEvaluate {
 
 tasks.register('aiConfigCheck') {
     group = 'verification'
-    description = 'Validates AI config (.claude/rules, .claude/docs, .claude/skills) against AGENTS.md and checks for dangling references.'
+    description = 'Validates AI config (.claude/rules, .claude/docs, .agents/skills) against AGENTS.md and checks for dangling references.'
     def repoRoot = layout.projectDirectory.asFile
     doLast {
         def checker = new com.duckduckgo.gradle.AiConfigChecker(repoRoot)

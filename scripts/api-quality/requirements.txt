@@ -1,0 +1,2 @@
+asana>=3.2.2
+pytest

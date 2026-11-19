@@ -17,16 +17,14 @@
 package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.statistics.BuildConfig
-import com.duckduckgo.codegen.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.common.utils.AppUrl
-import com.duckduckgo.di.scopes.AppScope
 import io.reactivex.Completable
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.QueryMap
 
-@ContributesNonCachingServiceApi(AppScope::class)
+/** Provided by [PixelNetworkModule] rather than generated, so it uses the pixel client's own Dispatcher. */
 interface PixelService {
 
     @GET("${AppUrl.Url.PIXEL}/t/{pixelName}_android_{formFactor}")
@@ -47,4 +45,28 @@ interface PixelService {
         @QueryMap(encoded = true) encodedQueryParams: Map<String, String> = emptyMap(),
         @Query(AppUrl.ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
     ): Completable
+
+    /**
+     * Suspend variant of [fire]. Suspend calls are dispatched through OkHttp's Dispatcher, which caps concurrent
+     * requests per host; blocking calls bypass that cap, so a burst of pixels with no open connection would each open their own.
+     */
+    @GET("${AppUrl.Url.PIXEL}/t/{pixelName}_android_{formFactor}")
+    suspend fun fireAsync(
+        @Path("pixelName") pixelName: String,
+        @Path("formFactor") formFactor: String,
+        @Query(AppUrl.ParamKey.ATB) atb: String,
+        @QueryMap additionalQueryParams: Map<String, String> = emptyMap(),
+        @QueryMap(encoded = true) encodedQueryParams: Map<String, String> = emptyMap(),
+        @Query(AppUrl.ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
+    )
+
+    /** Suspend variant of [fireWithoutAtb]; see [fireAsync]. */
+    @GET("${AppUrl.Url.PIXEL}/t/{pixelName}_android_{formFactor}")
+    suspend fun fireWithoutAtbAsync(
+        @Path("pixelName") pixelName: String,
+        @Path("formFactor") formFactor: String,
+        @QueryMap additionalQueryParams: Map<String, String> = emptyMap(),
+        @QueryMap(encoded = true) encodedQueryParams: Map<String, String> = emptyMap(),
+        @Query(AppUrl.ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null,
+    )
 }

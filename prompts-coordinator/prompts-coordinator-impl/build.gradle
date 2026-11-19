@@ -32,9 +32,6 @@ android {
             includeAndroidResources = true
         }
     }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -44,6 +41,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':statistics-api')
     implementation project(':browser-api')
+    implementation project(':custom-tabs-api')
 
     ksp project(':codegen-ksp')
     implementation project(':codegen-annotations')
@@ -65,6 +63,4 @@ dependencies {
     }
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

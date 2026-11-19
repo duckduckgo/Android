@@ -35,6 +35,8 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepI
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
@@ -60,6 +62,7 @@ import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRM
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -103,6 +106,9 @@ class RealPirRunStateHandlerTest {
             )
 
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testEventTimeInMillis)
+        runBlocking {
+            whenever(mockJobRecordUpdater.markRemovedOptOutJobRecords(any(), any(), any())).thenReturn(emptyList())
+        }
     }
 
     // Test data
@@ -595,6 +601,33 @@ class RealPirRunStateHandlerTest {
                 profileQueryId = testProfileQueryId,
             )
             verify(mockPixelSender).reportBrokerOptOutProfileReappeared(testBroker.url)
+        }
+
+    @Test
+    fun whenHandleBrokerScanActionSucceededWithRemovedProfileWhoseIdentifierIsFoundThenReportsPixel() =
+        runTest {
+            val state =
+                BrokerScanActionSucceeded(
+                    broker = testBroker,
+                    profileQueryId = testProfileQueryId,
+                    pirSuccessResponse = ExtractedResponse(
+                        actionID = "extract123",
+                        actionType = "extract",
+                        response = listOf(testScriptExtractedProfile),
+                    ),
+                )
+            whenever(mockJobRecordUpdater.markReappearedOptOutJobRecords(any(), any(), any()))
+                .thenReturn(emptyList())
+            whenever(mockJobRecordUpdater.markRemovedOptOutJobRecords(any(), any(), any()))
+                .thenReturn(listOf(RemovedProfileWithIdentifierFound(ChangedField.PROFILE_URL, OptOutJobStatus.REQUESTED)))
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportBrokerOptOutRemovedWithIdentifierFound(
+                brokerUrl = testBroker.url,
+                changedField = ChangedField.PROFILE_URL,
+                previousStatus = OptOutJobStatus.REQUESTED,
+            )
         }
 
     @Test

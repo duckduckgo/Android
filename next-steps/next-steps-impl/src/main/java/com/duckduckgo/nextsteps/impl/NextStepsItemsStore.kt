@@ -44,6 +44,10 @@ interface NextStepsItemsStore {
 
     fun addDismissedItemId(id: String)
 
+    /** Returns true only for the first call per message, so one tab notifies RMF when every tab has emptied the stack. */
+    fun markMessageDismissed(id: String): Boolean
+
+    /** The completed ids in the order they were completed, oldest first. */
     fun completedItemIds(): Set<String>
 
     fun addCompletedItemIds(ids: Set<String>)
@@ -59,6 +63,8 @@ class RealNextStepsItemsStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatchers: DispatcherProvider,
 ) : NextStepsItemsStore {
+
+    private val dismissedMessageIds = mutableSetOf<String>()
 
     private val preferences: SharedPreferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = false, migrate = false)
@@ -82,10 +88,22 @@ class RealNextStepsItemsStore @Inject constructor(
         preferences.edit { putStringSet(KEY_DISMISSED, readDismissedItemIds() + id) }
     }
 
-    override fun completedItemIds(): Set<String> = preferences.getStringSet(KEY_COMPLETED, null)?.toSet().orEmpty()
+    @Synchronized
+    override fun markMessageDismissed(id: String): Boolean = dismissedMessageIds.add(id)
+
+    override fun completedItemIds(): Set<String> {
+        val ordered = preferences.getString(KEY_COMPLETED_ORDER, null)?.split(ORDER_SEPARATOR)?.filter { it.isNotEmpty() }.orEmpty()
+        // Ids completed before the order was recorded have no known order, so they count as the oldest.
+        val legacy = preferences.getStringSet(KEY_COMPLETED, null).orEmpty()
+        return LinkedHashSet(legacy - ordered.toSet() + ordered)
+    }
 
     override fun addCompletedItemIds(ids: Set<String>) {
-        preferences.edit { putStringSet(KEY_COMPLETED, completedItemIds() + ids) }
+        val completed = completedItemIds() + ids
+        preferences.edit {
+            putStringSet(KEY_COMPLETED, completed)
+            putString(KEY_COMPLETED_ORDER, completed.joinToString(ORDER_SEPARATOR))
+        }
     }
 
     override fun frontImpressions(itemId: String): Int =
@@ -106,6 +124,7 @@ class RealNextStepsItemsStore @Inject constructor(
         const val KEY_ORDER = "KEY_ORDER"
         const val KEY_DISMISSED = "KEY_DISMISSED"
         const val KEY_COMPLETED = "KEY_COMPLETED"
+        const val KEY_COMPLETED_ORDER = "KEY_COMPLETED_ORDER"
         const val KEY_FRONT_ITEM_ID = "KEY_FRONT_ITEM_ID"
         const val KEY_FRONT_IMPRESSIONS = "KEY_FRONT_IMPRESSIONS"
         const val ORDER_SEPARATOR = "\n"

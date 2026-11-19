@@ -25,7 +25,6 @@
     <string name="no">Nee</string>
     <string name="open">Openen</string>
     <string name="cancel">Annuleren</string>
-    <string name="search">Zoeken</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat verwijderd</string>

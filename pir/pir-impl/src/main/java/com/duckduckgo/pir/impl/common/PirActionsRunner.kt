@@ -120,6 +120,7 @@ interface PirActionsRunner {
 class RealPirActionsRunner @AssistedInject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirDetachedWebViewProvider: PirDetachedWebViewProvider,
+    private val brokerUserAgentResolver: PirBrokerUserAgentResolver,
     private val brokerActionProcessor: BrokerActionProcessor,
     private val nativeBrokerActionHandler: NativeBrokerActionHandler,
     private val emailDataResolver: EmailDataResolver,
@@ -162,6 +163,7 @@ class RealPirActionsRunner @AssistedInject constructor(
     ): Result<Unit> {
         val token = WebViewToken()
         activeWebViewToken.set(token)
+        val userAgent = brokerUserAgentResolver.resolve(brokerStep.broker)
 
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Creating detached WebView" }
@@ -169,6 +171,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 pirDetachedWebViewProvider.createInstance(
                     context,
                     pirScriptToLoad,
+                    userAgent,
                     onPageLoaded = {
                         onLoadingComplete(token, it)
                     },
@@ -194,6 +197,7 @@ class RealPirActionsRunner @AssistedInject constructor(
     ): Result<Unit> {
         val token = WebViewToken()
         activeWebViewToken.set(token)
+        val userAgent = brokerUserAgentResolver.resolve(brokerStep.broker)
 
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Adopting caller-owned WebView" }
@@ -201,6 +205,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 pirDetachedWebViewProvider.setupWebView(
                     webView,
                     pirScriptToLoad,
+                    userAgent,
                     onPageLoaded = {
                         onLoadingComplete(token, it)
                     },

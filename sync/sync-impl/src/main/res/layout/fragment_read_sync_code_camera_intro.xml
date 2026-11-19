@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,43 +33,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/introAnimation"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/introCard"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:saveEnabled="false"
-        app:layout_constraintBottom_toTopOf="@+id/buttonsContainer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pairingHeader"
-        app:lottie_loop="false"
-        app:lottie_rawRes="@raw/sync_camera_intro_animation" />
-
-    <FrameLayout
-        android:id="@+id/buttonsContainer"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/keyline_5"
+        android:layout_marginHorizontal="@dimen/keyline_7"
+        android:layout_marginVertical="@dimen/keyline_5"
+        app:cardBackgroundColor="?attr/daxColorSurfaceTertiary"
+        app:cardCornerRadius="?attr/daxContainerRadius"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pairingHeader"
+        app:layout_constraintWidth_max="360dp">
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            android:id="@+id/readyToScanSecondaryButton"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/sync_simplified_scanner_camera_primary_button"
-            app:daxButtonSize="small" />
+            android:padding="@dimen/keyline_5">
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/readyToScanPrimaryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sync_simplified_scanner_camera_primary_button"
-            android:visibility="gone"
-            app:daxButtonSize="small" />
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/introAnimation"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/keyline_3"
+                android:saveEnabled="false"
+                app:layout_constraintDimensionRatio="4:3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:lottie_loop="false"
+                app:lottie_rawRes="@raw/sync_camera_intro_animation" />
 
-    </FrameLayout>
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/gotItButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:text="@string/sync_simplified_scanner_camera_primary_button_v2"
+                app:daxButtonSize="large"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/introAnimation" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

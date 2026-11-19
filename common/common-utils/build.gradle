@@ -33,9 +33,6 @@ android {
         }
     }
     namespace 'com.duckduckgo.common.utils'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -72,6 +69,4 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

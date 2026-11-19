@@ -17,5 +17,14 @@
 package com.duckduckgo.sync.impl.ui.dashboard
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 
-data class SyncActivityStartSyncFlow(val source: String?) : GlobalActivityStarter.ActivityParams
+data class SyncActivityStartSyncFlow(
+    val source: SyncLaunchSource,
+    val start: SyncFlowStart = SyncFlowStart.Direct,
+) : GlobalActivityStarter.ActivityParams
+
+enum class SyncFlowStart {
+    Direct,
+    AskSyncWithDesktop,
+}

@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Vazgeç</string>
     <string name="autocompleteRemoveItemRemove">Kaldır</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Sekmeye Geç · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Duck.ai\'a sor</string>
 </resources>

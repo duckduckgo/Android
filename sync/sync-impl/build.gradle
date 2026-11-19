@@ -35,10 +35,12 @@ dependencies {
     ksp project(':codegen-ksp')
     implementation project(path: ':di')
     implementation project(':browser-api')
+    implementation project(':browser-ui')
     implementation project(path: ':common-utils')
     implementation project(':data-store-api')
     implementation project(path: ':design-system')
     implementation project(path: ':sync-api')
+    implementation project(':device-migration-api')
     implementation project(path: ':sync-store')
     implementation project(path: ':sync-lib')
     implementation project(path: ':saved-sites-api')
@@ -119,8 +121,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -132,9 +132,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         buildConfig = true

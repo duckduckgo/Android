@@ -99,11 +99,10 @@ class RealContingencyMessageHandler @Inject constructor(
     }
 
     internal fun shouldShow(url: String?): Boolean {
-        val uxImprovements = feature.adBlockingUXImprovements().isEnabled()
         val contingency = feature.enableContingencyMode().isEnabled()
         val shown = shownInSession || store.shown.value
         val isExtensionDomain = domainMatcher.matches(url)
-        val result = uxImprovements && contingency && isExtensionDomain && !shown
+        val result = contingency && isExtensionDomain && !shown
         return result
     }
 }

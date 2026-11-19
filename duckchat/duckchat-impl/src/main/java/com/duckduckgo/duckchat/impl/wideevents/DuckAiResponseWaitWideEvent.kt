@@ -1,0 +1,497 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.duckchat.impl.wideevents
+
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
+import com.duckduckgo.app.statistics.wideevents.FlowStatus
+import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
+import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.attention.ChatVisibilityEvent
+import com.duckduckgo.duckchat.impl.attention.DuckAiChatVisibility
+import com.duckduckgo.duckchat.impl.attention.PendingResponse
+import com.duckduckgo.duckchat.impl.attention.PendingResponse.ScreenChange
+import com.duckduckgo.duckchat.impl.attention.PendingResponseStatus
+import com.duckduckgo.duckchat.impl.attention.clearedBy
+import com.duckduckgo.duckchat.impl.attention.describedByStatusFrom
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import logcat.logcat
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+
+interface DuckAiResponseWaitWideEvent {
+    fun onNativePromptSubmitted(tabId: String, browserMode: BrowserMode, reasoningEffort: String?, selectedTool: String?)
+    fun onResponseState(tabId: String, status: String)
+    fun onStopTapped(tabId: String)
+}
+
+/**
+ * Measures whether the user waits for a Duck.ai response or leaves and comes back for it.
+ *
+ * Every call is queued on one [Channel] and handled by a single consumer, so events are applied in the
+ * order they were sent and the state below is never touched concurrently.
+ *
+ * A flow is identified by its chat ID. Until the page reports one it is identified by its tab. Which chat
+ * is on screen comes from this class's own tracking of the selected tab, so callers pass only a tab ID.
+ *
+ * Open flows are saved to [DuckAiResponseWaitFlowStore] after every change and restored as the first
+ * action, so a wait that outlives the process can still record the user's return.
+ *
+ * Clearing Duck.ai chats ends their flows, so no chat ID outlives the chat it belongs to, including Fire mode chats.
+ */
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<DuckAiResponseWaitWideEvent>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
+@ContributesIntoSet(AppScope::class, binding = binding<DataClearingPlugin>())
+class DuckAiResponseWaitWideEventImpl @Inject constructor(
+    private val wideEventClient: WideEventClient,
+    private val duckChat: DuckChat,
+    private val duckChatFeature: Lazy<DuckChatFeature>,
+    private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val flowStore: DuckAiResponseWaitFlowStore,
+    dispatchers: DispatcherProvider,
+    @AppCoroutineScope appCoroutineScope: CoroutineScope,
+) : DuckAiResponseWaitWideEvent, DuckAiSessionCallback, BrowserLifecycleObserver, DataClearingPlugin {
+
+    private val coroutineScope = CoroutineScope(appCoroutineScope.coroutineContext + dispatchers.io())
+    private val channel = Channel<Action>(capacity = Channel.UNLIMITED)
+
+    private val flows = mutableListOf<WideEventPendingResponse>()
+    private var persisted = emptyList<PersistedResponseWaitFlow>()
+    private val chatVisibility = DuckAiChatVisibility(duckChat)
+    private var pendingExit: PendingExit? = null
+
+    init {
+        // Queued before anything else can reach the channel, so restored flows exist before any callback is applied.
+        channel.trySend(Action.Recover)
+        coroutineScope.launch {
+            for (action in channel) {
+                try {
+                    processAction(action)
+                    persist()
+                    if (action is Action.ClearChats) action.cleared.complete(Unit)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logcat(tag = TAG) { "Error handling ${action::class.simpleName}: ${e.message}" }
+                    if (action is Action.ClearChats) action.cleared.completeExceptionally(e)
+                }
+            }
+        }
+    }
+
+    override fun onNativePromptSubmitted(tabId: String, browserMode: BrowserMode, reasoningEffort: String?, selectedTool: String?) {
+        channel.trySend(Action.NativePromptSubmitted(tabId, browserMode, reasoningEffort, selectedTool))
+    }
+
+    override fun onResponseState(tabId: String, status: String) {
+        channel.trySend(Action.ResponseState(tabId, status))
+    }
+
+    override fun onStopTapped(tabId: String) {
+        channel.trySend(Action.StopTapped(tabId))
+    }
+
+    override fun onLaunchLandingResolved(tabId: String?, url: String?) {
+        channel.trySend(Action.ChatVisibility(ChatVisibilityEvent.LaunchLandingResolved(tabId, url)))
+    }
+
+    override fun onDuckAiPageVisible(tabId: String, url: String) {
+        channel.trySend(Action.ChatVisibility(ChatVisibilityEvent.DuckAiPageVisible(tabId, url)))
+    }
+
+    override fun onSelectedTabChanged(tabId: String?, url: String?) {
+        channel.trySend(Action.ChatVisibility(ChatVisibilityEvent.SelectedTabChanged(tabId, url)))
+    }
+
+    override fun onExitIntent(tabId: String, trigger: DuckAiSessionExitTrigger) {
+        channel.trySend(Action.ExitIntent(tabId, trigger))
+    }
+
+    // Can fire twice for one prompt (pixel and page metric) and carries no reasoning or tool, so flows start from onNativePromptSubmitted instead.
+    override fun onPromptSubmitted(tabId: String) = Unit
+
+    override fun onNewChatCreated(tabId: String) = Unit
+
+    override fun onOpen(isFreshLaunch: Boolean) {
+        channel.trySend(Action.ChatVisibility(ChatVisibilityEvent.AppOpened))
+    }
+
+    override fun onClose() {
+        channel.trySend(Action.ChatVisibility(ChatVisibilityEvent.AppClosed))
+    }
+
+    // Returns only once the cleared flows are off disk, since a Fire clear can kill the process right after.
+    override suspend fun onClearData(types: Set<ClearableData>) {
+        val cleared = CompletableDeferred<Unit>()
+        channel.send(Action.ClearChats(types, cleared))
+        cleared.await()
+    }
+
+    private suspend fun processAction(action: Action) {
+        if (action is Action.Recover) return recover()
+        val previousTabId = chatVisibility.selectedTabId
+        // Chat visibility is tracked even while the feature is off, so re-enabling it starts from the real screen state.
+        val tabChanged = updateChatVisibility(action)
+        if (isFeatureDisabled()) {
+            abortAllFlows()
+        } else {
+            if (action == Action.ChatVisibility(ChatVisibilityEvent.AppOpened)) dropFlowsClosedByCleanup()
+            when (action) {
+                is Action.NativePromptSubmitted -> startFlow(action.tabId, action.browserMode, action.reasoningEffort, action.selectedTool)
+                is Action.ResponseState -> applyResponseState(action.tabId, action.status)
+                is Action.StopTapped -> applyStop(action.tabId)
+                is Action.ClearChats -> clearChats(action.types)
+                else -> reconcileOnScreen(appClosed = action == Action.ChatVisibility(ChatVisibilityEvent.AppClosed))
+            }
+        }
+        if (action == Action.ChatVisibility(ChatVisibilityEvent.AppClosed)) pendingExit = null
+        if (previousTabId != null && tabChanged) clearIntents(previousTabId)
+    }
+
+    private suspend fun recover() {
+        persisted = flowStore.load()
+        flows += persisted.map { it.restore() }
+        dropFlowsClosedByCleanup()
+        if (isFeatureDisabled()) {
+            abortAllFlows()
+        } else {
+            // A flow that never left died on screen; the reloaded page's first 'ready' state would wrongly finish it as 'watched'.
+            flows.filter { !it.left }.forEach { abort(it) }
+            flows.filter { it.returned && it.done }.forEach { finish(it, REASON_RETURNED) }
+        }
+    }
+
+    // The 24h cleanup closes flows on its own; a flow it closed must not receive more steps.
+    private suspend fun dropFlowsClosedByCleanup() {
+        if (flows.isEmpty()) return
+        // Kept on failure: a transient error or the wide-events kill switch must not drop flows that are still open.
+        val openIds = wideEventClient.getFlowIds(FEATURE_NAME).getOrNull() ?: return
+        flows.removeAll { it.flowId !in openIds }
+    }
+
+    private suspend fun persist() {
+        val snapshot = flows.map { it.toPersisted() }
+        if (snapshot == persisted) return
+        flowStore.save(snapshot)
+        // Only after a successful save, so a failed write is retried after the next action.
+        persisted = snapshot
+    }
+
+    private fun updateChatVisibility(action: Action): Boolean {
+        when (action) {
+            is Action.ChatVisibility -> return chatVisibility.update(action.event)
+            is Action.ExitIntent -> if (pendingExit == null) pendingExit = PendingExit(action.tabId, action.trigger)
+            else -> Unit
+        }
+        return false
+    }
+
+    private fun clearIntents(tabId: String) {
+        if (pendingExit?.tabId == tabId) pendingExit = null
+    }
+
+    private suspend fun reconcileOnScreen(appClosed: Boolean) {
+        val screen = chatVisibility.onScreen()
+        for (flow in flows.toList()) {
+            when (flow.updateOnScreen(screen)) {
+                ScreenChange.ENTERED -> if (flow.left) recordReturn(flow)
+                ScreenChange.EXITED -> recordLeave(flow, resolveLeftVia(flow, appClosed))
+                null -> Unit
+            }
+        }
+    }
+
+    private fun resolveLeftVia(flow: WideEventPendingResponse, appClosed: Boolean): String {
+        val sameTab = chatVisibility.selectedTabId == flow.tabId
+        val pendingTrigger = pendingExit?.takeIf { it.tabId == flow.tabId }?.trigger
+        return when {
+            appClosed -> if (pendingTrigger == DuckAiSessionExitTrigger.BACK_OR_CLOSE) LEFT_VIA_BACK_OR_CLOSE else LEFT_VIA_APP_BACKGROUNDED
+            else -> pendingTrigger?.name?.lowercase() ?: if (sameTab) LEFT_VIA_OTHER_NAVIGATION else LEFT_VIA_TAB_SWITCHED
+        }
+    }
+
+    private suspend fun recordLeave(flow: WideEventPendingResponse, leftVia: String) {
+        when {
+            flow.done && flow.returned -> finish(flow, REASON_RETURNED)
+            !flow.done && !flow.left -> {
+                flow.left = true
+                wideEventClient.flowStep(flow.flowId, STEP_LEFT, metadata = mapOf(KEY_LEFT_VIA to leftVia))
+                wideEventClient.intervalEnd(flow.flowId, INTERVAL_PROMPT_TO_LEAVE)
+                wideEventClient.intervalStart(flow.flowId, INTERVAL_LEAVE_TO_RETURN, buckets = LEAVE_BUCKETS)
+            }
+        }
+    }
+
+    private suspend fun recordReturn(flow: WideEventPendingResponse) {
+        if (!flow.returned) {
+            flow.returned = true
+            wideEventClient.flowStep(flow.flowId, STEP_RETURNED)
+            wideEventClient.intervalEnd(flow.flowId, INTERVAL_LEAVE_TO_RETURN)
+        }
+        if (flow.readyToReturnRunning) {
+            flow.readyToReturnRunning = false
+            wideEventClient.intervalEnd(flow.flowId, INTERVAL_READY_TO_RETURN)
+        }
+    }
+
+    private suspend fun startFlow(tabId: String, browserMode: BrowserMode, reasoningEffort: String?, selectedTool: String?) {
+        flows.firstOrNull { it.isOnScreenIn(tabId) && it.returned }?.let { flow ->
+            wideEventClient.flowStep(flow.flowId, STEP_PROMPT_AFTER_RETURN)
+            finish(flow, REASON_RETURNED)
+        }
+        // Guard against a new prompt submitted while previous one has not finished yet.
+        // Should never happen unless there's a bug.
+        if (flows.any { it.tabId == tabId && !it.left && !it.done }) return
+
+        val screen = chatVisibility.onScreen()
+        wideEventClient.flowStart(
+            name = FEATURE_NAME,
+            metadata = startMetadata(reasoningEffort, selectedTool),
+            cleanupPolicy = CleanupPolicy.OnTimeout(duration = 24.hours, flowStatus = FlowStatus.Failure(reason = REASON_NOT_RETURNED)),
+        ).onSuccess { flowId ->
+            val flow = WideEventPendingResponse(flowId = flowId, tabId = tabId, browserMode = browserMode, awaitingFirstProgressStatus = true)
+            flow.updateOnScreen(screen)
+            flows += flow
+            wideEventClient.intervalStart(flowId, INTERVAL_PROMPT_TO_LEAVE, buckets = PROMPT_BUCKETS)
+            logcat(tag = TAG) { "Duck.ai response wait started" }
+            // A prompt from the address bar reaches the page only once it loads, which can be after the app was backgrounded or the tab switched.
+            when {
+                !chatVisibility.isAppOpen -> recordLeave(flow, LEFT_VIA_APP_BACKGROUNDED)
+                chatVisibility.selectedTabId != tabId -> recordLeave(flow, LEFT_VIA_TAB_SWITCHED)
+            }
+        }.onFailure { error ->
+            logcat(tag = TAG) { "Failed to start Duck.ai response wait: ${error.message}" }
+        }
+    }
+
+    private fun startMetadata(reasoningEffort: String?, selectedTool: String?): Map<String, String> = buildMap {
+        val effort = reasoningEffort?.takeIf { it in REASONING_EFFORTS }
+        effort?.let { put(KEY_REASONING_EFFORT, it) }
+        put(KEY_USED_REASONING, (effort in REASONING_USED).toString())
+        put(KEY_USED_EXTENDED_REASONING, (effort in EXTENDED_REASONING_USED).toString())
+        put(KEY_IMAGE_GENERATION, (selectedTool == TOOL_GENERATE_IMAGE).toString())
+        put(KEY_WEB_SEARCH, (selectedTool == TOOL_WEB_SEARCH).toString())
+        put(KEY_STATUS_REASON, REASON_NOT_RETURNED)
+    }
+
+    private suspend fun applyResponseState(tabId: String, rawStatus: String) {
+        val flow = flows.describedByStatusFrom(tabId) ?: return
+        val status = PendingResponseStatus.from(rawStatus)
+
+        when {
+            status == PendingResponseStatus.Blocked -> abort(flow)
+            // Any page stream except a restart counts as the next prompt in this chat, which ends a returned flow.
+            flow.returned && flow.done && status is PendingResponseStatus.StartStream && !status.isRestart -> {
+                wideEventClient.flowStep(flow.flowId, STEP_PROMPT_AFTER_RETURN)
+                finish(flow, REASON_RETURNED)
+            }
+            status.isProgress -> {
+                flow.awaitingFirstProgressStatus = false
+                flow.done = false
+            }
+            status == PendingResponseStatus.Ready || status == PendingResponseStatus.Error -> {
+                // A new chat page opened for a prompt sent from the address bar reports 'ready' once it
+                // loads, before streaming the response. An 'error' still counts, since a request can fail before streaming.
+                if (flow.awaitingFirstProgressStatus && status == PendingResponseStatus.Ready) return
+
+                flow.done = true
+                if (!flow.left) {
+                    finish(flow, REASON_WATCHED)
+                } else if (!flow.onScreen && status == PendingResponseStatus.Ready && !flow.readyWhileAwayRecorded) {
+                    flow.readyWhileAwayRecorded = true
+                    flow.readyToReturnRunning = true
+                    wideEventClient.flowStep(flow.flowId, STEP_READY_WHILE_AWAY)
+                    wideEventClient.intervalStart(flow.flowId, INTERVAL_READY_TO_RETURN, buckets = LEAVE_BUCKETS)
+                }
+            }
+        }
+    }
+
+    private suspend fun applyStop(tabId: String) {
+        val flow = flows.firstOrNull { it.isOnScreenIn(tabId) } ?: return
+        finish(flow, REASON_STOPPED)
+    }
+
+    private suspend fun clearChats(types: Set<ClearableData>) {
+        types.forEach { type ->
+            val cleared = flows.clearedBy(type, duckChat)
+            cleared.forEach { flow ->
+                // Matches leaving the screen: a return already seen still counts, anything else ends as the 24h cleanup would.
+                if (flow.returned && flow.done) finish(flow, REASON_RETURNED) else failNotReturned(flow)
+            }
+        }
+    }
+
+    private suspend fun failNotReturned(flow: WideEventPendingResponse) {
+        flows.remove(flow)
+        wideEventClient.flowFinish(wideEventId = flow.flowId, status = FlowStatus.Failure(reason = REASON_NOT_RETURNED))
+        logcat(tag = TAG) { "Duck.ai response wait failed: reason=$REASON_NOT_RETURNED" }
+    }
+
+    private suspend fun finish(flow: WideEventPendingResponse, statusReason: String) {
+        flows.remove(flow)
+        wideEventClient.flowFinish(
+            wideEventId = flow.flowId,
+            status = FlowStatus.Success,
+            metadata = mapOf(KEY_STATUS_REASON to statusReason),
+        )
+        logcat(tag = TAG) { "Duck.ai response wait finished: reason=$statusReason" }
+    }
+
+    private suspend fun abort(flow: WideEventPendingResponse) {
+        flows.remove(flow)
+        wideEventClient.flowAbort(flow.flowId)
+    }
+
+    private suspend fun abortAllFlows() {
+        flows.toList().forEach { abort(it) }
+    }
+
+    // The web input and the web sidebar can switch chats within a tab, which left_via has no value for.
+    // Native chat history is checked directly, not via DuckChat.isChatHistoryAvailable() to avoid a race condition with its internal cache
+    private suspend fun isFeatureDisabled(): Boolean {
+        val feature = duckChatFeature.value
+        return !feature.sendDuckAiResponseWaitWideEvent().isEnabled() ||
+            !feature.nativeChatInput().isEnabled() ||
+            !feature.nativeDuckAiSidebar().isEnabled() ||
+            !feature.self().isEnabled() ||
+            !feature.useNativeStorageChatData().isEnabled() ||
+            !duckChatFeatureRepository.isDuckChatUserEnabled()
+    }
+
+    private sealed class Action {
+        data class NativePromptSubmitted(
+            val tabId: String,
+            val browserMode: BrowserMode,
+            val reasoningEffort: String?,
+            val selectedTool: String?,
+        ) : Action()
+        data class ResponseState(val tabId: String, val status: String) : Action()
+        data class StopTapped(val tabId: String) : Action()
+        data class ChatVisibility(val event: ChatVisibilityEvent) : Action()
+        data class ExitIntent(val tabId: String, val trigger: DuckAiSessionExitTrigger) : Action()
+        data object Recover : Action()
+        data class ClearChats(val types: Set<ClearableData>, val cleared: CompletableDeferred<Unit>) : Action()
+    }
+
+    private data class PendingExit(val tabId: String, val trigger: DuckAiSessionExitTrigger)
+
+    private class WideEventPendingResponse(
+        val flowId: Long,
+        tabId: String,
+        browserMode: BrowserMode,
+        chatId: String? = null,
+        chatSwitchedAway: Boolean = false,
+        var awaitingFirstProgressStatus: Boolean = false,
+    ) : PendingResponse(tabId, browserMode, chatId, chatSwitchedAway) {
+        var left = false
+        var returned = false
+        var done = false
+        var readyWhileAwayRecorded = false
+        var readyToReturnRunning = false
+
+        fun toPersisted() = PersistedResponseWaitFlow(
+            flowId = flowId,
+            tabId = tabId,
+            chatId = chatId,
+            left = left,
+            returned = returned,
+            done = done,
+            readyWhileAwayRecorded = readyWhileAwayRecorded,
+            readyToReturnRunning = readyToReturnRunning,
+            chatSwitchedAway = chatSwitchedAway,
+            browserMode = browserMode,
+        )
+    }
+
+    private fun PersistedResponseWaitFlow.restore() = WideEventPendingResponse(
+        flowId = flowId,
+        tabId = tabId,
+        browserMode = browserMode,
+        chatId = chatId,
+        chatSwitchedAway = chatSwitchedAway,
+    ).also {
+        it.left = left
+        it.returned = returned
+        it.done = done
+        it.readyWhileAwayRecorded = readyWhileAwayRecorded
+        it.readyToReturnRunning = readyToReturnRunning
+    }
+
+    private companion object {
+        const val TAG = "DuckAiResponseWaitWideEvent"
+        const val FEATURE_NAME = "duckai-response-wait"
+
+        const val KEY_REASONING_EFFORT = "reasoning_effort"
+        const val KEY_USED_REASONING = "used_reasoning"
+        const val KEY_USED_EXTENDED_REASONING = "used_extended_reasoning"
+        const val KEY_IMAGE_GENERATION = "user_requested_image_generation"
+        const val KEY_WEB_SEARCH = "user_requested_web_search"
+        const val KEY_STATUS_REASON = "status_reason"
+        const val KEY_LEFT_VIA = "left_via"
+
+        const val STEP_LEFT = "left"
+        const val STEP_RETURNED = "returned"
+        const val STEP_READY_WHILE_AWAY = "response_ready_while_away"
+        const val STEP_PROMPT_AFTER_RETURN = "prompt_after_return"
+
+        const val INTERVAL_PROMPT_TO_LEAVE = "prompt_to_leave_ms_bucketed"
+        const val INTERVAL_LEAVE_TO_RETURN = "leave_to_return_ms_bucketed"
+        const val INTERVAL_READY_TO_RETURN = "ready_to_return_ms_bucketed"
+
+        const val REASON_WATCHED = "watched"
+        const val REASON_RETURNED = "returned"
+        const val REASON_NOT_RETURNED = "not_returned"
+        const val REASON_STOPPED = "stopped"
+
+        const val LEFT_VIA_APP_BACKGROUNDED = "app_backgrounded"
+        const val LEFT_VIA_BACK_OR_CLOSE = "back_or_close"
+        const val LEFT_VIA_TAB_SWITCHED = "tab_switched"
+        const val LEFT_VIA_OTHER_NAVIGATION = "other_navigation"
+
+        const val TOOL_GENERATE_IMAGE = "GenerateImage"
+        const val TOOL_WEB_SEARCH = "WebSearch"
+
+        val REASONING_EFFORTS = setOf("none", "minimal", "low", "medium", "high")
+        val REASONING_USED = setOf("low", "medium", "high")
+        val EXTENDED_REASONING_USED = setOf("medium", "high")
+
+        val PROMPT_BUCKETS = setOf(0.seconds, 2.seconds, 5.seconds, 10.seconds, 20.seconds, 30.seconds)
+        val LEAVE_BUCKETS = setOf(0.seconds, 5.seconds, 10.seconds, 30.seconds, 60.seconds, 5.minutes, 15.minutes, 60.minutes)
+    }
+}

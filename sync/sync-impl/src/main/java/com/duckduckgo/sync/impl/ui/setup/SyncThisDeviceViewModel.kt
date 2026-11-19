@@ -124,6 +124,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
     }
 
     fun onSyncWithAnotherDeviceClicked() {
+        if (syncThisDeviceJob?.isActive == true) return
         syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
         viewModelScope.launch {
             if (authenticate()) {

@@ -34,7 +34,6 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
     implementation AndroidX.fragment.ktx
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
     implementation project(path: ':common-utils')
     implementation project(':navigation-api')
 }
@@ -46,8 +45,5 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }

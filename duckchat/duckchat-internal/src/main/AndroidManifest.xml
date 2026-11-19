@@ -6,6 +6,8 @@
         <activity android:name=".DuckAiUrlSettingsActivity" android:exported="false"/>
         <activity android:name=".DuckAiDevActivity" android:exported="false"/>
         <activity android:name=".DuckAiUsageWarningsDevActivity" android:exported="false"/>
+        <activity android:name=".DuckAiPromoCampaignDevActivity" android:exported="false"/>
+        <activity android:name=".clienttools.DuckAiClientToolsDevActivity" android:exported="false"/>
     </application>
 
 </manifest>

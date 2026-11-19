@@ -25,7 +25,6 @@
     <string name="no">Nu</string>
     <string name="open">Deschide</string>
     <string name="cancel">Anulează</string>
-    <string name="search">Căutare</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat șters</string>

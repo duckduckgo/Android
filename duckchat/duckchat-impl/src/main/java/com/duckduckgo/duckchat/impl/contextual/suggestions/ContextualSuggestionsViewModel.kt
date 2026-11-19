@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionSubmissionAction
@@ -91,7 +92,8 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     fun onPageContextUpdated(serializedPageContext: String) {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return
-        if (json.optString("title").isBlank() || json.optString("content").isBlank()) return
+        if (json.optString("title").isBlank()) return
+        if (json.optString("content").isBlank() && json.optString("mimeType") != PDF_MIME_TYPE) return
         val pageTypeSignals = parsePageTypeSignals(json)
         pageType = ContextualSuggestionsMatcher.classifyPageType(pageTypeSignals)
         loadJob?.cancel()

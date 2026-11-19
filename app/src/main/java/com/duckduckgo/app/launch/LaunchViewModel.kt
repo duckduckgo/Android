@@ -20,9 +20,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
-import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.onboarding.orchestrator.PendingOnboardingStarter
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.ContributesViewModel
@@ -42,11 +40,10 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class LaunchViewModel @Inject constructor(
-    private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
     private val pixel: Pixel,
     private val testScenarioSeeder: TestScenarioSeeder,
-    private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper,
+    private val pendingOnboardingStarter: PendingOnboardingStarter,
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -79,22 +76,22 @@ class LaunchViewModel @Inject constructor(
     }
 
     suspend fun showOnboardingOrHome() {
-        if (userStageStore.isNewUser()) {
-            val startState = newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlan()
-            when (startState.currentStep.host) {
-                LinearOnboardingHost.OnboardingActivity -> {
-                    command.value = Command.Onboarding
-                }
-                LinearOnboardingHost.BrowserActivity -> {
-                    command.value = Command.Home()
-                }
-                else -> {
-                    // extend to support initial hosts in the future
-                    throw IllegalArgumentException("unsupported initial onboarding host transition")
-                }
-            }
-        } else {
+        val startState = pendingOnboardingStarter.startPending()
+        if (startState == null) {
             command.value = Command.Home()
+            return
+        }
+        when (startState.currentStep.host) {
+            LinearOnboardingHost.OnboardingActivity -> {
+                command.value = Command.Onboarding
+            }
+            LinearOnboardingHost.BrowserActivity -> {
+                command.value = Command.Home()
+            }
+            else -> {
+                // extend to support initial hosts in the future
+                throw IllegalArgumentException("unsupported initial onboarding host transition")
+            }
         }
     }
 

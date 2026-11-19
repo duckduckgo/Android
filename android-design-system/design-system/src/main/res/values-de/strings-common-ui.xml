@@ -32,6 +32,8 @@
     <string name="removeAll">Alle entfernen</string>
     <string name="undo">Rückgängig machen</string>
     <string name="cancel">Abbrechen</string>
+    <string name="done">Fertig</string>
+    <string name="search">Suche</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Immer aktiviert</string>

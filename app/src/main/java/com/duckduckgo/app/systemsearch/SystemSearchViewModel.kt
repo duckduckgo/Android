@@ -311,8 +311,8 @@ class SystemSearchViewModel @Inject constructor(
         voiceSearchState.tryEmit(Unit)
     }
 
-    fun onDuckAiRequested(query: String, entryPoint: DuckChatEntryPoint) {
-        duckChat.openDuckChatWithAutoPrompt(query, entryPoint)
+    fun onDuckAiRequested(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean = false) {
+        duckChat.openDuckChatWithAutoPrompt(query, entryPoint, voice = voice)
         command.value = Command.ExitSearch
     }
 

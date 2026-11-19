@@ -322,6 +322,8 @@ class FakeNetPGeoswitchingRepository : NetPGeoswitchingRepository {
         _userPreferredCity = userPreferredLocation.cityName
     }
 
+    override suspend fun clearAllPreferencesExceptUserPreferredLocation() = Unit
+
     override fun getLocations(): List<NetPGeoswitchingLocation> = locations
 
     override fun getLocationsFlow(): Flow<List<NetPGeoswitchingLocation>> = TODO()

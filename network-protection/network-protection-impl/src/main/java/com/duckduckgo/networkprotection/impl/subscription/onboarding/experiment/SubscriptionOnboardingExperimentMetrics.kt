@@ -16,6 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl.subscription.onboarding.experiment
 
+import android.content.SharedPreferences
+import androidx.core.content.edit
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -34,10 +37,20 @@ interface SubscriptionOnboardingExperimentMetrics {
 @ContributesBinding(AppScope::class)
 class RealSubscriptionOnboardingExperimentMetrics @Inject constructor(
     private val inventory: FeatureTogglesInventory,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : SubscriptionOnboardingExperimentMetrics {
 
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(FILENAME)
+    }
+
     override suspend fun fireVpnActivated() {
-        experimentToggles().forEach { toggle ->
+        if (preferences.getBoolean(KEY_VPN_ACTIVATED_REPORTED, false)) return
+        val activeToggles = experimentToggles()
+        if (activeToggles.isEmpty()) return
+        preferences.edit { putBoolean(KEY_VPN_ACTIVATED_REPORTED, true) }
+
+        activeToggles.forEach { toggle ->
             fire(toggle, metric = "vpnActivated_d1", window = ConversionWindow(lowerWindow = 0, upperWindow = 1))
             when (toggle.featureName().name) {
                 FREE_TRIALS_EXPERIMENT ->
@@ -63,10 +76,11 @@ class RealSubscriptionOnboardingExperimentMetrics @Inject constructor(
     }
 
     private suspend fun experimentToggles(): List<Toggle> =
-        inventory.getAllTogglesForParent(PRIVACY_PRO_FEATURE_NAME).filter { it.featureName().name in EXPERIMENT_NAMES }
+        inventory.getAllActiveExperimentToggles().filter { it.featureName().name in EXPERIMENT_NAMES }
 
     private companion object {
-        const val PRIVACY_PRO_FEATURE_NAME = "privacyPro"
+        const val FILENAME = "com.duckduckgo.networkprotection.subscription.onboarding.experiment.v1"
+        const val KEY_VPN_ACTIVATED_REPORTED = "KEY_VPN_ACTIVATED_REPORTED"
         const val FREE_TRIALS_EXPERIMENT = "subscriptionOnboardingFreeTrialsOct2026"
         const val PAID_SUBS_EXPERIMENT = "subscriptionOnboardingPaidSubsOct2026"
         val EXPERIMENT_NAMES = setOf(FREE_TRIALS_EXPERIMENT, PAID_SUBS_EXPERIMENT)

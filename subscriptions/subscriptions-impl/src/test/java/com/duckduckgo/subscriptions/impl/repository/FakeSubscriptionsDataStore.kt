@@ -54,4 +54,5 @@ class FakeSubscriptionsDataStore(
     override var subscriptionFeatures: String? = null
     override var subscriptionEntitlements: String? = null
     override var pendingPlans: String? = null
+    override var planCountry: String? = null
 }

@@ -37,6 +37,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -54,9 +55,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -72,6 +75,7 @@ class IntentDispatcherViewModelTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val inlinePdfHandler: InlinePdfHandler = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val customTabDetector: CustomTabDetector = mock()
     private val customTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java)
 
     private lateinit var testee: IntentDispatcherViewModel
@@ -87,6 +91,7 @@ class IntentDispatcherViewModelTest {
             appBuildConfig = mockAppBuildConfig,
             inlinePdfHandler = inlinePdfHandler,
             androidBrowserConfigFeature = androidBrowserConfigFeature,
+            customTabDetector = customTabDetector,
             customTabsFeature = customTabsFeature,
         )
 
@@ -432,6 +437,51 @@ class IntentDispatcherViewModelTest {
             assertNull(state.activityParams)
             assertEquals(url, state.intentText)
         }
+    }
+
+    @Test
+    fun `when Intent received with session and custom tab is requested then custom tab is marked and not cleared`() = runTest {
+        configureHasSession(true)
+        whenever(mockIntent.intentText).thenReturn("url")
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().customTabRequested)
+        }
+        verify(customTabDetector).setCustomTab(true)
+        verify(customTabDetector, never()).setCustomTab(false)
+    }
+
+    @Test
+    fun `when Intent received with session and custom tab is not requested then custom tab mark is cleared`() = runTest {
+        val text = "some DDG url"
+        configureHasSession(true)
+        whenever(mockIntent.intentText).thenReturn(text)
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(text)).thenReturn(true)
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().customTabRequested)
+        }
+        inOrder(customTabDetector) {
+            verify(customTabDetector).setCustomTab(true)
+            verify(customTabDetector).setCustomTab(false)
+        }
+    }
+
+    @Test
+    fun `when Intent received without session then custom tab state is not touched`() = runTest {
+        configureHasSession(false)
+        whenever(mockIntent.intentText).thenReturn("url")
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().customTabRequested)
+        }
+        verifyNoInteractions(customTabDetector)
     }
 
     private fun configureHasSession(returnValue: Boolean) {

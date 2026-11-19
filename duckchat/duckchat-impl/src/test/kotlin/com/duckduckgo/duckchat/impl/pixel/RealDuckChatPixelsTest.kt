@@ -37,8 +37,15 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.helper.TermsAcceptanceResult
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_COUNT
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_COLLECTION_EMPTY
@@ -74,6 +81,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_START_NEW_
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.responding.RespondingServiceStartFailure
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.MetricType
@@ -467,13 +475,47 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when reportContextualAddressBarMenuAllChatsSelected then fires count and daily`() = runTest {
-        testee.reportContextualAddressBarMenuAllChatsSelected()
+    fun `when reportContextualAddressBarMenuShown then fires count and daily with page type`() = runTest {
+        testee.reportContextualAddressBarMenuShown(DuckChatPixelPageType.NTP)
 
         advanceUntilIdle()
 
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT)
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+        val params = mapOf("page_type" to "ntp")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT, params)
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualAddressBarMenuSkipped then fires count and daily with page type`() = runTest {
+        testee.reportContextualAddressBarMenuSkipped(DuckChatPixelPageType.WEBSITE)
+
+        advanceUntilIdle()
+
+        val params = mapOf("page_type" to "website")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_COUNT, params)
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SKIPPED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualAddressBarMenuNewChatSelected then fires count and daily with page type`() = runTest {
+        testee.reportContextualAddressBarMenuNewChatSelected(DuckChatPixelPageType.SERP)
+
+        advanceUntilIdle()
+
+        val params = mapOf("page_type" to "serp")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT, params)
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualAddressBarMenuAllChatsSelected then fires count and daily with page type`() = runTest {
+        testee.reportContextualAddressBarMenuAllChatsSelected(DuckChatPixelPageType.WEBSITE)
+
+        advanceUntilIdle()
+
+        val params = mapOf("page_type" to "website")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT, params)
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -575,10 +617,35 @@ class RealDuckChatPixelsTest {
 
         val params = mapOf(
             "source" to "address_bar_prompt",
+            "voice" to "false",
             "duck_ai_enabled" to "true",
             "input_screen_enabled" to "true",
             "opens_new_tab" to "false",
             "has_prompt" to "true",
+        )
+        verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_COUNT, params)
+        verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `voice entry preserves the initiating source on count and daily pixels`() = runTest {
+        testee.sendDuckChatEntryPixel(
+            entryPoint = DuckChatEntryPoint.CONTEXTUAL_CHAT,
+            opensNewTab = true,
+            hasPrompt = false,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+            voice = true,
+        )
+        advanceUntilIdle()
+
+        val params = mapOf(
+            "source" to "contextual_chat",
+            "voice" to "true",
+            "duck_ai_enabled" to "true",
+            "input_screen_enabled" to "true",
+            "opens_new_tab" to "true",
+            "has_prompt" to "false",
         )
         verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_COUNT, params)
         verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_DAILY, params, type = Pixel.PixelType.Daily())
@@ -992,5 +1059,131 @@ class RealDuckChatPixelsTest {
             DuckChatPixelParameters.TOS_DISCLAIMER_SHOWN to "false",
         )
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_INPUT_OUTCOME_COUNT, params)
+    }
+
+    @Test
+    fun whenFireNewChatShownThenCountAndDailyFiredWithTheFlag() = runTest {
+        testee.fireNewChatShown(hasNewChatHints = false)
+
+        advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to "false")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_SHOWN_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireNewChatFirstPromptSentWithoutATapThenHintTappedIsNone() = runTest {
+        testee.fireNewChatFirstPromptSent(
+            hasNewChatHints = true,
+            hintsShown = false,
+            hintTapped = null,
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            selectedTool = "web_search",
+        )
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to "true",
+            DuckChatPixelParameters.HINTS_SHOWN to "false",
+            DuckChatPixelParameters.HINT_TAPPED to "none",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "true",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.SELECTED_TOOL to "web_search",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireNewChatFirstPromptSentAfterATapThenHintTappedIsTheHint() = runTest {
+        testee.fireNewChatFirstPromptSent(
+            hasNewChatHints = true,
+            hintsShown = true,
+            hintTapped = NewChatHint.IMAGE_GENERATION,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "image_generation",
+        )
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to "true",
+            DuckChatPixelParameters.HINTS_SHOWN to "true",
+            DuckChatPixelParameters.HINT_TAPPED to "image_generation",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.SELECTED_TOOL to "image_generation",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT, params)
+    }
+
+    @Test
+    fun whenFireNewChatHintsShownThenCountAndDailyFiredWithEachHintsSlotAndZeroForHidden() = runTest {
+        testee.fireNewChatHintsShown(listOf(NewChatHint.IMAGE_GENERATION, NewChatHint.DOCUMENTS))
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            DuckChatPixelParameters.DOCUMENTS_HINT_POSITION to "2",
+            DuckChatPixelParameters.PHOTO_HINT_POSITION to "0",
+            DuckChatPixelParameters.IMAGE_GENERATION_HINT_POSITION to "1",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_SHOWN_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireNewChatHintsCapReachedThenUniquePixelFired() = runTest {
+        testee.fireNewChatHintsCapReached()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINTS_CAP_REACHED, type = Pixel.PixelType.Unique())
+    }
+
+    @Test
+    fun whenFireNewChatHintTappedThenCountAndDailyFiredWithHintAndPosition() = runTest {
+        testee.fireNewChatHintTapped(NewChatHint.PHOTO, position = 1)
+
+        advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.HINT to "photo", DuckChatPixelParameters.HINT_POSITION to "1")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when responding service started then pixel with restricted sent`() {
+        testee.reportRespondingServiceStarted(restricted = false)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_STARTED, mapOf("restricted" to "false"))
+    }
+
+    @Test
+    fun `when responding service start failed then pixel with reason sent`() {
+        testee.reportRespondingServiceStartFailed(RespondingServiceStartFailure.FOREGROUND_NOT_ALLOWED)
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_START_FAILED,
+            mapOf("reason" to "foreground_not_allowed"),
+        )
+    }
+
+    @Test
+    fun `when responding service interrupted then pixel with restricted sent`() {
+        testee.reportRespondingServiceInterrupted(restricted = true)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_INTERRUPTED, mapOf("restricted" to "true"))
+    }
+
+    @Test
+    fun `when responding service timed out then pixel sent`() {
+        testee.reportRespondingServiceTimedOut()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT)
     }
 }

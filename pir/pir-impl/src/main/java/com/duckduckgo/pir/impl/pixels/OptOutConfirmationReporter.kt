@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus.REMOVED
-import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus.REQUESTED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import dev.zacsweers.metro.ContributesBinding
@@ -48,8 +47,10 @@ class RealOptOutConfirmationReporter @Inject constructor(
 
         withContext(dispatcherProvider.io()) {
             val activeBrokers = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
+            // A job counts once it has been requested, whatever its status now: a re-request can leave an
+            // unconfirmed job in PENDING_EMAIL_CONFIRMATION or ERROR, and dropping them would skew the pixels towards removals.
             val allValidRequestedOptOutJobs = pirSchedulingRepository.getAllValidOptOutJobRecords().filter {
-                it.status == REQUESTED || it.status == REMOVED
+                it.optOutFirstRequestedDateInMillis != null
             }
 
             if (activeBrokers.isEmpty() || allValidRequestedOptOutJobs.isEmpty()) return@withContext
@@ -117,7 +118,7 @@ class RealOptOutConfirmationReporter @Inject constructor(
     ) {
         val now = currentTimeProvider.currentTimeMillis()
         val optOutsForPixel = this.filter {
-            it.daysPassedSinceSubmission(now, confirmationDay) && jobRecordFilter(it)
+            it.daysPassedSinceFirstRequest(now, confirmationDay) && jobRecordFilter(it)
         }
 
         logcat { "PIR-CUSTOM-STATS: Firing $confirmationDay day confirmation pixels for ${optOutsForPixel.size} jobs" }
@@ -136,11 +137,13 @@ class RealOptOutConfirmationReporter @Inject constructor(
         }
     }
 
-    private fun OptOutJobRecord.daysPassedSinceSubmission(
+    // Not optOutRequestedDateInMillis: it is overwritten on every re-request, so an unconfirmed job would never reach 42 days.
+    private fun OptOutJobRecord.daysPassedSinceFirstRequest(
         now: Long,
         interval: Long,
     ): Boolean {
-        return now >= this.optOutRequestedDateInMillis + TimeUnit.DAYS.toMillis(interval)
+        val firstRequestedDateInMillis = this.optOutFirstRequestedDateInMillis ?: return false
+        return now >= firstRequestedDateInMillis + TimeUnit.DAYS.toMillis(interval)
     }
 
     companion object {

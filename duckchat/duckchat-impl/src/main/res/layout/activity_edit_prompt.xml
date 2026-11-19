@@ -84,27 +84,15 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.card.MaterialCardView
+                <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
                     android:id="@+id/editPromptInputCard"
-                    android:theme="?attr/daxInputModeCardThemeOverlay"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/keyline_2"
-                    app:cardBackgroundColor="?attr/daxColorWindow"
-                    app:cardElevation="2dp"
-                    app:cardUseCompatPadding="false"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-                        android:id="@+id/editPromptInput"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="4dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </com.google.android.material.card.MaterialCardView>
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:nativeInputSurface="edit" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

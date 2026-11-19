@@ -17,9 +17,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Personal Information Removal -->
-    <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
-    <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
-    <string name="pirStorageUnavailableDialogButton">Got It</string>
     <string name="planTierNamePlus">Plus</string>
     <string name="planTierNamePro">Pro</string>
 
@@ -158,5 +155,11 @@
     <string name="subscriptionOnboardingSettingsCardTitle" instruction="Placeholder is the whole-number percentage of onboarding completed, e.g. 75">Setup %1$d%% complete</string>
     <string name="subscriptionOnboardingSettingsCardDescription">Some premium protections aren\'t active yet.</string>
     <string name="subscriptionOnboardingSettingsCardButton">Continue Setup</string>
+
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Expiring</string>
+    <string name="subscriptionExpiringIconContentDescription">Subscription expiring</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Your subscription will expire on %1$s.</string>
+    <string name="subscriptionKeepSubscription">Keep Subscription</string>
 
 </resources>

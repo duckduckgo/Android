@@ -183,8 +183,8 @@ class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
                 with(binding) {
                     duckPlayerModeSelector.isEnabled = true
                     duckPlayerDisabledSection.isVisible = false
-                    openDuckPlayerInNewTabToggle.isVisible =
-                        viewState.privatePlayerMode != Disabled && viewState.openDuckPlayerInNewTab != Unavailable
+                    openDuckPlayerInNewTabToggle.isVisible = viewState.openDuckPlayerInNewTab != Unavailable
+                    openDuckPlayerInNewTabToggle.isEnabled = viewState.privatePlayerMode != Disabled
                     openDuckPlayerInNewTabToggle.setIsChecked(viewState.openDuckPlayerInNewTab is On)
                     setDuckPlayerSectionVisibility(true)
                 }

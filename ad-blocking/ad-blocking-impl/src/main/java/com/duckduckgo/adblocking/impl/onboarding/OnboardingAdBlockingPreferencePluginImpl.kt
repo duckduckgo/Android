@@ -21,7 +21,6 @@ import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Enabled
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
@@ -46,8 +45,7 @@ class OnboardingAdBlockingPreferencePluginImpl @Inject constructor(
     override val id: Id = Id.AdBlocking
 
     override suspend fun getPreference(): Preference? {
-        val placement = statusChecker.settingsPlacementFlow().firstOrNull()
-        if (placement == null || placement == SettingsPlacement.Hidden) return null
+        if (statusChecker.observeSettingsVisible().firstOrNull() != true) return null
 
         return Preference(
             primaryText = context.getString(R.string.ad_blocking_onboarding_preference_primary),

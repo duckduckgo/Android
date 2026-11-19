@@ -76,6 +76,27 @@ interface PirRemoteFeatures {
      */
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun freemium(): Toggle
+
+    /**
+     * When enabled, completing onboarding on the dashboard asks for the notification permission
+     * (after explaining why) so the user can be told when the initial scan completes.
+     */
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun notificationPermissionPrompt(): Toggle
+
+    /**
+     * Kill-switch for broker-specific user agents. When disabled, every broker runs with the
+     * default PIR user agent, ignoring the user agent set in its broker JSON.
+     */
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun customWebViewUserAgent(): Toggle
+
+    /**
+     * Kill-switch for matching the WebView's client hints (`Sec-CH-UA*`) to a broker-specific user agent.
+     * When disabled, the WebView keeps its own client hints even when a broker sets its user agent.
+     */
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun customWebViewUserAgentClientHints(): Toggle
 }
 
 @SingleIn(AppScope::class)

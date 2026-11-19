@@ -46,7 +46,7 @@ jobs:
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Set up git config
@@ -60,7 +60,7 @@ jobs:
         run: |
           output=$(git for-each-ref --sort=taggerdate --format='%(refname:short)' refs/tags | grep -E "^[0-9]+\.[0-9]+\.[0-9]+(\.?[0-9]*-internal)?$" | tail -n 1)
           echo "Latest tag: $output"
-          echo "latest_tag=$output" >> $GITHUB_OUTPUT
+          echo "latest_tag=$output" >> "$GITHUB_OUTPUT"
 
       - name: Check for changes
         id: check_for_changes
@@ -72,7 +72,7 @@ jobs:
         if: steps.check_for_changes.outputs.has_changes == 'false'
         run: |
           echo "No new commits since the last tag. Skipping internal release."
-          echo "No new commits since the last tag. Skipping internal release." >> $GITHUB_STEP_SUMMARY
+          echo "No new commits since the last tag. Skipping internal release." >> "$GITHUB_STEP_SUMMARY"
           exit 0   
 
       - name: Decode upload keys
@@ -126,14 +126,14 @@ jobs:
         id: generate_version_name
         run: |
           output=$(./gradlew --no-configuration-cache getBuildVersionName -PversionNameSuffix=-internal -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
-          echo "version=$output" >> $GITHUB_OUTPUT
+          echo "version=$output" >> "$GITHUB_OUTPUT"
 
       - name: Capture App Bundle Path
         if: steps.check_for_changes.outputs.has_changes == 'true'
         id: capture_output
         run: |
           output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
-          echo "bundle_path=$output" >> $GITHUB_OUTPUT
+          echo "bundle_path=$output" >> "$GITHUB_OUTPUT"
 
       - name: Upload bundle to Play Store Internal track
         if: steps.check_for_changes.outputs.has_changes == 'true'
@@ -168,7 +168,7 @@ jobs:
       - name: Set successful summary
         if: steps.check_for_changes.outputs.has_changes == 'true'
         run: |
-          echo "### Internal release completed! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "### Internal release completed! :rocket:" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install dependencies for create-asana-internal-release task
         run: |
@@ -183,21 +183,31 @@ jobs:
         run: |
           RELEASE_TASK_URL=$(python ./scripts/release/create-asana-internal-release.py \
           --android-repo-path . \
-          --tag ${{ steps.generate_version_name.outputs.version }} \
+          --tag "${{ steps.generate_version_name.outputs.version }}" \
           --trigger-phrase 'Task/Issue URL:' \
-          --asana-project-id ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }} \
-          --asana-section-id ${{ vars.GH_ANDROID_APP_RELEASES_NIGHTLY_SECTION_ID }} \
-          --asana-workspace-id ${{ secrets.GH_ASANA_WORKSPACE_ID }} \
+          --asana-project-id "${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}" \
+          --asana-section-id "${{ vars.GH_ANDROID_APP_RELEASES_NIGHTLY_SECTION_ID }}" \
+          --asana-workspace-id "${{ secrets.GH_ASANA_WORKSPACE_ID }}" \
           --asana-api-key-env-var ASANA_ACCESS_TOKEN)
-          echo "RELEASE_TASK_URL=$RELEASE_TASK_URL" >> $GITHUB_ENV
+          echo "RELEASE_TASK_URL=$RELEASE_TASK_URL" >> "$GITHUB_ENV"
+
+      - name: Find GitHub actor's Asana ID
+        if: ${{ failure() }}
+        id: get-asana-user-id
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
+        with:
+          action: 'get-asana-user-id'
+          github-username: ${{ github.actor }}
+          github-pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v2.7.1
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Internal Release
           asana-task-description: The Internal Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-assignee: ${{ steps.get-asana-user-id.outputs.asanaUserId }}
           action: 'create-asana-task'

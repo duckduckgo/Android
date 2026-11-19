@@ -62,14 +62,9 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.archCore.testing
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 
 android {
     namespace 'com.duckduckgo.user.agent.impl'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }

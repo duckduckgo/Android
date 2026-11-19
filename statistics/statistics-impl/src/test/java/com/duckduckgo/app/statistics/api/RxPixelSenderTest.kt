@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.api
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LifecycleOwner
 import androidx.room.Database
@@ -45,11 +46,14 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -63,11 +67,14 @@ import org.mockito.Mock
 import org.mockito.kotlin.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import java.util.concurrent.FutureTask
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RxPixelSenderTest {
 
@@ -95,6 +102,8 @@ class RxPixelSenderTest {
     private val mockLifecycleOwner: LifecycleOwner = mock()
     private val pixelFiredRepository = FakePixelFiredRepository()
     private val pixelSenderFeature = FakeFeatureToggleFactory.create(PixelSenderFeature::class.java)
+    private val concurrencyLimitFeature = FakeFeatureToggleFactory.create(PixelConcurrencyLimitFeature::class.java)
+    private val deviceMigration = FakeDeviceMigration()
     private var pixelsRequiringAtb: List<String> = emptyList()
     private var pixelsRequiringAtbSecondPlugin: List<String> = emptyList()
     private val pixelRequiringAtbPlugins = object : PluginPoint<PixelRequiringAtbPlugin> {
@@ -114,20 +123,25 @@ class RxPixelSenderTest {
 
         // Disabled by default so existing tests exercise the legacy (ATB-always) path.
         pixelSenderFeature.self().setRawStoredState(State(enable = false))
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = false))
 
-        testee = RxPixelSender(
-            api,
-            pendingPixelDao,
-            mockStatisticsDataStore,
-            mockDeviceInfo,
-            object : StatisticsLibraryConfig {
-                override fun shouldFirePixelsAsDev() = true
-            },
-            pixelFiredRepository,
-            lazy { pixelSenderFeature },
-            pixelRequiringAtbPlugins,
-        )
+        testee = createTestee(pendingPixelDao)
     }
+
+    private fun createTestee(pixelDao: PendingPixelDao) = RxPixelSender(
+        api,
+        pixelDao,
+        mockStatisticsDataStore,
+        mockDeviceInfo,
+        object : StatisticsLibraryConfig {
+            override fun shouldFirePixelsAsDev() = true
+        },
+        pixelFiredRepository,
+        lazy { pixelSenderFeature },
+        pixelRequiringAtbPlugins,
+        lazy { concurrencyLimitFeature },
+        lazy { deviceMigration },
+    )
 
     @After
     fun after() {
@@ -270,6 +284,72 @@ class RxPixelSenderTest {
             pixelEntity.additionalQueryParams,
             pixelEntity.encodedQueryParams,
         )
+    }
+
+    @Test
+    fun whenMigratedInstallForegroundedThenPreviousPhoneQueueDroppedUnsent() {
+        givenPixelApiSucceeds()
+        deviceMigration.migrated = true
+        pendingPixelDao.insert(queuedPixel())
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api, never()).fire(any(), any(), any(), any(), any(), any())
+        assertTrue(pendingPixelDao.pixels().test().assertNoErrors().values().last().isEmpty())
+    }
+
+    @Test
+    fun whenMigratedInstallForegroundedAgainThenQueueNotDroppedTwice() {
+        givenPixelApiSucceeds()
+        deviceMigration.migrated = true
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+        testee.onStart(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
+        val ownPixel = queuedPixel()
+        pendingPixelDao.insert(ownPixel)
+
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api).fire(ownPixel.pixelName, "phone", ownPixel.atb, ownPixel.additionalQueryParams, ownPixel.encodedQueryParams)
+    }
+
+    @Test
+    fun whenMigratedInstallEnqueuesBeforeForegroundThenOnlyPreviousPhoneQueueDropped() {
+        givenPixelApiSucceeds()
+        deviceMigration.migrated = true
+        pendingPixelDao.insert(queuedPixel().copy(pixelName = "previous_phone"))
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Unique()).test()
+            .assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api, never()).fire(eq("previous_phone"), any(), any(), any(), any(), any())
+        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenTransferredQueueAlreadyClearedThenLaterEnqueuesKept() {
+        deviceMigration.migrated = true
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Count).test()
+
+        testee.enqueuePixel(TEST.pixelName, emptyMap(), emptyMap(), Count).test()
+
+        assertEquals(2, pendingPixelDao.pixels().test().assertNoErrors().values().last().size)
+    }
+
+    @Test
+    fun whenNotMigratedInstallForegroundedThenQueueSentAndNotCheckedAgain() {
+        givenPixelApiSucceeds()
+        val pixelEntity = queuedPixel()
+        pendingPixelDao.insert(pixelEntity)
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.onStart(mockLifecycleOwner)
+
+        verify(api).fire(pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams)
+        assertTrue(deviceMigration.done.isNotEmpty())
     }
 
     @Test
@@ -760,6 +840,165 @@ class RxPixelSenderTest {
         assertEquals(expectedEntity.encodedQueryParams, pixelEntity.encodedQueryParams)
     }
 
+    @Test
+    fun whenConcurrencyLimitEnabledThenPixelSentWithFireAsync() {
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
+        givenAsyncPixelApiSucceeds()
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
+            .test().assertValue(PIXEL_SENT)
+
+        verifyBlocking(api) { fireAsync(eq(TEST.pixelName), eq("phone"), any(), any(), any(), any()) }
+        verify(api, never()).fire(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenConcurrencyLimitEnabledAndAtbOptInEnabledAndPixelNotOptedInThenFiredWithoutAtb() {
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
+        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+        pixelsRequiringAtb = emptyList()
+        wheneverBlocking { api.fireWithoutAtbAsync(any(), any(), any(), any(), any()) }.thenReturn(Unit)
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
+            .test().assertValue(PIXEL_SENT)
+
+        verifyBlocking(api) { fireWithoutAtbAsync(eq("test"), eq("phone"), any(), any(), any()) }
+        verifyBlocking(api, never()) { fireAsync(any(), any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun whenConcurrencyLimitEnabledAndDailyPixelFireFailsThenPixelNameIsNotStored() {
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
+        givenAsyncPixelApiFails()
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
+            .test().assertError(TimeoutException::class.java)
+
+        assertFalse(TEST.pixelName in pixelFiredRepository.dailyPixelsFiredToday)
+    }
+
+    @Test
+    fun whenConcurrencyLimitEnabledAndAppForegroundedThenQueuedPixelSentWithFireAsyncAndRemoved() {
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
+        givenAsyncPixelApiSucceeds()
+        val pixelEntity = PixelEntity(
+            pixelName = "test",
+            atb = "atbvariant",
+            additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+            encodedQueryParams = emptyMap(),
+        )
+        pendingPixelDao.insert(pixelEntity)
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.onStart(mockLifecycleOwner)
+
+        verifyBlocking(api) {
+            fireAsync(pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams)
+        }
+        verify(api, never()).fire(any(), any(), any(), any(), any(), any())
+        assertTrue(pendingPixelDao.pixels().test().assertNoErrors().values().last().isEmpty())
+    }
+
+    @Test
+    fun whenConcurrencyLimitEnabledAndQueuedPixelSendFailsThenPixelNotRemoved() {
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
+        givenAsyncPixelApiFails()
+        val pixelEntity = PixelEntity(
+            pixelName = "test",
+            atb = "atbvariant",
+            additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+            encodedQueryParams = emptyMap(),
+        )
+        pendingPixelDao.insert(pixelEntity)
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.onStart(mockLifecycleOwner)
+
+        assertEquals(1, pendingPixelDao.pixels().test().assertNoErrors().values().last().size)
+    }
+
+    @Test
+    fun whenConcurrencyLimitEnabledAndMultiplePixelsQueuedThenEachSentOnceAndQueueEmptied() {
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
+        // The send must actually suspend; with an instant mock a non-blocking drain would not get cancelled by switchMap.
+        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.doSuspendableAnswer { delay(10) }
+        val pixelNames = listOf("first", "second", "third")
+        pixelNames.forEach { name ->
+            pendingPixelDao.insert(
+                PixelEntity(
+                    pixelName = name,
+                    atb = "atbvariant",
+                    additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+                    encodedQueryParams = emptyMap(),
+                ),
+            )
+        }
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        testee.onStart(mockLifecycleOwner)
+
+        pixelNames.forEach { name ->
+            verifyBlocking(api, times(1)) { fireAsync(eq(name), any(), any(), any(), any(), any()) }
+        }
+        assertTrue(pendingPixelDao.pixels().test().assertNoErrors().values().last().isEmpty())
+    }
+
+    @Test
+    fun whenConcurrencyLimitEnabledAndAppStopsDuringQueuedSendThenSendCancelledAndPixelKept() {
+        concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
+        // As in the app, Room must emit on its own thread: otherwise disposing interrupts the sending thread, which cancels the send anyway
+        val roomExecutor = Executors.newSingleThreadExecutor()
+        val asyncDb = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, TestAppDatabase::class.java)
+            .allowMainThreadQueries()
+            .setQueryExecutor(roomExecutor)
+            .build()
+        val asyncPixelDao = asyncDb.pixelDao()
+        val testee = createTestee(asyncPixelDao)
+        val sendStarted = CountDownLatch(1)
+        val sendCancelled = CountDownLatch(1)
+        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.doSuspendableAnswer {
+            sendStarted.countDown()
+            try {
+                awaitCancellation()
+            } finally {
+                sendCancelled.countDown()
+            }
+        }
+        asyncPixelDao.insert(
+            PixelEntity(
+                pixelName = "test",
+                atb = "atbvariant",
+                additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+                encodedQueryParams = emptyMap(),
+            ),
+        )
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+
+        try {
+            testee.onStart(mockLifecycleOwner)
+            assertTrue(sendStarted.await(5, TimeUnit.SECONDS))
+
+            testee.onStop(mockLifecycleOwner)
+
+            assertTrue(sendCancelled.await(5, TimeUnit.SECONDS))
+            assertEquals(1, asyncPixelDao.pixels().blockingFirst().size)
+        } finally {
+            asyncDb.close()
+            roomExecutor.shutdownNow()
+        }
+    }
+
+    private fun givenAsyncPixelApiSucceeds() {
+        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.thenReturn(Unit)
+    }
+
+    private fun givenAsyncPixelApiFails() {
+        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.thenAnswer { throw TimeoutException() }
+    }
+
     private fun <T : Any> raceDailyPixelOperations(
         firstSend: Single<SendPixelResult>,
         competingOperation: Single<T>,
@@ -831,6 +1070,29 @@ class RxPixelSenderTest {
 
     private fun givenPixelApiFails() {
         whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+    }
+
+    private fun queuedPixel() = PixelEntity(
+        pixelName = "test",
+        atb = "atbvariant",
+        additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+        encodedQueryParams = emptyMap(),
+    )
+
+    private class FakeDeviceMigration : DeviceMigration {
+        var migrated = false
+        val done = mutableSetOf<String>()
+        override suspend fun isMigratedInstall() = migrated
+        override fun sourceDeviceIsNewInstall(): Boolean? = if (migrated) false else null
+        override suspend fun sourceDeviceWasDefaultBrowser(): Boolean? = null
+        override suspend fun previousDeviceHadSync(): Boolean = false
+        override suspend fun isMigrationFlowPending() = false
+        override suspend fun markMigrationFlowCompleted() = Unit
+        override suspend fun isMigrationExperienceEnabled() = true
+        override fun isDoneOnThisInstall(key: String) = key in done
+        override fun markDoneOnThisInstall(key: String) {
+            done += key
+        }
     }
 
     private fun PendingPixelDao.insert(

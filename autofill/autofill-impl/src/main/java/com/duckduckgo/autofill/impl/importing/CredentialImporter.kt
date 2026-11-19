@@ -64,6 +64,7 @@ class CredentialImporterImpl @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val credentialImportTimestamp: CredentialImportTimestamp,
 ) : CredentialImporter {
 
     private val _importStatus = MutableSharedFlow<ImportResult>(replay = 1)
@@ -95,6 +96,9 @@ class CredentialImporterImpl @Inject constructor(
 
         // mark that the user has imported passwords at least once, regardless of the number of credentials imported
         autofillStore.hasEverImportedPasswords = true
+        if (insertedIds.isNotEmpty()) {
+            credentialImportTimestamp.onPasswordsImported()
+        }
 
         _importStatus.emit(Finished(savedCredentials = insertedIds.size, numberSkipped = skippedCredentials, source = source))
     }

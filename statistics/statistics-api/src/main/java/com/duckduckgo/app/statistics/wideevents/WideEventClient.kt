@@ -82,7 +82,7 @@ interface WideEventClient {
     suspend fun flowAbort(wideEventId: Long): Result<Unit>
 
     /**
-     * Get ids of active flows by their name.
+     * Get ids of active flows by their name, regardless of the process that started them.
      * Ids are ordered chronologically based on wide event creation time.
      *
      * Use to pick up wideEventId after process restart or if the flow started
@@ -205,7 +205,9 @@ sealed class CleanupPolicy {
     abstract val flowStatus: FlowStatus
 
     /**
-     * Apply cleanup on the next (main) process start for any still-open flow.
+     * Apply cleanup on the next start of the process that began the flow: the main process cleans up on startup, a secondary
+     * process on its first wide-event operation. Ownership never moves to another process, so a flow that must outlive the
+     * process that started it should use [OnTimeout] instead.
      *
      * If [ignoreIfIntervalTimeoutPresent] is true and the flow has a pending interval timeout,
      * this policy is skipped so the interval timeout can handle cleanup.

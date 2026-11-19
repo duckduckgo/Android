@@ -163,10 +163,10 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.checkLinkingCodeCta.setOnClickListener { viewModel.onCheckLinkingCodeClicked() }
         binding.testSyncWarningToggle.setOnCheckedChangeListener(testSyncWarningListener)
-        binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
-        binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
-        binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
-        binding.clearHistoryChatTabPagePromo.setOnClickListener { viewModel.onClearHistoryChatTabPagePromoClicked() }
+        binding.openPromotionDebugButton.setOnClickListener {
+            startActivity(Intent(this, SyncPromotionDebugActivity::class.java))
+        }
+        binding.resetAllPromotionDataButton.setOnClickListener { viewModel.onResetAllPromotionDataClicked() }
         binding.userIdTextView.setOnClickListener { copyToClipboard("User ID", binding.userIdTextView.text.toString()) }
         binding.deviceNameTextView.setOnClickListener { copyToClipboard("Device Name", binding.deviceNameTextView.text.toString()) }
         binding.deviceIdTextView.setOnClickListener { copyToClipboard("Device ID", binding.deviceIdTextView.text.toString()) }
@@ -195,6 +195,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deleteCachedAccountInfoKeyButton.setOnClickListener { viewModel.onDeleteCachedAccountInfoKeyClicked() }
         binding.renameDeviceButton.setOnClickListener { viewModel.onRenameDeviceClicked() }
         binding.fetchDecryptDevicesButton.setOnClickListener { viewModel.onFetchAndDecryptDevicesClicked() }
+        binding.openAuditLogDebugButton.setOnClickListener {
+            startActivity(Intent(this, SyncAuditLogDebugActivity::class.java))
+        }
         binding.runMigrationButton.setOnClickListener { viewModel.onRunMigrationClicked() }
         binding.resetMigrationMarkerButton.setOnClickListener { viewModel.onResetMigrationMarkerClicked() }
         binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
@@ -350,7 +353,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.thirdPartyRecoveryCodeDecodedTextView.text = decodeThirdPartyRecoveryCode(viewState.thirdPartyRecoveryCode)
         binding.checkLinkingCodeResultTextView.text = viewState.checkLinkingCodeResult
         binding.connectedDevicesList.removeAllViews()
-        binding.blockStoreFeatureFlag.text = viewState.blockStoreFeatureFlagText
         binding.blockStoreAvailability.text = viewState.blockStoreAvailabilityText
         binding.blockStoreApiInUse.text = viewState.blockStoreApiLevelText
         binding.blockStoreDeviceLockStatus.text = viewState.blockStoreDeviceLockText
@@ -363,15 +365,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.syncInternalEnvironment.setSecondaryText(viewState.environment)
 
-        binding.canUseV2ConnectFlowToggle.quietlySetIsChecked(viewState.canUseV2ConnectFlowEnabled) { _, enabled ->
-            viewModel.onCanUseV2ConnectFlowFlagChanged(enabled)
-        }
-        binding.canShowV2ConnectCodeToggle.quietlySetIsChecked(viewState.canShowV2ConnectCodeEnabled) { _, enabled ->
-            viewModel.onCanShowV2ConnectCodeFlagChanged(enabled)
-        }
-        binding.canUseExchangeV2Point1Toggle.quietlySetIsChecked(viewState.canUseExchangeV2Point1Enabled) { _, enabled ->
-            viewModel.onCanUseExchangeV2Point1FlagChanged(enabled)
-        }
         binding.accessCredentialsTextView.text = viewState.accessCredentialsText
         binding.scopedTokenResultTextView.text = viewState.scopedTokenResult
         binding.v2StoreFieldsTextView.text = viewState.v2StoreFieldsText
@@ -385,11 +378,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.canReadUnifiedDeviceListToggle.quietlySetIsChecked(viewState.canReadUnifiedDeviceListEnabled) { _, enabled ->
             viewModel.onCanReadUnifiedDeviceListFlagChanged(enabled)
-        }
-        binding.canUsePatchEndpointForLegacyDeviceRenameToggle.quietlySetIsChecked(
-            viewState.canUsePatchEndpointForLegacyDeviceRenameEnabled,
-        ) { _, enabled ->
-            viewModel.onCanUsePatchEndpointForLegacyDeviceRenameFlagChanged(enabled)
         }
         binding.migrationStatusTextView.text = viewState.migrationStatusText
         binding.migrationResultTextView.text = viewState.migrationResult

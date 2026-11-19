@@ -25,7 +25,6 @@
     <string name="no">Nej</string>
     <string name="open">Åben</string>
     <string name="cancel">Annullér</string>
-    <string name="search">Søg</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat slettet</string>

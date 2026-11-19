@@ -77,7 +77,10 @@ class SubscriptionOnboardingViewModelTest {
         val stateFlow = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
         override val state: StateFlow<LinearOnboardingState> = stateFlow
         val events = mutableListOf<LinearOnboardingEvent>()
-        override suspend fun startPlan(plan: LinearOnboardingPlan) = Unit
+        var stateOnStart: LinearOnboardingState? = null
+        override suspend fun startPlan(plan: LinearOnboardingPlan) {
+            stateOnStart?.let { stateFlow.value = it }
+        }
         override suspend fun onEvent(event: LinearOnboardingEvent) {
             if (stateFlow.value is InProgress) events.add(event)
         }
@@ -92,6 +95,7 @@ class SubscriptionOnboardingViewModelTest {
             handoffState,
             pixelSender,
             subscriptionsManager,
+            coroutineRule.testScope,
         )
 
     @Test
@@ -154,6 +158,20 @@ class SubscriptionOnboardingViewModelTest {
 
         testee.commands.test {
             assertEquals(SubscriptionOnboardingViewModel.Command.FinishToSettings, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenPreviousRunWasSkippedThenNewRunShowsStepWithoutFinishing() = runTest {
+        val stepPlugin = stepPluginMock()
+        orchestrator.stateFlow.value = LinearOnboardingState.Skipped(rootPlanId = SUBSCRIPTION_ONBOARDING_PLAN_ID)
+        orchestrator.stateOnStart = inProgressState(stepPlugin = stepPlugin)
+        val testee = createViewModel()
+        testee.start()
+
+        testee.commands.test {
+            assertEquals(SubscriptionOnboardingViewModel.Command.ShowStep(stepPlugin), awaitItem())
+            expectNoEvents()
         }
     }
 
@@ -377,6 +395,32 @@ class SubscriptionOnboardingViewModelTest {
             (command as SubscriptionOnboardingViewModel.Command.RunHandoff).action()
             assertTrue(handoffRan)
         }
+    }
+
+    @Test
+    fun whenClearedWhileRunInProgressThenRunIsClosed() = runTest {
+        orchestrator.stateFlow.value = inProgressState()
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        testee.onCleared()
+        advanceUntilIdle()
+
+        assertTrue(orchestrator.events.contains(SubscriptionOnboardingEvent.Closed))
+    }
+
+    @Test
+    fun whenClearedWhileAnotherPlanInProgressThenRunIsNotClosed() = runTest {
+        orchestrator.stateFlow.value = inProgressState().copy(rootPlanId = "other_plan")
+        val testee = createViewModel()
+        testee.start()
+        advanceUntilIdle()
+
+        testee.onCleared()
+        advanceUntilIdle()
+
+        assertFalse(orchestrator.events.contains(SubscriptionOnboardingEvent.Closed))
     }
 
     @Test

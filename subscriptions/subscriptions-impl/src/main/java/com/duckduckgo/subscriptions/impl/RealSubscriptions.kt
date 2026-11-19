@@ -290,8 +290,18 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendAuthTokenRefreshWideEvent(): Toggle
 
+    /**
+     * When enabled, refreshAccessToken(force = false) returns the stored access token without
+     * rotating if that token is still usable. When disabled, every call rotates (previous behaviour).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun skipValidAccessTokenRefresh(): Toggle
+
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionSwitchWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionUndoCancellationWideEvent(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionRestoreWideEvent(): Toggle
@@ -339,19 +349,19 @@ interface SubscriptionsFeature {
      * When enabled, a local reminder notification can be scheduled by the subscription page
      * to fire ahead of the subscription's expiry/renewal date.
      */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun subscriptionExpirationReminderNotification(): Toggle
 
     /**
      * Kill switch for `getUserSettings` JS message
      */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun userSettingsMessaging(): Toggle
 
     /**
      * Kill switch for the `requestNotificationsPermission` JS message
      */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun notificationsPermissionMessaging(): Toggle
 
     /**
@@ -401,6 +411,30 @@ interface SubscriptionsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun bridgeOriginCheck(): Toggle
+
+    /**
+     * When enabled, eligible Stripe subscribers can withdraw from their subscription
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionWithdrawal(): Toggle
+
+    /**
+     * When enabled, Stripe subscribers see Stripe products on the plans page and plan changes are redirected to Stripe
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun stripeTierOptions(): Toggle
+
+    /**
+     * When enabled, Stripe products are fetched for the subscription's country
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun stripeTierOptionsByCountry(): Toggle
+
+    /**
+     * When enabled, Play subscribers see an option to undo a cancellation
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun undoSubscriptionCancellation(): Toggle
 
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),

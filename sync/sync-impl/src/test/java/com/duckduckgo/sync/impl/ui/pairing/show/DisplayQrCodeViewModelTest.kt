@@ -20,11 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures
-import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
-import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
 import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.ConnectedDevice
@@ -32,11 +28,8 @@ import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -57,7 +50,6 @@ import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.C
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShareCode
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.DialogType
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
@@ -107,7 +99,6 @@ class DisplayQrCodeViewModelTest {
     private val accountRepository = mock<SyncAccountRepository>()
     private val codeDispatcher = mock<SyncCodeDispatcher>()
     private val pixels = mock<SyncPixels>()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val qrEncoder = mock<QREncoder>()
     private val clipboard = mock<ClipboardInteractor>()
     private val switchedAccountDetector = mock<SwitchedAccountDetector>()
@@ -116,7 +107,6 @@ class DisplayQrCodeViewModelTest {
     fun setup() {
         whenever(codeDispatcher.presentV2()).thenReturn(emptyFlow())
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(bitmap)
-        whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
         whenever(accountRepository.getAccountInfo()).thenReturn(AccountInfo(isSignedIn = false))
     }
 
@@ -126,7 +116,6 @@ class DisplayQrCodeViewModelTest {
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
         pixels = pixels,
-        syncFeature = syncFeature,
         qrEncoder = qrEncoder,
         clipboard = clipboard,
         switchedAccountDetector = switchedAccountDetector,
@@ -134,207 +123,7 @@ class DisplayQrCodeViewModelTest {
     )
 
     @Test
-    fun `when v2 is disabled then the v1 connect code is shown as a QR code`() = runTest {
-        givenV2Disabled()
-        whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
-
-        val testee = createTestee()
-
-        testee.viewState.test {
-            assertEquals(BitmapWithCode(bitmap, "raw-code", "raw-code"), awaitItem().bitmap)
-            verify(qrEncoder).encodeAsBitmap(eq("raw-code"), any(), any())
-            verify(codeDispatcher, never()).presentV2()
-
-            cancel()
-        }
-    }
-
-    @Test
-    fun `when v2 is disabled and the connect code cannot be generated then an error is shown`() = runTest {
-        givenV2Disabled()
-        whenever(accountRepository.getConnectQR()).thenReturn(Result.Error(reason = "boom"))
-
-        val testee = createTestee()
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertIs<ShowV1Error>(command)
-            assertEquals(R.string.sync_connect_generic_error, command.content.message)
-            assertEquals("boom", command.content.reason)
-
-            cancel()
-        }
-        verify(accountRepository, never()).pollConnectionKeys()
-    }
-
-    @Test
-    fun `when v2 is disabled and the connection keys are synced then a success result with no role is set and the screen closes`() = runTest {
-        givenV2Disabled()
-        givenThisConnectedDevice()
-        whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
-        whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
-
-        val testee = createTestee(source = SyncLaunchSource.PromotionBookmarks)
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertIs<SetPairingResult>(command)
-            assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT),
-                command.result,
-            )
-            assertIs<Close>(awaitItem())
-
-            cancel()
-        }
-        verify(pixels).fireSignupConnectPixel(SyncLaunchSource.PromotionBookmarks)
-        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SyncLaunchSource.PromotionBookmarks, null, null, null)
-    }
-
-    @Test
-    fun `when v2 is disabled and polling fails with a login error then an error is shown`() = runTest {
-        givenV2Disabled()
-        whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
-        whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Error(code = LOGIN_FAILED.code, reason = "boom"))
-
-        val testee = createTestee()
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertIs<ShowV1Error>(command)
-            assertEquals(R.string.sync_connect_login_error, command.content.message)
-            assertEquals("boom", command.content.reason)
-
-            cancel()
-        }
-    }
-
-    @Test
-    fun `when only the v2 connect flow flag is enabled then the v1 connect code is shown`() = runTest {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
-        syncFeature.canShowV2ConnectCode().setRawStoredState(State(false))
-        whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
-
-        createTestee()
-
-        verify(accountRepository).getConnectQR()
-        verify(codeDispatcher, never()).presentV2()
-    }
-
-    @Test
-    fun `when v2 is disabled and this device is signed in then the exchange invitation code is shown as a QR code`() = runTest {
-        givenV2Disabled()
-        givenSignedIn()
-        givenExchangeKeysEnabled()
-        whenever(accountRepository.generateExchangeInvitationCode())
-            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
-        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Result.Success(true))
-
-        val testee = createTestee()
-
-        testee.viewState.test {
-            assertEquals(BitmapWithCode(bitmap, "invitation-code", "invitation-code"), awaitItem().bitmap)
-            verify(qrEncoder).encodeAsBitmap(eq("invitation-code"), any(), any())
-            verify(accountRepository, never()).getConnectQR()
-            verify(codeDispatcher, never()).presentV2()
-
-            cancel()
-        }
-    }
-
-    @Test
-    fun `when v2 is disabled and this device is signed in and the peer acknowledges then a success result is set and the screen closes`() = runTest {
-        givenV2Disabled()
-        givenSignedIn()
-        givenExchangeKeysEnabled()
-        givenThisConnectedDevice()
-        whenever(accountRepository.generateExchangeInvitationCode())
-            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
-        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Result.Success(true))
-
-        val testee = createTestee()
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertIs<SetPairingResult>(command)
-            assertEquals(
-                SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT),
-                command.result,
-            )
-            assertIs<Close>(awaitItem())
-
-            cancel()
-        }
-        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, SyncLaunchSource.Other, null, null, null)
-        verify(pixels, never()).fireLoginPixel()
-        verify(pixels, never()).fireSignupConnectPixel(anyOrNull())
-    }
-
-    @Test
-    fun `when v2 is disabled and this device is signed in and the invitation code cannot be generated then an error is shown`() = runTest {
-        givenV2Disabled()
-        givenSignedIn()
-        givenExchangeKeysEnabled()
-        whenever(accountRepository.generateExchangeInvitationCode()).thenReturn(Result.Error(reason = "boom"))
-
-        val testee = createTestee()
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertIs<ShowV1Error>(command)
-            assertEquals(R.string.sync_connect_generic_error, command.content.message)
-            assertEquals("boom", command.content.reason)
-
-            cancel()
-        }
-        verify(accountRepository, never()).pollSecondDeviceExchangeAcknowledgement()
-    }
-
-    @Test
-    fun `when v2 is disabled and this device is signed in and polling fails then an error is shown`() = runTest {
-        givenV2Disabled()
-        givenSignedIn()
-        givenExchangeKeysEnabled()
-        whenever(accountRepository.generateExchangeInvitationCode())
-            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
-        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement())
-            .thenReturn(Result.Error(code = EXCHANGE_FAILED.code, reason = "boom"))
-
-        val testee = createTestee()
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertIs<ShowV1Error>(command)
-            assertEquals(R.string.sync_simplified_pairing_failed_generic_message, command.content.message)
-            assertEquals("boom", command.content.reason)
-
-            cancel()
-        }
-    }
-
-    @Test
-    fun `when v2 and exchange keys are disabled and this device is signed in then the recovery code is shown without polling`() = runTest {
-        givenV2Disabled()
-        givenSignedIn()
-        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
-        whenever(accountRepository.getRecoveryCode())
-            .thenReturn(Result.Success(AuthCode(qrCode = "recovery-code", rawCode = "recovery-code")))
-
-        val testee = createTestee()
-
-        testee.viewState.test {
-            assertEquals(BitmapWithCode(bitmap, "recovery-code", "recovery-code"), awaitItem().bitmap)
-
-            cancel()
-        }
-        verify(accountRepository, never()).pollSecondDeviceExchangeAcknowledgement()
-        verify(accountRepository, never()).generateExchangeInvitationCode()
-        verify(accountRepository, never()).getConnectQR()
-    }
-
-    @Test
     fun `when this device is signed in then v2 pixels report the exchange screen`() = runTest {
-        givenV2Enabled()
         givenSignedIn()
         givenThisConnectedDevice()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
@@ -345,8 +134,7 @@ class DisplayQrCodeViewModelTest {
     }
 
     @Test
-    fun `when v2 is enabled then the v2 linking code is shown as a QR code`() = runTest {
-        givenV2Enabled()
+    fun `when the linking code is ready then it is shown as a QR code`() = runTest {
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
 
         val testee = createTestee()
@@ -354,7 +142,6 @@ class DisplayQrCodeViewModelTest {
         testee.viewState.test {
             assertEquals(BitmapWithCode(bitmap, linkingUrl, "encoded-code"), awaitItem().bitmap)
             verify(qrEncoder).encodeAsBitmap(eq(linkingUrl), any(), any())
-            verify(accountRepository, never()).getConnectQR()
 
             cancel()
         }
@@ -362,7 +149,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the host confirmation is requested then the host confirmation dialog is shown`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(
             flowOf(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0)),
         )
@@ -378,7 +164,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the joiner confirmation is requested then the joiner confirmation dialog is shown`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(
             flowOf(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0)),
         )
@@ -394,8 +179,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the host is confirmed then the dispatcher is notified`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
         testee.onHostConfirmed()
 
@@ -404,8 +187,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the host is denied then the dispatcher is notified`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
         testee.onHostDenied()
 
@@ -414,8 +195,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the joiner is confirmed then the dispatcher is notified`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
         testee.onJoinerConfirmed()
 
@@ -424,8 +203,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the joiner is denied then the dispatcher is notified`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
         testee.onJoinerDenied()
 
@@ -434,8 +211,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the host is confirmed then the connecting dialog is shown`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
         testee.onHostConfirmed()
 
@@ -448,8 +223,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the joiner is confirmed then the connecting dialog is shown`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
         testee.onJoinerConfirmed()
 
@@ -462,8 +235,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the host is denied then no dialog is shown`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
         testee.onHostConfirmed()
         testee.onHostDenied()
@@ -477,7 +248,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the login completes after confirming then the connecting dialog is dismissed`() = runTest {
-        givenV2Enabled()
         givenThisConnectedDevice()
         val outcomes = MutableSharedFlow<DispatchOutcome>()
         whenever(codeDispatcher.presentV2()).thenReturn(outcomes)
@@ -499,7 +269,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the join outcome is unknown after confirming then the check other device dialog is shown`() = runTest {
-        givenV2Enabled()
         val outcomes = MutableSharedFlow<DispatchOutcome>()
         whenever(codeDispatcher.presentV2()).thenReturn(outcomes)
 
@@ -520,8 +289,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the connecting dialog is cancelled then the failure result is set and the screen closes`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
 
         testee.commands.test {
@@ -537,8 +304,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the check other device dialog is cancelled then the failure result is set and the screen closes`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
 
         testee.commands.test {
@@ -554,7 +319,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the login completes then the success result is set and the screen closes`() = runTest {
-        givenV2Enabled()
         givenThisConnectedDevice()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
 
@@ -577,8 +341,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the screen opens then the account before pairing is recorded`() = runTest {
-        givenV2Enabled()
-
         createTestee()
 
         verify(switchedAccountDetector).onPairingStarted()
@@ -586,7 +348,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the v2 login completes then the switched account tracker is notified`() = runTest {
-        givenV2Enabled()
         givenThisConnectedDevice()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
 
@@ -597,7 +358,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when v2 pairing fails then the switched account tracker is not notified`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.Failed("boom")))
 
         createTestee()
@@ -607,7 +367,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the login completes as the elected host then a host success result is set`() = runTest {
-        givenV2Enabled()
         givenThisConnectedDevice()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING, myRole = SetupRole.HOST)))
 
@@ -625,7 +384,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the login completes but this connected device is missing then a failure result is set`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING, myRole = SetupRole.HOST)))
 
         val testee = createTestee()
@@ -642,7 +400,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the devices are already paired then the already paired error is shown`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.AlreadyConnected))
 
         val testee = createTestee()
@@ -658,7 +415,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the peer requires an app upgrade then the upgrade required error is shown`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.UpgradeRequired(codeMajor = 2)))
 
         val testee = createTestee()
@@ -674,7 +430,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when pairing fails then the pairing failed error is shown`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.Failed(reason = "boom")))
 
         val testee = createTestee()
@@ -691,7 +446,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when pairing fails then the setup failed pixel is fired`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.Failed(reason = "boom", path = SetupPath.PAIRING)))
 
         createTestee()
@@ -709,7 +463,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when pairing is denied then the setup abandoned pixel is fired`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.Failed(reason = "denied", code = PAIRING_CANCELLED.code)))
 
         createTestee()
@@ -719,7 +472,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when pairing is denied then the setup failed pixel is not fired`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.Failed(reason = "denied", code = PAIRING_CANCELLED.code)))
 
         createTestee()
@@ -729,7 +481,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the linking code is ready then no setup pixels are fired`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
 
         createTestee()
@@ -740,7 +491,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the copy button is clicked then the linking code is copied to the clipboard`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
 
         val testee = createTestee()
@@ -752,7 +502,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the copied code notification is not shown by the system then a message is shown`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
         whenever(clipboard.copyToClipboard(any(), any())).thenReturn(false)
 
@@ -768,7 +517,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the copied code notification is shown by the system then no message is shown`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
         whenever(clipboard.copyToClipboard(any(), any())).thenReturn(true)
 
@@ -784,8 +532,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the copy button is clicked before the code is ready then nothing is copied`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
         testee.onCopyCodeClicked()
 
@@ -796,7 +542,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the share button is clicked then the share code command is sent`() = runTest {
-        givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
 
         val testee = createTestee()
@@ -811,8 +556,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the share button is clicked before the code is ready then no command is sent`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
 
         testee.commands.test {
@@ -825,8 +568,6 @@ class DisplayQrCodeViewModelTest {
 
     @Test
     fun `when the error dialog is dismissed then the failure result is set and the screen closes`() = runTest {
-        givenV2Enabled()
-
         val testee = createTestee()
 
         testee.commands.test {
@@ -846,20 +587,6 @@ class DisplayQrCodeViewModelTest {
 
     private fun givenSignedIn() {
         whenever(accountRepository.getAccountInfo()).thenReturn(AccountInfo(isSignedIn = true))
-    }
-
-    private fun givenExchangeKeysEnabled() {
-        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
-    }
-
-    private fun givenV2Enabled() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
-        syncFeature.canShowV2ConnectCode().setRawStoredState(State(true))
-    }
-
-    private fun givenV2Disabled() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
-        syncFeature.canShowV2ConnectCode().setRawStoredState(State(false))
     }
 }
 

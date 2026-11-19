@@ -28,6 +28,9 @@ interface WebTrackersBlockedDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(tracker: WebTrackerBlocked)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertAll(trackers: List<WebTrackerBlocked>)
+
     @Query("DELETE FROM web_trackers_blocked")
     suspend fun deleteAll()
 

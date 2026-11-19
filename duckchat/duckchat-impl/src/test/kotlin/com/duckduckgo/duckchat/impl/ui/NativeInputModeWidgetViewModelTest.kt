@@ -47,6 +47,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
@@ -60,6 +61,9 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
@@ -71,6 +75,7 @@ import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -82,6 +87,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -101,6 +107,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
@@ -108,6 +115,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
@@ -150,6 +158,11 @@ class NativeInputModeWidgetViewModelTest {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
     private val chatStateStore = ChatStateStore()
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
+    private val attentionTracker: DuckAiResponseAttentionTracker = mock()
+    private val newChatHintsUsage: NewChatHintsUsage = mock()
+    private val newChatHintsPixels: NewChatHintsPixels = mock()
+    private val newChatDetector: NewChatDetector = mock { on { observe(any()) } doReturn emptyFlow() }
     private val realNativeInputStateStore = RealNativeInputStateStore(
         lazy { tabRepositoryProvider },
         browserModeStateHolder,
@@ -262,6 +275,12 @@ class NativeInputModeWidgetViewModelTest {
             inputOutcomeTracker = inputOutcomeTracker,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
             chatStateStore = chatStateStore,
+            responseWaitWideEvent = responseWaitWideEvent,
+            attentionTracker = attentionTracker,
+            newChatHintsUsage = newChatHintsUsage,
+            newChatHintsPixels = newChatHintsPixels,
+            newChatDetector = newChatDetector,
+            tabRepository = tabRepository,
         )
     }
 
@@ -1174,6 +1193,118 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenPromptSubmittedInANewDuckAiChatThenNewChatHintsUsageCountsIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = true)
+    }
+
+    @Test
+    fun whenPromptSubmittedInAnExistingChatThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
+    }
+
+    @Test
+    fun whenPromptSubmittedOutsideDuckAiThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
+    }
+
+    @Test
+    fun whenPromptSubmittedFromTheContextualSheetThenNewChatHintsUsageDoesNotCountIt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(newChatHintsUsage).onPromptSubmitted("tab-A", isNewChat = false)
+    }
+
+    @Test
+    fun whenSubmissionPixelsFireInANewDuckAiChatThenNewChatHintsPixelsGetTheFirstPrompt() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+
+        verify(newChatHintsPixels).onPromptSubmitted(
+            tabId = "tab-A",
+            isNewChat = true,
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            selectedTool = "image_generation",
+        )
+    }
+
+    @Test
+    fun whenConfiguredThenNewChatsInTheTabAreTracked() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        verify(newChatHintsPixels).track(eq("tab-A"), any(), any())
+    }
+
+    @Test
+    fun whenConfiguredInBrowserModeThenNewChatsInTheTabAreNotTracked() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        verify(newChatHintsPixels, never()).track(any(), any(), any())
+    }
+
+    @Test
+    fun whenSubmissionPixelsFireFromTheContextualSheetThenNewChatHintsPixelsAreToldItIsNotANewChat() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+
+        verify(newChatHintsPixels).onPromptSubmitted(
+            tabId = "tab-A",
+            isNewChat = false,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+        )
+    }
+
+    @Test
     fun whenExitModelChangeModeThenModelChangeModeClearedOnActiveTab() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
@@ -1925,6 +2056,76 @@ class NativeInputModeWidgetViewModelTest {
         )
         verify(duckChatPixels).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
+    }
+
+    @Test
+    fun whenPromptSubmittedInDuckAiTabThenResponseWaitGetsTabModeEffortAndTool() = runTest {
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("medium")
+        whenever(termsRepository.observeTermsAccepted(BrowserMode.FIRE)).thenReturn(termsAccepted)
+        val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+
+        verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", BrowserMode.FIRE, "medium", Tool.IMAGE_GENERATION.rawValue)
+        verify(attentionTracker).onNativePromptSubmitted("tab-A", BrowserMode.FIRE)
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarThenResponseWaitIsNotCalled() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+
+        verifyNoInteractions(responseWaitWideEvent)
+        verifyNoInteractions(attentionTracker)
+    }
+
+    @Test
+    fun whenEditedPromptSubmittedThenResponseWaitIsNotCalled() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureForEdit(sessionId = "session-1")
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            submitMethod = InputSubmitMethod.BUTTON,
+        )
+        viewModel.fireStopGenerationTapped()
+
+        verifyNoInteractions(responseWaitWideEvent)
+        verifyNoInteractions(attentionTracker)
+    }
+
+    @Test
+    fun whenStopTappedInDuckAiTabThenResponseWaitGetsOnStopTapped() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireStopGenerationTapped()
+
+        verify(responseWaitWideEvent).onStopTapped("tab-A")
+        verify(attentionTracker).onStopTapped("tab-A")
     }
 
     @Test

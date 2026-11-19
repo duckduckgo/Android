@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Открыть Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Подробнее</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Спросить у Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Нужен удобный доступ \nк приватному чату с ИИ?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Введите поисковый запрос или адрес сайта</string>
@@ -234,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Недавние</string>
     <string name="duck_ai_chat_history_untitled">Чат без названия</string>
     <string name="duck_ai_chat_history_empty_title">Пока нет чатов</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Открыть Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Другие параметры</string>
     <string name="duck_ai_chat_history_action_select">Выбрать</string>
     <string name="duck_ai_chat_history_action_pin">Закрепить</string>
@@ -402,6 +398,7 @@
         <item quantity="many">%1$d часов</item>
         <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d ч.</item>
     </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Кратко изложи содержимое документа</string>
 
     <!-- Duck.ai ToS consent submit button -->
     <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Спросить</string>
@@ -413,4 +410,10 @@
     <string name="duckAiTabCardListeningTitle" instruction="Header on a tab switcher card for a Duck.ai tab with a voice chat in progress, shown while Duck.ai is listening to the user.">Слушаю…</string>
     <string name="duckAiTabCardVoiceChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a voice chat, as opposed to a text chat.">Голосовой чат</string>
     <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Расшифровка</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Файлы автоматически проверяются на наличие незаконного контента. Для отмеченных чатов действует ограниченный срок хранения данных. <annotation type="learn_more_link">Подробнее</annotation></string>
+    <!-- Duck.ai new chat hints -->
+    <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Анализировать файлы</string>
+    <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Задать вопрос о фотографиях</string>
+    <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Создать изображение</string>
 </resources>

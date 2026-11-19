@@ -41,6 +41,8 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -52,6 +54,8 @@ import javax.inject.Inject
 class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context), CompactableControl {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
+
+    @Inject lateinit var newChatHintCommands: NewChatHintCommands
 
     @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
 
@@ -88,6 +92,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     private var popupWindow: PopupWindow? = null
     private var optionsButton: ImageView
+    private var hintCommandsJob: Job? = null
     private var selectedToolJob: Job? = null
     private var nativeInputStateJob: Job? = null
     private var visibleToolsJob: Job? = null
@@ -101,9 +106,22 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         addView(optionsButton)
     }
 
+    private fun observeNewChatHintCommands() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        hintCommandsJob?.cancel()
+        hintCommandsJob = newChatHintCommands.commandsFor { host.tabId() }.onEach { command ->
+            if (command is NewChatHintCommand.CreateImage && !isEditMode && !host.isContextualSurface()) {
+                viewModel.onToolSelectedByUser(Tool.IMAGE_GENERATION)
+                host.toolSelected(Tool.IMAGE_GENERATION.rawValue)
+                host.focusInput()
+            }
+        }.launchIn(scope)
+    }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        observeNewChatHintCommands()
         observeSelectedTool()
         observeNativeInputState()
         observeVisibleTools()
@@ -111,6 +129,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        hintCommandsJob?.cancel()
+        hintCommandsJob = null
         selectedToolJob?.cancel()
         selectedToolJob = null
         nativeInputStateJob?.cancel()

@@ -238,19 +238,6 @@ class DeviceInfoUpdaterTest {
     }
 
     @Test
-    fun whenV2ConnectFlowDisabledThenOmitDeviceInfoEvenThoughWritingIsEnabled() = runTest {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(enable = false))
-        whenever(syncStore.accountInfoPublicKey).thenReturn(null)
-        givenEncryptionAndPatchSucceed()
-
-        val result = updater.setThisDeviceName(name = "My Phone")
-
-        assertTrue(result is Result.Success)
-        verify(syncApi).patchThisDevice(token, "encName", "encType", null)
-        verify(accountInfoKeyManager, never()).ensureKeyRegistered()
-    }
-
-    @Test
     fun whenWriteFeatureEnabledThenSendDeviceInfoAlongsideTheLegacyFields() = runTest {
         givenEncryptionAndPatchSucceed()
 

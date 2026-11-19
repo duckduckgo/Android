@@ -111,8 +111,15 @@ PixelDefinitions/pixels/pixel_processing_results/*
 /pageload-results.json
 PixelDefinitions/node_modules/
 
+# Python
+__pycache__/
+*.pyc
+
 # LLM
 .claude/settings.local.json
 /.claude/worktrees/*
 CLAUDE.local.md
 docs/*
+# verify-android proofs are written per change and never committed; the shared steps are.
+/.agents/skills/verify-android/proofs/*.py
+!/.agents/skills/verify-android/proofs/steps.py

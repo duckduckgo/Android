@@ -39,10 +39,15 @@ class WelcomeBinder(
         bodyText2.isVisible = content.body2 != null
         content.body2?.let { bodyText2.text = it.resolve(context).preventWidows() }
 
+        // Set explicitly, like the second body line: the welcome card also renders without a pictogram.
+        welcomePictogram.isVisible = content.pictogramRes != null
+        content.pictogramRes?.let { welcomePictogram.setImageResource(it) }
+
         titleText.setTitle(content.title.resolve(context))
 
         ContentHandle(
             title = titleText,
+            preTitleFadeTargets = listOfNotNull(welcomePictogram.takeIf { content.pictogramRes != null }),
             fadeTargets = listOfNotNull(bodyText1, bodyText2.takeIf { content.body2 != null }),
         )
     }

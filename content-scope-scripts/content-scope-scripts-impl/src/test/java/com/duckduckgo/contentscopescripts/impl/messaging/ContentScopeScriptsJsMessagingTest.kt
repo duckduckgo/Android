@@ -53,6 +53,8 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import logcat.LogPriority
+import logcat.LogcatLogger
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
@@ -1044,6 +1046,44 @@ class ContentScopeScriptsJsMessagingTest {
             assertTrue(handled.await(10, SECONDS))
             assertEquals(1, maxActive.get())
             features.forEach { feature -> assertEquals(perFeature, flags.count { it == feature }) }
+        }
+
+    @Test
+    fun `when the consumer drains during warning logging then overflow reports the stage at rejection`() =
+        runTest {
+            val stalledMain = StandardTestDispatcher(TestCoroutineScheduler())
+            val messaging = givenQueuedMessaging(handlers, main = stalledMain)
+            whenever(mockWebView.url).thenReturn("https://example.com")
+            messaging.register(mockWebView, callback)
+            messaging.process(webShareMessage("waiting-for-url"), messaging.secret)
+            advanceUntilIdle()
+            repeat(MAX_QUEUED_MESSAGES) { messaging.process(webShareMessage("queued$it"), messaging.secret) }
+            timeProvider.elapsed = 15_000
+            assertEquals(emptyList<String>(), callback.ids)
+
+            // Pause the producer between the failed offer and reporting, then let the consumer catch up.
+            assertFalse(LogcatLogger.isInstalled)
+            LogcatLogger.install(object : LogcatLogger {
+                override fun isLoggable(priority: LogPriority): Boolean = priority == LogPriority.WARN
+                override fun log(priority: LogPriority, tag: String, message: String) {
+                    if (message.startsWith("Inbound queue full")) {
+                        stalledMain.scheduler.advanceUntilIdle()
+                        advanceUntilIdle()
+                    }
+                }
+            })
+            try {
+                messaging.process(webShareMessage("overflow"), messaging.secret)
+            } finally {
+                LogcatLogger.uninstall()
+            }
+
+            assertEquals(MAX_QUEUED_MESSAGES + 1, callback.ids.size)
+            val actual = firedOverflowParameters()
+            assertEquals(
+                mapOf("feature" to "webCompat", "handling_stage" to "url", "handling_time" to "10s_to_60s"),
+                actual,
+            )
         }
 
     private fun firedOverflowParameters(): Map<String, String> {

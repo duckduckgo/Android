@@ -17,6 +17,7 @@
 package com.duckduckgo.widget
 
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.nextsteps.NextStepsAdoptionMetrics
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -27,6 +28,7 @@ class SearchWidgetLifecycleDelegate @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val widgetCapabilities: AppWidgetCapabilities,
     private val pixel: Pixel,
+    private val nextStepsAdoptionMetrics: NextStepsAdoptionMetrics,
 ) {
 
     fun handleOnWidgetEnabled(widgetSpecificAddedPixel: AppPixelName) {
@@ -35,6 +37,7 @@ class SearchWidgetLifecycleDelegate @Inject constructor(
             pixel.fire(AppPixelName.WIDGETS_ADDED)
         }
         pixel.fire(widgetSpecificAddedPixel)
+        nextStepsAdoptionMetrics.onWidgetAdded()
     }
 
     fun handleOnWidgetDisabled(widgetSpecificDeletedPixel: AppPixelName) {

@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
@@ -26,6 +27,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportGoogleBookmarksWebflowBinding
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
@@ -35,6 +37,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
@@ -44,11 +47,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 /**
  * Launch the Google Bookmarks import flow
  */
-data class ImportBookmarksViaGoogleTakeoutScreen(val launchSource: String) : GlobalActivityStarter.ActivityParams
+data class ImportBookmarksViaGoogleTakeoutScreen(val params: BookmarksImportParams) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class, screenName = "importGoogleBookmarks")
@@ -68,7 +72,7 @@ class ImportGoogleBookmarksWebFlowActivity :
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
     private val viewModel by viewModels<ImportGoogleBookmarksViewModel> {
-        ImportGoogleBookmarksViewModel.Factory.Provider(importViewModelFactory, getLaunchSource(), isRedesignEnabled)
+        ImportGoogleBookmarksViewModel.Factory.Provider(importViewModelFactory, getImportParams(), isRedesignEnabled)
     }
 
     private var isRedesignEnabled = false
@@ -86,6 +90,7 @@ class ImportGoogleBookmarksWebFlowActivity :
         configureToolbar()
         configureEdgeToEdgeInsets()
         configureResultListeners()
+        configureBackHandler()
         observeViewModel()
     }
 
@@ -96,7 +101,9 @@ class ImportGoogleBookmarksWebFlowActivity :
 
     private fun configureEdgeToEdgeInsets() {
         if (isRedesignEnabled) {
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            // we paint the status bar strip with the page color instead of the toolbar-colored scrim,
+            // so moving between the web flow and the progress and result screens has no visible seam
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
         } else {
             edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
             edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
@@ -132,7 +139,7 @@ class ImportGoogleBookmarksWebFlowActivity :
                 if (isRedesignEnabled) {
                     ImportFinishedRedesignFragment.newInstanceSuccess(
                         importedCount = viewState.viewMode.importedCount,
-                        launchSource = getLaunchSource(),
+                        params = getImportParams(),
                     )
                 } else {
                     ImportFinishedFragment.newInstanceSuccess(
@@ -144,7 +151,7 @@ class ImportGoogleBookmarksWebFlowActivity :
             is ViewMode.Error -> showResultFragment {
                 if (isRedesignEnabled) {
                     ImportFinishedRedesignFragment.newInstanceError(
-                        launchSource = getLaunchSource(),
+                        params = getImportParams(),
                     )
                 } else {
                     ImportFinishedFragment.newInstanceFailure(getString(R.string.importBookmarksErrorGenericMessage))
@@ -210,6 +217,10 @@ class ImportGoogleBookmarksWebFlowActivity :
         }
     }
 
+    private fun configureBackHandler() {
+        onBackPressedDispatcher.addCallback(this) { viewModel.onBackPressed() }
+    }
+
     private fun exitWithResult(result: ImportGoogleBookmarkResult) {
         val resultBundle = Bundle().apply {
             putParcelable(ImportGoogleBookmarkResult.RESULT_KEY_DETAILS, result)
@@ -221,9 +232,16 @@ class ImportGoogleBookmarksWebFlowActivity :
     private fun configureToolbar() {
         with(binding.includeToolbar.toolbar) {
             setupToolbar(this)
-            setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+            setNavigationIcon(CommonR.drawable.ic_close_24)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        if (isRedesignEnabled) {
+            val pageBackground = getColorFromAttr(CommonR.attr.daxColorSurfaceTertiary)
+            binding.root.setBackgroundColor(pageBackground)
+            binding.includeToolbar.appBarLayout.setBackgroundColor(pageBackground)
+            binding.includeToolbar.toolbar.setBackgroundColor(pageBackground)
+        }
         // the redesign starts without a toolbar, and we can't wait for the first view state because it may arrive after the first frame
         binding.includeToolbar.appBarLayout.isVisible = !isRedesignEnabled
         binding.includeToolbar.topBrowserOutlineStroke.isVisible = !isRedesignEnabled
@@ -246,8 +264,9 @@ class ImportGoogleBookmarksWebFlowActivity :
         viewModel.onWaitingForExportStopped()
     }
 
-    private fun getLaunchSource(): String {
-        return intent.getActivityParams(ImportBookmarksViaGoogleTakeoutScreen::class.java)?.launchSource ?: UNKNOWN_LAUNCH_SOURCE
+    private fun getImportParams(): BookmarksImportParams {
+        return intent.getActivityParams(ImportBookmarksViaGoogleTakeoutScreen::class.java)?.params
+            ?: BookmarksImportParams(launchSource = UNKNOWN_LAUNCH_SOURCE)
     }
 
     companion object {

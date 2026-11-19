@@ -1,7 +1,7 @@
 {
   "name": "SpyFly",
   "url": "spyfly.com",
-  "version": "0.8.0",
+  "version": "0.8.3",
   "addedDatetime": 1775214750818,
   "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
   "steps": [
@@ -185,9 +185,13 @@
           "id": "386c4ff6-c057-4d8e-a587-f7de9832882c"
         },
         {
-          "_comment": "Wait for the results page to load",
+          "_comment": "Wait for the results page to load. The element check makes this retry for up to 30 seconds, because a text-only check runs once and fails on Windows before the page loads",
           "actionType": "expectation",
           "expectations": [
+            {
+              "type": "element",
+              "selector": ".section__head h1"
+            },
             {
               "type": "text",
               "selector": ".section__head h1",
@@ -235,10 +239,11 @@
         },
         {
           "actionType": "expectation",
+          "_comment": "Opt-outs are off on purpose: the correct selector is `.main`. Set it back to re-enable opt-outs, see https://app.asana.com/1/137249556945/project/1206873150423133/task/1220296008414083",
           "expectations": [
             {
               "type": "element",
-              "selector": ".main"
+              "selector": "#pir-opt-out-off-on-purpose"
             }
           ],
           "id": "928fdd3b-69c8-48f2-9d52-6f30a82a0bbc"

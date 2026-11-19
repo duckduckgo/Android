@@ -174,6 +174,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             "backToSettingsActivateSuccess",
             "getUserSettings",
             "requestNotificationsPermission",
+            "completeStripePayment",
         )
     }
 
@@ -292,7 +293,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         private suspend fun SubscriptionsManager.tryRefreshAccessToken() {
             try {
                 if (isSignedInV2()) {
-                    refreshAccessToken()
+                    refreshAccessToken(force = true)
                 }
             } catch (e: Exception) {
                 logcat { e.stackTraceToString() }

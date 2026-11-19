@@ -29,6 +29,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "aiChat",
 )
 interface DuckChatFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun pdfPageContext(): Toggle
+
     /**
      * @return `true` when the remote config has the global "aiChat" feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -246,6 +249,13 @@ interface DuckChatFeature {
     fun sendDuckAiSessionWideEvent(): Toggle
 
     /**
+     * @return `true` when the Duck.ai response wait wide event should be sent
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendDuckAiResponseWaitWideEvent(): Toggle
+
+    /**
      * @return `true` when the updated Duck.ai model and reasoning pickers are enabled: models grouped
      * by availability, backend-driven ordering and sublines, and a gated section header that follows the
      * user's tier.
@@ -294,6 +304,13 @@ interface DuckChatFeature {
     fun nativeToSConsent(): Toggle
 
     /**
+     * @return `true` when the native input shows the privacy disclaimer for image and file attachments.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun attachmentPrivacyDisclaimer(): Toggle
+
+    /**
      * @return `true` when the duckduckgo.com homepage may list the user's Duck.ai chats via `getAIChats`.
      * If the remote feature is not present defaults to `internal`.
      */
@@ -306,4 +323,14 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiPromoCampaigns(): Toggle
+
+    /**
+     * @return `true` when Duck.ai promo cards are supported. Exposed to Duck.ai as `supportsPromoCards`.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPromoCards(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun newChatHints(): Toggle
 }

@@ -45,6 +45,7 @@ class RealBundledBrokerDataLoaderTest {
     private val mockAssetManager: AssetManager = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockPixelSender: PirPixelSender = mock()
+    private val mockBrokerStepsValidator: BrokerStepsValidator = mock()
     private val mockPirUserUtils: PirUserUtils = mock {
         onBlocking { hasPirSubscription() } doReturn true
     }
@@ -57,7 +58,7 @@ class RealBundledBrokerDataLoaderTest {
         testee = RealBundledBrokerDataLoader(
             context = mockContext,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender, mockPirUserUtils),
+            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender, mockPirUserUtils, mockBrokerStepsValidator),
         )
     }
 
@@ -98,7 +99,7 @@ class RealBundledBrokerDataLoaderTest {
 
         verify(mockPirRepository, never()).updateBrokerData(any(), any())
         verify(mockPixelSender, never()).reportUpdateBrokerJsonSuccess(any(), any(), anyOrNull())
-        verify(mockPixelSender, never()).reportUpdateBrokerJsonFailure(any(), any(), anyOrNull())
+        verify(mockPixelSender, never()).reportUpdateBrokerJsonFailure(any(), any(), anyOrNull(), any())
     }
 
     @Test

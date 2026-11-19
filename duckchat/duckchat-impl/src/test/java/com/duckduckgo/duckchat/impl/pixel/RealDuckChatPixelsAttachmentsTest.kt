@@ -185,4 +185,56 @@ class RealDuckChatPixelsAttachmentsTest {
             parameters = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai"),
         )
     }
+
+    @Test
+    fun whenAttachmentPrivacyShownWithImagesThenImagePixelsSent() = runTest {
+        testee.fireAttachmentPrivacyShown(hasImages = true, surface = DuckChatPixelSurface.DUCK_AI)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_SHOWN_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenAttachmentPrivacyShownWithoutImagesThenFilePixelsSent() = runTest {
+        testee.fireAttachmentPrivacyShown(hasImages = false, surface = DuckChatPixelSurface.DUCK_AI)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_SHOWN_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenAttachmentPrivacyLearnMoreTappedWithImagesThenImagePixelsSent() = runTest {
+        testee.fireAttachmentPrivacyLearnMoreTapped(hasImages = true, surface = DuckChatPixelSurface.DUCK_AI)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_LEARN_MORE_TAPPED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_LEARN_MORE_TAPPED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenAttachmentPrivacyLearnMoreTappedWithoutImagesThenFilePixelsSent() = runTest {
+        testee.fireAttachmentPrivacyLearnMoreTapped(hasImages = false, surface = DuckChatPixelSurface.DUCK_AI)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_LEARN_MORE_TAPPED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_LEARN_MORE_TAPPED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
 }

@@ -42,6 +42,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.withResumed
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.BookmarksImportPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
@@ -354,10 +355,10 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         val result = viewMode.importResult
         with(binding.importSuccess) {
             val imported = getString(R.string.importPasswordsProcessingResultDialogResultPasswordsImported, result.savedCredentials)
-            successImportedRow.setPrimaryText(imported.html(binding.root.context))
+            successTitle.text = imported.html(binding.root.context)
             val failed = getString(R.string.importPasswordsProcessingResultDialogResultDuplicatesSkipped, result.numberSkipped)
             successFailedRow.setPrimaryText(failed.html(binding.root.context))
-            successFailedRow.isVisible = result.numberSkipped > 0
+            successResults.isVisible = result.numberSkipped > 0
 
             if (successPromoContainer.isEmpty()) {
                 val promo = viewMode.promo?.createView(requireContext(), promoCallback)
@@ -365,6 +366,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
                 successPromoContainer.isVisible = promo != null
             }
             val hasPromo = successPromoContainer.isVisible
+            successIcon.isVisible = !hasPromo
             successDoneButton.isVisible = !hasPromo
             successDoneSecondaryButton.isVisible = hasPromo
         }
@@ -561,7 +563,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private fun canShowPreImportDialog(launchSource: AutofillImportLaunchSource): Boolean {
         return when (launchSource) {
-            PasswordManagementPromo -> false
+            PasswordManagementPromo, BookmarksImportPromo -> false
             else -> true
         }
     }

@@ -362,6 +362,12 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when getLastUsedTogglePosition then get from data store`() = runTest {
+        whenever(mockDataStore.getLastUsedTogglePosition()).thenReturn("DUCK_AI")
+        assertEquals("DUCK_AI", testee.getLastUsedTogglePosition())
+    }
+
+    @Test
     fun `when observeDefaultTogglePosition then observe data store`() = runTest {
         whenever(mockDataStore.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
 

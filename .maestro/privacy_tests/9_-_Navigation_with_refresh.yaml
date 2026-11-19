@@ -19,9 +19,9 @@ tags:
                 text: "Publisher site"
             - runFlow: ../shared/browser_screen/click_on_privacy_shield.yaml
             - assertVisible:
-                text: "View Tracker Companies"
+                id: "View Tracker Companies"
             - tapOn:
-                text: "View Tracker Companies"
+                id: "View Tracker Companies"
             - assertVisible:
                 text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
             - assertVisible:
@@ -32,9 +32,9 @@ tags:
                 text: "ad-company.site"
             - action: back
             - assertVisible:
-                text: "View Non-Tracker Companies"
+                id: "View Non-Tracker Companies"
             - tapOn:
-                text: "View Non-Tracker Companies"
+                id: "View Non-Tracker Companies"
             - assertVisible:
                 text: "The following third-party domains’ requests were loaded. If a company's requests are loaded, it can allow them to profile you, though our other web tracking protections still apply."
             - assertVisible:
@@ -75,9 +75,9 @@ tags:
                 text: "Pay First Party"
             - runFlow: ../shared/browser_screen/click_on_privacy_shield.yaml
             - assertVisible:
-                text: "View Tracker Companies"
+                id: "View Tracker Companies"
             - tapOn:
-                text: "View Tracker Companies"
+                id: "View Tracker Companies"
             - assertVisible:
                 text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
             - assertVisible:
@@ -90,9 +90,9 @@ tags:
                 text: "convert.ad-company.site"
             - action: back
             - assertVisible:
-                text: "View Non-Tracker Companies"
+                id: "View Non-Tracker Companies"
             - tapOn:
-                text: "View Non-Tracker Companies"
+                id: "View Non-Tracker Companies"
             - assertVisible:
                 text: "We did not identify any requests from third-party domains."
             - assertVisible:
@@ -115,9 +115,9 @@ tags:
                 id: "pay-button"
             - runFlow: ../shared/browser_screen/click_on_privacy_shield.yaml
             - assertVisible:
-                text: "View Tracker Companies"
+                id: "View Tracker Companies"
             - tapOn:
-                text: "View Tracker Companies"
+                id: "View Tracker Companies"
             - assertVisible:
                 text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
             - assertVisible:
@@ -128,9 +128,9 @@ tags:
                 text: "ad-company.site"
             - action: back
             - assertVisible:
-                text: "View Non-Tracker Companies"
+                id: "View Non-Tracker Companies"
             - tapOn:
-                text: "View Non-Tracker Companies"
+                id: "View Non-Tracker Companies"
             - assertVisible:
                 text: "The following third-party domains’ requests were loaded. If a company's requests are loaded, it can allow them to profile you, though our other web tracking protections still apply."
             - assertVisible:

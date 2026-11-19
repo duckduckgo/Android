@@ -25,7 +25,6 @@
     <string name="no">Ei</string>
     <string name="open">Avatud</string>
     <string name="cancel">Tühista</string>
-    <string name="search">Otsing</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Vestlus kustutatud</string>

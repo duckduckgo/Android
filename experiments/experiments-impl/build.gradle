@@ -73,8 +73,6 @@ dependencies {
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -89,9 +87,6 @@ android {
     }
     sourceSets {
         test.assets.srcDirs += files("$projectDir/schemas")
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.experiments.impl'
     room {

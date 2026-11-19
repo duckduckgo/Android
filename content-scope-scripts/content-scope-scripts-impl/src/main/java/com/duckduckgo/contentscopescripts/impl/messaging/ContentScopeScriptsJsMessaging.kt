@@ -241,8 +241,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         val lane = laneFor(jsMessage)
         if (!lane.queue.offer(QueuedMessage(registration, jsMessage, url))) {
             url?.cancel()
-            logcat(WARN) { "Inbound queue full, dropping ${jsMessage.featureName}.${jsMessage.method}" }
             reportOverflow(lane)
+            logcat(WARN) { "Inbound queue full, dropping ${jsMessage.featureName}.${jsMessage.method}" }
             // The JavaScript transport rejects the pending request on the bridge return, without posting a main-thread reply.
             return if (jsMessage.id == null) NO_IMMEDIATE_ERROR else QUEUE_FULL_ERROR_CODE
         }

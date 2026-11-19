@@ -25,7 +25,6 @@
     <string name="no">No</string>
     <string name="open">Apri</string>
     <string name="cancel">Annulla</string>
-    <string name="search">Ricerca</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat eliminata</string>

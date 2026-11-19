@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.AppInstallTimeProvider
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -66,6 +67,9 @@ class CookiePopupOptInEvaluatorTest {
     private val appInstallTimeProvider: AppInstallTimeProvider = mock {
         on { firstInstallTimeMillis() } doReturn now - TimeUnit.DAYS.toMillis(30)
     }
+    private val nextSteps: NextSteps = mock {
+        onBlocking { isSectionActive() } doReturn false
+    }
 
     private val testee by lazy {
         CookiePopupOptInEvaluator(
@@ -78,6 +82,7 @@ class CookiePopupOptInEvaluatorTest {
             onboardingFlowChecker = onboardingFlowChecker,
             currentTimeProvider = currentTimeProvider,
             appInstallTimeProvider = appInstallTimeProvider,
+            nextSteps = nextSteps,
         )
     }
 
@@ -88,7 +93,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenOnboardingNotCompleteThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
@@ -97,7 +101,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenAutoconsentKillSwitchDisabledThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         feature.self().setRawStoredState(Toggle.State(enable = false))
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
@@ -106,7 +109,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenPreferenceSettingDisabledThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
@@ -114,17 +116,15 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     @Test
-    fun whenPromptToggleDisabledThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = false))
+    fun whenNextStepsSectionIsActiveThenSkippedAndNothingLaunched() = runTest {
+        whenever(nextSteps.isSectionActive()).thenReturn(true)
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
         assertNull(shadowOf(application).nextStartedActivity)
     }
 
     @Test
-    fun whenPromptToggleEnabledThenModalShownAndActivityLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
-
+    fun whenEligibleThenModalShownAndActivityLaunched() = runTest {
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
 
         val launched = shadowOf(application).nextStartedActivity
@@ -133,7 +133,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenNothingLeftToOptInToThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         whenever(autoconsent.isSettingEnabled()).thenReturn(true)
         whenever(autoconsent.isClickAcceptEnabled()).thenReturn(true)
 
@@ -143,7 +142,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenNothingLeftToOptInToThenChoiceRecorded() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         whenever(autoconsent.isSettingEnabled()).thenReturn(true)
         whenever(autoconsent.isClickAcceptEnabled()).thenReturn(true)
 
@@ -154,7 +152,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenProtectionOnButClickAcceptOffThenChoiceNotRecorded() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         whenever(autoconsent.isSettingEnabled()).thenReturn(true)
         whenever(autoconsent.isClickAcceptEnabled()).thenReturn(false)
 
@@ -165,7 +162,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenProtectionOnButClickAcceptOffThenModalShown() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         whenever(autoconsent.isSettingEnabled()).thenReturn(true)
         whenever(autoconsent.isClickAcceptEnabled()).thenReturn(false)
 
@@ -174,7 +170,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenShownFewerThanThreeTimesThenModalShown() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         settingsRepository.optInPromptShownCount = 2
 
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
@@ -182,7 +177,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenChoiceAlreadyMadeThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         settingsRepository.optInPromptChoiceMade = true
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
@@ -191,7 +185,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenInstalledLessThanTwoDaysAgoThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         setDaysSinceInstall(1)
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
@@ -200,7 +193,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenInstalledTwoDaysAgoThenModalShown() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         setDaysSinceInstall(2)
 
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
@@ -208,7 +200,6 @@ class CookiePopupOptInEvaluatorTest {
 
     @Test
     fun whenAlreadyShownThreeTimesThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         settingsRepository.optInPromptShownCount = 3
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())

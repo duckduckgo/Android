@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.DuckAiMigrationPrefs
+import com.duckduckgo.duckchat.store.impl.DuckAiNativeStorageDeletionListener
 import com.duckduckgo.duckchat.store.impl.DuckAiNativeStoragePixels
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
@@ -45,6 +46,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val migrationPrefs: DuckAiMigrationPrefs,
     private val pixels: DuckAiNativeStoragePixels,
+    private val deletionListener: DuckAiNativeStorageDeletionListener,
     private val browserMode: BrowserMode,
 ) : ContentScopeJsMessageHandlersPlugin {
 
@@ -108,7 +110,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         val key = jsMessage.params.optString("key")
                         val value = jsMessage.params.optString("value")
                         if (key.isNotBlank()) {
-                            logcat { "DuckAiNativeStorage: putEntry key=$key value=${value.take(80)}" }
+                            logcat { "DuckAiNativeStorage: putEntry" }
                             try {
                                 settingsDao.upsert(DuckAiBridgeSettingEntity(key = key, value = value))
                             } catch (e: Exception) {
@@ -257,7 +259,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     }
                     "putChats", "migrateChats" -> {
                         val array = jsMessage.params.optJSONArray("chats") ?: return
-                        logcat { "DuckAiNativeStorage: putChats $array" }
+                        logcat { "DuckAiNativeStorage: putChats" }
                         try {
                             val entities = (0 until array.length()).mapNotNull { i ->
                                 val obj = array.optJSONObject(i) ?: return@mapNotNull null
@@ -289,20 +291,26 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         val chatId = jsMessage.params.optString("chatId")
                         if (chatId.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: deleteChat chatId=$chatId" }
-                            try {
+                            val deleted = try {
                                 chatsDao.delete(chatId)
+                                true
                             } catch (e: Exception) {
                                 pixels.reportChatDeleteError()
+                                false
                             }
+                            if (deleted) deletionListener.onChatDeleted(chatId, mode)
                         }
                     }
                     "deleteAllChats" -> {
                         logcat { "DuckAiNativeStorage: deleteAllChats" }
-                        try {
+                        val deleted = try {
                             chatsDao.deleteAll()
+                            true
                         } catch (e: Exception) {
                             pixels.reportChatDeleteError()
+                            false
                         }
+                        if (deleted) deletionListener.onAllChatsDeleted(mode)
                     }
 
                     // --- Migration ---

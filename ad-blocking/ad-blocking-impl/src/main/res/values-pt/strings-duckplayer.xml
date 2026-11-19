@@ -35,6 +35,6 @@
     <string name="duck_player_info_modal_button">Entendi!</string>
     <string name="duck_player_unavailable">Duck Player indisponível</string>
     <string name="duck_player_unavailable_learn_more">Saiba mais</string>
-    <string name="duck_player_open_videos_setting" tools:ignore="MissingTranslation">Abrir vídeos do YouTube no Duck Player</string>
-    <string name="duck_player_open_in_a_new_tab_setting" tools:ignore="MissingTranslation">Abrir Duck Player num novo separador</string>
+    <string name="duck_player_open_videos_setting">Abrir vídeos do YouTube no Duck Player</string>
+    <string name="duck_player_open_in_a_new_tab_setting">Abrir Duck Player num novo separador</string>
 </resources>

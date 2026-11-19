@@ -185,6 +185,42 @@ class RealFileAttachmentProcessorTest {
     }
 
     @Test
+    fun whenReportedSizeIsZeroThenFileSizeUsesActualByteCount() = runTest {
+        givenCursorReturns(fileName = "file.txt", fileSize = 0L)
+        whenever(contentResolver.getType(uri)).thenReturn("text/plain")
+        val fileBytes = "hello world".toByteArray()
+        whenever(contentResolver.openInputStream(uri)).thenReturn(ByteArrayInputStream(fileBytes))
+
+        val result = processor.processFile(context, uri)
+
+        assertEquals(fileBytes.size.toLong(), result!!.sizeBytes)
+    }
+
+    @Test
+    fun whenReportedSizeIsSmallerThanPayloadThenFileSizeUsesActualByteCount() = runTest {
+        givenCursorReturns(fileName = "file.txt", fileSize = 5L)
+        whenever(contentResolver.getType(uri)).thenReturn("text/plain")
+        val fileBytes = "hello world".toByteArray()
+        whenever(contentResolver.openInputStream(uri)).thenReturn(ByteArrayInputStream(fileBytes))
+
+        val result = processor.processFile(context, uri)
+
+        assertEquals(fileBytes.size.toLong(), result!!.sizeBytes)
+    }
+
+    @Test
+    fun whenReportedSizeIsLargerThanPayloadThenFileSizeUsesActualByteCount() = runTest {
+        givenCursorReturns(fileName = "file.txt", fileSize = 100L)
+        whenever(contentResolver.getType(uri)).thenReturn("text/plain")
+        val fileBytes = "hello world".toByteArray()
+        whenever(contentResolver.openInputStream(uri)).thenReturn(ByteArrayInputStream(fileBytes))
+
+        val result = processor.processFile(context, uri)
+
+        assertEquals(fileBytes.size.toLong(), result!!.sizeBytes)
+    }
+
+    @Test
     fun whenMimeTypeIsNotPdfThenPageCountIsNull() = runTest {
         givenCursorReturns(fileName = "image.png", fileSize = 100L)
         whenever(contentResolver.getType(uri)).thenReturn("image/png")

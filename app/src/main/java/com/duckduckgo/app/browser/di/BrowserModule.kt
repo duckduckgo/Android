@@ -67,14 +67,13 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
+import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.codegen.annotations.ContributesPluginPoint
@@ -89,16 +88,13 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.request.filterer.api.RequestFilterer
-import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.request.interception.impl.RequestExemptions
+import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.tracker.detection.api.TrackerDetector
-import com.duckduckgo.user.agent.api.UserAgentProvider
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.IntoSet
@@ -184,44 +180,36 @@ class BrowserModule {
         trackerDetector: TrackerDetector,
         httpsUpgrader: HttpsUpgrader,
         privacyProtectionCountDao: PrivacyProtectionCountDao,
-        gpc: Gpc,
-        userAgentProvider: UserAgentProvider,
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
-        requestBlocklist: RequestBlocklist,
-        contentBlocking: ContentBlocking,
-        trackerAllowlist: TrackerAllowlist,
-        userAllowListRepository: UserAllowListRepository,
+        requestExemptions: RequestExemptions,
+        requestRewriteDecision: RequestRewriteDecision,
         duckPlayer: DuckPlayer,
         maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
         dispatchers: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         @IsMainProcess isMainProcess: Boolean,
-        webTrackersBlockedHistory: WebTrackersBlockedHistory,
+        trackerStatsWriter: TrackerStatsWriter,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
             trackerDetector,
             httpsUpgrader,
             privacyProtectionCountDao,
-            gpc,
-            userAgentProvider,
             adClickManager,
             cloakedCnameDetector,
             requestFilterer,
-            requestBlocklist,
-            contentBlocking,
-            trackerAllowlist,
-            userAllowListRepository,
+            requestExemptions,
+            requestRewriteDecision,
             duckPlayer,
             maliciousSiteBlockerWebViewIntegration,
             dispatchers,
             androidBrowserConfigFeature,
             appCoroutineScope,
             isMainProcess,
-            webTrackersBlockedHistory,
+            trackerStatsWriter,
         )
 
     @Provides

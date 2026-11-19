@@ -39,7 +39,7 @@ jobs:
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle_flags: '-Pautofill-disable-auth-requirement -Pconfig_patches=.maestro/duckplayer/patches/ad_blocking_enabled_patch.json'
+          gradle_flags: '-Pautofill-disable-auth-requirement -Pconfig_patches=.maestro/duckplayer/patches/ad_blocking_enabled_patch.json,.maestro/duckplayer/patches/duck_player_standalone_settings_patch.json'
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
@@ -176,7 +176,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.7.1
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}

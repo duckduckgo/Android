@@ -27,13 +27,12 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^6.0.0",
-    "asana": "github:Asana/node-asana",
-    "markdown-it": "^14.0.0"
+    "asana": "^3.4.0",
+    "markdown-it": "^14.3.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@octokit/webhooks-types": "^7.3.1",
-    "@types/asana": "^0.18.16",
     "@types/jest": "^27.5.2",
     "@types/markdown-it": "^13.0.7",
     "@types/node": "^20.11.25",

@@ -31,9 +31,6 @@ android {
     room {
         schemaDirectory("$projectDir/schemas")
     }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -68,8 +65,6 @@ dependencies {
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 tasks.register('androidTestsBuild') {

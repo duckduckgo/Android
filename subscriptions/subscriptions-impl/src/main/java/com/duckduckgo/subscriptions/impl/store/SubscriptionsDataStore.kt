@@ -42,6 +42,7 @@ interface SubscriptionsDataStore {
     // Local purchased at time, not from server or other devices
     var localPurchasedAt: Long?
     var platform: String?
+    var planCountry: String?
     var status: String?
     var entitlements: String?
     var productId: String?
@@ -172,6 +173,14 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override var planCountry: String?
+        get() = encryptedPreferences?.getString(KEY_PLAN_COUNTRY, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putString(KEY_PLAN_COUNTRY, value)
+            }
+        }
+
     override var externalId: String?
         get() = encryptedPreferences?.getString(KEY_EXTERNAL_ID, null)
         set(value) {
@@ -262,6 +271,7 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
         const val KEY_AUTH_TOKEN = "KEY_AUTH_TOKEN"
         const val KEY_PLATFORM = "KEY_PLATFORM"
+        const val KEY_PLAN_COUNTRY = "KEY_PLAN_COUNTRY"
         const val KEY_EMAIL = "KEY_EMAIL"
         const val KEY_EXTERNAL_ID = "KEY_EXTERNAL_ID"
         const val KEY_EXPIRES_OR_RENEWS_AT = "KEY_EXPIRES_OR_RENEWS_AT"

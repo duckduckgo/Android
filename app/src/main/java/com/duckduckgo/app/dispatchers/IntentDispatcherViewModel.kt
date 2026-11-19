@@ -37,6 +37,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -58,8 +59,11 @@ class IntentDispatcherViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val inlinePdfHandler: InlinePdfHandler,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val customTabDetector: CustomTabDetector,
     private val customTabsFeature: CustomTabsFeature,
 ) : ViewModel() {
+
+    private var customTabMarkedEarly = false
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -83,13 +87,20 @@ class IntentDispatcherViewModel @Inject constructor(
         isExternal: Boolean,
         isTaskRoot: Boolean = false,
     ) {
+        // Marked before the background routing below: on a cold start the dispatcher resumes first, and
+        // app-resume work such as modal prompts would otherwise run before CustomTabActivity marks itself.
+        customTabMarkedEarly = runCatching { intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true }.getOrDefault(false)
+        if (customTabMarkedEarly) {
+            customTabDetector.setCustomTab(true)
+        }
+
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
                 val localPdfUri = localPdfUriOrNull(intent)
                 if (localPdfUri != null) {
                     when (val result = inlinePdfHandler.cacheLocalPdf(localPdfUri)) {
                         is LocalPdfResult.Success -> {
-                            _viewState.emit(
+                            resolve(
                                 viewState.value.copy(
                                     resolved = true,
                                     activityParams = PdfViewerActivityParams(
@@ -102,8 +113,9 @@ class IntentDispatcherViewModel @Inject constructor(
                                 ),
                             )
                         }
+
                         is LocalPdfResult.Failure -> {
-                            _viewState.emit(viewState.value.copy(resolved = true, localPdfError = true, isExternal = isExternal))
+                            resolve(viewState.value.copy(resolved = true, localPdfError = true, isExternal = isExternal))
                         }
                     }
                     return@launch
@@ -148,7 +160,7 @@ class IntentDispatcherViewModel @Inject constructor(
                         "Is task root=$isTaskRoot. Custom tab launch mode=$customTabLaunchMode"
                 }
 
-                _viewState.emit(
+                resolve(
                     viewState.value.copy(
                         resolved = true,
                         customTabRequested = customTabRequested,
@@ -163,7 +175,7 @@ class IntentDispatcherViewModel @Inject constructor(
                 logcat(WARN) { "Error handling custom tab intent: ${it.message}" }
                 // Resolve to a routable state so the dispatcher doesn't hang on the unresolved default;
                 // fall back to opening the intent's URL in the browser.
-                _viewState.emit(
+                resolve(
                     viewState.value.copy(
                         resolved = true,
                         intentText = runCatching { intent?.intentText }.getOrNull(),
@@ -171,6 +183,20 @@ class IntentDispatcherViewModel @Inject constructor(
                     ),
                 )
             }
+        }
+    }
+
+    private suspend fun resolve(state: ViewState) {
+        if (customTabMarkedEarly && !state.customTabRequested) {
+            customTabDetector.setCustomTab(false)
+        }
+        _viewState.emit(state)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (customTabMarkedEarly && !viewState.value.resolved) {
+            customTabDetector.setCustomTab(false)
         }
     }
 

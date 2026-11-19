@@ -40,5 +40,12 @@
                 "description": "Eastern Time (America/New_York) timestamp of when the event occurred, in yyyy-MM-dd'T'HH:mm:ss format. Added automatically to enqueued pixels."
             }
         ]
+    },
+    "m_netp_ev_switched_to_fallback_port": {
+        "description": "Fired when port probing switches the VPN tunnel to an advertised endpoint port other than the server's default port, either when the VPN connects or when failure recovery restarts it",
+        "owners": ["karlenDimla"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

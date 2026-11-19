@@ -75,6 +75,15 @@ class RealNetworkProtectionPixelTest {
     }
 
     @Test
+    fun whenReportSwitchedToFallbackPortIsCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
+        testee.reportSwitchedToFallbackPort()
+        testee.reportSwitchedToFallbackPort()
+
+        verify(pixel).fire("m_netp_ev_switched_to_fallback_port_d", emptyMap())
+        verify(pixel, times(2)).fire("m_netp_ev_switched_to_fallback_port_c", emptyMap())
+    }
+
+    @Test
     fun whenReportErrorWgInvalidStateIsCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
         testee.reportErrorWgInvalidState()
         testee.reportErrorWgInvalidState()

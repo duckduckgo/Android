@@ -106,7 +106,7 @@ class RealAppReturnPixelSender @Inject constructor(
             val exceededIdleThreshold = lastBackgrounded != 0L && elapsedMs >= idleThresholdSeconds * 1000
             val afterInactivityOption = showOnAppLaunchOptionDataStore.optionFlow.firstOrNull()
                 ?.let { ShowOnAppLaunchOption.getDailyPixelValue(it) }
-            val toggleVisible = duckChatInputModeState.inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+            val toggleVisible = duckChatInputModeState.getSelectedInputMode() == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
 
             val params = buildMap {
                 put(AppReturnPixelParameters.TIME_AWAY_BUCKET, timeAwayBucket(lastBackgrounded, elapsedMs))

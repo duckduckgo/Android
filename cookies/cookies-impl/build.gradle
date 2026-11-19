@@ -68,8 +68,6 @@ dependencies {
     testImplementation AndroidX.work.testing
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation project(path: ':common-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -81,9 +79,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.cookies.impl'
 }

@@ -17,15 +17,12 @@
 package com.duckduckgo.app.browser.errorpage
 
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
-import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectOnUnresolvedErrorFeature
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -51,8 +48,6 @@ class BadUrlErrorPageWideEventTest {
     val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
 
     private val wideEventClient: WideEventClient = mock()
-    private val badUrlErrorPageWideEventFeature = FakeFeatureToggleFactory.create(BadUrlErrorPageWideEventFeature::class.java)
-    private val suggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
     private val regularTabRepository: TabRepository = mock()
     private val fireTabRepository: TabRepository = mock()
     private val openTabs = MutableStateFlow(listOf(TabEntity(tabId = TAB_ID), TabEntity(tabId = OTHER_TAB_ID)))
@@ -61,10 +56,6 @@ class BadUrlErrorPageWideEventTest {
 
     @Before
     fun setup() = runTest {
-        badUrlErrorPageWideEventFeature.self().setRawStoredState(Toggle.State(enable = true))
-        suggestRedirectFeature.self().setRawStoredState(Toggle.State(enable = true))
-        suggestRedirectFeature.suggestRedirect().setRawStoredState(Toggle.State(enable = true))
-
         whenever(
             wideEventClient.flowStart(
                 any(),
@@ -110,91 +101,12 @@ class BadUrlErrorPageWideEventTest {
 
         testee = RealBadUrlErrorPageWideEvent(
             wideEventClient = wideEventClient,
-            badUrlErrorPageWideEventFeature = lazy { badUrlErrorPageWideEventFeature },
-            suggestRedirectFeature = suggestRedirectFeature,
             regularTabRepository = regularTabRepository,
             fireTabRepository = fireTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )
     }
-
-    //region Wide event Feature Flag tests
-    @Test
-    fun `when wide event feature disabled, then error page displayed does not start flow`() = runTest {
-        badUrlErrorPageWideEventFeature.self().setRawStoredState(Toggle.State(enable = false))
-
-        testee.onBadUrlErrorPageDisplayed(TAB_ID)
-        advanceUntilIdle()
-
-        verify(wideEventClient, never()).flowStart(
-            any(),
-            anyOrNull(),
-            any(),
-            any(),
-            any(),
-            any(),
-        )
-    }
-
-    @Test
-    fun `when suggest redirect feature disabled, then error page displayed does not start flow`() = runTest {
-        suggestRedirectFeature.suggestRedirect().setRawStoredState(Toggle.State(enable = false))
-
-        testee.onBadUrlErrorPageDisplayed(TAB_ID)
-        advanceUntilIdle()
-
-        verify(wideEventClient, never()).flowStart(
-            any(),
-            anyOrNull(),
-            any(),
-            any(),
-            any(),
-            any(),
-        )
-    }
-
-    @Test
-    fun `when feature disabled mid-flow, then active flows still finish`() = runTest {
-        testee.onBadUrlErrorPageDisplayed(TAB_ID)
-        advanceUntilIdle()
-        badUrlErrorPageWideEventFeature.self().setRawStoredState(Toggle.State(enable = false))
-
-        testee.onBadUrlErrorPageExited(TAB_ID)
-        advanceUntilIdle()
-
-        verify(wideEventClient).flowFinish(
-            wideEventId = FLOW_ID,
-            status = FlowStatus.Cancelled,
-            metadata = mapOf("cancel_reason" to "abandoned"),
-        )
-    }
-
-    @Test
-    fun `when feature disabled mid-flow, then a repeat BAD_URL after redirect click still finishes as failure without a new flow`() = runTest {
-        testee.onBadUrlErrorPageDisplayed(TAB_ID)
-        testee.onRedirectClicked(TAB_ID)
-        advanceUntilIdle()
-        badUrlErrorPageWideEventFeature.self().setRawStoredState(Toggle.State(enable = false))
-
-        testee.onBadUrlErrorPageDisplayed(TAB_ID)
-        advanceUntilIdle()
-
-        verify(wideEventClient).flowFinish(
-            wideEventId = FLOW_ID,
-            status = FlowStatus.Failure(reason = "new_hostname_resolution_failed"),
-            metadata = emptyMap(),
-        )
-        verify(wideEventClient, times(1)).flowStart(
-            any(),
-            anyOrNull(),
-            any(),
-            any(),
-            any(),
-            any(),
-        )
-    }
-    //endregion
 
     //region Wide event flow start tests
     @Test

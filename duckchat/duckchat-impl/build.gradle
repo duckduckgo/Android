@@ -75,6 +75,7 @@ dependencies {
     implementation Square.retrofit2.retrofit
     implementation Square.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
@@ -90,8 +91,6 @@ dependencies {
     }
     testImplementation AndroidX.lifecycle.runtime.testing
     testImplementation AndroidX.archCore.testing
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -104,9 +103,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }
 

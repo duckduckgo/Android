@@ -414,6 +414,28 @@ class RealPirSchedulingRepositoryTest {
         }
 
     @Test
+    fun whenSaveOptOutJobRecordWithFirstRequestedDateThenSavesItToDao() =
+        runTest {
+            testee.saveOptOutJobRecord(optOutJobRecord.copy(optOutFirstRequestedDateInMillis = 1500L))
+
+            verify(mockJobSchedulingDao).saveOptOutJobRecord(
+                OptOutJobRecordEntity(
+                    extractedProfileId = 789L,
+                    brokerName = "test-broker",
+                    userProfileId = 123L,
+                    status = "NOT_EXECUTED",
+                    attemptCount = 0,
+                    lastOptOutAttemptDate = 1000L,
+                    optOutRequestedDate = 2000L,
+                    optOutFirstRequestedDate = 1500L,
+                    optOutRemovedDate = 0L,
+                    dateCreatedInMillis = 9000L,
+                    reporting = ReportingRecord(),
+                ),
+            )
+        }
+
+    @Test
     fun whenSaveOptOutJobRecordsThenConvertAllAndSaveToDao() =
         runTest {
             val optOutJobRecord2 =
@@ -484,6 +506,17 @@ class RealPirSchedulingRepositoryTest {
             assertEquals(1000L, result?.lastOptOutAttemptDateInMillis)
             assertEquals(2000L, result?.optOutRequestedDateInMillis)
             assertEquals(0L, result?.optOutRemovedDateInMillis)
+        }
+
+    @Test
+    fun whenGetValidOptOutJobRecordWithFirstRequestedDateThenReturnsIt() =
+        runTest {
+            whenever(mockJobSchedulingDao.getOptOutJobRecord(789L))
+                .thenReturn(validOptOutJobEntity.copy(optOutFirstRequestedDate = 1500L))
+
+            val result = testee.getValidOptOutJobRecord(789L)
+
+            assertEquals(1500L, result?.optOutFirstRequestedDateInMillis)
         }
 
     @Test

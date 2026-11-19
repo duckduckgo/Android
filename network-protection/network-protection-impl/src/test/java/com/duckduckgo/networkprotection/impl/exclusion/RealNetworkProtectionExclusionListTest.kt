@@ -45,7 +45,7 @@ class RealNetworkProtectionExclusionListTest {
 
     @Test
     fun whenNetpIsEnabledAndAppIsInExcludedPackagesThenReturnIsExcludedTrue() = runTest {
-        whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(listOf("com.test.app"))
+        whenever(netPExclusionListRepository.isExcluded("com.test.app")).thenReturn(true)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
 
         assertTrue(testee.isExcluded("com.test.app"))
@@ -53,7 +53,7 @@ class RealNetworkProtectionExclusionListTest {
 
     @Test
     fun whenNetpIsDisabledAndAppIsInExcludedPackagesThenReturnIsExcludedFalse() = runTest {
-        whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(listOf("com.test.app"))
+        whenever(netPExclusionListRepository.isExcluded("com.test.app")).thenReturn(true)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
 
         assertFalse(testee.isExcluded("com.test.app"))
@@ -61,7 +61,7 @@ class RealNetworkProtectionExclusionListTest {
 
     @Test
     fun whenNetpIsEnabledAndAppIsNotInExcludedPackagesThenReturnIsExcludedFalse() = runTest {
-        whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(emptyList())
+        whenever(netPExclusionListRepository.isExcluded("com.test.app")).thenReturn(false)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
 
         assertFalse(testee.isExcluded("com.test.app"))
@@ -69,7 +69,7 @@ class RealNetworkProtectionExclusionListTest {
 
     @Test
     fun whenNetpIsNotEnabledAndAppIsNotInExcludedPackagesThenReturnIsExcludedFalse() = runTest {
-        whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(emptyList())
+        whenever(netPExclusionListRepository.isExcluded("com.test.app")).thenReturn(false)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
 
         assertFalse(testee.isExcluded("com.test.app"))

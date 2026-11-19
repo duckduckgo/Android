@@ -38,4 +38,5 @@
     <dimen name="changeAppIconSelectionGap">2dp</dimen>
     <dimen name="brandDesignTabTileStrokeWidth">1px</dimen>
     <dimen name="brandDesignTabTileStrokeWidthSelected">1dp</dimen>
+    <dimen name="newTabPageSectionMaxWidth">544dp</dimen>
 </resources>

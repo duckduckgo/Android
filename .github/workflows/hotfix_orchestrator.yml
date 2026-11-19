@@ -63,6 +63,8 @@ jobs:
     with:
       commit: ${{ needs.resolve-hotfix-sha.outputs.commit_sha }}
       create_asana_tasks: false
+      fail_fast: true
+      maestro_priority: high
     secrets: inherit
 
   finish:
@@ -78,8 +80,16 @@ jobs:
     if: ${{ failure() }}
     runs-on: ubuntu-latest
     steps:
+      - name: Find GitHub actor's Asana ID
+        id: get-asana-user-id
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
+        with:
+          action: 'get-asana-user-id'
+          github-username: ${{ github.actor }}
+          github-pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
+
       - name: Create Asana task when any orchestrator step failed
-        uses: duckduckgo/native-github-asana-sync@v2.7.1
+        uses: duckduckgo/native-github-asana-sync@v2.8.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
@@ -89,4 +99,5 @@ jobs:
             The Hotfix Orchestrator workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
             ${{ needs.prepare.outputs.cherry-pick-conflict == 'true' && format('A fix commit did not cherry-pick cleanly. Follow Where to start > Prepare failed, keeping version {0}: {1}', inputs.app-version, env.HOTFIX_CONFLICT_PLAYBOOK_URL) || '' }}
             ${{ needs.finish.outputs.merge-conflict == 'true' && format('Merging the hotfix back stopped on a conflict. Follow Where to start > Finish failed, keeping version {0}: {1}', inputs.app-version, env.HOTFIX_CONFLICT_PLAYBOOK_URL) || '' }}
+          asana-task-assignee: ${{ steps.get-asana-user-id.outputs.asanaUserId }}
           action: 'create-asana-task'

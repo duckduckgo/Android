@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -47,6 +48,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
@@ -58,6 +60,9 @@ import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
@@ -69,6 +74,7 @@ import com.duckduckgo.duckchat.impl.pixel.InputSubmitMethod
 import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.history.api.NavigationHistory
@@ -130,6 +136,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val inputOutcomeTracker: InputOutcomeTracker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     chatStateStore: ChatStateStore,
+    private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
+    private val attentionTracker: DuckAiResponseAttentionTracker,
+    private val newChatHintsUsage: NewChatHintsUsage,
+    private val newChatHintsPixels: NewChatHintsPixels,
+    private val newChatDetector: NewChatDetector,
+    private val tabRepository: TabRepository,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -171,6 +183,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
     private var currentChatJob: Job? = null
+    private var newChatShownJob: Job? = null
 
     // Kept in sync via bindCurrentUrlSource so submission pixels can read the tab's URL
     // synchronously — a suspend re-read at fire time would race the navigation the submission triggers.
@@ -305,7 +318,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         addressBarEntryPoint: DuckChatEntryPoint,
         submitMethod: InputSubmitMethod,
     ) {
-        val tool = getSelectedTool()?.let { Tool.from(it) }
+        val rawTool = getSelectedTool()
+        val tool = rawTool?.let { Tool.from(it) }
         val selectedToolParam = when (tool) {
             Tool.IMAGE_GENERATION -> "image_generation"
             Tool.WEB_SEARCH -> "web_search"
@@ -313,10 +327,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         val inputState = currentInputState()
         val surface = currentSurface(inputState)
+        val reasoningEffort = getResolvedReasoningEffort()
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
             modelId = getSelectedModelId(),
-            reasoningEffort = getResolvedReasoningEffort(),
+            reasoningEffort = reasoningEffort,
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
             hasText = hasText,
@@ -331,7 +346,20 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSubmitted(surface)
             null -> {}
         }
+        activeTabId.value?.let { tabId ->
+            newChatHintsPixels.onPromptSubmitted(
+                tabId = tabId,
+                isNewChat = isNewDuckAiChat(tabId),
+                hasImageAttachment = hasImageAttachment,
+                hasFileAttachment = hasFileAttachment,
+                selectedTool = selectedToolParam,
+            )
+        }
         inputOutcomeTracker.promptSubmitted(submitMethod)
+        activeDuckAiTabId(surface)?.let {
+            responseWaitWideEvent.onNativePromptSubmitted(it, browserMode, reasoningEffort, rawTool)
+            attentionTracker.onNativePromptSubmitted(it, browserMode)
+        }
     }
 
     fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat(currentSurface())
@@ -343,7 +371,18 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun fireVoiceSearchTapped() = duckChatPixels.fireVoiceSearchTapped(currentSurface())
 
-    fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped(currentSurface())
+    fun fireStopGenerationTapped() {
+        val surface = currentSurface()
+        duckChatPixels.fireStopGenerationTapped(surface)
+        activeDuckAiTabId(surface)?.let {
+            responseWaitWideEvent.onStopTapped(it)
+            attentionTracker.onStopTapped(it)
+        }
+    }
+
+    // The edit screen's synthetic key never matches a tab, so a flow started under it could only expire unwatched.
+    private fun activeDuckAiTabId(surface: DuckChatPixelSurface): String? =
+        activeTabId.value?.takeIf { surface == DuckChatPixelSurface.DUCK_AI && it.isNotEmpty() && !it.startsWith(EDIT_STATE_KEY_PREFIX) }
 
     fun fireClearPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarClearButtonPressed(isSearchMode)
     fun fireKeyboardGoPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarKeyboardGoPressed(isSearchMode)
@@ -605,15 +644,21 @@ class NativeInputModeWidgetViewModel @Inject constructor(
      * */
     fun onPromptSubmitted() {
         footerPromptSubmissions.value += 1
+        val tabId = activeTabId.value
+        if (tabId != null) newChatHintsUsage.onPromptSubmitted(tabId, isNewChat = isNewDuckAiChat(tabId))
         // A prompt submitted while still in the recovery window means the user sent a prompt after
         // recovering the chat's model — report it before the window is cleared below.
-        val tabId = activeTabId.value
         if (tabId != null && nativeInputStateProvider.stateForTab(tabId).value.modelChangeMode) {
             duckChatPixels.fireSubmitChangeModelPromptSent(currentSurface())
         }
         // Ends the FE recovery model-change window for the active tab.
         endModelChangeMode()
     }
+
+    // Read from this widget's own config so the contextual sheet, which shares the browser tab's id, never passes as the full-screen chat.
+    private fun isNewDuckAiChat(tabId: String): Boolean =
+        widgetConfig.value.inputContext == NativeInputState.InputContext.DUCK_AI &&
+            nativeInputStateProvider.stateForTab(tabId).value.chatId == null
 
     /**
      * Called when the recovery model picker is dismissed without picking a model.
@@ -659,6 +704,19 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
         replayPendingState(tabId)
+        newChatShownJob?.cancel()
+        // A browser tab that opens Duck.ai is configured again in Duck.ai mode, so tracking only Duck.ai misses nothing.
+        newChatShownJob = if (isDuckAiMode) {
+            viewModelScope.launch {
+                newChatHintsPixels.track(
+                    tabId = tabId,
+                    isTabSelected = tabRepository.flowSelectedTab.map { it?.tabId == tabId },
+                    newChatStates = newChatDetector.observe(tabId),
+                )
+            }
+        } else {
+            null
+        }
         // An "open Duck.ai for image generation" launch preselects image generation on the new tab.
         // The image-capable model was already selected when the launch was requested.
         if (isDuckAiMode && forceImageGeneration) {

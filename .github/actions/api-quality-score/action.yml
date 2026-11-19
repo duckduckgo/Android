@@ -1,0 +1,73 @@
+name: 'Score API quality'
+description: 'Scores the -api modules of a branch, tag or commit with the checked-out scorer'
+
+# Needs a checkout with fetch-depth: 0, so any branch, tag or commit can be found.
+# The scorer always comes from the checked-out workspace, not from the ref being scored: every ref is scored with the
+# same rules, including refs from before the scripts existed.
+
+inputs:
+  ref:
+    description: 'Branch, tag or commit to score'
+    required: true
+  out-dir:
+    description: 'Folder to write the scorecard and CSVs to'
+    required: true
+  label:
+    description: 'Used in the output file names, e.g. a date'
+    required: true
+  previous-scores:
+    description: 'Scores CSV of an earlier run; adds a "Score changes" section to the scorecard'
+    required: false
+    default: ''
+
+outputs:
+  sha:
+    description: 'The commit that was scored'
+    value: ${{ steps.resolve.outputs.sha }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up JDK
+      uses: actions/setup-java@v6
+      with:
+        distribution: 'temurin'
+        java-version-file: .github/.java-version
+
+    - name: Cache scorer jars
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/api-quality-scorer
+        key: api-quality-jars-${{ hashFiles('versions.properties') }}
+
+    - name: Find ${{ inputs.ref }}
+      id: resolve
+      shell: bash
+      env:
+        REF: ${{ inputs.ref }}
+      run: |
+        sha=""
+        for candidate in "$REF" "origin/$REF"; do
+          if sha="$(git rev-parse --verify --quiet "$candidate^{commit}")"; then
+            break
+          fi
+        done
+        if [[ -z "$sha" ]]; then
+          echo "::error::Can't find '$REF'. Use a branch name, a tag or a full commit SHA."
+          exit 1
+        fi
+        echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+    - name: Score ${{ inputs.ref }}
+      shell: bash
+      env:
+        SHA: ${{ steps.resolve.outputs.sha }}
+        OUT_DIR: ${{ inputs.out-dir }}
+        LABEL: ${{ inputs.label }}
+        PREVIOUS: ${{ inputs.previous-scores }}
+      run: |
+        source_dir="$RUNNER_TEMP/api-quality-src-$SHA"
+        if [[ ! -d "$source_dir" ]]; then
+          git worktree add --detach "$source_dir" "$SHA"
+        fi
+        REPO_ROOT="$source_dir" scripts/api-quality/score.sh "$OUT_DIR" "$LABEL" $PREVIOUS

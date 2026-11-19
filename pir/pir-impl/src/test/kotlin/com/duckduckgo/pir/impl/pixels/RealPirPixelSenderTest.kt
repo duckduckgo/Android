@@ -21,6 +21,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdateFailureReason
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -649,6 +652,34 @@ class RealPirPixelSenderTest {
     }
 
     @Test
+    fun whenReportBrokerOptOutRemovedWithIdentifierFoundThenEnqueuesPixelWithParameters() = runTest {
+        testee.reportBrokerOptOutRemovedWithIdentifierFound(
+            brokerUrl = "https://broker.com",
+            changedField = ChangedField.NAME_AND_PROFILE_URL,
+            previousStatus = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+        )
+
+        val nameCaptor = argumentCaptor<String>()
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = nameCaptor.capture(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assertEquals("m_dbp_optoutjob_removed-identifier-found_c", nameCaptor.firstValue)
+        assertEquals(
+            mapOf(
+                "data_broker" to "https://broker.com",
+                "changed_field" to "name_and_profile_url",
+                "optout_status" to "pending_email_confirmation",
+            ),
+            paramsCaptor.firstValue,
+        )
+    }
+
+    @Test
     fun whenReportBrokerOptOutConfirmed7DaysThenEnqueuesPixelWithBrokerUrl() = runTest {
         testee.reportBrokerOptOutConfirmed7Days("https://broker.com")
 
@@ -1095,6 +1126,7 @@ class RealPirPixelSenderTest {
             brokerJsonFileName = "broker.json",
             removedAtMs = 987654321L,
             isFreeScan = false,
+            reason = BrokerJsonUpdateFailureReason.UNSUPPORTED_ACTION,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1110,6 +1142,7 @@ class RealPirPixelSenderTest {
         assert(params["free_scan"] == "false")
         assert(params["data_broker_json_file"] == "broker.json")
         assert(params["removed_at"] == "987654321")
+        assert(params["reason"] == "unsupported_action")
     }
 
     @Test

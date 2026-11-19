@@ -31,8 +31,6 @@ dependencies {
     implementation project(':common-utils')
 
     implementation KotlinX.coroutines.android
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -41,9 +39,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }
 

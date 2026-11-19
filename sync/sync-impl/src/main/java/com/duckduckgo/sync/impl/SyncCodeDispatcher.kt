@@ -24,9 +24,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Routes a pasted/scanned sync code to either the v1 stack or the v2 exchange protocol, gated by
- * [SyncFeature.canUseV2ConnectFlow]. With the flag off, [route] behaves identically to
- * [SyncAccountRepository.parseSyncAuthCode]; v2 work is exposed via [RouteDecision.V2InProgress].
+ * Routes a pasted/scanned sync code to either the v1 stack or the v2 exchange protocol.
  */
 interface SyncCodeDispatcher {
 
@@ -77,7 +75,7 @@ interface SyncCodeDispatcher {
 }
 
 sealed interface RouteDecision {
-    /** Caller MUST process [authCode] as it would have today — no behaviour change from FF off. */
+    /** Caller MUST process [authCode] through the v1 stack. */
     data class Legacy(val authCode: SyncAuthCode) : RouteDecision
 
     /**

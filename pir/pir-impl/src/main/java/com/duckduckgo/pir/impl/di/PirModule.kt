@@ -22,9 +22,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.BrokerJsonTypes
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.CaptchaResolver
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler
 import com.duckduckgo.pir.impl.common.RealNativeBrokerActionHandler
@@ -152,24 +151,13 @@ class PirModule {
                     .withSubtype(SolveCaptcha::class.java, "solveCaptcha")
                     .withSubtype(UserProfile::class.java, "userProfile"),
             ).add(
-                PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
-                    .withSubtype(BrokerAction.Extract::class.java, "extract")
-                    .withSubtype(BrokerAction.Expectation::class.java, "expectation")
-                    .withSubtype(BrokerAction.Click::class.java, "click")
-                    .withSubtype(BrokerAction.ExecuteScript::class.java, "executeScript")
-                    .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
-                    .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                    .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
-                    .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation")
-                    .withSubtype(BrokerAction.Condition::class.java, "condition")
-                    .withSubtype(BrokerAction.Scroll::class.java, "scroll")
-                    .withSubtype(BrokerAction.GenerateEmail::class.java, "generateEmail")
-                    .withSubtype(BrokerAction.GetEmailData::class.java, "getEmailData"),
+                BrokerJsonTypes.actionSubtypes.entries.fold(
+                    PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, BrokerJsonTypes.ACTION_TYPE_KEY),
+                ) { factory, (label, subtype) -> factory.withSubtype(subtype, label) },
             ).add(
-                PolymorphicJsonAdapterFactory.of(BrokerStepActions::class.java, "stepType")
-                    .withSubtype(ScanStepActions::class.java, "scan")
-                    .withSubtype(OptOutStepActions::class.java, "optOut"),
+                BrokerJsonTypes.stepSubtypes.entries.fold(
+                    PolymorphicJsonAdapterFactory.of(BrokerStepActions::class.java, BrokerJsonTypes.STEP_TYPE_KEY),
+                ) { factory, (label, subtype) -> factory.withSubtype(subtype, label) },
             ).add(
                 PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
                     .withSubtype(NavigateResponse::class.java, "navigate")

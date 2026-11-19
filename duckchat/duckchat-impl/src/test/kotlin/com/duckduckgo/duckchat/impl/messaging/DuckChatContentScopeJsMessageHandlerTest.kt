@@ -67,6 +67,8 @@ class DuckChatContentScopeJsMessageHandlerTest {
             "editPrompt",
             "cancelEdit",
             "getAIChats",
+            "aiChatPromoVisibility",
+            "executeClientTool",
         )
         // assert exact membership (size guards against accidental add/remove).
         assertEquals(expected.size, handler.methods.size)

@@ -32,4 +32,7 @@ abstract class DefaultBrowserPromptsAppUsageDao {
 
     @Query("SELECT isoDateET FROM default_browser_prompts_app_usage ORDER BY isoDateET ASC LIMIT 1")
     abstract fun getFirstDay(): String?
+
+    @Query("DELETE FROM default_browser_prompts_app_usage")
+    abstract fun deleteAll()
 }

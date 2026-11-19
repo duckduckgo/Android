@@ -30,4 +30,11 @@ class DuckChatParamRemovalPluginTest {
             assertEquals(PixelParameter.removeAtb(), names[it.pixelName])
         }
     }
+
+    @Test
+    fun whenAddressBarMenuPixelsThenAtbIsRemoved() {
+        DuckChatPixelName.entries
+            .filter { it.name.startsWith("DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_") }
+            .forEach { assertEquals(it.pixelName, PixelParameter.removeAtb(), names[it.pixelName]) }
+    }
 }

@@ -7,7 +7,7 @@
         "parameters": ["appVersion"]
     },
     "timeout_atb_pre_initializer_plugin": {
-        "description": "A pre-ATB initialization plugin timed out",
+        "description": "A pre-ATB initialization plugin timed out. For plugin=ReinstallAtbListener the step is not cut short: it finishes, still applies the ru variant for a returning user, and the ATB waits for it, so this is sent afterwards and means the step was slow, not that ru was lost",
         "owners": ["CDRussell"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -17,8 +17,66 @@
                 "key": "plugin",
                 "description": "The class name of the plugin which timed out",
                 "type": "string",
-                "enum": ["AuraExperimentManager", "EmptyReferrerStateListener", "PlayStoreAppReferrerStateListener", "ReinstallAtbListener"]
+                "enum": [
+                    "AuraExperimentManager",
+                    "EmptyReferrerStateListener",
+                    "PlayStoreAppReferrerStateListener",
+                    "ReinstallAtbListener",
+                    "SamsungStoreInstallAttribution"
+                ]
             }
         ]
+    },
+    "atb_reinstall_check_slow": {
+        "description": "The reinstall step before the first ATB call made the ATB wait longer than its 1.5s time limit. The step still finishes and the ATB waits for it. This measures the ATB's wait, not the reinstall check itself: the check can already have been started by another caller (e.g. onboarding), so it can take longer than this wait. Sent once per install. With ru_applied=true it counts returning users who now get the ru variant but would have lost it before the reinstall step was made non-cancellable: when the ATB waited past the limit, no answer was saved yet, and the old step ran its own full check, which took at least as long. It is a lower bound, because it misses checks that were already partly done when the ATB asked. timeout_atb_pre_initializer_plugin with plugin=ReinstallAtbListener is sent for the same event. Only sent on Android 11 and later: on Android 10 and older reinstall detection reads Block Store, a slow returning user there is a reinstall that was never detected before, and atb_reinstall_check_block_store times that read",
+        "owners": ["anikiki"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "returningUser",
+            {
+                "key": "ru_applied",
+                "description": "Whether the ru variant was applied. False for a new user, and for a returning user whose protected experiment variant was kept",
+                "type": "boolean"
+            },
+            {
+                "key": "duration",
+                "description": "How long the ATB waited for the reinstall step, in seconds",
+                "type": "string",
+                "enum": ["1.5-3", "3-5", "5-10", "10-30", "30+"]
+            }
+        ],
+        "expires": "2027-04-30"
+    },
+    "atb_reinstall_block_store_ru_applied": {
+        "description": "A returning user on Android 10 and older was given the ru variant before the first ATB call. Sent once per install. Reinstalls there were never detected before Block Store detection, so this is exactly the number of ru installs it adds to the ATB data, and subtracting it from the change in ru gives the change on Android 11 and later. Not sent for a returning user whose protected experiment variant was kept, or for an update, because the step only runs before the first ATB call",
+        "owners": ["anikiki"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2027-04-30"
+    },
+    "atb_reinstall_check_block_store": {
+        "description": "The reinstall check on Android 10 and older finished reading the Block Store \"install seen\" flag. Sent once per new install or reinstall, only on Android 10 and older, where reinstalls are detected with Block Store instead of the Downloads folder. Not sent when an install from before Block Store detection runs the check once after updating, so the results describe new installs and reinstalls only. Shows whether detection works there: Block Store only keeps the flag through an uninstall when the device has Android backup turned on. Any result other than found counts the install as new. duration times the Block Store read itself, whichever caller started the check, so it shows how slow detection is on Android 10 and older",
+        "owners": ["anikiki"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "result",
+                "description": "found: flag found, so the install is a reinstall. not_found: no flag, so a new install, or the flag didn't survive the uninstall. unavailable: Play services isn't available. timeout: Block Store didn't answer within the time limit. error: the read failed",
+                "type": "string",
+                "enum": ["found", "not_found", "unavailable", "timeout", "error"]
+            },
+            {
+                "key": "duration",
+                "description": "How long the Block Store read took, in seconds. A read that hits the 10s time limit is reported as 10+ with result=timeout",
+                "type": "string",
+                "enum": ["0-0.5", "0.5-1.5", "1.5-3", "3-5", "5-10", "10+"]
+            }
+        ],
+        "expires": "2027-04-30"
     }
 }

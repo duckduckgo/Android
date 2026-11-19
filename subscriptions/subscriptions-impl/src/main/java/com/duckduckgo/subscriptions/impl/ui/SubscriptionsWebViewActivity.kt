@@ -79,6 +79,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
+import com.duckduckgo.pir.api.PirScreens.PirDesktopScreen
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
@@ -92,7 +93,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.appendFunnelOriginParam
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
-import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
@@ -570,7 +570,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experiments)
-            is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode)
+            is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode, command.change)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
@@ -608,7 +608,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun goToPIR() {
-        globalActivityStarter.start(this, PirScreenWithEmptyParams)
+        globalActivityStarter.start(this, PirDesktopScreen)
     }
 
     private fun goToNetP(params: ActivityParams) {
@@ -652,9 +652,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 onPurchaseSuccess(subscriptionEventData = null, launchOnboarding = false)
             }
             is PurchaseStateView.Success -> {
-                if (!purchaseState.isPlanSwitch) {
-                    pixelSender.reportPurchaseSuccessOrigin(params.origin, purchaseState.isFreeTrial)
-                }
                 onPurchaseSuccess(purchaseState.subscriptionEventData, purchaseState.launchOnboarding)
             }
             is PurchaseStateView.Recovered -> {
@@ -737,6 +734,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         planId: String,
         offerId: String?,
         replacementMode: com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode,
+        change: String?,
     ) {
         viewModel.switchSubscriptionPlan(
             activity = this,
@@ -744,6 +742,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             offerId = offerId,
             replacementMode = replacementMode,
             origin = params.origin,
+            change = change,
         )
     }
 

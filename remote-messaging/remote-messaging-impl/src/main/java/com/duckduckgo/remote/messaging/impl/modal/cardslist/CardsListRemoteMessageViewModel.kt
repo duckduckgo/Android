@@ -87,7 +87,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
             val cardsList = message?.content as? Content.CardsList
             val imageFile = remoteMessagingModel.getRemoteMessageImageFile(Surface.MODAL)
             if (cardsList != null) {
-                _viewState.value = buildViewState(cardsList, imageFile)
+                _viewState.value = buildViewState(message, cardsList, imageFile)
             } else {
                 _command.send(Command.DismissMessage)
             }
@@ -131,7 +131,11 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun buildViewState(cardsList: Content.CardsList, imageFilePath: String?): ViewState {
+    private suspend fun buildViewState(
+        message: RemoteMessage,
+        cardsList: Content.CardsList,
+        imageFilePath: String?,
+    ): ViewState {
         val items = mutableListOf<ModalListItem>()
 
         items.add(
@@ -146,7 +150,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         items.addAll(
             cardsList.listItems.map { cardItem ->
                 val itemImagePath = if (cardItem is CardItem.ListItem && !cardItem.imageUrl.isNullOrEmpty()) {
-                    remoteMessagingRepository.getCardItemImageFilePath(cardItem.id)
+                    remoteMessagingRepository.getItemImageFilePath(message, cardItem.id)
                 } else {
                     null
                 }

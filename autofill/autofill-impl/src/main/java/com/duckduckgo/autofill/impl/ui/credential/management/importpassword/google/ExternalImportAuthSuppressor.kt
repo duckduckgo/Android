@@ -25,8 +25,9 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Importing from another app moves our app to the background, which would otherwise make the passwords screen
- * ask for device auth again when the user comes back. Activity-scoped so the suppression never leaves the screen that started the import.
+ * Importing from another app moves our app to the background, and importing through one of our own screens stops the
+ * passwords screen. Either would otherwise make the passwords screen ask for device auth again when the user comes back.
+ * Activity-scoped so the suppression never leaves the screen that started the import.
  */
 interface ExternalImportAuthSuppressor {
     /**

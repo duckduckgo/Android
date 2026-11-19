@@ -29,9 +29,6 @@ android {
             includeAndroidResources = true
         }
     }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -67,10 +64,9 @@ dependencies {
     implementation project(':settings-api')
     implementation project(path: ':statistics-api')
 
+    implementation Square.retrofit2.retrofit
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.airbnb.android:lottie:_"
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')

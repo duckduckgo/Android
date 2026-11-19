@@ -97,7 +97,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     )
 
                     val settings = settingsCache.getSettings() ?: return@launch
-                    val config = buildConfig(settings.disabledCMPs, webView)
+                    val config = buildConfig(settings.disabledCMPs, settings.heuristicPopupSearchTimeout, webView)
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
                         InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
                     } else {
@@ -129,6 +129,7 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     private fun buildConfig(
         disabledCmps: List<String>,
+        heuristicPopupSearchTimeout: Any?,
         webView: WebView,
     ): Config {
         return Config(
@@ -141,7 +142,16 @@ class InitMessageHandlerPlugin @Inject constructor(
             enableCosmeticRules = true,
             enableHeuristicDetection = true,
             heuristicMode = heuristicModeProvider.getHeuristicMode(),
+            enableHeuristicHitTest = autoconsentFeature.heuristicHitTest().isEnabled(),
+            enablePopupMutationObserver = autoconsentFeature.popupMutationObserver().isEnabled(),
+            heuristicPopupSearchTimeout = toHeuristicPopupSearchTimeout(heuristicPopupSearchTimeout),
         )
+    }
+
+    private fun toHeuristicPopupSearchTimeout(value: Any?): Int {
+        val timeout = value as? Double ?: return DEFAULT_HEURISTIC_POPUP_SEARCH_TIMEOUT_MS
+        val isPositiveInt = timeout > 0 && timeout <= Int.MAX_VALUE && timeout % 1.0 == 0.0
+        return if (isPositiveInt) timeout.toInt() else DEFAULT_HEURISTIC_POPUP_SEARCH_TIMEOUT_MS
     }
 
     private fun parseMessage(jsonString: String): InitMessage? {
@@ -167,9 +177,8 @@ class InitMessageHandlerPlugin @Inject constructor(
         if (rules.index != null) {
             val genericRules = rules.r.slice(IntRange(rules.index.genericRuleRange[0], rules.index.genericRuleRange[1] - 1))
             val specificRules = rules.r.slice(IntRange(rules.index.specificRuleRange[0], rules.index.specificRuleRange[1] - 1)).filter {
-                (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
-                    (it[4] as Double).toInt() != 1 &&
-                    (it[3] == "" || url.matches((it[3] as String).toRegex()))
+                (it[4] as Double).toInt() != 1 &&
+                    (it[3] == "" || (it[3] as String).toRegex().containsMatchIn(url))
             }
             if (specificRules.isEmpty()) {
                 // no specific rules, return generic rules + strings up to genericStringEnd
@@ -182,16 +191,15 @@ class InitMessageHandlerPlugin @Inject constructor(
                     ),
                 )
             }
-            // combine generic and specific rules, then filter out strings after genericStringEnd that are not used by matched specificRules.
+            // combine generic and specific rules; strings before genericStringEnd belong to generic rules and are always kept.
             val filteredRules = genericRules + specificRules
             val filteredStrings = filterUnusedStrings(specificRules, rules.s, rules.index.genericStringEnd)
             return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules, index = null))
         }
         // No index: run rule and string filtering over the entire ruleset.
         val filteredRules = rules.r.filter {
-            (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
-                (it[4] as Double).toInt() != 1 &&
-                (it[3] == "" || url.matches((it[3] as String).toRegex()))
+            (it[4] as Double).toInt() != 1 &&
+                (it[3] == "" || (it[3] as String).toRegex().containsMatchIn(url))
         }
         val filteredStrings = filterUnusedStrings(filteredRules, rules.s, 0)
         return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules, index = null))
@@ -200,7 +208,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private fun filterUnusedStrings(
         rules: List<List<Any>>,
         strings: List<String>,
-        offset: Int = 0,
+        genericStringEnd: Int = 0,
     ): List<String> {
         val usedStringIndices = HashSet<Int>()
         val shortKeys = arrayOf("v", "e", "c", "h", "k", "cc", "w", "wv")
@@ -227,8 +235,9 @@ class InitMessageHandlerPlugin @Inject constructor(
             addStringIdsFromRuleSteps(it[9] as List<Map<String, Any>>)
             (it[5] as List<Int>).forEach { usedStringIndices.add(it) }
         }
-        return strings.slice(IntRange(start = 0, endInclusive = usedStringIndices.max())).mapIndexed { index, str ->
-            if (index <= offset || usedStringIndices.contains(index)) str else ""
+        val lastIndex = minOf(strings.lastIndex, maxOf(genericStringEnd - 1, usedStringIndices.maxOrNull() ?: -1))
+        return strings.slice(IntRange(start = 0, endInclusive = lastIndex)).mapIndexed { index, str ->
+            if (index < genericStringEnd || usedStringIndices.contains(index)) str else ""
         }
     }
 
@@ -247,6 +256,9 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
         val enableHeuristicDetection: Boolean,
         val heuristicMode: String,
+        val enableHeuristicHitTest: Boolean,
+        val enablePopupMutationObserver: Boolean,
+        val heuristicPopupSearchTimeout: Int,
     )
 
     data class AutoconsentRuleset(val compact: Any?)
@@ -259,6 +271,6 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     companion object {
         const val MAX_SUPPORTED_RULES_VERSION = 1
-        const val MAX_SUPPORTED_STEP_VERSION = 1
+        const val DEFAULT_HEURISTIC_POPUP_SEARCH_TIMEOUT_MS = 100
     }
 }

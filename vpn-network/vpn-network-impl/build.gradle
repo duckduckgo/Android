@@ -43,8 +43,6 @@ dependencies {
 
     androidTestImplementation project(':common-test')
     testImplementation project(':common-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -56,9 +54,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.vpn.network.impl'
 }

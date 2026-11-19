@@ -1,7 +1,7 @@
 {
   "name": "USA Trace",
   "url": "usatrace.com",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "parent": "peoplefinders.com",
   "addedDatetime": 1674540000000,
   "optOutUrl": "https://www.usatrace.com/contact-us/",
@@ -36,7 +36,8 @@
               "selector": ".//td[3]"
             },
             "addressCityStateList": {
-              "selector": ".//td[4]"
+              "selector": ".//td[4]//text()",
+              "findElements": true
             },
             "relativesList": {
               "selector": ".//td[7]/a",

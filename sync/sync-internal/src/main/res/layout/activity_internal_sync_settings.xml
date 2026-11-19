@@ -88,28 +88,30 @@
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="V2 Connect Flow flags" />
+            app:primaryText="@string/sync_internal_promotions_header" />
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/canUseV2ConnectFlowToggle"
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/openPromotionDebugButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_promotions_open_dev_screen" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+            android:id="@+id/resetAllPromotionDataButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_promotions_reset_all_data" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:showSwitch="true"
-            app:primaryText="canUseV2ConnectFlow (master kill switch)" />
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/canShowV2ConnectCodeToggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:showSwitch="true"
-            app:primaryText="canShowV2ConnectCode (display, requires canUseV2ConnectFlow)" />
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/canUseExchangeV2Point1Toggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:showSwitch="true"
-            app:primaryText="canUseExchangeV2Point1 (v2.1 protocol)" />
+            app:primaryText="V2 Connect Flow" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/openV2PairingDebugButton"
@@ -247,6 +249,35 @@
             android:layout_marginBottom="@dimen/keyline_4"
             app:typography="body2" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Device Audit Log" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:text="Logins and logouts on this Sync account, read from the server log. Includes the unseen logins check and fake logins from other devices."
+            app:typography="body2"
+            app:textType="secondary" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/openAuditLogDebugButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_audit_log_open_dev_screen" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -265,15 +296,6 @@
             android:layout_height="wrap_content"
             app:showSwitch="true"
             app:primaryText="canReadUnifiedDeviceList" />
-
-        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-            android:id="@+id/canUsePatchEndpointForLegacyDeviceRenameToggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:showSwitch="true"
-            app:primaryText="canUsePatchEndpointFor\nLegacyDeviceRename"
-            app:primaryTextTruncated="false"
-        />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/migrationStatusTextView"
@@ -422,14 +444,6 @@
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/blockStoreApiInUse"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_4"
-                app:typography="body1" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/blockStoreFeatureFlag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_4"
@@ -842,43 +856,6 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginBottom="@dimen/keyline_4"
             app:typography="body2" />
-
-        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/sync_internal_promotions_header" />
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/clearHistoryBookmarkAddedDialogPromo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/sync_internal_promotions_clear_history_bookmark_added_promo" />
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/clearHistoryBookmarkScreenPromo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/sync_internal_promotions_clear_history_bookmark_screen_promo" />
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/clearHistoryPasswordScreenPromo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/sync_internal_promotions_clear_history_password_screen_promo" />
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/clearHistoryChatTabPagePromo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/sync_internal_promotions_clear_history_chat_tab_page_promo" />
 
     </LinearLayout>
     </ScrollView>

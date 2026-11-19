@@ -75,8 +75,6 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -89,9 +87,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }
 

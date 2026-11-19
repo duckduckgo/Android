@@ -27,9 +27,6 @@ android {
         test.assets.srcDirs += files("$projectDir/schemas")
     }
     namespace 'com.duckduckgo.remote.messaging.store'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -52,6 +49,4 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.room.testing
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

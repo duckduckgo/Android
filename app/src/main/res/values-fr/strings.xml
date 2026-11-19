@@ -25,7 +25,6 @@
     <string name="no">Non</string>
     <string name="open">Ouvrir</string>
     <string name="cancel">Annuler</string>
-    <string name="search">Rechercher</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Discussion supprimée</string>

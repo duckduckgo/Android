@@ -60,7 +60,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
     interface HatchListener {
         fun onHatchPressed()
-        fun onHatchRendered(visible: Boolean)
+        fun onIdleReturnSettled()
         fun onBurnTabPressed()
         fun onAfterInactivityPressed()
 
@@ -182,7 +182,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         } else {
             binding.returnHatchRoot.gone()
         }
-        hatchHatchListener?.onHatchRendered(state.shouldShow)
+        if (state.isIdleReturnSettled) hatchHatchListener?.onIdleReturnSettled()
     }
 
     private fun initPopupMenu() {

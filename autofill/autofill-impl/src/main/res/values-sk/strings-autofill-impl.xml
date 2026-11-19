@@ -324,4 +324,24 @@
     <string name="importBookmarksErrorGenericMessage">Vyskytla sa chyba</string>
     <string name="importBookmarksErrorGenericMessageSecondary">Uisti sa, že si pripojený na internet a skús to znova.</string>
 
+    <!-- Passwords import redesign: success and error -->
+    <string name="importPasswordsRedesignResultTitle">Import je dokončený!</string>
+
+    <!-- Bookmarks import redesign: importing -->
+    <string name="importBookmarksRedesignImportingSubtitle">Počkaj – nechaj toto okno otvorené. Nemalo by to trvať viac ako minútu alebo dve.</string>
+    <string name="importBookmarksRedesignImportingFirstInfoRow">Google ťa môže požiadať o zadanie hesla.</string>
+    <string name="importBookmarksRedesignImportingSecondInfoRow">Google ti pošle e-mail s potvrdením, že tvoje údaje boli exportované. Nemusíš nič robiť.</string>
+
+    <!-- Bookmarks import redesign: success and error -->
+    <string name="importBookmarksRedesignResultTitle">Import je dokončený!</string>
+    <string name="importBookmarksRedesignSuccessImportedRow" instruction="Placeholder is the number of bookmarks that were imported"><![CDATA[Importované záložky: <b>%1$d</b>]]></string>
+
+    <!-- Passwords import promo on the bookmarks import result screen -->
+    <string name="passwords_import_promo_in_bookmarks_import_title">Prenes si heslá z Google do DuckDuckGo.</string>
+    <string name="passwords_import_promo_in_bookmarks_import_button">Importuj heslá z Google</string>
+
+    <!-- Bookmarks import promo on the passwords import result screen -->
+    <string name="bookmarks_import_promo_in_passwords_import_title">Prenes si záložky z Google do DuckDuckGo.</string>
+    <string name="bookmarks_import_promo_in_passwords_import_button">Importuj záložky z Google</string>
+
 </resources>

@@ -22,13 +22,11 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace "com.duckduckgo.duckchat.api"
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
     implementation project(':navigation-api')
+    implementation project(':js-messaging-api')
     implementation project(':common-utils')
     api project(':browser-mode-api')
 
@@ -36,8 +34,6 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.recyclerView
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

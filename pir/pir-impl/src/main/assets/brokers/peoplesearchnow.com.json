@@ -1,7 +1,7 @@
 {
   "name": "People Search Now",
   "url": "peoplesearchnow.com",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705989600000,
   "optOutUrl": "https://www.peoplesearchnow.com/opt-out",
@@ -24,7 +24,7 @@
               "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
             }
           ],
-          "id": "b00ba411-0253-42ad-bbc4-b4b0940df3a7"
+          "id": "cfc-eb07ed73-7fb1-40c7-925c-15d1331a7e20"
         },
         {
           "actionType": "extract",

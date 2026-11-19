@@ -87,7 +87,7 @@
         <item name="typography">h3</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/autofill_import_instruction_bullet</item>
-        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textColor">?attr/daxColorAccentAltTextPrimary</item>
     </style>
 
     <style name="AutofillImportNumberedInstructionText">

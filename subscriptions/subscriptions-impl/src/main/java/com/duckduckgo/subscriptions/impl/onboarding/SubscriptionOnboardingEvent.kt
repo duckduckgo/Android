@@ -23,4 +23,6 @@ sealed interface SubscriptionOnboardingEvent : LinearOnboardingEvent {
     data class StepFinished(val stepId: String, val outcome: SubscriptionOnboardingStepOutcome) : SubscriptionOnboardingEvent
 
     data object BackPressed : SubscriptionOnboardingEvent
+
+    data object Closed : SubscriptionOnboardingEvent
 }

@@ -102,7 +102,7 @@ class AdBlockingProtectionsSettingsEntryView @JvmOverloads constructor(
 
     private fun processCommand(command: Command) {
         when (command) {
-            is OpenSettings -> globalActivityStarter.start(context, AdBlockingSettingsV2NoParams, null)
+            is OpenSettings -> globalActivityStarter.start(context, AdBlockingSettingsNoParams, null)
         }
     }
 }

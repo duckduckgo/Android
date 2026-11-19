@@ -16,11 +16,7 @@
 
 package com.duckduckgo.sync.impl.autorestore
 
-import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -33,13 +29,11 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi")
 class SyncAutoRestoreAccountDisabledObserverTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val syncStore: SyncStore = mock()
     private val syncAutoRestoreManager: SyncAutoRestoreManager = mock()
 
@@ -47,12 +41,10 @@ class SyncAutoRestoreAccountDisabledObserverTest {
 
     @Before
     fun setup() {
-        syncFeature.syncAutoRestore().setRawStoredState(State(enable = true))
         testee = SyncAutoRestoreAccountDisabledObserver(
             appCoroutineScope = coroutineTestRule.testScope,
             syncStore = syncStore,
             syncAutoRestoreManager = syncAutoRestoreManager,
-            syncFeature = syncFeature,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
     }
@@ -85,18 +77,6 @@ class SyncAutoRestoreAccountDisabledObserverTest {
         whenever(syncStore.isSignedInFlow()).thenReturn(isSignedInFlow)
 
         testee.onCreate(mock())
-
-        verify(syncAutoRestoreManager, never()).clearAutoRestoreData()
-    }
-
-    @Test
-    fun whenSignedOutButFeatureFlagDisabledThenDoesNotClearRecoveryCode() = runTest {
-        syncFeature.syncAutoRestore().setRawStoredState(State(enable = false))
-        val isSignedInFlow = MutableStateFlow(true)
-        whenever(syncStore.isSignedInFlow()).thenReturn(isSignedInFlow)
-        testee.onCreate(mock())
-
-        isSignedInFlow.emit(false)
 
         verify(syncAutoRestoreManager, never()).clearAutoRestoreData()
     }

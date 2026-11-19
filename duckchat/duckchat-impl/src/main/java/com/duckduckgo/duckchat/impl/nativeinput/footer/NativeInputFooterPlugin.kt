@@ -71,7 +71,7 @@ interface NativeInputFooterHost {
 
 /** Groups of footers of which at most one shows at a time. */
 enum class FooterCategory {
-    /** The usage limit and high usage notices. */
+    /** The usage limit, high usage and attachment privacy notices. */
     USAGE_NOTICE,
 }
 

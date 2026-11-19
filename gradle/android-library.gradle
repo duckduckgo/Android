@@ -43,6 +43,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled = true
     }
     kotlin {
         jvmToolchain(21)
@@ -53,6 +54,7 @@ android {
 }
 dependencies {
     lintChecks project(':lint-rules')
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
     testImplementation 'org.junit.vintage:junit-vintage-engine:_'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
 }

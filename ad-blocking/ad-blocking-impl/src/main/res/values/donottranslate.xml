@@ -15,4 +15,9 @@
   -->
 <resources>
     <string name="ad_blocking_onboarding_preference_primary">Block video ads on YouTube</string>
+    <string name="segment_skip_settings_title">Skip sponsored content</string>
+    <string name="segment_skip_settings_description">Skips sponsored segments, like a paid promotion read by the creator. Segments are identified by the SponsorBlock community, so not every video is covered.</string>
+    <string name="segment_skip_mode_always_ask">Always Ask</string>
+    <string name="segment_skip_mode_always_skip">Always Skip</string>
+    <string name="segment_skip_mode_off">Off</string>
 </resources>

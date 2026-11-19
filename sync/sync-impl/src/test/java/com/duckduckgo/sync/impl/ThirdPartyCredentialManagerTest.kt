@@ -16,10 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.TestSyncFixtures.secretKey
@@ -54,7 +51,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class ThirdPartyCredentialManagerTest {
 
@@ -63,7 +59,6 @@ class ThirdPartyCredentialManagerTest {
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val nativeLib: SyncLib = mock()
     private val protectedKeyUnwrapper: ProtectedKeyUnwrapper = mock()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     // A ddg-wrapped key already on the account; used by the happy-path tests.
     private val existingDdgKey = ProtectedKeyEntry(
@@ -78,7 +73,7 @@ class ThirdPartyCredentialManagerTest {
 
     @Before
     fun before() {
-        manager = RealThirdPartyCredentialManager(syncStore, syncApi, syncJweCrypto, nativeLib, syncFeature, protectedKeyUnwrapper)
+        manager = RealThirdPartyCredentialManager(syncStore, syncApi, syncJweCrypto, nativeLib, protectedKeyUnwrapper)
     }
 
     // ---- create() ----
@@ -91,7 +86,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenNotSignedInThenCreateReturnsError() = runTest {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(null)
 
         val result = manager.create()
@@ -103,7 +97,6 @@ class ThirdPartyCredentialManagerTest {
         // Server's `encryptedCredential` is decrypted via AES-GCM-JWE-dir(SP, DDG-MEK); the
         // resulting base64url SP is re-encoded as standard base64 for local storage. Fixture
         // chosen so wire ("_-__") and stored ("/+//") differ on every character.
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.secretKey).thenReturn(secretKey)
@@ -124,7 +117,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenServerReturnsCredentialMissingEncryptedThenError() = runTest {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncApi.getAccessCredentials(token)).thenReturn(
             Success(listOf(AccessCredentialEntry(id = "3party", scope = "ai_chats", encryptedCredential = null))),
@@ -355,7 +347,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenNotSignedInThenRefreshReturnsError() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(null)
 
         val result = manager.refresh()
@@ -364,7 +355,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenNoCredentialOnServerThenRefreshReturnsSuccessFalse() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncApi.getAccessCredentials(token)).thenReturn(Success(emptyList()))
 
@@ -376,7 +366,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenServerCredentialMissingEncryptedThenRefreshReturnsError() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncApi.getAccessCredentials(token)).thenReturn(
             Success(listOf(AccessCredentialEntry(id = "3party", encryptedCredential = null))),
@@ -390,7 +379,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenRefreshSucceedsThenDecryptsAndStoresSp() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.userId).thenReturn(userId)
@@ -409,7 +397,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenRefreshDecryptFailsThenError() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.userId).thenReturn(userId)
@@ -428,7 +415,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenRefreshGetAccessCredentialsFailsThenError() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncApi.getAccessCredentials(token)).thenReturn(Error(code = 500, reason = "boom"))
 
@@ -447,7 +433,6 @@ class ThirdPartyCredentialManagerTest {
 
     @Test
     fun whenNoScopedPasswordThenGetRecoveryCodeReturnsError() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.scopedPassword).thenReturn(null)
 
         val result = manager.getRecoveryCode()
@@ -457,7 +442,6 @@ class ThirdPartyCredentialManagerTest {
     @Test
     fun whenGetRecoveryCodeThenJsonEnvelopeMatchesSpec() {
         // SP stored as standard base64 "/+//" — wire form must be base64url "_-__" (no padding).
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.scopedPassword).thenReturn(ScopedPassword("/+//"))
         whenever(syncStore.userId).thenReturn(userId)
 
@@ -521,7 +505,6 @@ class ThirdPartyCredentialManagerTest {
     // ---- helpers ----
 
     private fun primeCreate() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.secretKey).thenReturn(secretKey)

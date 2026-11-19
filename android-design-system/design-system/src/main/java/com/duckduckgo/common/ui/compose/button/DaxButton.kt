@@ -19,30 +19,42 @@
 package com.duckduckgo.common.ui.compose.button
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.Surface
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -85,25 +97,33 @@ internal fun DaxButton(
     val dimensions = resolveButtonDimensions(size = size)
 
     CompositionLocalProvider(
-        LocalRippleConfiguration provides rippleConfiguration,
+        LocalRippleConfiguration provides null,
     ) {
-        Button(
+        Surface(
             onClick = onClick,
             modifier = modifier
-                .height(dimensions.surfaceHeight),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colors.containerColor,
-                contentColor = colors.contentColor,
-                disabledContainerColor = colors.disabledContainerColor,
-                disabledContentColor = colors.disabledContentColor,
-            ),
-            border = border,
+                .height(dimensions.surfaceHeight)
+                .semantics { role = Role.Button },
             enabled = enabled,
             shape = DuckDuckGoTheme.shapes.medium,
-            contentPadding = dimensions.contentPadding,
+            color = if (enabled) colors.containerColor else colors.disabledContainerColor,
+            contentColor = if (enabled) colors.contentColor else colors.disabledContentColor,
+            border = border,
             interactionSource = interactionSource,
-            content = content,
-        )
+        ) {
+            Box(
+                modifier = Modifier.defaultMinSize(minWidth = ButtonDefaults.MinWidth, minHeight = ButtonDefaults.MinHeight),
+                contentAlignment = Alignment.Center,
+            ) {
+                DaxRippleLayer(interactionSource, rippleConfiguration, Modifier.matchParentSize())
+                Row(
+                    modifier = Modifier.padding(dimensions.contentPadding),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = content,
+                )
+            }
+        }
     }
 }
 
@@ -317,3 +337,32 @@ private fun previewButtonColors(): DaxButtonColors = DaxButtonColors(
     disabledContainerColor = Color.LightGray,
     disabledContentColor = Color.DarkGray,
 )
+
+/**
+ * Compose forces the ripple alpha to a fixed value and discards the color's own alpha, whereas the XML
+ * `rippleColor` selectors honour it. Moving the alpha into [RippleAlpha] keeps both rendering the same.
+ */
+internal fun daxRippleConfiguration(color: Color): RippleConfiguration = RippleConfiguration(
+    color = color.copy(alpha = 1f),
+    rippleAlpha = RippleAlpha(
+        draggedAlpha = color.alpha,
+        focusedAlpha = color.alpha,
+        hoveredAlpha = color.alpha,
+        pressedAlpha = color.alpha,
+    ),
+)
+
+/**
+ * Material draws its ripple above the content, whereas the XML buttons draw it in the background. The Material ripple is
+ * disabled by the caller and this layer is placed behind the content instead.
+ */
+@Composable
+internal fun DaxRippleLayer(
+    interactionSource: MutableInteractionSource,
+    rippleConfiguration: RippleConfiguration,
+    modifier: Modifier = Modifier,
+) {
+    CompositionLocalProvider(LocalRippleConfiguration provides rippleConfiguration) {
+        Box(modifier.indication(interactionSource, ripple()))
+    }
+}

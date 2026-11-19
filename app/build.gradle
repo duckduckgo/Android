@@ -10,6 +10,7 @@ plugins {
     id 'dev.zacsweers.metro'
     id 'androidx.room'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'androidx.baselineprofile'
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
@@ -191,7 +192,8 @@ android {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
         unitTests.all {
-            jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1'
+            // TieredStopAtLevel=1 on its own shrinks the code cache to 48 MB, and Robolectric sandboxes can fill that.
+            jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1', '-XX:ReservedCodeCacheSize=256m'
             maxHeapSize = "2g"
             forkEvery = 100
         }
@@ -211,6 +213,12 @@ android {
             useLegacyPackaging = true
         }
     }
+}
+
+baselineProfile {
+    automaticGenerationDuringBuild = false
+    saveInSrc = true
+    mergeIntoMain = true
 }
 
 base {
@@ -456,6 +464,9 @@ dependencies {
     playImplementation project(':persistent-storage-impl')
     fdroidImplementation project(':persistent-storage-dummy-impl')
 
+    implementation project(':device-migration-api')
+    implementation project(':device-migration-impl')
+
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
@@ -541,6 +552,9 @@ dependencies {
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
 
+    implementation project(':page-translation-api')
+    implementation project(':page-translation-impl')
+
     // Widgets
     implementation "androidx.core:core-remoteviews:1.1.0"
 
@@ -596,6 +610,7 @@ dependencies {
     // Android KTX
     implementation AndroidX.core.ktx
     implementation AndroidX.core.splashscreen
+    baselineProfile project(':macrobenchmark')
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData

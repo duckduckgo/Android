@@ -38,4 +38,7 @@ interface SwipingTabsFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun applyAutofillFix(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun removeSelectedTabDebounce(): Toggle
 }

@@ -54,6 +54,7 @@ import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -465,6 +466,7 @@ class RealDuckChat @Inject constructor(
     private val chatSuggestionsStore: ChatSuggestionsStore,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val duckAiModelManager: DuckAiModelManager,
+    private val entryWideEvent: Lazy<DuckAiEntryWideEvent>,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -706,9 +708,9 @@ class RealDuckChat @Inject constructor(
         openDuckChat(emptyMap())
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) {
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
-        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = stripBang(query).isNotEmpty())
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = stripBang(query).isNotEmpty(), voice = voice)
         val parameters = addChatParameters(query, autoPrompt = true, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
@@ -789,7 +791,7 @@ class RealDuckChat @Inject constructor(
 
     override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openVoiceDuckChat" }
-        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false, voice = true)
         val parameters = mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE)
         openDuckChat(parameters, forceNewSession = true)
     }
@@ -803,7 +805,9 @@ class RealDuckChat @Inject constructor(
         entryPoint: DuckChatEntryPoint,
         opensNewTab: Boolean,
         hasPrompt: Boolean,
+        voice: Boolean,
     ) {
+        entryWideEvent.value.onEntry(entryPoint, hasPrompt, opensNewTab, voice)
         // Lets the tab that ends up hosting this entry attribute itself once it's created/navigated,
         // so a later prompt submission in it can carry this same entry point as its `source`.
         duckAiTabSessionRepository.setPendingEntryPointSource(entryPoint.toPixelValue())
@@ -813,6 +817,7 @@ class RealDuckChat @Inject constructor(
             hasPrompt = hasPrompt,
             duckAiEnabled = isEnabled(),
             inputScreenEnabled = inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
+            voice = voice,
         )
     }
 
@@ -960,16 +965,30 @@ class RealDuckChat @Inject constructor(
         duckChatFeatureRepository.setLastUsedTogglePosition(position)
     }
 
-    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection {
-        val defaultPosition = DefaultTogglePosition.fromName(duckChatFeatureRepository.observeDefaultTogglePosition().value)
-        val configured = if (defaultPosition == DefaultTogglePosition.LAST_USED) {
-            DefaultTogglePosition.fromName(duckChatFeatureRepository.observeLastUsedTogglePosition().value)
-        } else {
-            defaultPosition
-        }
+    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection = toggleSelectionFor(
+        defaultPosition = duckChatFeatureRepository.observeDefaultTogglePosition().value,
+    ) { duckChatFeatureRepository.observeLastUsedTogglePosition().value }
+
+    override suspend fun getInitialToggleSelection(): NativeInputState.ToggleSelection = withContext(dispatchers.io()) {
+        toggleSelectionFor(
+            defaultPosition = duckChatFeatureRepository.getDefaultTogglePosition(),
+        ) { duckChatFeatureRepository.getLastUsedTogglePosition() }
+    }
+
+    private inline fun toggleSelectionFor(defaultPosition: String?, lastUsedPosition: () -> String?): NativeInputState.ToggleSelection {
+        val default = DefaultTogglePosition.fromName(defaultPosition)
+        val configured = if (default == DefaultTogglePosition.LAST_USED) DefaultTogglePosition.fromName(lastUsedPosition()) else default
         return when (configured) {
             DefaultTogglePosition.DUCK_AI -> NativeInputState.ToggleSelection.DUCK_AI
             else -> NativeInputState.ToggleSelection.SEARCH
+        }
+    }
+
+    override suspend fun getSelectedInputMode(): NativeInputState.InputMode = withContext(dispatchers.io()) {
+        if (duckChatFeatureRepository.isDuckChatUserEnabled() && duckChatFeatureRepository.isInputScreenUserSettingEnabled()) {
+            NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+        } else {
+            NativeInputState.InputMode.SEARCH_ONLY
         }
     }
 
@@ -1139,5 +1158,9 @@ class RealDuckChat @Inject constructor(
         private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
         private const val ORIGIN_QUERY_NAME = "origin"
         private const val ORIGIN_VALUE_ADDRESS_BAR_PICKER = "funnel_addressbar_android__aitoggle"
+
+        internal fun isVoiceModeUrl(uri: Uri): Boolean = uri.getQueryParameter(MODE_QUERY_NAME) == VOICE_MODE_QUERY_VALUE
+
+        internal fun isPromptHandoverUrl(uri: Uri): Boolean = uri.getQueryParameter(PROMPT_QUERY_NAME) == PROMPT_QUERY_VALUE
     }
 }

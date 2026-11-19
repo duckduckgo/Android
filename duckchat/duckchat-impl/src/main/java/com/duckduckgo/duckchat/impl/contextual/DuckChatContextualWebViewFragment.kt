@@ -367,24 +367,42 @@ class DuckChatContextualWebViewFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        logcat { "JS Helper: process $featureName $method $id $data" }
+                        logcat { "JS Helper: process $featureName $method" }
                         when (featureName) {
                             RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     if (!viewModel.handleJSCall(method)) {
+                                        val (contextRequest, pageContext, allowAutomaticAttachment, sheetUrl) =
+                                            withContext(dispatcherProvider.main()) {
+                                                SheetJsCallState(
+                                                    contextRequest = viewModel.capturePageContextRequest(),
+                                                    pageContext = viewModel.currentPageContext,
+                                                    allowAutomaticAttachment = !viewModel.viewState.value.userRemovedContext,
+                                                    sheetUrl = simpleWebview.url,
+                                                )
+                                            }
                                         duckChatJSHelper.processJsCallbackMessage(
                                             featureName,
                                             method,
                                             id,
                                             data,
                                             Mode.CONTEXTUAL,
-                                            viewModel.currentPageContext,
-                                            viewModel.viewState.value.tabId,
+                                            pageContext,
+                                            contextRequest.tabId,
                                             browserMode,
+                                            pageUrl = sheetUrl,
+                                            allowAutomaticPageContextAttachment = allowAutomaticAttachment,
                                         )?.let { response ->
-                                            logcat { "JS Helper: response $response" }
+                                            logcat { "JS Helper: response ready" }
                                             withContext(dispatcherProvider.main()) {
-                                                contentScopeScripts.onResponse(response)
+                                                val currentResponse = if (method == RealDuckChatJSHelper.METHOD_GET_PAGE_CONTEXT &&
+                                                    !viewModel.isPageContextRequestCurrent(contextRequest)
+                                                ) {
+                                                    response.copy(params = JSONObject().put("pageContext", JSONObject.NULL))
+                                                } else {
+                                                    response
+                                                }
+                                                contentScopeScripts.onResponse(currentResponse)
                                             }
                                             // once Duck.ai is fully loaded we attach the latest context if needed
                                             if (method == RealDuckChatJSHelper.METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) {
@@ -451,8 +469,7 @@ class DuckChatContextualWebViewFragment :
         }
         contextualNativeInputManager.init(
             tabId = tabId,
-            card = binding.contextualNativeInputCard,
-            widget = binding.contextualNativeInputWidget,
+            inputLayout = binding.contextualNativeInputCard,
             footer = binding.contextualNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
@@ -482,7 +499,7 @@ class DuckChatContextualWebViewFragment :
             onPageContextRemoved = { viewModel.removePageContext() },
             onVoiceChatRequested = {
                 viewModel.onContextualClose()
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
             },
             onVoiceSearchRequested = {
                 activity?.hideKeyboard()
@@ -566,7 +583,7 @@ class DuckChatContextualWebViewFragment :
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.ChangeSheetState -> {
-                        command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
+                        command.prefillNativeInput?.let { binding.contextualNativeInputCard.widget.text = it }
                         if (command.hideKeyboard) activity?.hideKeyboard()
                         bottomSheetBehavior.state = command.newState
                     }
@@ -605,7 +622,7 @@ class DuckChatContextualWebViewFragment :
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.FocusInput -> {
-                        binding.contextualNativeInputWidget.focusInput(activity)
+                        binding.contextualNativeInputCard.widget.focusInput(activity)
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.ApplyContextualReopened -> {
@@ -622,7 +639,9 @@ class DuckChatContextualWebViewFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
-                        viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                        if (command.tabId == viewModel.viewState.value.tabId) {
+                            viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                        }
                     }
 
                     DuckChatContextualSharedViewModel.Command.ReloadChat -> {
@@ -658,12 +677,13 @@ class DuckChatContextualWebViewFragment :
         contextualNativeInputManager.onWebViewMode()
 
         if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
-            binding.contextualNativeInputWidget.setPageContext(
+            binding.contextualNativeInputCard.widget.setPageContext(
                 title = viewState.contextTitle,
+                mimeType = viewState.contextMimeType,
                 url = viewState.contextUrl,
             )
         } else {
-            binding.contextualNativeInputWidget.clearPageContext()
+            binding.contextualNativeInputCard.widget.clearPageContext()
         }
     }
 
@@ -672,7 +692,7 @@ class DuckChatContextualWebViewFragment :
     private fun renderFireButton() {
         val isFireButtonEnabled = viewModel.viewState.value.isFireButtonEnabled
         val isNativeInputVisible = binding.contextualNativeInputCard.isVisible
-        val isNativeInputFocused = binding.contextualNativeInputWidget.hasInputFocus()
+        val isNativeInputFocused = binding.contextualNativeInputCard.widget.hasInputFocus()
         if (isFireButtonEnabled && !isNativeInputVisible) binding.contextualFire.show() else binding.contextualFire.gone()
         if (isFireButtonEnabled && isNativeInputVisible && !isNativeInputFocused) {
             binding.contextualInputFire.show()
@@ -1016,3 +1036,10 @@ class DuckChatContextualWebViewFragment :
         const val KEY_DUCK_AI_CONTEXTUAL_TAB_ID: String = "KEY_DUCK_AI_CONTEXTUAL_TAB_ID"
     }
 }
+
+private data class SheetJsCallState(
+    val contextRequest: DuckChatContextualWebViewViewModel.PageContextRequest,
+    val pageContext: String,
+    val allowAutomaticAttachment: Boolean,
+    val sheetUrl: String?,
+)

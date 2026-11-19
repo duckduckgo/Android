@@ -21,4 +21,10 @@ data class LoadingViewState(
     val trackersAnimationEnabled: Boolean = true,
     val progress: Int = 0,
     val url: String = "",
-)
+) {
+    /** Null when a bar is already running, since restarting it would show a second cycle. */
+    fun onIntentStart(): LoadingViewState? = if (isLoading) null else copy(isLoading = true, progress = 0)
+
+    /** Progress stays 0 while pending, so a non-zero value means the bar belongs to a page that is still loading. */
+    fun onNavigationAbandoned(): LoadingViewState? = if (progress == 0) copy(isLoading = false) else null
+}

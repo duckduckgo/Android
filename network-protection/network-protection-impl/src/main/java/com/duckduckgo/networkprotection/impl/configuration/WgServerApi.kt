@@ -36,6 +36,7 @@ interface WgServerApi {
         val address: String,
         val location: String?,
         val gateway: String,
+        val ports: List<Long> = emptyList(),
     )
 
     suspend fun registerPublicKey(
@@ -120,6 +121,7 @@ class RealWgServerApi @Inject constructor(
         address = allowedIPs.first(),
         gateway = server.internalIp,
         location = server.attributes.extractLocation(),
+        ports = server.ports.orEmpty().ifEmpty { listOf(server.port) },
     )
 
     private fun Server.extractPublicEndpoint(): String {

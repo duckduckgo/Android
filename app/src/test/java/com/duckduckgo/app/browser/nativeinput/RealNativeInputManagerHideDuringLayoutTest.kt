@@ -27,10 +27,10 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NewChatHintsRenderer
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,10 +71,13 @@ class RealNativeInputManagerHideDuringLayoutTest {
         duckChatInputModeState,
         mock<Pixel>(),
         FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java),
-        FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java).also { it.self().setRawStoredState(State(enable = true)) },
         mock<NativeInputEventListener>(),
         EdgeToEdgeHandler(),
         mock<DuckAiChatStore>(),
+        object : NewChatHintsRenderer {
+            override suspend fun create(context: Context, tabId: String): View = View(context)
+        },
+        FakeFeatureToggleFactory.create(NativeInputRecalculateContentPaddingOnTabSwitchFeature::class.java),
     )
 
     private val rootView = object : FrameLayout(activity) {
@@ -102,7 +105,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
 
         val widgetView = FrameLayout(activity).apply {
             id = R.id.inputModeRoot
-            addView(TestWidget(activity).apply { id = R.id.inputModeWidget })
+            addView(TestWidget(activity).apply { id = com.duckduckgo.duckchat.impl.R.id.inputModeWidget })
         }
         val layoutInflater: LayoutInflater = mock()
         whenever(layoutInflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)
@@ -117,7 +120,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
                 onSearchSubmitted = {},
                 onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
-                onDuckAiQuerySubmitted = { _, _ -> },
+                onDuckAiQuerySubmitted = { _, _, _ -> },
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),

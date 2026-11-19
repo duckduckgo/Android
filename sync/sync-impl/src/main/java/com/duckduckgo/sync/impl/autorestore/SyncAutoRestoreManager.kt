@@ -17,11 +17,11 @@
 package com.duckduckgo.sync.impl.autorestore
 
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SyncFeature
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesBinding
@@ -34,6 +34,11 @@ import javax.inject.Inject
 interface SyncAutoRestoreManager {
     suspend fun isAutoRestoreAvailable(): Boolean
     suspend fun saveAutoRestoreData(recoveryCode: String, deviceId: String?): Boolean
+
+    /**
+     * The saved recovery code, and the Sync device ID of the phone that saved it. On a migrated install the device ID is left
+     * out: it belongs to the previous phone, and signing in with it would make this phone take over that phone's device.
+     */
     suspend fun retrieveRecoveryPayload(): RestorePayload?
     suspend fun clearAutoRestoreData(): Result<Unit>
     suspend fun isRestoreOnReinstallEnabled(): Boolean
@@ -44,15 +49,14 @@ interface SyncAutoRestoreManager {
 class RealSyncAutoRestoreManager @Inject constructor(
     private val persistentStorage: PersistentStorage,
     private val dataStore: SyncAutoRestorePreferenceDataStore,
-    private val syncFeature: SyncFeature,
     private val dispatcherProvider: DispatcherProvider,
     private val moshi: Moshi,
+    private val deviceMigration: DeviceMigration,
 ) : SyncAutoRestoreManager {
 
     override suspend fun isAutoRestoreAvailable(): Boolean {
         return withContext(dispatcherProvider.io()) {
-            syncFeature.syncAutoRestore().isEnabled() &&
-                persistentStorage.checkAvailability() is PersistentStorageAvailability.Available
+            persistentStorage.checkAvailability() is PersistentStorageAvailability.Available
         }
     }
 
@@ -75,7 +79,8 @@ class RealSyncAutoRestoreManager @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             val bytes = persistentStorage.retrieve(SyncRecoveryPersistentStorageKey).getOrNull() ?: return@withContext null
             val rawString = String(bytes, Charsets.UTF_8)
-            moshi.adapter(RestorePayload::class.java).fromJson(rawString)
+            val payload = moshi.adapter(RestorePayload::class.java).fromJson(rawString) ?: return@withContext null
+            if (payload.deviceId != null && deviceMigration.isMigratedInstall()) payload.copy(deviceId = null) else payload
         }
     }
 

@@ -29,6 +29,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@org.junit.runner.RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class RealTabPageContextRepositoryTest {
 
     private val mockDao: TabPageContextDao = mock()
@@ -37,6 +38,13 @@ class RealTabPageContextRepositoryTest {
     @Before
     fun setup() {
         testee = RealTabPageContextRepository(dao = mockDao)
+    }
+
+    @Test
+    fun whenContextContainsAttachmentThenItIsNotPersisted() = runTest {
+        testee.storePageContext("tab1", "https://example.com", """{"mimeType":"application/pdf","data":"secret"}""")
+        testee.storePageContext("tab1", "https://example.com", """{"data":"secret"}""")
+        org.mockito.kotlin.verifyNoInteractions(mockDao)
     }
 
     @Test

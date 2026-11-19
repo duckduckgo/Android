@@ -1292,6 +1292,8 @@ private class ShowcaseSnackbar(
 
     fun trailingIcon() = show("Overflow menu clicked")
 
+    fun menuItem(text: String) = show("$text pressed")
+
     fun switch(checked: Boolean) = show("Switch checked: $checked")
 
     private fun show(message: String) = Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
@@ -1304,9 +1306,19 @@ private fun ComposeSectionHeader(snackbar: ShowcaseSnackbar) {
         DaxSectionHeader(title = "Section Header")
         DaxSectionHeader(
             title = "Section Header with Overflow Menu",
-            overflowMenuClickListener = { snackbar.trailingIcon() },
             overflowMenuContentDescription = "Overflow menu",
-        )
+        ) {
+            DaxDefaultItem(text = "Edit", onClick = { snackbar.menuItem("Edit") })
+            DaxDefaultItem(text = "Hide section", onClick = { snackbar.menuItem("Hide section") })
+            DaxDefaultItem(text = "Clear all", onClick = { snackbar.menuItem("Clear all") }, isDestructive = true)
+        }
+        DaxSectionHeader(
+            title = "Section Header with Disabled Overflow Menu",
+            overflowMenuEnabled = false,
+            overflowMenuContentDescription = "Overflow menu",
+        ) {
+            DaxDefaultItem(text = "Edit", onClick = {})
+        }
     }
 }
 

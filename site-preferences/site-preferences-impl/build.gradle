@@ -28,9 +28,6 @@ android {
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     namespace 'com.duckduckgo.site.preferences.impl'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -69,6 +66,4 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

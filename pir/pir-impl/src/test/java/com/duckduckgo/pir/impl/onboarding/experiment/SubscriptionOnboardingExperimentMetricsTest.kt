@@ -51,7 +51,7 @@ class SubscriptionOnboardingExperimentMetricsTest {
 
     @Test
     fun whenPirActivatedThenFiresD1AndExperimentSpecificLaterWindowForEachExperiment() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(freeTrialToggle, paidToggle))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(freeTrialToggle, paidToggle))
 
         testee.firePirActivated()
 
@@ -73,8 +73,8 @@ class SubscriptionOnboardingExperimentMetricsTest {
     }
 
     @Test
-    fun whenNoExperimentTogglesInInventoryThenNoMetricSent() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(emptyList())
+    fun whenNoActiveExperimentsThenNoMetricSent() = runTest {
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
 
         testee.firePirActivated()
 

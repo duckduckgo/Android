@@ -48,7 +48,7 @@ class FakeDuckChat(
         openDuckChatCalls.add(Unit)
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) {
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {
         openDuckChatWithAutoPromptCalls.add(query)
     }
 
@@ -56,7 +56,7 @@ class FakeDuckChat(
         openDuckChatWithPrefillCalls.add(query)
     }
 
-    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean) { }
+    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean, voice: Boolean) { }
 
     override fun getDuckChatUrl(
         query: String,

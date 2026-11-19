@@ -280,23 +280,16 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
 
         if (neverAutoLogout) {
             logcat(WARN) { "Sync-UnifiedDevices: $id → Unknown device placeholder (${entry.credentialId}): ${result.reason}" }
-            return FailureOutcome.Fallback(placeholderDevice(id, entry.credentialId))
+            return FailureOutcome.Fallback(DecryptedDevice.placeholder(id, entry.credentialId))
         }
 
         if (entry.credentialId == CREDENTIAL_ID_3PARTY && !refreshGotFreshSp) {
             logcat(WARN) { "Sync-UnifiedDevices: $id → Unknown fallback (refreshing SP was inconclusive): ${result.reason}" }
-            return FailureOutcome.Fallback(placeholderDevice(id, entry.credentialId))
+            return FailureOutcome.Fallback(DecryptedDevice.placeholder(id, entry.credentialId))
         }
         logcat(WARN) { "Sync-UnifiedDevices: $id marked for logout (${entry.credentialId}): ${result.reason}" }
         return FailureOutcome.PermanentlyUndecryptable(id)
     }
-
-    private fun placeholderDevice(deviceId: String, credentialId: String?): DecryptedDevice =
-        DecryptedDevice(
-            deviceId = deviceId,
-            name = ThirdPartyDeviceListDecryptor.FALLBACK_NAME,
-            type = if (credentialId == CREDENTIAL_ID_3PARTY) ThirdPartyDeviceListDecryptor.FALLBACK_TYPE_3PARTY else null,
-        )
 
     private data class DeviceInfoDecryptResult(
         val resolved: List<DecryptedDevice>,

@@ -455,6 +455,19 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun `when process and complete stripe payment message then callback called`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"completeStripePayment","id":"id","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
     fun `when process and get subscription tier options message and no id then callback still called`() = runTest {
         givenInterfaceIsRegistered()
 
@@ -669,7 +682,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -683,7 +696,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -697,7 +710,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).refreshAccessToken()
+        verify(subscriptionsManager).refreshAccessToken(force = true)
     }
 
     @Test
@@ -711,7 +724,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test
@@ -725,7 +738,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test
@@ -739,7 +752,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager, never()).refreshAccessToken()
+        verify(subscriptionsManager, never()).refreshAccessToken(any())
     }
 
     @Test

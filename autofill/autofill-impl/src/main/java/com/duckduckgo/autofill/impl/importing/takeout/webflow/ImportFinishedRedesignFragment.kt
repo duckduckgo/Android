@@ -18,9 +18,11 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
+import com.duckduckgo.autofill.api.ImportFromGoogleLauncher.BookmarksImportParams
 import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentImportBookmarksResultRedesignBinding
@@ -41,7 +43,7 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
     private val importViewModel by activityViewModels<ImportGoogleBookmarksViewModel> {
         ImportGoogleBookmarksViewModel.Factory.Provider(
             assistedFactory = importViewModelFactory,
-            launchSource = requireNotNull(requireArguments().getString(ARG_LAUNCH_SOURCE)),
+            params = requireNotNull(BundleCompat.getSerializable(requireArguments(), ARG_PARAMS, BookmarksImportParams::class.java)),
             isRedesignEnabled = true,
         )
     }
@@ -77,14 +79,14 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
     ) {
         with(binding) {
             resultIcon.setImageResource(R.drawable.success_128)
-            resultTitle.setText(R.string.importBookmarksRedesignSuccessTitle)
-            resultRow.setPrimaryText(getString(R.string.importBookmarksRedesignSuccessImportedRow, importedCount).html(requireContext()))
-            resultRow.setLeadingIconResource(CommonR.drawable.check_recolorable_24)
+            resultTitle.text = getString(R.string.importBookmarksRedesignSuccessImportedRow, importedCount).html(requireContext())
+            resultRow.isVisible = false
             resultSecondaryText.isVisible = false
-            resultDoneButton.setText(R.string.importBookmarksRedesignSuccessPrimaryButton)
+            resultDoneButton.setText(CommonR.string.done)
             val promo = (importViewModel.viewState.value.viewMode as? ViewMode.Success)?.promo?.createView(requireContext(), promoCallback)
             promo?.let(resultPromoContainer::addView)
             resultPromoContainer.isVisible = promo != null
+            resultIcon.isVisible = promo == null
             resultDoneButton.isVisible = promo == null
             resultDoneSecondaryButton.isVisible = promo != null
         }
@@ -93,34 +95,34 @@ class ImportFinishedRedesignFragment : DuckDuckGoFragment(R.layout.fragment_impo
     private fun renderError(binding: FragmentImportBookmarksResultRedesignBinding) {
         with(binding) {
             resultIcon.setImageResource(R.drawable.bookmarks_import_128)
-            resultTitle.setText(R.string.importBookmarksRedesignErrorTitle)
+            resultTitle.setText(R.string.importBookmarksRedesignResultTitle)
             resultRow.setPrimaryText(getString(R.string.importBookmarksErrorGenericMessage))
             resultRow.setLeadingIconResource(CommonR.drawable.cross_recolorable_24)
             resultSecondaryText.isVisible = true
-            resultDoneButton.setText(R.string.importBookmarksRedesignErrorPrimaryButton)
+            resultDoneButton.setText(CommonR.string.done)
         }
     }
 
     companion object {
         private const val ARG_IS_SUCCESS = "is_success"
         private const val ARG_IMPORTED_COUNT = "imported_count"
-        private const val ARG_LAUNCH_SOURCE = "launch_source"
+        private const val ARG_PARAMS = "params"
 
         fun newInstanceSuccess(
             importedCount: Int,
-            launchSource: String,
+            params: BookmarksImportParams,
         ): ImportFinishedRedesignFragment = ImportFinishedRedesignFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(ARG_IS_SUCCESS, true)
                 putInt(ARG_IMPORTED_COUNT, importedCount)
-                putString(ARG_LAUNCH_SOURCE, launchSource)
+                putSerializable(ARG_PARAMS, params)
             }
         }
 
-        fun newInstanceError(launchSource: String): ImportFinishedRedesignFragment = ImportFinishedRedesignFragment().apply {
+        fun newInstanceError(params: BookmarksImportParams): ImportFinishedRedesignFragment = ImportFinishedRedesignFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(ARG_IS_SUCCESS, false)
-                putString(ARG_LAUNCH_SOURCE, launchSource)
+                putSerializable(ARG_PARAMS, params)
             }
         }
     }

@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLanding
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingResult
+import com.duckduckgo.app.browser.state.IdleReturnLandingGate
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
@@ -32,6 +33,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
@@ -39,8 +41,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
@@ -52,6 +59,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -91,6 +99,10 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchToggle: Toggle = mock()
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val modeSwitchRecreateSignal = ModeSwitchRecreateSignal()
+    private val idleReturnLandingGate = IdleReturnLandingGate()
+    private val newTabReturnHatchFeature = FakeFeatureToggleFactory.create(NewTabReturnHatchFeature::class.java).apply {
+        idleReturnFirstFrameHold().setRawStoredState(State(enable = true))
+    }
     private val returnSessionLandingListener: ReturnSessionLandingListener = mock()
     private val duckAiSessionCallback: DuckAiSessionCallback = mock()
     private val testScope = coroutineTestRule.testScope
@@ -110,28 +122,32 @@ class FirstScreenHandlerImplTest {
         whenever(tabRepository.liveSelectedTab).thenReturn(liveSelectedTab)
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
 
-        testee = FirstScreenHandlerImpl(
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
-            showOnAppLaunchFeature = showOnAppLaunchFeature,
-            settingsDataStore = settingsDataStore,
-            showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
-            showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
-            appBuildConfig = appBuildConfig,
-            duckDuckGoUrlDetector = duckDuckGoUrlDetector,
-            duckChat = duckChat,
-            tabRepositoryProvider = tabRepositoryProvider,
-            browserModeStateHolder = browserModeStateHolder,
-            ntpAfterIdleManager = ntpAfterIdleManager,
-            systemAutofillEngagement = systemAutofillEngagement,
-            customTabDetector = customTabDetector,
-            modeSwitchRecreateSignal = modeSwitchRecreateSignal,
-            returnSessionLandingListener = returnSessionLandingListener,
-            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            appCoroutineScope = testScope,
-            idleThresholdResolver = RealIdleThresholdResolver(androidBrowserConfigFeature),
-            duckAiSessionCallback = duckAiSessionCallback,
-        )
+        testee = createTestee()
     }
+
+    private fun createTestee(appCoroutineScope: CoroutineScope = testScope) = FirstScreenHandlerImpl(
+        androidBrowserConfigFeature = androidBrowserConfigFeature,
+        showOnAppLaunchFeature = showOnAppLaunchFeature,
+        settingsDataStore = settingsDataStore,
+        showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+        showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
+        appBuildConfig = appBuildConfig,
+        duckDuckGoUrlDetector = duckDuckGoUrlDetector,
+        duckChat = duckChat,
+        tabRepositoryProvider = tabRepositoryProvider,
+        browserModeStateHolder = browserModeStateHolder,
+        ntpAfterIdleManager = ntpAfterIdleManager,
+        systemAutofillEngagement = systemAutofillEngagement,
+        customTabDetector = customTabDetector,
+        modeSwitchRecreateSignal = modeSwitchRecreateSignal,
+        returnSessionLandingListener = returnSessionLandingListener,
+        dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        appCoroutineScope = appCoroutineScope,
+        idleThresholdResolver = RealIdleThresholdResolver(androidBrowserConfigFeature),
+        duckAiSessionCallback = duckAiSessionCallback,
+        idleReturnLandingGate = idleReturnLandingGate,
+        newTabReturnHatchFeature = newTabReturnHatchFeature,
+    )
 
     // --- new-user default is persisted on onOpen when conditions are met ---
 
@@ -200,6 +216,132 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
+    }
+
+    @Test
+    fun whenIdleReturnThenLandingGateHoldsUntilLandingIsDecided() = runTest {
+        givenIdleReturn()
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .doSuspendableAnswer { awaitCancellation() }
+
+        testee.onOpen(isFreshLaunch = false)
+
+        assertEquals(IdleReturnLandingGate.State.Pending, idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenFirstFrameHoldDisabledThenLandingGateStaysOpenOnIdleReturn() = runTest {
+        givenIdleReturn()
+        newTabReturnHatchFeature.idleReturnFirstFrameHold().setRawStoredState(State(enable = false))
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .doSuspendableAnswer { awaitCancellation() }
+
+        testee.onOpen(isFreshLaunch = false)
+
+        assertEquals(IdleReturnLandingGate.State.Open, idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenIdleReturnAddsNtpLandingTabThenLandingGateAwaitsThatTabAndItsHatch() = runTest {
+        givenIdleReturn()
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .thenReturn(ShowOnAppLaunchResult(destinationUrl = null, treatment = AfterIdleTreatment.NTP, landingTabId = "ntp"))
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(IdleReturnLandingGate.State.AwaitingTab("ntp", awaitHatch = true), idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenIdleReturnLandsOnSpecificPageThenLandingGateAwaitsThatTabWithoutHatch() = runTest {
+        givenIdleReturn()
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .thenReturn(ShowOnAppLaunchResult(destinationUrl = "https://example.com", treatment = null, landingTabId = "page"))
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(IdleReturnLandingGate.State.AwaitingTab("page", awaitHatch = false), idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenFreshIdleLaunchRestoresNtpThenLandingGateAwaitsItsHatch() = runTest {
+        givenIdleReturn()
+        liveSelectedTab.value = TabEntity(tabId = "restored", url = null)
+        whenever(tabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "restored", url = null))
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(IdleReturnLandingGate.State.AwaitingTab("restored", awaitHatch = true), idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenIdleReturnKeepsCurrentTabThenLandingGateOpens() = runTest {
+        givenIdleReturn()
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .thenReturn(ShowOnAppLaunchResult(destinationUrl = "https://example.com", treatment = AfterIdleTreatment.LUT))
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(IdleReturnLandingGate.State.Open, idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenIdleReturnIsSkippedForCustomTabThenLandingGateOpens() = runTest {
+        givenIdleReturn()
+        whenever(customTabDetector.isCustomTab()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(IdleReturnLandingGate.State.Open, idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenLandingThrowsThenLandingGateOpens() = runTest {
+        givenIdleReturn()
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .doSuspendableAnswer { throw IllegalStateException() }
+        val scope = CoroutineScope(coroutineTestRule.testDispatcher + CoroutineExceptionHandler { _, _ -> })
+
+        testee = createTestee(appCoroutineScope = scope)
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(IdleReturnLandingGate.State.Open, idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenNonIdleReturnFollowsUnclaimedHoldThenLandingGateOpens() = runTest {
+        idleReturnLandingGate.hold()
+        idleReturnLandingGate.resolve("ntp")
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - 1000)
+
+        testee.onOpen(isFreshLaunch = false)
+
+        assertEquals(IdleReturnLandingGate.State.Open, idleReturnLandingGate.state)
+    }
+
+    @Test
+    fun whenReturnIsNotIdleThenLandingGateStaysOpen() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - 1000)
+
+        testee.onOpen(isFreshLaunch = false)
+
+        assertEquals(IdleReturnLandingGate.State.Open, idleReturnLandingGate.state)
+    }
+
+    private fun givenIdleReturn() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - (6 * 60 * 1000))
     }
 
     @Test

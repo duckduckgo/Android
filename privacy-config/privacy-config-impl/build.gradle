@@ -73,8 +73,7 @@ dependencies {
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    testImplementation project(':feature-toggles-test')
 }
 
 android {
@@ -88,8 +87,5 @@ android {
         }
     }
   namespace 'com.duckduckgo.privacy.config.impl'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 

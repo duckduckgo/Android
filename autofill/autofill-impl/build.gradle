@@ -39,6 +39,7 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':credential-exchange-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':browser-ui')
     implementation project(path: ':browser-mode-api')
     implementation project(path: ':prompts-coordinator-api')
     implementation project(path: ':statistics-api')
@@ -110,8 +111,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -125,9 +124,6 @@ android {
         }
     }
     namespace 'com.duckduckgo.autofill.impl'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     buildFeatures {
         buildConfig = true
     }

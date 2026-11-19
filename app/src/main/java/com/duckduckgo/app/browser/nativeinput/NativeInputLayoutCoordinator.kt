@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.R
 class NativeInputLayoutCoordinator(
     private val rootView: ViewGroup,
     private val omnibarState: OmnibarState,
+    private val recalculateContentPaddingOnTabSwitch: Boolean,
 ) {
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
 
@@ -53,6 +54,9 @@ class NativeInputLayoutCoordinator(
     /** Restores content targets to the padding snapshotted in [configureContentOffset]. */
     private var resetContentOffset: (() -> Unit)? = null
     private var reapplyAutocompleteOffset: (() -> Unit)? = null
+    private var clearForcedBottomTranslationListeners: (() -> Unit)? = null
+    private var clearAutocompleteLayoutResources: (() -> Unit)? = null
+    private var clearContentOffsetResources: (() -> Unit)? = null
 
     // The content-reflow LayoutTransition is suspended while a per-frame content-offset drive is running
     // (nav bar slide or widget exit) so that drive is the only thing moving the content. Captured on suspend.
@@ -83,12 +87,51 @@ class NativeInputLayoutCoordinator(
         }
     }
 
+    fun configureNewChatHints(widgetView: View, hintsView: View) {
+        val spacing = rootView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        hintsView.layoutParams = CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            gravity = Gravity.BOTTOM
+        }
+        // The input root is raised and opaque; matching its Z keeps the chips (added later) drawn on top of it.
+        hintsView.elevation = widgetView.elevation
+        hintsView.translationZ = widgetView.translationZ
+        val card = widgetView.findViewById<View>(R.id.inputModeWidgetCard)
+        val preDrawListener = ViewTreeObserver.OnPreDrawListener {
+            if (!hintsView.isVisible) return@OnPreDrawListener true
+            val targetBottom = widgetView.top + widgetView.translationY + card.topWithin(widgetView) - spacing
+            hintsView.translationY = targetBottom - hintsView.bottom
+            hintsView.alpha = if (card.isShown) widgetView.alpha * card.alpha else 0f
+            true
+        }
+        var observer: ViewTreeObserver? = null
+        hintsView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                observer = v.viewTreeObserver.also { it.addOnPreDrawListener(preDrawListener) }
+            }
+
+            override fun onViewDetachedFromWindow(v: View) {
+                observer?.takeIf { it.isAlive }?.removeOnPreDrawListener(preDrawListener)
+                observer = null
+            }
+        })
+    }
+
+    private fun View.topWithin(ancestor: View): Float {
+        var offset = 0f
+        var view: View = this
+        while (view !== ancestor) {
+            offset += view.top + view.translationY
+            view = view.parent as? View ?: break
+        }
+        return offset
+    }
+
     fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
         val autoCompleteList = rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)
 
         // In duck.ai mode the legacy AppBar stays visible; float overlays over it so AppBar
-        // behavior/elevation doesn't push or cover them. Restored on widget detach.
+        // behavior/elevation doesn't push or cover them. Restored when the widget is removed.
         val restoreFloats: List<() -> Unit> = if (omnibarState.isDuckAiMode()) {
             listOfNotNull(autoCompleteList, focusedView).map { it.floatOverLegacyOmnibar() }
         } else {
@@ -131,28 +174,45 @@ class NativeInputLayoutCoordinator(
 
         reapplyAutocompleteOffset = { applyForWidgetPosition() }
         widgetView.post { applyForWidgetPosition() }
-        val layoutListener =
-            View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-                applyForWidgetPosition()
-            }
-        widgetView.addOnLayoutChangeListener(layoutListener)
-        autoCompleteList.addOnLayoutChangeListener(layoutListener)
-        focusedView?.addOnLayoutChangeListener(layoutListener)
-        widgetView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = Unit
-
-                override fun onViewDetachedFromWindow(v: View) {
-                    applyPadding(deltaTop = 0, deltaBottom = 0)
-                    reapplyAutocompleteOffset = null
-                    restoreFloats.forEach { it() }
-                    v.removeOnLayoutChangeListener(layoutListener)
-                    autoCompleteList.removeOnLayoutChangeListener(layoutListener)
-                    focusedView?.removeOnLayoutChangeListener(layoutListener)
-                    v.removeOnAttachStateChangeListener(this)
+        val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            applyForWidgetPosition()
+        }
+        fun addListeners() {
+            widgetView.addOnLayoutChangeListener(layoutListener)
+            autoCompleteList.addOnLayoutChangeListener(layoutListener)
+            focusedView?.addOnLayoutChangeListener(layoutListener)
+        }
+        fun removeListeners() {
+            widgetView.removeOnLayoutChangeListener(layoutListener)
+            autoCompleteList.removeOnLayoutChangeListener(layoutListener)
+            focusedView?.removeOnLayoutChangeListener(layoutListener)
+        }
+        addListeners()
+        val attachListener = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                if (recalculateContentPaddingOnTabSwitch) {
+                    addListeners()
+                    v.post { if (v.isAttachedToWindow) applyForWidgetPosition() }
                 }
-            },
-        )
+            }
+
+            override fun onViewDetachedFromWindow(v: View) {
+                if (recalculateContentPaddingOnTabSwitch) {
+                    removeListeners()
+                } else {
+                    clearAutocompleteLayoutResources?.invoke()
+                }
+            }
+        }
+        clearAutocompleteLayoutResources = {
+            removeListeners()
+            applyPadding(deltaTop = 0, deltaBottom = 0)
+            reapplyAutocompleteOffset = null
+            restoreFloats.forEach { it() }
+            widgetView.removeOnAttachStateChangeListener(attachListener)
+            clearAutocompleteLayoutResources = null
+        }
+        widgetView.addOnAttachStateChangeListener(attachListener)
     }
 
     // Clears the CoordinatorLayout behavior and raises elevation so the view floats over
@@ -179,9 +239,8 @@ class NativeInputLayoutCoordinator(
         resetContentOffset?.invoke()
         clearNtpScrollArtifacts()
 
-        val newTabContent =
-            rootView.findViewById<View?>(R.id.newTabPage)
-                ?: rootView.findViewById(R.id.includeNewBrowserTab)
+        val newTabContent: View? = rootView.findViewById<View?>(R.id.newTabPage)
+            ?: rootView.findViewById(R.id.includeNewBrowserTab)
         // newTabPage has no XML padding — any top/bottom here is from a prior offset session. Zero it
         // so the snapshot can't inherit a dirty baseline. Leave browserLayout alone: its bottom padding
         // is owned by BottomOmnibarBrowserContainerLayoutBehavior.
@@ -297,13 +356,14 @@ class NativeInputLayoutCoordinator(
                 return
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
+            val widgetTopInWindow = IntArray(2).also { widgetView.getLocationInWindow(it) }[1]
             val widgetBottomInWindow = anchorLocation[1] + anchor.height
             val anchorBottomInWindow = contentAnchorBottom(
                 isBottom = isBottom,
                 widgetBottomInWindow = widgetBottomInWindow,
                 visibleFooterExtent = visibleFooterExtent(widgetBottomInWindow),
             )
-            applyOffsetWithBottom(anchorTopInWindow = anchorLocation[1], anchorBottomInWindow = anchorBottomInWindow)
+            applyOffsetWithBottom(anchorTopInWindow = widgetTopInWindow, anchorBottomInWindow = anchorBottomInWindow)
         }
 
         // Called from the animators' onUpdate before the layout pass. Projects the card's visual bottom
@@ -335,56 +395,80 @@ class NativeInputLayoutCoordinator(
             clearNtpScrollArtifacts()
         }
         widgetView.post { applyOffset() }
-        val layoutListener =
-            View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-                if (isWidgetAnimating) return@OnLayoutChangeListener
-                applyOffset()
-            }
-        widgetView.addOnLayoutChangeListener(layoutListener)
-        rootView.addOnLayoutChangeListener(layoutListener)
+        val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            if (isWidgetAnimating) return@OnLayoutChangeListener
+            applyOffset()
+        }
 
         // Some offset inputs change without moving rootView/widgetView (hatch height, logo visibility,
         // NTP reflow), which the per-view listeners miss. The window-shared viewTreeObserver fires on
         // every global layout pass — broad by design; kept cheap via the isWidgetAnimating skip and
         // no-op applyPadding. Needed in both modes: bottom mode's nav bar top inset also flips with
         // logo-only transitions (hatch/RMF/AppTP banner appearing).
-        val ntpContentView = newTabContent
-        val globalLayoutListener =
-            ViewTreeObserver.OnGlobalLayoutListener {
-                if (isWidgetAnimating) return@OnGlobalLayoutListener
-                applyOffset()
-            }
-        // Keep the observer we registered on. When the fragment view detaches, the NTP content is
-        // gone before the widget, so `ntpContentView.viewTreeObserver` at cleanup time is a new
-        // object and removing from it would be no-op and leak this listener.
-        val ntpObserver = ntpContentView?.viewTreeObserver
-        ntpObserver?.addOnGlobalLayoutListener(globalLayoutListener)
-        widgetView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = Unit
+        val globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+            if (isWidgetAnimating) return@OnGlobalLayoutListener
+            applyOffset()
+        }
 
-                override fun onViewDetachedFromWindow(v: View) {
-                    ntpGroup?.layoutTransition = previousNtpTransition
-                    pendingContentLayoutTransition = null
-                    widgetAnimationFrameHandler = null
-                    reapplyContentOffset = null
-                    resetContentOffset = null
-                    isWidgetAnimating = false
-                    contentTransitionGroup = null
-                    suspendedContentTransition = null
-                    isContentReflowSuspended = false
-                    isReflowSuspendRequested = false
-                    targets.forEach { target ->
-                        applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
-                    }
-                    clearNtpScrollArtifacts()
-                    v.removeOnLayoutChangeListener(layoutListener)
-                    rootView.removeOnLayoutChangeListener(layoutListener)
-                    ntpObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
-                    v.removeOnAttachStateChangeListener(this)
+        // In order to avoid leaking the globalLayoutListener, keep a reference to the observer
+        // that we used to register the listener on and unregister from it on detach.
+        // When recalculating on tab switch, it's only registered while the NTP content is attached.
+        // A detached view returns a temporary observer, so registering then and again when the
+        // widget re-attaches would leave a copy that's never removed from the temporary observer.
+        var ntpObserver: ViewTreeObserver? = null
+
+        fun addListeners() {
+            widgetView.addOnLayoutChangeListener(layoutListener)
+            rootView.addOnLayoutChangeListener(layoutListener)
+            if (newTabContent != null && (!recalculateContentPaddingOnTabSwitch || newTabContent.isAttachedToWindow)) {
+                ntpObserver = newTabContent.viewTreeObserver.also {
+                    it.addOnGlobalLayoutListener(globalLayoutListener)
                 }
-            },
-        )
+            }
+        }
+        fun removeListeners() {
+            widgetView.removeOnLayoutChangeListener(layoutListener)
+            rootView.removeOnLayoutChangeListener(layoutListener)
+            ntpObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
+            ntpObserver = null
+        }
+        addListeners()
+        val attachListener = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                if (recalculateContentPaddingOnTabSwitch) {
+                    addListeners()
+                    v.post { if (v.isAttachedToWindow) applyOffset() }
+                }
+            }
+
+            override fun onViewDetachedFromWindow(v: View) {
+                if (recalculateContentPaddingOnTabSwitch) {
+                    removeListeners()
+                } else {
+                    clearContentOffsetResources?.invoke()
+                }
+            }
+        }
+        clearContentOffsetResources = {
+            removeListeners()
+            ntpGroup?.layoutTransition = previousNtpTransition
+            pendingContentLayoutTransition = null
+            widgetAnimationFrameHandler = null
+            reapplyContentOffset = null
+            resetContentOffset = null
+            isWidgetAnimating = false
+            contentTransitionGroup = null
+            suspendedContentTransition = null
+            isContentReflowSuspended = false
+            isReflowSuspendRequested = false
+            targets.forEach { target ->
+                applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
+            }
+            clearNtpScrollArtifacts()
+            widgetView.removeOnAttachStateChangeListener(attachListener)
+            clearContentOffsetResources = null
+        }
+        widgetView.addOnAttachStateChangeListener(attachListener)
     }
 
     /**
@@ -404,10 +488,22 @@ class NativeInputLayoutCoordinator(
     }
 
     /**
+     * Must be invoked when the widget is removed from the root view. Restores the padding, floated
+     * overlays and reflow transition that [configureAutocompleteLayout] and
+     * [configureContentOffset] set up for it.
+     */
+    fun onWidgetRemoved() {
+        if (recalculateContentPaddingOnTabSwitch) {
+            clearAutocompleteLayoutResources?.invoke()
+            clearContentOffsetResources?.invoke()
+        }
+    }
+
+    /**
      * Around a nav bar show/hide slide (widget stays open): silence the layout listeners and suspend the
      * content-reflow transition so the per-frame [updateNavBarInset] drive moves the content in lock-step
      * with the bar. Paired with [endNavBarSlide]; both idempotent, so a rapid re-toggle that cancels the
-     * previous slide stays suspended until the last slide ends. [configureContentOffset]/detach reset it.
+     * previous slide stays suspended until the last slide ends. [configureContentOffset]/[onWidgetRemoved] reset it.
      */
     fun beginNavBarSlide() {
         isWidgetAnimating = true
@@ -499,6 +595,8 @@ class NativeInputLayoutCoordinator(
     }
 
     fun applyForcedBottomTranslation(widgetView: View, isBottom: Boolean) {
+        clearForcedBottomTranslationListeners?.invoke()
+        clearForcedBottomTranslationListeners = null
         val shouldForce = isBottom && !omnibarState.isOmnibarBottom()
         if (!shouldForce) {
             // Only reset bottom-anchored widgets. A top-anchored widget's translationY is owned by the
@@ -525,19 +623,28 @@ class NativeInputLayoutCoordinator(
         // Both views matter: the root resizes when the keyboard hides, and the host is re-laid out a
         // frame later. Listening to the root alone measured the gap against the host's pre-resize
         // bottom and left the input parked below the screen.
-        rootView.addOnLayoutChangeListener(layoutListener)
-        widgetView.addOnLayoutChangeListener(layoutListener)
-        widgetView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = Unit
+        if (widgetView.isAttachedToWindow) {
+            rootView.addOnLayoutChangeListener(layoutListener)
+            widgetView.addOnLayoutChangeListener(layoutListener)
+        }
+        val attachListener = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                rootView.addOnLayoutChangeListener(layoutListener)
+                v.addOnLayoutChangeListener(layoutListener)
+                applyOffset()
+            }
 
-                override fun onViewDetachedFromWindow(v: View) {
-                    rootView.removeOnLayoutChangeListener(layoutListener)
-                    v.removeOnLayoutChangeListener(layoutListener)
-                    v.removeOnAttachStateChangeListener(this)
-                }
-            },
-        )
+            override fun onViewDetachedFromWindow(v: View) {
+                rootView.removeOnLayoutChangeListener(layoutListener)
+                v.removeOnLayoutChangeListener(layoutListener)
+            }
+        }
+        widgetView.addOnAttachStateChangeListener(attachListener)
+        clearForcedBottomTranslationListeners = {
+            rootView.removeOnLayoutChangeListener(layoutListener)
+            widgetView.removeOnLayoutChangeListener(layoutListener)
+            widgetView.removeOnAttachStateChangeListener(attachListener)
+        }
     }
 }
 

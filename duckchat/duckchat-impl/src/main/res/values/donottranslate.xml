@@ -45,4 +45,7 @@
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
 
+    <!-- Foreground service notification shown while a response the user left is generating -->
+    <string name="duckAiRespondingNotificationTitle">Duck.ai is responding…</string>
+    <string name="duckAiRespondingNotificationChannelName">Duck.ai responses in progress</string>
 </resources>

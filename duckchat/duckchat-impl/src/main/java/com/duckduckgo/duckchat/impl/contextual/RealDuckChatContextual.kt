@@ -35,6 +35,7 @@ import com.duckduckgo.duckchat.api.DuckChatHistoryParams
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
@@ -71,8 +72,10 @@ class RealDuckChatContextual @Inject constructor(
             return
         }
         textSelection?.let { textSelectionRepository.add(sourceTabId, it, sourceUrl.orEmpty()) }
+        val pageType = pageType(sourceUrl)
         if (hasChatInProgress(sourceTabId)) {
             // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
+            if (textSelection == null) duckChatPixels.reportContextualAddressBarMenuSkipped(pageType)
             showChatSurface()
             return
         }
@@ -90,7 +93,13 @@ class RealDuckChatContextual @Inject constructor(
             ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) }
             ?.let { duckDuckGoUrlDetector.extractQuery(it) }
             ?.takeIf { it.isNotBlank() }
-        showMenu(sourceTabId, anchor, sourceUrl, serpQuery, showChatSurface)
+        showMenu(sourceTabId, anchor, sourceUrl, serpQuery, pageType, showChatSurface)
+    }
+
+    private fun pageType(sourceUrl: String?): DuckChatPixelPageType = when {
+        sourceUrl.isNullOrBlank() -> DuckChatPixelPageType.NTP
+        duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(sourceUrl) -> DuckChatPixelPageType.SERP
+        else -> DuckChatPixelPageType.WEBSITE
     }
 
     private suspend fun hasChatInProgress(tabId: String): Boolean {
@@ -118,13 +127,14 @@ class RealDuckChatContextual @Inject constructor(
         anchor: View,
         sourceUrl: String?,
         serpQuery: String?,
+        pageType: DuckChatPixelPageType,
         onAskAboutPage: () -> Unit,
     ) {
         val activity = anchor.activity() ?: return
         val popup = PopupMenu(LayoutInflater.from(activity), R.layout.popup_contextual_chat_menu)
         val content = popup.contentView
         popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuNewChat)) {
-            duckChatPixels.reportContextualAddressBarMenuNewChatSelected()
+            duckChatPixels.reportContextualAddressBarMenuNewChatSelected(pageType)
             openNewChatTab(activity, sourceTabId, sourceUrl)
         }
         val askItem = content.findViewById<PopupMenuItemView>(R.id.contextualChatMenuAskAboutPage)
@@ -146,7 +156,7 @@ class RealDuckChatContextual @Inject constructor(
         }
         if (duckChatInternal.isContextualMenuAllChatsEnabled()) {
             popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAllChats)) {
-                duckChatPixels.reportContextualAddressBarMenuAllChatsSelected()
+                duckChatPixels.reportContextualAddressBarMenuAllChatsSelected(pageType)
                 globalActivityStarter.start(activity, DuckChatHistoryParams(DuckChatHistorySource.ADDRESS_BAR))
             }
         } else {
@@ -154,7 +164,7 @@ class RealDuckChatContextual @Inject constructor(
             content.findViewById<View>(R.id.contextualChatMenuAllChatsDivider).gone()
         }
         popup.showAnchoredView(activity, anchor.rootView, anchor)
-        duckChatPixels.reportContextualAddressBarMenuShown()
+        duckChatPixels.reportContextualAddressBarMenuShown(pageType)
     }
 
     private fun showEntryDialog(

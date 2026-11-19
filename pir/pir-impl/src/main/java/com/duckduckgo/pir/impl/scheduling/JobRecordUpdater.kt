@@ -22,6 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.toKey
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
@@ -102,12 +104,13 @@ interface JobRecordUpdater {
      * @param newExtractedProfiles Newly [ExtractedProfile]s for the [brokerName] and [profileQueryId]
      * @param brokerName The name of the broker associated with the scan job.
      * @param profileQueryId The ID of the [ProfileQuery] related to the scan job.
+     * @return The newly removed records whose identifier was still found in [newExtractedProfiles].
      */
     suspend fun markRemovedOptOutJobRecords(
         newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
-    )
+    ): List<RemovedProfileWithIdentifierFound>
 
     /**
      * This method compares the [newExtractedProfiles] from the ones currently stored locally and
@@ -145,9 +148,10 @@ interface JobRecordUpdater {
      *
      * This method should be called when the opt-out attempt has been successfully completed.
      * It updates the corresponding all necessary attributes to mark the [OptOutJobRecord] as
-     * requested. Also stamps [OptOutJobRecord.optOutFormSubmittedDateInMillis] on first call,
-     * leaving it untouched on subsequent retries so that it always reflects the first
-     * successful form submission.
+     * requested. Also stamps [OptOutJobRecord.optOutFormSubmittedDateInMillis] and
+     * [OptOutJobRecord.optOutFirstRequestedDateInMillis] on first call, leaving them untouched on
+     * subsequent retries so that they always reflect the first successful form submission and
+     * the first successful request.
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      */
@@ -377,8 +381,8 @@ class RealJobRecordUpdater @Inject constructor(
         newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
-    ) {
-        withContext(dispatcherProvider.io()) {
+    ): List<RemovedProfileWithIdentifierFound> {
+        return withContext(dispatcherProvider.io()) {
             val currentTimeMillis = currentTimeProvider.currentTimeMillis()
             val storedExtractedProfiles =
                 repository.getExtractedProfiles(brokerName, profileQueryId)
@@ -402,23 +406,61 @@ class RealJobRecordUpdater @Inject constructor(
                 logcat { "PIR-JOB-RECORD: Removed Profiles $removedExtractedProfiles" }
 
                 val profileQuery = repository.getUserProfileQuery(profileQueryId)
-                removedExtractedProfiles.forEach { extractedProfile ->
-                    updateOptOutJobRecordAsRemoved(
+                val storedKeys =
+                    storedExtractedProfiles
+                        .asSequence()
+                        .map { it.toKey() }
+                        .toHashSet()
+                // Only profiles that aren't stored yet count: a stored one means its split was reported when it first appeared,
+                // and a broker alternating between two URLs would otherwise report it again on every scan.
+                val newProfilesByIdentifier =
+                    newExtractedProfiles
+                        .filter { it.identifier.isNotEmpty() && it.toKey() !in storedKeys }
+                        .associateBy { it.identifier }
+                removedExtractedProfiles.mapNotNull { extractedProfile ->
+                    val previousRecord = updateOptOutJobRecordAsRemoved(
                         profileQuery = profileQuery,
                         extractedProfileId = extractedProfile.dbId,
                         removedDateInMillis = currentTimeMillis,
                     )
+                    val foundProfile = newProfilesByIdentifier[extractedProfile.identifier]
+                    // Already-removed jobs are skipped so the stale half of an earlier split isn't reported on every scan.
+                    if (previousRecord == null || previousRecord.status == OptOutJobStatus.REMOVED || foundProfile == null) {
+                        return@mapNotNull null
+                    }
+                    RemovedProfileWithIdentifierFound(
+                        changedField = changedFieldBetween(extractedProfile, foundProfile),
+                        previousStatus = previousRecord.status,
+                    )
                 }
+            } else {
+                emptyList()
             }
         }
     }
 
+    private fun changedFieldBetween(
+        stored: ExtractedProfile,
+        found: ExtractedProfile,
+    ): ChangedField {
+        val nameChanged = stored.name != found.name
+        val profileUrlChanged = stored.profileUrl != found.profileUrl
+        return when {
+            nameChanged && profileUrlChanged -> ChangedField.NAME_AND_PROFILE_URL
+            nameChanged -> ChangedField.NAME
+            else -> ChangedField.PROFILE_URL
+        }
+    }
+
+    /**
+     * @return The job record as it was before being marked removed, or null if there is no valid one.
+     */
     private suspend fun updateOptOutJobRecordAsRemoved(
         profileQuery: ProfileQuery?,
         extractedProfileId: Long,
         removedDateInMillis: Long,
-    ) {
-        withContext(dispatcherProvider.io()) {
+    ): OptOutJobRecord? {
+        return withContext(dispatcherProvider.io()) {
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
                 schedulingRepository.saveOptOutJobRecord(
                     it
@@ -499,6 +541,7 @@ class RealJobRecordUpdater @Inject constructor(
                 val updatedRecord = it.copy(
                     status = OptOutJobStatus.REQUESTED,
                     optOutRequestedDateInMillis = now,
+                    optOutFirstRequestedDateInMillis = it.optOutFirstRequestedDateInMillis ?: now,
                     optOutFormSubmittedDateInMillis = it.optOutFormSubmittedDateInMillis ?: now,
                 )
                 schedulingRepository.saveOptOutJobRecord(updatedRecord)

@@ -25,7 +25,6 @@
     <string name="no">Ne</string>
     <string name="open">Odpri</string>
     <string name="cancel">Preklic</string>
-    <string name="search">Iskanje</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Klepet je izbrisan</string>

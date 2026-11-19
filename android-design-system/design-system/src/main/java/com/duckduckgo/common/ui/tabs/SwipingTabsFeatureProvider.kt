@@ -31,4 +31,8 @@ class SwipingTabsFeatureProvider @Inject constructor(
     fun applyAutofillFixEnabled(): Boolean {
         return swipingTabsFeature.applyAutofillFix().isEnabled()
     }
+
+    fun removeSelectedTabDebounceEnabled(): Boolean {
+        return swipingTabsFeature.removeSelectedTabDebounce().isEnabled()
+    }
 }

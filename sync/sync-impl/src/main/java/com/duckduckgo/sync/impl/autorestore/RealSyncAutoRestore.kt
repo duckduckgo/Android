@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncAutoRestore
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import dev.zacsweers.metro.ContributesBinding
@@ -41,7 +40,6 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class, binding = binding<SyncOnboardingRestoreState>())
 class RealSyncAutoRestore @Inject constructor(
     private val manager: SyncAutoRestoreManager,
-    private val syncFeature: SyncFeature,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncPixels: SyncPixels,
     @AppCoroutineScope private val appScope: CoroutineScope,
@@ -52,7 +50,6 @@ class RealSyncAutoRestore @Inject constructor(
 
     override suspend fun canRestore(): Boolean {
         return withContext(dispatcherProvider.io()) {
-            if (!syncFeature.syncAutoRestore().isEnabled()) return@withContext false
             manager.retrieveRecoveryPayload() != null
         }
     }
@@ -60,10 +57,6 @@ class RealSyncAutoRestore @Inject constructor(
     override fun restoreSyncAccount() {
         appScope.launch(dispatcherProvider.io()) {
             try {
-                if (!syncFeature.syncAutoRestore().isEnabled()) {
-                    logcat(LogPriority.WARN) { "Sync-Recovery: syncAutoRestore FF disabled, skipping restore" }
-                    return@launch
-                }
                 logcat { "Sync-Recovery: restoreSyncAccount called" }
 
                 val payload = manager.retrieveRecoveryPayload()
@@ -80,7 +73,8 @@ class RealSyncAutoRestore @Inject constructor(
                         logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
                         restoreTimestamp = System.currentTimeMillis()
                         syncPixels.fireAutoRestoreSuccess(SyncPixelParameters.AUTO_RESTORE_SOURCE_ONBOARDING)
-                        manager.saveAutoRestoreData(payload.recoveryCode, payload.deviceId)
+                        val signedInDeviceId = syncAccountRepository.getAccountInfo().deviceId.ifEmpty { payload.deviceId }
+                        manager.saveAutoRestoreData(payload.recoveryCode, signedInDeviceId)
                     }
                     is Result.Error -> {
                         logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }
