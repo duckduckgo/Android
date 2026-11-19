@@ -17,19 +17,29 @@
 package com.duckduckgo.adblocking.impl.segmentskip
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames
+import com.duckduckgo.adblocking.impl.di.AdBlockingPreferences
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.ContributesWorker
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -37,11 +47,15 @@ import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -60,10 +74,16 @@ class SegmentSkipDatasetSync @Inject constructor(
     private val binary: SegmentSkipBinaryStore,
     private val segmentsProvider: SegmentSkipSegmentsProvider,
     private val pixel: Pixel,
+    private val freshness: SegmentSkipDatasetFreshness,
+    private val preferences: SegmentSkipUserPreferences,
+    private val feature: SegmentSkipFeature,
 ) {
     private val syncMutex = Mutex()
 
-    suspend fun sync() = syncMutex.withLock {
+    suspend fun sync(staleOnly: Boolean = false, enableGeneration: Long? = null) = syncMutex.withLock {
+        if (!feature.mvpEnabled().isEnabled() || preferences.modeFlow().firstOrNull().let { it == null || it == SegmentSkipMode.OFF }) return@withLock
+        if (staleOnly && !freshness.isStale(binary)) return@withLock
+        if (enableGeneration != null && freshness.generation() != enableGeneration) return@withLock
         val latest = try {
             requireNotNull(service.revision().revision).also { require(it in 0..0xffffffffL) }
         } catch (e: CancellationException) {
@@ -82,6 +102,8 @@ class SegmentSkipDatasetSync @Inject constructor(
             }
             current = binary.revision()
         }
+        currentCoroutineContext().ensureActive()
+        freshness.recordSuccess()
     }
 
     private suspend fun download(revision: Long, expected: Long, requireFull: Boolean = false) = coroutineScope {
@@ -174,7 +196,8 @@ class SegmentSkipDatasetWorker(context: Context, parameters: WorkerParameters) :
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
         if (!feature.mvpEnabled().isEnabled()) return@withContext Result.success()
         try {
-            sync.sync()
+            val force = inputData.getBoolean(FORCE_CHECK, false)
+            sync.sync(staleOnly = !force, enableGeneration = if (force) inputData.getLong(ENABLE_GENERATION, 0) else null)
             Result.success()
         } catch (e: UnsupportedSegmentSkipFormat) {
             Result.success()
@@ -184,6 +207,38 @@ class SegmentSkipDatasetWorker(context: Context, parameters: WorkerParameters) :
             Result.retry()
         }
     }
+
+    companion object {
+        const val FORCE_CHECK = "force_check"
+        const val ENABLE_GENERATION = "enable_generation"
+    }
+}
+
+@SingleIn(AppScope::class)
+class SegmentSkipDatasetFreshness @Inject constructor(
+    @AdBlockingPreferences private val dataStore: DataStore<Preferences>,
+    private val clock: CurrentTimeProvider,
+) {
+    suspend fun isStale(binary: SegmentSkipBinaryStore): Boolean {
+        if (binary.revision() == 0L) return true
+        val last = dataStore.data.firstOrNull()?.get(LAST_CHECK) ?: return true
+        val now = clock.currentTimeMillis()
+        return last <= 0 || last > now || now - last >= TimeUnit.HOURS.toMillis(24)
+    }
+
+    suspend fun generation(): Long = dataStore.data.firstOrNull()?.get(GENERATION) ?: 0
+
+    suspend fun recordSuccess() {
+        dataStore.edit {
+            it[LAST_CHECK] = clock.currentTimeMillis()
+            it[GENERATION] = (it[GENERATION] ?: 0) + 1
+        }
+    }
+
+    private companion object {
+        val LAST_CHECK = longPreferencesKey("sponsor_dataset_last_check")
+        val GENERATION = longPreferencesKey("sponsor_dataset_check_generation")
+    }
 }
 
 @ContributesIntoSet(scope = AppScope::class, binding = binding<MainProcessLifecycleObserver>())
@@ -192,24 +247,81 @@ class SegmentSkipDatasetWorker(context: Context, parameters: WorkerParameters) :
 class SegmentSkipDatasetScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val feature: SegmentSkipFeature,
+    private val preferences: SegmentSkipUserPreferences,
+    private val freshness: SegmentSkipDatasetFreshness,
+    private val binary: SegmentSkipBinaryStore,
+    @AppCoroutineScope private val scope: CoroutineScope,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
-    override fun onCreate(owner: LifecycleOwner) = schedule()
+    private val schedulingMutex = Mutex()
 
-    override fun onPrivacyConfigDownloaded() = schedule()
-
-    private fun schedule() {
-        if (!feature.mvpEnabled().isEnabled()) {
-            workManager.cancelUniqueWork(WORK_NAME)
-            return
+    override fun onCreate(owner: LifecycleOwner) {
+        scope.launch {
+            var previous: Boolean? = null
+            combine(preferences.modeFlow(), feature.mvpEnabled().enabled()) { mode, enabled ->
+                enabled && mode != SegmentSkipMode.OFF
+            }.distinctUntilChanged().collect { enabled ->
+                schedulingMutex.withLock {
+                    if (enabled) {
+                        if (previous == false) enqueueImmediate(force = true)
+                        schedulePeriodic()
+                    } else {
+                        cancelWork()
+                    }
+                    previous = enabled
+                }
+            }
         }
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        scope.launch {
+            schedulingMutex.withLock {
+                if (feature.mvpEnabled().isEnabled() && preferences.modeFlow().firstOrNull().let {
+                        it != null && it != SegmentSkipMode.OFF
+                    } && freshness.isStale(binary) &&
+                    feature.mvpEnabled().isEnabled() && preferences.modeFlow().firstOrNull().let { it != null && it != SegmentSkipMode.OFF }
+                ) {
+                    enqueueImmediate(force = false)
+                }
+            }
+        }
+    }
+
+    override fun onPrivacyConfigDownloaded() = Unit
+
+    private fun schedulePeriodic() {
         val request = PeriodicWorkRequestBuilder<SegmentSkipDatasetWorker>(24, TimeUnit.HOURS)
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .setConstraints(networkConstraints())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
             .build()
         workManager.enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
     }
 
+    private suspend fun enqueueImmediate(force: Boolean) {
+        val request = OneTimeWorkRequestBuilder<SegmentSkipDatasetWorker>()
+            .setConstraints(networkConstraints())
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
+            .setInputData(
+                workDataOf(
+                    SegmentSkipDatasetWorker.FORCE_CHECK to force,
+                    SegmentSkipDatasetWorker.ENABLE_GENERATION to if (force) freshness.generation() else 0L,
+                ),
+            )
+            .build()
+        workManager.enqueueUniqueWork(if (force) ENABLE_WORK_NAME else CATCH_UP_WORK_NAME, ExistingWorkPolicy.KEEP, request)
+    }
+
+    private fun cancelWork() {
+        workManager.cancelUniqueWork(WORK_NAME)
+        workManager.cancelUniqueWork(ENABLE_WORK_NAME)
+        workManager.cancelUniqueWork(CATCH_UP_WORK_NAME)
+    }
+
+    private fun networkConstraints() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
     companion object {
         private const val WORK_NAME = "sponsor_dataset"
+        private const val ENABLE_WORK_NAME = "sponsor_dataset_enable"
+        private const val CATCH_UP_WORK_NAME = "sponsor_dataset_catch_up"
     }
 }

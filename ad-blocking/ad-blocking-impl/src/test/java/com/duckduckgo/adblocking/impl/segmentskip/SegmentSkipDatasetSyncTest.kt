@@ -31,6 +31,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -76,13 +77,17 @@ class SegmentSkipDatasetSyncTest {
     private val service = FakeService()
     private val segmentsProvider: SegmentSkipSegmentsProvider = mock()
     private val pixel: Pixel = mock()
+    private val freshness: SegmentSkipDatasetFreshness = mock()
+    private val preferences: SegmentSkipUserPreferences = mock()
     private lateinit var sync: SegmentSkipDatasetSync
 
     @Before fun setup() {
         file.delete()
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
         store = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
-        sync = SegmentSkipDatasetSync(service, store, segmentsProvider, pixel)
+        whenever(preferences.modeFlow()).thenReturn(flowOf(SegmentSkipMode.ALWAYS_ASK))
+        runBlocking { whenever(freshness.isStale(any())).thenReturn(true) }
+        sync = SegmentSkipDatasetSync(service, store, segmentsProvider, pixel, freshness, preferences, feature)
     }
 
     @After fun clean() { file.delete() }
@@ -119,6 +124,7 @@ class SegmentSkipDatasetSyncTest {
         service.responses[2L] = diff(3, listOf(3), emptyList(), listOf(2, 3))
         sync.sync()
         assertEquals(listOf(0L, 1L, 2L), service.requests)
+        verify(freshness, times(2)).recordSuccess()
         verify(segmentsProvider, times(3)).clearCache()
         verify(pixel, times(3)).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATED_COUNT, parameters = emptyMap())
         verify(pixel, times(3)).enqueueFire(
@@ -127,6 +133,7 @@ class SegmentSkipDatasetSyncTest {
             type = Pixel.PixelType.Daily(),
         )
         sync.sync()
+        verify(freshness, times(3)).recordSuccess()
         verify(pixel, times(3)).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATED_COUNT, parameters = emptyMap())
         assertEquals(3L, store.revision())
         assertFalse(store.contains("00000001"))
@@ -171,6 +178,7 @@ class SegmentSkipDatasetSyncTest {
         assertTrue(store.contains("00000001"))
         assertEquals(1L, SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).revision())
         verify(segmentsProvider, never()).clearCache()
+        verify(freshness, never()).recordSuccess()
         service.responses[0L] = full(2, listOf(2))
         sync.sync()
         assertEquals(2L, store.revision())
@@ -200,6 +208,7 @@ class SegmentSkipDatasetSyncTest {
         } catch (_: IOException) { }
         assertEquals(1L, store.revision())
         assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
+        verify(freshness, never()).recordSuccess()
         verify(pixel).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_FETCH_ERROR_COUNT, parameters = emptyMap())
         service.failure = null
         service.responses[1L] = diff(2, listOf(2), emptyList(), listOf(1, 2))
@@ -222,6 +231,30 @@ class SegmentSkipDatasetSyncTest {
         )
         assertEquals(1L, store.revision())
         assertTrue(store.contains("00000001"))
+    }
+
+    @Test fun disabledWorkerDoesNotRequestRevision() = runTest {
+        whenever(preferences.modeFlow()).thenReturn(flowOf(SegmentSkipMode.OFF))
+        val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context).build().also {
+            it.sync = sync
+            it.feature = feature
+            it.dispatchers = coroutineRule.testDispatcherProvider
+        }
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(0, service.revisionRequests)
+        verify(freshness, never()).recordSuccess()
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = false))
+        whenever(preferences.modeFlow()).thenReturn(flowOf(SegmentSkipMode.ALWAYS_ASK))
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(0, service.revisionRequests)
+    }
+
+    @Test fun enableCheckSkipsWhenAnotherCheckSucceededAfterTrigger() = runTest {
+        whenever(freshness.generation()).thenReturn(4L)
+        sync.sync(enableGeneration = 3L)
+        assertEquals(0, service.revisionRequests)
+        sync.sync(enableGeneration = 4L)
+        assertEquals(1, service.revisionRequests)
     }
 
     @Test fun workerRetriesFailuresAndDefersUnsupportedVersions() = runTest {
@@ -323,6 +356,7 @@ class SegmentSkipDatasetSyncTest {
         assertTrue(readStarted.await(5, TimeUnit.SECONDS))
         withTimeout(5000) { job.cancelAndJoin() }
         verify(call).cancel()
+        verify(freshness, never()).recordSuccess()
         verifyNoInteractions(pixel)
         assertEquals(1L, store.revision())
         assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
