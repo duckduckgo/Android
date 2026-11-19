@@ -199,12 +199,14 @@ class RealDuckChatTest {
         )
         val views = mock<android.widget.RemoteViews>()
         val renderer = com.duckduckgo.duckchat.impl.widget.DuckAiWidgetConfigurator(
-            duckChatFeature,
-            mockDuckChatFeatureRepository,
-            mock(),
-            dispatcherProvider,
+            duckChatFeature = duckChatFeature,
+            repository = mockDuckChatFeatureRepository,
+            duckChat = cold,
+            chats = com.duckduckgo.duckchat.impl.widget.DuckAiChatsWidgetChats(mockContext, mock()),
+            intents = com.duckduckgo.duckchat.impl.widget.fakeDuckAiWidgetIntents(),
+            dispatcherProvider = dispatcherProvider,
         )
-        val render = async { renderer.populateRemoteViews(mockContext, views) }
+        val render = async { renderer.populateRemoteViews(mockContext, 1, views) }
         readSetting.complete(true)
         render.await()
         coroutineRule.testScope.advanceUntilIdle()
