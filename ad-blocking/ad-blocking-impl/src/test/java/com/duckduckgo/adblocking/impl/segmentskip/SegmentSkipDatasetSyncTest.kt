@@ -345,16 +345,20 @@ class SegmentSkipDatasetSyncTest {
         )
     }
 
-    @Test fun localPublicationFailureReportsUpdateErrorAndPreservesSnapshot() = runTest {
+    @Test fun localStorageFailureReportsUpdateErrorAndPreservesSnapshot() = runTest {
         store.apply(0, full(1, listOf(1)).inputStream())
         service.latest = 2
         service.responses[1L] = full(2, listOf(2))
-        store.beforePublish = { throw IOException("local failure") }
+        val blockedDownload = File(context.filesDir, "sponsor-download.tmp")
+        assertTrue(blockedDownload.mkdir())
 
         try {
             sync.sync()
             fail("Expected local failure")
-        } catch (_: IOException) { }
+        } catch (_: IOException) {
+        } finally {
+            blockedDownload.delete()
+        }
 
         assertEquals(1L, store.revision())
         assertTrue(store.contains("00000001"))
