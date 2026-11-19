@@ -127,7 +127,6 @@ class RealClientToolPermissionGate @Inject constructor(
                     grantedNow(tools, accessContext)
                 }
                 ClientToolPermissionAnswer.DontAllow -> ClientToolAccessDecision.Denied
-                ClientToolPermissionAnswer.Dismissed -> ClientToolAccessDecision.Cancelled
             }
         }
     }
@@ -172,7 +171,6 @@ class RealClientToolPermissionGate @Inject constructor(
                 ClientToolPermissionDecision.ALLOWED
             }
             ClientToolPermissionAnswer.DontAllow -> ClientToolPermissionDecision.DENIED
-            ClientToolPermissionAnswer.Dismissed -> ClientToolPermissionDecision.CANCELLED
         }
 
     /**

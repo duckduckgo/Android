@@ -318,8 +318,8 @@ class RealClientToolsExecutorTest {
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
-        assertFailure("cancelled", other.await())
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
+        assertFailure("denied", other.await())
     }
 
     @Test
@@ -330,8 +330,8 @@ class RealClientToolsExecutorTest {
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
-        assertFailure("cancelled", other.await())
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
+        assertFailure("denied", other.await())
     }
 
     @Test
@@ -346,8 +346,8 @@ class RealClientToolsExecutorTest {
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
-        assertFailure("cancelled", second.await())
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
+        assertFailure("denied", second.await())
     }
 
     @Test
@@ -363,7 +363,7 @@ class RealClientToolsExecutorTest {
         assertEquals(2, prompt.prompts.size)
         assertTrue(store.choices.isEmpty())
         assertTrue(askTool.calls.isEmpty())
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
         second.await()
     }
 
@@ -404,7 +404,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
 
         assertEquals(2, prompt.prompts.size)
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
         next.await()
     }
 
@@ -416,17 +416,6 @@ class RealClientToolsExecutorTest {
 
         assertEquals(true, executeAskTool().getBoolean("ok"))
         assertEquals(1, prompt.prompts.size)
-    }
-
-    @Test
-    fun whenPromptDismissedThenCancelledAndNothingStored() = runTest {
-        val reply = async { executeAskTool() }
-        runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
-
-        assertFailure("cancelled", reply.await())
-        assertTrue(askTool.calls.isEmpty())
-        assertTrue(store.choices.isEmpty())
     }
 
     @Test
@@ -574,9 +563,9 @@ class RealClientToolsExecutorTest {
 
         val reply = async { executeAskTool() }
         runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
 
-        assertFailure("cancelled", reply.await())
+        assertFailure("denied", reply.await())
         assertEquals(1, prompt.prompts.size)
     }
 
@@ -755,18 +744,6 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenRequestAccessDismissedThenCancelled() = runTest {
-        enableRequestAccess()
-
-        val reply = async { requestAccess("askTool") }
-        runCurrent()
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
-
-        assertFailure("cancelled", reply.await())
-        assertFalse(chatGrants.isGranted(CHAT_ID, "askTool"))
-    }
-
-    @Test
     fun whenRequestAccessUnansweredFor120SecondsThenCancelled() = runTest {
         enableRequestAccess()
 
@@ -875,8 +852,8 @@ class RealClientToolsExecutorTest {
             ClientToolPermissionRequest.RunTool(CHAT_TAB_ID, BrowserMode.REGULAR, AskingTool("otherAskTool", OTHER_ASK_MODE)),
             prompt.current.request,
         )
-        prompt.current.answer(ClientToolPermissionAnswer.Dismissed)
-        assertFailure("cancelled", call.await())
+        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
+        assertFailure("denied", call.await())
 
         val again = async { requestAccess("askTool", "otherAskTool") }
         runCurrent()

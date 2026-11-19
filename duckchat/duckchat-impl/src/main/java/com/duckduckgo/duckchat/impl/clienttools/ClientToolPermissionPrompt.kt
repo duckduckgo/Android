@@ -68,8 +68,6 @@ sealed interface ClientToolPermissionAnswer {
     data class AllowForChat(val removedTools: Set<String> = emptySet()) : ClientToolPermissionAnswer
 
     data object DontAllow : ClientToolPermissionAnswer
-
-    data object Dismissed : ClientToolPermissionAnswer
 }
 
 /** A prompt waiting for the user. Only the first [answer] counts, and answers after it is withdrawn are ignored. */
