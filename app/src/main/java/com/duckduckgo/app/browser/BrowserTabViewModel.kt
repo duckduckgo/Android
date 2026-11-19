@@ -4277,12 +4277,8 @@ class BrowserTabViewModel @Inject constructor(
         hasGesture: Boolean,
     ): Boolean {
         val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
-        val customTabCallerOverridesNever = appLinksHandler.isTrustedCaller(
-            appLink,
-            trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true),
-        )
-        val plainTabCallerOverridesNever = appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller())
-        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled && (customTabCallerOverridesNever || plainTabCallerOverridesNever)
+        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled &&
+            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true))
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink,
@@ -4320,20 +4316,13 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun appLinkClicked(appLink: AppLink, hasGesture: Boolean) {
         val inCustomTab = customTab != null
-        val callerPackage = customTab?.clientPackage ?: customTab?.referrerPackage
         when {
-            appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller()) -> {
-                plainTabLaunchingApp = null
-                command.value = OpenAppLink(appLink, closeTabOnLaunch = true)
-            }
             inCustomTab && !customTabsFeature.handleTrustedCallers().isEnabled() -> command.value = OpenAppLink(appLink)
-            inCustomTab && appLinksHandler.isTrustedCaller(appLink, callerPackage) -> {
-                // The handoff opens another app, leaving a stale custom tab behind; close it, but only once
+            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = false)) -> {
+                consumePlainTabTrust()
+                // The handoff opens another app, leaving a stale tab behind; leave it, but only once
                 // the app has actually launched, so a failed launch doesn't strand the user on a closed tab.
-                command.value = OpenAppLink(
-                    appLink,
-                    finishCustomTabOnLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
-                )
+                command.value = OpenAppLink(appLink, leaveTabOnLaunch = leaveTabAfterTrustedHandoff())
             }
             inCustomTab && appLinksHandler.isAlwaysTriggerDomain(appLink) -> command.value = OpenAppLink(appLink)
             appSettingsPreferencesStore.showAppLinksPrompt -> command.value = ShowAppLinkPrompt(appLink)
@@ -4346,11 +4335,19 @@ class BrowserTabViewModel @Inject constructor(
         nonHttpLink: Boolean,
         overridingDisabledAppLinks: Boolean,
     ): String? {
+        val customTab = customTab ?: return plainTabTrustedCaller()
         val enabled = customTabsFeature.handleTrustedCallers().isEnabled() &&
             (!nonHttpLink || customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) &&
             (!overridingDisabledAppLinks || customTabsFeature.handleTrustedCallersWhenAppLinksDisabled().isEnabled())
-        if (!enabled) return null
-        return customTab?.let { it.clientPackage ?: it.referrerPackage }
+        return if (enabled) customTab.clientPackage ?: customTab.referrerPackage else null
+    }
+
+    private fun leaveTabAfterTrustedHandoff(): Boolean =
+        customTab == null || customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled()
+
+    // A plain tab trusts its launching app once; a custom tab keeps its caller for the whole session.
+    private fun consumePlainTabTrust() {
+        if (customTab == null) plainTabLaunchingApp = null
     }
 
     override fun handleNonHttpAppLink(
@@ -4366,42 +4363,20 @@ class BrowserTabViewModel @Inject constructor(
         hasGesture: Boolean = false,
     ) {
         if (!nonHttpAppLinkChecker.isPermitted(appLink.intent)) return
-        val plainTabCaller = plainTabTrustedCaller()
-        val headers = getUrlHeaders(appLink.fallbackUrl)
-        if (!appSettingsPreferencesStore.appLinksEnabled) {
-            val customTabCaller = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
-            when {
-                customTabCaller != null -> command.value = HandleNonHttpAppLink(
-                    nonHttpAppLink = appLink,
-                    headers = headers,
-                    showConfirmation = false,
-                    trustedCallerPackage = customTabCaller,
-                    finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
-                    trustedCallerOnly = true,
-                )
-                plainTabCaller != null -> {
-                    plainTabLaunchingApp = null
-                    command.value = HandleNonHttpAppLink(
-                        nonHttpAppLink = appLink,
-                        headers = headers,
-                        showConfirmation = false,
-                        trustedCallerPackage = plainTabCaller,
-                        trustedCallerOnly = true,
-                        closeTabOnTrustedCallerLaunch = true,
-                    )
-                }
-                else -> navigateToFallbackUrl(appLink.fallbackUrl)
-            }
+        val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
+        val trustedCaller = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = !appLinksEnabled)
+        if (!appLinksEnabled && trustedCaller == null) {
+            navigateToFallbackUrl(appLink.fallbackUrl)
             return
         }
-        if (plainTabCaller != null) plainTabLaunchingApp = null
+        if (trustedCaller != null) consumePlainTabTrust()
         command.value = HandleNonHttpAppLink(
             nonHttpAppLink = appLink,
-            headers = headers,
-            showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
-            trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false) ?: plainTabCaller,
-            finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
-            closeTabOnTrustedCallerLaunch = plainTabCaller != null,
+            headers = getUrlHeaders(appLink.fallbackUrl),
+            showConfirmation = appLinksEnabled && appSettingsPreferencesStore.showAppLinksPrompt,
+            trustedCallerPackage = trustedCaller,
+            trustedCallerOnly = !appLinksEnabled,
+            leaveTabOnTrustedCallerLaunch = trustedCaller != null && leaveTabAfterTrustedHandoff(),
         )
     }
 
