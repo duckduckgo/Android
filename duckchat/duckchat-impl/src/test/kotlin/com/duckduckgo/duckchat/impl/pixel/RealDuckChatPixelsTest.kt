@@ -81,6 +81,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_START_NEW_
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.responding.RespondingServiceStartFailure
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.MetricType
@@ -1153,5 +1154,36 @@ class RealDuckChatPixelsTest {
         val params = mapOf(DuckChatPixelParameters.HINT to "photo", DuckChatPixelParameters.HINT_POSITION to "1")
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT, params)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when responding service started then pixel with restricted sent`() {
+        testee.reportRespondingServiceStarted(restricted = false)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_STARTED, mapOf("restricted" to "false"))
+    }
+
+    @Test
+    fun `when responding service start failed then pixel with reason sent`() {
+        testee.reportRespondingServiceStartFailed(RespondingServiceStartFailure.FOREGROUND_NOT_ALLOWED)
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_START_FAILED,
+            mapOf("reason" to "foreground_not_allowed"),
+        )
+    }
+
+    @Test
+    fun `when responding service interrupted then pixel with restricted sent`() {
+        testee.reportRespondingServiceInterrupted(restricted = true)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_INTERRUPTED, mapOf("restricted" to "true"))
+    }
+
+    @Test
+    fun `when responding service timed out then pixel sent`() {
+        testee.reportRespondingServiceTimedOut()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT)
     }
 }
