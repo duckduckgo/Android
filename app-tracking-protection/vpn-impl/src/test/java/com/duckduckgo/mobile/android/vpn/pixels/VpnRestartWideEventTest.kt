@@ -249,4 +249,61 @@ class VpnRestartWideEventTest {
         verify(wideEventClient).flowFinish(wideEventId = eq(1L), status = eq(FlowStatus.Unknown), metadata = any())
         verify(wideEventClient).intervalStart(wideEventId = eq(2L), key = eq("restart_duration_ms_bucketed"), timeout = anyOrNull(), buckets = any())
     }
+
+    @Test
+    fun whenInPlaceRestartFallsBackToLegacyThenItFinishesAsLegacy() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(42L))
+        wideEvent.onRestartStarted(networkStackName = "NETP_VPN", inPlace = true)
+        wideEvent.onPhaseStarted(Phase.NETWORK_STACK_PREPARE)
+
+        wideEvent.onFellBackToLegacyRestart()
+        wideEvent.onPhaseStarted(Phase.NETWORK_STACK_PREPARE)
+        wideEvent.onPhaseCompleted(Phase.NETWORK_STACK_PREPARE)
+        wideEvent.onRestartSucceeded()
+        advanceUntilIdle()
+
+        inOrder(wideEventClient) {
+            verify(wideEventClient).intervalStart(eq(42L), eq("network_stack_prepare_duration_ms_bucketed"), anyOrNull(), any())
+            verify(wideEventClient).intervalEnd(wideEventId = 42L, key = "network_stack_prepare_duration_ms_bucketed")
+            verify(wideEventClient).intervalStart(eq(42L), eq("network_stack_prepare_duration_ms_bucketed"), anyOrNull(), any())
+            verify(wideEventClient).intervalEnd(wideEventId = 42L, key = "network_stack_prepare_duration_ms_bucketed")
+            verify(wideEventClient).flowFinish(
+                wideEventId = eq(42L),
+                status = eq(FlowStatus.Success),
+                metadata = eq(mapOf("restart_mode" to "legacy")),
+            )
+        }
+    }
+
+    @Test
+    fun whenFallenBackRestartFailsThenItFinishesAsLegacy() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(42L))
+        wideEvent.onRestartStarted(networkStackName = "NETP_VPN", inPlace = true)
+        wideEvent.onFellBackToLegacyRestart()
+
+        wideEvent.onRestartFailed(FailureReason.NULL_TUNNEL_FAILED)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(42L),
+            status = eq(FlowStatus.Failure("null_tunnel_failed")),
+            metadata = eq(mapOf("restart_mode" to "legacy")),
+        )
+    }
+
+    @Test
+    fun whenInPlaceRestartDoesNotFallBackThenFinishKeepsStartMode() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+            .thenReturn(Result.success(2L))
+        wideEvent.onRestartStarted(networkStackName = "NETP_VPN", inPlace = true)
+        wideEvent.onFellBackToLegacyRestart()
+        wideEvent.onRestartSucceeded()
+
+        wideEvent.onRestartStarted(networkStackName = "NETP_VPN", inPlace = true)
+        wideEvent.onRestartSucceeded()
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(wideEventId = eq(2L), status = eq(FlowStatus.Success), metadata = eq(emptyMap()))
+    }
 }

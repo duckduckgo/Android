@@ -42,6 +42,9 @@ import kotlin.time.Duration.Companion.seconds
  */
 interface VpnRestartWideEvent {
     fun onRestartStarted(networkStackName: String, inPlace: Boolean)
+
+    /** An in-place restart could not prepare without the network and continues on the legacy path. */
+    fun onFellBackToLegacyRestart()
     fun onPhaseStarted(phase: Phase)
     fun onPhaseCompleted(phase: Phase)
     fun onRestartSucceeded()
@@ -86,6 +89,9 @@ class VpnRestartWideEventImpl @Inject constructor(
     private var wideEventId: Long? = null
     private var activePhase: VpnRestartWideEvent.Phase? = null
 
+    // The restart mode is reported for the path the restart completes on
+    private var fellBackToLegacy = false
+
     override fun onRestartStarted(networkStackName: String, inPlace: Boolean) {
         coroutineScope.launch {
             mutex.withLock {
@@ -93,10 +99,11 @@ class VpnRestartWideEventImpl @Inject constructor(
 
                 // A restart that never reported an outcome is still open, e.g. it was interrupted by another restart
                 wideEventId?.let { id ->
-                    wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Unknown)
+                    wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Unknown, metadata = finishMetadata())
                     wideEventId = null
                     activePhase = null
                 }
+                fellBackToLegacy = false
 
                 val id = wideEventClient.flowStart(
                     name = VPN_RESTART_FEATURE_NAME,
@@ -111,6 +118,15 @@ class VpnRestartWideEventImpl @Inject constructor(
                 wideEventId = id
                 wideEventClient.intervalStart(wideEventId = id, key = KEY_RESTART_DURATION, buckets = RESTART_BUCKETS)
             }
+        }
+    }
+
+    override fun onFellBackToLegacyRestart() {
+        updateWideEventAsync { id ->
+            fellBackToLegacy = true
+            // The legacy path prepares again, and the phase interval times that prepare
+            activePhase?.let { phase -> wideEventClient.intervalEnd(wideEventId = id, key = phase.intervalKey) }
+            activePhase = null
         }
     }
 
@@ -132,7 +148,7 @@ class VpnRestartWideEventImpl @Inject constructor(
     override fun onRestartSucceeded() {
         updateWideEventAsync { id ->
             wideEventClient.intervalEnd(wideEventId = id, key = KEY_RESTART_DURATION)
-            wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Success)
+            wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Success, metadata = finishMetadata())
             wideEventId = null
         }
     }
@@ -143,7 +159,7 @@ class VpnRestartWideEventImpl @Inject constructor(
             activePhase?.let { phase -> wideEventClient.intervalEnd(wideEventId = id, key = phase.intervalKey) }
             activePhase = null
             wideEventClient.intervalEnd(wideEventId = id, key = KEY_RESTART_DURATION)
-            wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Failure(reason = reason.value))
+            wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Failure(reason = reason.value), metadata = finishMetadata())
             wideEventId = null
         }
     }
@@ -155,6 +171,9 @@ class VpnRestartWideEventImpl @Inject constructor(
             }
         }
     }
+
+    private fun finishMetadata(): Map<String, String> =
+        if (fellBackToLegacy) mapOf(KEY_RESTART_MODE to RESTART_MODE_LEGACY) else emptyMap()
 
     private fun String.toNetworkStackValue(): String = when (this) {
         APPTP_STACK_NAME -> NETWORK_STACK_APPTP

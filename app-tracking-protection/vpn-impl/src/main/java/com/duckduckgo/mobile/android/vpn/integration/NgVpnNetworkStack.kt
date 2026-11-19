@@ -95,7 +95,7 @@ class NgVpnNetworkStack @Inject constructor(
         return Result.success(Unit)
     }
 
-    override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
+    override suspend fun onPrepareVpn(networkAllowed: Boolean): Result<VpnTunnelConfig> {
         fun getDns(): Set<InetAddress> {
             val privateDns = dnsProvider.getPrivateDns()
             if (privateDns.isNotEmpty()) {

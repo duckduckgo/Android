@@ -34,4 +34,10 @@ interface DnsProvider {
      * if not set
      */
     fun getPrivateDns(): List<InetAddress>
+
+    /**
+     * @return `true` when the user set a Private DNS server via the Android Private DNS settings (strict mode).
+     * Unlike [getPrivateDns], it does not resolve the server name, so it makes no network call.
+     */
+    fun isPrivateDnsConfigured(): Boolean
 }

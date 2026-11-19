@@ -79,11 +79,6 @@ class NgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenCheckingNeedsNetworkToPrepareThenFalse() {
-        assertFalse(ngVpnNetworkStack.needsNetworkToPrepare)
-    }
-
-    @Test
     fun whenOnCreateVpnNoErrorThenReturnSuccess() {
         assertTrue(ngVpnNetworkStack.onCreateVpn().isSuccess)
     }

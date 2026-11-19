@@ -322,10 +322,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
-        // Resolved once so the in-place decision, the wide event and the handover all see the same stack
+        // Resolved once so the wide event and the handover see the same stack
         val restartNetworkStack = if (restarting) vpnNetworkStackProvider.provideNetworkStack() else null
-        val restartInPlace = restartNetworkStack != null && appTpRemoteFeatures.restartInPlace().isEnabled() &&
-            VpnNetworkStackHandover.supportsInPlaceRestart(restartNetworkStack)
+        val restartInPlace = restartNetworkStack != null && appTpRemoteFeatures.restartInPlace().isEnabled()
 
         if (!restarting) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
@@ -344,7 +343,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         // An in-place restart prepares the next stack and establishes the new tunnel while the current tunnel is
         // still up. Nothing reads the current tunnel once its stack is stopped, so it keeps traffic blackholed
         // until Android hands over to the new tunnel and no temporary null-route tunnel is needed.
-        val handover = if (restartInPlace) {
+        var handover = if (restartInPlace) {
             VpnNetworkStackHandover(
                 current = vpnNetworkStack,
                 next = restartNetworkStack!!,
@@ -358,6 +357,19 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         } else {
             null
+        }
+
+        // This app's traffic still goes through the current tunnel, so the in-place prepare runs without the network: a
+        // call into a dead tunnel would hang. A stack that needs the network is prepared behind the null-route tunnel.
+        val inPlacePrepareResult = handover?.let {
+            vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_PREPARE)
+            it.next.onPrepareVpn(networkAllowed = false)
+        }
+        if (inPlacePrepareResult?.exceptionOrNull() is VpnNetworkStack.NeedsNetworkException) {
+            logcat { "VPN log: in-place prepare needs the network, falling back to the null-route tunnel" }
+            vpnRestartWideEvent.onFellBackToLegacyRestart()
+            handover?.abort()
+            handover = null
         }
 
         if (handover == null) {
@@ -389,9 +401,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             activeTun = nullTun
         }
 
-        val nextNetworkStack = handover?.next ?: vpnNetworkStack
-        vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_PREPARE)
-        val tunnelConfig = nextNetworkStack.onPrepareVpn().getOrNull()
+        // A handover that survived the in-place prepare already holds its next stack's result
+        val prepareResult = if (handover != null) {
+            checkNotNull(inPlacePrepareResult)
+        } else {
+            vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_PREPARE)
+            vpnNetworkStack.onPrepareVpn()
+        }
+        val tunnelConfig = prepareResult.getOrNull()
         if (tunnelConfig == null) {
             logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
             vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_PREPARE_FAILED)
