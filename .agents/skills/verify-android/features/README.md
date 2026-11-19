@@ -59,7 +59,7 @@ has a recipe; the subscription VPN is a different feature.
 
 ## Proofs
 
-`../prove.py ../proofs/<name>.py` replays a recipe as checks: it refuses to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. Every recipe has a proof in `../proofs/` (`search-and-navigate.md` has `search_and_navigate.py`), with shared paths in `proofs/steps.py`. The video is split into segments of 160 s, because screenrecord stops at 170 s. After changing `prove.py`, run `../prove.py selftest`: it checks that a wrong expectation is FAIL, a broken step and a stale build are ERROR, a proof with no checks (or only `unverified` items) isn't a pass, pixels logged before `mark()` aren't counted, and `pr-summary` carries no local path (`selftest --offline` runs only that part, with no device).
+`../prove.py ../proofs/<name>.py` replays a recipe as checks: it refuses to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. A proof is throwaway, written to verify one PR and never committed; `pr-summary` carries its source into the PR. Shared paths are in `proofs/steps.py`, which is committed. The video is split into segments of 160 s, because screenrecord stops at 170 s. After changing `prove.py`, run `../prove.py selftest`: it checks that a wrong expectation is FAIL, a broken step and a stale build are ERROR, a proof with no checks (or only `unverified` items) isn't a pass, pixels logged before `mark()` aren't counted, and `pr-summary` carries no local path (`selftest --offline` runs only that part, with no device).
 
 ## Adding a feature
 
@@ -67,5 +67,5 @@ has a recipe; the subscription VPN is a different feature.
 2. Drive it once on a fresh run: reach the starting point through the Common paths, then walk every entry point with `$V ui` and `$V text` on each screen (and `$V web eval` inside pages) to collect real selectors. Never copy selectors from code or Maestro flows without seeing them in `android layout`.
 3. Create `<feature>.md` here: an H1, one paragraph of user-visible behaviour, then exactly these H2s: `Sub-features` (short ids, one line each), `How to get to it (user POV)` (every entry point), `Driving it with verify.sh` (commands and the observable end state per entry point), `Gotchas` (ending with which sub-features have been driven and when).
 4. Add a row to the table above and remove the area from the "without a recipe" list.
-5. Write `../proofs/<feature>.py` from the recipe (one `check` per observable end state, `steps.py` for the shared paths) and run it with `../prove.py` until it passes; fix the recipe where it drifted.
+5. Write a proof from the recipe in `../proofs/` (one `check` per observable end state, `steps.py` for the shared paths) and run it with `../prove.py` until it passes; fix the recipe where it drifted. Don't commit the proof: the recipe is what stays.
 

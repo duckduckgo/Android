@@ -120,3 +120,6 @@ __pycache__/
 /.claude/worktrees/*
 CLAUDE.local.md
 docs/*
+# verify-android proofs are written per change and never committed; the shared steps are.
+/.agents/skills/verify-android/proofs/*.py
+!/.agents/skills/verify-android/proofs/steps.py
