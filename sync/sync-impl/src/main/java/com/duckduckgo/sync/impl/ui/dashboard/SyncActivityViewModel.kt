@@ -174,7 +174,7 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun schedulePeriodicRefresh() {
         backgroundRefreshJob += viewModelScope.launch(dispatchers.io()) {
-            while (isActive && syncFeatureToggle.automaticallyUpdateSyncSettings()) {
+            while (isActive) {
                 delay(SETTINGS_REFRESH_RATE_MS)
                 if (syncAccountRepository.isSignedIn()) {
                     fetchRemoteDevices(showLoadingState = false)
