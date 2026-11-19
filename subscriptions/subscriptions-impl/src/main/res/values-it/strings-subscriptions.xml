@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Il tuo rimborso è in fase di elaborazione.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Non siamo riusciti a elaborare automaticamente la tua richiesta di prelievo. Visita <annotation type="withdrawal_help_link">questa pagina</annotation> per completare la procedura.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">In scadenza</string>
+    <string name="subscriptionExpiringIconContentDescription">Abbonamento in scadenza</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Il tuo abbonamento scadrà il %1$s.</string>
+    <string name="subscriptionKeepSubscription">Mantieni l\'abbonamento</string>
+
 </resources>
