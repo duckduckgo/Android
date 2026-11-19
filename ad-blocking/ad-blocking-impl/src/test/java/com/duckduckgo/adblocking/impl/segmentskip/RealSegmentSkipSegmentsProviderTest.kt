@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsor
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.Moshi
@@ -30,16 +30,16 @@ import org.junit.Test
 import retrofit2.Response
 import java.io.IOException
 
-class RealSponsorSegmentsProviderTest {
+class RealSegmentSkipSegmentsProviderTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val service = FakeSponsorService()
+    private val service = FakeSegmentSkipService()
     private val gate = FakeHashPrefixGate()
     private val settingsProvider = FakeSettingsProvider()
 
-    private val provider = RealSponsorSegmentsProvider(
+    private val provider = RealSegmentSkipSegmentsProvider(
         service = service,
         hashPrefixGate = gate,
         settingsProvider = settingsProvider,
@@ -66,7 +66,7 @@ class RealSponsorSegmentsProviderTest {
 
         assertEquals(
             listOf(
-                SponsorSegment(start = 10.0, end = 20.0, category = "sponsor", actionType = "skip", videoDuration = 300.0, uuid = "uuid-10.0"),
+                SegmentSkipSegment(start = 10.0, end = 20.0, category = "sponsor", actionType = "skip", videoDuration = 300.0, uuid = "uuid-10.0"),
             ),
             provider.getSegments(VIDEO_ID),
         )
@@ -83,7 +83,7 @@ class RealSponsorSegmentsProviderTest {
 
     @Test
     fun whenSegmentsHaveDisallowedCategoryOrActionTypeThenTheyAreDropped() = runTest {
-        settingsProvider.settings = SponsorSettings(categories = listOf("sponsor", "intro"), actionTypes = listOf("skip"))
+        settingsProvider.settings = SegmentSkipSettings(categories = listOf("sponsor", "intro"), actionTypes = listOf("skip"))
         service.response = Response.success(
             listOf(
                 video(
@@ -125,7 +125,7 @@ class RealSponsorSegmentsProviderTest {
 
         assertEquals(
             listOf(
-                SponsorSegment(start = 30.0, end = 40.0, category = "sponsor", actionType = "skip", videoDuration = null, uuid = "uuid-30.0"),
+                SegmentSkipSegment(start = 30.0, end = 40.0, category = "sponsor", actionType = "skip", videoDuration = null, uuid = "uuid-30.0"),
             ),
             provider.getSegments(VIDEO_ID),
         )
@@ -170,7 +170,7 @@ class RealSponsorSegmentsProviderTest {
         )
         assertEquals(1, provider.getSegments(VIDEO_ID).size)
 
-        settingsProvider.settings = SponsorSettings(categories = listOf("sponsor", "intro"))
+        settingsProvider.settings = SegmentSkipSettings(categories = listOf("sponsor", "intro"))
 
         assertEquals(2, provider.getSegments(VIDEO_ID).size)
         assertEquals(1, service.requestedPrefixes.size)
@@ -216,7 +216,7 @@ class RealSponsorSegmentsProviderTest {
         uuid: String? = "uuid-$start",
     ) = SegmentResponse(segment = listOf(start, end), category = category, actionType = actionType, videoDuration = videoDuration, uuid = uuid)
 
-    private class FakeSponsorService : SponsorService {
+    private class FakeSegmentSkipService : SegmentSkipService {
         val requestedPrefixes = mutableListOf<String>()
         var response: Response<List<VideoSegmentsResponse>> = Response.success(emptyList())
         var error: Exception? = null
@@ -230,7 +230,7 @@ class RealSponsorSegmentsProviderTest {
         }
     }
 
-    private class FakeHashPrefixGate : SponsorHashPrefixGate {
+    private class FakeHashPrefixGate : SegmentSkipHashPrefixGate {
         val checkedPrefixes = mutableListOf<String>()
         var hit = true
 
@@ -240,10 +240,10 @@ class RealSponsorSegmentsProviderTest {
         }
     }
 
-    private class FakeSettingsProvider : SponsorSettingsProvider {
-        var settings = SponsorSettings()
+    private class FakeSettingsProvider : SegmentSkipSettingsProvider {
+        var settings = SegmentSkipSettings()
 
-        override suspend fun settings(): SponsorSettings = settings
+        override suspend fun settings(): SegmentSkipSettings = settings
     }
 
     private companion object {

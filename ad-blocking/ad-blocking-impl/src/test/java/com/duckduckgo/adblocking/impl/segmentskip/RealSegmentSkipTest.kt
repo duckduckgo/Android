@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsor
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -33,12 +33,12 @@ import org.junit.runner.RunWith
 
 @SuppressLint("DenyListedApi") // setRawStoredState
 @RunWith(AndroidJUnit4::class)
-class RealSponsorTest {
+class RealSegmentSkipTest {
 
-    private val feature = FakeFeatureToggleFactory.create(SponsorFeature::class.java)
+    private val feature = FakeFeatureToggleFactory.create(SegmentSkipFeature::class.java)
     private val segmentsProvider = FakeSegmentsProvider()
     private val userPreferences = FakeUserPreferences()
-    private val sponsor = RealSponsor(feature, segmentsProvider, userPreferences)
+    private val segmentSkip = RealSegmentSkip(feature, segmentsProvider, userPreferences)
 
     @Before
     fun setup() {
@@ -47,52 +47,52 @@ class RealSponsorTest {
 
     @Test
     fun whenEnabledThenConfigIsEnabledWithManualSkipMode() {
-        assertEquals(SponsorConfig(enabled = true, skipMode = SponsorSkipMode.MANUAL), sponsor.config())
+        assertEquals(SegmentSkipConfig(enabled = true, skipMode = SegmentSkipSkipMode.MANUAL), segmentSkip.config())
     }
 
     @Test
     fun whenDisabledThenConfigIsNotEnabled() {
         setEnabled(false)
 
-        assertFalse(sponsor.config().enabled)
+        assertFalse(segmentSkip.config().enabled)
     }
 
     @Test
     fun whenModeIsAlwaysSkipThenConfigIsEnabledWithAutoSkipMode() {
-        userPreferences.mode.value = SponsorMode.ALWAYS_SKIP
+        userPreferences.mode.value = SegmentSkipMode.ALWAYS_SKIP
 
-        assertEquals(SponsorConfig(enabled = true, skipMode = SponsorSkipMode.AUTO), sponsor.config())
+        assertEquals(SegmentSkipConfig(enabled = true, skipMode = SegmentSkipSkipMode.AUTO), segmentSkip.config())
     }
 
     @Test
     fun whenModeIsOffThenConfigIsNotEnabled() {
-        userPreferences.mode.value = SponsorMode.OFF
+        userPreferences.mode.value = SegmentSkipMode.OFF
 
-        assertFalse(sponsor.config().enabled)
+        assertFalse(segmentSkip.config().enabled)
     }
 
     @Test
     fun whenModeIsOffThenGetSegmentsReturnsEmptyWithoutLookup() = runTest {
-        userPreferences.mode.value = SponsorMode.OFF
+        userPreferences.mode.value = SegmentSkipMode.OFF
 
-        assertTrue(sponsor.getSegments(VALID_ID).isEmpty())
+        assertTrue(segmentSkip.getSegments(VALID_ID).isEmpty())
         assertTrue(segmentsProvider.requestedIds.isEmpty())
     }
 
     @Test
     fun whenValidIdThenReturnsSegmentsSortedByStart() = runTest {
-        val late = SponsorSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", uuid = "late")
-        val early = SponsorSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip", uuid = "early")
+        val late = SegmentSkipSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", uuid = "late")
+        val early = SegmentSkipSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip", uuid = "early")
         segmentsProvider.segments = listOf(late, early)
 
-        assertEquals(listOf(early, late), sponsor.getSegments(VALID_ID))
+        assertEquals(listOf(early, late), segmentSkip.getSegments(VALID_ID))
         assertEquals(VALID_ID, segmentsProvider.requestedIds.single())
     }
 
     @Test
     fun whenBlankIdThenReturnsEmptyWithoutLookup() = runTest {
         listOf("", "   ").forEach { id ->
-            assertTrue(sponsor.getSegments(id).isEmpty())
+            assertTrue(segmentSkip.getSegments(id).isEmpty())
         }
         assertTrue(segmentsProvider.requestedIds.isEmpty())
     }
@@ -101,7 +101,7 @@ class RealSponsorTest {
     fun whenDisabledThenGetSegmentsReturnsEmptyWithoutLookup() = runTest {
         setEnabled(false)
 
-        assertTrue(sponsor.getSegments(VALID_ID).isEmpty())
+        assertTrue(segmentSkip.getSegments(VALID_ID).isEmpty())
         assertTrue(segmentsProvider.requestedIds.isEmpty())
     }
 
@@ -109,14 +109,14 @@ class RealSponsorTest {
     fun whenProviderThrowsThenReturnsEmpty() = runTest {
         segmentsProvider.error = RuntimeException("boom")
 
-        assertTrue(sponsor.getSegments(VALID_ID).isEmpty())
+        assertTrue(segmentSkip.getSegments(VALID_ID).isEmpty())
     }
 
     @Test(expected = CancellationException::class)
     fun whenProviderIsCancelledThenCancellationPropagates() = runTest {
         segmentsProvider.error = CancellationException("cancelled")
 
-        sponsor.getSegments(VALID_ID)
+        segmentSkip.getSegments(VALID_ID)
     }
 
     private fun setEnabled(enabled: Boolean) {
@@ -124,22 +124,22 @@ class RealSponsorTest {
         feature.mvpEnabled().setRawStoredState(State(enable = enabled))
     }
 
-    private class FakeUserPreferences : SponsorUserPreferences {
-        val mode = MutableStateFlow(SponsorMode.ALWAYS_ASK)
+    private class FakeUserPreferences : SegmentSkipUserPreferences {
+        val mode = MutableStateFlow(SegmentSkipMode.ALWAYS_ASK)
 
-        override fun modeFlow(): Flow<SponsorMode> = mode
-        override fun cachedMode(): SponsorMode = mode.value
-        override suspend fun setMode(mode: SponsorMode) {
+        override fun modeFlow(): Flow<SegmentSkipMode> = mode
+        override fun cachedMode(): SegmentSkipMode = mode.value
+        override suspend fun setMode(mode: SegmentSkipMode) {
             this.mode.value = mode
         }
     }
 
-    private class FakeSegmentsProvider : SponsorSegmentsProvider {
-        var segments: List<SponsorSegment> = emptyList()
+    private class FakeSegmentsProvider : SegmentSkipSegmentsProvider {
+        var segments: List<SegmentSkipSegment> = emptyList()
         var error: Exception? = null
         val requestedIds = mutableListOf<String>()
 
-        override suspend fun getSegments(videoId: String): List<SponsorSegment> {
+        override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> {
             requestedIds += videoId
             error?.let { throw it }
             return segments

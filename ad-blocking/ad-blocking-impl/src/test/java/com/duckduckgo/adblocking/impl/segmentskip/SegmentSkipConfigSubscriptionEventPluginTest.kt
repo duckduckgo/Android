@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsor
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
@@ -26,14 +26,14 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class SponsorConfigSubscriptionEventPluginTest {
+class SegmentSkipConfigSubscriptionEventPluginTest {
 
-    private val sponsor: Sponsor = mock()
-    private val plugin = SponsorConfigSubscriptionEventPlugin(sponsor)
+    private val segmentSkip: SegmentSkip = mock()
+    private val plugin = SegmentSkipConfigSubscriptionEventPlugin(segmentSkip)
 
     @Test
     fun sendsTheCurrentConfigAsOnConfigChanged() {
-        whenever(sponsor.config()).thenReturn(SponsorConfig(enabled = true, skipMode = SponsorSkipMode.MANUAL))
+        whenever(segmentSkip.config()).thenReturn(SegmentSkipConfig(enabled = true, skipMode = SegmentSkipSkipMode.MANUAL))
 
         with(plugin.getSubscriptionEventData()) {
             assertEquals("sponsorBlock", featureName)
@@ -46,14 +46,14 @@ class SponsorConfigSubscriptionEventPluginTest {
 
     @Test
     fun whenAutoSkipModeThenSendsAuto() {
-        whenever(sponsor.config()).thenReturn(SponsorConfig(enabled = true, skipMode = SponsorSkipMode.AUTO))
+        whenever(segmentSkip.config()).thenReturn(SegmentSkipConfig(enabled = true, skipMode = SegmentSkipSkipMode.AUTO))
 
         assertEquals("auto", plugin.getSubscriptionEventData().params.getString("skipMode"))
     }
 
     @Test
     fun whenDisabledThenSendsNotEnabled() {
-        whenever(sponsor.config()).thenReturn(SponsorConfig(enabled = false, skipMode = SponsorSkipMode.MANUAL))
+        whenever(segmentSkip.config()).thenReturn(SegmentSkipConfig(enabled = false, skipMode = SegmentSkipSkipMode.MANUAL))
 
         assertFalse(plugin.getSubscriptionEventData().params.getBoolean("enabled"))
     }
