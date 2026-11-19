@@ -21,9 +21,7 @@ import app.cash.turbine.test
 import com.duckduckgo.autofill.impl.FakePasswordStoreEventPlugin
 import com.duckduckgo.autofill.sync.CredentialsFixtures.invalidCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
-import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -47,7 +45,6 @@ class CredentialsInvalidItemsViewModelTest {
         credentialsSyncStore,
         credentialsSyncMetadata,
         FakeCrypto(),
-        FakeFeatureToggleFactory.create(CredentialsSyncLocalValidationFeature::class.java),
         FakePasswordStoreEventPlugin(),
     )
 
