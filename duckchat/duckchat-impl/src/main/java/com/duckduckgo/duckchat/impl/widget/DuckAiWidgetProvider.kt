@@ -34,6 +34,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.logcat
 import javax.inject.Inject
 
@@ -103,8 +105,10 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         val widthDp = options?.getInt(if (portrait) OPTION_APPWIDGET_MIN_WIDTH else OPTION_APPWIDGET_MAX_WIDTH, 0) ?: 0
 
         appCoroutineScope.launch {
-            val views = duckAiWidgetConfigurator.createRemoteViews(context, appWidgetId, heightDp, widthDp)
-            appWidgetManager.updateAppWidget(appWidgetId, views)
+            renderLock.withLock {
+                val views = duckAiWidgetConfigurator.createRemoteViews(context, appWidgetId, heightDp, widthDp)
+                appWidgetManager.updateAppWidget(appWidgetId, views)
+            }
             logcat { "DuckAiWidgetProvider updateAppWidget completed for widget id = $appWidgetId" }
         }
     }
@@ -115,4 +119,8 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         homeScreenWidgetLifecycle.onWidgetDisabled()
     }
 
+    private companion object {
+        // Receivers are instantiated per broadcast, so the lock must be process-wide.
+        val renderLock = Mutex()
+    }
 }
