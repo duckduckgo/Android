@@ -1741,17 +1741,6 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.savedsites.impl.sync.BookmarksSyncLocalValidationFeature&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.savedsites.impl.sync.BookmarksSyncLocalValidationFeature"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/SavedSitesSyncDataProviderTest.kt"
-            line="38"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="NoImplImportsInAppModule"
         message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.savedsites.impl.sync.RealSavedSitesFormFactorSyncMigration&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
         errorLine1="import com.duckduckgo.savedsites.impl.sync.RealSavedSitesFormFactorSyncMigration"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
