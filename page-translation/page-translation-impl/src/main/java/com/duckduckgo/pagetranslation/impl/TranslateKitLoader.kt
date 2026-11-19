@@ -56,7 +56,7 @@ class TranslateKitLoader @Inject constructor(
     fun loadIfNeeded() {
         if (loadStarted.get()) return
         appScope.launch(dispatchers.io()) {
-            if (!feature.self().isEnabled() || !loadStarted.compareAndSet(false, true)) return@launch
+            if (!feature.translation().isEnabled() || !loadStarted.compareAndSet(false, true)) return@launch
             try {
                 library.init()
             } catch (e: Exception) {
@@ -65,5 +65,5 @@ class TranslateKitLoader @Inject constructor(
         }
     }
 
-    fun isAvailable(): Boolean = feature.self().isEnabled() && library.isInitialized()
+    fun isAvailable(): Boolean = feature.translation().isEnabled() && library.isInitialized()
 }

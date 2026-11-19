@@ -90,7 +90,7 @@ class TranslateKitLoaderTest {
     }
 
     private fun setFlag(enabled: Boolean) {
-        feature.self().setRawStoredState(State(enabled))
+        feature.translation().setRawStoredState(State(enabled))
     }
 
     private class FakeTranslateKitLibrary : TranslateKitLibrary {
