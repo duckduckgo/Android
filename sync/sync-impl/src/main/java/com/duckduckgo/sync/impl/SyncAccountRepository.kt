@@ -599,7 +599,9 @@ class AppSyncAccountRepository @Inject constructor(
         val parsed = parseThirdPartyRecoveryCode(pastedCode)
             ?: return Error(reason = "JoinFrom3party: code is not a valid 3party recovery code")
 
+        // Saved before the 3party login so a retry after a transient failure logs in with the same id and replaces this device's record.
         val deviceId = syncDeviceIds.deviceId()
+        syncStore.deviceId = deviceId
         val deviceName = syncDeviceIds.deviceName()
 
         // Step 2 — authenticate against the 3party credential.
@@ -608,20 +610,33 @@ class AppSyncAccountRepository @Inject constructor(
             is Success -> loginResult.data
         }
 
-        // The login above registered this device. If the upgrade then fails, the device stays on an account it never joined, so remove it again.
-        val upgradeResult = upgradeThirdPartyAccount(parsed, loginResponse, deviceId, deviceName)
-        if (upgradeResult is Error) {
-            logoutTemporaryThirdPartyDevice(loginResponse.token, deviceId)
+        return when (val upgrade = upgradeThirdPartyAccount(parsed, loginResponse, deviceId, deviceName)) {
+            is ThirdPartyUpgrade.Upgraded -> Success(true)
+            is ThirdPartyUpgrade.TransientFailure -> upgrade.error
+            is ThirdPartyUpgrade.Aborted -> {
+                // The login above registered this device. The account will never be joined, so remove the device and let the next attempt use a new id.
+                logoutTemporaryThirdPartyDevice(loginResponse.token, deviceId)
+                if (!syncStore.isSignedIn()) syncStore.deviceId = null
+                upgrade.error
+            }
         }
-        return upgradeResult
     }
+
+    private sealed interface ThirdPartyUpgrade {
+        data object Upgraded : ThirdPartyUpgrade
+        data class TransientFailure(val error: Error) : ThirdPartyUpgrade
+        data class Aborted(val error: Error) : ThirdPartyUpgrade
+    }
+
+    private fun Error.asUpgradeFailure(causeCode: Int = code): ThirdPartyUpgrade =
+        if (isRetryableTransient(causeCode)) ThirdPartyUpgrade.TransientFailure(this) else ThirdPartyUpgrade.Aborted(this)
 
     private suspend fun upgradeThirdPartyAccount(
         parsed: ThirdPartyRecoveryCode,
         loginResponse: LoginResponse,
         deviceId: String,
         deviceName: String,
-    ): Result<Boolean> {
+    ): ThirdPartyUpgrade {
         // Step 2a — "Does it need an upgrade?" check per Unified Algorithm (Asana 1214739740392701,
         // "Native only - Upgrading 3party account"). The /sync/login response includes the account's
         // current access_credentials, so we can detect a pre-existing ddg credential without a
@@ -630,10 +645,12 @@ class AppSyncAccountRepository @Inject constructor(
         val accountAlreadyHasDdg = loginResponse.accessCredentials.orEmpty().any { it.id == CREDENTIAL_ID_DDG }
         if (accountAlreadyHasDdg) {
             logcat(WARN) { "Sync-ScopedToken: account already has a ddg credential — cannot re-upgrade from 3party" }
-            return Error(
-                code = AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
-                reason = "JoinFrom3party: account already upgraded. " +
-                    "Please use one of the already connected Native DDG Applications to add another one.",
+            return ThirdPartyUpgrade.Aborted(
+                Error(
+                    code = AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
+                    reason = "JoinFrom3party: account already upgraded. " +
+                        "Please use one of the already connected Native DDG Applications to add another one.",
+                ),
             )
         }
 
@@ -646,7 +663,7 @@ class AppSyncAccountRepository @Inject constructor(
 
         // Steps 3 + 4 + 5 — build the upgrade payload locally.
         val upgradePackage = when (val pkg = buildThirdPartyUpgradePackage(parsed, keysFromLogin)) {
-            is Error -> return pkg.copy(reason = "JoinFrom3party: ${pkg.reason}")
+            is Error -> return ThirdPartyUpgrade.Aborted(pkg.copy(reason = "JoinFrom3party: ${pkg.reason}"))
             is Success -> pkg.data
         }
 
@@ -662,17 +679,19 @@ class AppSyncAccountRepository @Inject constructor(
                 // credential, OR a previous attempt by this device crashed mid-flight and the BE
                 // will auto-remove the orphan after its 5-minute TTL.
                 logcat(WARN) { "Sync-ScopedToken: 409 — account already has a ddg credential" }
-                return Error(
-                    code = AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
-                    reason = "JoinFrom3party: account already has a ddg credential. " +
-                        "Please use one of the already connected Native DDG Applications to add another one.",
+                return ThirdPartyUpgrade.Aborted(
+                    Error(
+                        code = AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
+                        reason = "JoinFrom3party: account already has a ddg credential. " +
+                            "Please use one of the already connected Native DDG Applications to add another one.",
+                    ),
                 )
             }
             logcat(ERROR) { "Sync-ScopedToken: /access-credentials/ddg POST failed: ${postResult.reason}" }
             return postResult.copy(
                 code = AccountErrorCodes.ACCOUNT_UPGRADE_FAILED.code,
                 reason = "JoinFrom3party: ${postResult.reason}",
-            )
+            ).asUpgradeFailure(causeCode = postResult.code)
         }
 
         // Step 7 — Native login as the new ddg credential. Required: without a login inside the
@@ -694,7 +713,7 @@ class AppSyncAccountRepository @Inject constructor(
             } else {
                 logcat(ERROR) { "Sync-ScopedToken: ddg login after upgrade failed: ${ddgLoginResult.reason}" }
             }
-            return ddgLoginResult.copy(reason = "JoinFrom3party: post-upgrade ddg login failed: ${ddgLoginResult.reason}")
+            return ddgLoginResult.copy(reason = "JoinFrom3party: post-upgrade ddg login failed: ${ddgLoginResult.reason}").asUpgradeFailure()
         }
 
         // Defensive: performLogin will also set scopedPassword if the BE echoes back the new
@@ -706,7 +725,7 @@ class AppSyncAccountRepository @Inject constructor(
             .onFailure { logcat(ERROR) { "Sync-ScopedToken: failed to write local SP after upgrade: ${it.message}" } }
 
         logcat { "Sync-ScopedToken: 3party→ddg upgrade complete; account joined as ddg" }
-        return Success(true)
+        return ThirdPartyUpgrade.Upgraded
     }
 
     override fun logout(deviceId: String): Result<Boolean> {
