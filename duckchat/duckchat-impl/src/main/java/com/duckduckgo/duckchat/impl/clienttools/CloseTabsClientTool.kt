@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -51,14 +50,8 @@ class CloseTabsClientTool @Inject constructor(
         input: JSONObject,
         context: ClientToolCallContext,
     ): ClientToolResult {
-        val requested = parseTabIds(input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
+        val tabIds = parseTabIds(input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
         val tabs = tabRepositoryProvider.value.forMode(context.browserMode)
-        val tabIds = requested.value ?: run {
-            // With no tabIds the target is the chat's own tab, which a Duck.ai tab chat cannot close from inside itself.
-            val hostUrl = tabs.getTab(context.chatTabId)?.url
-            if (hostUrl != null && duckChat.isDuckChatUrl(hostUrl.toUri())) return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
-            listOf(context.chatTabId)
-        }
 
         // Tab IDs are UUIDs, and the output schema only allows those, so any other ID cannot name a tab and is left out.
         val targets = tabIds.distinct().filter { it.isUuid() }
@@ -70,16 +63,16 @@ class CloseTabsClientTool @Inject constructor(
         return ClientToolResult.Success(JSONObject().put(TABS, results))
     }
 
-    /** The requested tab IDs, holding null when they are omitted; null itself when the input breaks the schema. */
-    private fun parseTabIds(input: JSONObject): Requested? {
+    /**
+     * The requested tab IDs, or null when the input breaks the schema or omits them. Omitted IDs would mean the chat's own tab,
+     * which from the contextual sheet is the page underneath, so the model must always name the tabs.
+     */
+    private fun parseTabIds(input: JSONObject): List<String>? {
         if (!ClientToolInput.hasOnlyKeys(input, TAB_IDS)) return null
-        if (!input.has(TAB_IDS)) return Requested(null)
-        return ClientToolInput.stringList(input, TAB_IDS, items = 1..MAX_TABS, itemLengths = 0..Int.MAX_VALUE)?.let { Requested(it) }
+        return ClientToolInput.stringList(input, TAB_IDS, items = 1..MAX_TABS, itemLengths = 0..Int.MAX_VALUE)
     }
 
     private fun String.isUuid(): Boolean = UUID_PATTERN.matches(this)
-
-    private data class Requested(val value: List<String>?)
 
     private companion object {
         const val TAB_IDS = "tabIds"
