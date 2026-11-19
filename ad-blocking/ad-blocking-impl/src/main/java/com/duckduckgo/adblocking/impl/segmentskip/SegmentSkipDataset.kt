@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adblocking.impl.segmentskip
 
+import com.duckduckgo.adblocking.impl.BuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
@@ -28,10 +29,10 @@ import retrofit2.http.Streaming
 import retrofit2.http.Query as HttpQuery
 
 interface SegmentSkipDatasetService {
-    @GET("https://protection.duckduckgo.com/api/protection/segments/v1/android" + "/revision")
+    @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/revision")
     suspend fun revision(): SegmentSkipRevisionResponse
 
-    @GET("https://protection.duckduckgo.com/api/protection/segments/v1/android" + "/hashPrefix")
+    @GET(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/hashPrefix")
     @Streaming
     fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): Call<ResponseBody>
 }

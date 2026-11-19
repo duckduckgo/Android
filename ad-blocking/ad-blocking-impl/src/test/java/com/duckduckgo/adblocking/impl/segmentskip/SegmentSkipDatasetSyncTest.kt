@@ -21,6 +21,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
+import com.duckduckgo.adblocking.impl.BuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -86,8 +87,7 @@ class SegmentSkipDatasetSyncTest {
     @Test fun binaryRequestUsesHashPrefixEndpoint() {
         val service = Retrofit.Builder().baseUrl("https://duckduckgo.com/").build().create(SegmentSkipDatasetService::class.java)
         val url = service.binaryHashPrefixes(42).request().url
-        assertEquals("protection.duckduckgo.com", url.host)
-        assertEquals("/api/protection/segments/v1/android/hashPrefix", url.encodedPath)
+        assertEquals(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/hashPrefix?revision=42", url.toString())
         assertEquals(setOf("revision"), url.queryParameterNames)
         assertEquals("42", url.queryParameter("revision"))
     }
