@@ -30,7 +30,6 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncDeviceIds
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
@@ -45,7 +44,6 @@ class V1ConnectCode @Inject constructor(
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
-    private val syncFeature: SyncFeature,
     private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
     private val syncAccountRepository: SyncAccountRepository,
 ) {
@@ -69,12 +67,7 @@ class V1ConnectCode @Inject constructor(
         ) ?: return Error(reason = "Error generating Linking Code")
 
         val b64Encoded = Base64.encodeToString(linkingQRCode.toByteArray(), Base64.NO_WRAP)
-        val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
-            syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
-        } else {
-            b64Encoded
-        }
-        return Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
+        return Success(AuthCode(qrCode = syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded), rawCode = b64Encoded))
     }
 
     fun pollConnectionKeys(): Result<Boolean> {

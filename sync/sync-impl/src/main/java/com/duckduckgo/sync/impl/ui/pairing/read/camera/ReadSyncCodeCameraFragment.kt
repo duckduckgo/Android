@@ -48,10 +48,8 @@ import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeCameraBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
@@ -70,7 +68,6 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -96,12 +93,6 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
-
-    @Inject
-    lateinit var syncFeature: SyncFeature
-
-    @Inject
-    lateinit var dispatchers: DispatcherProvider
 
     private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
@@ -316,12 +307,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     private fun configureScanner() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val restrictToQr = withContext(dispatchers.io()) {
-                syncFeature.restrictScannedBarcodesToQrTypes().isEnabled()
-            }
-            if (restrictToQr) {
-                binding.includeCamera.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
-            }
+            binding.includeCamera.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
 
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 binding.includeCamera.barcodeView.decodeContinuous { barcode ->

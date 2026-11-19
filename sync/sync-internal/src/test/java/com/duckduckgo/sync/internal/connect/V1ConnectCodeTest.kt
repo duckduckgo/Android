@@ -16,11 +16,8 @@
 
 package com.duckduckgo.sync.internal.connect
 
-import android.annotation.SuppressLint
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.API_CODE.GONE
@@ -32,7 +29,6 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncDeviceIds
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
@@ -47,7 +43,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class V1ConnectCodeTest {
 
@@ -55,7 +50,6 @@ class V1ConnectCodeTest {
     private val nativeLib: SyncLib = mock()
     private val syncApi: SyncApi = mock()
     private val syncStore: SyncStore = mock()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
 
@@ -64,7 +58,6 @@ class V1ConnectCodeTest {
         nativeLib = nativeLib,
         syncApi = syncApi,
         syncStore = syncStore,
-        syncFeature = syncFeature,
         syncCodeUrlWrapper = syncCodeUrlWrapper,
         syncAccountRepository = syncAccountRepository,
     )
@@ -76,28 +69,16 @@ class V1ConnectCodeTest {
     }
 
     @Test
-    fun `getConnectQR returns the connect code and stores the connect keys`() {
+    fun `getConnectQR returns the URL-wrapped connect code and stores the connect keys`() {
         whenever(nativeLib.prepareForConnect()).thenReturn(ConnectKeys(0, publicKey = PUBLIC_KEY, secretKey = SECRET_KEY))
-        syncFeature.syncSetupBarcodeIsUrlBased().setRawStoredState(State(enable = false))
-
-        val result = v1ConnectCode.getConnectQR() as Success
-
-        assertEquals(CONNECT_CODE_B64, result.data.rawCode)
-        assertEquals(CONNECT_CODE_B64, result.data.qrCode)
-        verify(syncStore).deviceId = DEVICE_ID
-        verify(syncStore).primaryKey = PUBLIC_KEY
-        verify(syncStore).secretKey = SECRET_KEY
-    }
-
-    @Test
-    fun `getConnectQR wraps the QR code in a URL when the URL-based flag is on`() {
-        whenever(nativeLib.prepareForConnect()).thenReturn(ConnectKeys(0, publicKey = PUBLIC_KEY, secretKey = SECRET_KEY))
-        syncFeature.syncSetupBarcodeIsUrlBased().setRawStoredState(State(enable = true))
 
         val result = v1ConnectCode.getConnectQR() as Success
 
         assertEquals(CONNECT_CODE_B64, result.data.rawCode)
         assertEquals(WRAPPED_CODE, result.data.qrCode)
+        verify(syncStore).deviceId = DEVICE_ID
+        verify(syncStore).primaryKey = PUBLIC_KEY
+        verify(syncStore).secretKey = SECRET_KEY
     }
 
     @Test

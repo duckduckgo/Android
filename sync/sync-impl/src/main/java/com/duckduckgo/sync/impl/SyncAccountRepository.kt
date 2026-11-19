@@ -244,11 +244,6 @@ class AppSyncAccountRepository @Inject constructor(
                 ?: Pair(stringCode, false)
         }.getOrDefault(Pair(stringCode, false))
 
-        if (wasInUrl && syncFeature.canScanUrlBasedSyncSetupBarcodes().isEnabled().not()) {
-            logcat(ERROR) { "Feature to allow scanning URL-based sync setup codes is disabled" }
-            return Unknown(code)
-        }
-
         return kotlin.runCatching {
             val decodedCode = code.decodeB64()
 
