@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SyncFeature
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesBinding
@@ -50,7 +49,6 @@ interface SyncAutoRestoreManager {
 class RealSyncAutoRestoreManager @Inject constructor(
     private val persistentStorage: PersistentStorage,
     private val dataStore: SyncAutoRestorePreferenceDataStore,
-    private val syncFeature: SyncFeature,
     private val dispatcherProvider: DispatcherProvider,
     private val moshi: Moshi,
     private val deviceMigration: DeviceMigration,
@@ -58,8 +56,7 @@ class RealSyncAutoRestoreManager @Inject constructor(
 
     override suspend fun isAutoRestoreAvailable(): Boolean {
         return withContext(dispatcherProvider.io()) {
-            syncFeature.syncAutoRestore().isEnabled() &&
-                persistentStorage.checkAvailability() is PersistentStorageAvailability.Available
+            persistentStorage.checkAvailability() is PersistentStorageAvailability.Available
         }
     }
 

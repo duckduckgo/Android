@@ -21,7 +21,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.store.SyncStore
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.binding
@@ -43,7 +42,6 @@ class SyncAutoRestoreAccountDisabledObserver @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val syncStore: SyncStore,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
-    private val syncFeature: SyncFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
@@ -55,7 +53,6 @@ class SyncAutoRestoreAccountDisabledObserver @Inject constructor(
             .distinctUntilChanged()
             // only interested when user signs out
             .filter { isSignedIn -> !isSignedIn }
-            .filter { syncFeature.syncAutoRestore().isEnabled() }
             .onEach {
                 logcat { "Sync-Recovery: sync disabled, clearing auto-restore data" }
                 syncAutoRestoreManager.clearAutoRestoreData()

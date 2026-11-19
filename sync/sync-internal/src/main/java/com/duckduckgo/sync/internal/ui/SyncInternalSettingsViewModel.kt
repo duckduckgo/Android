@@ -136,11 +136,9 @@ constructor(
         val environment: String = "",
         val recoveryCode: String = "",
         val thirdPartyRecoveryCode: String = "",
-        val syncAutoRestoreEnabled: Boolean = false,
         val blockStoreAvailable: Boolean? = null,
         val blockStoreE2ESupported: Boolean? = null,
         val blockStoreCurrentValue: BlockStoreValue = BlockStoreValue.Loading,
-        val blockStoreFeatureFlagText: String = "",
         val blockStoreAvailabilityText: String = "",
         val blockStoreApiLevelText: String = "",
         val blockStoreDeviceLockText: String = "",
@@ -185,7 +183,6 @@ constructor(
     init {
         viewModelScope.launch(dispatchers.io()) {
             updateViewState()
-            checkSyncAutoRestoreFlag()
             checkBlockStoreAvailability()
             refreshBlockStoreValue()
         }
@@ -214,7 +211,6 @@ constructor(
 
     fun onResume() {
         viewModelScope.launch(dispatchers.io()) {
-            checkSyncAutoRestoreFlag()
             checkBlockStoreAvailability()
             refreshBlockStoreValue()
         }
@@ -860,16 +856,6 @@ constructor(
         }
     }
 
-    private fun checkSyncAutoRestoreFlag() {
-        val enabled = syncFeature.syncAutoRestore().isEnabled()
-        viewState.update { state ->
-            state.copy(syncAutoRestoreEnabled = enabled).withBlockStoreChecklistText(
-                apiLevel = appBuildConfig.sdkInt,
-                hasSecureLock = isDeviceSecureLockEnabled(),
-            )
-        }
-    }
-
     private suspend fun checkBlockStoreAvailability() {
         when (val availability = persistentStorage.checkAvailability()) {
             is PersistentStorageAvailability.Unavailable -> {
@@ -975,11 +961,6 @@ constructor(
         hasSecureLock: Boolean,
     ): ViewState {
         val apiSupportsE2e = apiLevel >= 28
-        val featureFlagText = if (syncAutoRestoreEnabled) {
-            "✅ syncAutoRestore flag: enabled"
-        } else {
-            "❌ syncAutoRestore flag: disabled"
-        }
         val availabilityText = when (blockStoreAvailable) {
             null -> "Checking..."
             true -> "✅ Block Store API: Available"
@@ -1019,7 +1000,6 @@ constructor(
             is BlockStoreValue.HasValue -> value.value
         }
         return copy(
-            blockStoreFeatureFlagText = featureFlagText,
             blockStoreAvailabilityText = availabilityText,
             blockStoreApiLevelText = apiLevelText,
             blockStoreDeviceLockText = deviceLockText,
