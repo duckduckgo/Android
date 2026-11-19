@@ -51,28 +51,11 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun automaticallyUpdateSyncSettings(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun syncSetupBarcodeIsUrlBased(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canScanUrlBasedSyncSetupBarcodes(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canInterceptSyncSetupUrls(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSync(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendSyncSetupWideEvent(): Toggle
-
-    /**
-     * When enabled, the sync barcode scanner only attempts to decode QR codes. Sync codes are
-     * always encoded as QR, so other formats only add noise (and false-positive decodes) to
-     * the scanner.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun restrictScannedBarcodesToQrTypes(): Toggle
 
     /**
      * Gates writing `device_info`
