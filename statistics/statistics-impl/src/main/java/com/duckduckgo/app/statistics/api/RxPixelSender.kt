@@ -39,12 +39,14 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 @ContributesBinding(
@@ -68,6 +70,7 @@ class RxPixelSender @Inject constructor(
 ) : PixelSender, MainProcessLifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
+    private val dailyPixelsInFlight = ConcurrentHashMap<String, CompletableDeferred<Unit>>()
 
     private val shouldFirePixelsAsDev: Int? by lazy {
         if (statisticsLibraryConfig.shouldFirePixelsAsDev()) 1 else null
@@ -112,7 +115,7 @@ class RxPixelSender @Inject constructor(
         type: Pixel.PixelType,
     ): Single<PixelSender.SendPixelResult> = Single.fromCallable {
         runBlocking {
-            if (shouldFirePixel(pixelName, type)) {
+            runIfPixelEligible(pixelName, type, PixelSender.SendPixelResult.PIXEL_IGNORED) {
                 val completable = if (shouldSendAtb(pixelName)) {
                     api.fire(
                         pixelName,
@@ -132,10 +135,7 @@ class RxPixelSender @Inject constructor(
                     )
                 }
                 completable.blockingAwait()
-                storePixelFired(pixelName, type)
                 PixelSender.SendPixelResult.PIXEL_SENT
-            } else {
-                PixelSender.SendPixelResult.PIXEL_IGNORED
             }
         }
     }
@@ -148,7 +148,7 @@ class RxPixelSender @Inject constructor(
     ): Single<PixelSender.EnqueuePixelResult> {
         return Single.fromCallable {
             runBlocking {
-                if (shouldFirePixel(pixelName, type)) {
+                runIfPixelEligible(pixelName, type, PixelSender.EnqueuePixelResult.PIXEL_IGNORED) {
                     val pixelEntity = PixelEntity(
                         pixelName = pixelName,
                         atb = getAtbInfo(),
@@ -156,10 +156,7 @@ class RxPixelSender @Inject constructor(
                         encodedQueryParams = encodedParameters,
                     )
                     pendingPixelDao.insert(pixelEntity)
-                    storePixelFired(pixelName, type)
                     PixelSender.EnqueuePixelResult.PIXEL_ENQUEUED
-                } else {
-                    PixelSender.EnqueuePixelResult.PIXEL_IGNORED
                 }
             }
         }
@@ -212,24 +209,48 @@ class RxPixelSender @Inject constructor(
 
     private fun getDeviceFactor() = deviceInfo.formFactor().description
 
-    private suspend fun shouldFirePixel(
+    private suspend fun <T> runIfPixelEligible(
         pixelName: String,
         type: Pixel.PixelType,
-    ): Boolean =
-        when (type) {
-            is Count -> true
-            is Daily -> !pixelFiredRepository.hasDailyPixelFiredToday(type.tag ?: pixelName)
-            is Unique -> !pixelFiredRepository.hasUniquePixelFired(type.tag ?: pixelName)
+        ignored: T,
+        operation: () -> T,
+    ): T = when (type) {
+        is Count -> operation()
+        is Daily -> {
+            val key = type.tag ?: pixelName
+            withDailyPixelClaim(key) {
+                if (pixelFiredRepository.hasDailyPixelFiredToday(key)) {
+                    ignored
+                } else {
+                    operation().also { pixelFiredRepository.storeDailyPixelFiredToday(key) }
+                }
+            }
         }
 
-    private suspend fun storePixelFired(
-        pixelName: String,
-        type: Pixel.PixelType,
-    ) {
-        when (type) {
-            is Count -> {} // no-op
-            is Daily -> pixelFiredRepository.storeDailyPixelFiredToday(type.tag ?: pixelName)
-            is Unique -> pixelFiredRepository.storeUniquePixelFired(type.tag ?: pixelName)
+        is Unique -> {
+            val key = type.tag ?: pixelName
+            if (pixelFiredRepository.hasUniquePixelFired(key)) {
+                ignored
+            } else {
+                operation().also { pixelFiredRepository.storeUniquePixelFired(key) }
+            }
+        }
+    }
+
+    private suspend fun <T> withDailyPixelClaim(
+        key: String,
+        operation: suspend () -> T,
+    ): T {
+        val completion = CompletableDeferred<Unit>()
+        while (true) {
+            val inFlight = dailyPixelsInFlight.putIfAbsent(key, completion) ?: break
+            inFlight.await()
+        }
+        return try {
+            operation()
+        } finally {
+            dailyPixelsInFlight.remove(key, completion)
+            completion.complete(Unit)
         }
     }
 }

@@ -25,6 +25,7 @@ import androidx.room.TypeConverters
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.api.PixelSender.EnqueuePixelResult
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_IGNORED
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.api.RxPixelSenderTest.TestPixels.TEST
@@ -47,6 +48,8 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.observers.TestObserver
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -58,7 +61,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.kotlin.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.FutureTask
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicBoolean
 
 @RunWith(AndroidJUnit4::class)
 class RxPixelSenderTest {
@@ -322,6 +330,56 @@ class RxPixelSenderTest {
             pixelEntity.additionalQueryParams,
             pixelEntity.encodedQueryParams,
         )
+    }
+
+    @Test
+    fun whenDailySendsOverlapThenOnlyOneReachesTheApi() {
+        val (first, second) = raceDailyPixelOperations(
+            testee.sendPixel(TEST.pixelName, mapOf("feature" to "webEvents"), emptyMap(), Daily()),
+            testee.sendPixel(TEST.pixelName, mapOf("feature" to "webCompat"), emptyMap(), Daily()),
+        )
+
+        first.assertValue(PIXEL_SENT)
+        second.assertValue(PIXEL_IGNORED)
+        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenDailySendAndEnqueueOverlapWithTheSameTagThenOnlyTheSendSucceeds() {
+        val (send, enqueue) = raceDailyPixelOperations(
+            testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("shared-tag")),
+            testee.enqueuePixel("another-pixel", emptyMap(), emptyMap(), Daily("shared-tag")),
+        )
+
+        send.assertValue(PIXEL_SENT)
+        enqueue.assertValue(EnqueuePixelResult.PIXEL_IGNORED)
+        pendingPixelDao.pixels().test().assertValue(emptyList())
+    }
+
+    @Test
+    fun whenInFlightDailySendFailsThenAnOverlappingSendCanSucceed() {
+        val (first, second) = raceDailyPixelOperations(
+            testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily()),
+            testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily()),
+            firstResponse = Completable.error(TimeoutException()),
+        )
+
+        first.assertError(RuntimeException::class.java)
+        second.assertValue(PIXEL_SENT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily()).test().assertValue(PIXEL_IGNORED)
+    }
+
+    @Test
+    fun whenDailySendIsInFlightThenCountPixelWithTheSameNameCanSendImmediately() {
+        val countSent = AtomicBoolean()
+        val (daily, count) = raceDailyPixelOperations(
+            testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily()),
+            testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count).doOnSuccess { countSent.set(true) },
+            firstResponse = Completable.fromAction { assertTrue(countSent.get()) },
+        )
+
+        daily.assertValue(PIXEL_SENT)
+        count.assertValue(PIXEL_SENT)
     }
 
     @Test
@@ -702,6 +760,46 @@ class RxPixelSenderTest {
         assertEquals(expectedEntity.encodedQueryParams, pixelEntity.encodedQueryParams)
     }
 
+    private fun <T : Any> raceDailyPixelOperations(
+        firstSend: Single<SendPixelResult>,
+        competingOperation: Single<T>,
+        firstResponse: Completable = Completable.complete(),
+    ): Pair<TestObserver<SendPixelResult>, TestObserver<T>> {
+        givenFormFactor(DeviceInfo.FormFactor.PHONE)
+        val enteredFirstSend = CountDownLatch(1)
+        val releaseFirstSend = CountDownLatch(1)
+        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(
+            Completable.fromAction {
+                enteredFirstSend.countDown()
+                check(releaseFirstSend.await(10, SECONDS))
+            }.andThen(firstResponse),
+            Completable.complete(),
+        )
+
+        val firstResult = FutureTask { firstSend.test() }
+        val competingResult = FutureTask { competingOperation.test() }
+        val firstThread = Thread(firstResult).apply { isDaemon = true }
+        val competingThread = Thread(competingResult).apply { isDaemon = true }
+        try {
+            firstThread.start()
+            assertTrue("First send did not reach the API", enteredFirstSend.await(10, SECONDS))
+            competingThread.start()
+            // Let the contender run until it finishes or has to wait, while the first send is still in flight.
+            val deadline = System.nanoTime() + SECONDS.toNanos(5)
+            val waitingOrFinished = setOf(Thread.State.WAITING, Thread.State.TIMED_WAITING, Thread.State.TERMINATED)
+            while (competingThread.state !in waitingOrFinished) {
+                check(System.nanoTime() < deadline) { "Competing operation did not finish or wait" }
+                Thread.sleep(1)
+            }
+            releaseFirstSend.countDown()
+            return firstResult.get(10, SECONDS) to competingResult.get(10, SECONDS)
+        } finally {
+            releaseFirstSend.countDown()
+            firstThread.interrupt()
+            competingThread.interrupt()
+        }
+    }
+
     @Suppress("SameParameterValue")
     private fun givenAppVersion(appVersion: String) {
         whenever(mockDeviceInfo.appVersion).thenReturn(appVersion)
@@ -763,7 +861,7 @@ internal abstract class TestAppDatabase : RoomDatabase() {
 
 private class FakePixelFiredRepository : PixelFiredRepository {
 
-    val dailyPixelsFiredToday = mutableSetOf<String>()
+    val dailyPixelsFiredToday = ConcurrentHashMap.newKeySet<String>()
     val uniquePixelsFired = mutableSetOf<String>()
 
     override suspend fun storeDailyPixelFiredToday(name: String) {

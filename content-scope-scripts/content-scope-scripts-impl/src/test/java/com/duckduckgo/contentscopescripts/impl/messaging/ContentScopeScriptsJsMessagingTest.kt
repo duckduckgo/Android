@@ -75,6 +75,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.CoroutineContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -913,18 +914,64 @@ class ContentScopeScriptsJsMessagingTest {
         }
 
     @Test
-    fun `when a message with an id is dropped because its queue is full then a queue full error is sent`() =
+    fun `when a request overflows its queue then the JavaBridge returns an error without scheduling a reply`() =
         runTest {
-            val messaging = givenQueuedMessaging(WebEventsPluginPoint())
-            messaging.register(mockWebView, webEventsCallback)
+            val stalledMain = StandardTestDispatcher(TestCoroutineScheduler())
+            var mainDispatches = 0
+            val main = object : CoroutineDispatcher() {
+                override fun dispatch(context: CoroutineContext, block: Runnable) {
+                    mainDispatches++
+                    stalledMain.dispatch(context, block)
+                }
+            }
+            val messaging = givenQueuedMessaging(handlers, main = main)
+            messaging.register(mockWebView, callback)
+            whenever(mockWebView.url).thenReturn("https://example.com")
 
-            repeat(MAX_QUEUED_MESSAGES + 1) { messaging.process(webEventMessage("e$it"), messaging.secret) }
+            val bridge = argumentCaptor<ContentScopeScriptsJsMessaging.JavascriptBridge>()
+            verify(mockWebView).addJavascriptInterface(bridge.capture(), eq("javascriptInterface"))
 
-            val captor = argumentCaptor<JsRequestResponse>()
-            verify(jsMessageHelper).sendJsResponse(captor.capture(), any(), any(), any())
-            val error = captor.firstValue as JsRequestResponse.Error
-            assertEquals("e$MAX_QUEUED_MESSAGES", error.id)
-            assertEquals(ContentScopeScriptsJsMessaging.QUEUE_FULL_ERROR_CODE, error.error.code)
+            repeat(MAX_QUEUED_MESSAGES) {
+                assertEquals(0, bridge.firstValue.process(webShareMessage("e$it"), messaging.secret))
+            }
+            assertEquals(MAX_QUEUED_MESSAGES, mainDispatches)
+            assertEquals(-32000, bridge.firstValue.process(webShareMessage("overflow"), messaging.secret))
+            val notification = JSONObject(webShareMessage("unused"))
+            notification.remove("id")
+            assertEquals(0, bridge.firstValue.process(notification.toString(), messaging.secret))
+
+            assertEquals(MAX_QUEUED_MESSAGES, mainDispatches)
+            verify(jsMessageHelper, never()).sendJsResponse(any(), any(), any(), any())
+            stalledMain.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
+            assertEquals(MAX_QUEUED_MESSAGES, callback.counter)
+        }
+
+    @Test
+    fun `when the URL was slow but the handler just began then overflow reports the handler age`() =
+        runTest {
+            val stalledMain = StandardTestDispatcher(TestCoroutineScheduler())
+            val messaging = givenQueuedMessaging(handlers, main = stalledMain)
+            whenever(mockWebView.url).thenReturn("https://example.com")
+            messaging.register(
+                mockWebView,
+                object : JsMessageCallback() {
+                    override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
+                        if (id == "first") {
+                            repeat(MAX_QUEUED_MESSAGES + 1) { messaging.process(webShareMessage("queued$it"), messaging.secret) }
+                        }
+                    }
+                },
+            )
+
+            messaging.process(webShareMessage("first"), messaging.secret)
+            advanceUntilIdle()
+            timeProvider.elapsed = 15_000
+            stalledMain.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
+
+            assertEquals("handler", firedOverflowParameters()["handling_stage"])
+            assertEquals("under_1s", firedOverflowParameters()["handling_time"])
         }
 
     @Test

@@ -1,6 +1,6 @@
 {
     "m_content_scope_scripts_inbound_queue_full": {
-        "description": "One feature's bounded queue of inbound contentScopeScripts JS messages was full, so a message was dropped without being routed to a handler, and answered with an error if the page expected a reply. Reported once per overflow episode, at most once per day, and indicates the optimizeContentScopeMessaging kill-switch may need to be pulled. The parameters tell a flood (messages arriving faster than they are handled) apart from a stall (the consumer stuck on one message).",
+        "description": "One feature's bounded queue of inbound contentScopeScripts JS messages was full, so a message was dropped without being routed to a handler, and rejected by the bridge if the page expected a reply. Reported once per overflow episode, at most once per day, and indicates the optimizeContentScopeMessaging kill-switch may need to be pulled. The parameters tell a flood (messages arriving faster than they are handled) apart from a stall (the consumer stuck on one message).",
         "owners": ["anikiki"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
@@ -35,7 +35,7 @@
             {
                 "key": "handling_time",
                 "type": "string",
-                "description": "How long the in-progress message had been in progress when the queue overflowed, bucketed.",
+                "description": "How long the in-progress message had spent in the reported stage when the queue overflowed, bucketed.",
                 "enum": ["under_1s", "1s_to_10s", "10s_to_60s", "over_60s", "none"]
             }
         ]

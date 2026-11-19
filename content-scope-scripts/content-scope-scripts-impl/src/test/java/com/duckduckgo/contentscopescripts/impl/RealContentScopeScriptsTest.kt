@@ -72,6 +72,18 @@ class RealContentScopeScriptsTest {
     }
 
     @Test
+    fun whenGetScriptThenTransportCapturesTheBridgeAdapter() {
+        val script = testee.getScript(null, emptyList())
+        val config = contentScopeRegex.find(script.substringAfterLast('\n'))!!
+        val transportInterface = config.groupValues[3]
+
+        assertTrue(script.startsWith("\"use strict\";"))
+        assertTrue(script.contains("""const name = "${testee.javascriptInterface}""""))
+        assertTrue(script.contains("""Object.defineProperty(globalThis, "$transportInterface","""))
+        assertTrue(testee.javascriptInterface != transportInterface)
+    }
+
+    @Test
     fun whenGetScriptWhenVariablesAreCachedAndNoChangesThenUseCachedVariables() {
         var js = testee.getScript(null, listOf())
         verifyJsScript(js)
@@ -857,7 +869,7 @@ class RealContentScopeScriptsTest {
     )
 
     private fun verifyJsScript(js: String, regex: Regex = contentScopeRegex) {
-        val matchResult = regex.find(js)
+        val matchResult = regex.find(js.substringAfterLast('\n'))
         val messageSecret = matchResult!!.groupValues[1]
         val messageCallback = matchResult.groupValues[2]
         val messageInterface = matchResult.groupValues[3]

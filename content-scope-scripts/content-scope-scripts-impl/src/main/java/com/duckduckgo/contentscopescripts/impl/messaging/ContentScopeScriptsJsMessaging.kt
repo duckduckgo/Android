@@ -45,6 +45,7 @@ import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.ensureActive
@@ -132,11 +133,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val lanes = ConcurrentHashMap<String, Lane>()
 
     private class InFlight(
+        val stage: InFlightStage,
         val startedAtMillis: Long,
-    ) {
-        @Volatile
-        var stage: InFlightStage = InFlightStage.URL
-    }
+    )
 
     private enum class InFlightStage(val paramValue: String) {
         URL("url"),
@@ -200,30 +199,40 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    @JavascriptInterface
+    private val bridge = JavascriptBridge()
+
     override fun process(
         message: String,
         secret: String,
     ) {
-        if (optimizedProcessing) {
-            processOptimized(message, secret)
-        } else {
+        bridge.process(message, secret)
+    }
+
+    internal inner class JavascriptBridge {
+        @JavascriptInterface
+        fun process(
+            message: String,
+            secret: String,
+        ): Int {
+            if (optimizedProcessing) return processOptimized(message, secret)
+
             processLegacy(message, secret)
+            return NO_IMMEDIATE_ERROR
         }
     }
 
     private fun processOptimized(
         message: String,
         secret: String,
-    ) {
-        if (this.secret != secret) return
-        val jsMessage = parseJsMessage(message) ?: return
-        if (context != jsMessage.context) return
-        val registration = this.registration ?: return
+    ): Int {
+        if (this.secret != secret) return NO_IMMEDIATE_ERROR
+        val jsMessage = parseJsMessage(message) ?: return NO_IMMEDIATE_ERROR
+        if (context != jsMessage.context) return NO_IMMEDIATE_ERROR
+        val registration = this.registration ?: return NO_IMMEDIATE_ERROR
 
         val url =
             if (allowedDomains.isNotEmpty() || jsMessage.featureName in domainRestrictedFeatures) {
-                appCoroutineScope.async(dispatcherProvider.main()) {
+                appCoroutineScope.async(dispatcherProvider.main(), start = CoroutineStart.LAZY) {
                     runCatching { registration.webView.url }.getOrNull()
                 }
             } else {
@@ -233,11 +242,14 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         if (!lane.queue.offer(QueuedMessage(registration, jsMessage, url))) {
             url?.cancel()
             logcat(WARN) { "Inbound queue full, dropping ${jsMessage.featureName}.${jsMessage.method}" }
-            jsMessage.id?.let { id -> sendErrorResponse(jsMessage, id, registration.webView, QUEUE_FULL_ERROR_CODE, QUEUE_FULL_ERROR_MESSAGE) }
             reportOverflow(lane)
-            return
+            // The JavaScript transport rejects the pending request on the bridge return, without posting a main-thread reply.
+            return if (jsMessage.id == null) NO_IMMEDIATE_ERROR else QUEUE_FULL_ERROR_CODE
         }
+        // Start at admission so the URL read samples the sending document without adding work for rejected messages.
+        url?.start()
         ensureQueueConsumerRunning(lane)
+        return NO_IMMEDIATE_ERROR
     }
 
     private fun laneFor(jsMessage: JsMessage): Lane {
@@ -304,11 +316,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 try {
                     while (true) {
                         ensureActive()
-                        val jsMessage = lane.queue.poll() ?: break
-                        val inFlight = InFlight(currentTimeProvider.elapsedRealtime())
-                        lane.inFlight = inFlight
+                        val queued = lane.queue.poll() ?: break
+                        val stage = if (queued.url == null) InFlightStage.HANDLER else InFlightStage.URL
+                        lane.inFlight = InFlight(stage, currentTimeProvider.elapsedRealtime())
                         try {
-                            handle(jsMessage, inFlight)
+                            handle(queued, lane)
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
@@ -331,7 +343,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
     private suspend fun handle(
         queued: QueuedMessage,
-        inFlight: InFlight,
+        lane: Lane,
     ) {
         if (queued.registration !== this.registration) {
             queued.url?.cancel()
@@ -340,8 +352,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         val jsMessage = queued.jsMessage
         val webView = queued.registration.webView
         val jsMessageCallback = queued.registration.jsMessageCallback
-        val host = queued.url?.await()?.toUri()?.host
-        inFlight.stage = InFlightStage.HANDLER
+        val host = queued.url?.let { url ->
+            val resolvedHost = url.await()?.toUri()?.host
+            lane.inFlight = InFlight(InFlightStage.HANDLER, currentTimeProvider.elapsedRealtime())
+            resolvedHost
+        }
 
         if (allowedDomains.isNotEmpty() && !isUrlAllowed(allowedDomains, host)) return
 
@@ -436,7 +451,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         drainQueue()
         this.optimizedProcessing = contentScopeScriptsFeature.optimizeContentScopeMessaging().isEnabled()
         this.checkSenderHost = contentScopeScriptsFeature.bridgeOriginCheck().isEnabled()
-        webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
+        webView.addJavascriptInterface(bridge, coreContentScopeScripts.javascriptInterface)
 
         appCoroutineScope.launch(dispatcherProvider.io()) { domainRestrictedFeatures }
     }
@@ -504,14 +519,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         jsMessage: JsMessage,
         id: String,
         webView: WebView,
-    ) = sendErrorResponse(jsMessage, id, webView, METHOD_NOT_FOUND_ERROR_CODE, METHOD_NOT_FOUND_ERROR_MESSAGE)
-
-    private fun sendErrorResponse(
-        jsMessage: JsMessage,
-        id: String,
-        webView: WebView,
-        code: Int,
-        message: String,
     ) {
         jsMessageHelper.sendJsResponse(
             JsRequestResponse.Error(
@@ -520,8 +527,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 method = jsMessage.method,
                 id = id,
                 error = JsErrorDetails(
-                    code = code,
-                    message = message,
+                    code = METHOD_NOT_FOUND_ERROR_CODE,
+                    message = METHOD_NOT_FOUND_ERROR_MESSAGE,
                 ),
             ),
             callbackName,
@@ -534,10 +541,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         private const val METHOD_NOT_FOUND_ERROR_CODE = -32601
         private const val METHOD_NOT_FOUND_ERROR_MESSAGE = "Method not found"
 
-        // JSON-RPC reserves -32000 to -32099 for implementation-defined server errors. Replying lets a page waiting on
-        // a dropped request fail instead of waiting forever.
+        private const val NO_IMMEDIATE_ERROR = 0
         internal const val QUEUE_FULL_ERROR_CODE = -32000
-        private const val QUEUE_FULL_ERROR_MESSAGE = "Too many pending messages"
 
         private const val SHARED_LANE = ""
         private const val ADD_DEBUG_FLAG_METHOD = "addDebugFlag"
