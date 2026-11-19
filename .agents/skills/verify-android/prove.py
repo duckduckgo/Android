@@ -536,10 +536,12 @@ def summarize(before, after):
     if not committed and proof.get("source"):
         lines += ["", "<details><summary>Proof source</summary>", "", "```python", proof["source"].rstrip(), "```", "",
                   "</details>"]
+    # proofs/ is where a proof finds steps.py, and .gitignore keeps it out of the repo there.
+    saved = f"{SKILL.relative_to(REPO)}/proofs/{proof.get('name') or 'proof'}.py"
     lines += ["", "<details><summary>Rerun</summary>", "", "```",
-              *([] if committed else ["# save the proof source above as proof.py"]),
+              *([] if committed else [f"# save the proof source above as {saved}"]),
               f"V={SKILL.relative_to(REPO)}/verify.sh", f"P={SKILL.relative_to(REPO)}/prove.py",
-              *rerun_lines(before, after, committed or "proof.py"), "```", "", "</details>"]
+              *rerun_lines(before, after, committed or saved), "```", "", "</details>"]
     return public("\n".join(lines) + "\n")
 
 
