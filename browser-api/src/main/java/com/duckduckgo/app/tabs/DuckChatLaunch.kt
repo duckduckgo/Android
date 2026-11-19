@@ -49,12 +49,16 @@ sealed interface DuckChatLaunch {
     data class ChatHistory(val origin: DuckChatLaunchOrigin) : DuckChatLaunch
 
     /**
-     * Opens the contextual Duck.ai sheet on the current tab, optionally with the text selected in the page.
+     * Opens the contextual Duck.ai sheet on the current tab.
+     *
+     * @param textSelection optional text select in the page.
      */
     data class ContextualChat(val textSelection: String?) : DuckChatLaunch
 
     /**
-     * Opens a new full screen Duck.ai tab, in regular mode, with [text] selected in another app.
+     * Opens a new full screen Duck.ai tab, in regular mode.
+     *
+     * @param text selected from another app.
      */
     data class TextSelection(val text: String) : DuckChatLaunch
 }
