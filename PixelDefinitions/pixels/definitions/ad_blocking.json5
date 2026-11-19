@@ -34,7 +34,7 @@
             {
                 "key": "segment_skip_status",
                 "type": "string",
-                "description": "Effective SegmentSkip mode",
+                "description": "Effective SegmentSkip mode: ask is Ask to Skip, skip is Always, and off is Never",
                 "enum": ["ask", "skip", "off"]
             }
         ]
@@ -56,7 +56,7 @@
             {
                 "key": "segment_skip_status",
                 "type": "string",
-                "description": "Effective SegmentSkip mode",
+                "description": "Effective SegmentSkip mode: ask is Ask to Skip, skip is Always, and off is Never",
                 "enum": ["ask", "skip", "off"]
             }
         ]
