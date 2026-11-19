@@ -77,6 +77,7 @@ class DuckAiWidgetUpdaterTest {
         val updater = DuckAiWidgetUpdater(widgetContext, DuckAiChatsWidgetChats(stringContext, chatStore), coroutineTestRule.testScope)
         updater.startObservingIfNeeded()
         assertEquals(1, chatsFlow.subscriptionCount.value)
+        shadowOf(context).clearBroadcastIntents()
 
         widgetIds = IntArray(0)
         chatsFlow.value = listOf(chat("a"), chat("b"))
@@ -86,10 +87,10 @@ class DuckAiWidgetUpdaterTest {
     }
 
     @Test
-    fun whenWidgetInstanceExistsThenInitialEmissionIsSkippedAndChangeBroadcastsUpdateForItsIds() {
+    fun whenWidgetInstanceExistsThenChangeBroadcastsUpdateForItsIds() {
         val widgetId = createWidget()
         testee.startObservingIfNeeded()
-        assertTrue(shadowOf(context).broadcastIntents.isEmpty())
+        shadowOf(context).clearBroadcastIntents()
 
         chatsFlow.value = listOf(chat("a"), chat("b"))
 
@@ -100,9 +101,20 @@ class DuckAiWidgetUpdaterTest {
     }
 
     @Test
+    fun whenFirstEmissionArrivesThenWidgetIsRefreshedInCaseChatsChangedSinceItWasRendered() {
+        val widgetId = createWidget()
+
+        testee.startObservingIfNeeded()
+
+        val intent = shadowOf(context).broadcastIntents.single()
+        assertEquals(listOf(widgetId), intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)?.toList())
+    }
+
+    @Test
     fun whenChatsChangeInWaysNotDisplayedThenNoBroadcast() {
         createWidget()
         testee.startObservingIfNeeded()
+        shadowOf(context).clearBroadcastIntents()
 
         chatsFlow.value = listOf(chat("a").copy(model = "other-model", lastEdit = "2026-09-09T00:00:00.000Z"))
 
@@ -113,6 +125,7 @@ class DuckAiWidgetUpdaterTest {
     fun whenTitleOrPinnedChangesThenBroadcasts() {
         createWidget()
         testee.startObservingIfNeeded()
+        shadowOf(context).clearBroadcastIntents()
 
         chatsFlow.value = listOf(chat("a").copy(pinned = true))
         chatsFlow.value = listOf(chat("a").copy(pinned = true, title = "Renamed"))
@@ -125,6 +138,7 @@ class DuckAiWidgetUpdaterTest {
         createWidget()
         testee.startObservingIfNeeded()
         testee.startObservingIfNeeded()
+        shadowOf(context).clearBroadcastIntents()
 
         chatsFlow.value = listOf(chat("a"), chat("b"))
 
