@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
-interface SponsorBlockHashPrefixGate {
+interface SegmentSkipHashPrefixGate {
     /** Whether any video whose ID hash starts with [hashPrefix] has segments; when false, the lookup skips the network. */
     suspend fun hasSegments(hashPrefix: String): Boolean
 }
 
 // TODO: replace with a gate backed by the local hash prefix list.
 @ContributesBinding(AppScope::class)
-class AlwaysHitSponsorBlockHashPrefixGate @Inject constructor() : SponsorBlockHashPrefixGate {
+class AlwaysHitSegmentSkipHashPrefixGate @Inject constructor() : SegmentSkipHashPrefixGate {
     override suspend fun hasSegments(hashPrefix: String): Boolean = true
 }

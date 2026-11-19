@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -25,14 +25,14 @@ import javax.inject.Inject
 // Sent on every resume rather than when the config changes, so a change made while the page is on screen applies on the next resume or
 // page load.
 @ContributesIntoSet(AppScope::class)
-class SponsorBlockConfigSubscriptionEventPlugin @Inject constructor(
-    private val sponsorBlock: SponsorBlock,
+class SegmentSkipConfigSubscriptionEventPlugin @Inject constructor(
+    private val segmentSkip: SegmentSkip,
 ) : ContentScopeScriptsSubscriptionEventPlugin {
 
     override fun getSubscriptionEventData(): SubscriptionEventData = SubscriptionEventData(
-        featureName = SponsorBlockContentScopeJsMessageHandler.FEATURE_NAME,
+        featureName = SegmentSkipContentScopeJsMessageHandler.FEATURE_NAME,
         subscriptionName = SUBSCRIPTION_CONFIG_CHANGED,
-        params = sponsorBlock.config().toJson(),
+        params = segmentSkip.config().toJson(),
     )
 
     private companion object {

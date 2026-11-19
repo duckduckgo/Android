@@ -33,13 +33,13 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlock
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockFeature
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkip
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipFeature
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipMode
 import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
-import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.ShowSponsorBlockModeDialog
+import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
@@ -64,8 +64,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     duckPlayer: DuckPlayer,
     duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider,
-    sponsorBlockFeature: SponsorBlockFeature,
-    private val sponsorBlock: SponsorBlock,
+    segmentSkipFeature: SegmentSkipFeature,
+    private val segmentSkip: SegmentSkip,
 ) : ViewModel() {
 
     init {
@@ -80,7 +80,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
         val duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
         val isContingencyMode: Boolean = false,
         val duckPlayerSection: DuckPlayerSection = DuckPlayerSection.None,
-        val sponsorBlockMode: SponsorBlockMode? = null,
+        val segmentSkipMode: SegmentSkipMode? = null,
     )
 
     sealed interface DuckPlayerSection {
@@ -92,12 +92,12 @@ class AdBlockingSettingsViewModel @Inject constructor(
     sealed class Command {
         data class OpenLearnMore(val url: String) : Command()
         data object OpenDuckPlayerSettings : Command()
-        data class ShowSponsorBlockModeDialog(val mode: SponsorBlockMode) : Command()
+        data class ShowSegmentSkipModeDialog(val mode: SegmentSkipMode) : Command()
     }
 
-    private val sponsorBlockModeFlow: Flow<SponsorBlockMode?> = combine(
-        sponsorBlockFeature.mvpEnabled().enabled(),
-        sponsorBlock.modeFlow(),
+    private val segmentSkipModeFlow: Flow<SegmentSkipMode?> = combine(
+        segmentSkipFeature.mvpEnabled().enabled(),
+        segmentSkip.modeFlow(),
     ) { mvpEnabled, mode -> mode.takeIf { mvpEnabled } }
 
     val viewState: StateFlow<ViewState> = combine(
@@ -105,8 +105,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
         duckPlayer.observeUserPreferences(),
         feature.enableContingencyMode().enabled(),
         duckPlayerSettingsPlacementProvider.placementFlow(),
-        sponsorBlockModeFlow,
-    ) { state, duckPlayerPreferences, contingencyModeOn, duckPlayerSettingsPlacement, sponsorBlockMode ->
+        segmentSkipModeFlow,
+    ) { state, duckPlayerPreferences, contingencyModeOn, duckPlayerSettingsPlacement, segmentSkipMode ->
         ViewState(
             isEnabled = state is AdBlockingState.Enabled,
             disabledUntilRelaunch = state is AdBlockingState.Disabled.UntilRelaunch,
@@ -119,7 +119,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
                 DuckPlayerSettingsPlacement.Standalone -> DuckPlayerSection.Link
                 DuckPlayerSettingsPlacement.Hidden -> DuckPlayerSection.None
             },
-            sponsorBlockMode = sponsorBlockMode,
+            segmentSkipMode = segmentSkipMode,
         )
     }
         .stateIn(
@@ -159,16 +159,16 @@ class AdBlockingSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onSponsorBlockModeClicked() {
+    fun onSegmentSkipModeClicked() {
         viewModelScope.launch {
-            val mode = sponsorBlock.modeFlow().firstOrNull() ?: return@launch
-            commandChannel.send(ShowSponsorBlockModeDialog(mode))
+            val mode = segmentSkip.modeFlow().firstOrNull() ?: return@launch
+            commandChannel.send(ShowSegmentSkipModeDialog(mode))
         }
     }
 
-    fun onSponsorBlockModeSelected(mode: SponsorBlockMode) {
+    fun onSegmentSkipModeSelected(mode: SegmentSkipMode) {
         viewModelScope.launch {
-            sponsorBlock.setMode(mode)
+            segmentSkip.setMode(mode)
         }
     }
 

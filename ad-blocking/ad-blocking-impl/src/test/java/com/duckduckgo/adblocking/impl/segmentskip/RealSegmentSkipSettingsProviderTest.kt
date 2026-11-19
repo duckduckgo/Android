@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -29,26 +29,26 @@ import org.junit.runner.RunWith
 
 @SuppressLint("DenyListedApi") // setRawStoredState
 @RunWith(AndroidJUnit4::class)
-class RealSponsorBlockSettingsProviderTest {
+class RealSegmentSkipSettingsProviderTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val feature = FakeFeatureToggleFactory.create(SponsorBlockFeature::class.java)
-    private val provider = RealSponsorBlockSettingsProvider(feature, coroutineRule.testDispatcherProvider)
+    private val feature = FakeFeatureToggleFactory.create(SegmentSkipFeature::class.java)
+    private val provider = RealSegmentSkipSettingsProvider(feature, coroutineRule.testDispatcherProvider)
 
     @Test
     fun whenSettingsAreMissingThenDefaultsAreReturned() = runTest {
         setSettings(null)
 
-        assertEquals(SponsorBlockSettings(), provider.settings())
+        assertEquals(SegmentSkipSettings(), provider.settings())
     }
 
     @Test
     fun whenSettingsJsonIsMalformedThenDefaultsAreReturned() = runTest {
         setSettings("{ not valid json")
 
-        assertEquals(SponsorBlockSettings(), provider.settings())
+        assertEquals(SegmentSkipSettings(), provider.settings())
     }
 
     @Test
@@ -64,7 +64,7 @@ class RealSponsorBlockSettingsProviderTest {
         )
 
         assertEquals(
-            SponsorBlockSettings(
+            SegmentSkipSettings(
                 categories = listOf("sponsor", "selfpromo"),
                 actionTypes = listOf("skip", "mute"),
             ),
@@ -76,7 +76,7 @@ class RealSponsorBlockSettingsProviderTest {
     fun whenSomeSettingsAreMissingThenDefaultsFillTheGaps() = runTest {
         setSettings("""{"categories": ["intro"]}""")
 
-        assertEquals(SponsorBlockSettings(categories = listOf("intro")), provider.settings())
+        assertEquals(SegmentSkipSettings(categories = listOf("intro")), provider.settings())
     }
 
     private fun setSettings(json: String?) {

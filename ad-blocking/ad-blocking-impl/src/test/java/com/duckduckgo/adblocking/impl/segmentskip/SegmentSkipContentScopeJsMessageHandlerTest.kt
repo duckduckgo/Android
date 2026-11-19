@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsorblock
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerFeatureRepository
@@ -40,17 +40,17 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class SponsorBlockContentScopeJsMessageHandlerTest {
+class SegmentSkipContentScopeJsMessageHandlerTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository = mock()
     private val jsMessaging: JsMessaging = mock()
-    private val sponsorBlock = FakeSponsorBlock()
+    private val segmentSkip = FakeSegmentSkip()
 
-    private val handler = SponsorBlockContentScopeJsMessageHandler(
-        sponsorBlock = sponsorBlock,
+    private val handler = SegmentSkipContentScopeJsMessageHandler(
+        segmentSkip = segmentSkip,
         duckPlayerFeatureRepository = duckPlayerFeatureRepository,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         appScope = coroutineRule.testScope,
@@ -77,21 +77,21 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
 
     @Test
     fun whenNotEnabledThenGetConfigReturnsNotEnabled() {
-        sponsorBlock.config = sponsorBlock.config.copy(enabled = false)
+        segmentSkip.config = segmentSkip.config.copy(enabled = false)
 
         assertFalse(send("getConfig").getBoolean("enabled"))
     }
 
     @Test
     fun whenGetSegmentsThenPassesVideoIdAndSerializesSegments() {
-        sponsorBlock.segments = listOf(
-            SponsorBlockSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip", uuid = "uuid-1"),
-            SponsorBlockSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", videoDuration = 300.5, uuid = "uuid-2"),
+        segmentSkip.segments = listOf(
+            SegmentSkipSegment(start = 5.0, end = 15.0, category = "sponsor", actionType = "skip", uuid = "uuid-1"),
+            SegmentSkipSegment(start = 60.0, end = 70.0, category = "sponsor", actionType = "skip", videoDuration = 300.5, uuid = "uuid-2"),
         )
 
         val segments = send("getSegments", JSONObject().put("videoID", VIDEO_ID)).getJSONArray("segments")
 
-        assertEquals(VIDEO_ID, sponsorBlock.requestedIds.single())
+        assertEquals(VIDEO_ID, segmentSkip.requestedIds.single())
         assertEquals(2, segments.length())
         with(segments.getJSONObject(0)) {
             assertEquals(5.0, getDouble("start"), 0.0)
@@ -107,7 +107,7 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
     @Test
     fun whenGetSegmentsWithoutVideoIdThenPassesEmptyId() {
         assertEquals(0, send("getSegments").getJSONArray("segments").length())
-        assertEquals("", sponsorBlock.requestedIds.single())
+        assertEquals("", segmentSkip.requestedIds.single())
     }
 
     @Test
@@ -128,21 +128,21 @@ class SponsorBlockContentScopeJsMessageHandlerTest {
         }.params
     }
 
-    private class FakeSponsorBlock : SponsorBlock {
-        var config = SponsorBlockConfig(enabled = true, skipMode = SponsorBlockSkipMode.MANUAL)
-        var segments: List<SponsorBlockSegment> = emptyList()
+    private class FakeSegmentSkip : SegmentSkip {
+        var config = SegmentSkipConfig(enabled = true, skipMode = SegmentSkipSkipMode.MANUAL)
+        var segments: List<SegmentSkipSegment> = emptyList()
         val requestedIds = mutableListOf<String>()
 
-        override fun config(): SponsorBlockConfig = config
+        override fun config(): SegmentSkipConfig = config
 
-        override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> {
+        override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> {
             requestedIds += videoId
             return segments
         }
 
-        override fun modeFlow(): Flow<SponsorBlockMode> = throw UnsupportedOperationException()
+        override fun modeFlow(): Flow<SegmentSkipMode> = throw UnsupportedOperationException()
 
-        override suspend fun setMode(mode: SponsorBlockMode) = throw UnsupportedOperationException()
+        override suspend fun setMode(mode: SegmentSkipMode) = throw UnsupportedOperationException()
     }
 
     private companion object {

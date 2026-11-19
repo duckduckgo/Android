@@ -31,11 +31,11 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlock
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockConfig
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockFeature
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockSegment
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkip
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipConfig
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipFeature
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipMode
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipSegment
 import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -76,14 +76,14 @@ class AdBlockingSettingsViewModelTest {
     private val pixel: Pixel = mock()
     private val duckPlayer: DuckPlayer = mock()
     private val duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider = mock()
-    private val sponsorBlockFeature = FeatureToggles.Builder()
+    private val segmentSkipFeature = FeatureToggles.Builder()
         .store(FakeToggleStore())
         .appVersionProvider { Int.MAX_VALUE }
         .featureName("sponsorBlock")
         .ioDispatcher(coroutineRule.testDispatcher)
         .build()
-        .create(SponsorBlockFeature::class.java)
-    private val sponsorBlock = FakeSponsorBlock()
+        .create(SegmentSkipFeature::class.java)
+    private val segmentSkip = FakeSegmentSkip()
 
     private fun createViewModel(
         duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
@@ -99,14 +99,14 @@ class AdBlockingSettingsViewModelTest {
             pixel,
             duckPlayer,
             duckPlayerSettingsPlacementProvider,
-            sponsorBlockFeature,
-            sponsorBlock,
+            segmentSkipFeature,
+            segmentSkip,
         )
     }
 
-    private fun setSponsorBlockEnabled(enabled: Boolean) {
-        sponsorBlockFeature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
-        sponsorBlockFeature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+    private fun setSegmentSkipEnabled(enabled: Boolean) {
+        segmentSkipFeature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
+        segmentSkipFeature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = enabled))
     }
 
     private fun setToggles(contingency: Boolean) {
@@ -299,54 +299,54 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenSponsorBlockDisabledThenHidesSponsorBlockMode() = runTest {
+    fun whenSegmentSkipDisabledThenHidesSegmentSkipMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setSponsorBlockEnabled(false)
+        setSegmentSkipEnabled(false)
 
         createViewModel().viewState.test {
-            assertNull(expectMostRecentItem().sponsorBlockMode)
+            assertNull(expectMostRecentItem().segmentSkipMode)
         }
     }
 
     @Test
-    fun whenSponsorBlockEnabledThenShowsStoredSponsorBlockMode() = runTest {
+    fun whenSegmentSkipEnabledThenShowsStoredSegmentSkipMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setSponsorBlockEnabled(true)
-        sponsorBlock.mode.value = SponsorBlockMode.ALWAYS_SKIP
+        setSegmentSkipEnabled(true)
+        segmentSkip.mode.value = SegmentSkipMode.ALWAYS_SKIP
 
         createViewModel().viewState.test {
-            assertEquals(SponsorBlockMode.ALWAYS_SKIP, expectMostRecentItem().sponsorBlockMode)
+            assertEquals(SegmentSkipMode.ALWAYS_SKIP, expectMostRecentItem().segmentSkipMode)
         }
     }
 
     @Test
-    fun whenSponsorBlockModeClickedThenShowsDialogWithCurrentMode() = runTest {
+    fun whenSegmentSkipModeClickedThenShowsDialogWithCurrentMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        sponsorBlock.mode.value = SponsorBlockMode.OFF
+        segmentSkip.mode.value = SegmentSkipMode.OFF
         val viewModel = createViewModel()
 
         viewModel.commands.test {
-            viewModel.onSponsorBlockModeClicked()
-            assertEquals(AdBlockingSettingsViewModel.Command.ShowSponsorBlockModeDialog(SponsorBlockMode.OFF), awaitItem())
+            viewModel.onSegmentSkipModeClicked()
+            assertEquals(AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog(SegmentSkipMode.OFF), awaitItem())
         }
     }
 
     @Test
-    fun whenSponsorBlockModeSelectedThenStoresIt() = runTest {
+    fun whenSegmentSkipModeSelectedThenStoresIt() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
 
-        createViewModel().onSponsorBlockModeSelected(SponsorBlockMode.ALWAYS_SKIP)
+        createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP)
 
-        assertEquals(SponsorBlockMode.ALWAYS_SKIP, sponsorBlock.mode.value)
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
     }
 
-    private class FakeSponsorBlock : SponsorBlock {
-        val mode = MutableStateFlow(SponsorBlockMode.ALWAYS_ASK)
+    private class FakeSegmentSkip : SegmentSkip {
+        val mode = MutableStateFlow(SegmentSkipMode.ALWAYS_ASK)
 
-        override fun config(): SponsorBlockConfig = throw UnsupportedOperationException()
-        override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> = throw UnsupportedOperationException()
-        override fun modeFlow(): Flow<SponsorBlockMode> = mode
-        override suspend fun setMode(mode: SponsorBlockMode) {
+        override fun config(): SegmentSkipConfig = throw UnsupportedOperationException()
+        override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> = throw UnsupportedOperationException()
+        override fun modeFlow(): Flow<SegmentSkipMode> = mode
+        override suspend fun setMode(mode: SegmentSkipMode) {
             this.mode.value = mode
         }
     }
