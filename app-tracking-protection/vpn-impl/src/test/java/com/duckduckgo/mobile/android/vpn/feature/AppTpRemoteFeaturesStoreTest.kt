@@ -127,6 +127,43 @@ class AppTpRemoteFeaturesStoreTest {
     }
 
     @Test
+    fun `test preferences are not opened until a toggle is read`() {
+        var opened = 0
+        val store = AppTpRemoteFeaturesStore(
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
+            object : SharedPreferencesProvider {
+                override fun getSharedPreferences(
+                    name: String,
+                    multiprocess: Boolean,
+                    migrate: Boolean,
+                ): SharedPreferences {
+                    opened++
+                    return preferences
+                }
+
+                override fun getEncryptedSharedPreferences(
+                    name: String,
+                    multiprocess: Boolean,
+                ): SharedPreferences? = TODO("Not yet implemented")
+
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? = TODO("Not yet implemented")
+
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? = TODO("Not yet implemented")
+            },
+            Moshi.Builder().build(),
+        )
+        assertEquals(0, opened)
+
+        store.get("key")
+
+        assertEquals(1, opened)
+    }
+
+    @Test
     fun `test preference change propagation`() {
         val adapter = Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(State::class.java)
         assertNull(appTpRemoteFeaturesStore.get("key"))

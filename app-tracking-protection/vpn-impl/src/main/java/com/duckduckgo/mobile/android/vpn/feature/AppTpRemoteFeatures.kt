@@ -241,7 +241,16 @@ class AppTpRemoteFeaturesStore @Inject constructor(
     moshi: Moshi,
 ) : Toggle.Store {
 
-    private val togglesCache = ConcurrentHashMap<String, State>()
+    // Every user builds this store at startup through the remote config plugins, but few ever read an AppTP toggle,
+    // so the stored state is only parsed on first access.
+    private val togglesCache: ConcurrentHashMap<String, State> by lazy {
+        ConcurrentHashMap<String, State>().also { cache ->
+            preferences?.run {
+                all.keys.forEach { key -> load(key)?.let { cache[key] = it } }
+                registerOnSharedPreferenceChangeListener(listener)
+            }
+        }
+    }
 
     private val preferences: SharedPreferences? by lazy {
         runCatching {
@@ -264,13 +273,6 @@ class AppTpRemoteFeaturesStore @Inject constructor(
         }
     }
 
-    init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            preferences?.load()
-            preferences?.registerOnSharedPreferenceChangeListener(listener)
-        }
-    }
-
     override fun set(key: String, state: State) {
         togglesCache[key] = state
         preferences?.save(key, state)
@@ -283,15 +285,6 @@ class AppTpRemoteFeaturesStore @Inject constructor(
     private fun SharedPreferences.save(key: String, state: State) {
         coroutineScope.launch(dispatcherProvider.io()) {
             edit { putString(key, stateAdapter.toJson(state)) }
-        }
-    }
-
-    private suspend fun SharedPreferences.load() = withContext(dispatcherProvider.io()) {
-        togglesCache.clear()
-        preferences?.all?.keys?.forEach { key ->
-            load(key)?.let {
-                togglesCache[key] = it
-            }
         }
     }
 
