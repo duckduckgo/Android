@@ -30,7 +30,6 @@ import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -68,8 +67,7 @@ class DuckAiWidgetUpdater @Inject constructor(
         if (observeJob.isActive || widgetIds().isEmpty()) return
 
         observeJob += appCoroutineScope.launch {
-            // The first emission is the state the widget has just rendered.
-            chats.observeChats().drop(1).collect {
+            chats.observeChats().collect {
                 if (widgetIds().isEmpty()) {
                     cancel()
                 } else {
