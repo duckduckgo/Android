@@ -49,6 +49,7 @@ class SearchBookmarksClientTool @Inject constructor(
         section = ClientToolSettingsSection.SEE,
         name = R.string.duckAiClientToolSearchBookmarksName,
         description = R.string.duckAiClientToolSearchBookmarksDescription,
+        icon = CommonR.drawable.ic_bookmarks_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.searchBookmarks().isEnabled()

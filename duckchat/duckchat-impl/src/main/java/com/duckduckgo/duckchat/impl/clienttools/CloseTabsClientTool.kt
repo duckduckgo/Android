@@ -47,6 +47,7 @@ class CloseTabsClientTool @Inject constructor(
         section = ClientToolSettingsSection.DO,
         name = R.string.duckAiClientToolCloseTabsName,
         description = R.string.duckAiClientToolCloseTabsDescription,
+        icon = CommonR.drawable.ic_close_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.closeTabs().isEnabled()

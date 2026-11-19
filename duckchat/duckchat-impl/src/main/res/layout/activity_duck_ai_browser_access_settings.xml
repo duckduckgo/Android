@@ -37,6 +37,16 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_5">
 
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="@string/duckAiBrowserAccessIntro"
+                app:textType="secondary"
+                app:typography="body2" />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/seeSectionHeader"
                 android:layout_width="match_parent"
@@ -48,6 +58,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/doSectionDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/doSectionHeader"

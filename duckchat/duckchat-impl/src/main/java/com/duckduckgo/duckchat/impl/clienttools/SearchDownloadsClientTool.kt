@@ -50,6 +50,7 @@ class SearchDownloadsClientTool @Inject constructor(
         section = ClientToolSettingsSection.SEE,
         name = R.string.duckAiClientToolSearchDownloadsName,
         description = R.string.duckAiClientToolSearchDownloadsDescription,
+        icon = CommonR.drawable.ic_downloads_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.searchDownloads().isEnabled()

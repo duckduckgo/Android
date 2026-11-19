@@ -25,6 +25,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(AppScope::class)
 class OpenTabClientTool @Inject constructor(
@@ -45,6 +46,7 @@ class OpenTabClientTool @Inject constructor(
         section = ClientToolSettingsSection.DO,
         name = R.string.duckAiClientToolOpenTabName,
         description = R.string.duckAiClientToolOpenTabDescription,
+        icon = CommonR.drawable.ic_add_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.openTab().isEnabled()
