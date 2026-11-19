@@ -164,10 +164,20 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenModelsListIsEmptyThenSupportsUploadIsTrue() = runTest {
-        modelStateFlow.value = ModelState(models = emptyList())
+    fun whenModelsListIsEmptyAndFeatureEnabledThenSupportsUploadIsTrue() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        modelStateFlow.value = ModelState(models = emptyList(), selectedModelId = "m1")
 
         assertTrue(viewModel.attachmentState.value.supportsUpload)
+    }
+
+    @Test
+    fun whenModelsListIsEmptyAndFeatureDisabledThenSupportsUploadIsFalse() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(false)
+        modelStateFlow.value = ModelState(models = emptyList(), selectedModelId = "m1")
+
+        assertFalse(viewModel.attachmentState.value.supportsUpload)
+        assertFalse(viewModel.attachmentState.value.supportsImageUpload)
     }
 
     @Test
