@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.wideevents
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTrackerImpl
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
 import javax.inject.Inject
@@ -27,24 +28,28 @@ import javax.inject.Inject
 class DuckAiSessionCallbackDispatcher @Inject constructor(
     private val session: RealDuckAiSessionWideEvent,
     private val responseWait: DuckAiResponseWaitWideEventImpl,
+    private val attentionTracker: DuckAiResponseAttentionTrackerImpl,
     private val entry: DuckAiEntryWideEvent,
 ) : DuckAiSessionCallback {
 
     override fun onLaunchLandingResolved(tabId: String?, url: String?) {
         session.onLaunchLandingResolved(tabId, url)
         responseWait.onLaunchLandingResolved(tabId, url)
+        attentionTracker.onLaunchLandingResolved(tabId, url)
         entry.onLaunchLandingResolved(tabId, url)
     }
 
     override fun onDuckAiPageVisible(tabId: String, url: String) {
         session.onDuckAiPageVisible(tabId, url)
         responseWait.onDuckAiPageVisible(tabId, url)
+        attentionTracker.onDuckAiPageVisible(tabId, url)
         entry.onDuckAiPageVisible(tabId, url)
     }
 
     override fun onSelectedTabChanged(tabId: String?, url: String?) {
         session.onSelectedTabChanged(tabId, url)
         responseWait.onSelectedTabChanged(tabId, url)
+        attentionTracker.onSelectedTabChanged(tabId, url)
         entry.onSelectedTabChanged(tabId, url)
     }
 

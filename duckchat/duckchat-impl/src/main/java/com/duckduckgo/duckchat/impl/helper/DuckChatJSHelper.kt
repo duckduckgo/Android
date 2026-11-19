@@ -46,6 +46,7 @@ import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -160,6 +161,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val pdfPageContextResolver: PdfPageContextResolver,
     private val chatStateStore: ChatStateStore,
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
+    private val attentionTracker: DuckAiResponseAttentionTracker,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val tabSessions: DuckAiTabSessionRepository,
     private val newChatHintsUsage: NewChatHintsUsage,
@@ -248,7 +250,9 @@ class RealDuckChatJSHelper @Inject constructor(
                         ?.let { status -> chatStateStore.update(tabId, status) }
                 }
                 if (mode == Mode.FULL && tabId.isNotEmpty()) {
-                    responseWaitWideEvent.onResponseState(tabId, data?.optString("status").orEmpty())
+                    val status = data?.optString("status").orEmpty()
+                    responseWaitWideEvent.onResponseState(tabId, status)
+                    attentionTracker.onResponseState(tabId, status)
                 }
                 data?.optJSONObject("attachments")?.let { attachments ->
                     val usage = AIChatAttachmentUsage(
@@ -658,6 +662,7 @@ class RealDuckChatJSHelper @Inject constructor(
         val pending = pendingNativePromptStore.consume()
         if (pending != null && mode == Mode.FULL && tabId.isNotEmpty()) {
             responseWaitWideEvent.onNativePromptSubmitted(tabId, browserMode, pending.reasoningEffort, pending.selectedTool)
+            attentionTracker.onNativePromptSubmitted(tabId, browserMode)
         }
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)

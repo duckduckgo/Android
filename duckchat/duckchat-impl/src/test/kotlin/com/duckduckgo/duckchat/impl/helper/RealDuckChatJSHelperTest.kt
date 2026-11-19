@@ -44,6 +44,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -143,6 +144,7 @@ class RealDuckChatJSHelperTest {
     private val mockTermsConsent: DuckAiTermsConsent = mock()
     private val chatStateStore = ChatStateStore()
     private val mockResponseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
+    private val mockAttentionTracker: DuckAiResponseAttentionTracker = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock {
         on { isDuckDuckGoQueryUrl(SERP_URL) } doReturn true
@@ -181,6 +183,7 @@ class RealDuckChatJSHelperTest {
         termsConsent = mockTermsConsent,
         chatStateStore = chatStateStore,
         responseWaitWideEvent = mockResponseWaitWideEvent,
+        attentionTracker = mockAttentionTracker,
         duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         tabSessions = tabSessions,
         newChatHintsUsage = newChatHintsUsage,
@@ -2886,6 +2889,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockResponseWaitWideEvent).onResponseState("tab-1", "start_stream:restart_stream")
+        verify(mockAttentionTracker).onResponseState("tab-1", "start_stream:restart_stream")
     }
 
     @Test
@@ -2901,6 +2905,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verifyNoInteractions(mockResponseWaitWideEvent)
+        verifyNoInteractions(mockAttentionTracker)
     }
 
     @Test
@@ -2919,6 +2924,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockResponseWaitWideEvent).onNativePromptSubmitted("tab-1", BrowserMode.FIRE, "high", "WebSearch")
+        verify(mockAttentionTracker).onNativePromptSubmitted("tab-1", BrowserMode.FIRE)
     }
 
     @Test
@@ -2928,6 +2934,7 @@ class RealDuckChatJSHelperTest {
         testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext, tabId = "tab-1")
 
         verifyNoInteractions(mockResponseWaitWideEvent)
+        verifyNoInteractions(mockAttentionTracker)
     }
 
     @Test

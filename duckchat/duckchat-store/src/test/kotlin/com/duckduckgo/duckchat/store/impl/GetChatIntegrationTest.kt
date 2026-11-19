@@ -71,6 +71,7 @@ class GetChatIntegrationTest {
             duckAiHostProvider = hostProvider,
             migrationPrefs = DuckAiMigrationPrefs(mock()),
             pixels = mock(),
+            deletionListener = mock(),
             browserMode = BrowserMode.REGULAR,
         )
         handler = handlerPlugin.getJsMessageHandler()
