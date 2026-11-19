@@ -461,6 +461,28 @@ class BrowserActivityNewTabTransitionTest {
     }
 
     @Test
+    fun widgetLaunchIntoAReusedEmptyTabReportsTheEntryWithoutANewTab() {
+        viewModel.stub { onBlocking { findEmptyDuckAiTabId() } doReturn OTHER }
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+        val duckChat: DuckChat = mock()
+
+        processIntentWhileOnScreen(intent, duckChat)
+
+        verifyBlocking(tabManager) { switchToTab(OTHER) }
+        verify(duckChat).reportDuckChatEntry(DuckChatEntryPoint.WIDGET_DUCK_AI, opensNewTab = false, hasPrompt = false)
+    }
+
+    @Test
+    fun widgetLaunchWithoutAnEmptyTabReportsTheEntryWithANewTab() {
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+        val duckChat: DuckChat = mock { on { getDuckChatUrl("", false) } doReturn URL }
+
+        processIntentWhileOnScreen(intent, duckChat)
+
+        verify(duckChat).reportDuckChatEntry(DuckChatEntryPoint.WIDGET_DUCK_AI, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
     fun newChatLaunchWithoutUrlBuildsTheChatUrlAtTapTime() {
         val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
 
