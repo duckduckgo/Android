@@ -593,19 +593,16 @@ class RealAuthRepositoryTest {
     }
 
     @Test
-    fun whenClearTokensAndHistoryThenTokensAccountAndHistoryAreGoneAndSerpCookieIsCleared() = runTest {
+    fun whenClearTokensThenTokensAndAccountAreGoneAndSerpCookieIsCleared() = runTest {
         authStore.accessTokenV2 = "access"
         authStore.refreshTokenV2 = "refresh"
         authStore.accessToken = "legacy access"
         authStore.authToken = "legacy auth"
         authStore.email = "email@duck.com"
         authStore.externalId = "externalId"
-        authStore.tokenRefreshFailureStreak = 3
-        authStore.lastTokenRefreshSuccessAt = 1_000L
-        authStore.lastTokenRefreshProcess = "main"
         serpPromo.injectCookie("access")
 
-        authRepository.clearTokensAndHistory()
+        authRepository.clearTokens()
 
         assertNull(authStore.accessTokenV2)
         assertNull(authStore.refreshTokenV2)
@@ -613,9 +610,6 @@ class RealAuthRepositoryTest {
         assertNull(authStore.authToken)
         assertNull(authStore.email)
         assertNull(authStore.externalId)
-        assertEquals(0, authStore.tokenRefreshFailureStreak)
-        assertNull(authStore.lastTokenRefreshSuccessAt)
-        assertNull(authStore.lastTokenRefreshProcess)
         assertNull(serpPromo.cookie)
     }
 }

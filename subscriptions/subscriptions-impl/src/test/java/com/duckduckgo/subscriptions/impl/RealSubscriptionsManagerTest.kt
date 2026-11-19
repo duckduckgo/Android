@@ -1809,7 +1809,7 @@ class RealSubscriptionsManagerTest {
             subscriptionOnboardingExperiments,
         )
         manager.signOut()
-        verify(mockRepo).clearTokensAndHistory()
+        verify(mockRepo).clearTokens()
         verify(mockRepo).setSubscription(null)
         verify(mockRepo).setEntitlements(emptyList())
         verify(mockRepo).removeLocalPurchasedAt()
@@ -2502,32 +2502,30 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenRefreshIsRejectedAndRecoverySignsOutThenFailureStreakIsNotKept() = runTest {
+    fun whenRefreshIsRejectedAndRecoverySignsOutThenWideEventIsToldAboutTheSignOut() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(error = "invalid_token")
         givenPurchaseStored()
         givenStoreLoginFails()
-        authDataStore.tokenRefreshFailureStreak = 2
 
         subscriptionsManager.getAccessToken()
 
         assertFalse(subscriptionsManager.isSignedIn())
-        assertEquals(0, authDataStore.tokenRefreshFailureStreak)
+        verify(tokenRefreshWideEvent).onSignOut()
     }
 
     @Test
-    fun whenRefreshFailsWithUnknownAccountThenFailureStreakIsNotKept() = runTest {
+    fun whenRefreshFailsWithUnknownAccountThenWideEventIsToldAboutTheSignOut() = runTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(error = "unknown_account")
-        authDataStore.tokenRefreshFailureStreak = 2
 
         subscriptionsManager.getAccessToken()
 
         assertFalse(subscriptionsManager.isSignedIn())
-        assertEquals(0, authDataStore.tokenRefreshFailureStreak)
+        verify(tokenRefreshWideEvent).onSignOut()
     }
 
     @Test
@@ -2548,15 +2546,12 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenSignOutThenRefreshHistoryIsCleared() = runTest {
+    fun whenSignOutThenWideEventIsToldAboutTheSignOut() = runTest {
         givenUserIsSignedIn()
-        authDataStore.tokenRefreshFailureStreak = 4
-        authDataStore.lastTokenRefreshSuccessAt = 1_000L
 
         subscriptionsManager.signOut()
 
-        assertEquals(0, authDataStore.tokenRefreshFailureStreak)
-        assertNull(authDataStore.lastTokenRefreshSuccessAt)
+        verify(tokenRefreshWideEvent).onSignOut()
     }
 
     private suspend fun givenUrlPortalSucceeds() {

@@ -81,7 +81,7 @@ interface AuthRepository {
         entitlements: List<Entitlement>,
         account: Account,
     ): Boolean
-    suspend fun clearTokensAndHistory()
+    suspend fun clearTokens()
 }
 
 @BindingContainer
@@ -414,8 +414,8 @@ internal class RealAuthRepository constructor(
         saved
     }
 
-    override suspend fun clearTokensAndHistory() = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.clearTokensAndHistory()
+    override suspend fun clearTokens() = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.clearTokens()
         updateSerpPromoCookie()
     }
 }
