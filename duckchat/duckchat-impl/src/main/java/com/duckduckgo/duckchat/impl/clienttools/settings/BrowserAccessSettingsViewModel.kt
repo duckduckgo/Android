@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clienttools.settings
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -59,6 +60,7 @@ class BrowserAccessSettingsViewModel @Inject constructor(
         val toolName: String,
         @StringRes val name: Int,
         @StringRes val description: Int,
+        @DrawableRes val icon: Int,
         val choice: BrowserAccessChoice,
         val options: List<BrowserAccessChoice>,
     )
@@ -119,6 +121,7 @@ class BrowserAccessSettingsViewModel @Inject constructor(
         toolName = tool.name,
         name = tool.settingsListing.name,
         description = tool.settingsListing.description,
+        icon = tool.settingsListing.icon,
         choice = currentChoice(tool.permissionMode, stored),
         options = options(tool.permissionMode),
     )
@@ -139,8 +142,8 @@ class BrowserAccessSettingsViewModel @Inject constructor(
 }
 
 enum class BrowserAccessChoice(@StringRes val label: Int) {
-    ALWAYS_ASK(R.string.duckAiBrowserAccessAlwaysAsk),
     ALWAYS_ALLOW(R.string.duckAiBrowserAccessAlwaysAllow),
+    ALWAYS_ASK(R.string.duckAiBrowserAccessAlwaysAsk),
     NEVER_ALLOW(R.string.duckAiBrowserAccessNeverAllow),
 }
 

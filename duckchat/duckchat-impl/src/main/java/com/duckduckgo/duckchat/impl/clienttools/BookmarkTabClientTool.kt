@@ -35,6 +35,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.UUID
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(AppScope::class)
 class BookmarkTabClientTool @Inject constructor(
@@ -58,6 +59,7 @@ class BookmarkTabClientTool @Inject constructor(
         section = ClientToolSettingsSection.DO,
         name = R.string.duckAiClientToolBookmarkTabName,
         description = R.string.duckAiClientToolBookmarkTabDescription,
+        icon = CommonR.drawable.ic_bookmark_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.bookmarkTab().isEnabled()

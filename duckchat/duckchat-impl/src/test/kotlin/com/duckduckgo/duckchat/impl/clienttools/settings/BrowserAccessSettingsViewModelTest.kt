@@ -82,7 +82,7 @@ class BrowserAccessSettingsViewModelTest {
     fun whenToolsLoadThenOptionsMatchWhatTheGateHonours() = runTest {
         val testee = testee(listOpenTabs, switchToTab, openTab)
 
-        assertEquals(listOf(ALWAYS_ASK, ALWAYS_ALLOW, NEVER_ALLOW), testee.row("listOpenTabs").options)
+        assertEquals(listOf(ALWAYS_ALLOW, ALWAYS_ASK, NEVER_ALLOW), testee.row("listOpenTabs").options)
         assertEquals(listOf(ALWAYS_ALLOW, NEVER_ALLOW), testee.row("switchToTab").options)
         assertEquals(listOf(ALWAYS_ASK, NEVER_ALLOW), testee.row("openTab").options)
     }
@@ -180,6 +180,6 @@ class BrowserAccessSettingsViewModelTest {
     ) = FakeClientTool(
         name = name,
         permissionMode = mode,
-        settingsListing = ClientToolSettingsListing(section, name = 0, description = 0),
+        settingsListing = ClientToolSettingsListing(section, name = 0, description = 0, icon = 0),
     )
 }

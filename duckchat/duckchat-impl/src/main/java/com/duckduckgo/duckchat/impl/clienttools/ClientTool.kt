@@ -55,6 +55,7 @@ data class ClientToolSettingsListing(
     val section: ClientToolSettingsSection,
     @StringRes val name: Int,
     @StringRes val description: Int,
+    @DrawableRes val icon: Int,
 )
 
 enum class ClientToolSettingsSection {

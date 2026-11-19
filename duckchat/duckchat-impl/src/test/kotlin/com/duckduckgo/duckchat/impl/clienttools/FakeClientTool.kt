@@ -29,7 +29,8 @@ class FakeClientTool(
     override val name: String = "fakeTool",
     override val version: Int = 1,
     override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.Auto,
-    override val settingsListing: ClientToolSettingsListing = ClientToolSettingsListing(ClientToolSettingsSection.SEE, name = 0, description = 0),
+    override val settingsListing: ClientToolSettingsListing =
+        ClientToolSettingsListing(ClientToolSettingsSection.SEE, name = 0, description = 0, icon = 0),
     var enabled: Boolean = true,
     var validInput: (JSONObject) -> Boolean = { true },
     var result: suspend (JSONObject) -> ClientToolResult = { ClientToolResult.Success(JSONObject().put("echo", it)) },

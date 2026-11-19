@@ -63,7 +63,7 @@
     <string name="duckAiClientToolOpenTabDescription">Open a page in a new tab.</string>
     <string name="duckAiClientToolSwitchToTabName">Switch to Tab</string>
     <string name="duckAiClientToolSwitchToTabDescription">Bring one of your open tabs to the front.</string>
-    <string name="duckAiClientToolBookmarkTabName">Bookmark Tab</string>
+    <string name="duckAiClientToolBookmarkTabName">Bookmark Page</string>
     <string name="duckAiClientToolBookmarkTabDescription">Add a page to your bookmarks.</string>
     <string name="duckAiClientToolOpenTabPromptTitle">Allow Duck.ai to open this page?</string>
     <string name="duckAiClientToolOpenTabPromptMessage" instruction="Placeholder is the full address of the page, such as https://example.com/travel/paris">It will open %1$s in a new tab.</string>
@@ -74,23 +74,24 @@
     <string name="duckAiClientToolCloseTabsPromptTitle">Allow Duck.ai to close tabs?</string>
     <string name="duckAiClientToolCloseTabsPromptMessage">It will close the tabs you asked it to close.</string>
     <string name="duckAiClientToolSearchBookmarksName">Search Bookmarks</string>
-    <string name="duckAiClientToolSearchBookmarksDescription">Find bookmarks by title, address or folder.</string>
+    <string name="duckAiClientToolSearchBookmarksDescription">Search your bookmarks and their folders.</string>
     <string name="duckAiClientToolSearchBookmarksPromptTitle">Allow Duck.ai to search your bookmarks?</string>
     <string name="duckAiClientToolSearchBookmarksPromptMessage">It will see the title, address and folder of the bookmarks it finds.</string>
     <string name="duckAiClientToolSearchDownloadsName">Search Downloads</string>
-    <string name="duckAiClientToolSearchDownloadsDescription">Find downloaded files by name.</string>
+    <string name="duckAiClientToolSearchDownloadsDescription">Search the names and sources of files you’ve downloaded.</string>
     <string name="duckAiClientToolSearchDownloadsPromptTitle">Allow Duck.ai to search your downloads?</string>
     <string name="duckAiClientToolSearchDownloadsPromptMessage">It will see the name and download date of the files it finds.</string>
 
     <!-- Browser Access settings -->
     <string name="duckAiBrowserAccessTitle">Browser Access</string>
     <string name="duckAiBrowserAccessDescription">Choose what Duck.ai can see and do in your browser.</string>
+    <string name="duckAiBrowserAccessIntro">Choose what actions Duck.ai can take in the browser, and whether it can act without asking for permission each time. These settings apply to every site and chat.</string>
     <string name="duckAiBrowserAccessSeeSection">What Duck.ai Can See</string>
     <string name="duckAiBrowserAccessDoSection">What Duck.ai Can Do</string>
     <string name="duckAiBrowserAccessAlwaysAsk">Always Ask</string>
     <string name="duckAiBrowserAccessAlwaysAllow">Always Allow</string>
     <string name="duckAiBrowserAccessNeverAllow">Never Allow</string>
-    <string name="duckAiBrowserAccessResetAll">Reset All to Default</string>
+    <string name="duckAiBrowserAccessResetAll">Reset All</string>
     <string name="duckAiBrowserAccessResetAllDialogTitle">Reset browser access?</string>
     <string name="duckAiBrowserAccessResetAllDialogMessage">Duck.ai will go back to asking before it uses these features.</string>
     <string name="duckAiBrowserAccessResetAllDialogConfirm">Reset</string>

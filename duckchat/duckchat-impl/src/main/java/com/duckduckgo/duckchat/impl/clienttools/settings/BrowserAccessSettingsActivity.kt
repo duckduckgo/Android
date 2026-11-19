@@ -76,6 +76,7 @@ class BrowserAccessSettingsActivity : DuckDuckGoActivity() {
     private fun render(viewState: ViewState) {
         binding.seeSectionHeader.isVisible = viewState.seeTools.isNotEmpty()
         renderRows(binding.seeTools, viewState.seeTools)
+        binding.doSectionDivider.isVisible = viewState.doTools.isNotEmpty()
         binding.doSectionHeader.isVisible = viewState.doTools.isNotEmpty()
         renderRows(binding.doTools, viewState.doTools)
         binding.resetAll.isEnabled = viewState.isResetAllEnabled
@@ -88,6 +89,7 @@ class BrowserAccessSettingsActivity : DuckDuckGoActivity() {
         container.removeAllViews()
         rows.forEach { row ->
             val item = TwoLineListItem(this).apply {
+                setLeadingIconResource(row.icon)
                 setPrimaryText(getString(row.name))
                 setSecondaryText(getString(row.choice.label))
                 setClickListener { viewModel.onToolClicked(row.toolName) }
