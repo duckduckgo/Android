@@ -557,7 +557,7 @@ class WelcomePageViewModel @Inject constructor(
             if (state.rootPlanId != MIGRATION_PLAN_ID) {
                 shownPixels.fireFor(dialog)
             } else if (dialog == NewUserOnboardingActivityDialog.MigrationAllSet) {
-                pixel.fire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_SHOWN, type = Unique())
+                pixel.enqueueFire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_SHOWN, type = Unique())
             }
             _viewState.update {
                 it.copy(
