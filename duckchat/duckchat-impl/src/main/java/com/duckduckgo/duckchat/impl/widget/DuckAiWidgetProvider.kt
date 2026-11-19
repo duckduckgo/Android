@@ -16,9 +16,14 @@
 package com.duckduckgo.duckchat.impl.widget
 
 import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT
+import android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH
+import android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT
+import android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -93,8 +98,9 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appWidgetId: Int,
     ) {
         val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
-        val heightDp = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, Int.MAX_VALUE) ?: Int.MAX_VALUE
-        val widthDp = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, Int.MAX_VALUE) ?: Int.MAX_VALUE
+        val portrait = context.resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
+        val heightDp = options?.getInt(if (portrait) OPTION_APPWIDGET_MAX_HEIGHT else OPTION_APPWIDGET_MIN_HEIGHT, 0) ?: 0
+        val widthDp = options?.getInt(if (portrait) OPTION_APPWIDGET_MIN_WIDTH else OPTION_APPWIDGET_MAX_WIDTH, 0) ?: 0
 
         appCoroutineScope.launch {
             val views = duckAiWidgetConfigurator.createRemoteViews(context, appWidgetId, heightDp, widthDp)
@@ -108,4 +114,5 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         pixel.fire(DuckChatPixelName.DUCK_AI_WIDGET_DELETED)
         homeScreenWidgetLifecycle.onWidgetDisabled()
     }
+
 }
