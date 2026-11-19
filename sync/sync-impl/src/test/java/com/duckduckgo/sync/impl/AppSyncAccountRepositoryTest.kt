@@ -16,11 +16,8 @@
 
 package com.duckduckgo.sync.impl
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
@@ -101,7 +98,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class AppSyncAccountRepositoryTest {
 
@@ -117,10 +113,6 @@ class AppSyncAccountRepositoryTest {
     private val moshi = Moshi.Builder().build()
     private val invitationCodeWrapperAdapter = moshi.adapter(InvitationCodeWrapper::class.java)
     private val recoveryCodeAdapter = moshi.adapter(LinkCode::class.java)
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
-        this.seamlessAccountSwitching().setRawStoredState(State(true))
-    }
-
     private lateinit var syncRepo: SyncAccountRepository
 
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
@@ -144,7 +136,6 @@ class AppSyncAccountRepositoryTest {
             syncPixels,
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
-            syncFeature,
             deviceKeyGenerator,
             syncSetupWideEvent = syncSetupWideEvent,
             syncJweCrypto = syncJweCrypto,
@@ -290,17 +281,6 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenExchangeCodeProcessedButFeatureFlagIsDisabledThenIsError() {
-        prepareForExchangeSuccess()
-        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
-
-        val exchangeCode = jsonExchangeKey(primaryDeviceKeyId, validLoginKeys.primaryKey)
-
-        val result = syncRepo.processCode(syncRepo.parseSyncAuthCode(exchangeCode.encodeB64()))
-        assertTrue(result is Error)
-    }
-
-    @Test
     fun whenExchangeCodeProcessedThenInvitationAccepted() {
         prepareForExchangeSuccess()
 
@@ -315,7 +295,6 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenExchangeCodeProcessedAndInvitationAcceptedRequestFailedThenIsError() {
-        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
         prepareForExchangeSuccess()
 
         whenever(syncApi.sendEncryptedMessage(eq(primaryDeviceKeyId), eq(encryptedExchangeCode))).thenReturn(Result.Error(reason = "error"))
@@ -466,7 +445,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenSignedInAndProcessRecoveryCodeIfAllowSwitchAccountTrueThenSwitchAccountIfOnly1DeviceConnected() {
+    fun whenSignedInAndProcessRecoveryCodeThenSwitchAccountIfOnly1DeviceConnected() {
         givenAuthenticatedDevice()
         givenAccountWithConnectedDevices(1)
         doAnswer {
@@ -484,7 +463,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenSignedInAndProcessRecoveryCodeIfAllowSwitchAccountTrueThenReturnErrorIfMultipleDevicesConnected() {
+    fun whenSignedInAndProcessRecoveryCodeThenReturnErrorIfMultipleDevicesConnected() {
         givenAuthenticatedDevice()
         givenAccountWithConnectedDevices(2)
         doAnswer {
@@ -499,7 +478,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenSignedInAndProcessRecoveryCodeIfAllowSwitchAccountTrueThenReturnErrorIfNoDeviceCountStored() {
+    fun whenSignedInAndProcessRecoveryCodeThenReturnErrorIfNoDeviceCountStored() {
         givenAuthenticatedDevice()
         prepareForEncryption()
         prepareForLoginSuccess()
@@ -670,10 +649,9 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenRenameThisDeviceAndCanWriteUnifiedDeviceListThenRenamesViaUnifiedPath() = runTest {
+    fun whenRenameThisDeviceThenPatchViaTheUpdater() = runTest {
         givenAuthenticatedDevice()
         prepareForLoginSuccess()
-        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(deviceInfoUpdater.setThisDeviceName(name = any(), source = eq(DeviceInfoUpdateSource.UPDATE))).thenReturn(Success(emptyList()))
 
         val result = syncRepo.renameDevice(connectedDevice.copy(deviceName = "New Name"))
@@ -684,10 +662,9 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenUnifiedRenameFailsThenReturnErrorAndFireUpdateDevicePixel() = runTest {
+    fun whenRenameFailsThenReturnErrorAndFireUpdateDevicePixel() = runTest {
         givenAuthenticatedDevice()
         prepareForLoginSuccess()
-        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(
             deviceInfoUpdater.setThisDeviceName(name = any(), source = eq(DeviceInfoUpdateSource.UPDATE)),
         ).thenReturn(Error(reason = "patch failed"))
@@ -703,43 +680,12 @@ class AppSyncAccountRepositoryTest {
     fun whenRenameAnotherDeviceThenReturnErrorWithoutWritingAnything() = runTest {
         givenAuthenticatedDevice()
         prepareForLoginSuccess()
-        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         val anotherDevice = connectedDevice.copy(thisDevice = false, deviceId = "anotherDeviceId")
 
         val result = syncRepo.renameDevice(anotherDevice)
 
         assertTrue(result is Error)
         verifyNoInteractions(deviceInfoUpdater)
-        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
-    }
-
-    @Test
-    fun whenRenameThisDeviceAndCannotWriteUnifiedDeviceListThenStillPatchViaTheUpdater() = runTest {
-        givenAuthenticatedDevice()
-        prepareForLoginSuccess()
-        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
-        whenever(deviceInfoUpdater.setThisDeviceName(name = any(), source = eq(DeviceInfoUpdateSource.UPDATE))).thenReturn(Success(emptyList()))
-
-        val result = syncRepo.renameDevice(connectedDevice.copy(deviceName = "New Name"))
-
-        assertTrue(result is Success)
-        verify(deviceInfoUpdater).setThisDeviceName(name = "New Name", source = DeviceInfoUpdateSource.UPDATE)
-        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
-    }
-
-    @Test
-    fun whenLegacyOnlyRenameFailsThenReturnErrorAndFireUpdateDevicePixel() = runTest {
-        givenAuthenticatedDevice()
-        prepareForLoginSuccess()
-        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
-        whenever(
-            deviceInfoUpdater.setThisDeviceName(name = any(), source = eq(DeviceInfoUpdateSource.UPDATE)),
-        ).thenReturn(Error(reason = "patch failed"))
-
-        val result = syncRepo.renameDevice(connectedDevice)
-
-        assertTrue(result is Error)
-        verify(syncPixels).fireSyncAccountErrorPixel(any(), eq(SyncAccountOperation.UPDATE_DEVICE))
         verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
     }
 
@@ -789,7 +735,6 @@ class AppSyncAccountRepositoryTest {
 
     private fun prepareForExchangeSuccess() {
         prepareForEncryption()
-        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
         whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
