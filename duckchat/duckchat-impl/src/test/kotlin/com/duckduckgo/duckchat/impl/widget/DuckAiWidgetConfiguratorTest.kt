@@ -22,8 +22,11 @@ import android.widget.RemoteViews
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -45,12 +48,14 @@ class DuckAiWidgetConfiguratorTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    private val duckChat: DuckChatInternal = mock()
+    private val repository: DuckChatFeatureRepository = mock()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val remoteViews: RemoteViews = mock()
     private val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
 
     private val testee = DuckAiWidgetConfigurator(
-        duckChat = duckChat,
+        duckChatFeature = duckChatFeature,
+        repository = repository,
         intents = fakeDuckAiWidgetIntents(),
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
@@ -92,17 +97,27 @@ class DuckAiWidgetConfiguratorTest {
     }
 
     @Test
-    fun whenRenderedThenNoNewChatUrlIsBuilt() = runTest {
+    fun whenRenderedThenPromptTargetIsWired() = runTest {
         stubDuckAi(enabled = true)
 
         testee.populateRemoteViews(activity, remoteViews)
 
-        verify(duckChat, never()).getDuckChatUrl(any(), any(), any())
+        verify(remoteViews).setOnClickPendingIntent(eq(R.id.promptBarContainer), any())
     }
 
     @Test
     fun whenDuckAiDisabledThenNoClickTargetsWired() = runTest {
-        whenever(duckChat.isEnabled()).thenReturn(false)
+        stubDuckAi(enabled = false)
+
+        testee.populateRemoteViews(activity, remoteViews)
+
+        verify(remoteViews, never()).setOnClickPendingIntent(any(), any())
+    }
+
+    @Test
+    fun whenFeatureDisabledThenNoClickTargetsWired() = runTest {
+        stubDuckAi(enabled = true)
+        duckChatFeature.self().setRawStoredState(State(false))
 
         testee.populateRemoteViews(activity, remoteViews)
 
@@ -116,8 +131,9 @@ class DuckAiWidgetConfiguratorTest {
         assertEquals(requestCodes.size, requestCodes.toSet().size)
     }
 
-    private fun stubDuckAi(enabled: Boolean) {
-        whenever(duckChat.isEnabled()).thenReturn(enabled)
+    private suspend fun stubDuckAi(enabled: Boolean) {
+        duckChatFeature.self().setRawStoredState(State(true))
+        whenever(repository.isDuckChatUserEnabled()).thenReturn(enabled)
     }
 
     private suspend fun populateAndCaptureClickIntent(viewId: Int): Intent {

@@ -36,9 +36,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -74,6 +76,32 @@ class DuckAiWidgetAvailabilityTest {
         homeScreenWidgetLifecycle = homeScreenWidgetLifecycle,
         appCoroutineScope = coroutineTestRule.testScope,
     )
+
+    @Test
+    fun reproInFlightConfigSnapshotReEnablesWidgetAfterOptOut() = runTest {
+        givenConditions()
+        var receiverState = PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+        whenever(packageManager.getComponentEnabledSetting(receiver)).thenAnswer { receiverState }
+        org.mockito.kotlin.doAnswer {
+            receiverState = it.getArgument<Int>(1)
+            null
+        }.whenever(packageManager).setComponentEnabledSetting(eq(receiver), any(), any())
+
+        testee.onCreate(mock())
+        val releaseEarlierRead = kotlinx.coroutines.CompletableDeferred<Unit>()
+        repository.stub {
+            onBlocking { isDuckChatUserEnabled() } doSuspendableAnswer {
+                val snapshot = userEnabledFlow.value
+                if (snapshot) releaseEarlierRead.await()
+                snapshot
+            }
+        }
+        testee.onPrivacyConfigDownloaded()
+        userEnabledFlow.value = false
+        releaseEarlierRead.complete(Unit)
+        coroutineTestRule.testScope.testScheduler.runCurrent()
+        org.junit.Assert.assertEquals("receiver state after opt-out", PackageManager.COMPONENT_ENABLED_STATE_DISABLED, receiverState)
+    }
 
     @Test
     fun whenAllConditionsMetThenEnablesReceiver() = runTest {
