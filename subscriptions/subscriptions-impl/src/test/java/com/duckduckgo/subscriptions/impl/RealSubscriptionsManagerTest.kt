@@ -62,7 +62,6 @@ import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import com.duckduckgo.subscriptions.impl.repository.TokenRefreshHistory
 import com.duckduckgo.subscriptions.impl.repository.TokenStoreException
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.subscriptions.impl.services.ActiveOfferResponse
@@ -81,7 +80,6 @@ import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEven
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionUndoCancellationWideEvent
-import com.duckduckgo.subscriptions.impl.wideevents.TokenStoreError
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
@@ -2455,76 +2453,27 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenRefreshStartsThenPlatformAndHistoryArePassedToWideEvent() = runTest {
+    fun whenRefreshStartsThenStatusAndPlatformArePassedToWideEvent() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshSucceeds()
-        authDataStore.tokenRefreshFailureStreak = 3
-        authDataStore.lastTokenRefreshSuccessAt = 1_000L
 
         subscriptionsManager.getAccessToken()
 
-        verify(tokenRefreshWideEvent).onStart(
-            subscriptionStatus = AUTO_RENEWABLE,
-            subscriptionPlatform = "google",
-            refreshHistory = TokenRefreshHistory(failureStreak = 3, lastSuccessAt = Instant.ofEpochMilli(1_000L)),
-        )
+        verify(tokenRefreshWideEvent).onStart(subscriptionStatus = AUTO_RENEWABLE, subscriptionPlatform = "google")
     }
 
     @Test
-    fun whenRefreshSucceedsThenFailureStreakResetsAndSuccessTimeIsRecorded() = runTest {
+    fun whenRefreshSucceedsThenTokenSaveAndSuccessAreReportedToWideEvent() = runTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshSucceeds()
-        authDataStore.tokenRefreshFailureStreak = 3
 
         subscriptionsManager.getAccessToken()
 
-        assertEquals(0, authDataStore.tokenRefreshFailureStreak)
-        assertEquals(timeProvider.currentTime.toEpochMilli(), authDataStore.lastTokenRefreshSuccessAt)
         verify(tokenRefreshWideEvent).onTokensSaved()
-    }
-
-    @Test
-    fun whenRefreshIsRejectedAndRecoveryIsDeferredThenFailureStreakIncrements() = runTest {
-        givenUserIsSignedIn()
-        givenSubscriptionExists()
-        givenAccessTokenIsExpired()
-        givenV2AccessTokenRefreshFails(error = "invalid_token")
-        givenPurchaseInfoUnknown()
-        authDataStore.tokenRefreshFailureStreak = 1
-
-        subscriptionsManager.getAccessToken()
-
-        assertEquals(2, authDataStore.tokenRefreshFailureStreak)
-        assertTrue(subscriptionsManager.isSignedIn())
-    }
-
-    @Test
-    fun whenRefreshFailsWithNetworkErrorThenFailureStreakIsUnchanged() = runTest {
-        givenUserIsSignedIn()
-        givenAccessTokenIsExpired()
-        whenever(authClient.getTokens(any())).thenAnswer { throw IOException() }
-        authDataStore.tokenRefreshFailureStreak = 1
-
-        subscriptionsManager.getAccessToken()
-
-        assertEquals(1, authDataStore.tokenRefreshFailureStreak)
-    }
-
-    @Test
-    fun whenRefreshFailsWithServerErrorThenFailureStreakIsUnchanged() = runTest {
-        givenUserIsSignedIn()
-        givenAccessTokenIsExpired()
-        val responseBody = "unavailable".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authClient.getTokens(any())).thenThrow(HttpException(Response.error<Void>(503, responseBody)))
-        authDataStore.tokenRefreshFailureStreak = 1
-
-        subscriptionsManager.getAccessToken()
-
-        assertEquals(1, authDataStore.tokenRefreshFailureStreak)
-        assertTrue(subscriptionsManager.isSignedIn())
+        verify(tokenRefreshWideEvent).onSuccess()
     }
 
     @Test
@@ -2541,39 +2490,15 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenRefreshTokenIsMissingThenTokenReadFailureIsReportedAsMissing() = runTest {
+    fun whenRefreshTokenIsMissingThenTokenReadFailureIsReportedToWideEvent() = runTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         authDataStore.refreshTokenV2 = null
 
         runCatching { subscriptionsManager.refreshAccessToken() }
 
-        verify(tokenRefreshWideEvent).onTokenReadFailed(TokenStoreError.MISSING)
+        verify(tokenRefreshWideEvent).onTokenReadFailed()
         verify(tokenRefreshWideEvent).onFailure(any<TokenStoreException>())
-    }
-
-    @Test
-    fun whenRefreshTokenCannotBeDecryptedThenTokenReadFailureIsReportedAsUnreadable() = runTest {
-        givenUserIsSignedIn()
-        givenAccessTokenIsExpired()
-        authDataStore.refreshTokenV2 = null
-        authDataStore.simulateUnreadableRefreshToken = true
-
-        runCatching { subscriptionsManager.refreshAccessToken() }
-
-        verify(tokenRefreshWideEvent).onTokenReadFailed(TokenStoreError.UNREADABLE)
-    }
-
-    @Test
-    fun whenTokenStoreIsUnavailableThenTokenReadFailureIsReportedAsUnavailable() = runTest {
-        givenUserIsSignedIn()
-        givenAccessTokenIsExpired()
-        authDataStore.refreshTokenV2 = null
-        authDataStore.available = false
-
-        runCatching { subscriptionsManager.refreshAccessToken() }
-
-        verify(tokenRefreshWideEvent).onTokenReadFailed(TokenStoreError.UNAVAILABLE)
     }
 
     @Test
@@ -2617,7 +2542,7 @@ class RealSubscriptionsManagerTest {
         assertTrue(result is AccessTokenResult.Failure)
         assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
         assertEquals("1234", authDataStore.externalId)
-        verify(tokenRefreshWideEvent).onTokenSaveFailed(TokenStoreError.WRITE_FAILED)
+        verify(tokenRefreshWideEvent).onTokenSaveFailed()
         verify(tokenRefreshWideEvent, never()).onTokensSaved()
         verify(pixelSender).reportAuthV2TokenStoreError()
     }

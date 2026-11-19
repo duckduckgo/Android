@@ -613,26 +613,9 @@ class RealAuthRepositoryTest {
         assertNull(authStore.authToken)
         assertNull(authStore.email)
         assertNull(authStore.externalId)
-        assertEquals(TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null), authRepository.getTokenRefreshHistory())
+        assertEquals(0, authStore.tokenRefreshFailureStreak)
+        assertNull(authStore.lastTokenRefreshSuccessAt)
+        assertNull(authStore.lastTokenRefreshProcess)
         assertNull(serpPromo.cookie)
-    }
-
-    @Test
-    fun whenTokenRefreshOutcomesAreRecordedThenHistoryFollowsThem() = runTest {
-        assertEquals(TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null), authRepository.getTokenRefreshHistory())
-
-        authRepository.recordTokenRefreshFailure()
-        authRepository.recordTokenRefreshFailure()
-        assertEquals(TokenRefreshHistory(failureStreak = 2, lastSuccessAt = null), authRepository.getTokenRefreshHistory())
-
-        authRepository.recordTokenRefreshSuccess(at = Instant.ofEpochMilli(5_000L))
-        assertEquals(
-            TokenRefreshHistory(failureStreak = 0, lastSuccessAt = Instant.ofEpochMilli(5_000L), lastSuccessProcess = "main"),
-            authRepository.getTokenRefreshHistory(),
-        )
-
-        authRepository.recordTokenRefreshFailure()
-        authRepository.clearTokensAndHistory()
-        assertEquals(TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null), authRepository.getTokenRefreshHistory())
     }
 }
