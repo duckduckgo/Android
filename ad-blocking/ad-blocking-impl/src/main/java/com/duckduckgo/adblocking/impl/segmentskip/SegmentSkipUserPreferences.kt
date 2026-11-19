@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsor
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -34,45 +34,45 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-enum class SponsorMode {
+enum class SegmentSkipMode {
     ALWAYS_ASK,
     ALWAYS_SKIP,
     OFF,
 }
 
-interface SponsorUserPreferences {
-    fun modeFlow(): Flow<SponsorMode>
+interface SegmentSkipUserPreferences {
+    fun modeFlow(): Flow<SegmentSkipMode>
 
     /**
      * The last mode read from storage, for callers that can't suspend. It holds the default until the first read completes, so
      * callers that can suspend should read [modeFlow] instead.
      */
-    fun cachedMode(): SponsorMode
+    fun cachedMode(): SegmentSkipMode
 
-    suspend fun setMode(mode: SponsorMode)
+    suspend fun setMode(mode: SegmentSkipMode)
 }
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealSponsorUserPreferences @Inject constructor(
+class RealSegmentSkipUserPreferences @Inject constructor(
     @AdBlockingPreferences private val dataStore: DataStore<Preferences>,
     @AppCoroutineScope appScope: CoroutineScope,
-) : SponsorUserPreferences {
+) : SegmentSkipUserPreferences {
 
-    private val mode: StateFlow<SponsorMode> = modeFlow().stateIn(appScope, SharingStarted.Eagerly, DEFAULT_MODE)
+    private val mode: StateFlow<SegmentSkipMode> = modeFlow().stateIn(appScope, SharingStarted.Eagerly, DEFAULT_MODE)
 
-    override fun modeFlow(): Flow<SponsorMode> = dataStore.data
-        .map { prefs -> prefs[KEY_MODE]?.let { stored -> SponsorMode.entries.firstOrNull { it.name == stored } } ?: DEFAULT_MODE }
+    override fun modeFlow(): Flow<SegmentSkipMode> = dataStore.data
+        .map { prefs -> prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } } ?: DEFAULT_MODE }
         .distinctUntilChanged()
 
-    override fun cachedMode(): SponsorMode = mode.value
+    override fun cachedMode(): SegmentSkipMode = mode.value
 
-    override suspend fun setMode(mode: SponsorMode) {
+    override suspend fun setMode(mode: SegmentSkipMode) {
         dataStore.edit { prefs -> prefs[KEY_MODE] = mode.name }
     }
 
     private companion object {
-        val DEFAULT_MODE = SponsorMode.ALWAYS_ASK
+        val DEFAULT_MODE = SegmentSkipMode.ALWAYS_ASK
         val KEY_MODE = stringPreferencesKey("sponsor_block_mode")
     }
 }

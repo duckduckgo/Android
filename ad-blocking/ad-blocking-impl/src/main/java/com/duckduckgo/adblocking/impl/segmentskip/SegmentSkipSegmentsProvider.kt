@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsor
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -32,7 +32,7 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
-data class SponsorSegment(
+data class SegmentSkipSegment(
     val start: Double,
     val end: Double,
     val category: String,
@@ -41,35 +41,35 @@ data class SponsorSegment(
     val uuid: String,
 )
 
-interface SponsorSegmentsProvider {
+interface SegmentSkipSegmentsProvider {
     /** Segments for [videoId], or an empty list when there are none or the lookup fails. */
-    suspend fun getSegments(videoId: String): List<SponsorSegment>
+    suspend fun getSegments(videoId: String): List<SegmentSkipSegment>
 }
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealSponsorSegmentsProvider @Inject constructor(
-    private val service: SponsorService,
-    private val hashPrefixGate: SponsorHashPrefixGate,
-    private val settingsProvider: SponsorSettingsProvider,
+class RealSegmentSkipSegmentsProvider @Inject constructor(
+    private val service: SegmentSkipService,
+    private val hashPrefixGate: SegmentSkipHashPrefixGate,
+    private val settingsProvider: SegmentSkipSettingsProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
-) : SponsorSegmentsProvider {
+) : SegmentSkipSegmentsProvider {
 
     private val mutex = Mutex()
 
-    private val lookups = object : LinkedHashMap<String, Deferred<List<SponsorSegment>?>>(CACHE_SIZE, LOAD_FACTOR, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Deferred<List<SponsorSegment>?>>): Boolean =
+    private val lookups = object : LinkedHashMap<String, Deferred<List<SegmentSkipSegment>?>>(CACHE_SIZE, LOAD_FACTOR, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Deferred<List<SegmentSkipSegment>?>>): Boolean =
             size > CACHE_SIZE
     }
 
-    override suspend fun getSegments(videoId: String): List<SponsorSegment> {
+    override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> {
         val segments = lookup(videoId).await() ?: return emptyList()
         val settings = settingsProvider.settings()
         return segments.filter { it.category in settings.categories && it.actionType in settings.actionTypes }
     }
 
-    private suspend fun lookup(videoId: String): Deferred<List<SponsorSegment>?> = mutex.withLock {
+    private suspend fun lookup(videoId: String): Deferred<List<SegmentSkipSegment>?> = mutex.withLock {
         lookups.getOrPut(videoId) {
             appScope.async(dispatchers.io()) {
                 fetch(videoId).also { segments ->
@@ -80,7 +80,7 @@ class RealSponsorSegmentsProvider @Inject constructor(
     }
 
     /** Null when the lookup failed, so the failure isn't cached. */
-    private suspend fun fetch(videoId: String): List<SponsorSegment>? {
+    private suspend fun fetch(videoId: String): List<SegmentSkipSegment>? {
         val hashPrefix = videoId.sha256.take(HASH_PREFIX_LENGTH)
         return try {
             if (!hashPrefixGate.hasSegments(hashPrefix)) return emptyList()
@@ -92,25 +92,25 @@ class RealSponsorSegmentsProvider @Inject constructor(
                     ?.segments.orEmpty()
                     .mapNotNull { it.toSegmentOrNull() }
                 else -> {
-                    logcat(WARN) { "Sponsor: segments lookup failed: HTTP ${response.code()}" }
+                    logcat(WARN) { "SegmentSkip: segments lookup failed: HTTP ${response.code()}" }
                     null
                 }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            logcat(WARN) { "Sponsor: segments lookup failed: ${e.javaClass.simpleName}" }
+            logcat(WARN) { "SegmentSkip: segments lookup failed: ${e.javaClass.simpleName}" }
             null
         }
     }
 
-    private fun SegmentResponse.toSegmentOrNull(): SponsorSegment? {
+    private fun SegmentResponse.toSegmentOrNull(): SegmentSkipSegment? {
         val range = segment?.takeIf { it.size == 2 } ?: return null
         val start = range[0] ?: return null
         val end = range[1] ?: return null
         if (!start.isFinite() || !end.isFinite() || start < 0 || end <= start) return null
         if (category.isNullOrBlank() || actionType.isNullOrBlank() || uuid.isNullOrBlank()) return null
-        return SponsorSegment(
+        return SegmentSkipSegment(
             start = start,
             end = end,
             category = category,

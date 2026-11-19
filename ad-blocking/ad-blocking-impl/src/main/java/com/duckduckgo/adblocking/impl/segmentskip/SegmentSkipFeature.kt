@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.sponsor
+package com.duckduckgo.adblocking.impl.segmentskip
 
 import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -25,7 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     scope = AppScope::class,
     featureName = "sponsorBlock",
 )
-interface SponsorFeature {
+interface SegmentSkipFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 
