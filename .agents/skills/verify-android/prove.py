@@ -7,10 +7,11 @@
   prove.py pr-summary [<before>] <after>
                                Markdown for a PR's verification section from runs' proof-<name>.json files (or
                                the evidence folder); safe for a public PR: no local paths, logs or screenshots
-  prove.py publish <evidence folder> [--into <auto evidence folder>]
-                               copies a run into an auto evidence folder (a new one, or the one auto opened for
-                               this change), records each report's served URL in its proof-<name>.json, uploads it,
-                               and prints the URLs: the one to put in the PR template's Evidence URL field
+  prove.py publish <proof-<name>.json | evidence folder> [--into <auto evidence folder>]
+                               copies one run (and its base run, after compare) into an auto evidence folder (a
+                               new one, or the one auto opened for this change), records each report's served URL
+                               in its proof-<name>.json, uploads it, and prints the URLs: the one to put in the PR
+                               template's Evidence URL field
   prove.py selftest [--offline]
                                checks the harness itself (run it after changing prove.py); see tests/.
                                --offline runs only the cases that need no device
@@ -309,6 +310,7 @@ def prove(path):
     selected = devices.read_text().split() if devices.exists() else []
     serial = os.environ.get("VERIFY_SERIAL") or (selected[0] if selected else None)
     error, evidence, build, proof, android, videos, props = None, None, {}, None, None, [], {}
+    existing, ui_header = {}, None
     try:
         if not serial:
             raise Error("no device selected: run verify.sh use <serial>")
@@ -328,8 +330,11 @@ def prove(path):
             props[key] = android._adb("shell", "getprop", prop).strip()
         if evidence:
             evidence.mkdir(parents=True, exist_ok=True)
+            # The folder holds every run until verify.sh cleanup, so a run's own files are what changed during it.
+            existing = {f.name: f.stat().st_mtime_ns for f in evidence.iterdir() if f.is_file()}
             os.environ["VERIFY_UI_LOG"] = str(evidence / "ui.log")
-            ui_log(f"== {label} {datetime.datetime.now().isoformat(timespec='seconds')}")
+            ui_header = f"== {label} {datetime.datetime.now().isoformat(timespec='seconds')}"
+            ui_log(ui_header)
         recording = Recording(label)
         try:
             proof.run(android)
@@ -358,10 +363,13 @@ def prove(path):
          "live": list(getattr(proof, "LIVE", [])) if proof else [],
          "unverified": android.unverified_items if android else [],
          "videos": videos, "notes": android.notes if android else [], "sections": android.sections if android else [],
-         "finished": datetime.datetime.now().isoformat(timespec="seconds"),
+         "finished": datetime.datetime.now().isoformat(timespec="seconds"), "ui_log": ui_header,
          "exit": {"PASS": 0, "FAIL": 1}.get(verdict, 2), "evidence": str(evidence) if evidence else None}
     if evidence:
         evidence.mkdir(parents=True, exist_ok=True)
+        own = {f"proof-{label}.json", f"proof-{label}.md"}
+        m["files"] = sorted(own | {f.name for f in evidence.iterdir() if f.is_file() and f.name != "ui.log"
+                                   and existing.get(f.name) != f.stat().st_mtime_ns})
         (evidence / f"proof-{label}.json").write_text(json.dumps({**m, "sections": [list(s) for s in m["sections"]]}, indent=2) + "\n")
         (evidence / f"proof-{label}.md").write_text(report(m))
     passed = sum(c["ok"] for c in checks)
@@ -431,7 +439,7 @@ def load_run(arg):
     if path.is_dir():
         found = sorted(f for f in path.glob("proof-*.json") if not f.stem.endswith(("-base", "-external")))
         if len(found) != 1:
-            raise Error(f"{arg} holds {len(found)} runs on this checkout's build; pass the proof-<name>.json to summarise")
+            raise Error(f"{arg} holds {len(found)} runs on this checkout's build; pass the run's proof-<name>.json")
         path = found[0]
     if not path.is_file():
         raise Error(f"no run at {arg}: pass a proof-<name>.json or the evidence folder holding it")
@@ -518,31 +526,51 @@ def node(script, *args):
         raise Error(f"{script.name} failed: {detail}")
     return p.stdout.strip().splitlines()[-1]
 
-def publish(folder, into=None):
-    """Copies a run's evidence folder into an auto evidence folder, records each report's served URL in the run's
-    proof-<name>.json (here and in the copy), uploads the auto folder, and prints the URLs."""
+def ui_log_sections(text, headers):
+    """The parts of a shared ui.log that belong to the given runs: each starts at its "== <label> <time>" line."""
+    keep, out = False, []
+    for line in text.splitlines(keepends=True):
+        if line.startswith("== "):
+            keep = line.rstrip("\n") in headers
+        if keep:
+            out.append(line)
+    return "".join(out)
+
+def publish(arg, into=None):
+    """Copies one run (with its base run and compare report, when compare left them) into an auto evidence folder,
+    records each report's served URL in the run's proof-<name>.json (here and in the copy), uploads the auto folder,
+    and prints the URLs."""
     try:
-        src = Path(folder).resolve()
-        src = src.parent if src.is_file() else src
-        if not any(src.glob("proof-*.json")):
-            raise Error(f"no run in {folder}: pass the evidence folder doctor printed")
+        after, path = load_run(arg)
+        src = path.parent
+        base = path.with_name(f"{path.stem}-base.json")
+        runs = [(after, path)] + ([(json.loads(base.read_text()), base)] if base.is_file() else [])
+        compared = src / f"compare-{after['proof']['name']}.md"
         scripts = auto_evidence_scripts()
         os.umask(0o022)  # the store serves what it uploads; keep files readable
         root = Path(into).resolve() if into else Path(node(scripts / "new-evidence.ts"))
-        dest = root / "verify-android" / f"{src.parent.name}-{src.name}"
+        dest = root / "verify-android" / f"{src.parent.name}-{src.name}-{path.stem.removeprefix('proof-')}"
         if dest.exists():
             raise Error(f"{dest} exists: the store never replaces a file, so publish a run once")
-        shutil.copytree(src, dest)
+        dest.mkdir(parents=True)
+        # Runs from before files were recorded fall back to their own report, data and videos.
+        names = {n for m, p in runs for n in (m.get("files") or [p.name, p.with_suffix(".md").name, *m.get("videos", [])])}
+        names |= {compared.name} if base.is_file() and compared.is_file() else set()
+        for n in sorted(names):
+            if (src / n).is_file():
+                shutil.copy2(src / n, dest / n)
+        if (src / "ui.log").is_file():
+            (dest / "ui.log").write_text(ui_log_sections((src / "ui.log").read_text(), {m.get("ui_log") for m, _ in runs}))
         urls = {}
-        for run in sorted(dest.glob("proof-*.json")):
-            report_md = run.with_suffix(".md")
-            urls[run.name] = node(scripts / "evidence-url.ts", report_md if report_md.is_file() else run)
-            for copy in (run, src / run.name):
-                m = json.loads(copy.read_text())
-                m["evidence_url"] = urls[run.name]
-                copy.write_text(json.dumps(m, indent=2) + "\n")
-        for compared in sorted(dest.glob("compare-*.md")):
-            urls[compared.name] = node(scripts / "evidence-url.ts", compared)
+        for m, p in runs:
+            report_md = dest / p.with_suffix(".md").name
+            urls[p.name] = node(scripts / "evidence-url.ts", report_md if report_md.is_file() else dest / p.name)
+            for copy in (dest / p.name, p):
+                data = json.loads(copy.read_text())
+                data["evidence_url"] = urls[p.name]
+                copy.write_text(json.dumps(data, indent=2) + "\n")
+        if (dest / compared.name).is_file():
+            urls[compared.name] = node(scripts / "evidence-url.ts", dest / compared.name)
         uploaded = json.loads(node(scripts / "upload-evidence.ts", "--directory", root))
         if uploaded.get("failed"):
             raise Error(f"{uploaded['failed']} files failed to upload; rerun publish with --into {root}")
