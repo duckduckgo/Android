@@ -83,6 +83,16 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
         binding.duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
         binding.duckPlayerSettingsLink.setOnClickListener { viewModel.onDuckPlayerClicked() }
         binding.segmentSkipModeEntry.setClickListener { viewModel.onSegmentSkipModeClicked() }
+        binding.segmentSkipDescription.addClickableSpan(
+            textSequence = getText(R.string.segment_skip_settings_description),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreClicked()
+                    }
+                },
+            ),
+        )
 
         configureEdgeToEdgeInsets()
         observeViewModel()
