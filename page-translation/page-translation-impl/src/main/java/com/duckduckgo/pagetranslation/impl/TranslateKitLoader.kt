@@ -36,6 +36,7 @@ interface TranslateKitLibrary {
     fun isInitialized(): Boolean
 }
 
+@Suppress("DenyListedApi")
 @ContributesBinding(AppScope::class)
 class RealTranslateKitLibrary @Inject constructor(
     private val context: Context,
