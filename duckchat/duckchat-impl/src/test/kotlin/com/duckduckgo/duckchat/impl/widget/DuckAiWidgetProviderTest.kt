@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
+import kotlinx.coroutines.CompletableDeferred
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +44,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -128,6 +130,30 @@ class DuckAiWidgetProviderTest {
         whenever(manager.getAppWidgetOptions(WIDGET_ID)).thenReturn(Bundle())
 
         testee.onUpdate(context, manager, intArrayOf(WIDGET_ID))
+
+        val root = lastPublished().apply(context, FrameLayout(context))
+        assertEquals(View.GONE, root.findViewById<View>(R.id.chatsSection).visibility)
+    }
+
+    @Test
+    @Config(sdk = [30], qualifiers = "port")
+    fun whenChatIsDeletedWhileEarlierRenderIsLoadingThenOlderRenderCannotPublishAfterIt() {
+        var stored = listOf(chat("a"))
+        val releaseFirstLoad = CompletableDeferred<Unit>()
+        runBlockingStub {
+            whenever(chatStore.getChats()).doSuspendableAnswer {
+                val snapshot = stored
+                if (snapshot.isNotEmpty()) releaseFirstLoad.await()
+                snapshot
+            }
+        }
+        stubDuckAi()
+        stubOptions(minWidth = 360, maxHeight = 400, maxWidth = 500, minHeight = 300)
+        testee.onUpdate(context, manager, intArrayOf(WIDGET_ID))
+
+        stored = emptyList()
+        testee.onUpdate(context, manager, intArrayOf(WIDGET_ID))
+        releaseFirstLoad.complete(Unit)
 
         val root = lastPublished().apply(context, FrameLayout(context))
         assertEquals(View.GONE, root.findViewById<View>(R.id.chatsSection).visibility)
