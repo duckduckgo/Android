@@ -942,7 +942,7 @@ class RealClientToolsExecutorTest {
         const val OTHER_CHAT_TAB_ID = "other-chat-tab"
         const val CHAT_ID = "chat-1"
         const val OTHER_CHAT_ID = "chat-2"
-        val ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, name = 3, description = 4)
-        val OTHER_ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 5, promptMessage = 6, name = 7, description = 8)
+        val ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, name = 4, icon = 5)
+        val OTHER_ASK_MODE = ClientToolPermissionMode.Ask(promptTitle = 6, promptMessage = 7, name = 9, icon = 10)
     }
 }

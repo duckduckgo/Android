@@ -96,7 +96,7 @@ class PublishingClientToolPermissionPromptTest {
         val REQUEST = ClientToolPermissionRequest.RunTool(
             chatTabId = "chat",
             browserMode = BrowserMode.REGULAR,
-            tool = AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, name = 3, description = 4)),
+            tool = AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(promptTitle = 1, promptMessage = 2, name = 4, icon = 5)),
         )
     }
 }

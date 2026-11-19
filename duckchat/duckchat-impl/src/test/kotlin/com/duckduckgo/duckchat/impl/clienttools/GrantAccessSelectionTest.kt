@@ -27,67 +27,73 @@ import org.junit.Test
 class GrantAccessSelectionTest {
 
     @Test
-    fun whenRemovingIsOffThenNoToolCanBeRemoved() {
+    fun whenRemovingIsOffThenNoToolCanBeUnchecked() {
         val selection = selection(removable = false, "a", "b", "c")
 
-        assertFalse(selection.showsBoxes)
-        assertFalse(selection.canRemove)
-        assertEquals(selection, selection.remove("a"))
+        assertFalse(selection.showsCheckboxes)
+        assertFalse(selection.canToggle("a"))
+        assertEquals(selection, selection.toggle("a"))
     }
 
     @Test
-    fun whenOnlyOneToolIsAskedThenItCannotBeRemoved() {
+    fun whenOnlyOneToolIsAskedThenItCannotBeUnchecked() {
         val selection = selection(removable = true, "a")
 
-        assertFalse(selection.showsBoxes)
-        assertFalse(selection.canRemove)
-        assertEquals(listOf("a"), selection.remove("a").remaining.names())
+        assertFalse(selection.showsCheckboxes)
+        assertTrue(selection.toggle("a").isChecked("a"))
     }
 
     @Test
-    fun whenToolRemovedThenItLeavesTheListInAskedOrder() {
-        val selection = selection(removable = true, "a", "b", "c").remove("b")
+    fun whenPromptOpensThenEveryToolIsChecked() {
+        val selection = selection(removable = true, "a", "b", "c")
 
-        assertEquals(listOf("a", "c"), selection.remaining.names())
-        assertEquals(listOf("b"), selection.removedTools.names())
+        assertTrue(selection.showsCheckboxes)
+        assertTrue(listOf("a", "b", "c").all { selection.isChecked(it) })
+        assertTrue(selection.removed.isEmpty())
+    }
+
+    @Test
+    fun whenToolUncheckedThenItIsLeftOutOfTheAnswer() {
+        val selection = selection(removable = true, "a", "b", "c").toggle("b")
+
+        assertFalse(selection.isChecked("b"))
         assertEquals(setOf("b"), selection.removed)
     }
 
     @Test
-    fun whenOneToolRemainsThenItCannotBeRemoved() {
-        val selection = selection(removable = true, "a", "b").remove("a")
+    fun whenToolCheckedAgainThenItIsBackInTheAnswer() {
+        val selection = selection(removable = true, "a", "b", "c").toggle("b").toggle("b")
 
-        assertTrue(selection.showsBoxes)
-        assertFalse(selection.canRemove)
-        assertEquals(listOf("b"), selection.remove("b").remaining.names())
+        assertTrue(selection.isChecked("b"))
+        assertTrue(selection.removed.isEmpty())
     }
 
     @Test
-    fun whenUndoThenEveryToolIsBack() {
-        val selection = selection(removable = true, "a", "b", "c").remove("a").remove("c").undo()
+    fun whenOneToolStaysCheckedThenItCannotBeUnchecked() {
+        val selection = selection(removable = true, "a", "b").toggle("a")
 
-        assertEquals(listOf("a", "b", "c"), selection.remaining.names())
-        assertTrue(selection.removed.isEmpty())
+        assertFalse(selection.canToggle("b"))
+        assertTrue(selection.toggle("b").isChecked("b"))
+        assertTrue(selection.canToggle("a"))
+    }
+
+    @Test
+    fun whenToolIsNotAskedThenItCannotBeToggled() {
+        val selection = selection(removable = true, "a", "b")
+
+        assertEquals(selection, selection.toggle("c"))
     }
 
     @Test
     fun whenBuiltFromRequestThenItFollowsTheRequestFlag() {
         val tools = listOf(tool("a"), tool("b"))
 
-        assertTrue(GrantAccessSelection(ClientToolPermissionRequest.GrantAccess("tab", BrowserMode.REGULAR, tools, toolsRemovable = true)).canRemove)
-        assertFalse(
-            GrantAccessSelection(ClientToolPermissionRequest.GrantAccess("tab", BrowserMode.REGULAR, tools, toolsRemovable = false)).canRemove,
+        assertTrue(
+            GrantAccessSelection(ClientToolPermissionRequest.GrantAccess("tab", BrowserMode.REGULAR, tools, toolsRemovable = true)).showsCheckboxes,
         )
-    }
-
-    @Test
-    fun whenJoiningNamesThenListReadsNaturally() {
-        fun join(vararg names: String) = GrantAccessSelection.joinNames(names.toList(), series = { a, b -> "$a, $b" }, pair = { a, b -> "$a and $b" })
-
-        assertEquals("A", join("A"))
-        assertEquals("A and B", join("A", "B"))
-        assertEquals("A, B and C", join("A", "B", "C"))
-        assertEquals("A, B, C and D", join("A", "B", "C", "D"))
+        assertFalse(
+            GrantAccessSelection(ClientToolPermissionRequest.GrantAccess("tab", BrowserMode.REGULAR, tools, toolsRemovable = false)).showsCheckboxes,
+        )
     }
 
     private fun selection(
@@ -96,8 +102,6 @@ class GrantAccessSelectionTest {
     ) = GrantAccessSelection(names.map { tool(it) }, removable)
 
     private fun tool(name: String) = AskingTool(name, ClientToolPermissionMode.Ask(1, 2, 3, 4))
-
-    private fun List<AskingTool>.names() = map { it.name }
 }
 
 class GrantAccessSelectionsTest {
@@ -105,16 +109,16 @@ class GrantAccessSelectionsTest {
     private val selections = GrantAccessSelections()
 
     @Test
-    fun whenSamePromptShownAgainThenRemovedToolsStayRemoved() {
+    fun whenSamePromptShownAgainThenUncheckedToolsStayUnchecked() {
         val prompt = pending("a", "b")
-        selections.update(prompt) { it.remove("a") }
+        selections.update(prompt) { it.toggle("a") }
 
         assertEquals(setOf("a"), selections.of(prompt)?.removed)
     }
 
     @Test
     fun whenAnotherPromptArrivesThenItStartsWithEveryTool() {
-        selections.update(pending("a", "b")) { it.remove("a") }
+        selections.update(pending("a", "b")) { it.toggle("a") }
 
         assertEquals(emptySet<String>(), selections.of(pending("a", "b"))?.removed)
     }

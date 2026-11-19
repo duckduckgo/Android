@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesPluginPoint
@@ -43,13 +44,14 @@ sealed interface ClientToolPermissionMode {
 
     /**
      * Asks the user before running, with the tool's own prompt copy.
-     * @param name the tool's name and [description] its one line summary, shown in a prompt that asks for several tools at once.
+     * @param icon badges the pictogram of a prompt that asks for this tool alone.
+     * @param name and [icon] list the tool, with [promptMessage] under it, in a prompt that asks for several tools at once.
      */
     data class Ask(
         @StringRes val promptTitle: Int,
         @StringRes val promptMessage: Int,
         @StringRes val name: Int,
-        @StringRes val description: Int,
+        @DrawableRes val icon: Int,
     ) : ClientToolPermissionMode
 }
 

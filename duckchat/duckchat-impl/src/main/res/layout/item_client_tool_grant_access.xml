@@ -14,15 +14,23 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/keyline_2"
+    android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:minHeight="@dimen/keyline_7"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/keyline_5"
+    android:paddingVertical="@dimen/keyline_2">
+
+    <ImageView
+        android:id="@+id/grantAccessToolIcon"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:importantForAccessibility="no" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -35,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:textType="primary"
-            app:typography="body1_bold" />
+            app:typography="body1" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/grantAccessToolDescription"
@@ -45,14 +53,11 @@
             app:typography="body2" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/grantAccessToolRemove"
-        android:layout_width="@dimen/keyline_7"
-        android:layout_height="@dimen/keyline_7"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/closeButtonContentDescription"
-        android:scaleType="center"
-        android:visibility="gone"
-        app:srcCompat="@drawable/ic_close_16" />
+    <CheckBox
+        android:id="@+id/grantAccessToolCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
-/** The tools a [ClientToolPermissionRequest.GrantAccess] prompt asks for, and which ones the user took out before answering. */
+/** The tools a [ClientToolPermissionRequest.GrantAccess] prompt asks for, and which ones the user unchecked before answering. */
 data class GrantAccessSelection(
     val tools: List<AskingTool>,
     private val removable: Boolean,
@@ -24,31 +24,18 @@ data class GrantAccessSelection(
 ) {
     constructor(request: ClientToolPermissionRequest.GrantAccess) : this(request.tools, request.toolsRemovable)
 
-    val remaining: List<AskingTool> get() = tools.filterNot { it.name in removed }
+    val showsCheckboxes: Boolean get() = removable && tools.size >= 2
 
-    val removedTools: List<AskingTool> get() = tools.filter { it.name in removed }
+    fun isChecked(toolName: String): Boolean = toolName !in removed
 
-    val showsBoxes: Boolean get() = removable && tools.size >= 2
+    /** The last checked tool can't be unchecked: Don't Allow is how the user says no to all of them. */
+    fun canToggle(toolName: String): Boolean =
+        showsCheckboxes && tools.any { it.name == toolName } && (toolName in removed || tools.size - removed.size >= 2)
 
-    /** The last remaining tool can't be taken out: Don't Allow is how the user says no to all of them. */
-    val canRemove: Boolean get() = showsBoxes && remaining.size >= 2
-
-    fun remove(toolName: String): GrantAccessSelection =
-        if (canRemove && remaining.any { it.name == toolName }) copy(removed = removed + toolName) else this
-
-    fun undo(): GrantAccessSelection = copy(removed = emptySet())
-
-    companion object {
-        /** Joins [names] as "A", "A and B" or "A, B and C", with [series] and [pair] doing the joining. */
-        fun joinNames(
-            names: List<String>,
-            series: (String, String) -> String,
-            pair: (String, String) -> String,
-        ): String = when (names.size) {
-            0 -> ""
-            1 -> names.single()
-            else -> pair(names.dropLast(1).reduce(series), names.last())
-        }
+    fun toggle(toolName: String): GrantAccessSelection = when {
+        !canToggle(toolName) -> this
+        toolName in removed -> copy(removed = removed - toolName)
+        else -> copy(removed = removed + toolName)
     }
 }
 

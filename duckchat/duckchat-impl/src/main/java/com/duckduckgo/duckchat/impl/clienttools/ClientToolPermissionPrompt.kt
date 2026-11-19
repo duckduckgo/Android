@@ -45,7 +45,7 @@ sealed interface ClientToolPermissionRequest {
 
     /**
      * Asks to use several tools for the rest of the chat.
-     * @param toolsRemovable whether the user may take tools out before allowing the rest.
+     * @param toolsRemovable whether the user may uncheck tools before allowing the rest.
      */
     data class GrantAccess(
         override val chatTabId: String,
@@ -62,7 +62,7 @@ data class AskingTool(
 
 sealed interface ClientToolPermissionAnswer {
     /**
-     * Allows the asked tools for the chat, except [removedTools]: the ones the user took out of a [ClientToolPermissionRequest.GrantAccess]
+     * Allows the asked tools for the chat, except [removedTools]: the ones the user unchecked in a [ClientToolPermissionRequest.GrantAccess]
      * prompt. Those stay unanswered, so the next call or request for them asks again.
      */
     data class AllowForChat(val removedTools: Set<String> = emptySet()) : ClientToolPermissionAnswer
