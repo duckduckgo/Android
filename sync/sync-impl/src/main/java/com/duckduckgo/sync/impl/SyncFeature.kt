@@ -43,9 +43,6 @@ interface SyncFeature {
     fun level3AllowCreateAccount(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun gzipPatchRequests(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun seamlessAccountSwitching(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
@@ -79,9 +76,6 @@ interface SyncFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun restrictScannedBarcodesToQrTypes(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun preventStaleTokenLogout(): Toggle
 
     /**
      * Gates writing `device_info`

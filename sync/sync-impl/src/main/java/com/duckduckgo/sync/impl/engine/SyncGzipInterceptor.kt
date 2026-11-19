@@ -20,7 +20,6 @@ import android.util.Base64
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
@@ -43,7 +42,6 @@ import javax.inject.Inject
     binding = binding<ApiInterceptorPlugin>(),
 )
 class SyncGzipInterceptor @Inject constructor(
-    private val syncFeature: SyncFeature,
     private val pixel: Pixel,
 ) : ApiInterceptorPlugin, Interceptor {
 
@@ -56,7 +54,7 @@ class SyncGzipInterceptor @Inject constructor(
         }
 
         // check if it's http operation is PATCH
-        if (chain.request().method == "PATCH" && syncFeature.gzipPatchRequests().isEnabled()) {
+        if (chain.request().method == "PATCH") {
             kotlin.runCatching {
                 val originalRequest = chain.request()
                 val body = originalRequest.body ?: return chain.proceed(originalRequest)

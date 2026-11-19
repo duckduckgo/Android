@@ -243,7 +243,6 @@ class SyncServiceRemote @Inject constructor(
     private val syncService: SyncService,
     private val syncStore: SyncStore,
     private val setKeysIfAbsentCall: SetKeysIfAbsentCall,
-    private val syncFeature: SyncFeature,
 ) : SyncApi {
     override fun createAccount(
         userID: String,
@@ -834,7 +833,7 @@ class SyncServiceRemote @Inject constructor(
         // token swap can 401 on the old token while the account is still valid. Only wipe local state
         // when the token that failed is still the current one (or unknown, preserving prior behavior).
         val tokenStillCurrent = requestToken == null || requestToken == syncStore.token
-        if (!tokenStillCurrent && syncFeature.preventStaleTokenLogout().isEnabled()) return
+        if (!tokenStillCurrent) return
 
         syncStore.clearAll()
     }
