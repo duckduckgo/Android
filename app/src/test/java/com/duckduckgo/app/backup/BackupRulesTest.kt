@@ -78,7 +78,7 @@ class BackupRulesTest {
 
     @Test
     fun atbStoreIsIncluded() {
-        // Device migration detection falls back to a transferred ATB when the old phone never wrote the migration marker.
+        // Keeps the install's ATB and retention state continuous, so the new phone is not counted as a new install.
         assertTrue("sharedpref" to "com.duckduckgo.app.statistics.xml" in deviceTransferIncludes)
     }
 
