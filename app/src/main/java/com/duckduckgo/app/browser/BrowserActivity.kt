@@ -1442,6 +1442,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     launchDuckAi(url, sourceTabId, newTabTransition, nativeInputLaunch, entryPoint, reuseEmptyTab = false)
                     return@launch
                 }
+                entryPoint?.let { duckChat.reportDuckChatEntry(it, opensNewTab = false, hasPrompt = false) }
                 isDuckChatVisible = true
                 // Swiping tabs tag their fragments by adapter id, so the tab id is matched on the fragment itself.
                 val fragment = supportFragmentManager.fragments.filterIsInstance<BrowserTabFragment>().firstOrNull { it.tabId == emptyTabId }
