@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.content.Intent
-import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -32,6 +31,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultAppsActivity
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
+import com.duckduckgo.app.browser.nativeinput.DuckAiChatUrlType
+import com.duckduckgo.app.browser.nativeinput.classifyDuckAiChatUrl
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.fire.DataClearer
@@ -72,7 +73,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -340,11 +340,9 @@ class BrowserViewModel @Inject constructor(
         tabRepository.getTabId(url)?.also { tabRepository.select(it) } ?: tabRepository.add(url = url, skipHome = true)
 
     suspend fun findEmptyDuckAiTabId(): String? {
-        val emptyTabIds = tabRepository.getTabs().filter { tab ->
-            tab.url?.toUri()?.let {
-                duckChat.isDuckChatUrl(it) && it.toChatIdOrNull(duckChat) == null && it.getQueryParameter("mode") != "voice-mode"
-            } == true
-        }.map { it.tabId }
+        val emptyTabIds = tabRepository.getTabs()
+            .filter { classifyDuckAiChatUrl(it.url, duckChat) == DuckAiChatUrlType.NewChat }
+            .map { it.tabId }
         val selectedTabId = tabRepository.getSelectedTab()?.tabId
         return emptyTabIds.firstOrNull { it == selectedTabId } ?: emptyTabIds.firstOrNull()
     }

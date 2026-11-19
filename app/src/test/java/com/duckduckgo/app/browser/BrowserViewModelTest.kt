@@ -925,6 +925,22 @@ class BrowserViewModelTest {
         assertNull(testee.findEmptyDuckAiTabId())
     }
 
+    @Test
+    fun whenOnlyDuckAiWebSettingsIsOpenThenThereIsNoEmptyChatTab() = runTest {
+        val settings = TabEntity(tabId = "settings", url = "https://duck.ai?settings=open")
+        givenTabs(settings, selected = settings)
+
+        assertNull(testee.findEmptyDuckAiTabId())
+    }
+
+    @Test
+    fun whenSelectedTabHasPendingPromptThenTheEmptyChatTabIsReturned() = runTest {
+        val prompt = TabEntity(tabId = "pending-prompt", url = "https://duck.ai/?q=hello&prompt=1")
+        givenTabs(prompt, emptyDuckAiTab, selected = prompt)
+
+        assertEquals("empty", testee.findEmptyDuckAiTabId())
+    }
+
     private suspend fun givenTabs(vararg tabs: TabEntity, selected: TabEntity? = null) {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenAnswer { (it.getArgument<Uri>(0)).host == "duck.ai" }
         whenever(mockTabRepository.getTabs()).thenReturn(tabs.toList())
