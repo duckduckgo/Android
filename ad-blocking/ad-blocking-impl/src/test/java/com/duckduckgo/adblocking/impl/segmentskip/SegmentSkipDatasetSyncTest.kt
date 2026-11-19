@@ -77,7 +77,7 @@ class SegmentSkipDatasetSyncTest {
     @Before fun setup() {
         file.delete()
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
-        store = SegmentSkipBinaryStore(context)
+        store = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
         sync = SegmentSkipDatasetSync(service, store, segmentsProvider)
     }
 
@@ -152,7 +152,7 @@ class SegmentSkipDatasetSyncTest {
         } catch (_: InvalidSegmentSkipFile) { }
         assertEquals(1L, store.revision())
         assertTrue(store.contains("00000001"))
-        assertEquals(1L, SegmentSkipBinaryStore(context).revision())
+        assertEquals(1L, SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).revision())
         verify(segmentsProvider, never()).clearCache()
         service.responses[0L] = full(2, listOf(2))
         sync.sync()
@@ -182,7 +182,7 @@ class SegmentSkipDatasetSyncTest {
             fail("Expected download failure")
         } catch (_: IOException) { }
         assertEquals(1L, store.revision())
-        assertTrue(SegmentSkipBinaryStore(context).contains("00000001"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
         service.failure = null
         service.responses[1L] = diff(2, listOf(2), emptyList(), listOf(1, 2))
         sync.sync()
@@ -302,7 +302,7 @@ class SegmentSkipDatasetSyncTest {
         withTimeout(5000) { job.cancelAndJoin() }
         verify(call).cancel()
         assertEquals(1L, store.revision())
-        assertTrue(SegmentSkipBinaryStore(context).contains("00000001"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
         assertFalse(File(context.filesDir, "sponsor-download.tmp").exists())
     }
 
