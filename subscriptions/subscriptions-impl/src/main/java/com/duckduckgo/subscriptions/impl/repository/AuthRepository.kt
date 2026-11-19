@@ -16,7 +16,6 @@
 
 package com.duckduckgo.subscriptions.impl.repository
 
-import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -82,11 +81,6 @@ interface AuthRepository {
         entitlements: List<Entitlement>,
         account: Account,
     ): Boolean
-    suspend fun isTokenStoreAvailable(): Boolean
-    suspend fun hasRefreshTokenV2Entry(): Boolean
-    suspend fun getTokenRefreshHistory(): TokenRefreshHistory
-    suspend fun recordTokenRefreshSuccess(at: Instant)
-    suspend fun recordTokenRefreshFailure()
     suspend fun clearTokensAndHistory()
 }
 
@@ -95,20 +89,19 @@ interface AuthRepository {
 object AuthRepositoryModule {
     @Provides
     @SingleIn(AppScope::class)
+    fun provideSubscriptionsDataStore(sharedPreferencesProvider: SharedPreferencesProvider): SubscriptionsDataStore {
+        return SubscriptionsEncryptedDataStore(sharedPreferencesProvider)
+    }
+
+    @Provides
+    @SingleIn(AppScope::class)
     fun provideAuthRepository(
+        subscriptionsDataStore: SubscriptionsDataStore,
         dispatcherProvider: DispatcherProvider,
-        sharedPreferencesProvider: SharedPreferencesProvider,
         serpPromo: SerpPromo,
         subscriptionsFeature: Lazy<SubscriptionsFeature>,
-        @ProcessName processName: String,
     ): AuthRepository {
-        return RealAuthRepository(
-            SubscriptionsEncryptedDataStore(sharedPreferencesProvider),
-            dispatcherProvider,
-            serpPromo,
-            subscriptionsFeature,
-            processName,
-        )
+        return RealAuthRepository(subscriptionsDataStore, dispatcherProvider, serpPromo, subscriptionsFeature)
     }
 }
 
@@ -117,7 +110,6 @@ internal class RealAuthRepository constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val serpPromo: SerpPromo,
     private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
-    private val processName: String = "main",
 ) : AuthRepository {
 
     private val moshi = Builder().build()
@@ -422,43 +414,11 @@ internal class RealAuthRepository constructor(
         saved
     }
 
-    override suspend fun isTokenStoreAvailable(): Boolean = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.isAvailable()
-    }
-
-    override suspend fun hasRefreshTokenV2Entry(): Boolean = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.hasRefreshTokenV2Entry()
-    }
-
-    override suspend fun getTokenRefreshHistory(): TokenRefreshHistory = withContext(dispatcherProvider.io()) {
-        TokenRefreshHistory(
-            failureStreak = subscriptionsDataStore.tokenRefreshFailureStreak,
-            lastSuccessAt = subscriptionsDataStore.lastTokenRefreshSuccessAt?.let { Instant.ofEpochMilli(it) },
-            lastSuccessProcess = subscriptionsDataStore.lastTokenRefreshProcess,
-        )
-    }
-
-    override suspend fun recordTokenRefreshSuccess(at: Instant) = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.tokenRefreshFailureStreak = 0
-        subscriptionsDataStore.lastTokenRefreshSuccessAt = at.toEpochMilli()
-        subscriptionsDataStore.lastTokenRefreshProcess = processName
-    }
-
-    override suspend fun recordTokenRefreshFailure() = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.tokenRefreshFailureStreak += 1
-    }
-
     override suspend fun clearTokensAndHistory() = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.clearTokensAndHistory()
         updateSerpPromoCookie()
     }
 }
-
-data class TokenRefreshHistory(
-    val failureStreak: Int,
-    val lastSuccessAt: Instant?,
-    val lastSuccessProcess: String? = null,
-)
 
 class TokenStoreException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 

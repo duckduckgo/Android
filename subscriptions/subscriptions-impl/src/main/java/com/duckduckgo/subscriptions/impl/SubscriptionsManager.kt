@@ -86,7 +86,6 @@ import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEven
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionUndoCancellationWideEvent
-import com.duckduckgo.subscriptions.impl.wideevents.TokenStoreError
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
@@ -874,7 +873,6 @@ class RealSubscriptionsManager @Inject constructor(
                     tokenRefreshWideEvent.onStart(
                         subscriptionStatus = subscriptionStatus(),
                         subscriptionPlatform = authRepository.getSubscription()?.platform,
-                        refreshHistory = authRepository.getTokenRefreshHistory(),
                     )
 
                     val lockResult = crossProcessLock.acquire(TOKEN_REFRESH_LOCK_KEY)
@@ -890,15 +888,7 @@ class RealSubscriptionsManager @Inject constructor(
                             }
                         }
 
-                        val newAccessToken = doRefreshAccessToken()
-                        authRepository.recordTokenRefreshSuccess(at = Instant.ofEpochMilli(timeProvider.currentTimeMillis()))
-                        newAccessToken
-                    } catch (e: Exception) {
-                        // Network errors say nothing about the token, so they do not count towards a stuck device
-                        if (e !is IOException && !e.isServerError() && isSignedInV2()) {
-                            authRepository.recordTokenRefreshFailure()
-                        }
-                        throw e
+                        doRefreshAccessToken()
                     } finally {
                         lockResult.getOrNull()?.let { lockHandle ->
                             withContext(dispatcherProvider.io()) { lockHandle.close() }
@@ -921,13 +911,8 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun doRefreshAccessToken(): AccessToken {
         val refreshToken = authRepository.getRefreshTokenV2() ?: run {
-            val storeError = when {
-                !authRepository.isTokenStoreAvailable() -> TokenStoreError.UNAVAILABLE
-                authRepository.hasRefreshTokenV2Entry() -> TokenStoreError.UNREADABLE
-                else -> TokenStoreError.MISSING
-            }
-            tokenRefreshWideEvent.onTokenReadFailed(storeError)
-            throw TokenStoreException("Refresh token ${storeError.paramValue}")
+            tokenRefreshWideEvent.onTokenReadFailed()
+            throw TokenStoreException("Refresh token could not be read")
         }
         tokenRefreshWideEvent.onTokenRead()
 
@@ -1013,8 +998,7 @@ class RealSubscriptionsManager @Inject constructor(
         try {
             saveTokens(newTokens)
         } catch (e: TokenStoreException) {
-            val storeError = if (authRepository.isTokenStoreAvailable()) TokenStoreError.WRITE_FAILED else TokenStoreError.UNAVAILABLE
-            tokenRefreshWideEvent.onTokenSaveFailed(storeError)
+            tokenRefreshWideEvent.onTokenSaveFailed()
             throw e
         }
         tokenRefreshWideEvent.onTokensSaved()
@@ -1607,5 +1591,3 @@ data class PurchaseExperiments(
     val experiments: List<Experiment> = emptyList(),
     val legacyExperiment: Experiment? = null,
 )
-
-private fun Exception.isServerError(): Boolean = this is HttpException && code() >= 500

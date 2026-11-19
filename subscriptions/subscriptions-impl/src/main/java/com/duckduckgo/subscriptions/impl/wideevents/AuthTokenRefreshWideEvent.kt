@@ -43,13 +43,14 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Missi
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
-import com.duckduckgo.subscriptions.impl.repository.TokenRefreshHistory
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import java.io.Closeable
+import java.io.IOException
 import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -62,12 +63,11 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onStart(
         subscriptionStatus: SubscriptionStatus,
         subscriptionPlatform: String?,
-        refreshHistory: TokenRefreshHistory,
     )
 
     suspend fun onCrossProcessLockAcquired(result: Result<Closeable>)
     suspend fun onTokenRead()
-    suspend fun onTokenReadFailed(storeError: TokenStoreError)
+    suspend fun onTokenReadFailed()
     suspend fun onJwksFetched()
     suspend fun onTokensFetched()
     suspend fun onBackendErrorResponse(
@@ -87,17 +87,10 @@ interface AuthTokenRefreshWideEvent {
     )
 
     suspend fun onTokensSaved()
-    suspend fun onTokenSaveFailed(storeError: TokenStoreError)
+    suspend fun onTokenSaveFailed()
     suspend fun onSkipped()
     suspend fun onSuccess()
     suspend fun onFailure(e: Exception)
-}
-
-enum class TokenStoreError(val paramValue: String) {
-    UNAVAILABLE("unavailable"),
-    MISSING("missing"),
-    UNREADABLE("unreadable"),
-    WRITE_FAILED("write_failed"),
 }
 
 @SingleIn(AppScope::class)
@@ -109,18 +102,23 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
     private val networkProtectionState: Lazy<NetworkProtectionState>,
     private val isVerifiedPlayStoreInstall: Lazy<IsVerifiedPlayStoreInstall>,
     private val timeProvider: CurrentTimeProvider,
+    private val store: AuthTokenRefreshWideEventStore,
     @ProcessName val processName: String,
 ) : AuthTokenRefreshWideEvent {
 
     private var ongoingTokenRefreshWideEventId: Long? = null
 
+    // Without a readable refresh token there is no session, so the failure must not carry over to the next sign-in
+    private var tokenReadFailed = false
+
     override suspend fun onStart(
         subscriptionStatus: SubscriptionStatus,
         subscriptionPlatform: String?,
-        refreshHistory: TokenRefreshHistory,
     ) {
         if (!isFeatureEnabled()) return
 
+        tokenReadFailed = false
+        val refreshHistory = runCatching { store.getRefreshHistory() }.getOrDefault(NO_REFRESH_HISTORY)
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
             wideEventClient.intervalEnd(wideEventId = wideEventId, key = INTERVAL_TOTAL_DURATION)
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Unknown)
@@ -176,17 +174,30 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         }
     }
 
-    override suspend fun onTokenReadFailed(storeError: TokenStoreError) {
+    override suspend fun onTokenReadFailed() {
         if (!isFeatureEnabled()) return
+        tokenReadFailed = true
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
             wideEventClient.flowStep(
                 wideEventId = wideEventId,
                 stepName = STEP_TOKEN_READ,
                 success = false,
-                metadata = mapOf(KEY_STORE_ERROR to storeError.paramValue),
+                metadata = storeErrorMetadata(storeError = runCatching { tokenReadError() }.getOrNull()),
             )
         }
     }
+
+    private suspend fun tokenReadError(): TokenStoreError = when {
+        !store.isTokenStoreAvailable() -> TokenStoreError.UNAVAILABLE
+        store.hasRefreshTokenEntry() -> TokenStoreError.UNREADABLE
+        else -> TokenStoreError.MISSING
+    }
+
+    private suspend fun tokenSaveError(): TokenStoreError =
+        if (store.isTokenStoreAvailable()) TokenStoreError.WRITE_FAILED else TokenStoreError.UNAVAILABLE
+
+    private fun storeErrorMetadata(storeError: TokenStoreError?): Map<String, String> =
+        if (storeError == null) emptyMap() else mapOf(KEY_STORE_ERROR to storeError.paramValue)
 
     override suspend fun onTokensSaved() {
         if (!isFeatureEnabled()) return
@@ -195,14 +206,14 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         }
     }
 
-    override suspend fun onTokenSaveFailed(storeError: TokenStoreError) {
+    override suspend fun onTokenSaveFailed() {
         if (!isFeatureEnabled()) return
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
             wideEventClient.flowStep(
                 wideEventId = wideEventId,
                 stepName = STEP_TOKEN_SAVE,
                 success = false,
-                metadata = mapOf(KEY_STORE_ERROR to storeError.paramValue),
+                metadata = storeErrorMetadata(storeError = runCatching { tokenSaveError() }.getOrNull()),
             )
         }
     }
@@ -305,6 +316,8 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                 metadata = mapOf(KEY_SIGNED_OUT to signedOut.toString()),
             )
             ongoingTokenRefreshWideEventId = null
+            // Signing out clears the history together with the tokens
+            if (!signedOut) recordRefreshFailure()
         }
     }
 
@@ -322,6 +335,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
             wideEventClient.intervalEnd(wideEventId = wideEventId, key = INTERVAL_TOTAL_DURATION)
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Success)
             ongoingTokenRefreshWideEventId = null
+            recordRefreshSuccess()
         }
     }
 
@@ -331,7 +345,17 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
             wideEventClient.intervalEnd(wideEventId = wideEventId, key = INTERVAL_TOTAL_DURATION)
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Failure(reason = e.toErrorString()))
             ongoingTokenRefreshWideEventId = null
+            if (!tokenReadFailed && e.shouldCountTowardsFailureStreak()) recordRefreshFailure()
         }
+    }
+
+    private suspend fun recordRefreshSuccess() {
+        val now = Instant.ofEpochMilli(timeProvider.currentTimeMillis())
+        runCatching { store.recordRefreshSuccess(at = now, processName = processName) }
+    }
+
+    private suspend fun recordRefreshFailure() {
+        runCatching { store.recordRefreshFailure() }
     }
 
     override suspend fun onBackendErrorResponse(
@@ -403,6 +427,22 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
 }
 
 private fun Exception.toErrorString(): String = javaClass.simpleName
+
+private enum class TokenStoreError(val paramValue: String) {
+    UNAVAILABLE("unavailable"),
+    MISSING("missing"),
+    UNREADABLE("unreadable"),
+    WRITE_FAILED("write_failed"),
+}
+
+private val NO_REFRESH_HISTORY = TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null)
+
+// Network errors and backend 5xx responses say nothing about the token, so they do not count towards a stuck device
+private fun Exception.shouldCountTowardsFailureStreak(): Boolean {
+    val isNetworkError = this is IOException
+    val isServerError = this is HttpException && code() >= 500
+    return !isNetworkError && !isServerError
+}
 
 private val KNOWN_PROCESS_NAMES = setOf("main", ":vpn", ":pir", ":autofill", ":fire")
 

@@ -44,20 +44,26 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Missi
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
-import com.duckduckgo.subscriptions.impl.repository.TokenRefreshHistory
+import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
+import retrofit2.HttpException
+import retrofit2.Response
 import java.io.Closeable
+import java.io.IOException
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -84,6 +90,11 @@ class AuthTokenRefreshWideEventTest {
         override fun invoke(): Boolean = verifiedInstall
     }
     private val timeProvider: CurrentTimeProvider = mock()
+    private val tokenDataStore = FakeSubscriptionsDataStore()
+    private val store = RealAuthTokenRefreshWideEventStore(
+        subscriptionsDataStore = tokenDataStore,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
+    )
 
     private lateinit var authWideEvent: AuthTokenRefreshWideEventImpl
 
@@ -93,22 +104,39 @@ class AuthTokenRefreshWideEventTest {
         whenever(networkProtectionState.isRunning()).thenReturn(false)
         whenever(timeProvider.currentTimeMillis()).thenReturn(NOW.toEpochMilli())
 
-        authWideEvent = AuthTokenRefreshWideEventImpl(
-            wideEventClient = wideEventClient,
-            subscriptionsFeature = lazy { subscriptionsFeature },
-            dispatchers = coroutineRule.testDispatcherProvider,
-            networkProtectionState = lazy { networkProtectionState },
-            isVerifiedPlayStoreInstall = lazy { isVerifiedPlayStoreInstall },
-            timeProvider = timeProvider,
-            processName = "main",
-        )
+        authWideEvent = createWideEvent(store = store)
     }
+
+    private fun createWideEvent(store: AuthTokenRefreshWideEventStore) = AuthTokenRefreshWideEventImpl(
+        wideEventClient = wideEventClient,
+        subscriptionsFeature = lazy { subscriptionsFeature },
+        dispatchers = coroutineRule.testDispatcherProvider,
+        networkProtectionState = lazy { networkProtectionState },
+        isVerifiedPlayStoreInstall = lazy { isVerifiedPlayStoreInstall },
+        timeProvider = timeProvider,
+        store = store,
+        processName = "main",
+    )
 
     private suspend fun startFlow(
         subscriptionStatus: SubscriptionStatus = SubscriptionStatus.UNKNOWN,
         subscriptionPlatform: String? = "google",
         refreshHistory: TokenRefreshHistory = TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null),
-    ) = authWideEvent.onStart(subscriptionStatus, subscriptionPlatform, refreshHistory)
+    ) {
+        givenStoredRefreshHistory(refreshHistory)
+        authWideEvent.onStart(subscriptionStatus = subscriptionStatus, subscriptionPlatform = subscriptionPlatform)
+    }
+
+    private fun givenStoredRefreshHistory(refreshHistory: TokenRefreshHistory) {
+        tokenDataStore.tokenRefreshFailureStreak = refreshHistory.failureStreak
+        tokenDataStore.lastTokenRefreshSuccessAt = refreshHistory.lastSuccessAt?.toEpochMilli()
+        tokenDataStore.lastTokenRefreshProcess = refreshHistory.lastSuccessProcess
+    }
+
+    private suspend fun startFlowWithId(wideEventId: Long) {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(wideEventId))
+        authWideEvent.onStart(subscriptionStatus = SubscriptionStatus.UNKNOWN, subscriptionPlatform = "google")
+    }
 
     @Test
     fun `onStart starts a new flow and total interval`() = runTest {
@@ -705,15 +733,35 @@ class AuthTokenRefreshWideEventTest {
     }
 
     @Test
-    fun `onTokenReadFailed sends failed token_read step with the store error`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
-            .thenReturn(Result.success(30L))
-        startFlow()
+    fun `onTokenReadFailed reports a missing refresh token entry`() = runTest {
+        startFlowWithId(wideEventId = 30L)
+        tokenDataStore.refreshTokenV2 = null
 
-        authWideEvent.onTokenReadFailed(TokenStoreError.MISSING)
+        authWideEvent.onTokenReadFailed()
 
         verify(wideEventClient).flowStep(30L, "token_read", false, mapOf("store_error" to "missing"))
         verify(wideEventClient, never()).intervalStart(eq(30L), eq("fetch_jwks_latency_ms_bucketed"), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun `onTokenReadFailed reports a refresh token entry that cannot be decrypted`() = runTest {
+        startFlowWithId(wideEventId = 30L)
+        tokenDataStore.refreshTokenV2 = null
+        tokenDataStore.simulateUnreadableRefreshToken = true
+
+        authWideEvent.onTokenReadFailed()
+
+        verify(wideEventClient).flowStep(30L, "token_read", false, mapOf("store_error" to "unreadable"))
+    }
+
+    @Test
+    fun `onTokenReadFailed reports an unavailable token store`() = runTest {
+        startFlowWithId(wideEventId = 30L)
+        tokenDataStore.available = false
+
+        authWideEvent.onTokenReadFailed()
+
+        verify(wideEventClient).flowStep(30L, "token_read", false, mapOf("store_error" to "unavailable"))
     }
 
     @Test
@@ -728,14 +776,168 @@ class AuthTokenRefreshWideEventTest {
     }
 
     @Test
-    fun `onTokenSaveFailed sends failed token_save step with the store error`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
-            .thenReturn(Result.success(32L))
-        startFlow()
+    fun `onTokenSaveFailed reports a failed write when the token store is available`() = runTest {
+        startFlowWithId(wideEventId = 32L)
 
-        authWideEvent.onTokenSaveFailed(TokenStoreError.WRITE_FAILED)
+        authWideEvent.onTokenSaveFailed()
 
         verify(wideEventClient).flowStep(32L, "token_save", false, mapOf("store_error" to "write_failed"))
+    }
+
+    @Test
+    fun `onTokenSaveFailed reports an unavailable token store`() = runTest {
+        startFlowWithId(wideEventId = 32L)
+        tokenDataStore.available = false
+
+        authWideEvent.onTokenSaveFailed()
+
+        verify(wideEventClient).flowStep(32L, "token_save", false, mapOf("store_error" to "unavailable"))
+    }
+
+    @Test
+    fun `onSuccess resets the failure streak and records when and where the refresh succeeded`() = runTest {
+        tokenDataStore.tokenRefreshFailureStreak = 3
+        startFlowWithId(wideEventId = 40L)
+
+        authWideEvent.onSuccess()
+
+        assertEquals(0, tokenDataStore.tokenRefreshFailureStreak)
+        assertEquals(NOW.toEpochMilli(), tokenDataStore.lastTokenRefreshSuccessAt)
+        assertEquals("main", tokenDataStore.lastTokenRefreshProcess)
+    }
+
+    @Test
+    fun `onFailure adds to the failure streak`() = runTest {
+        tokenDataStore.tokenRefreshFailureStreak = 1
+        startFlowWithId(wideEventId = 41L)
+
+        authWideEvent.onFailure(IllegalStateException())
+
+        assertEquals(2, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `onFailure with a network error leaves the failure streak unchanged`() = runTest {
+        tokenDataStore.tokenRefreshFailureStreak = 1
+        startFlowWithId(wideEventId = 42L)
+
+        authWideEvent.onFailure(IOException())
+
+        assertEquals(1, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `onFailure with a backend server error leaves the failure streak unchanged`() = runTest {
+        tokenDataStore.tokenRefreshFailureStreak = 1
+        startFlowWithId(wideEventId = 43L)
+
+        authWideEvent.onFailure(httpException(code = 503))
+
+        assertEquals(1, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `onFailure with a backend rejection adds to the failure streak`() = runTest {
+        tokenDataStore.tokenRefreshFailureStreak = 1
+        startFlowWithId(wideEventId = 44L)
+
+        authWideEvent.onFailure(httpException(code = 400))
+
+        assertEquals(2, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `onFailure after the refresh token could not be read leaves the failure streak unchanged`() = runTest {
+        tokenDataStore.refreshTokenV2 = null
+        startFlowWithId(wideEventId = 49L)
+
+        authWideEvent.onTokenReadFailed()
+        authWideEvent.onFailure(IllegalStateException())
+
+        assertEquals(0, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `a refresh that reads the token counts its failure even when the previous refresh could not read it`() = runTest {
+        startFlowWithId(wideEventId = 50L)
+        authWideEvent.onTokenReadFailed()
+        authWideEvent.onFailure(IllegalStateException())
+        startFlowWithId(wideEventId = 51L)
+
+        authWideEvent.onTokenRead()
+        authWideEvent.onFailure(IllegalStateException())
+
+        assertEquals(1, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `onPlayLoginFailure with the recovery deferred adds to the failure streak once`() = runTest {
+        tokenDataStore.tokenRefreshFailureStreak = 1
+        startFlowWithId(wideEventId = 45L)
+        val refreshException = httpException(code = 400)
+
+        authWideEvent.onPlayLoginFailure(signedOut = false, refreshException = refreshException, loginError = "UnknownError")
+        authWideEvent.onFailure(refreshException)
+
+        assertEquals(2, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `onPlayLoginFailure with the user signed out leaves the failure streak to the sign out`() = runTest {
+        tokenDataStore.tokenRefreshFailureStreak = 1
+        startFlowWithId(wideEventId = 46L)
+        val refreshException = httpException(code = 400)
+
+        authWideEvent.onPlayLoginFailure(signedOut = true, refreshException = refreshException, loginError = "NoActivePurchase")
+        authWideEvent.onFailure(refreshException)
+
+        assertEquals(1, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `onUnknownAccountError leaves the failure streak to the sign out`() = runTest {
+        tokenDataStore.tokenRefreshFailureStreak = 1
+        startFlowWithId(wideEventId = 47L)
+
+        authWideEvent.onUnknownAccountError()
+        authWideEvent.onFailure(httpException(code = 400))
+
+        assertEquals(1, tokenDataStore.tokenRefreshFailureStreak)
+    }
+
+    @Test
+    fun `a store that throws does not stop the wide event`() = runTest {
+        val throwingStore: AuthTokenRefreshWideEventStore = mock()
+        whenever(throwingStore.getRefreshHistory()).thenThrow(IllegalStateException())
+        whenever(throwingStore.isTokenStoreAvailable()).thenThrow(IllegalStateException())
+        whenever(throwingStore.recordRefreshSuccess(any(), any())).thenThrow(IllegalStateException())
+        authWideEvent = createWideEvent(store = throwingStore)
+        startFlowWithId(wideEventId = 48L)
+
+        authWideEvent.onTokenSaveFailed()
+        authWideEvent.onSuccess()
+
+        verify(wideEventClient).flowStep(48L, "token_save", false, emptyMap())
+        verify(wideEventClient).flowFinish(48L, FlowStatus.Success, emptyMap())
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `feature disabled leaves the refresh history untouched`() = runTest {
+        subscriptionsFeature.sendAuthTokenRefreshWideEvent().setRawStoredState(Toggle.State(false))
+        tokenDataStore.tokenRefreshFailureStreak = 1
+
+        startFlow(refreshHistory = TokenRefreshHistory(failureStreak = 1, lastSuccessAt = null))
+        authWideEvent.onSuccess()
+        authWideEvent.onFailure(IllegalStateException())
+
+        assertEquals(1, tokenDataStore.tokenRefreshFailureStreak)
+        assertNull(tokenDataStore.lastTokenRefreshSuccessAt)
+    }
+
+    private fun httpException(code: Int): HttpException {
+        val responseBody = "error".toResponseBody("text/json".toMediaTypeOrNull())
+        return HttpException(Response.error<Void>(code, responseBody))
     }
 
     @SuppressLint("DenyListedApi")
