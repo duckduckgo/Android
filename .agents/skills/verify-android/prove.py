@@ -281,8 +281,12 @@ def report(m):
     lines += [f"| {c['check']} | {'pass' if c['ok'] else 'FAIL'} | {c['detail']} |" for c in m["checks"]]
     if m.get("unverified"):
         lines += ["", "Not verified:", *[f"- {u['what']}: {u['why']}" for u in m["unverified"]]]
+    # Relative links resolve beside the report, locally and in auto's evidence viewer once published.
     if m["videos"]:
-        lines += ["", "Video, in order: " + ", ".join(m["videos"])]
+        lines += ["", "Video, in order: " + ", ".join(f"[{v}]({v})" for v in m["videos"])]
+    shots = [f for f in m.get("files") or [] if f.endswith(".png")]
+    if shots:
+        lines += ["", "## Screenshots", "", *[line for f in shots for line in (f"![{f}]({f})", "")]]
     if m["notes"]:
         lines += ["", "Notes:", *[f"- {n}" for n in m["notes"]]]
     for title, body in m["sections"]:
