@@ -103,8 +103,8 @@ class VpnServiceHeartbeatMonitorWorkerTest {
             it.dispatcherProvider = coroutineTestRule.testDispatcherProvider
             it.migratedInstallVpnStateCleanup = MigratedInstallVpnStateCleanup(
                 deviceMigration = deviceMigration,
-                vpnDatabase = db,
-                appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider),
+                vpnDatabase = lazyOf(db),
+                appTrackerBlockingStatsRepository = lazyOf(RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)),
                 dispatchers = coroutineTestRule.testDispatcherProvider,
                 appCoroutineScope = coroutineTestRule.testScope,
             )

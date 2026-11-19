@@ -45,7 +45,7 @@ import javax.inject.Inject
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class MigratedInstallNetpStateCleanup @Inject constructor(
     private val deviceMigration: DeviceMigration,
-    private val geoswitchingRepository: NetPGeoswitchingRepository,
+    private val geoswitchingRepository: Lazy<NetPGeoswitchingRepository>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
@@ -56,7 +56,7 @@ class MigratedInstallNetpStateCleanup @Inject constructor(
 
             try {
                 if (!deviceMigration.isMigratedInstall()) return@launch
-                geoswitchingRepository.clearAllPreferencesExceptUserPreferredLocation()
+                geoswitchingRepository.value.clearAllPreferencesExceptUserPreferredLocation()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

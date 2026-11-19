@@ -72,7 +72,7 @@ class MigratedInstallNetpStateCleanupTest {
 
     private val testee = MigratedInstallNetpStateCleanup(
         deviceMigration = deviceMigration,
-        geoswitchingRepository = geoswitchingRepository,
+        geoswitchingRepository = lazyOf(geoswitchingRepository),
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
     )
@@ -117,7 +117,7 @@ class MigratedInstallNetpStateCleanupTest {
     }
 
     @Test
-    fun whenStartingOnAnOrdinaryInstallThenCleanupDoesNotConstructTheGeoSwitchingRepository() = runTest {
+    fun whenStartingOnAnOrdinaryInstallThenCleanupDoesNotResolveTheGeoswitchingRepository() = runTest {
         whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
         var repositoryRequested = false
         val graph = createGraphFactory<NetpCleanupTestGraph.Factory>().create(
@@ -130,7 +130,7 @@ class MigratedInstallNetpStateCleanupTest {
         graph.cleanup().onCreate(mock())
         coroutineTestRule.testScope.advanceUntilIdle()
 
-        assertFalse("Startup constructed the cleanup repository for an ordinary install", repositoryRequested)
+        assertFalse("Startup resolved the cleanup repository for an ordinary install", repositoryRequested)
     }
 
     @Test

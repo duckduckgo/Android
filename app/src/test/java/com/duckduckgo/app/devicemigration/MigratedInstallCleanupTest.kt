@@ -67,11 +67,11 @@ class MigratedInstallCleanupTest {
 
     private val testee get() = MigratedInstallCleanup(
         deviceMigration = deviceMigration,
-        pageLoadedPixelDao = pageLoadedPixelDao,
-        pagePaintedPixelDao = pagePaintedPixelDao,
-        defaultBrowserPromptsAppUsageDao = defaultBrowserPromptsAppUsageDao,
-        appInstallStore = appInstallStore,
-        defaultBrowserPromptsDataStore = promptsDataStore,
+        pageLoadedPixelDao = lazyOf(pageLoadedPixelDao),
+        pagePaintedPixelDao = lazyOf(pagePaintedPixelDao),
+        defaultBrowserPromptsAppUsageDao = lazyOf(defaultBrowserPromptsAppUsageDao),
+        appInstallStore = lazyOf(appInstallStore),
+        defaultBrowserPromptsDataStore = lazyOf(promptsDataStore),
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
     )

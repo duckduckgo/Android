@@ -75,8 +75,8 @@ class MigratedInstallVpnStateCleanupTest {
         repository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
         testee = MigratedInstallVpnStateCleanup(
             deviceMigration = deviceMigration,
-            vpnDatabase = db,
-            appTrackerBlockingStatsRepository = repository,
+            vpnDatabase = lazyOf(db),
+            appTrackerBlockingStatsRepository = lazyOf(repository),
             dispatchers = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
         )
