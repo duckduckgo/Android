@@ -48,8 +48,8 @@ import javax.inject.Inject
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class MigratedInstallVpnStateCleanup @Inject constructor(
     private val deviceMigration: DeviceMigration,
-    private val vpnDatabase: VpnDatabase,
-    private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
+    private val vpnDatabase: Lazy<VpnDatabase>,
+    private val appTrackerBlockingStatsRepository: Lazy<AppTrackerBlockingStatsRepository>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
@@ -70,10 +70,12 @@ class MigratedInstallVpnStateCleanup @Inject constructor(
 
             try {
                 if (!deviceMigration.isMigratedInstall()) return@withLock true
-                vpnDatabase.runInTransaction {
-                    vpnDatabase.vpnHeartBeatDao().deleteAll()
-                    vpnDatabase.vpnServiceStateDao().deleteAll()
-                    appTrackerBlockingStatsRepository.deleteAllTrackers()
+                val database = vpnDatabase.value
+                val statsRepository = appTrackerBlockingStatsRepository.value
+                database.runInTransaction {
+                    database.vpnHeartBeatDao().deleteAll()
+                    database.vpnServiceStateDao().deleteAll()
+                    statsRepository.deleteAllTrackers()
                 }
             } catch (e: CancellationException) {
                 throw e

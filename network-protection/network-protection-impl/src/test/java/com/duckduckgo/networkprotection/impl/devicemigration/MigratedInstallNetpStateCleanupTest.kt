@@ -17,16 +17,25 @@
 package com.duckduckgo.networkprotection.impl.devicemigration
 
 import android.content.SharedPreferences
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore.DataVolume
 import com.duckduckgo.networkprotection.impl.volume.RealNetpDataVolumeStore
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.RealNetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
+import dev.zacsweers.metro.DependencyGraph
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.createGraphFactory
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -63,7 +72,7 @@ class MigratedInstallNetpStateCleanupTest {
 
     private val testee = MigratedInstallNetpStateCleanup(
         deviceMigration = deviceMigration,
-        geoswitchingRepository = geoswitchingRepository,
+        geoswitchingRepository = lazyOf(geoswitchingRepository),
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
     )
@@ -105,6 +114,23 @@ class MigratedInstallNetpStateCleanupTest {
         assertEquals(PREVIOUS_PHONE_ENABLED_TIME, networkProtectionRepository.enabledTimeInMillis)
         assertEquals(PREVIOUS_PHONE_DATA_VOLUME, dataVolumeStore.dataVolume)
         assertEquals(PREFERRED_LOCATION, geoswitchingRepository.getUserPreferredLocation())
+    }
+
+    @Test
+    fun whenStartingOnAnOrdinaryInstallThenCleanupDoesNotResolveTheGeoswitchingRepository() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
+        var repositoryRequested = false
+        val graph = createGraphFactory<NetpCleanupTestGraph.Factory>().create(
+            deviceMigration,
+            { geoswitchingRepository.also { repositoryRequested = true } },
+            coroutineTestRule.testDispatcherProvider,
+            coroutineTestRule.testScope,
+        )
+
+        graph.cleanup().onCreate(mock())
+        coroutineTestRule.testScope.advanceUntilIdle()
+
+        assertFalse("Startup resolved the cleanup repository for an ordinary install", repositoryRequested)
     }
 
     @Test
@@ -175,6 +201,29 @@ class MigratedInstallNetpStateCleanupTest {
         val PREVIOUS_PHONE_DATA_VOLUME = DataVolume(receivedBytes = 10, transmittedBytes = 20)
         val PREFERRED_LOCATION = UserPreferredLocation(countryCode = "nl", cityName = "Amsterdam")
     }
+}
+
+@DependencyGraph
+@SingleIn(AppScope::class)
+internal interface NetpCleanupTestGraph {
+    fun cleanup(): MigratedInstallNetpStateCleanup
+
+    @Provides
+    fun geoswitchingRepository(repositoryProvider: NetpRepositoryProvider): NetPGeoswitchingRepository = repositoryProvider.get()
+
+    @DependencyGraph.Factory
+    interface Factory {
+        fun create(
+            @Provides deviceMigration: DeviceMigration,
+            @Provides repositoryProvider: NetpRepositoryProvider,
+            @Provides dispatchers: DispatcherProvider,
+            @Provides @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        ): NetpCleanupTestGraph
+    }
+}
+
+internal fun interface NetpRepositoryProvider {
+    fun get(): NetPGeoswitchingRepository
 }
 
 /** Counts how edits are written, to check that a replacement cannot be half applied. */

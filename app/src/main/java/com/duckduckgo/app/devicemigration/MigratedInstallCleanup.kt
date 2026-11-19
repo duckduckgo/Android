@@ -49,11 +49,11 @@ import javax.inject.Inject
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class MigratedInstallCleanup @Inject constructor(
     private val deviceMigration: DeviceMigration,
-    private val pageLoadedPixelDao: PageLoadedPixelDao,
-    private val pagePaintedPixelDao: PagePaintedPixelDao,
-    private val defaultBrowserPromptsAppUsageDao: DefaultBrowserPromptsAppUsageDao,
-    private val appInstallStore: AppInstallStore,
-    private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
+    private val pageLoadedPixelDao: Lazy<PageLoadedPixelDao>,
+    private val pagePaintedPixelDao: Lazy<PagePaintedPixelDao>,
+    private val defaultBrowserPromptsAppUsageDao: Lazy<DefaultBrowserPromptsAppUsageDao>,
+    private val appInstallStore: Lazy<AppInstallStore>,
+    private val defaultBrowserPromptsDataStore: Lazy<DefaultBrowserPromptsDataStore>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
@@ -65,11 +65,11 @@ class MigratedInstallCleanup @Inject constructor(
             if (!deviceMigration.isMigrationExperienceEnabled()) return@launch
 
             try {
-                pageLoadedPixelDao.deleteAll()
-                pagePaintedPixelDao.deleteAll()
-                defaultBrowserPromptsAppUsageDao.deleteAll()
+                pageLoadedPixelDao.value.deleteAll()
+                pagePaintedPixelDao.value.deleteAll()
+                defaultBrowserPromptsAppUsageDao.value.deleteAll()
                 restartDefaultBrowserPrompts()
-                appInstallStore.newDefaultBrowserDialogCount = 0
+                appInstallStore.value.newDefaultBrowserDialogCount = 0
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -89,12 +89,13 @@ class MigratedInstallCleanup @Inject constructor(
 
     // A stage the user stopped is kept: it may be their "do not ask again" choice.
     private suspend fun restartDefaultBrowserPrompts() {
-        if (defaultBrowserPromptsDataStore.stage.firstOrNull() != STOPPED) {
-            defaultBrowserPromptsDataStore.storeStage(NOT_STARTED)
+        val promptsDataStore = defaultBrowserPromptsDataStore.value
+        if (promptsDataStore.stage.firstOrNull() != STOPPED) {
+            promptsDataStore.storeStage(NOT_STARTED)
         }
-        defaultBrowserPromptsDataStore.storeShowSetAsDefaultPopupMenuItemState(false)
-        defaultBrowserPromptsDataStore.storeHighlightPopupMenuState(false)
-        defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
+        promptsDataStore.storeShowSetAsDefaultPopupMenuItemState(false)
+        promptsDataStore.storeHighlightPopupMenuState(false)
+        promptsDataStore.storeShowSetAsDefaultMessageState(false)
     }
 
     private companion object {
