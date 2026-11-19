@@ -28,6 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -91,6 +92,22 @@ class RealSegmentSkipUserPreferencesTest {
         assertEquals(SegmentSkipMode.OFF, testee.modeFlow().first())
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(SegmentSkipMode.OFF, testee.cachedMode())
+    }
+
+    @Test
+    fun whenConcurrentSavesSelectSameModeThenOnlyOneChangesIt() = runTest {
+        val first = async { testee.setMode(SegmentSkipMode.ALWAYS_SKIP) }
+        val second = async { testee.setMode(SegmentSkipMode.ALWAYS_SKIP) }
+        assertEquals(listOf(false, true), listOf(first.await(), second.await()).sorted())
+    }
+
+    @Test
+    fun whenDefaultIsSavedThenLaterDefaultChangeDoesNotReplaceIt() = runTest {
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        assertEquals(false, testee.setMode(SegmentSkipMode.ALWAYS_ASK))
+        feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = false))
+        assertEquals(SegmentSkipMode.ALWAYS_ASK, testee.modeFlow().first())
     }
 
     @Test

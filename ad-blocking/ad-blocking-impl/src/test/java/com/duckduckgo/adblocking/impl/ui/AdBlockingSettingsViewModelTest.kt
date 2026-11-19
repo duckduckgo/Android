@@ -54,6 +54,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -329,6 +331,8 @@ class AdBlockingSettingsViewModelTest {
             viewModel.onSegmentSkipModeClicked()
             assertEquals(AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog(SegmentSkipMode.OFF), awaitItem())
         }
+        verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_COUNT)
     }
 
     @Test
@@ -338,16 +342,57 @@ class AdBlockingSettingsViewModelTest {
         createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP)
 
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
+        val parameters = mapOf("segment_skip_status" to "skip")
+        verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_DAILY, parameters = parameters, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = parameters)
+    }
+
+    @Test
+    fun whenModeIsReselectedThenNoUpdatedPixelFires() = runTest {
+        createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_ASK)
+        verify(pixel, never()).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = mapOf("segment_skip_status" to "ask"))
+    }
+
+    @Test
+    fun whenRowIsClickedTwiceThenBothClicksAreCounted() = runTest {
+        val viewModel = createViewModel()
+        viewModel.onSegmentSkipModeClicked()
+        viewModel.onSegmentSkipModeClicked()
+        verify(pixel, times(2)).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_COUNT)
+        verify(pixel, never()).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = mapOf("segment_skip_status" to "ask"))
+    }
+
+    @Test
+    fun whenSaveFailsThenNoUpdatedPixelFires() {
+        org.junit.Assert.assertThrows(IllegalStateException::class.java) {
+            runTest {
+                segmentSkip.failSave = true
+                createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP)
+            }
+        }
+        verify(pixel, never()).fire(
+            AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT,
+            parameters = mapOf("segment_skip_status" to "skip"),
+        )
+        verify(pixel, never()).fire(
+            AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_DAILY,
+            parameters = mapOf("segment_skip_status" to "skip"),
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     private class FakeSegmentSkip : SegmentSkip {
         val mode = MutableStateFlow(SegmentSkipMode.ALWAYS_ASK)
+        var failSave = false
 
         override fun config(): SegmentSkipConfig = throw UnsupportedOperationException()
         override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> = throw UnsupportedOperationException()
         override fun modeFlow(): Flow<SegmentSkipMode> = mode
-        override suspend fun setMode(mode: SegmentSkipMode) {
+        override suspend fun setMode(mode: SegmentSkipMode): Boolean {
+            check(!failSave)
+            val changed = this.mode.value != mode
             this.mode.value = mode
+            return changed
         }
     }
 }

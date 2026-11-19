@@ -39,7 +39,12 @@ import java.security.MessageDigest
 import javax.inject.Inject
 
 class UnsupportedSegmentSkipFormat : Exception()
-class InvalidSegmentSkipFile : Exception()
+enum class SegmentSkipValidationReason(val pixelValue: String) {
+    DECODE_ERROR("decode_error"),
+    CHECKSUM_MISMATCH("checksum_mismatch"),
+}
+
+class InvalidSegmentSkipFile(val reason: SegmentSkipValidationReason = SegmentSkipValidationReason.DECODE_ERROR) : Exception()
 
 @SingleIn(AppScope::class)
 class SegmentSkipBinaryStore @Inject constructor(
@@ -214,7 +219,7 @@ class SegmentSkipBinaryStore @Inject constructor(
                     digest.update(buffer, 0, n)
                 }
             }
-            valid(digest.digest().copyOf(4).contentEquals(header.checksum))
+            if (!digest.digest().copyOf(4).contentEquals(header.checksum)) throw InvalidSegmentSkipFile(SegmentSkipValidationReason.CHECKSUM_MISMATCH)
             output.flush()
             stream.fd.sync()
         }
@@ -249,7 +254,7 @@ class SegmentSkipBinaryStore @Inject constructor(
             digest.update(chunk)
             content.position(end)
         }
-        valid(digest.digest().copyOf(4).contentEquals(header.checksum))
+        if (!digest.digest().copyOf(4).contentEquals(header.checksum)) throw InvalidSegmentSkipFile(SegmentSkipValidationReason.CHECKSUM_MISMATCH)
         return Snapshot(header.revision, header.count, data)
     }
 

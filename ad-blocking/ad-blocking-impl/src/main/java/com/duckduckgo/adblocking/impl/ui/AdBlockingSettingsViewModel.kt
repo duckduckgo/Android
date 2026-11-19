@@ -27,6 +27,10 @@ import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_ENABLED_C
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_ENABLED_DAILY
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_OPENED_COUNT
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_OPENED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_DAILY
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
@@ -160,6 +164,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
     }
 
     fun onSegmentSkipModeClicked() {
+        pixel.fire(SEGMENT_SKIP_SETTINGS_CLICKED_DAILY, type = Pixel.PixelType.Daily())
+        pixel.fire(SEGMENT_SKIP_SETTINGS_CLICKED_COUNT)
         viewModelScope.launch {
             val mode = segmentSkip.modeFlow().firstOrNull() ?: return@launch
             commandChannel.send(ShowSegmentSkipModeDialog(mode))
@@ -168,7 +174,11 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     fun onSegmentSkipModeSelected(mode: SegmentSkipMode) {
         viewModelScope.launch {
-            segmentSkip.setMode(mode)
+            if (segmentSkip.setMode(mode)) {
+                val parameters = mapOf("segment_skip_status" to mode.pixelValue)
+                pixel.fire(SEGMENT_SKIP_SETTINGS_UPDATED_DAILY, parameters = parameters, type = Pixel.PixelType.Daily())
+                pixel.fire(SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = parameters)
+            }
         }
     }
 
