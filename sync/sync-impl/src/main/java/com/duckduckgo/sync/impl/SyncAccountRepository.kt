@@ -53,7 +53,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyCreateFailureReason
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
@@ -92,10 +91,6 @@ interface SyncAccountRepository {
     fun getRecoveryCode(): Result<AuthCode>
     fun getThisConnectedDevice(): ConnectedDevice?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
-    fun getConnectQR(): Result<AuthCode>
-    fun pollConnectionKeys(): Result<Boolean>
-    fun generateExchangeInvitationCode(): Result<AuthCode>
-    fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
     fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
 
     /**
@@ -179,7 +174,6 @@ class AppSyncAccountRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val syncFeature: SyncFeature,
     private val deviceKeyGenerator: DeviceKeyGenerator,
-    private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val syncJweCrypto: SyncJweCrypto,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
@@ -194,13 +188,9 @@ class AppSyncAccountRepository @Inject constructor(
     internal var upgradeRetryDelayMillis: Long = DEFAULT_UPGRADE_RETRY_DELAY_MILLIS
 
     /**
-     * If there is a key-exchange flow in progress, we need to keep a reference to them
-     * There are separate device details for the inviter and the receiver
-     *
-     * Inviter is reset every time a new exchange invitation code is created.
-     * Receiver is reset every time an exchange invitation is received.
+     * If there is a key-exchange flow in progress, we need to keep a reference to this device's details.
+     * Reset every time an exchange invitation is received.
      */
-    private var exchangeDeviceDetailsAsInviter: DeviceDetailsForKeyExchange? = null
     private var exchangeDeviceDetailsAsReceiver: DeviceDetailsForKeyExchange? = null
 
     override fun isSyncSupported(): Boolean {
@@ -467,58 +457,6 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun generateExchangeInvitationCode(): Result<AuthCode> {
-        // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
-        logcat { "Sync-exchange: InviteFlow - A. Generating invitation code" }
-
-        // generate new ID and and public/private key-pair for inviter device
-        val deviceDetailsAsInviter = kotlin.runCatching {
-            generateInviterDeviceDetails()
-        }.getOrElse {
-            return Error(code = EXCHANGE_FAILED.code, reason = "Error generating inviter key-pair").alsoFireAccountErrorPixel()
-        }
-
-        val invitationCode = InvitationCode(keyId = deviceDetailsAsInviter.keyId, publicKey = deviceDetailsAsInviter.publicKey)
-        val invitationWrapper = InvitationCodeWrapper(invitationCode)
-
-        return kotlin.runCatching {
-            val b64Encoded = Adapters.invitationCodeAdapter.toJson(invitationWrapper).encodeB64()
-            val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
-                syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
-            } else {
-                b64Encoded
-            }
-            Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
-        }.getOrElse {
-            Error(code = EXCHANGE_FAILED.code, reason = "Error generating invitation code").alsoFireAccountErrorPixel()
-        }
-    }
-
-    override fun getConnectQR(): Result<AuthCode> {
-        val prepareForConnect = kotlin.runCatching {
-            nativeLib.prepareForConnect().also {
-                it.checkResult("Creating ConnectQR code failed")
-            }
-        }.getOrElse { return it.asErrorResult().alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code) }
-
-        val deviceId = syncDeviceIds.deviceId()
-        syncStore.deviceId = deviceId
-        syncStore.primaryKey = prepareForConnect.publicKey
-        syncStore.secretKey = prepareForConnect.secretKey
-
-        val linkingQRCode = Adapters.recoveryCodeAdapter.toJson(
-            LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
-        ) ?: return Error(reason = "Error generating Linking Code").alsoFireAccountErrorPixel()
-
-        val b64Encoded = linkingQRCode.encodeB64()
-        val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
-            syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
-        } else {
-            b64Encoded
-        }
-        return Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
-    }
-
     private fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
         if (!isSignedIn()) {
             performCreateAccount().onFailure {
@@ -530,124 +468,6 @@ class AppSyncAccountRepository @Inject constructor(
         return performConnect(connectKeys).onFailure {
             it.alsoFireLoginErrorPixel()
             return it.copy(code = CONNECT_FAILED.code)
-        }
-    }
-
-    override fun pollConnectionKeys(): Result<Boolean> {
-        val deviceId = syncDeviceIds.deviceId()
-
-        return when (val result = syncApi.connectDevice(deviceId)) {
-            is Error -> {
-                if (result.code == NOT_FOUND.code) {
-                    return Success(false)
-                } else if (result.code == GONE.code) {
-                    return Error(code = CONNECT_FAILED.code, reason = "Connect: keys expired").alsoFireAccountErrorPixel()
-                }
-                result.alsoFireAccountErrorPixel()
-            }
-
-            is Success -> {
-                val sealOpen = kotlin.runCatching {
-                    nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
-                }.getOrElse { throwable ->
-                    throwable.asErrorResult().alsoFireAccountErrorPixel()
-                    return Error(code = CONNECT_FAILED.code, reason = "Connect: Error opening seal")
-                }
-                val recoveryCode = kotlin.runCatching {
-                    Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery
-                }.getOrNull() ?: return Error(
-                    code = CONNECT_FAILED.code,
-                    reason = "Connect: Error reading received recovery code",
-                ).alsoFireAccountErrorPixel()
-                syncStore.userId = recoveryCode.userId
-                syncStore.primaryKey = recoveryCode.primaryKey
-                return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey).onFailure {
-                    return it.copy(code = LOGIN_FAILED.code)
-                }
-            }
-        }
-    }
-
-    override fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean> {
-        // Sync: InviteFlow - C (https://app.asana.com/0/72649045549333/1209571867429615)
-        logcat { "Sync-exchange: InviteFlow - C" }
-
-        val keyId = exchangeDeviceDetailsAsInviter?.keyId ?: return Error(reason = "No pending invitation initialized")
-
-        return when (val result = syncApi.getEncryptedMessage(keyId)) {
-            is Error -> {
-                if (result.code == NOT_FOUND.code) {
-                    return Success(false)
-                } else if (result.code == GONE.code) {
-                    return Error(
-                        code = EXCHANGE_FAILED.code,
-                        reason = "Connect: keys expired",
-                    ).alsoFireAccountErrorPixel()
-                }
-                result.alsoFireAccountErrorPixel()
-            }
-
-            is Success -> {
-                logcat(VERBOSE) { "Sync-exchange: Found invitation acceptance for keyId: $keyId} ${result.data}" }
-
-                val decrypted = kotlin.runCatching {
-                    val pending = exchangeDeviceDetailsAsInviter
-                        ?: return Error(code = EXCHANGE_FAILED.code, reason = "Exchange: No pending invitation initialized")
-                            .alsoFireAccountErrorPixel()
-
-                    nativeLib.sealOpen(result.data, pending.publicKey, pending.privateKey)
-                }.getOrElse { throwable ->
-                    throwable.asErrorResult().alsoFireAccountErrorPixel()
-                    return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error opening seal")
-                }
-
-                logcat(VERBOSE) { "Sync-exchange: invitation acceptance received: $decrypted" }
-
-                val response = Adapters.invitedDeviceAdapter.fromJson(decrypted)
-                    ?: return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error reading invitation response").alsoFireAccountErrorPixel()
-
-                val otherDevicePublicKey = response.publicKey
-                val otherDeviceKeyId = response.keyId
-
-                logcat(VERBOSE) {
-                    """
-                    Sync-exchange: We have received the other device's details.
-                    name:${response.deviceName},
-                    keyId:${response.keyId},
-                    public key: ${response.publicKey}
-                    """.trimIndent()
-                }
-
-                // we encrypt our secrets with otherDevicePublicKey, and send them to the backend endpoint
-                return sendSecrets(otherDeviceKeyId, otherDevicePublicKey).onFailure {
-                    logcat(WARN) { "Sync-exchange: failed to send secrets. error code: ${it.code} ${it.reason}" }
-                    return it.copy(code = EXCHANGE_FAILED.code)
-                }
-            }
-        }
-    }
-
-    private fun sendSecrets(keyId: String, publicKey: String): Result<Boolean> {
-        // Sync: InviteFlow - D (https://app.asana.com/0/72649045549333/1209571867429615)
-        logcat { "Sync-exchange: InviteFlow - D" }
-
-        when (val recoveryCode = getRecoveryCode()) {
-            is Error -> {
-                logcat(ERROR) { "Sync-exchange: failed to get recovery code. error code: ${recoveryCode.code} ${recoveryCode.reason}" }
-                return Error(code = GENERIC_ERROR.code, reason = "Connect: Error getting recovery code").alsoFireAccountErrorPixel()
-            }
-            is Success -> {
-                logcat(VERBOSE) { "Sync-exchange: Got recovery code, ready to share encrypted data for key ID: $keyId" }
-
-                // recovery code comes b64 encoded, so we need to decode it, then encrypt, which automatically b64 encodes the encrypted form
-                return kotlin.runCatching {
-                    val json = recoveryCode.data.rawCode.decodeB64()
-                    val encryptedJson = nativeLib.seal(json, publicKey)
-                    syncApi.sendEncryptedMessage(keyId, encryptedJson)
-                }.getOrElse {
-                    it.asErrorResult()
-                }
-            }
         }
     }
 
@@ -785,10 +605,6 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override suspend fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean> {
-        if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            return Error(reason = "JoinFrom3party: canUseV2ConnectFlow is disabled")
-        }
-
         logcat { "Sync-ScopedToken: joining account via 3party recovery code" }
 
         val parsed = parseThirdPartyRecoveryCode(pastedCode)
@@ -983,22 +799,6 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun generateInviterDeviceDetails(): DeviceDetailsForKeyExchange {
-        logcat(INFO) { "Sync-exchange: Generating inviter device details" }
-        val keyId = deviceKeyGenerator.generate()
-        val prepareForConnect = nativeLib.prepareForConnect()
-
-        return DeviceDetailsForKeyExchange(
-            keyId = keyId,
-            privateKey = prepareForConnect.secretKey,
-            publicKey = prepareForConnect.publicKey,
-        ).also {
-            exchangeDeviceDetailsAsInviter = it
-            logcat(WARN) { "Sync-exchange: this (inviter) device's key ID is $keyId" }
-            logcat(WARN) { "Sync-exchange: this (inviter) device's public key is ${it.publicKey}" }
-        }
-    }
-
     private fun generateReceiverDeviceDetails(): DeviceDetailsForKeyExchange {
         logcat(INFO) { "Sync-exchange: Generating receiver device details" }
         val thisDeviceKeyId = deviceKeyGenerator.generate()
@@ -1045,15 +845,9 @@ class AppSyncAccountRepository @Inject constructor(
             return throwable.asErrorResult()
         }
 
-        val credentialId = if (syncFeature.canUseV2ConnectFlow().isEnabled()) CREDENTIAL_ID_DDG else null
-
         // Unified device list: mint the account_info key locally and encrypt device_info so both are included in the signup request.
-        // Best-effort — null means we sign up without them (if feature flag is off, or mint/encrypt failed) and migration/login backfills later.
-        val unifiedDeviceInfo = if (credentialId == CREDENTIAL_ID_DDG) {
-            signupAccountInfoBuilder.build(account.secretKey, deviceName, deviceType.deviceFactor)
-        } else {
-            null
-        }
+        // Best-effort: null means we sign up without them (writing disabled, or mint/encrypt failed) and migration/login backfills later.
+        val unifiedDeviceInfo = signupAccountInfoBuilder.build(account.secretKey, deviceName, deviceType.deviceFactor)
 
         val result = try {
             runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
@@ -1064,7 +858,7 @@ class AppSyncAccountRepository @Inject constructor(
                 deviceId,
                 encryptedDeviceName,
                 encryptedDeviceType,
-                credentialId,
+                CREDENTIAL_ID_DDG,
                 deviceInfo = unifiedDeviceInfo?.deviceInfo,
                 keys = unifiedDeviceInfo?.keys,
             )
@@ -1084,10 +878,8 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
-                if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
-                    logcat { "Sync-ScopedToken: setting credentialId=ddg after account creation" }
-                    syncStore.credentialId = CREDENTIAL_ID_DDG
-                }
+                logcat { "Sync-ScopedToken: setting credentialId=ddg after account creation" }
+                syncStore.credentialId = CREDENTIAL_ID_DDG
                 unifiedDeviceInfo?.let {
                     syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyCreateSuccess)
                     syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowDeviceInfoFirstWriteSuccess)
@@ -1223,36 +1015,34 @@ class AppSyncAccountRepository @Inject constructor(
 
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
 
-                if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
-                    logcat { "Sync-ScopedToken: login response has v2 data, storing" }
-                    syncStore.credentialId = CREDENTIAL_ID_DDG
-                    result.data.accessCredentials?.let { credentials ->
-                        logcat { "Sync-ScopedToken: ${credentials.size} access credential(s) in response" }
-                        val thirdParty = credentials.find { it.id == CREDENTIAL_ID_3PARTY }
-                        val encryptedSp = thirdParty?.encryptedCredential
-                        if (encryptedSp != null) {
-                            // Decrypt with the DDG MEK; convert wire base64url to standard base64 for storage.
-                            val decryptedSp = kotlin.runCatching {
-                                val ddgMek = syncJweCrypto.hkdfDeriveBytes(preLogin.primaryKey, userId.toByteArray(Charsets.UTF_8), "Main Key", 32)
-                                val b64Url = String(syncJweCrypto.jweDecryptSymmetric(encryptedSp, ddgMek), Charsets.UTF_8)
-                                base64UrlStringToStandardBase64(b64Url)
-                            }.getOrElse {
-                                logcat(ERROR) { "Sync-ScopedToken: failed to decrypt SP from server: ${it.message}" }
-                                null
-                            }
-                            if (decryptedSp != null) {
-                                syncStore.scopedPassword = ScopedPassword(decryptedSp)
-                            }
+                logcat { "Sync-ScopedToken: login response has v2 data, storing" }
+                syncStore.credentialId = CREDENTIAL_ID_DDG
+                result.data.accessCredentials?.let { credentials ->
+                    logcat { "Sync-ScopedToken: ${credentials.size} access credential(s) in response" }
+                    val thirdParty = credentials.find { it.id == CREDENTIAL_ID_3PARTY }
+                    val encryptedSp = thirdParty?.encryptedCredential
+                    if (encryptedSp != null) {
+                        // Decrypt with the DDG MEK; convert wire base64url to standard base64 for storage.
+                        val decryptedSp = kotlin.runCatching {
+                            val ddgMek = syncJweCrypto.hkdfDeriveBytes(preLogin.primaryKey, userId.toByteArray(Charsets.UTF_8), "Main Key", 32)
+                            val b64Url = String(syncJweCrypto.jweDecryptSymmetric(encryptedSp, ddgMek), Charsets.UTF_8)
+                            base64UrlStringToStandardBase64(b64Url)
+                        }.getOrElse {
+                            logcat(ERROR) { "Sync-ScopedToken: failed to decrypt SP from server: ${it.message}" }
+                            null
+                        }
+                        if (decryptedSp != null) {
+                            syncStore.scopedPassword = ScopedPassword(decryptedSp)
                         }
                     }
-                    result.data.keys?.let { keys ->
-                        logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
-                    }
+                }
+                result.data.keys?.let { keys ->
+                    logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
+                }
 
-                    // Best-effort unified-device-list write; gated internally and never fails the login.
-                    appCoroutineScope.launch(dispatcherProvider.io()) {
-                        loginDeviceInfoWriter.onLogin(result.data.keys)
-                    }
+                // Best-effort unified-device-list write; gated internally and never fails the login.
+                appCoroutineScope.launch(dispatcherProvider.io()) {
+                    loginDeviceInfoWriter.onLogin(result.data.keys)
                 }
 
                 appCoroutineScope.launch(dispatcherProvider.io()) {

@@ -85,7 +85,7 @@
         ]
     },
     "m_sync_signup_connect": {
-        "description": "This device joined Sync after another device scanned the v1 connect code shown here",
+        "description": "This device joined Sync after another device scanned the v1 connect code shown here. Only sent by older versions; current versions show the v2 code instead",
         "owners": ["MiSikora"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["form_factor"],

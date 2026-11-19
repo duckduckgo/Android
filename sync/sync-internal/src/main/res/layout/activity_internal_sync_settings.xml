@@ -111,21 +111,7 @@
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="V2 Connect Flow flags" />
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/canUseV2ConnectFlowToggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:showSwitch="true"
-            app:primaryText="canUseV2ConnectFlow (master kill switch)" />
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/canShowV2ConnectCodeToggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:showSwitch="true"
-            app:primaryText="canShowV2ConnectCode (display, requires canUseV2ConnectFlow)" />
+            app:primaryText="V2 Connect Flow" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/openV2PairingDebugButton"

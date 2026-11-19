@@ -61,7 +61,6 @@ import javax.inject.Inject
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSyncCodeDispatcher @Inject constructor(
-    private val syncFeature: SyncFeature,
     private val syncAccountRepository: SyncAccountRepository,
     private val qrCode: ExchangeV2QrCode,
     private val runner: ExchangeV2Runner,
@@ -143,16 +142,6 @@ class RealSyncCodeDispatcher @Inject constructor(
     }
 
     override fun route(pastedCode: String): RouteDecision {
-        val v2Enabled = syncFeature.canUseV2ConnectFlow().isEnabled()
-        logcat { "$TAG: route() called, canUseV2ConnectFlow=$v2Enabled" }
-        if (!v2Enabled) {
-            // Flag off → never look at v2 shapes; defer entirely to the v1 path.
-            return legacy(pastedCode, reason = "FF off")
-        }
-        return classifyV2(pastedCode)
-    }
-
-    private fun classifyV2(pastedCode: String): RouteDecision {
         val parsed = qrCode.parse(pastedCode)
         logcat { "$TAG: v2 parse=${parsed::class.simpleName}" }
         return when (parsed) {
