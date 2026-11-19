@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataRequest
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
+import com.duckduckgo.pir.impl.service.androidUserAgent
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
 import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
@@ -87,6 +88,16 @@ interface PirRepository {
     suspend fun updateMainEtag(etag: String?)
 
     suspend fun updateBrokerJsons(brokers: List<BrokerJson>)
+
+    /**
+     * Marks every stored broker whose json file is not in [activeBrokerFileNames] as removed at [removedAtMs],
+     * and drops the stored etags of those files so they are downloaded again if they become active later.
+     * Brokers that are already removed keep their original removedAt.
+     */
+    suspend fun deactivateBrokersNotIn(
+        activeBrokerFileNames: Set<String>,
+        removedAtMs: Long,
+    )
 
     /**
      * Clears all broker configuration: both the download etags and the parsed broker details
@@ -241,6 +252,10 @@ interface PirRepository {
 
     suspend fun hasBrokerConfigBeenManuallyUpdated(): Boolean
 
+    suspend fun getBrokerJsonsProcessedRevision(): Int
+
+    suspend fun setBrokerJsonsProcessedRevision(revision: Int)
+
     suspend fun latestBackgroundScanRunInMs(): Long
 
     suspend fun setLatestBackgroundScanRunInMs(timeMs: Long)
@@ -366,6 +381,19 @@ class RealPirRepository(
         }
     }
 
+    override suspend fun deactivateBrokersNotIn(
+        activeBrokerFileNames: Set<String>,
+        removedAtMs: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            val db = database.await() ?: return@withContext
+            db.runInTransaction {
+                db.brokerDao().markBrokersRemovedExcept(activeBrokerFileNames, removedAtMs)
+                db.brokerJsonDao().deleteEtagsExcept(activeBrokerFileNames)
+            }
+        }
+    }
+
     override suspend fun clearAllBrokerData() {
         withContext(dispatcherProvider.io()) {
             brokerJsonDao()?.deleteAll()
@@ -465,6 +493,7 @@ class RealPirRepository(
                     parent = broker.parent,
                     addedDatetime = broker.addedDatetime,
                     removedAt = broker.removedAt ?: 0L,
+                    userAgent = broker.androidUserAgent(),
                 ),
                 brokerScan =
                 BrokerScan(
@@ -864,6 +893,16 @@ class RealPirRepository(
         return@withContext pirDataStore.hasBrokerConfigBeenManuallyUpdated
     }
 
+    override suspend fun getBrokerJsonsProcessedRevision(): Int = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.brokerJsonsProcessedRevision
+    }
+
+    override suspend fun setBrokerJsonsProcessedRevision(revision: Int) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.brokerJsonsProcessedRevision = revision
+        }
+    }
+
     override suspend fun latestBackgroundScanRunInMs(): Long = withContext(dispatcherProvider.io()) {
         return@withContext pirDataStore.latestBackgroundScanRunInMs
     }
@@ -982,6 +1021,7 @@ class RealPirRepository(
         parent = parent,
         addedDatetime = addedDatetime,
         removedAt = removedAt,
+        userAgent = userAgent,
     )
 
     private suspend fun prepareDatabase(): PirDatabase? {

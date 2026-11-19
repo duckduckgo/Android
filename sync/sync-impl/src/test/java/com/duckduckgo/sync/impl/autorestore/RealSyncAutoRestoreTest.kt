@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
@@ -33,6 +34,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -55,6 +57,7 @@ class RealSyncAutoRestoreTest {
     @Before
     fun setup() = runTest {
         configureAutoRestoreEnabled(true)
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(AccountInfo())
         testee = RealSyncAutoRestore(
             manager = manager,
             syncFeature = syncFeature,
@@ -130,6 +133,19 @@ class RealSyncAutoRestoreTest {
         testee.restoreSyncAccount()
 
         verify(manager).saveAutoRestoreData(recoveryCodeString, deviceId)
+    }
+
+    @Test
+    fun whenRestoredWithoutADeviceIdThenSavesTheDeviceIdItSignedInWith() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = null))
+        configureProcessCodeResult(SyncResult.Success(true))
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(AccountInfo(deviceId = "new-device-id", isSignedIn = true))
+
+        testee.restoreSyncAccount()
+
+        verify(syncAccountRepository).processCode(any(), isNull())
+        verify(manager).saveAutoRestoreData(recoveryCodeString, "new-device-id")
     }
 
     @Test

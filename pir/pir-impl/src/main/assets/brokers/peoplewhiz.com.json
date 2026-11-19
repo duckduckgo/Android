@@ -1,7 +1,7 @@
 {
   "name": "PeopleWhiz.com",
   "url": "peoplewhiz.com",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "addedDatetime": 1676160000000,
   "optOutUrl": "https://www.peoplewhiz.com/remove-my-info",
   "steps": [
@@ -309,5 +309,5 @@
     "maintenanceScan": 120,
     "maxAttempts": -1
   },
-  "removedAt": null
+  "removedAt": 1793852188537
 }

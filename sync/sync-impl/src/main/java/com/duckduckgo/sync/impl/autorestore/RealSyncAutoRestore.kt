@@ -80,7 +80,8 @@ class RealSyncAutoRestore @Inject constructor(
                         logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
                         restoreTimestamp = System.currentTimeMillis()
                         syncPixels.fireAutoRestoreSuccess(SyncPixelParameters.AUTO_RESTORE_SOURCE_ONBOARDING)
-                        manager.saveAutoRestoreData(payload.recoveryCode, payload.deviceId)
+                        val signedInDeviceId = syncAccountRepository.getAccountInfo().deviceId.ifEmpty { payload.deviceId }
+                        manager.saveAutoRestoreData(payload.recoveryCode, signedInDeviceId)
                     }
                     is Result.Error -> {
                         logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }

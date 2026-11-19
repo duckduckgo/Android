@@ -120,6 +120,27 @@
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/sponsorBlockModeEntry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:visibility="gone"
+                app:primaryText="@string/sponsor_block_settings_title"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/sponsorBlockDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:text="@string/sponsor_block_settings_description"
+                android:visibility="gone"
+                app:textType="secondary"
+                app:typography="body2"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckPlayerEntry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

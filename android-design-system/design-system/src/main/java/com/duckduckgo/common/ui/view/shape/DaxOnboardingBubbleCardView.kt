@@ -272,13 +272,26 @@ constructor(
         if (context.theme.resolveAttribute(R.attr.onboardingSurfaceTertiary, typedValue, true)) {
             return context
         }
-        val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        val themeRes = if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
-            R.style.Theme_DuckDuckGo_Dark_Onboarding
-        } else {
+        val themeRes = if (isLightTheme(context)) {
             R.style.Theme_DuckDuckGo_Light_Onboarding
+        } else {
+            R.style.Theme_DuckDuckGo_Dark_Onboarding
         }
         return ContextThemeWrapper(context, themeRes)
+    }
+
+    /**
+     * The text drawn on the card takes its colour from the app's theme, which the user can set apart from the system's dark
+     * mode, so the card follows that theme too. Themes that don't declare it, and Android 9 where it is stripped, keep following
+     * the system.
+     */
+    private fun isLightTheme(context: Context): Boolean {
+        val typedValue = TypedValue()
+        if (context.theme.resolveAttribute(android.R.attr.isLightTheme, typedValue, true)) {
+            return typedValue.data != 0
+        }
+        val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return nightMode != Configuration.UI_MODE_NIGHT_YES
     }
 
     /**

@@ -82,6 +82,8 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_R
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_CONFIRM_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_DISMISS
@@ -135,6 +137,8 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionSettingsWithdrawalDialogShown()
     fun reportSubscriptionSettingsWithdrawalDialogConfirmClick()
     fun reportSubscriptionSettingsWithdrawalDialogDismissed()
+    fun reportSubscriptionSettingsUndoCancellationShown(isFreeTrial: Boolean)
+    fun reportSubscriptionSettingsUndoCancellationClick(isFreeTrial: Boolean)
     fun reportMonthlyPriceClick()
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
@@ -310,6 +314,12 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportSubscriptionSettingsWithdrawalClick() =
         fire(SUBSCRIPTION_SETTINGS_WITHDRAWAL_CLICK)
+
+    override fun reportSubscriptionSettingsUndoCancellationShown(isFreeTrial: Boolean) =
+        fire(SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_SHOWN, mapOf(SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString()))
+
+    override fun reportSubscriptionSettingsUndoCancellationClick(isFreeTrial: Boolean) =
+        fire(SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_CLICK, mapOf(SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString()))
 
     override fun reportSubscriptionSettingsWithdrawalDialogShown() =
         fire(SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_SHOWN)

@@ -129,6 +129,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
             showDuckAiSection = duckAiFeatureState.showPopupMenuShortcut.value,
             showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
+            vpnMenuState = browserViewState.vpnMenuState,
             pageContextHeader = PageContextHeaderState.DuckAi(title = title, tabId = tabId),
         )
     }

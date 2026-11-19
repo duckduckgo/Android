@@ -71,6 +71,11 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data object PasswordImportErrorRetryRequested : NewUserOnboardingEvent
 
     data object PasswordImportErrorCancelled : NewUserOnboardingEvent
+
+    /** Keeps the migration default-browser step open; the system prompt's outcome arrives as [DefaultBrowserPromptFinished]. */
+    data object MigrationSetDefaultBrowserRequested : NewUserOnboardingEvent
+
+    data object MigrationDefaultBrowserSkipped : NewUserOnboardingEvent
 }
 
 sealed interface PasswordImportResult {

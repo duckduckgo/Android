@@ -72,6 +72,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.TIMEOUT
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.applinks.AppLinkFeature
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -121,6 +122,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardin
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
 import com.duckduckgo.app.browser.commands.Command.LaunchSubscription
+import com.duckduckgo.app.browser.commands.Command.LaunchSyncSetup
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.commands.Command.LaunchVpnManagement
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -276,6 +278,7 @@ import com.duckduckgo.app.cta.ui.DaxTryASearchBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBubbleCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
+import com.duckduckgo.app.cta.ui.SyncAfterDeviceTransferBubbleCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -322,6 +325,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
+import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autoconsent.api.AutoconsentResult
@@ -553,6 +557,7 @@ class BrowserTabViewModel @Inject constructor(
     private val cameraHardwareChecker: CameraHardwareChecker,
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
     private val customTabsFeature: CustomTabsFeature,
+    private val appLinkFeature: AppLinkFeature,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
@@ -631,6 +636,7 @@ class BrowserTabViewModel @Inject constructor(
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
     private val autocompleteSpeedFeature: AutocompleteSpeedFeature,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val trackerStatsWriter: TrackerStatsWriter,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -836,6 +842,11 @@ class BrowserTabViewModel @Inject constructor(
      * caller (skipping confirmation prompts, or overriding "Never" in Open Links in Apps), never the launch carve-out. */
     private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
+
+    /**
+     * Package of the app that opened this regular tab through a VIEW intent; cleared once a handoff back to it happens.
+     */
+    private var plainTabLaunchingApp: String? = null
 
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
@@ -1079,6 +1090,13 @@ class BrowserTabViewModel @Inject constructor(
     fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null, referrerPackage: String? = null) {
         this.customTab = if (isCustomTab) CustomTabContext(clientPackage, referrerPackage) else null
     }
+
+    fun setLaunchingAppPackage(packageName: String?) {
+        plainTabLaunchingApp = packageName
+    }
+
+    private fun plainTabTrustedCaller(): String? =
+        plainTabLaunchingApp.takeIf { customTab == null && appLinkFeature.plainTabTrustedCaller().isEnabled() }
 
     fun onViewReady() {
         // Navigation is handled by restoreWebViewState in onViewStateRestored: it either
@@ -1526,6 +1544,7 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ) {
+        plainTabLaunchingApp = null
         submitQuery(query, queryOrigin, QuerySubmissionSource.USER)
     }
 
@@ -3076,7 +3095,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
         val networkName = event.entity?.name ?: return
-        appCoroutineScope.launch(dispatchers.io()) { networkLeaderboardDao.incrementNetworkCount(networkName) }
+        trackerStatsWriter.incrementNetworkCount(networkName)
     }
 
     override fun pageHasHttpResources(page: String) {
@@ -4099,6 +4118,7 @@ class BrowserTabViewModel @Inject constructor(
                     ctaViewModel.areBubbleDaxDialogsCompleted()
                 }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
+            val previousCta = currentCtaViewState().cta
             ctaViewState.value =
                 currentCtaViewState().copy(
                     cta = cta,
@@ -4106,6 +4126,11 @@ class BrowserTabViewModel @Inject constructor(
                     isBrowserShowing = isBrowserShowing,
                     isErrorShowing = isErrorShowing,
                 )
+            // The renderer only brings the new tab page back when onboarding counts as complete there, so a Sync suggestion
+            // that stopped being due (Sync turned on, or dismissed elsewhere) is hidden explicitly.
+            if (cta == null && !isBrowserShowing && previousCta is SyncAfterDeviceTransferBubbleCta) {
+                command.value = HideOnboardingDaxBubbleCta(previousCta)
+            }
             return cta
         }
         return null
@@ -4165,6 +4190,8 @@ class BrowserTabViewModel @Inject constructor(
         val onboardingCommand =
             when (cta) {
                 is ContextualDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
+                // Stays due if the user backs out of setup; the next refresh drops it once Sync is on.
+                is SyncAfterDeviceTransferBubbleCta -> LaunchSyncSetup
                 is DaxBubbleCta -> {
                     onDaxBubbleCtaOkButtonClicked(cta)
                     null
@@ -4250,17 +4277,21 @@ class BrowserTabViewModel @Inject constructor(
         hasGesture: Boolean,
     ): Boolean {
         val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
-        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled &&
-            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true))
+        val customTabCallerOverridesNever = appLinksHandler.isTrustedCaller(
+            appLink,
+            trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true),
+        )
+        val plainTabCallerOverridesNever = appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller())
+        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled && (customTabCallerOverridesNever || plainTabCallerOverridesNever)
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink,
             hasGesture,
-            customTab?.clientPackage,
+            customTab?.clientPackage ?: plainTabTrustedCaller(),
             appLinksEnabled,
             !appSettingsPreferencesStore.showAppLinksPrompt,
             trustedCallerOverridesDisabledAppLinks,
-        ) { appLinkClicked(appLink) }
+        ) { appLinkClicked(appLink, hasGesture) }
     }
 
     fun openAppLink() {
@@ -4287,10 +4318,14 @@ class BrowserTabViewModel @Inject constructor(
             )
     }
 
-    private fun appLinkClicked(appLink: AppLink) {
+    private fun appLinkClicked(appLink: AppLink, hasGesture: Boolean) {
         val inCustomTab = customTab != null
         val callerPackage = customTab?.clientPackage ?: customTab?.referrerPackage
         when {
+            appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller()) -> {
+                plainTabLaunchingApp = null
+                command.value = OpenAppLink(appLink, closeTabOnLaunch = true)
+            }
             inCustomTab && !customTabsFeature.handleTrustedCallers().isEnabled() -> command.value = OpenAppLink(appLink)
             inCustomTab && appLinksHandler.isTrustedCaller(appLink, callerPackage) -> {
                 // The handoff opens another app, leaving a stale custom tab behind; close it, but only once
@@ -4318,37 +4353,56 @@ class BrowserTabViewModel @Inject constructor(
         return customTab?.let { it.clientPackage ?: it.referrerPackage }
     }
 
-    override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink): Boolean {
-        nonHttpAppLinkClicked(nonHttpAppLink)
+    override fun handleNonHttpAppLink(
+        nonHttpAppLink: NonHttpAppLink,
+        hasGesture: Boolean,
+    ): Boolean {
+        nonHttpAppLinkClicked(nonHttpAppLink, hasGesture)
         return true
     }
 
-    fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
-        if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
-            if (!appSettingsPreferencesStore.appLinksEnabled) {
-                val trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
-                if (trustedCallerPackage != null) {
+    fun nonHttpAppLinkClicked(
+        appLink: NonHttpAppLink,
+        hasGesture: Boolean = false,
+    ) {
+        if (!nonHttpAppLinkChecker.isPermitted(appLink.intent)) return
+        val plainTabCaller = plainTabTrustedCaller()
+        val headers = getUrlHeaders(appLink.fallbackUrl)
+        if (!appSettingsPreferencesStore.appLinksEnabled) {
+            val customTabCaller = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
+            when {
+                customTabCaller != null -> command.value = HandleNonHttpAppLink(
+                    nonHttpAppLink = appLink,
+                    headers = headers,
+                    showConfirmation = false,
+                    trustedCallerPackage = customTabCaller,
+                    finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                    trustedCallerOnly = true,
+                )
+                plainTabCaller != null -> {
+                    plainTabLaunchingApp = null
                     command.value = HandleNonHttpAppLink(
                         nonHttpAppLink = appLink,
-                        headers = getUrlHeaders(appLink.fallbackUrl),
+                        headers = headers,
                         showConfirmation = false,
-                        trustedCallerPackage = trustedCallerPackage,
-                        finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                        trustedCallerPackage = plainTabCaller,
                         trustedCallerOnly = true,
+                        closeTabOnTrustedCallerLaunch = true,
                     )
-                    return
                 }
-                navigateToFallbackUrl(appLink.fallbackUrl)
-                return
+                else -> navigateToFallbackUrl(appLink.fallbackUrl)
             }
-            command.value = HandleNonHttpAppLink(
-                nonHttpAppLink = appLink,
-                headers = getUrlHeaders(appLink.fallbackUrl),
-                showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
-                trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false),
-                finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
-            )
+            return
         }
+        if (plainTabCaller != null) plainTabLaunchingApp = null
+        command.value = HandleNonHttpAppLink(
+            nonHttpAppLink = appLink,
+            headers = headers,
+            showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
+            trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false) ?: plainTabCaller,
+            finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+            closeTabOnTrustedCallerLaunch = plainTabCaller != null,
+        )
     }
 
     fun onTrustedCallerLaunchUnavailable(fallbackUrl: String?) {

@@ -27,9 +27,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 )
 interface DeviceMigrationFeature {
     /**
-     * Kill switch for the migration experience on a new phone. Enabled by default because the OS transfers the data whether or
-     * not this is on, and without the experience the transferred state is left as the previous phone's.
+     * Kill switch for device transfers and the migration experience on a new phone. While it is off the backup agent sends
+     * nothing, so no data leaves the old phone. On by default in internal builds only; other builds take it from remote config.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 }

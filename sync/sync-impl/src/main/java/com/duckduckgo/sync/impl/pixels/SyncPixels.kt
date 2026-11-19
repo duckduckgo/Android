@@ -343,7 +343,7 @@ class RealSyncPixels @Inject constructor(
 
     /**
      * Common metadata describing the setup flow this device is opening:
-     * - [SYNC_SETUP_FLOW_VERSION]: "v2" when the device is on the v2 connect/exchange stack
+     * - [SYNC_SETUP_FLOW_VERSION]: "v2.1" when the device is on the v2 connect/exchange stack
      *   ([SyncFeature.canUseV2ConnectFlow]), "v1" otherwise. Independent of which code version is
      *   actually displayed (that is gated separately by [SyncFeature.canShowV2ConnectCode]).
      * - [SYNC_SETUP_UI_VERSION]: always "v2"; the simplified sync UI is the only setup UI, so "v1"
@@ -352,11 +352,7 @@ class RealSyncPixels @Inject constructor(
      */
     private fun setupFlowMetadata(): Map<String, String> = buildMap {
         val flowVersion = if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            if (syncFeature.canUseExchangeV2Point1().isEnabled()) {
-                FLOW_VERSION_V2_1
-            } else {
-                FLOW_VERSION_V2
-            }
+            FLOW_VERSION_V2_1
         } else {
             FLOW_VERSION_V1
         }
@@ -1128,7 +1124,6 @@ class RealSyncPixels @Inject constructor(
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
         const val FLOW_VERSION_V1 = "v1"
-        const val FLOW_VERSION_V2 = "v2"
         const val FLOW_VERSION_V2_1 = "v2.1"
         const val UI_VERSION_V2 = "v2"
         private const val MY_KIND_DDG = "ddg"

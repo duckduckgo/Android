@@ -80,9 +80,9 @@ class PirWebGetDataBrokersMessageHandler @Inject constructor(
         }
         val activeBrokers = activeBrokerObjects.associateBy { it.name }
 
-        // A mirror inherits its parent's scan steps, so a gated broker's mirror is equally unscannable.
+        // A mirror inherits its parent's scan steps, so a mirror of a removed or gated broker is equally unscannable.
         val mirrorSites = repository.getAllMirrorSites().filter {
-            it.removedAt == 0L && (!isFreeScan || activeBrokers.containsKey(it.parentSite))
+            it.removedAt == 0L && activeBrokers.containsKey(it.parentSite)
         }
         val brokerOptOutUrls = repository.getAllBrokerOptOutUrls()
 

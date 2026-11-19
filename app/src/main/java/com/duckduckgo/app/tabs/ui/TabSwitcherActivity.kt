@@ -20,6 +20,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.Gravity
@@ -59,6 +60,9 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserv
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.tabs.transition.NewTabTransitionConfigProvider
+import com.duckduckgo.app.browser.tabs.transition.PendingNewTabTransitions
+import com.duckduckgo.app.browser.tabs.transition.capturePicture
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -113,6 +117,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
@@ -180,6 +185,12 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var duckAiChatsMenu: Lazy<DuckAiChatsMenu>
+
+    @Inject
+    lateinit var newTabTransitionConfigProvider: NewTabTransitionConfigProvider
+
+    @Inject
+    lateinit var pendingNewTabTransitions: PendingNewTabTransitions
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -269,6 +280,10 @@ class TabSwitcherActivity :
     private var switchedModeFromDrag = false
 
     private var finishingAfterModeSwitch = false
+
+    private val newTabTransition by lazy {
+        TabSwitcherNewTabTransition(lifecycleScope, pendingNewTabTransitions) { lifecycleScope.async { window.capturePicture() } }
+    }
 
     private var lastSnackbar: DefaultSnackbar? = null
 
@@ -388,6 +403,7 @@ class TabSwitcherActivity :
 
     override fun onResume() {
         super.onResume()
+        lifecycleScope.launch { newTabTransition.enabled = newTabTransitionConfigProvider.enabledConfig() != null }
 
         // Bail when onCreate aborted before wiring up views to recreate into the launch-requested mode.
         if (!::tabsRecycler.isInitialized) return
@@ -437,7 +453,7 @@ class TabSwitcherActivity :
                     }
 
                     override fun onNewTabButtonClicked() {
-                        viewModel.onNewTabRequested()
+                        viewModel.onNewTabRequested(newTabRequestId = newTabTransition.onNewTabTap())
                     }
 
                     override fun onFireButtonClicked() {
@@ -908,13 +924,16 @@ class TabSwitcherActivity :
     private fun processCommand(command: Command) {
         when (command) {
             Close -> {
+                newTabTransition.onClose()
                 finishAfterTransition()
             }
             is Command.CloseAndSelectTab -> {
+                newTabTransition.onClose()
                 setResult(RESULT_OK, Intent().putExtra(EXTRA_KEY_SELECTED_TAB_ID, command.tabId))
                 finishAfterTransition()
             }
             is CloseAndShowUndoMessage -> {
+                newTabTransition.onClose()
                 skipTabPurge = true
                 setResult(
                     RESULT_OK,
@@ -936,11 +955,26 @@ class TabSwitcherActivity :
             Command.ShowFireBottomSheet -> onFireButtonClicked()
             Command.DismissSnackbar -> lastSnackbar?.dismiss()
             Command.SwitchToRegularModeAndClose -> {
+                newTabTransition.onClose()
                 finishingAfterModeSwitch = true
                 viewModel.onBrowserModeToggled(BrowserMode.REGULAR, BrowserModeSwitchSource.TAB_SWITCHER_EXIT)
                 finishAfterTransition()
             }
             Command.ShowDuckAiChatsMenu -> showDuckAiChatsMenu()
+            is Command.CloseToNewTab -> newTabTransition.closeToNewTab(command.requestId, command.tabId, command.motion) { animated ->
+                if (animated) finishWithoutAnimation() else finishAfterTransition()
+            }
+        }
+    }
+
+    private fun finishWithoutAnimation() {
+        if (Build.VERSION.SDK_INT >= 34) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+            finish()
+        } else {
+            finish()
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, 0)
         }
     }
 
@@ -953,8 +987,13 @@ class TabSwitcherActivity :
                     menuStyle = DuckAiChatsMenu.ChatsMenuStyle.COMPACT,
                 ),
                 listener = object : DuckAiChatsMenu.Listener {
-                    override fun onNewChatSelected() = viewModel.onDuckAiNewChatSelected()
-                    override fun onChatSelected(chatUrl: String) = viewModel.onDuckAiChatSelected(chatUrl)
+                    override fun onNewChatSelected() {
+                        viewModel.onDuckAiNewChatSelected(newTabRequestId = newTabTransition.onNewTabTap())
+                    }
+
+                    override fun onChatSelected(chatUrl: String) {
+                        viewModel.onDuckAiChatSelected(chatUrl, newTabRequestId = newTabTransition.onNewTabTap())
+                    }
                 },
             )
         }
@@ -1028,7 +1067,10 @@ class TabSwitcherActivity :
             R.id.fireToolbarButton -> viewModel.onFireButtonTapped()
             R.id.popupMenuToolbarButton -> showPopupMenu(item.itemId)
             R.id.newTabToolbarButton -> onNewTabRequested(fromOverflowMenu = false)
-            R.id.duckAIToolbarButton -> viewModel.onDuckAIButtonClicked()
+            R.id.duckAIToolbarButton -> {
+                val chatsMenuEnabled = viewModel.viewState.value.isDuckAiChatsMenuEnabled
+                viewModel.onDuckAIButtonClicked(newTabRequestId = newTabTransition.onDuckAiButtonTap(chatsMenuEnabled))
+            }
             android.R.id.home -> {
                 viewModel.onUpButtonPressed()
                 return true
@@ -1061,10 +1103,11 @@ class TabSwitcherActivity :
     }
 
     override fun onNewTabRequested(fromOverflowMenu: Boolean) {
+        val newTabRequestId = newTabTransition.onNewTabTap()
         // clear observers early to stop view updates
         removeObservers()
 
-        viewModel.onNewTabRequested(fromOverflowMenu)
+        viewModel.onNewTabRequested(fromOverflowMenu, newTabRequestId)
     }
 
     override fun onTabSelected(tabId: String) {

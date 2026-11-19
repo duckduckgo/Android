@@ -181,6 +181,7 @@ class DaxNoTrackersContextualCtaTest {
             onboardingPixelSender = mock(),
             contextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit(),
             contextualCtaSuppressorPlugins = mock(),
+            syncAfterDeviceTransferPrompt = FakeSyncAfterDeviceTransferPrompt(),
         )
     }
 

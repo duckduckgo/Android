@@ -17,9 +17,7 @@ current areas rather than assuming a fixed set.
 ## Shared flows
 Inside `.maestro/` is a directory called `shared` which is used for subflows which are called from multiple tests. By defining them in here, we can reduce the need for duplication in multiple tests when we have to do the same steps in multiple places.
 
-Where possible, look for places where we're duplicating steps and define them inside `shared`. An example of running a shared flow: 
-
-`- runFlow: ../shared/skip_all_onboarding.yaml`
+Where possible, look for places where we're duplicating steps and define them inside `shared`. See "Prefer to Skip Onboarding" below for an example of running a shared flow.
 
 Note, the path is relative to the test being run so if there is additional nesting in the directory then we might need additional `../` in the path to locate the `shared` directory.
 
@@ -42,7 +40,7 @@ Maestro tests can be run individually by supplying the filename or folder (to ru
 - the flag is `--include-tags`; `--tag` and `--tags` are not valid Maestro flags
 
 ## Troubleshooting
-- If you encounter Metro build errors at compile time, try the more expensive build step of including `--no-build-cache clean` after `.gradlew` and before the other build commands.
+- If you encounter Metro build errors at compile time, try the more expensive build step of including `--no-build-cache clean` after `./gradlew` and before the other build commands.
 
 ## Maestro Development Guidelines
 
@@ -63,6 +61,7 @@ When working with Maestro tests in this project, always consider the existing or
 
 ### Prefer to Skip Onboarding
 - Most tests launch the app in a clean state, which would result in the onboarding flow launching first. Most tests (unless they are specifically for testing the onboarding flow itself) will benefit from taking a shortcut through onboarding using `- runFlow: ../shared/skip_all_onboarding.yaml`
+- On `internal` builds, passing `isMaestro: "true"` and `skipOnboarding: "true"` in `launchApp` `arguments` marks onboarding complete before launch through the test seeder (`TestSeederKey.SKIP_ONBOARDING`), so no skip button is involved. The seeder is internal only, so `play` builds still need the shared flow.
 
 ### Retries
 - Use `retry` block to mark that a test can be retried (if any of the retries pass the whole test is considered a pass)

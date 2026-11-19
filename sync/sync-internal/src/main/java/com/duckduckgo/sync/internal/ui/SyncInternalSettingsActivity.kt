@@ -195,7 +195,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deleteCachedAccountInfoKeyButton.setOnClickListener { viewModel.onDeleteCachedAccountInfoKeyClicked() }
         binding.renameDeviceButton.setOnClickListener { viewModel.onRenameDeviceClicked() }
         binding.fetchDecryptDevicesButton.setOnClickListener { viewModel.onFetchAndDecryptDevicesClicked() }
-        binding.fetchDecryptAuditLogButton.setOnClickListener { viewModel.onFetchAndDecryptAuditLogClicked() }
+        binding.openAuditLogDebugButton.setOnClickListener {
+            startActivity(Intent(this, SyncAuditLogDebugActivity::class.java))
+        }
         binding.runMigrationButton.setOnClickListener { viewModel.onRunMigrationClicked() }
         binding.resetMigrationMarkerButton.setOnClickListener { viewModel.onResetMigrationMarkerClicked() }
         binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
@@ -370,9 +372,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.canShowV2ConnectCodeToggle.quietlySetIsChecked(viewState.canShowV2ConnectCodeEnabled) { _, enabled ->
             viewModel.onCanShowV2ConnectCodeFlagChanged(enabled)
         }
-        binding.canUseExchangeV2Point1Toggle.quietlySetIsChecked(viewState.canUseExchangeV2Point1Enabled) { _, enabled ->
-            viewModel.onCanUseExchangeV2Point1FlagChanged(enabled)
-        }
         binding.accessCredentialsTextView.text = viewState.accessCredentialsText
         binding.scopedTokenResultTextView.text = viewState.scopedTokenResult
         binding.v2StoreFieldsTextView.text = viewState.v2StoreFieldsText
@@ -381,17 +380,11 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.cachedAccountInfoKeyTextView.text = viewState.cachedAccountInfoKeyResult
         binding.renameDeviceResultTextView.text = viewState.renameDeviceResult
         binding.fetchDecryptDevicesResultTextView.text = viewState.fetchDecryptDevicesResult
-        binding.fetchDecryptAuditLogResultTextView.text = viewState.fetchDecryptAuditLogResult
         binding.canWriteUnifiedDeviceListToggle.quietlySetIsChecked(viewState.canWriteUnifiedDeviceListEnabled) { _, enabled ->
             viewModel.onCanWriteUnifiedDeviceListFlagChanged(enabled)
         }
         binding.canReadUnifiedDeviceListToggle.quietlySetIsChecked(viewState.canReadUnifiedDeviceListEnabled) { _, enabled ->
             viewModel.onCanReadUnifiedDeviceListFlagChanged(enabled)
-        }
-        binding.canUsePatchEndpointForLegacyDeviceRenameToggle.quietlySetIsChecked(
-            viewState.canUsePatchEndpointForLegacyDeviceRenameEnabled,
-        ) { _, enabled ->
-            viewModel.onCanUsePatchEndpointForLegacyDeviceRenameFlagChanged(enabled)
         }
         binding.migrationStatusTextView.text = viewState.migrationStatusText
         binding.migrationResultTextView.text = viewState.migrationResult

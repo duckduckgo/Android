@@ -45,8 +45,14 @@ interface SubscriptionWithdrawal {
 }
 
 sealed class WithdrawalResult {
-    /** [refund] is null when the refunded amount is unknown. */
-    data class Success(val refund: Refund?) : WithdrawalResult()
+    /**
+     * [refund] is null when the refunded amount is unknown.
+     * [requestedAtMillis] is when the withdrawal was requested, or null when unknown.
+     */
+    data class Success(
+        val refund: Refund?,
+        val requestedAtMillis: Long?,
+    ) : WithdrawalResult()
 
     /** The subscription can no longer be withdrawn from. */
     data object NotEligible : WithdrawalResult()
@@ -95,8 +101,8 @@ class RealSubscriptionWithdrawal @Inject constructor(
     }
 
     override suspend fun withdraw(): WithdrawalResult {
-        val refund = try {
-            subscriptionsService.withdraw().toRefund()
+        val response = try {
+            subscriptionsService.withdraw()
         } catch (e: HttpException) {
             return if (e.code() == HTTP_CONFLICT) WithdrawalResult.NotEligible else WithdrawalResult.Failed
         } catch (e: JsonDataException) {
@@ -111,7 +117,10 @@ class RealSubscriptionWithdrawal @Inject constructor(
         // A withdrawn account has nothing left to manage on this device
         subscriptionsManager.signOut()
 
-        return Success(refund)
+        return Success(
+            refund = response?.toRefund(),
+            requestedAtMillis = response?.requestedAt,
+        )
     }
 
     private fun WithdrawResponse.toRefund(): Refund? {

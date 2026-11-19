@@ -1,6 +1,7 @@
 package com.duckduckgo.subscriptions.impl.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -12,12 +13,15 @@ import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.UndoCancellationResult
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -29,6 +33,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPlayStoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
@@ -76,12 +81,14 @@ class SubscriptionSettingsViewModelTest {
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val subscriptionWithdrawal: SubscriptionWithdrawal = mock()
+    private val currentPurchaseState = MutableSharedFlow<CurrentPurchase>()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
     @Before
     fun before() {
         runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(currentPurchaseState)
         viewModel = SubscriptionSettingsViewModel(
             subscriptionsManager,
             pixelSender,
@@ -902,7 +909,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalConfirmedAndSucceedsThenHideWithdrawalOption() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
 
@@ -947,7 +954,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenWithdrawalSucceedsThenDismissWithdrawalDialog() = runTest {
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         stubReadySubscription(platform = "stripe")
 
         viewModel.commands().test {
@@ -1044,7 +1051,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalSucceedsThenShowCompletedWithdrawal() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
@@ -1053,7 +1060,7 @@ class SubscriptionSettingsViewModelTest {
             assertNull((expectMostRecentItem() as Ready).completedWithdrawal)
             viewModel.onWithdrawalConfirmed()
             val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
-            assertEquals("October 15, 2026", completedWithdrawal?.date)
+            assertEquals("October 06, 2026", completedWithdrawal?.date)
             assertTrue(completedWithdrawal!!.refundAmount!!.contains("9.99"))
         }
     }
@@ -1062,7 +1069,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenWithdrawalSucceedsWithoutRefundThenShowCompletedWithdrawalWithoutAmount() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(refund = null))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(refund = null, requestedAtMillis = null))
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
@@ -1073,6 +1080,22 @@ class SubscriptionSettingsViewModelTest {
             val completedWithdrawal = (expectMostRecentItem() as Ready).completedWithdrawal
             assertNotNull(completedWithdrawal)
             assertNull(completedWithdrawal!!.refundAmount)
+        }
+    }
+
+    @Test
+    fun whenWithdrawalSucceedsWithoutRequestedAtThenShowCurrentDate() = runTest {
+        whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
+        whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(refund = null, requestedAtMillis = null))
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
+        stubReadySubscription(platform = "stripe")
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            expectMostRecentItem()
+            viewModel.onWithdrawalConfirmed()
+            assertEquals("October 15, 2026", (expectMostRecentItem() as Ready).completedWithdrawal?.date)
         }
     }
 
@@ -1098,7 +1121,7 @@ class SubscriptionSettingsViewModelTest {
         whenever(onboardingProgress.completionPercentage()).thenReturn(50)
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1_000L)
         stubReadySubscription(startedAt = 1_000L, platform = "stripe")
         viewModel.onCreate(mock())
@@ -1133,7 +1156,7 @@ class SubscriptionSettingsViewModelTest {
     fun whenCompletedWithdrawalShownAndAccountSignedOutThenItStaysOnResume() = runTest {
         whenever(subscriptionWithdrawal.isWithdrawable(any())).thenReturn(true)
         whenever(subscriptionWithdrawal.getEligibility()).thenReturn(ELIGIBILITY)
-        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WithdrawalResult.Success(Refund(amount = BigDecimal("9.99"), currency = "EUR")))
+        whenever(subscriptionWithdrawal.withdraw()).thenReturn(WITHDRAWAL_SUCCESS)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(ELIGIBILITY.eligibleUntil)
         stubReadySubscription(platform = "stripe")
         viewModel.onCreate(mock())
@@ -1148,6 +1171,200 @@ class SubscriptionSettingsViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         assertNotNull((viewModel.viewState.value as Ready).completedWithdrawal)
+    }
+
+    @Test
+    fun whenUndoCancellationEnabledAndGoogleSubscriptionCancelledThenShowUndoCancellation() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        assertTrue((viewModel.viewState.value as Ready).showUndoCancellation)
+    }
+
+    @Test
+    fun whenUndoCancellationDisabledThenDoNotShowUndoCancellation() = runTest {
+        givenUndoSubscriptionCancellationEnabled(false)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        assertFalse((viewModel.viewState.value as Ready).showUndoCancellation)
+    }
+
+    @Test
+    fun whenSubscriptionAutoRenewableThenDoNotShowUndoCancellation() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        assertFalse((viewModel.viewState.value as Ready).showUndoCancellation)
+    }
+
+    @Test
+    fun whenCancelledSubscriptionNotFromGoogleThenDoNotShowUndoCancellation() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "stripe")
+
+        viewModel.onCreate(mock())
+
+        assertFalse((viewModel.viewState.value as Ready).showUndoCancellation)
+    }
+
+    @Test
+    fun whenResumeWithCancelledGoogleSubscriptionThenRefreshSubscription() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager).refreshSubscriptionData()
+    }
+
+    @Test
+    fun whenResumeWithAutoRenewableSubscriptionThenDoNotRefreshSubscription() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager, never()).refreshSubscriptionData()
+    }
+
+    @Test
+    fun whenResumeDuringInAppUndoThenDoNotRefreshSubscription() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+        viewModel.onCreate(mock())
+        viewModel.onKeepSubscriptionClicked(mock())
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager, never()).refreshSubscriptionData()
+    }
+
+    @Test
+    fun whenResumeAfterInAppUndoConfirmFailsThenRefreshSubscription() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+        viewModel.onCreate(mock())
+        viewModel.onKeepSubscriptionClicked(mock())
+        currentPurchaseState.emit(CurrentPurchase.Waiting)
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager).refreshSubscriptionData()
+    }
+
+    @Test
+    fun whenResumeAfterStoreFallbackThenRefreshSubscription() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.NotEligible)
+        viewModel.onCreate(mock())
+        viewModel.onKeepSubscriptionClicked(mock())
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager).refreshSubscriptionData()
+    }
+
+    @Test
+    fun whenKeepSubscriptionClickedThenUndoCancellation() = runTest {
+        val activity: Activity = mock()
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+
+        viewModel.onKeepSubscriptionClicked(activity)
+
+        verify(subscriptionsManager).undoSubscriptionCancellation(activity)
+    }
+
+    @Test
+    fun whenKeepSubscriptionNotEligibleThenGoToPlayStore() = runTest {
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.NotEligible)
+
+        viewModel.commands().test {
+            viewModel.onKeepSubscriptionClicked(mock())
+            assertEquals(GoToPlayStoreSubscription, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenKeepSubscriptionPurchaseFailsThenGoToPlayStore() = runTest {
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+        viewModel.onCreate(mock())
+
+        viewModel.commands().test {
+            viewModel.onKeepSubscriptionClicked(mock())
+            currentPurchaseState.emit(CurrentPurchase.Failure("error"))
+            assertEquals(GoToPlayStoreSubscription, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenKeepSubscriptionCanceledByUserThenDoNotGoToPlayStore() = runTest {
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+        viewModel.onCreate(mock())
+
+        viewModel.commands().test {
+            viewModel.onKeepSubscriptionClicked(mock())
+            currentPurchaseState.emit(CurrentPurchase.Canceled)
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenUndoCancellationShownThenReportShownPixelOnce() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google", activeOffers = listOf(ActiveOfferType.TRIAL))
+
+        viewModel.onCreate(mock())
+        viewModel.onResume(mock())
+
+        verify(pixelSender, times(1)).reportSubscriptionSettingsUndoCancellationShown(isFreeTrial = true)
+    }
+
+    @Test
+    fun whenUndoCancellationNotShownThenDoNotReportShownPixel() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        verify(pixelSender, never()).reportSubscriptionSettingsUndoCancellationShown(any())
+    }
+
+    @Test
+    fun whenKeepSubscriptionClickedThenReportClickPixel() = runTest {
+        givenUndoSubscriptionCancellationEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        whenever(subscriptionsManager.undoSubscriptionCancellation(any())).thenReturn(UndoCancellationResult.Launched)
+        viewModel.onCreate(mock())
+
+        viewModel.onKeepSubscriptionClicked(mock())
+
+        verify(pixelSender).reportSubscriptionSettingsUndoCancellationClick(isFreeTrial = false)
+    }
+
+    @Test
+    fun whenPurchaseFailsWithoutKeepSubscriptionClickThenDoNotGoToPlayStore() = runTest {
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        viewModel.onCreate(mock())
+
+        viewModel.commands().test {
+            currentPurchaseState.emit(CurrentPurchase.Failure("error"))
+            expectNoEvents()
+        }
+    }
+
+    private fun givenUndoSubscriptionCancellationEnabled(enabled: Boolean) {
+        subscriptionsFeature.undoSubscriptionCancellation().setRawStoredState(Toggle.State(enable = enabled))
     }
 
     private suspend fun stubReadySubscription(
@@ -1184,6 +1401,11 @@ class SubscriptionSettingsViewModelTest {
             eligibleUntil = 1792065600000,
             refundAmount = BigDecimal("9.99"),
             refundCurrency = "EUR",
+        )
+        private const val REQUESTED_AT_MILLIS = 1791288000000L
+        private val WITHDRAWAL_SUCCESS = WithdrawalResult.Success(
+            refund = Refund(amount = BigDecimal("9.99"), currency = "EUR"),
+            requestedAtMillis = REQUESTED_AT_MILLIS,
         )
     }
 }

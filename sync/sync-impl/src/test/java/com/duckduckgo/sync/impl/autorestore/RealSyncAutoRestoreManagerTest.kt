@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.autorestore
 
 import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.persistentstorage.api.PersistentStorage
@@ -50,6 +51,7 @@ class RealSyncAutoRestoreManagerTest {
     private val persistentStorage: PersistentStorage = mock()
     private val dataStore: SyncAutoRestorePreferenceDataStore = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val deviceMigration: DeviceMigration = mock()
 
     private lateinit var testee: RealSyncAutoRestoreManager
 
@@ -57,12 +59,14 @@ class RealSyncAutoRestoreManagerTest {
     fun setup() = runTest {
         whenever(persistentStorage.store(any(), any())).thenReturn(Result.success(Unit))
         whenever(persistentStorage.clear(any())).thenReturn(Result.success(Unit))
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(false)
         testee = RealSyncAutoRestoreManager(
             persistentStorage = persistentStorage,
             dataStore = dataStore,
             syncFeature = syncFeature,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             moshi = Moshi.Builder().build(),
+            deviceMigration = deviceMigration,
         )
     }
 
@@ -118,6 +122,17 @@ class RealSyncAutoRestoreManagerTest {
         val result = testee.retrieveRecoveryPayload()
 
         assertEquals(RestorePayload(recoveryCode = "code-123", deviceId = "device-456"), result)
+    }
+
+    @Test
+    fun whenMigratedInstallThenRetrievedPayloadLeavesOutThePreviousPhonesDeviceId() = runTest {
+        whenever(deviceMigration.isMigratedInstall()).thenReturn(true)
+        val json = """{"recovery_code":"code-123","device_id":"device-456"}"""
+        whenever(persistentStorage.retrieve(any())).thenReturn(Result.success(json.toByteArray(Charsets.UTF_8)))
+
+        val result = testee.retrieveRecoveryPayload()
+
+        assertEquals(RestorePayload(recoveryCode = "code-123", deviceId = null), result)
     }
 
     @Test

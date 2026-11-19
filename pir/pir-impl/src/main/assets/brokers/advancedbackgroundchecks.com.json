@@ -1,7 +1,7 @@
 {
   "name": "AdvancedBackgroundChecks",
   "url": "advancedbackgroundchecks.com",
-  "version": "0.12.0",
+  "version": "0.14.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678060800000,
   "optOutUrl": "https://www.advancedbackgroundchecks.com/opt-out",
@@ -28,10 +28,21 @@
         },
         {
           "actionType": "expectation",
+          "_comment": "Cloudflare hard block ('Sorry, you have been blocked'). Its challenge-platform script sits in <head>, so the challenge wait above passes; this separate id makes the block countable in telemetry",
           "expectations": [
             {
               "type": "element",
-              "selector": "//main//h1[contains(., ' in ')]"
+              "selector": "//body[not(.//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "cfc-9cff50bd-7300-4ae5-9e4d-55ca48e1ca7b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(., ' in ')]"
             }
           ],
           "id": "95594c0e-e6a3-4b60-8596-489e58cead2c"
@@ -41,7 +52,7 @@
           "elements": [
             {
               "type": "button",
-              "selector": "//main//div[contains(., 'Also known as:')]//button[contains(translate(normalize-space(string(.)), 'MORE', 'more'), 'more')]",
+              "selector": "//div[contains(., 'Also known as:')]//button[contains(translate(normalize-space(string(.)), 'MORE', 'more'), 'more')]",
               "multiple": true,
               "failSilently": true
             }
@@ -51,8 +62,8 @@
         {
           "actionType": "extract",
           "id": "d760163d-4a1f-476a-bc3e-4f3ccedc29f1",
-          "selector": "(//main//div[contains(@class, 'space-y-3')])[1]/div[contains(@class, 'bg-white') and .//a[contains(@href, '/find/person/')]]",
-          "noResultsSelector": "//main//p[contains(., \"didn't find any matching records\")]",
+          "selector": "(//div[contains(@class, 'space-y-3') and div[contains(@class, 'bg-white') and .//a[contains(@href, '/find/person/')]]])[1]/div[contains(@class, 'bg-white') and .//a[contains(@href, '/find/person/')]]",
+          "noResultsSelector": "//p[contains(., \"didn't find any matching records\")]",
           "profile": {
             "name": {
               "selector": ".//h2",

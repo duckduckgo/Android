@@ -231,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Последни</string>
     <string name="duck_ai_chat_history_untitled">Чат без заглавие</string>
     <string name="duck_ai_chat_history_empty_title">Все още няма чатове</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Отваряне на Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Още опции</string>
     <string name="duck_ai_chat_history_action_select">Избор</string>
     <string name="duck_ai_chat_history_action_pin">Добавяне като отметка</string>
@@ -405,4 +404,8 @@
     <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Препис</string>
     <!-- Duck.ai attachment privacy footer -->
     <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Файловете се сканират автоматично за незаконно съдържание. Отбелязаните с флаг чатове имат ограничено съхранение на данни. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <!-- Duck.ai new chat hints -->
+    <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Анализиране на файлове</string>
+    <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Въпроси за снимки</string>
+    <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Създаване на изображение</string>
 </resources>

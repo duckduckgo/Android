@@ -281,29 +281,6 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `onUserAuthCancelled aborts the flow`() = runTest {
-        whenever(wideEventClient.getFlowIds(any()))
-            .thenReturn(Result.success(listOf(1L)))
-
-        wideEvent.onUserAuthCancelled()
-
-        verify(wideEventClient).flowFinish(
-            wideEventId = 1L,
-            status = FlowStatus.Cancelled,
-        )
-    }
-
-    @Test
-    fun `onEnrollDeviceAuthDialogShown aborts the flow`() = runTest {
-        whenever(wideEventClient.getFlowIds(any()))
-            .thenReturn(Result.success(listOf(1L)))
-
-        wideEvent.onEnrollDeviceAuthDialogShown()
-
-        verify(wideEventClient).flowAbort(wideEventId = 1L)
-    }
-
-    @Test
     fun `onRecoveryCodeGenerationFailed finishes flow with failure`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(1L)))
@@ -355,15 +332,12 @@ class SyncSetupWideEventImplTest {
         val value: String,
     ) {
         ProtocolV1("v1"),
-        ProtocolV2("v2"),
         ProtocolV2Point1("v2.1"),
         ;
 
         fun configure(syncFeature: SyncFeature) {
             val v2Enabled = this != ProtocolV1
-            val v2Point1Enabled = this == ProtocolV2Point1
             syncFeature.canUseV2ConnectFlow().setRawStoredState(State(v2Enabled))
-            syncFeature.canUseExchangeV2Point1().setRawStoredState(State(v2Point1Enabled))
         }
     }
 }

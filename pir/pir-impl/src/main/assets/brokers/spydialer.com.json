@@ -1,0 +1,303 @@
+{
+  "name": "SpyDialer",
+  "url": "spydialer.com",
+  "version": "0.1.1",
+  "addedDatetime": 1794050751000,
+  "optOutUrl": "https://www.spydialer.com/optout",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.spydialer.com/",
+          "id": "48416470-f683-43ce-a091-2a5f88029fed"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#ctl00_ContentPlaceHolder1_NameLabel"
+            }
+          ],
+          "id": "9481aa36-3dc2-4632-93ea-89e174a5b697"
+        },
+        {
+          "actionType": "click",
+          "_comment": "Shows the people search form, which is hidden behind the PEOPLE tab.",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#ctl00_ContentPlaceHolder1_NameLabel"
+            }
+          ],
+          "id": "81120a39-a61f-412b-b404-1c33d79bdf51"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#NameSearchDiv",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#TxtBxFrstNm"
+            },
+            {
+              "type": "lastName",
+              "selector": "#TxtBxLstNm"
+            },
+            {
+              "type": "city",
+              "selector": "#TxtBxNmCty"
+            },
+            {
+              "type": "state",
+              "selector": "#DrpDwnLstNmeStt"
+            }
+          ],
+          "id": "1df0cc40-a074-4d4a-9424-ca82deab1849"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#nClck_NmSrchBttn"
+            }
+          ],
+          "id": "37957b98-9401-49f7-951e-fe814a985e58"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[@id='ctl00_ContentPlaceHolder1_TotalHitsLabel'] | //span[@id='ctl00_ContentPlaceHolder1_DataMessageLabel' and contains(text(), 'have anything')] | //*[@id='ctl00_ContentPlaceHolder1_OtherDataCityLabel']"
+            }
+          ],
+          "id": "40fabedd-1d1e-4095-abb9-00790e586e77"
+        },
+        {
+          "actionType": "executeScript",
+          "_comment": "Age bands such as '50s' only match within a year of their start, so a band that fits the user's age is replaced with it.",
+          "script": "var a = parseInt(userProfile.age, 10); function fit(t) { var m = /^(\\d+)(s|\\+)$/.exec((t || '').trim()); if (!m || isNaN(a)) return null; var lo = +m[1], hi = m[2] === '+' ? 1e9 : lo + 9; return a >= lo - 1 && a <= hi + 1 ? String(a) : null; } root.querySelectorAll('#HideWaitMiddleDiv div.section.group div.span_2').forEach(function (e) { var v = fit(e.textContent); if (v) e.textContent = v; });",
+          "id": "63cad379-ea2e-4b3e-8b63-6bff67f8ea02"
+        },
+        {
+          "actionType": "extract",
+          "selector": "#HideWaitMiddleDiv div.section.group",
+          "noResultsSelector": "//span[@id='ctl00_ContentPlaceHolder1_DataMessageLabel' and contains(text(), 'have anything')] | //*[@id='ctl00_ContentPlaceHolder1_OtherDataCityLabel']",
+          "profile": {
+            "name": {
+              "selector": "a.name-display"
+            },
+            "age": {
+              "selector": "div.span_2"
+            },
+            "addressFull": {
+              "selector": "div.span_3"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "bd1c5d8b-7647-4967-9535-8542933abfdd"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.spydialer.com/optout",
+          "id": "1542dc0f-3303-4a68-8f29-b52669427365"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#OptOutForm1SubmitButton"
+            }
+          ],
+          "id": "1a66bd2a-f099-436e-94b1-0a2331d349b6"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "#OptOutForm1",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#SubjectFirstNameInput"
+            },
+            {
+              "type": "lastName",
+              "selector": "#SubjectLastNameInput"
+            }
+          ],
+          "id": "f775ca43-0b19-42f2-8c2b-1dc8d85d0f2f"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "#OptOutForm1",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#SubjectEmailInput"
+            }
+          ],
+          "id": "47e7b60e-dfff-4b59-a86f-b16908c893ba"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#ConsentCheckbox"
+            }
+          ],
+          "id": "0fc39e2b-a5ae-4339-b7ad-a9d38b12c67e"
+        },
+        {
+          "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[@id='OptOutForm1']//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-70537d2d-08a5-4aff-9472-1f758a7eea54"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#OptOutForm1SubmitButton"
+            }
+          ],
+          "id": "dc7d978f-4ec0-423a-94f6-efbf33423a10"
+        },
+        {
+          "_comment": "The page's own script redirects here once /OptOut/SendVerification reports success. The body entry only enables the retry.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "url",
+              "expect": "/optout-start-submitted"
+            },
+            {
+              "type": "element",
+              "selector": "body"
+            }
+          ],
+          "id": "e8eff85b-f003-4f7b-b536-76c00defddbe"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "c24d08b0-a36c-408c-ae32-07a6672efeef"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#OptOutForm2SubmitButton"
+            }
+          ],
+          "id": "5457357a-7fe7-4b4b-98f0-fb666c5e322b"
+        },
+        {
+          "_comment": "Name and email arrive prefilled from the link. The site needs city, state, a 5-digit ZIP, and a date of birth or a street address. Street, city and state come from the matched record: C-S-S parses addressFull into the address and its extras.street. SpyDialer shows no DOB or ZIP anywhere, including the details page, so DOB stays empty and the ZIP is generated.",
+          "actionType": "fillForm",
+          "selector": "#OptOutForm2",
+          "dataSource": "extractedProfile",
+          "elements": [
+            {
+              "type": "street",
+              "selector": "#StreetAddressInput"
+            },
+            {
+              "type": "city",
+              "selector": "#CityInput"
+            },
+            {
+              "type": "state",
+              "selector": "#StateSelect"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#ZipInput"
+            }
+          ],
+          "id": "936ab3d8-98b2-4dd2-95d8-ff6d8d6e5a49"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#ConfirmCheckbox"
+            }
+          ],
+          "id": "d7510824-706f-4c2b-8241-e708890339ed"
+        },
+        {
+          "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[@id='OptOutForm2']//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-1c7b2d6b-b42b-4344-a864-ea9ea4d9908d"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#OptOutForm2SubmitButton"
+            }
+          ],
+          "id": "e4923227-b396-48f9-9b8b-5b28008e799d"
+        },
+        {
+          "_comment": "/OptOut/SubmitOptOut returns this as redirectUrl on success. The body entry only enables the retry.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "url",
+              "expect": "/consumersuccess.aspx"
+            },
+            {
+              "type": "text",
+              "selector": "h1",
+              "expect": "Opt-out Success"
+            },
+            {
+              "type": "element",
+              "selector": "body"
+            }
+          ],
+          "id": "8a7d7c9a-7dac-4fc5-8bef-b540beb3195b"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

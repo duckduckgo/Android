@@ -289,7 +289,7 @@ fladle {
             ])
             devices.set([
                     ["model": "MediumPhone.arm", "version": "30"],
-                    ["model": "Pixel2.arm", "version": "28"]
+                    ["model": "SmallPhone.arm", "version": "28"]
             ])
             localResultsDir.set("fladleResults")
             // retry once, if it succeeds it will be reported as a flaky test
@@ -345,7 +345,7 @@ afterEvaluate {
 
 tasks.register('aiConfigCheck') {
     group = 'verification'
-    description = 'Validates AI config (.claude/rules, .claude/docs, .claude/skills) against AGENTS.md and checks for dangling references.'
+    description = 'Validates AI config (.claude/rules, .claude/docs, .agents/skills) against AGENTS.md and checks for dangling references.'
     def repoRoot = layout.projectDirectory.asFile
     doLast {
         def checker = new com.duckduckgo.gradle.AiConfigChecker(repoRoot)

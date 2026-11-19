@@ -40,7 +40,6 @@ import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE_SECONDARY
-import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -51,6 +50,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
+import com.duckduckgo.sync.api.SyncActivityStartSetupFlow
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.api.SyncMessagePlugin
@@ -66,7 +66,6 @@ import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSetupSyncDeepLink
@@ -111,6 +110,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
 @ContributeToActivityStarter(SyncActivityStartSyncFlow::class)
+@ContributeToActivityStarter(SyncActivityStartSetupFlow::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 @ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
@@ -145,15 +145,19 @@ class SyncActivity : DuckDuckGoActivity() {
     private val startSyncFlowParams
         get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)
 
+    private val startSetupFlowParams
+        get() = intent.getActivityParams(SyncActivityStartSetupFlow::class.java)
+
     private val launchSource
         get() = startSyncFlowParams?.source
+            ?: startSetupFlowParams?.let { SyncLaunchSource.from(it.source) }
             ?: SyncLaunchSource.from(intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source)
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
 
     private val shouldDeepLinkStartSync
-        get() = startSyncFlowParams != null
+        get() = startSyncFlowParams != null || startSetupFlowParams != null
 
     private val isAnotherDeviceSync
         get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
@@ -381,13 +385,6 @@ class SyncActivity : DuckDuckGoActivity() {
             getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
-            deleteAccountItem.setPrimaryTextResource(
-                if (viewState.isImprovedSyncFlow) {
-                    R.string.sync_simplified_settings_turn_off_item
-                } else {
-                    R.string.sync_simplified_settings_delete_account_item
-                },
-            )
             restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
             if (viewState.showAutoRestoreToggle) {
                 restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, autoRestoreListener)
@@ -422,20 +419,13 @@ class SyncActivity : DuckDuckGoActivity() {
                 )
             }
 
-            is AskDeleteAccount -> {
-                showDeleteAccountDialog()
-            }
-
             is AskDeleteServerData -> {
                 askDeleteServerData()
             }
 
             is AskEditDevice -> {
                 editDeviceLauncher.launch(
-                    EditDeviceContract.Input(
-                        device = command.device,
-                        isImprovedSyncFlow = command.isImprovedSyncFlow,
-                    ),
+                    EditDeviceContract.Input(device = command.device),
                 )
             }
 
@@ -481,8 +471,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 backUpNewAccountLauncher.launch(
                     SyncThisDeviceContract.Input(
                         launchSource = launchSource,
-                        isAuthRequired = command.isAuthRequired,
-                        isImprovedSyncFlow = command.isImprovedSyncFlow,
+                        isAuthRequired = true,
                     ),
                 )
             }
@@ -491,7 +480,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 recoverSyncedDataLauncher.launch(
                     RecoverSyncedDataContract.Input(
                         launchSource = launchSource,
-                        isAuthRequired = command.isAuthRequired,
+                        isAuthRequired = true,
                     ),
                 )
             }
@@ -512,8 +501,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         backUpNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
                                 launchSource = launchSource,
-                                isAuthRequired = false,
-                                isImprovedSyncFlow = command.isImprovedSyncFlow,
+                                isAuthRequired = command.isAuthRequired,
                             ),
                         )
                     }
@@ -534,7 +522,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         recoverSyncedDataLauncher.launch(
                             RecoverSyncedDataContract.Input(
                                 launchSource = launchSource,
-                                isAuthRequired = false,
+                                isAuthRequired = command.isAuthRequired,
                             ),
                         )
                     }
@@ -564,10 +552,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is ShowPreviousSessionReady -> {
                 restoreSavedAccountLauncher.launch(
-                    PreviousSessionReadyContract.Input(
-                        syncEntryPoint = command.syncEntryPoint,
-                        isAuthRequired = command.isAuthRequired,
-                    ),
+                    PreviousSessionReadyContract.Input(syncEntryPoint = command.syncEntryPoint),
                 )
             }
 
@@ -759,31 +744,6 @@ class SyncActivity : DuckDuckGoActivity() {
             setPrimaryTextColorStateList(color)
             setOnClickListener { viewModel.onDeleteAccountClicked() }
         }
-    }
-
-    private fun showDeleteAccountDialog() {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_simplified_settings_delete_server_data_dialog_title)
-            .setMessage(getString(R.string.sync_simplified_settings_delete_server_data_dialog_body))
-            .setPositiveButton(R.string.sync_simplified_settings_delete_server_data_dialog_primary_button, DESTRUCTIVE)
-            .setNegativeButton(R.string.sync_simplified_settings_delete_server_data_dialog_secondary_button, GHOST_ALT)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onDeleteAccountConfirmed()
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        viewModel.onDeleteAccountCancelled()
-                    }
-
-                    override fun onDialogCancelled() {
-                        viewModel.onDeleteAccountCancelled()
-                    }
-                },
-            )
-            .setCancellable(true)
-            .show()
     }
 
     private fun askDeleteServerData() {

@@ -26,7 +26,7 @@
         <activity
             android:name=".dashboard.PirDashboardWebViewActivity"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:label="@string/activityPirDashboard" />
+            android:label="@string/pirFeatureName" />
 
         <activity
             android:name=".onboarding.SubscriptionOnboardingPirStepActivity"

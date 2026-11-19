@@ -47,11 +47,22 @@ abstract class NetworkLeaderboardDao {
         }
     }
 
+    @Transaction
+    open fun incrementNetworkCountBy(network: String, delta: Int) {
+        val changedRows = incrementNetworkCountByIfExists(network, delta)
+        if (changedRows == 0) {
+            initializeNetwork(NetworkLeaderboardEntry(network, delta))
+        }
+    }
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     protected abstract fun initializeNetwork(leaderboardEntry: NetworkLeaderboardEntry)
 
     @Query("UPDATE network_leaderboard SET count = count + 1 WHERE networkName = :networkName")
     protected abstract fun incrementNetworkCountIfExists(networkName: String): Int
+
+    @Query("UPDATE network_leaderboard SET count = count + :delta WHERE networkName = :networkName")
+    protected abstract fun incrementNetworkCountByIfExists(networkName: String, delta: Int): Int
 
     @Query("select * from network_leaderboard order by count desc")
     abstract fun trackerNetworkLeaderboard(): LiveData<List<NetworkLeaderboardEntry>>

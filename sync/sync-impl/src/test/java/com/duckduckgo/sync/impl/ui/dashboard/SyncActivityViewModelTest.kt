@@ -43,7 +43,6 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
@@ -59,6 +58,7 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.Check
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchLearnMore
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowMessage
@@ -88,6 +88,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.lang.String.format
 import kotlin.reflect.KClass
@@ -112,7 +113,6 @@ class SyncActivityViewModelTest {
     private val syncAutoRestore: SyncAutoRestore = mock()
 
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
-    private val fakeSyncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -135,7 +135,6 @@ class SyncActivityViewModelTest {
             syncAutoRestoreManager = syncAutoRestoreManager,
             syncAutoRestore = syncAutoRestore,
             appCoroutineScope = coroutineTestRule.testScope,
-            syncFeature = fakeSyncFeature,
         )
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
@@ -447,21 +446,6 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenLaunchedFromPromotionWithLegacySyncFlowThenContentIsShownForAuthentication() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        givenSetupFlowsAllowed()
-        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
-
-        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
-
-        testee.viewState().test {
-            assertFalse(expectMostRecentItem().isContentHidden)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenLaunchedFromPromotionAndSignedInThenContentIsShownForAuthentication() = runTest {
         givenUserHasDeviceAuthentication(true)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
@@ -476,7 +460,6 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runTest {
-        givenUserHasDeviceAuthentication(true)
         testee.commands().test {
             testee.onSyncThisDevice()
             awaitItem().assertCommandType(IntroCreateAccount::class)
@@ -485,56 +468,11 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncThisDeviceWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(false)
-
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            expectNoEvents()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSyncThisDeviceThenIntroCreateAccountDoesNotRequireAuth() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            assertEquals(IntroCreateAccount(isAuthRequired = false, isImprovedSyncFlow = false), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSyncThisDeviceWithImprovedFlowThenIntroCreateAccountRequiresAuth() = runTest {
-        givenImprovedSyncFlowEnabled()
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            assertEquals(IntroCreateAccount(isAuthRequired = true, isImprovedSyncFlow = true), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSyncThisDeviceWithImprovedFlowThenDoesNotAuthenticate() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenSyncThisDeviceThenDoesNotAuthenticate() = runTest {
         testee.commands().test {
             testee.onSyncThisDevice()
             awaitItem()
             assertTrue(deviceAuthenticator.requests.isEmpty())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSyncThisDeviceWithImprovedFlowAndWithoutDeviceAuthenticationThenLaunchCreateAccountFlow() = runTest {
-        givenImprovedSyncFlowEnabled()
-        givenUserHasDeviceAuthentication(false)
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            awaitItem().assertCommandType(IntroCreateAccount::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -574,214 +512,48 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncThisDeviceWithoutDeviceAuthThenOnDeviceAuthNotEnrolledCalled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(false)
-
-        testee.onSyncThisDevice()
-
-        verify(syncSetupWideEvent).onFlowStarted(launchSource = SyncLaunchSource.Other)
-        verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
-    }
-
-    @Test
-    fun whenAddAnotherDeviceWithoutDeviceAuthThenOnDeviceAuthNotEnrolledCalled() = runTest {
+    fun whenAddAnotherDeviceWithoutDeviceAuthThenSetupWideEventNotTouched() = runTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.onAddAnotherDevice()
 
-        verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
+        verifyNoInteractions(syncSetupWideEvent)
     }
 
     @Test
-    fun whenEnrollmentPromptShownThenOnEnrollDeviceAuthDialogShownCalled() = runTest {
-        givenUserHasDeviceAuthentication(false)
-
-        testee.onAddAnotherDevice()
-
-        verify(syncSetupWideEvent).onEnrollDeviceAuthDialogShown()
-    }
-
-    @Test
-    fun whenSyncThisDeviceWithoutDeviceAuthThenThisDeviceSyncIdle() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(false)
-
-        testee.viewState().test {
-            testee.onSyncThisDevice()
-            assertFalse(expectMostRecentItem().isThisDeviceSyncing)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSyncThisDeviceAuthenticatedThenOnUserAuthSuccessCalled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-
-        testee.onSyncThisDevice()
-
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncThisDeviceWithinGracePeriodThenOnUserAuthSuccessCalled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        deviceAuthenticator.response = Response.Allowed.WithinGracePeriod
-
-        testee.onSyncThisDevice()
-
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncThisDeviceAndAuthNotRequiredForBuildThenOnUserAuthSuccessCalled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        deviceAuthenticator.response = Response.Allowed.NotRequiredForBuild
-
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            awaitItem().assertCommandType(IntroCreateAccount::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenAddAnotherDeviceAuthenticatedThenOnUserAuthSuccessNotCalled() = runTest {
-        givenUserHasDeviceAuthentication(true)
-
-        testee.onAddAnotherDevice()
-
-        verify(syncSetupWideEvent, never()).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncThisDeviceVerificationDismissedThenNoCommandSentAndFlowCancelled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
-
-        testee.viewState().test {
-            testee.onSyncThisDevice()
-            assertFalse(expectMostRecentItem().isThisDeviceSyncing)
-            cancelAndIgnoreRemainingEvents()
-        }
-        testee.commands().test {
-            expectNoEvents()
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthCancelled()
-    }
-
-    @Test
-    fun whenSyncThisDeviceVerificationFailsThenShowErrorAndFlowCancelled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        deviceAuthenticator.response = Response.Failed("reason")
-
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            val command = awaitItem()
-            command.assertCommandType(Command.ShowError::class)
-            assertEquals("reason", (command as Command.ShowError).reason)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthCancelled()
-    }
-
-    @Test
-    fun whenSyncWithAnotherDeviceAndCanRestoreWithImprovedFlowThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenSyncWithAnotherDeviceAndCanRestoreThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
 
         testee.commands().test {
             testee.onSyncWithAnotherDevice()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE, isAuthRequired = true), awaitItem())
+            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE), awaitItem())
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceAndCanRestoreWithImprovedFlowThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenSyncThisDeviceAndCanRestoreThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
 
         testee.commands().test {
             testee.onSyncThisDevice()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = true), awaitItem())
+            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT), awaitItem())
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenRecoverSyncedDataAndCanRestoreWithImprovedFlowThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenRecoverSyncedDataAndCanRestoreThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
 
         testee.commands().test {
             testee.onRecoverYourSyncedData()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA, isAuthRequired = true), awaitItem())
+            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA), awaitItem())
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    @Test
-    fun whenSyncWithAnotherDeviceAndCanRestoreWithoutImprovedFlowThenAuthenticateBeforeShowPreviousSessionReady() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        whenever(syncAutoRestore.canRestore()).thenReturn(true)
-
-        testee.commands().test {
-            testee.onSyncWithAnotherDevice()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE, isAuthRequired = false), awaitItem())
-            assertEquals(1, deviceAuthenticator.requests.size)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncThisDeviceAndCanRestoreWithoutImprovedFlowThenAuthenticateBeforeShowPreviousSessionReady() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        whenever(syncAutoRestore.canRestore()).thenReturn(true)
-
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = false), awaitItem())
-            assertEquals(1, deviceAuthenticator.requests.size)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenRecoverSyncedDataAndCanRestoreWithoutImprovedFlowThenAuthenticateBeforeShowPreviousSessionReady() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        whenever(syncAutoRestore.canRestore()).thenReturn(true)
-
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA, isAuthRequired = false), awaitItem())
-            assertEquals(1, deviceAuthenticator.requests.size)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncWithAnotherDeviceAndCanRestoreWithoutImprovedFlowAndVerificationDismissedThenFlowCancelled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        whenever(syncAutoRestore.canRestore()).thenReturn(true)
-        deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
-
-        testee.onSyncWithAnotherDevice()
-
-        verify(syncSetupWideEvent).onUserAuthCancelled()
     }
 
     @Test
@@ -790,7 +562,7 @@ class SyncActivityViewModelTest {
 
         testee.onSyncWithAnotherDevice()
 
-        verify(syncSetupWideEvent, never()).onUserAuthCancelled()
+        verifyNoInteractions(syncSetupWideEvent)
     }
 
     @Test
@@ -841,6 +613,17 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenContinueSetupAfterSkipRestoreThenLaunchOriginalFlowWithoutAuth() = runTest {
+        whenever(syncAutoRestoreManager.clearAutoRestoreData()).thenReturn(Result.Success(Unit))
+
+        testee.commands().test {
+            testee.onContinueSetupAfterSkipRestore(SyncEntryPoint.SYNC_NEW_ACCOUNT)
+            assertEquals(LaunchOriginalFlow(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = false), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSkipRestoreClearFailsThenThisDeviceSyncIdle() = runTest {
         whenever(syncAutoRestoreManager.clearAutoRestoreData()).thenReturn(Result.Error(reason = "error"))
 
@@ -857,7 +640,6 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenRecoverDataThenRecoverDataCommandSent() = runTest {
-        givenUserHasDeviceAuthentication(true)
         testee.onRecoverYourSyncedData()
 
         testee.commands().test {
@@ -867,41 +649,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenRecoverDataWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(false)
-
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            expectNoEvents()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRecoverDataThenIntroRecoverSyncDataDoesNotRequireAuth() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            assertEquals(IntroRecoverSyncData(isAuthRequired = false), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRecoverDataWithImprovedFlowThenIntroRecoverSyncDataRequiresAuth() = runTest {
-        givenImprovedSyncFlowEnabled()
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            assertEquals(IntroRecoverSyncData(isAuthRequired = true), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRecoverDataWithImprovedFlowThenDoesNotAuthenticate() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenRecoverDataThenDoesNotAuthenticate() = runTest {
         testee.commands().test {
             testee.onRecoverYourSyncedData()
             awaitItem()
@@ -911,19 +659,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenRecoverDataWithImprovedFlowAndWithoutDeviceAuthenticationThenRecoverDataCommandSent() = runTest {
-        givenImprovedSyncFlowEnabled()
-        givenUserHasDeviceAuthentication(false)
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            awaitItem().assertCommandType(IntroRecoverSyncData::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRecoverDataWithImprovedFlowThenManualRecoveryShownPixelFired() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenRecoverDataThenManualRecoveryShownPixelFired() = runTest {
         testee.commands().test {
             testee.onRecoverYourSyncedData()
             awaitItem()
@@ -1021,22 +757,8 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountClickedWithDeviceAuthenticationThenAskDeleteAccount() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-
-        testee.onDeleteAccountClicked()
-
-        testee.commands().test {
-            awaitItem().assertCommandType(Command.AskDeleteAccount::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenDeleteAccountClickedWithImprovedFlowAndOnlyThisDeviceThenAskTurnOffSync() = runTest {
+    fun whenDeleteAccountClickedAndOnlyThisDeviceThenAskTurnOffSync() = runTest {
         givenAuthenticatedUser()
-        givenImprovedSyncFlowEnabled()
         givenUserHasDeviceAuthentication(true)
 
         testee.viewState().test {
@@ -1050,9 +772,8 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountClickedWithImprovedFlowAndMultipleDevicesThenAskTurnOffSync() = runTest {
+    fun whenDeleteAccountClickedAndMultipleDevicesThenAskTurnOffSync() = runTest {
         givenAuthenticatedUser()
-        givenImprovedSyncFlowEnabled()
         givenUserHasDeviceAuthentication(true)
         val otherDevice = connectedDevice.copy(thisDevice = false, deviceId = "otherDeviceId")
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(listOf(connectedDevice, otherDevice)))
@@ -1086,28 +807,6 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenImprovedSyncFlowEnabledAndSignedInThenViewStateReflectsImprovedFlow() = runTest {
-        givenAuthenticatedUser()
-        givenImprovedSyncFlowEnabled()
-
-        testee.viewState().test {
-            assertTrue(expectMostRecentItem().isImprovedSyncFlow)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenImprovedSyncFlowDisabledAndSignedInThenViewStateReflectsLegacyFlow() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenAuthenticatedUser()
-
-        testee.viewState().test {
-            assertFalse(expectMostRecentItem().isImprovedSyncFlow)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenDeleteAccountClickedWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
         givenUserHasDeviceAuthentication(false)
 
@@ -1119,7 +818,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountSuccessThenUpdateViewState() = runTest {
+    fun whenDeleteServerDataConfirmedAndSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.deleteAccount()).thenReturn(Result.Success(true))
@@ -1127,7 +826,7 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             var viewState = expectMostRecentItem()
             assertTrue(viewState.showAccount)
-            testee.onDeleteAccountConfirmed()
+            testee.onDeleteServerDataConfirmed()
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
@@ -1135,12 +834,12 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountErrorThenUpdateViewState() = runTest {
+    fun whenDeleteServerDataConfirmedAndErrorThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.deleteAccount()).thenReturn(Result.Error(reason = "error"))
 
-        testee.onDeleteAccountConfirmed()
+        testee.onDeleteServerDataConfirmed()
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -1150,26 +849,28 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountConfirmedThenDeleteAccount() = runTest {
+    fun whenDeleteServerDataConfirmedThenDeleteAccount() = runTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
         whenever(syncAccountRepository.deleteAccount()).thenReturn(Result.Success(true))
 
-        testee.onDeleteAccountConfirmed()
+        testee.onDeleteServerDataConfirmed()
 
+        verify(syncPixels).fireDeleteServerDataConfirmationConfirmed()
         verify(syncAccountRepository).deleteAccount()
     }
 
     @Test
-    fun whenDeleteAccountCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
+    fun whenDeleteServerDataCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
-            testee.onDeleteAccountCancelled()
+            testee.onDeleteServerDataCancelled()
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
+        verify(syncPixels).fireDeleteServerDataConfirmationDismissed()
     }
 
     @Test
@@ -2018,17 +1719,9 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
     }
 
-    private fun givenImprovedSyncFlowEnabled() {
-        fakeSyncFeature.canUseImprovedSyncFlow().setRawStoredState(State(true))
-    }
-
     private fun givenSetupFlowsAllowed() {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
         whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(true)
-    }
-
-    private fun givenImprovedSyncFlowDisabled() {
-        fakeSyncFeature.canUseImprovedSyncFlow().setRawStoredState(State(false))
     }
 
     private fun givenUserHasDeviceAuthentication(hasDeviceAuthentication: Boolean) {

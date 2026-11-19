@@ -382,6 +382,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.sync.api.SyncActivityStartSetupFlow
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -524,6 +525,7 @@ class BrowserTabFragment :
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
     private val customTabClientPackage get() = requireArguments().getString(CLIENT_PACKAGE_ARG)
     private val customTabReferrerPackage get() = requireArguments().getString(REFERRER_PACKAGE_ARG)
+    private val launchingAppPackage get() = requireArguments().getString(LAUNCHING_APP_PACKAGE_ARG)
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
@@ -850,12 +852,13 @@ class BrowserTabFragment :
                         } else {
                             null
                         },
+                        animated = true,
                     )
                 }
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
                 viewModel.onNewFireTabFromChatMenuSelected()
-                browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE)
+                browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE, animated = true)
             }
         }
     }
@@ -865,6 +868,7 @@ class BrowserTabFragment :
     private var lastTouchX: Float = 0f
     private var lastTouchY: Float = 0f
     private var lastLongPressUrl: String? = null
+    private var hideNativeInputForTabSwitcher = false
 
     private val tabSwitcherActivityResult =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -1235,6 +1239,7 @@ class BrowserTabFragment :
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen, customTabClientPackage, customTabReferrerPackage)
+            viewModel.setLaunchingAppPackage(launchingAppPackage)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
@@ -2006,15 +2011,23 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        // Dismiss the native input first (no-op when it isn't shown) so a browser-input widget doesn't
-        // linger behind the switcher and leave the omnibar and widget both visible on return. Skip Duck.ai:
-        // there the widget is the persistent chat input, and hideNativeInput would restore the default
-        // omnibar and tear it down.
+        // Dismissed once the switcher covers this tab, so the input doesn't collapse on screen just before it opens.
+        hideNativeInputForTabSwitcher = true
+        val intent = TabSwitcherActivity.intent(activity)
+        tabSwitcherActivityResult.launch(intent)
+    }
+
+    /**
+     * Dismisses the native input (no-op when it isn't shown) so a browser-input widget doesn't linger behind the switcher
+     * and leave the omnibar and widget both visible on return. Skip Duck.ai: there the widget is the persistent chat
+     * input, and hideNativeInput would restore the default omnibar and tear it down.
+     */
+    private fun hideNativeInputLeftForTabSwitcher() {
+        if (!hideNativeInputForTabSwitcher) return
+        hideNativeInputForTabSwitcher = false
         if (omnibar.viewMode != ViewMode.DuckAI) {
             nativeInputManager.hideNativeInput(animate = false)
         }
-        val intent = TabSwitcherActivity.intent(activity)
-        tabSwitcherActivityResult.launch(intent)
     }
 
     override fun onStart() {
@@ -2024,6 +2037,8 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
+        // Normally done in onStop. This covers the edge case where we come back from the tab switcher before onStop had a chance to run.
+        hideNativeInputLeftForTabSwitcher()
 
         // we need to prevent new tab initialization while clearing data, because it can mess up onboarding state after the process is restarted
         if (swipingTabsFeature.isEnabled && (requireActivity() as? BrowserActivity)?.isDataClearingInProgress == true) {
@@ -2064,6 +2079,7 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        hideNativeInputLeftForTabSwitcher()
         viewModel.onViewStopped()
         webViewClient.onTabBackgrounded()
         alertDialog?.dismiss()
@@ -2699,7 +2715,7 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
-                // Skip Duck.ai for the same reason launchTabSwitcher does: the widget is that tab's
+                // Skip Duck.ai for the same reason hideNativeInputLeftForTabSwitcher does: the widget is that tab's
                 // persistent chat input, and tearing it down restores the default omnibar, so the
                 // chat would be sitting behind an address bar when the user comes back to it.
                 if (omnibar.viewMode != DuckAI) {
@@ -2707,9 +2723,9 @@ class BrowserTabFragment :
                 }
 
                 if (swipingTabsFeature.isEnabled) {
-                    browserActivity?.launchNewTab(it.query, it.sourceTabId)
+                    browserActivity?.launchNewTab(it.query, it.sourceTabId, animated = true)
                 } else {
-                    browserActivity?.openInNewTab(it.query, it.sourceTabId)
+                    browserActivity?.openInNewTab(it.query, it.sourceTabId, animated = true)
                 }
             }
 
@@ -2720,7 +2736,7 @@ class BrowserTabFragment :
                 }
                 binding.autoCompleteSuggestionsList.gone()
                 nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
-                browserActivity?.launchNewTab(it.query, it.sourceTabId, browserMode = BrowserMode.FIRE)
+                browserActivity?.launchNewTab(it.query, it.sourceTabId, browserMode = BrowserMode.FIRE, animated = true)
             }
 
             is Command.OpenMessageInNewTab -> {
@@ -2741,7 +2757,7 @@ class BrowserTabFragment :
             }
 
             is Command.LaunchNewTab -> {
-                browserActivity?.launchNewTab()
+                browserActivity?.launchNewTab(animated = true)
             }
 
             is Command.NavigateBackInCustomTab -> {
@@ -2832,6 +2848,10 @@ class BrowserTabFragment :
                 globalActivityStarter.start(requireContext(), NetworkProtectionManagementScreenNoParams)
             }
 
+            is Command.LaunchSyncSetup -> {
+                globalActivityStarter.start(requireContext(), SyncActivityStartSetupFlow(source = null))
+            }
+
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
@@ -2920,8 +2940,9 @@ class BrowserTabFragment :
 
             is Command.OpenAppLink -> {
                 val launched = openAppLink(it.appLink)
-                if (it.finishCustomTabOnLaunch && launched) {
-                    finishCustomTab()
+                if (launched) {
+                    if (it.finishCustomTabOnLaunch) finishCustomTab()
+                    if (it.closeTabOnLaunch) viewModel.closeCurrentTab()
                 }
             }
 
@@ -2936,6 +2957,7 @@ class BrowserTabFragment :
                     trustedCallerPackage = it.trustedCallerPackage,
                     finishCustomTabOnTrustedCallerLaunch = it.finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly = it.trustedCallerOnly,
+                    closeTabOnTrustedCallerLaunch = it.closeTabOnTrustedCallerLaunch,
                 )
             }
 
@@ -3498,6 +3520,7 @@ class BrowserTabFragment :
         trustedCallerPackage: String? = null,
         finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
+        closeTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         context?.let {
             val pm = it.packageManager
@@ -3574,6 +3597,7 @@ class BrowserTabFragment :
                     finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly,
                     fallbackUrl,
+                    closeTabOnTrustedCallerLaunch,
                 )
             }
         }
@@ -3591,6 +3615,7 @@ class BrowserTabFragment :
         finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
         fallbackUrl: String? = null,
+        closeTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
@@ -3611,7 +3636,7 @@ class BrowserTabFragment :
                 useFirstActivityFound = useFirstActivityFound,
                 showConfirmation = showConfirmation,
                 trustedCallerIntent = trustedCallerIntent,
-                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch,
+                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch || closeTabOnTrustedCallerLaunch,
             )
 
             val resolvedIntent = if (launch.useChooser) {
@@ -3627,7 +3652,7 @@ class BrowserTabFragment :
             } else {
                 context.startActivity(resolvedIntent)
                 if (launch.finishCustomTab) {
-                    finishCustomTab()
+                    if (isActiveCustomTab()) finishCustomTab() else viewModel.closeCurrentTab()
                 }
             }
         }.onFailure { exception ->
@@ -5616,6 +5641,7 @@ class BrowserTabFragment :
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val CLIENT_PACKAGE_ARG = "CLIENT_PACKAGE_ARG"
         private const val REFERRER_PACKAGE_ARG = "REFERRER_PACKAGE_ARG"
+        private const val LAUNCHING_APP_PACKAGE_ARG = "LAUNCHING_APP_PACKAGE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -6008,12 +6034,16 @@ class BrowserTabFragment :
             query: String? = null,
             skipHome: Boolean,
             isExternal: Boolean,
+            launchingAppPackage: String? = null,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             args.putBoolean(SKIP_HOME_ARG, skipHome)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            launchingAppPackage?.let {
+                args.putString(LAUNCHING_APP_PACKAGE_ARG, it)
+            }
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }

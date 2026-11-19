@@ -372,6 +372,69 @@ class InitMessageHandlerPluginTest {
         assertEquals("tier2", initResp!!.config.heuristicMode)
     }
 
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenHeuristicHitTestToggleChangesThenConfigFollowsIt() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+
+        feature.heuristicHitTest().setRawStoredState(Toggle.State(enable = false))
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+        assertFalse(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enableHeuristicHitTest)
+
+        feature.heuristicHitTest().setRawStoredState(Toggle.State(enable = true))
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+        assertTrue(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enableHeuristicHitTest)
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenPopupMutationObserverToggleChangesThenConfigFollowsIt() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+
+        feature.popupMutationObserver().setRawStoredState(Toggle.State(enable = false))
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+        assertFalse(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enablePopupMutationObserver)
+
+        feature.popupMutationObserver().setRawStoredState(Toggle.State(enable = true))
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+        assertTrue(jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.enablePopupMutationObserver)
+    }
+
+    @Test
+    fun whenHeuristicPopupSearchTimeoutIsSetThenConfigUsesIt() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings(settingsWithTimeoutField("\"heuristicPopupSearchTimeout\": 250,"))
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        assertEquals(250, jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.heuristicPopupSearchTimeout)
+    }
+
+    @Test
+    fun whenHeuristicPopupSearchTimeoutIsMissingOrInvalidThenConfigUsesDefault() {
+        settingsRepository.userSetting = true
+        listOf(
+            "",
+            "\"heuristicPopupSearchTimeout\": null,",
+            "\"heuristicPopupSearchTimeout\": 0,",
+            "\"heuristicPopupSearchTimeout\": -5,",
+            "\"heuristicPopupSearchTimeout\": 12.5,",
+            "\"heuristicPopupSearchTimeout\": \"250\",",
+        ).forEach { timeoutField ->
+            settingsCache.updateSettings(settingsWithTimeoutField(timeoutField))
+
+            initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+            assertEquals(
+                timeoutField,
+                InitMessageHandlerPlugin.DEFAULT_HEURISTIC_POPUP_SEARCH_TIMEOUT_MS,
+                jsonToInitResp(shadowOf(webView).lastEvaluatedJavascript)!!.config.heuristicPopupSearchTimeout,
+            )
+        }
+    }
+
     @Test
     fun whenInitProcessedThenUpdateUrlCalledOnDetector() {
         settingsRepository.userSetting = true
@@ -500,6 +563,42 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    fun filterCompactRulesWhenSpecificRuleUsesNoStringsThenGenericStringsAreKept() {
+        settingsCache.updateSettings(stringEdgeCaseRulesetJson)
+        val rules = settingsCache.getSettings()!!.compactRuleList
+
+        val result = invokeFilterCompactRules(rules, "https://no-strings.example/")
+        val compact = result.compact as CompactRules
+
+        assertEquals(listOf("generic-a", "site-no-strings"), compact.r.map { it[1] })
+        assertEquals(listOf("#generic-a", "#generic-b"), compact.s)
+    }
+
+    @Test
+    fun filterCompactRulesWhenSpecificRuleUsesOnlyGenericStringsThenAllGenericStringsAreKept() {
+        settingsCache.updateSettings(stringEdgeCaseRulesetJson)
+        val rules = settingsCache.getSettings()!!.compactRuleList
+
+        val result = invokeFilterCompactRules(rules, "https://shared.example/")
+        val compact = result.compact as CompactRules
+
+        assertEquals(listOf("generic-a", "site-shared-string"), compact.r.map { it[1] })
+        assertEquals(listOf("#generic-a", "#generic-b"), compact.s)
+    }
+
+    @Test
+    fun filterCompactRulesKeepsSpecificRulesWithNewerStepVersions() {
+        settingsCache.updateSettings(stringEdgeCaseRulesetJson)
+        val rules = settingsCache.getSettings()!!.compactRuleList
+
+        val result = invokeFilterCompactRules(rules, "https://v3.example/")
+        val compact = result.compact as CompactRules
+
+        assertEquals(listOf("generic-a", "site-step-v3"), compact.r.map { it[1] })
+        assertEquals(listOf("#generic-a", "#generic-b", "#site-only"), compact.s)
+    }
+
+    @Test
     fun whenRuleFilteringDisabledThenUseOriginalRuleset() {
         settingsRepository.userSetting = true
         settingsCache.updateSettings(mockRulesetJson)
@@ -516,6 +615,20 @@ class InitMessageHandlerPluginTest {
 
         assertEquals(5, rules.size)
     }
+
+    // Generic rule uses strings 0 and 1; site rules use no strings, only string 0, or step version 3.
+    private val stringEdgeCaseRulesetJson = """
+        {"disabledCMPs": [], "compactRuleList": {"v": 1,
+          "s": ["#generic-a", "#generic-b", "#site-only"],
+          "r": [
+            [1, "generic-a", 2, "", 22, [0], [{"e": 0}], [{"v": 0}], [{"c": 1}], [], {}],
+            [1, "site-no-strings", 2, "^https?://no-strings\\.example/", 22, [], [{"eval": "X"}], [{"eval": "X"}], [{"eval": "X"}], [], {}],
+            [1, "site-shared-string", 2, "^https?://(www\\.)?shared\\.example/", 22, [], [{"e": 0}], [{"v": 0}], [{"c": 0}], [], {}],
+            [3, "site-step-v3", 2, "^https?://(www\\.)?v3\\.example/", 22, [], [{"e": 2}], [{"v": 2}], [{"c": 2}], [], {}]
+          ],
+          "index": {"genericRuleRange": [0, 1], "frameRuleRange": [1, 1], "specificRuleRange": [1, 4], "genericStringEnd": 2, "frameStringEnd": 2}
+        }}
+    """.trimIndent()
 
     private fun invokeFilterCompactRules(
         rules: CompactRules,
@@ -534,6 +647,10 @@ class InitMessageHandlerPluginTest {
         return """
             {"type":"${initHandlerPlugin.supportedTypes.first()}", "url": "http://www.example.com"}
         """.trimIndent()
+    }
+
+    private fun settingsWithTimeoutField(timeoutField: String): String {
+        return "{\"disabledCMPs\": [], $timeoutField \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}"
     }
 
     private fun jsonToInitResp(json: String): InitResp? {

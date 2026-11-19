@@ -17,9 +17,6 @@
 <resources>
     <string name="netpDevSettingsTitle">NetP Dev Settings</string>
     <string name="netpDevSettingHeaderConfig">Config</string>
-    <string name="netpDevSettingHeaderPCAP">PCAP</string>
-    <string name="netpDevSettingHeaderPCAPDelete">Delete PCAP file</string>
-    <string name="netpDevSettingHeaderPCAPShare">Share PCAP file</string>
     <string name="netpSystemAppsExclusionList">Manage System Apps Exclusion</string>
     <string name="netpStagingEnvironment">VPN staging environment</string>
     <string name="netpStagingEndpoint">VPN Staging endpoint</string>
@@ -27,7 +24,6 @@
     <string name="netpMtuSize">MTU Size</string>
     <string name="netpDevSettingInternalIP">Internal IP</string>
     <string name="netpDevSettingConnectionQuality">Connection Quality</string>
-    <string name="netpPcapRecording">Enable PCAP recording</string>
     <string name="netpForceRekey">Force Rekey</string>
     <string name="netpEgressFailure">Simulate egress failure</string>
     <string name="netpUnsafeWifiDetectionPrimary">Unsafe Wi-Fi detection</string>

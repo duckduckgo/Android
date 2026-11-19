@@ -31,6 +31,11 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlock
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockConfig
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockFeature
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
+import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockSegment
 import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -38,10 +43,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -68,6 +76,14 @@ class AdBlockingSettingsViewModelTest {
     private val pixel: Pixel = mock()
     private val duckPlayer: DuckPlayer = mock()
     private val duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider = mock()
+    private val sponsorBlockFeature = FeatureToggles.Builder()
+        .store(FakeToggleStore())
+        .appVersionProvider { Int.MAX_VALUE }
+        .featureName("sponsorBlock")
+        .ioDispatcher(coroutineRule.testDispatcher)
+        .build()
+        .create(SponsorBlockFeature::class.java)
+    private val sponsorBlock = FakeSponsorBlock()
 
     private fun createViewModel(
         duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
@@ -83,7 +99,14 @@ class AdBlockingSettingsViewModelTest {
             pixel,
             duckPlayer,
             duckPlayerSettingsPlacementProvider,
+            sponsorBlockFeature,
+            sponsorBlock,
         )
+    }
+
+    private fun setSponsorBlockEnabled(enabled: Boolean) {
+        sponsorBlockFeature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
+        sponsorBlockFeature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = enabled))
     }
 
     private fun setToggles(contingency: Boolean) {
@@ -273,5 +296,58 @@ class AdBlockingSettingsViewModelTest {
         verify(repository).disable()
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_DISABLED_DAILY, type = Pixel.PixelType.Daily())
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_DISABLED_COUNT)
+    }
+
+    @Test
+    fun whenSponsorBlockDisabledThenHidesSponsorBlockMode() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setSponsorBlockEnabled(false)
+
+        createViewModel().viewState.test {
+            assertNull(expectMostRecentItem().sponsorBlockMode)
+        }
+    }
+
+    @Test
+    fun whenSponsorBlockEnabledThenShowsStoredSponsorBlockMode() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setSponsorBlockEnabled(true)
+        sponsorBlock.mode.value = SponsorBlockMode.ALWAYS_SKIP
+
+        createViewModel().viewState.test {
+            assertEquals(SponsorBlockMode.ALWAYS_SKIP, expectMostRecentItem().sponsorBlockMode)
+        }
+    }
+
+    @Test
+    fun whenSponsorBlockModeClickedThenShowsDialogWithCurrentMode() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        sponsorBlock.mode.value = SponsorBlockMode.OFF
+        val viewModel = createViewModel()
+
+        viewModel.commands.test {
+            viewModel.onSponsorBlockModeClicked()
+            assertEquals(AdBlockingSettingsViewModel.Command.ShowSponsorBlockModeDialog(SponsorBlockMode.OFF), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenSponsorBlockModeSelectedThenStoresIt() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+
+        createViewModel().onSponsorBlockModeSelected(SponsorBlockMode.ALWAYS_SKIP)
+
+        assertEquals(SponsorBlockMode.ALWAYS_SKIP, sponsorBlock.mode.value)
+    }
+
+    private class FakeSponsorBlock : SponsorBlock {
+        val mode = MutableStateFlow(SponsorBlockMode.ALWAYS_ASK)
+
+        override fun config(): SponsorBlockConfig = throw UnsupportedOperationException()
+        override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> = throw UnsupportedOperationException()
+        override fun modeFlow(): Flow<SponsorBlockMode> = mode
+        override suspend fun setMode(mode: SponsorBlockMode) {
+            this.mode.value = mode
+        }
     }
 }

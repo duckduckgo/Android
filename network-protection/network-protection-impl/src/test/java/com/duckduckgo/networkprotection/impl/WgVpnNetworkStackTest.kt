@@ -330,7 +330,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenWgProtocolStartWgReturnsFailureThenOnStartVpnShouldReturnFailure() = runTest {
-        whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.failure(java.lang.IllegalStateException()))
+        whenever(wgProtocol.startWg(any(), any())).thenReturn(Result.failure(java.lang.IllegalStateException()))
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
 
         wgVpnNetworkStack.onPrepareVpn()
@@ -344,7 +344,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenWgProtocolStartWgReturnsSuccessThenOnStartVpnShouldReturnSuccess() = runTest {
-        whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.success(Unit))
+        whenever(wgProtocol.startWg(any(), any())).thenReturn(Result.success(Unit))
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
 
         wgVpnNetworkStack.onPrepareVpn()

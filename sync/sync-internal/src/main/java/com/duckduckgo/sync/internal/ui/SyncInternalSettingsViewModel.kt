@@ -108,7 +108,6 @@ constructor(
     private val gracePeriod: DeviceAuthorizationGracePeriod,
     private val promotionDataStore: InternalSyncPromotionDataStore,
     private val promotionAppInstall: InternalSyncPromotionAppInstall,
-    private val auditLogDebugReport: AuditLogDebugReport,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -148,7 +147,6 @@ constructor(
         val blockStoreCurrentValueText: String = "Loading...",
         val canUseV2ConnectFlowEnabled: Boolean = false,
         val canShowV2ConnectCodeEnabled: Boolean = false,
-        val canUseExchangeV2Point1Enabled: Boolean = false,
         val checkLinkingCodeResult: String = "",
         val accessCredentialsText: String = "",
         val scopedTokenResult: String = "",
@@ -160,10 +158,8 @@ constructor(
         val cachedAccountInfoKeyResult: String = "",
         val renameDeviceResult: String = "",
         val fetchDecryptDevicesResult: String = "",
-        val fetchDecryptAuditLogResult: String = "",
         val canWriteUnifiedDeviceListEnabled: Boolean = false,
         val canReadUnifiedDeviceListEnabled: Boolean = false,
-        val canUsePatchEndpointForLegacyDeviceRenameEnabled: Boolean = false,
         val migrationStatusText: String = "",
         val migrationResult: String = "",
         val authenticateResult: String = "",
@@ -299,15 +295,6 @@ constructor(
     }
 
     @SuppressLint("DenyListedApi")
-    fun onCanUseExchangeV2Point1FlagChanged(enabled: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-ScopedToken: setting canUseExchangeV2Point1 flag = $enabled" }
-            setRawToggleState(syncFeature.canUseExchangeV2Point1(), enabled)
-            updateViewState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
     private fun setRawToggleState(
         toggle: Toggle,
         enabled: Boolean,
@@ -379,7 +366,6 @@ constructor(
                 environment = syncEnvDataStore.syncEnvironmentUrl,
                 canUseV2ConnectFlowEnabled = syncFeature.canUseV2ConnectFlow().isEnabled(),
                 canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
-                canUseExchangeV2Point1Enabled = syncFeature.canUseExchangeV2Point1().isEnabled(),
                 v2StoreFieldsText = buildV2StoreFieldsText(),
                 // Clear per-session dev-tool results once signed out so stale keys aren't shown.
                 keysText = if (accountInfo.isSignedIn) viewState.value.keysText else "",
@@ -387,10 +373,8 @@ constructor(
                 cachedAccountInfoKeyResult = if (accountInfo.isSignedIn) viewState.value.cachedAccountInfoKeyResult else "",
                 renameDeviceResult = if (accountInfo.isSignedIn) viewState.value.renameDeviceResult else "",
                 fetchDecryptDevicesResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptDevicesResult else "",
-                fetchDecryptAuditLogResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptAuditLogResult else "",
                 canWriteUnifiedDeviceListEnabled = syncFeature.canWriteUnifiedDeviceList().isEnabled(),
                 canReadUnifiedDeviceListEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled(),
-                canUsePatchEndpointForLegacyDeviceRenameEnabled = syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled(),
                 migrationStatusText = buildMigrationStatusText(),
                 migrationResult = if (accountInfo.isSignedIn) viewState.value.migrationResult else "",
             ),
@@ -837,19 +821,6 @@ constructor(
         }
     }
 
-    fun onFetchAndDecryptAuditLogClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            val token = syncStore.token
-            if (token.isNullOrEmpty()) {
-                command.send(ShowMessage("Not signed in"))
-                return@launch
-            }
-            viewState.update { it.copy(fetchDecryptAuditLogResult = "Loading…") }
-            val text = auditLogDebugReport.fetchAndDescribe(token, syncStore.deviceId)
-            viewState.update { it.copy(fetchDecryptAuditLogResult = text) }
-        }
-    }
-
     private fun describeDeviceInfo(entry: DeviceV2, session: DeviceInfoSessionResult): String {
         val id = entry.deviceId ?: "(no id)"
         val marker = if (entry.deviceId != null && entry.deviceId == syncStore.deviceId) " (this device)" else ""
@@ -893,14 +864,6 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Sync-UnifiedDevices: setting canReadUnifiedDeviceList flag = $enabled" }
             setRawToggleState(syncFeature.canReadUnifiedDeviceList(), enabled)
-            updateViewState()
-        }
-    }
-
-    fun onCanUsePatchEndpointForLegacyDeviceRenameFlagChanged(enabled: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-UnifiedDevices: setting canUsePatchEndpointForLegacyDeviceRename flag = $enabled" }
-            setRawToggleState(syncFeature.canUsePatchEndpointForLegacyDeviceRename(), enabled)
             updateViewState()
         }
     }

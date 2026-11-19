@@ -65,7 +65,6 @@ class CookiePopupOptInEvaluator @Inject constructor(
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
         if (!autoconsentFeature.self().isEnabled() ||
-            !autoconsentFeature.cookiePopUpOptInPrompt().isEnabled() ||
             !autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
         ) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped

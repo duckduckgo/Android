@@ -45,9 +45,9 @@ import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetectorClientProvider
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
-import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
@@ -65,6 +65,8 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.request.interception.impl.RequestExemptions
+import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
@@ -105,7 +107,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val mockRequestBlocklist: RequestBlocklist = mock()
-    private var mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
+    private var mockTrackerStatsWriter: TrackerStatsWriter = mock()
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
@@ -179,8 +181,10 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = resourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
-            gpc = mockGpc,
-            userAgentProvider = userAgentProvider,
+            requestRewriteDecision = RequestRewriteDecision(
+                gpc = mockGpc,
+                userAgentProvider = userAgentProvider,
+            ),
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = CloakedCnameDetectorImpl(
                 tdsCnameEntityDao,
@@ -189,17 +193,19 @@ class DomainsReferenceTest(private val testCase: TestCase) {
                 cachedCnameLookupEnabled,
             ),
             requestFilterer = mockRequestFilterer,
-            requestBlocklist = mockRequestBlocklist,
-            contentBlocking = mockContentBlocking,
-            trackerAllowlist = mockTrackerAllowlist,
-            userAllowListRepository = mockUserAllowListRepository,
+            requestExemptions = RequestExemptions(
+                requestBlocklist = mockRequestBlocklist,
+                contentBlocking = mockContentBlocking,
+                trackerAllowlist = mockTrackerAllowlist,
+                userAllowListRepository = mockUserAllowListRepository,
+            ),
             duckPlayer = mockDuckPlayer,
             maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             appCoroutineScope = coroutinesTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
-            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
+            trackerStatsWriter = mockTrackerStatsWriter,
         )
     }
 

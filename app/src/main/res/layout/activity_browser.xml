@@ -29,6 +29,13 @@
         android:layout_alignParentTop="true"
         layout="@layout/include_omnibar_toolbar_mockup" />
 
+    <ImageView
+        android:id="@+id/newTabTransitionCover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
