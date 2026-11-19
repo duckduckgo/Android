@@ -185,6 +185,31 @@ class RealPirNotificationManagerTest {
     }
 
     @Test
+    fun whenScanStatusNotificationIsCreatedThenItOnlyAlertsOnce() {
+        val notification = testee.createScanStatusNotification(title = "title", message = "message")
+
+        assertTrue(notification.flags and Notification.FLAG_ONLY_ALERT_ONCE != 0)
+    }
+
+    @Test
+    fun whenScanStatusNotificationIsShownThenItAlertsOnEveryPost() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        testee.showScanStatusNotification(title = "title", message = "message")
+
+        assertFalse(capturePostedNotification().flags and Notification.FLAG_ONLY_ALERT_ONCE != 0)
+    }
+
+    @Test
+    fun whenScanCompleteNotificationIsPostedThenItAlertsOnEveryPost() {
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        testee.showScanCompleteNotification(SCAN_ONLY)
+
+        assertFalse(capturePostedNotification().flags and Notification.FLAG_ONLY_ALERT_ONCE != 0)
+    }
+
+    @Test
     fun whenFreemiumScanCompleteNotificationIsTappedThenItReplacesAnOpenDashboard() {
         shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
 

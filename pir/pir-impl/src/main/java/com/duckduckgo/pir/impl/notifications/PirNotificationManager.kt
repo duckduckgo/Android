@@ -88,10 +88,7 @@ class RealPirNotificationManager @Inject constructor(
         notificationManagerCompat.checkPermissionAndNotify(
             context,
             PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE,
-            createScanStatusNotification(
-                title = title,
-                message = message,
-            ),
+            buildNotification(title = title, message = message, contentIntent = dashboardPendingIntent()),
         )
     }
 
@@ -99,7 +96,8 @@ class RealPirNotificationManager @Inject constructor(
         title: String,
         message: String,
     ): Notification {
-        return buildNotification(title = title, message = message, contentIntent = dashboardPendingIntent())
+        // the foreground service re-posts this under the same id once the run mode is known, which would otherwise alert twice
+        return buildNotification(title = title, message = message, contentIntent = dashboardPendingIntent(), onlyAlertOnce = true)
     }
 
     override fun showScanCompleteNotification(runMode: PirRunMode): Boolean = runCatching {
@@ -162,7 +160,7 @@ class RealPirNotificationManager @Inject constructor(
         )
 
         return buildNotification(
-            title = context.getString(R.string.pirFreemiumNotificationTitleComplete),
+            title = context.getString(R.string.pirFreemiumNotificationTitle),
             message = context.getString(R.string.pirFreemiumNotificationMessageComplete),
             contentIntent = pendingIntent,
             autoCancel = true,
@@ -174,6 +172,7 @@ class RealPirNotificationManager @Inject constructor(
         message: String,
         contentIntent: PendingIntent,
         autoCancel: Boolean = false,
+        onlyAlertOnce: Boolean = false,
     ): Notification {
         return NotificationCompat.Builder(context, PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
@@ -181,6 +180,7 @@ class RealPirNotificationManager @Inject constructor(
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setContentIntent(contentIntent)
             .setAutoCancel(autoCancel)
+            .setOnlyAlertOnce(onlyAlertOnce)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .build()
     }
