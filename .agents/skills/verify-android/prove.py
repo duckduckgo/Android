@@ -7,6 +7,10 @@
   prove.py pr-summary [<before>] <after>
                                Markdown for a PR's verification section from runs' proof-<name>.json files (or
                                the evidence folder); safe for a public PR: no local paths, logs or screenshots
+  prove.py publish <evidence folder> [--into <auto evidence folder>]
+                               copies a run into an auto evidence folder (a new one, or the one auto opened for
+                               this change), records each report's served URL in its proof-<name>.json, uploads it,
+                               and prints the URLs: the one to put in the PR template's Evidence URL field
   prove.py selftest [--offline]
                                checks the harness itself (run it after changing prove.py); see tests/.
                                --offline runs only the cases that need no device
@@ -23,6 +27,7 @@ import importlib.util
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -491,6 +496,63 @@ def rerun_lines(before, after, proof):
     return [f"{setup(run['build'])} && $P {proof}" for run in (before, after) if run]
 
 
+def auto_evidence_scripts():
+    """show-me-your-work's scripts from the newest installed auto: only auto's evidence store serves evidence to a PR."""
+    if os.environ.get("VERIFY_AUTO_EVIDENCE_SCRIPTS"):
+        candidates = [Path(os.environ["VERIFY_AUTO_EVIDENCE_SCRIPTS"])]
+    else:
+        roots = [Path.home() / ".claude/plugins/cache/ddg-auto/auto", Path.home() / ".codex/plugins/cache/ddg-auto/auto"]
+        versions = [v for r in roots if r.is_dir() for v in r.iterdir()]
+        version = lambda v: tuple(int(x) if x.isdigit() else -1 for x in v.name.split("."))
+        candidates = [v / "skills/show-me-your-work/scripts" for v in sorted(versions, key=version, reverse=True)]
+    for scripts in candidates:
+        if (scripts / "evidence-url.ts").is_file():
+            return scripts
+    raise Error("auto isn't installed: publishing evidence needs its show-me-your-work scripts "
+                "(or point VERIFY_AUTO_EVIDENCE_SCRIPTS at them)")
+
+def node(script, *args):
+    p = subprocess.run(["node", str(script), *map(str, args)], capture_output=True, text=True)
+    if p.returncode:
+        detail = ((p.stderr or p.stdout).strip().splitlines() or ["no output"])[-1]
+        raise Error(f"{script.name} failed: {detail}")
+    return p.stdout.strip().splitlines()[-1]
+
+def publish(folder, into=None):
+    """Copies a run's evidence folder into an auto evidence folder, records each report's served URL in the run's
+    proof-<name>.json (here and in the copy), uploads the auto folder, and prints the URLs."""
+    try:
+        src = Path(folder).resolve()
+        src = src.parent if src.is_file() else src
+        if not any(src.glob("proof-*.json")):
+            raise Error(f"no run in {folder}: pass the evidence folder doctor printed")
+        scripts = auto_evidence_scripts()
+        os.umask(0o022)  # the store serves what it uploads; keep files readable
+        root = Path(into).resolve() if into else Path(node(scripts / "new-evidence.ts"))
+        dest = root / "verify-android" / f"{src.parent.name}-{src.name}"
+        if dest.exists():
+            raise Error(f"{dest} exists: the store never replaces a file, so publish a run once")
+        shutil.copytree(src, dest)
+        urls = {}
+        for run in sorted(dest.glob("proof-*.json")):
+            report_md = run.with_suffix(".md")
+            urls[run.name] = node(scripts / "evidence-url.ts", report_md if report_md.is_file() else run)
+            for copy in (run, src / run.name):
+                m = json.loads(copy.read_text())
+                m["evidence_url"] = urls[run.name]
+                copy.write_text(json.dumps(m, indent=2) + "\n")
+        for compared in sorted(dest.glob("compare-*.md")):
+            urls[compared.name] = node(scripts / "evidence-url.ts", compared)
+        uploaded = json.loads(node(scripts / "upload-evidence.ts", "--directory", root))
+        if uploaded.get("failed"):
+            raise Error(f"{uploaded['failed']} files failed to upload; rerun publish with --into {root}")
+    except Error as e:
+        print(f"ERROR {e}", file=sys.stderr)
+        return 2
+    for name, url in urls.items():
+        print(f"{name}  {url}")
+    return 0
+
 def summarize(before, after):
     proof = after["proof"]
     committed = proof.get("repo_path") if proof.get("committed") else None
@@ -503,6 +565,7 @@ def summarize(before, after):
     lines += [f"- Device: {device}"] if device else []
     lines += ["- Builds: " + (f"{build_public(before['build'])} → " if before else "") + build_public(after["build"]),
               f"- Live services: {', '.join(after.get('live') or []) or 'none'}"]
+    lines += [f"- Evidence: {after['evidence_url']}"] if after.get("evidence_url") else []
     if before:
         differs = [k for k in ("model", "api") if before.get(k) != after.get(k)]
         differs += ["proof source"] if before["proof"].get("source") != proof.get("source") else []
@@ -672,10 +735,12 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     if args[:1] == ["pr-summary"] and len(args) in (2, 3):
         sys.exit(pr_summary(*args[1:]))
+    if args[:1] == ["publish"] and len(args) in (2, 4) and (len(args) == 2 or args[2] == "--into"):
+        sys.exit(publish(args[1], args[3] if len(args) == 4 else None))
     if args[:1] == ["compare"] and len(args) == 2:
         sys.exit(compare(args[1]))
     if args[:1] == ["selftest"] and args[1:] in ([], ["--offline"]):
         sys.exit(selftest(offline=args[1:] == ["--offline"]))
-    if len(args) == 1 and not args[0].startswith("-") and args[0] not in ("pr-summary", "compare"):
+    if len(args) == 1 and not args[0].startswith("-") and args[0] not in ("pr-summary", "compare", "publish"):
         sys.exit(prove(args[0])["exit"])
     sys.exit(__doc__)

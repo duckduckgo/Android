@@ -94,6 +94,7 @@ $P .agents/skills/verify-android/proofs/<name>.py           # exit 0 PASS, 1 FAI
 $V build --base origin/develop                     # the "before" build (git fetch first for the latest)
 $P compare .agents/skills/verify-android/proofs/<name>.py   # runs it on the base build, then on this checkout's
 $P pr-summary [<before>] <after>                   # Markdown for the PR, from runs' proof-<name>.json (or the evidence folder)
+$P publish <evidence folder> [--into <dir>]        # uploads the run to auto's evidence store; prints the Evidence URL
 $P selftest                                        # after changing prove.py: the harness still tells pass from fail
 $P selftest --offline                              # only the cases that need no device (pr-summary)
 ```
@@ -120,6 +121,13 @@ commands to rerun it. It carries no local paths, logs, screenshots or device ser
 a public PR. Given one run with a `-base` run of the same proof beside it (as `compare` leaves them), it
 summarises both. A run that stopped at `doctor` never read the device or the build, so its summary leaves
 those lines out rather than guessing them.
+
+`publish` makes the evidence viewable by reviewers. It needs auto installed and signed in to its store
+(`upload-evidence.ts --check` from auto's show-me-your-work scripts says `ready`). It copies the run's folder
+into an auto evidence folder (`--into` the one auto already opened for this change, or a new one), records each
+report's served URL as `evidence_url` in the run's `proof-<name>.json`, uploads the folder and prints the URLs.
+The store never replaces a file, so publish a run once, after its last proof. `pr-summary` then adds an
+`Evidence:` line. The URLs need DuckDuckGo sign-in and point at internal storage only.
 
 `build --base <ref>` builds the ref in `build/verify/base-worktree`, a worktree this skill owns and moves
 between base commits, and keeps the APK per commit, so the same base is built once. `compare` installs
@@ -199,7 +207,7 @@ Proof standards:
 - Capture the action and the resulting state: a shot before the step that matters and one after.
 - Verify side effects through a second view (the tab switcher after opening a tab, the New Tab Page after changing a setting).
 - Look at every PNG you cite; for web content pair it with a `web eval` read of the same state.
-- Report the commit from `doctor` with the evidence path. For a PR, paste the output of `$P pr-summary`, not paths or screenshots. An entry point you could not drive is reported as not verified, with the failing command and its exit code.
+- Report the commit from `doctor` with the evidence path. For a PR, run `$P publish`, put the proof report's URL in the template's `Evidence URL (if applicable):` field and paste the output of `$P pr-summary`, not paths or screenshots. Keep every field of `.github/PULL_REQUEST_TEMPLATE.md`, `Task/Issue URL:` first, even when another skill writes the rest of the body: the merge and Asana sync workflows read it. An entry point you could not drive is reported as not verified, with the failing command and its exit code.
 - Use synthetic data only and keep captures on this machine.
 
 ## Cleanup
