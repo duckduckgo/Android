@@ -28,6 +28,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Path
 import java.io.IOException
 
 class RealSegmentSkipSegmentsProviderTest {
@@ -36,23 +38,27 @@ class RealSegmentSkipSegmentsProviderTest {
     val coroutineRule = CoroutineTestRule()
 
     private val service = FakeSegmentSkipService()
-    private val gate = FakeHashPrefixGate()
     private val settingsProvider = FakeSettingsProvider()
 
     private val provider = RealSegmentSkipSegmentsProvider(
         service = service,
-        hashPrefixGate = gate,
         settingsProvider = settingsProvider,
         dispatchers = coroutineRule.testDispatcherProvider,
         appScope = coroutineRule.testScope,
     )
 
     @Test
+    fun whenUsingMockDatasetThenSegmentsStillUseProductionEndpoint() {
+        val method = SegmentSkipService::class.java.declaredMethods.single { it.name == "getSegments" }
+        assertEquals("https://duckduckgo.com/sponsorblock/v1/segments/{hashPrefix}", method.getAnnotation(GET::class.java)?.value)
+        assertEquals("hashPrefix", method.parameterAnnotations[0].filterIsInstance<Path>().single().value)
+    }
+
+    @Test
     fun whenLookingUpThenOnlyTheFourCharacterHashPrefixIsSent() = runTest {
-        provider.getSegments(VIDEO_ID)
+        provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX)
 
         assertEquals(listOf(VIDEO_ID_HASH_PREFIX), service.requestedPrefixes)
-        assertEquals(listOf(VIDEO_ID_HASH_PREFIX), gate.checkedPrefixes)
     }
 
     @Test
@@ -68,7 +74,7 @@ class RealSegmentSkipSegmentsProviderTest {
             listOf(
                 SegmentSkipSegment(start = 10.0, end = 20.0, category = "sponsor", actionType = "skip", videoDuration = 300.0, uuid = "uuid-10.0"),
             ),
-            provider.getSegments(VIDEO_ID),
+            provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX),
         )
     }
 
@@ -78,7 +84,7 @@ class RealSegmentSkipSegmentsProviderTest {
         val json = """[{"videoID":"$VIDEO_ID","segments":[{"segment":[10.0,20.0],"category":"sponsor","actionType":"skip","UUID":"abc"}]}]"""
         service.response = Response.success(Moshi.Builder().build().adapter<List<VideoSegmentsResponse>>(type).fromJson(json))
 
-        assertEquals(listOf("abc"), provider.getSegments(VIDEO_ID).map { it.uuid })
+        assertEquals(listOf("abc"), provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).map { it.uuid })
     }
 
     @Test
@@ -96,7 +102,7 @@ class RealSegmentSkipSegmentsProviderTest {
             ),
         )
 
-        assertEquals(listOf(1.0, 3.0), provider.getSegments(VIDEO_ID).map { it.start })
+        assertEquals(listOf(1.0, 3.0), provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).map { it.start })
     }
 
     @Test
@@ -127,7 +133,7 @@ class RealSegmentSkipSegmentsProviderTest {
             listOf(
                 SegmentSkipSegment(start = 30.0, end = 40.0, category = "sponsor", actionType = "skip", videoDuration = null, uuid = "uuid-30.0"),
             ),
-            provider.getSegments(VIDEO_ID),
+            provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX),
         )
     }
 
@@ -135,8 +141,8 @@ class RealSegmentSkipSegmentsProviderTest {
     fun whenServiceReturnsNotFoundThenEmptyListIsReturnedAndCached() = runTest {
         service.response = Response.error(404, "".toResponseBody())
 
-        assertTrue(provider.getSegments(VIDEO_ID).isEmpty())
-        provider.getSegments(VIDEO_ID)
+        assertTrue(provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).isEmpty())
+        provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX)
 
         assertEquals(1, service.requestedPrefixes.size)
     }
@@ -144,23 +150,15 @@ class RealSegmentSkipSegmentsProviderTest {
     @Test
     fun whenServiceFailsThenEmptyListIsReturnedAndNotCached() = runTest {
         service.response = Response.error(410, "".toResponseBody())
-        assertTrue(provider.getSegments(VIDEO_ID).isEmpty())
+        assertTrue(provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).isEmpty())
 
         service.error = IOException()
-        assertTrue(provider.getSegments(VIDEO_ID).isEmpty())
+        assertTrue(provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).isEmpty())
 
         service.error = null
         service.response = Response.success(listOf(video(VIDEO_ID, segment(1.0, 2.0))))
-        assertEquals(1, provider.getSegments(VIDEO_ID).size)
+        assertEquals(1, provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).size)
         assertEquals(3, service.requestedPrefixes.size)
-    }
-
-    @Test
-    fun whenGateMissesThenNetworkIsNotCalled() = runTest {
-        gate.hit = false
-
-        assertTrue(provider.getSegments(VIDEO_ID).isEmpty())
-        assertTrue(service.requestedPrefixes.isEmpty())
     }
 
     @Test
@@ -168,24 +166,53 @@ class RealSegmentSkipSegmentsProviderTest {
         service.response = Response.success(
             listOf(video(VIDEO_ID, segment(1.0, 2.0, category = "sponsor"), segment(3.0, 4.0, category = "intro"))),
         )
-        assertEquals(1, provider.getSegments(VIDEO_ID).size)
+        assertEquals(1, provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).size)
 
         settingsProvider.settings = SegmentSkipSettings(categories = listOf("sponsor", "intro"))
 
-        assertEquals(2, provider.getSegments(VIDEO_ID).size)
+        assertEquals(2, provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).size)
         assertEquals(1, service.requestedPrefixes.size)
+    }
+
+    @Test
+    fun whenCacheIsClearedThenNextLookupFetchesAgain() = runTest {
+        service.response = Response.success(listOf(video(VIDEO_ID, segment(1.0, 2.0))))
+        provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX)
+        provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX)
+        assertEquals(1, service.requestedPrefixes.size)
+        provider.clearCache()
+        provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX)
+        assertEquals(2, service.requestedPrefixes.size)
+    }
+
+    @Test
+    fun whenOldLookupFailsAfterClearThenItDoesNotEvictNewEntry() = runTest {
+        val release = CompletableDeferred<Unit>()
+        service.gate = release
+        val old = async { provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX) }
+        coroutineRule.testScope.testScheduler.runCurrent()
+        provider.clearCache()
+        service.gate = null
+        service.response = Response.success(listOf(video(VIDEO_ID, segment(1.0, 2.0))))
+        assertEquals(1, provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).size)
+        service.error = IOException()
+        release.complete(Unit)
+        assertTrue(old.await().isEmpty())
+        service.error = null
+        assertEquals(1, provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX).size)
+        assertEquals(2, service.requestedPrefixes.size)
     }
 
     @Test
     fun whenCacheIsFullThenLeastRecentlyUsedVideoIsEvicted() = runTest {
         val videoIds = (0..50).map { "video${it.toString().padStart(6, '0')}" }
-        videoIds.forEach { provider.getSegments(it) }
+        videoIds.forEach { provider.getSegments(it, VIDEO_ID_HASH_PREFIX) }
         assertEquals(51, service.requestedPrefixes.size)
 
-        provider.getSegments(videoIds.last())
+        provider.getSegments(videoIds.last(), VIDEO_ID_HASH_PREFIX)
         assertEquals(51, service.requestedPrefixes.size)
 
-        provider.getSegments(videoIds.first())
+        provider.getSegments(videoIds.first(), VIDEO_ID_HASH_PREFIX)
         assertEquals(52, service.requestedPrefixes.size)
     }
 
@@ -195,8 +222,8 @@ class RealSegmentSkipSegmentsProviderTest {
         service.gate = release
         service.response = Response.success(listOf(video(VIDEO_ID, segment(1.0, 2.0))))
 
-        val first = async { provider.getSegments(VIDEO_ID) }
-        val second = async { provider.getSegments(VIDEO_ID) }
+        val first = async { provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX) }
+        val second = async { provider.getSegments(VIDEO_ID, VIDEO_ID_HASH_PREFIX) }
         coroutineRule.testScope.testScheduler.runCurrent()
         release.complete(Unit)
 
@@ -227,16 +254,6 @@ class RealSegmentSkipSegmentsProviderTest {
             gate?.await()
             error?.let { throw it }
             return response
-        }
-    }
-
-    private class FakeHashPrefixGate : SegmentSkipHashPrefixGate {
-        val checkedPrefixes = mutableListOf<String>()
-        var hit = true
-
-        override suspend fun hasSegments(hashPrefix: String): Boolean {
-            checkedPrefixes += hashPrefix
-            return hit
         }
     }
 

@@ -38,7 +38,8 @@ class RealSegmentSkipTest {
     private val feature = FakeFeatureToggleFactory.create(SegmentSkipFeature::class.java)
     private val segmentsProvider = FakeSegmentsProvider()
     private val userPreferences = FakeUserPreferences()
-    private val segmentSkip = RealSegmentSkip(feature, segmentsProvider, userPreferences)
+    private val gate = FakeHashPrefixGate()
+    private val segmentSkip = RealSegmentSkip(feature, segmentsProvider, gate, userPreferences)
 
     @Before
     fun setup() {
@@ -87,6 +88,16 @@ class RealSegmentSkipTest {
 
         assertEquals(listOf(early, late), segmentSkip.getSegments(VALID_ID))
         assertEquals(VALID_ID, segmentsProvider.requestedIds.single())
+        assertEquals("5f6b0b4e", gate.checkedPrefixes.single())
+        assertEquals("5f6b", segmentsProvider.requestedPrefixes.single())
+    }
+
+    @Test
+    fun whenDatasetDoesNotContainVideoThenProviderIsNotCalled() = runTest {
+        gate.hit = false
+        assertTrue(segmentSkip.getSegments(VALID_ID).isEmpty())
+        assertEquals(listOf("5f6b0b4e"), gate.checkedPrefixes)
+        assertTrue(segmentsProvider.requestedIds.isEmpty())
     }
 
     @Test
@@ -134,13 +145,26 @@ class RealSegmentSkipTest {
         }
     }
 
+    private class FakeHashPrefixGate : SegmentSkipHashPrefixGate {
+        var hit = true
+        val checkedPrefixes = mutableListOf<String>()
+        override suspend fun hasSegments(hashPrefix: String): Boolean {
+            checkedPrefixes += hashPrefix
+            return hit
+        }
+    }
+
     private class FakeSegmentsProvider : SegmentSkipSegmentsProvider {
         var segments: List<SegmentSkipSegment> = emptyList()
         var error: Exception? = null
         val requestedIds = mutableListOf<String>()
+        val requestedPrefixes = mutableListOf<String>()
 
-        override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> {
+        override fun clearCache() = Unit
+
+        override suspend fun getSegments(videoId: String, hashPrefix: String): List<SegmentSkipSegment> {
             requestedIds += videoId
+            requestedPrefixes += hashPrefix
             error?.let { throw it }
             return segments
         }

@@ -16,8 +16,10 @@
 
 package com.duckduckgo.adblocking.impl.segmentskip
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SegmentSkipHashPrefixGate {
@@ -25,8 +27,11 @@ interface SegmentSkipHashPrefixGate {
     suspend fun hasSegments(hashPrefix: String): Boolean
 }
 
-// TODO: replace with a gate backed by the local hash prefix list.
 @ContributesBinding(AppScope::class)
-class AlwaysHitSegmentSkipHashPrefixGate @Inject constructor() : SegmentSkipHashPrefixGate {
-    override suspend fun hasSegments(hashPrefix: String): Boolean = true
+class RealSegmentSkipHashPrefixGate @Inject constructor(
+    private val binary: SegmentSkipBinaryStore,
+    private val dispatchers: DispatcherProvider,
+) : SegmentSkipHashPrefixGate {
+    override suspend fun hasSegments(hashPrefix: String): Boolean =
+        withContext(dispatchers.io()) { binary.contains(hashPrefix) }
 }
