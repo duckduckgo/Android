@@ -20,7 +20,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.SizeF
+import android.util.Xml
 import android.view.View
+import android.view.View.MeasureSpec
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RemoteViews
@@ -52,6 +54,7 @@ import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.xmlpull.v1.XmlPullParser
 
 @RunWith(AndroidJUnit4::class)
 class DuckAiWidgetConfiguratorTest {
@@ -285,8 +288,34 @@ class DuckAiWidgetConfiguratorTest {
 
         val variants = sizedVariantsByKey(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400))
 
-        assertEquals(setOf(SizeF(180f, 110f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 110f)), variants.keys)
+        assertEquals(setOf(SizeF(180f, COMPACT_HEIGHT_DP), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), COMPACT_HEIGHT_DP)), variants.keys)
         variants.values.forEach { assertEquals(View.GONE, chatsSectionVisibility(it)) }
+    }
+
+    @Test
+    @Config(sdk = [34], qualifiers = "mdpi")
+    fun whenCompactThenAdvertisedMinimumHeightsMatchMeasuredLayout() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true, chats = emptyList())
+        val variants = sizedVariantsByKey(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 200))
+        val compact = variants.minBy { (size) -> size.width * size.height }.value
+        val root = compact.apply(activity, FrameLayout(activity))
+        root.measure(MeasureSpec.makeMeasureSpec(180, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+        val metadataHeights = activity.resources.getXml(R.xml.duck_ai_widget_info).use { parser ->
+            while (parser.next() != XmlPullParser.START_TAG) {
+                check(parser.eventType != XmlPullParser.END_DOCUMENT)
+            }
+            listOf(android.R.attr.minHeight, android.R.attr.minResizeHeight).map { attribute ->
+                val values = activity.obtainStyledAttributes(Xml.asAttributeSet(parser), intArrayOf(attribute))
+                try {
+                    values.getDimensionPixelSize(0, -1)
+                } finally {
+                    values.recycle()
+                }
+            }
+        }
+
+        assertEquals("minHeight and minResizeHeight in dp", List(2) { root.measuredHeight }, metadataHeights)
+        assertEquals(setOf(root.measuredHeight.toFloat()), variants.keys.map { it.height }.filter { it < MIN_CHATS_HEIGHT_DP }.toSet())
     }
 
     @Test
@@ -351,9 +380,9 @@ class DuckAiWidgetConfiguratorTest {
         val variants = sizedVariantsByKey(views)
         assertEquals(
             setOf(
-                SizeF(180f, 110f),
+                SizeF(180f, COMPACT_HEIGHT_DP),
                 SizeF(180f, MIN_CHATS_HEIGHT_DP.toFloat()),
-                SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 110f),
+                SizeF(MIN_LABELS_WIDTH_DP.toFloat(), COMPACT_HEIGHT_DP),
                 SizeF(MIN_LABELS_WIDTH_DP.toFloat(), MIN_CHATS_HEIGHT_DP.toFloat()),
             ),
             variants.keys,
@@ -377,7 +406,7 @@ class DuckAiWidgetConfiguratorTest {
 
         val variants = sizedVariantsByKey(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400))
 
-        assertEquals(setOf(SizeF(180f, 110f), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), 110f)), variants.keys)
+        assertEquals(setOf(SizeF(180f, COMPACT_HEIGHT_DP), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), COMPACT_HEIGHT_DP)), variants.keys)
         variants.values.forEach { assertEquals(View.GONE, chatsSectionVisibility(it)) }
     }
 
@@ -483,5 +512,6 @@ class DuckAiWidgetConfiguratorTest {
 
     private companion object {
         const val APP_WIDGET_ID = 7
+        const val COMPACT_HEIGHT_DP = 142f
     }
 }
