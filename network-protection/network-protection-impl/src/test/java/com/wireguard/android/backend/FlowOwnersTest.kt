@@ -27,71 +27,96 @@ class FlowOwnersTest {
     private val flowOwners = FlowOwners(capacity = 2)
     private val flow = Flow(TCP, "10.0.0.2", 40000, "185.151.204.15", 443)
 
+    /** The owners [judge] was asked about, in order. */
+    private val judged = mutableListOf<Int>()
+
+    private fun hello(flow: Flow = this.flow, sni: String = TRACKER, lookedUp: Int = APP, blockFor: Set<Int> = setOf(APP)) =
+        flowOwners.allow(flow, sni, lookup = { lookedUp }, judge = { owner ->
+            judged += owner
+            owner !in blockFor
+        })
+
     @Test
-    fun whenOwnerIsKnownThenItIsReturned() {
-        assertEquals(10193, flowOwners.ownerOf(flow, 10193))
+    fun whenOwnerIsKnownThenTheHelloIsJudgedAsItsOwners() {
+        assertFalse(hello())
+        assertEquals(listOf(APP), judged)
     }
 
     @Test
-    fun whenOwnerIsGoneThenTheOwnerSeenEarlierIsReturned() {
-        flowOwners.ownerOf(flow, 10193)
+    fun whenOwnerIsGoneThenTheHelloIsJudgedAsTheOwnerSeenEarlier() {
+        hello(blockFor = emptySet())
 
-        assertEquals(10193, flowOwners.ownerOf(flow, 0))
-        assertEquals(10193, flowOwners.ownerOf(flow, -1))
+        assertTrue(hello(lookedUp = 0, blockFor = emptySet()))
+        assertTrue(hello(lookedUp = -1, blockFor = emptySet()))
+        assertEquals(listOf(APP, APP, APP), judged)
     }
 
     @Test
-    fun whenOwnerOfANewFlowIsUnknownThenItStaysUnknown() {
-        flowOwners.ownerOf(flow, 10193)
+    fun whenOwnerOfANewFlowIsUnknownThenItIsJudgedAsUnknown() {
+        hello(blockFor = emptySet())
 
-        assertEquals(0, flowOwners.ownerOf(flow.copy(sport = 40001), 0))
+        hello(flow = flow.copy(sport = 40001), lookedUp = 0)
+        assertEquals(listOf(APP, 0), judged)
     }
 
     @Test
-    fun whenCapacityIsExceededThenTheLeastRecentFlowIsForgotten() {
-        flowOwners.ownerOf(flow, 10193)
-        flowOwners.ownerOf(flow.copy(sport = 40001), 10194)
-        flowOwners.ownerOf(flow.copy(sport = 40002), 10195)
+    fun whenCapacityIsExceededThenTheLeastRecentOwnerIsForgotten() {
+        hello(blockFor = emptySet())
+        hello(flow = flow.copy(sport = 40001), lookedUp = 10194, blockFor = emptySet())
+        hello(flow = flow.copy(sport = 40002), lookedUp = 10195, blockFor = emptySet())
 
-        assertEquals(0, flowOwners.ownerOf(flow, 0))
-        assertEquals(10195, flowOwners.ownerOf(flow.copy(sport = 40002), 0))
+        hello(lookedUp = 0, blockFor = emptySet())
+        assertEquals(0, judged.last())
     }
 
     @Test
-    fun whenAConnectionIsBlockedThenItsRetransmittedHelloIsBlocked() {
-        flowOwners.ownerOf(flow, 10193)
-        flowOwners.block(flow, "app.adjust.com")
+    fun whenAConnectionIsBlockedThenItsRetransmittedHelloIsBlockedWithoutBeingJudgedAgain() {
+        assertFalse(hello())
 
-        assertTrue(flowOwners.isBlocked(flow, "app.adjust.com"))
+        assertFalse(hello(lookedUp = 0))
+        assertFalse(hello())
+        assertEquals(listOf(APP), judged)
     }
 
     @Test
-    fun whenAConnectionIsNotBlockedThenItsHelloIsJudged() {
-        flowOwners.ownerOf(flow, 10193)
+    fun whenAConnectionIsAllowedThenEachHelloIsJudged() {
+        assertTrue(hello(blockFor = emptySet()))
+        assertTrue(hello(blockFor = emptySet()))
 
-        assertFalse(flowOwners.isBlocked(flow, "app.adjust.com"))
+        assertEquals(listOf(APP, APP), judged)
     }
 
     @Test
-    fun whenAConnectionIsBlockedThenAnotherServerNameOnItIsJudged() {
-        flowOwners.ownerOf(flow, 10193)
-        flowOwners.block(flow, "app.adjust.com")
+    fun whenAConnectionIsBlockedThenAnotherServerNameOrFlowIsJudged() {
+        hello()
 
-        assertFalse(flowOwners.isBlocked(flow, "example.com"))
-        assertFalse(flowOwners.isBlocked(flow.copy(sport = 40001), "app.adjust.com"))
+        hello(sni = "example.com")
+        hello(flow = flow.copy(sport = 40001))
+        assertEquals(listOf(APP, APP, APP), judged)
     }
 
     @Test
-    fun whenABlockedConnectionIsForgottenThenItsHelloIsJudgedAgain() {
-        flowOwners.ownerOf(flow, 10193)
-        flowOwners.block(flow, "app.adjust.com")
-        flowOwners.ownerOf(flow.copy(sport = 40001), 10194)
-        flowOwners.ownerOf(flow.copy(sport = 40002), 10195)
+    fun whenAllowedTrafficFillsTheOwnersThenABlockedConnectionStaysBlocked() {
+        hello()
+        repeat(5) { hello(flow = flow.copy(sport = 41000 + it), lookedUp = 10194, blockFor = emptySet()) }
 
-        assertFalse(flowOwners.isBlocked(flow, "app.adjust.com"))
+        assertFalse(hello(lookedUp = 0))
+        assertEquals(6, judged.size)
+    }
+
+    @Test
+    fun whenMoreConnectionsAreBlockedThanItsCapacityThenTheLeastRecentIsJudgedAgain() {
+        hello()
+        hello(flow = flow.copy(sport = 40001))
+        hello(flow = flow.copy(sport = 40002))
+
+        hello()
+        assertEquals(4, judged.size)
     }
 
     private companion object {
         const val TCP = 6
+        const val APP = 10193
+        const val TRACKER = "app.adjust.com"
     }
 }

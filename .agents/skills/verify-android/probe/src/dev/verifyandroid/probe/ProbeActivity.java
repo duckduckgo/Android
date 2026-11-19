@@ -143,6 +143,10 @@ public class ProbeActivity extends Activity {
             connection = (HttpURLConnection) new URL("https://" + host + "/cdn-cgi/trace").openConnection();
             connection.setConnectTimeout(timeoutMs);
             connection.setReadTimeout(timeoutMs);
+            int status = connection.getResponseCode();
+            if (status != HttpURLConnection.HTTP_OK) {
+                throw new ConnectFailed("ERROR:http-" + status);
+            }
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream(), StandardCharsets.US_ASCII))) {
                 for (String line; (line = reader.readLine()) != null; ) {
@@ -152,6 +156,8 @@ public class ProbeActivity extends Activity {
             outcome = ip.isEmpty() ? "ERROR:no-ip" : "ALLOWED";
         } catch (UnknownHostException e) {
             outcome = "NO_ADDRESS";
+        } catch (ConnectFailed e) {
+            outcome = e.getMessage();
         } catch (SocketTimeoutException e) {
             outcome = "TIMEOUT";
         } catch (IOException e) {
