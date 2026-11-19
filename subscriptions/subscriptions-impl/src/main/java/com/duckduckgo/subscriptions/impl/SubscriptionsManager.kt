@@ -609,7 +609,8 @@ class RealSubscriptionsManager @Inject constructor(
                 coroutineScope.launch { authClient.tryLogout(accessTokenV2 = jwt) }
             }
         }
-        authRepository.clearTokensAndHistory()
+        authRepository.clearTokens()
+        tokenRefreshWideEvent.onSignOut()
         authRepository.setSubscription(null)
         authRepository.setEntitlements(emptyList())
         authRepository.removeLocalPurchasedAt()

@@ -59,10 +59,6 @@ class FakeSubscriptionsDataStore(
     override var pendingPlans: String? = null
     override var planCountry: String? = null
 
-    override var tokenRefreshFailureStreak: Int = 0
-    override var lastTokenRefreshSuccessAt: Long? = null
-    override var lastTokenRefreshProcess: String? = null
-
     override fun isAvailable(): Boolean = available
 
     override fun hasRefreshTokenV2Entry(): Boolean = available && (refreshTokenV2 != null || simulateUnreadableRefreshToken)
@@ -88,7 +84,7 @@ class FakeSubscriptionsDataStore(
         return true
     }
 
-    override fun clearTokensAndHistory(): Boolean {
+    override fun clearTokens(): Boolean {
         if (!available) return false
         accessTokenV2 = null
         accessTokenV2ExpiresAt = null
@@ -98,9 +94,6 @@ class FakeSubscriptionsDataStore(
         authToken = null
         email = null
         externalId = null
-        tokenRefreshFailureStreak = 0
-        lastTokenRefreshSuccessAt = null
-        lastTokenRefreshProcess = null
         return true
     }
 }

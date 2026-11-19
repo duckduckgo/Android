@@ -91,6 +91,7 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onSkipped()
     suspend fun onSuccess()
     suspend fun onFailure(e: Exception)
+    suspend fun onSignOut()
 }
 
 @SingleIn(AppScope::class)
@@ -356,6 +357,10 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
 
     private suspend fun recordRefreshFailure() {
         runCatching { store.recordRefreshFailure() }
+    }
+
+    override suspend fun onSignOut() {
+        runCatching { store.clearRefreshHistory() }
     }
 
     override suspend fun onBackendErrorResponse(
