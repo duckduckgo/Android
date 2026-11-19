@@ -72,7 +72,7 @@ class CloseTabsClientToolTest {
 
     @Test
     fun whenInputMatchesSchemaThenValid() {
-        listOf(JSONObject(), JSONObject().put("tabIds", JSONArray(List(50) { A }))).forEach {
+        listOf(JSONObject().put("tabIds", JSONArray(listOf(A))), JSONObject().put("tabIds", JSONArray(List(50) { A }))).forEach {
             assertTrue(it.toString(), testee.isValidInput(it))
         }
     }
@@ -80,6 +80,7 @@ class CloseTabsClientToolTest {
     @Test
     fun whenInputBreaksSchemaThenInvalidArguments() = runTest {
         listOf(
+            """{}""",
             """{"tabIds":[]}""",
             JSONObject().put("tabIds", JSONArray(List(51) { A })).toString(),
             """{"tabIds":"$A"}""",
@@ -93,19 +94,8 @@ class CloseTabsClientToolTest {
     }
 
     @Test
-    fun whenTabIdsOmittedThenTheHostTabCloses() = runTest {
+    fun whenTabIdsOmittedThenNothingClosesEvenOnAWebPageHostTab() = runTest {
         givenTab(HOST, "https://example.com/")
-
-        val value = success(testee.execute(JSONObject(), regular))
-
-        assertEquals("""{"tabs":[{"tabId":"$HOST","closed":true}]}""", value.toString())
-        verify(regularTabs).deleteTabs(listOf(HOST))
-    }
-
-    @Test
-    fun whenTabIdsOmittedAndTheChatIsADuckAiTabThenInvalidArguments() = runTest {
-        whenever(duckChat.isDuckChatUrl(Uri.parse("https://duck.ai/chat"))).thenReturn(true)
-        givenTab(HOST, "https://duck.ai/chat")
 
         assertEquals(ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS), testee.execute(JSONObject(), regular))
         verify(regularTabs, never()).deleteTabs(any())
