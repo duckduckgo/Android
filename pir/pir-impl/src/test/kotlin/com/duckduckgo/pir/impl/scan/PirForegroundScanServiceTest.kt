@@ -38,6 +38,8 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -108,5 +110,47 @@ class PirForegroundScanServiceTest {
         verifyBlocking(pirJobsRunner, times(1)) { runEligibleJobs(any(), any(), any()) }
         verify(pirNotificationManager, times(2)).createScanStatusNotification(any(), any())
         assertFalse(shadowOf(service).isStoppedBySelf)
+    }
+
+    @Test
+    fun `test paid run keeps the feature name as the scan notification title`() {
+        wheneverBlocking { pirJobsRunner.runEligibleJobs(any(), any(), any()) }.doSuspendableAnswer { awaitCancellation() }
+
+        service.onStartCommand(PirForegroundScanService.intentFor(service, PirExecutionType.MANUAL_INITIAL), 0, 1)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(pirNotificationManager, times(1)).createScanStatusNotification(eq(FEATURE_NAME), any())
+        verify(pirNotificationManager, never()).createScanStatusNotification(eq(FREE_SCAN_TITLE), any())
+    }
+
+    @Test
+    fun `test free run updates the scan notification title to the free scan title`() {
+        wheneverBlocking { pirWorkHandler.canRunPir() } doReturn flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY))
+        wheneverBlocking { pirJobsRunner.runEligibleJobs(any(), any(), any()) }.doSuspendableAnswer { awaitCancellation() }
+
+        service.onStartCommand(PirForegroundScanService.intentFor(service, PirExecutionType.MANUAL_INITIAL), 0, 1)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        inOrder(pirNotificationManager) {
+            verify(pirNotificationManager).createScanStatusNotification(eq(FEATURE_NAME), any())
+            verify(pirNotificationManager).createScanStatusNotification(eq(FREE_SCAN_TITLE), any())
+        }
+    }
+
+    @Test
+    fun `test show intent during a free run shows the free scan title`() {
+        wheneverBlocking { pirWorkHandler.canRunPir() } doReturn flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY))
+        wheneverBlocking { pirJobsRunner.runEligibleJobs(any(), any(), any()) }.doSuspendableAnswer { awaitCancellation() }
+        service.onStartCommand(PirForegroundScanService.intentFor(service, PirExecutionType.MANUAL_INITIAL), 0, 1)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        service.onStartCommand(PirForegroundScanService.intentForShowScanNotification(service), 0, 2)
+
+        verify(pirNotificationManager, times(2)).createScanStatusNotification(eq(FREE_SCAN_TITLE), any())
+    }
+
+    private companion object {
+        const val FEATURE_NAME = "Personal Information Removal"
+        const val FREE_SCAN_TITLE = "Free Personal Information Scan"
     }
 }
