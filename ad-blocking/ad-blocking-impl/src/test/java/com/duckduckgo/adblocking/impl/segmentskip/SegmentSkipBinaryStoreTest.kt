@@ -19,11 +19,16 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Test
@@ -37,7 +42,6 @@ import java.nio.ByteOrder
 import java.security.MessageDigest
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 
 @RunWith(AndroidJUnit4::class)
@@ -70,46 +74,45 @@ class SegmentSkipBinaryStoreTest {
         assertFalse(invalid.contains("00000001"))
     }
 
-    @Test fun concurrentFirstAccessLoadsSnapshotOnce() = runBlocking {
+    @Test fun concurrentFirstAccessLoadsSnapshotOnce() = runTest {
         clean()
         file.writeBytes(full(1, listOf(1)))
-        val fresh = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
-        val started = CountDownLatch(1)
-        val resume = CountDownLatch(1)
-        val checkpoints = AtomicInteger()
-        fresh.onLoadCheckpoint = {
-            if (checkpoints.incrementAndGet() == 1) {
-                started.countDown()
-                check(resume.await(5, TimeUnit.SECONDS))
+        var ioRequests = 0
+        val io = StandardTestDispatcher(testScheduler)
+        val dispatchers = object : DispatcherProvider {
+            override fun io(): CoroutineDispatcher {
+                ioRequests++
+                return io
             }
         }
-        val first = async(DefaultDispatcherProvider().io()) { fresh.revision() }
-        assertTrue(started.await(5, TimeUnit.SECONDS))
-        val second = async(DefaultDispatcherProvider().io(), start = CoroutineStart.UNDISPATCHED) { fresh.contains("00000001") }
-        try {
-            assertFalse(second.isCompleted)
-        } finally {
-            resume.countDown()
-        }
+        val fresh = SegmentSkipBinaryStore(context, dispatchers)
+        val first = async(start = CoroutineStart.UNDISPATCHED) { fresh.revision() }
+        val second = async(start = CoroutineStart.UNDISPATCHED) { fresh.contains("00000001") }
+        assertFalse(first.isCompleted)
+        assertFalse(second.isCompleted)
+        advanceUntilIdle()
         assertEquals(1L, first.await())
         assertTrue(second.await())
-        val afterLoad = checkpoints.get()
         assertTrue(fresh.contains("00000001"))
-        assertEquals(afterLoad, checkpoints.get())
+        assertEquals(1, ioRequests)
     }
 
-    @Test fun cancelledFirstLoadCanBeRetried() = runBlocking {
+    @Test fun cancelledFirstLoadCanBeRetried() = runTest {
         clean()
         file.writeBytes(full(1, listOf(1)))
-        val fresh = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
-        lateinit var job: Job
-        fresh.onLoadCheckpoint = { job.cancel() }
-        job = launch(DefaultDispatcherProvider().io(), start = CoroutineStart.LAZY) { fresh.revision() }
-        job.start()
-        job.join()
+        val io = StandardTestDispatcher(testScheduler)
+        val dispatchers = object : DispatcherProvider {
+            override fun io(): CoroutineDispatcher = io
+        }
+        val fresh = SegmentSkipBinaryStore(context, dispatchers)
+        val job = launch(start = CoroutineStart.UNDISPATCHED) { fresh.revision() }
+        assertFalse(job.isCompleted)
+        job.cancel()
+        advanceUntilIdle()
         assertTrue(job.isCancelled)
-        fresh.onLoadCheckpoint = null
-        assertEquals(1L, fresh.revision())
+        val retry = async { fresh.revision() }
+        advanceUntilIdle()
+        assertEquals(1L, retry.await())
         assertTrue(fresh.contains("00000001"))
     }
 

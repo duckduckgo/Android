@@ -53,8 +53,6 @@ class SegmentSkipBinaryStore @Inject constructor(
 
     @VisibleForTesting internal var onUpdateCheckpoint: (() -> Unit)? = null
 
-    @VisibleForTesting internal var onLoadCheckpoint: (() -> Unit)? = null
-
     @Volatile private var loaded: Loaded? = null
 
     suspend fun revision(): Long = currentSnapshot()?.revision ?: 0L
@@ -136,7 +134,6 @@ class SegmentSkipBinaryStore @Inject constructor(
         val snapshot = withContext(dispatchers.io()) {
             val coroutineContext = currentCoroutineContext()
             val checkCancellation = {
-                onLoadCheckpoint?.invoke()
                 coroutineContext.ensureActive()
             }
             try {
