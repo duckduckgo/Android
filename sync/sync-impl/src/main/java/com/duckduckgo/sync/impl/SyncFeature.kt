@@ -64,9 +64,6 @@ interface SyncFeature {
     fun aiChatSync(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun syncAutoRestore(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendSyncSetupWideEvent(): Toggle
 
     /**

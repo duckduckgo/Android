@@ -353,7 +353,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.thirdPartyRecoveryCodeDecodedTextView.text = decodeThirdPartyRecoveryCode(viewState.thirdPartyRecoveryCode)
         binding.checkLinkingCodeResultTextView.text = viewState.checkLinkingCodeResult
         binding.connectedDevicesList.removeAllViews()
-        binding.blockStoreFeatureFlag.text = viewState.blockStoreFeatureFlagText
         binding.blockStoreAvailability.text = viewState.blockStoreAvailabilityText
         binding.blockStoreApiInUse.text = viewState.blockStoreApiLevelText
         binding.blockStoreDeviceLockStatus.text = viewState.blockStoreDeviceLockText
