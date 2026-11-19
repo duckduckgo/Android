@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Sinu tagasimakset töödeldakse.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Me ei saanud sinu taganemisavaldust automaatselt töödelda. Palun mine <annotation type="withdrawal_help_link">sellele lehele</annotation>, et taganemine lõpule viia.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Aegub</string>
+    <string name="subscriptionExpiringIconContentDescription">Tellimus aegub</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Sinu tellimus aegub %1$s.</string>
+    <string name="subscriptionKeepSubscription">Jätka tellimust</string>
+
 </resources>
