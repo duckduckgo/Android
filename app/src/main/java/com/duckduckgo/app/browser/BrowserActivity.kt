@@ -1443,6 +1443,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     return@launch
                 }
                 entryPoint?.let { duckChat.reportDuckChatEntry(it, opensNewTab = false, hasPrompt = false) }
+                // The launch below delivers the image action itself, so the one-shot flag must not outlive it.
+                consumeDuckChatForceImageGeneration()
                 isDuckChatVisible = true
                 // Swiping tabs tag their fragments by adapter id, so the tab id is matched on the fragment itself.
                 val fragment = supportFragmentManager.fragments.filterIsInstance<BrowserTabFragment>().firstOrNull { it.tabId == emptyTabId }
