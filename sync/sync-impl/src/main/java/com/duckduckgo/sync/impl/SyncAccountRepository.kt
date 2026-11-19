@@ -172,7 +172,6 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncPixels: SyncPixels,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val syncFeature: SyncFeature,
     private val deviceKeyGenerator: DeviceKeyGenerator,
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val syncJweCrypto: SyncJweCrypto,
@@ -221,11 +220,7 @@ class AppSyncAccountRepository @Inject constructor(
             }
 
             is Exchange -> {
-                if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
-                    logcat(WARN) { "Sync: Scanned exchange code type but exchanging keys to sync with another device is disabled" }
-                } else {
-                    return onInvitationCodeReceived(code.b64Code)
-                }
+                return onInvitationCodeReceived(code.b64Code)
             }
 
             else -> {
@@ -377,10 +372,9 @@ class AppSyncAccountRepository @Inject constructor(
     private fun login(recoveryCode: RecoveryCode, existingDeviceId: String? = null): Result<Boolean> {
         var wasUserLogout = false
         if (isSignedIn()) {
-            val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
             val error = Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in").alsoFireAlreadySignedInErrorPixel()
             val deviceCount = runBlocking { connectedDevicesRepository.latestConnectedDeviceCount() }
-            if (allowSwitchAccount && deviceCount == 1) {
+            if (deviceCount == 1) {
                 val thisDeviceId = syncStore.deviceId.orEmpty()
                 val result = logout(thisDeviceId)
                 if (result is Error) {

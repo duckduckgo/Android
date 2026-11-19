@@ -43,12 +43,6 @@ interface SyncFeature {
     fun level3AllowCreateAccount(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun seamlessAccountSwitching(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun exchangeKeysToSyncWithAnotherDevice(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun automaticallyUpdateSyncSettings(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
