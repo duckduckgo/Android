@@ -75,6 +75,7 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor(
                     "cancelEdit",
                     "getAIChats",
                     "aiChatPromoVisibility",
+                    "executeClientTool",
                 )
         }
 }
