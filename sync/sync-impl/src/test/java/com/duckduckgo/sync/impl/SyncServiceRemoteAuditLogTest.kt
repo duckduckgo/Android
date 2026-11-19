@@ -16,8 +16,6 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncService.Companion.SYNC_PROD_ENVIRONMENT_URL
 import com.duckduckgo.sync.impl.auditlog.AuditLogResult
 import com.duckduckgo.sync.store.SyncStore
@@ -43,10 +41,7 @@ class SyncServiceRemoteAuditLogTest {
     private val syncService: SyncService = mock()
     private val syncStore: SyncStore = mock()
     private val call: Call<AuditLogResponse> = mock()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
-        preventStaleTokenLogout().setRawStoredState(State(true))
-    }
-    private val syncRemote = SyncServiceRemote(syncService, syncStore, mock(), syncFeature)
+    private val syncRemote = SyncServiceRemote(syncService, syncStore, mock())
 
     @Before
     fun setup() {
