@@ -96,7 +96,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
                         appWidgetId = appWidgetId,
                         remoteViews = it,
                         state = state,
-                        showChats = state.hasChats() && heightDp >= MIN_CHATS_HEIGHT_DP,
+                        showChats = showChats,
                         showLabels = showLabels,
                     )
                 }
@@ -116,13 +116,15 @@ class DuckAiWidgetConfigurator @Inject constructor(
             }
             return RemoteViews(variants)
         }
-        return RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight).also {
+        val showChats = state.hasChats() && heightDp >= MIN_CHATS_HEIGHT_DP
+        val layout = if (showChats) R.layout.duck_ai_widget_daynight else R.layout.duck_ai_widget_compact_daynight
+        return RemoteViews(context.packageName, layout).also {
             render(
                 context = context,
                 appWidgetId = appWidgetId,
                 remoteViews = it,
                 state = state,
-                showChats = state.hasChats() && heightDp >= MIN_CHATS_HEIGHT_DP,
+                showChats = showChats,
                 showLabels = widthDp >= MIN_LABELS_WIDTH_DP,
             )
         }

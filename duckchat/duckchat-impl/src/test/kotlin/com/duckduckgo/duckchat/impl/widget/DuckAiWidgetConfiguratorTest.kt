@@ -23,6 +23,7 @@ import android.util.SizeF
 import android.util.Xml
 import android.view.View
 import android.view.View.MeasureSpec
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RemoteViews
@@ -290,6 +291,35 @@ class DuckAiWidgetConfiguratorTest {
 
         assertEquals(setOf(SizeF(180f, COMPACT_HEIGHT_DP), SizeF(MIN_LABELS_WIDTH_DP.toFloat(), COMPACT_HEIGHT_DP)), variants.keys)
         variants.values.forEach { assertEquals(View.GONE, chatsSectionVisibility(it)) }
+    }
+
+    @Test
+    @Config(sdk = [30], qualifiers = "mdpi")
+    fun whenNoChatsBelowApi31ThenTallHostShowsACardWrappingItsControls() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true, chats = emptyList())
+        val parent = FrameLayout(activity)
+        val root = testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400).apply(activity, parent)
+        parent.addView(root)
+        parent.measure(MeasureSpec.makeMeasureSpec(360, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(400, MeasureSpec.EXACTLY))
+        parent.layout(0, 0, 360, 400)
+        val card = root.findViewById<View>(R.id.duckAiWidgetContainer)
+
+        assertEquals(card.findViewById<View>(R.id.actionsRow).bottom + card.paddingBottom, card.height)
+    }
+
+    @Test
+    @Config(sdk = [30], qualifiers = "mdpi")
+    fun whenChatsShownBelowApi31ThenCardFillsTheHost() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+        val parent = FrameLayout(activity)
+        val root = testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 400).apply(activity, parent)
+        parent.addView(root)
+        parent.measure(MeasureSpec.makeMeasureSpec(360, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(400, MeasureSpec.EXACTLY))
+        parent.layout(0, 0, 360, 400)
+
+        val card = root.findViewById<View>(R.id.duckAiWidgetContainer)
+        val margins = card.layoutParams as ViewGroup.MarginLayoutParams
+        assertEquals(parent.height - margins.topMargin - margins.bottomMargin, card.height)
     }
 
     @Test
