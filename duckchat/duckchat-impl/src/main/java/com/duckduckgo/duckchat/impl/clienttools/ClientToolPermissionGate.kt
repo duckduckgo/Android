@@ -120,6 +120,7 @@ class RealClientToolPermissionGate @Inject constructor(
                 context.browserMode,
                 toAsk,
                 toolsRemovable = browserToolsFeature.requestAccessRemoveTools().isEnabled(),
+                contextual = context.contextual,
             )
             when (val answer = prompt.request(request)) {
                 is ClientToolPermissionAnswer.AllowForChat -> {
@@ -164,7 +165,7 @@ class RealClientToolPermissionGate @Inject constructor(
         tool: AskingTool,
         context: ClientToolCallContext,
     ): ClientToolPermissionDecision =
-        when (prompt.request(ClientToolPermissionRequest.RunTool(context.chatTabId, context.browserMode, tool))) {
+        when (prompt.request(ClientToolPermissionRequest.RunTool(context.chatTabId, context.browserMode, tool, context.contextual))) {
             is ClientToolPermissionAnswer.AllowForChat -> {
                 // Without a chat ID there is no chat to remember the answer for, so it covers this call only.
                 context.chatId?.let { chatGrants.grant(it, listOf(tool.name)) }

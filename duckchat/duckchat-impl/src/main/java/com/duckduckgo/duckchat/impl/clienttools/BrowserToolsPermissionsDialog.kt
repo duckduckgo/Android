@@ -34,7 +34,7 @@ import com.duckduckgo.duckchat.impl.databinding.ItemClientToolGrantAccessBinding
 import com.duckduckgo.mobile.android.R as CommonR
 
 /**
- * Asks before Duck.ai uses [tools]. One tool gets its own copy under a pictogram badged with its icon.
+ * Asks the user about [request]. One tool gets its own copy under a pictogram badged with its icon.
  * Several tools are listed, each with a checkbox, in a height capped list that scrolls on its own.
  * The whole dialog scrolls only on screens too short for the header and buttons, such as a phone in landscape.
  * Looks like the design system's rebrand stacked dialog, which has no room for the badge or the list.
@@ -44,7 +44,7 @@ import com.duckduckgo.mobile.android.R as CommonR
  */
 class BrowserToolsPermissionsDialog(
     private val activity: Activity,
-    private val tools: List<AskingTool>,
+    private val request: ClientToolPermissionRequest,
     private val selection: () -> GrantAccessSelection?,
     private val onToggle: (toolName: String) -> Unit,
     private val onAnswer: (ClientToolPermissionAnswer) -> Unit,
@@ -65,6 +65,10 @@ class BrowserToolsPermissionsDialog(
 
     override fun build(): DaxAlertDialog {
         val binding = DialogBrowserToolsPermissionsBinding.inflate(LayoutInflater.from(activity)).also { binding = it }
+        val tools = when (request) {
+            is ClientToolPermissionRequest.RunTool -> listOf(request.tool)
+            is ClientToolPermissionRequest.GrantAccess -> request.tools
+        }
         when (val tool = tools.singleOrNull()) {
             null -> {
                 binding.browserToolsPermissionsTitle.setText(R.string.duckAiClientToolRequestAccessPromptTitle)

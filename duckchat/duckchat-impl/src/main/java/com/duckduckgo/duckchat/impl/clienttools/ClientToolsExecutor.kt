@@ -45,6 +45,7 @@ interface ClientToolsExecutor {
         pageUrl: String?,
         chatTabId: String,
         browserMode: BrowserMode,
+        contextual: Boolean = false,
     ): JSONObject
 
     /** Settles the calls of [chatTabId] still waiting for a permission decision as `cancelled`, so their tools never run. */
@@ -84,6 +85,7 @@ class RealClientToolsExecutor @Inject constructor(
         pageUrl: String?,
         chatTabId: String,
         browserMode: BrowserMode,
+        contextual: Boolean,
     ): JSONObject {
         val parsed = ParsedExecuteClientToolRequest.parse(params)
         val caller = caller(pageUrl, browserMode) ?: return failureReply(parsed.callId, ClientToolErrorCode.UNAVAILABLE)
@@ -91,7 +93,7 @@ class RealClientToolsExecutor @Inject constructor(
             is Malformed -> return failureReply(parsed.callId, ClientToolErrorCode.INVALID_ARGUMENTS)
             is Valid -> parsed.request
         }
-        val context = ClientToolCallContext(chatTabId, browserMode, request.chatId ?: caller.pageChatId)
+        val context = ClientToolCallContext(chatTabId, browserMode, request.chatId ?: caller.pageChatId, contextual)
         val result = if (request.name == RequestAccess.NAME) requestAccess(request, context) else run(request, context)
         logcat {
             val chatIdSource = when {

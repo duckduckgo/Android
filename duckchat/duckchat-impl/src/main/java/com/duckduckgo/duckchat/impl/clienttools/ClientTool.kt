@@ -58,11 +58,13 @@ sealed interface ClientToolPermissionMode {
 /**
  * @param chatTabId the tab the chat belongs to: the Duck.ai tab itself, or the page tab hosting the contextual sheet.
  * @param chatId the Duck.ai conversation, or null when the page has not started one.
+ * @param contextual whether the chat runs in the contextual sheet rather than a Duck.ai tab.
  */
 data class ClientToolCallContext(
     val chatTabId: String,
     val browserMode: BrowserMode,
     val chatId: String?,
+    val contextual: Boolean = false,
 )
 
 sealed interface ClientToolResult {

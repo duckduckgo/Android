@@ -19,7 +19,9 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -30,6 +32,12 @@ import com.duckduckgo.duckchat.api.PageContextTrigger
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionAnswer
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionRequest
+import com.duckduckgo.duckchat.impl.clienttools.GrantAccessSelection
+import com.duckduckgo.duckchat.impl.clienttools.GrantAccessSelections
+import com.duckduckgo.duckchat.impl.clienttools.PendingClientToolPermission
+import com.duckduckgo.duckchat.impl.clienttools.PublishingClientToolPermissionPrompt
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -46,15 +54,20 @@ import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -94,6 +107,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val entryWideEvent: DuckAiEntryWideEvent,
     promoCampaignJSHelper: PromoCampaignJSHelper,
     private val pdfPageContextResolver: PdfPageContextResolver,
+    private val clientToolPermissionPrompt: PublishingClientToolPermissionPrompt,
+    // Lazy, as in RealNativeInputStateStore: TabDataRepository injects duckchat bindings itself.
+    private val tabRepositoryProvider: Lazy<BrowserModeDataProvider<TabRepository>>,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -181,7 +197,12 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         data class OpenSearchInNewTab(val query: String) : Command()
         data class ApplyContextualReopened(val tabId: String) : Command()
         data class ApplyContextualClosed(val tabId: String) : Command()
+        data class ShowClientToolPermissionDialog(val request: ClientToolPermissionRequest) : Command()
+        data object DismissClientToolPermissionDialog : Command()
     }
+
+    private var shownClientToolPermission: PendingClientToolPermission? = null
+    private val clientToolPermissionSelections = GrantAccessSelections()
 
     private val _viewState: MutableStateFlow<ViewState> = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -196,6 +217,48 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         promoCampaignJSHelper.promoRecordEvents
             .onEach { event -> _subscriptionEventDataChannel.trySend(event) }
             .launchIn(viewModelScope)
+        observeClientToolPermissionPrompts()
+    }
+
+    /** Shows the sheet's pending tool permission prompt while its page's tab is the selected one, and hides it otherwise. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeClientToolPermissionPrompts() {
+        viewState
+            .map { it.tabId }
+            .distinctUntilChanged()
+            .flatMapLatest { tabId ->
+                if (tabId.isEmpty()) {
+                    flowOf(null)
+                } else {
+                    combine(
+                        clientToolPermissionPrompt.pendingFor(tabId, contextual = true),
+                        tabRepositoryProvider.value.forMode(browserMode).flowSelectedTab.map { it?.tabId == tabId }.distinctUntilChanged(),
+                    ) { pending, selected -> pending.takeIf { selected } }
+                }
+            }
+            .distinctUntilChanged()
+            .onEach { showClientToolPermission(it) }
+            .launchIn(viewModelScope)
+    }
+
+    private fun showClientToolPermission(pending: PendingClientToolPermission?) {
+        if (pending === shownClientToolPermission) return
+        if (shownClientToolPermission != null) commandChannel.trySend(Command.DismissClientToolPermissionDialog)
+        shownClientToolPermission = pending?.takeIf { it.isOpen }
+        shownClientToolPermission?.let { commandChannel.trySend(Command.ShowClientToolPermissionDialog(it.request)) }
+    }
+
+    fun clientToolPermissionSelection(): GrantAccessSelection? =
+        shownClientToolPermission?.let { clientToolPermissionSelections.of(it) }
+
+    fun onClientToolPermissionToggled(toolName: String) {
+        val pending = shownClientToolPermission ?: return
+        clientToolPermissionSelections.update(pending) { it.toggle(toolName) }
+    }
+
+    fun onClientToolPermissionAnswered(answer: ClientToolPermissionAnswer) {
+        shownClientToolPermission?.answer(answer)
+        shownClientToolPermission = null
     }
 
     data class ViewState(

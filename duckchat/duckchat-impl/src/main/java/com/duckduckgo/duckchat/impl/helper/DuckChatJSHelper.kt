@@ -309,7 +309,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_EXECUTE_CLIENT_TOOL ->
                 id?.let {
-                    val reply = clientToolsExecutor.execute(data, pageUrl, tabId, browserMode)
+                    val reply = clientToolsExecutor.execute(data, pageUrl, tabId, browserMode, contextual = mode == Mode.CONTEXTUAL)
                     JsCallbackData(reply, featureName, method, it)
                 }
 

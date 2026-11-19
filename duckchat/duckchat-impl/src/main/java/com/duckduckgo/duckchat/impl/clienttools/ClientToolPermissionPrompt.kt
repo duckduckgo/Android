@@ -21,9 +21,12 @@ import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface ClientToolPermissionPrompt {
@@ -31,16 +34,18 @@ interface ClientToolPermissionPrompt {
     suspend fun request(request: ClientToolPermissionRequest): ClientToolPermissionAnswer
 }
 
-/** What the prompt asks for, in the chat of [chatTabId]. */
+/** What the prompt asks for, in the chat of [chatTabId]; [contextual] when that chat runs in the contextual sheet. */
 sealed interface ClientToolPermissionRequest {
     val chatTabId: String
     val browserMode: BrowserMode
+    val contextual: Boolean
 
     /** Asks to run one tool now. */
     data class RunTool(
         override val chatTabId: String,
         override val browserMode: BrowserMode,
         val tool: AskingTool,
+        override val contextual: Boolean = false,
     ) : ClientToolPermissionRequest
 
     /**
@@ -52,6 +57,7 @@ sealed interface ClientToolPermissionRequest {
         override val browserMode: BrowserMode,
         val tools: List<AskingTool>,
         val toolsRemovable: Boolean,
+        override val contextual: Boolean = false,
     ) : ClientToolPermissionRequest
 }
 
@@ -82,13 +88,25 @@ class PendingClientToolPermission(
     }
 }
 
-/** Publishes the open prompt for [ClientToolPermissionDialogPresenter] to show; the gate keeps it to one at a time. */
+/**
+ * Publishes the open prompt to the screen hosting its chat, which shows the dialog and answers it.
+ * The gate keeps it to one prompt at a time.
+ */
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class PublishingClientToolPermissionPrompt @Inject constructor() : ClientToolPermissionPrompt {
 
     private val _pending = MutableStateFlow<PendingClientToolPermission?>(null)
     val pending: StateFlow<PendingClientToolPermission?> = _pending.asStateFlow()
+
+    /** The open prompt of the chat in [chatTabId], hosted in the contextual sheet when [contextual], or null. */
+    fun pendingFor(
+        chatTabId: String,
+        contextual: Boolean,
+    ): Flow<PendingClientToolPermission?> =
+        pending
+            .map { prompt -> prompt?.takeIf { it.request.chatTabId == chatTabId && it.request.contextual == contextual } }
+            .distinctUntilChanged()
 
     override suspend fun request(request: ClientToolPermissionRequest): ClientToolPermissionAnswer {
         val reply = CompletableDeferred<ClientToolPermissionAnswer>()

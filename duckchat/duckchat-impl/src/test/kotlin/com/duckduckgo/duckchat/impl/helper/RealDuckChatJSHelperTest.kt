@@ -509,6 +509,25 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenExecuteClientToolFromContextualSheetThenTheCallIsMarkedContextual() = runTest {
+        fakeClientTool.enabled = true
+        val params = JSONObject("""{"callId":"c1","capability":{"name":"listOpenTabs","version":1},"input":{}}""")
+
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "executeClientTool",
+            "1",
+            params,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+            pageUrl = "https://duck.ai/chat",
+        )
+        testee.processJsCallbackMessage("aiChat", "executeClientTool", "2", params, tabId = "tab-1", pageUrl = "https://duck.ai/chat")
+
+        assertEquals(listOf(true, false), fakeClientTool.calls.map { it.second.contextual })
+    }
+
+    @Test
     fun whenCancelPendingClientToolCallsThenTheTabsWaitingCallsAreCancelled() {
         testee.cancelPendingClientToolCalls("tab-1")
 

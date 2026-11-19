@@ -17,14 +17,25 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.Event
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.PageContextTrigger
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.clienttools.AskingTool
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionAnswer
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionMode
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionRequest
+import com.duckduckgo.duckchat.impl.clienttools.PublishingClientToolPermissionPrompt
+import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualWebViewViewModel.Command
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -44,11 +55,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
@@ -60,6 +73,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -67,6 +81,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualWebViewViewModel.Command.ShowClientToolPermissionDialog as ShowToolDialog
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -77,6 +92,9 @@ class DuckChatContextualWebViewViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: DuckChatContextualWebViewViewModel
+    private val clientToolPermissionPrompt = PublishingClientToolPermissionPrompt()
+    private val selectedTab = MutableStateFlow<TabEntity?>(TabEntity(tabId = "tab-1", position = 0))
+    private val tabRepository: TabRepository = mock { on { flowSelectedTab } doReturn selectedTab }
     private val duckChat: com.duckduckgo.duckchat.api.DuckChat = FakeDuckChat()
     private val duckChatInternal: DuckChatInternal = mock()
     private val duckChatJSHelper: DuckChatJSHelper = mock()
@@ -949,6 +967,74 @@ class DuckChatContextualWebViewViewModelTest {
         }
     }
 
+    @Test
+    fun whenSheetsToolPermissionPromptOpensWhileItsTabIsSelectedThenDialogIsShownAndTheAnswerGoesBack() = runTest {
+        testee.onSheetOpened("tab-1")
+        val request = toolPermissionRequest(chatTabId = "tab-1", contextual = true)
+
+        testee.commands.test {
+            val reply = async { clientToolPermissionPrompt.request(request) }
+
+            assertEquals(request, awaitCommand<ShowToolDialog>().request)
+            testee.onClientToolPermissionAnswered(ClientToolPermissionAnswer.AllowForChat())
+            assertEquals(ClientToolPermissionAnswer.AllowForChat(), reply.await())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToolPermissionPromptBelongsToTheDuckAiTabThenTheSheetDoesNotShowIt() = runTest {
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            val reply = async { clientToolPermissionPrompt.request(toolPermissionRequest(chatTabId = "tab-1", contextual = false)) }
+            advanceUntilIdle()
+
+            assertTrue(cancelAndConsumeRemainingEvents().none { it is Event.Item && it.value is ShowToolDialog })
+            reply.cancel()
+        }
+    }
+
+    @Test
+    fun whenSheetsTabIsNotSelectedThenThePromptWaitsUntilItIs() = runTest {
+        selectedTab.value = TabEntity(tabId = "other", position = 0)
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            val reply = async { clientToolPermissionPrompt.request(toolPermissionRequest(chatTabId = "tab-1", contextual = true)) }
+            advanceUntilIdle()
+            assertTrue(cancelAndConsumeRemainingEvents().none { it is Event.Item && it.value is ShowToolDialog })
+            reply.cancel()
+        }
+
+        testee.commands.test {
+            val reply = async { clientToolPermissionPrompt.request(toolPermissionRequest(chatTabId = "tab-1", contextual = true)) }
+            advanceUntilIdle()
+            selectedTab.value = TabEntity(tabId = "tab-1", position = 0)
+
+            awaitCommand<ShowToolDialog>()
+            reply.cancel()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private suspend inline fun <reified T : Command> ReceiveTurbine<Command>.awaitCommand(): T {
+        while (true) {
+            val command = awaitItem()
+            if (command is T) return command
+        }
+    }
+
+    private fun toolPermissionRequest(
+        chatTabId: String,
+        contextual: Boolean,
+    ) = ClientToolPermissionRequest.RunTool(
+        chatTabId = chatTabId,
+        browserMode = BrowserMode.REGULAR,
+        tool = AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(1, 2, 3, 4)),
+        contextual = contextual,
+    )
+
     private fun buildViewModel() = DuckChatContextualWebViewViewModel(
         pdfPageContextResolver = pdfPageContextResolver,
         dispatchers = coroutineRule.testDispatcherProvider,
@@ -969,6 +1055,12 @@ class DuckChatContextualWebViewViewModelTest {
         browserMode = BrowserMode.REGULAR,
         entryWideEvent = entryWideEvent,
         promoCampaignJSHelper = promoCampaignJSHelper,
+        clientToolPermissionPrompt = clientToolPermissionPrompt,
+        tabRepositoryProvider = lazy {
+            object : BrowserModeDataProvider<TabRepository> {
+                override fun forMode(mode: BrowserMode): TabRepository = tabRepository
+            }
+        },
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
