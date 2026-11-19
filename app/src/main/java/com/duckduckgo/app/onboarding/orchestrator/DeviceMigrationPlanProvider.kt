@@ -109,7 +109,7 @@ class DeviceMigrationPlanProvider @Inject constructor(
         dialog = NewUserOnboardingActivityDialog.MigrationAllSet,
     ) { event ->
         if (event is NewUserOnboardingEvent.ContinueClicked) {
-            pixel.fire(DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
+            pixel.enqueueFire(DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
             Advance
         } else {
             Stay
