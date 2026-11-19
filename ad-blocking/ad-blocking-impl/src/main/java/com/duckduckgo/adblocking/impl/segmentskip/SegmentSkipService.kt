@@ -26,15 +26,15 @@ import dev.zacsweers.metro.SingleIn
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Path
 import javax.inject.Named
 
 interface SegmentSkipService {
-    @GET(SEGMENTS_ENDPOINT)
-    suspend fun getSegments(@Query("hashPrefix") hashPrefix: String): Response<List<VideoSegmentsResponse>>
+    @GET("$SEGMENTS_ENDPOINT/{hashPrefix}")
+    suspend fun getSegments(@Path("hashPrefix") hashPrefix: String): Response<List<VideoSegmentsResponse>>
 
     companion object {
-        private const val SEGMENTS_ENDPOINT = "https://protection.duckduckgo.com/api/protection/segments/v1/android/matches"
+        private const val SEGMENTS_ENDPOINT = "https://duckduckgo.com/sponsorblock/v1/segments"
     }
 }
 
