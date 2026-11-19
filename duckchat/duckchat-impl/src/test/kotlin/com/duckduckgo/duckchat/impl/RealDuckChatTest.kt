@@ -56,6 +56,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -78,8 +79,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -163,6 +166,51 @@ class RealDuckChatTest {
 
         whenever(mockBrowserNav.openDuckChat(any(), any(), anyOrNull(), any())).thenReturn(mockIntent)
         whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
+    }
+
+    @Test
+    fun reproPlacedWidgetUpdateDuringColdStartLeavesEveryTargetUnwired() = runTest {
+        val readSetting = kotlinx.coroutines.CompletableDeferred<Boolean>()
+        mockDuckChatFeatureRepository.stub {
+            onBlocking { isDuckChatUserEnabled() }.doSuspendableAnswer { readSetting.await() }
+        }
+        val cold = RealDuckChat(
+            mockDuckChatFeatureRepository,
+            mockAddressBarPickerAttributionRepository,
+            duckChatFeature,
+            moshi,
+            dispatcherProvider,
+            mockGlobalActivityStarter,
+            mockContext,
+            true,
+            coroutineRule.testScope,
+            lazy { mockDuckChatPixels },
+            imageUploadFeature,
+            mockBrowserNav,
+            mockDeviceSyncState,
+            cookiesManager,
+            mockDuckAiHostProvider,
+            mockAppBuildConfig,
+            mockVoiceSessionStateManager,
+            chatSuggestionsStore,
+            mockDuckAiTabSessionRepository,
+            mockDuckAiModelManager,
+            lazy { entryWideEvent },
+        )
+        val views = mock<android.widget.RemoteViews>()
+        val renderer = com.duckduckgo.duckchat.impl.widget.DuckAiWidgetConfigurator(
+            duckChatFeature,
+            mockDuckChatFeatureRepository,
+            mock(),
+            dispatcherProvider,
+        )
+        val render = async { renderer.populateRemoteViews(mockContext, views) }
+        readSetting.complete(true)
+        render.await()
+        coroutineRule.testScope.advanceUntilIdle()
+        org.junit.Assert.assertTrue("Duck.ai is now enabled", cold.isEnabled())
+        val count = org.mockito.Mockito.mockingDetails(views).invocations.count { it.method.name == "setOnClickPendingIntent" }
+        org.junit.Assert.assertEquals("installed widget targets after settings load", 4, count)
     }
 
     @Test

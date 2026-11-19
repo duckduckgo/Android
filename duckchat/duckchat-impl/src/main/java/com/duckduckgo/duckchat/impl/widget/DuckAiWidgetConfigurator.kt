@@ -20,8 +20,9 @@ import android.widget.RemoteViews
 import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -35,7 +36,8 @@ enum class DuckAiWidgetTarget(val requestCode: Int) {
 }
 
 class DuckAiWidgetConfigurator @Inject constructor(
-    private val duckChat: DuckChatInternal,
+    private val duckChatFeature: DuckChatFeature,
+    private val repository: DuckChatFeatureRepository,
     private val intents: DuckAiWidgetIntents,
     private val dispatcherProvider: DispatcherProvider,
 ) {
@@ -45,7 +47,9 @@ class DuckAiWidgetConfigurator @Inject constructor(
         context: Context,
         remoteViews: RemoteViews,
     ) {
-        val enabled = withContext(dispatcherProvider.io()) { duckChat.isEnabled() }
+        val enabled = withContext(dispatcherProvider.io()) {
+            duckChatFeature.self().isEnabled() && repository.isDuckChatUserEnabled()
+        }
 
         withContext(dispatcherProvider.main()) {
             if (!enabled) {

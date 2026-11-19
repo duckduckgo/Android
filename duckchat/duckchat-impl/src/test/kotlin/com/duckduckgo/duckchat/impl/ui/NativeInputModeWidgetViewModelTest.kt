@@ -515,6 +515,80 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun reproCameraWithUploadDisabledBeforeModelsLoad() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(false)
+        assertTrue(modelStateFlow.value.models.isEmpty())
+        val launchCamera = com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldLaunchCameraCapture(
+            true,
+            DuckChatLaunch.CameraCapture(),
+            testee.supportsImageUpload(),
+        )
+        assertEquals("launch camera while image uploads are remotely disabled", false, launchCamera)
+    }
+
+    @Test
+    fun reproColdImageWidgetLosesSelectionAfterCatalogArrives() = runTest {
+        val service = mock<com.duckduckgo.duckchat.impl.models.DuckAiModelsService>()
+        val dataStore = mock<com.duckduckgo.duckchat.impl.store.DuckChatDataStore>()
+        val host = mock<com.duckduckgo.duckchat.api.DuckAiHostProvider>()
+        whenever(host.getHost()).thenReturn("duck.ai")
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE)
+        val manager = com.duckduckgo.duckchat.impl.models.RealDuckAiModelManager(
+            service, dataStore, subscriptions, host, lazy { duckChatFeature }, lazy { duckChatPixels }, mock(),
+            coroutineRule.testDispatcherProvider, coroutineRule.testScope,
+        )
+        whenever(modelManager.modelState).thenReturn(manager.modelState)
+        modelManager.stub { onBlocking { ensureImageCapableModelSelected() } doSuspendableAnswer { manager.ensureImageCapableModelSelected() } }
+        testee = createViewModel()
+        assertTrue(manager.modelState.value.models.isEmpty())
+        val model = com.duckduckgo.duckchat.impl.models.RemoteAIChatModel(
+            id = "image",
+            name = "image",
+            accessTier = listOf("free"),
+            entityHasAccess = true,
+            supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue),
+        )
+        whenever(service.getModels(any(), org.mockito.kotlin.anyOrNull(), org.mockito.kotlin.anyOrNull()))
+            .thenReturn(com.duckduckgo.duckchat.impl.models.AIChatModelsResponse(listOf(model)))
+        testee.configure("cold-tab", true, false, DuckChatLaunch.ImageGeneration())
+        advanceUntilIdle()
+        assertTrue(manager.modelState.value.models.single().supportsTool(Tool.IMAGE_GENERATION))
+        assertEquals(
+            "image-capable catalog loaded",
+            Tool.IMAGE_GENERATION.rawValue,
+            nativeInputStateProvider.stateForTab("cold-tab").value.selectedTool,
+        )
+    }
+
+    @Test
+    fun whenImageLaunchPendingThenExplicitToolChoiceWins() = runTest {
+        val ready = kotlinx.coroutines.CompletableDeferred<Boolean>()
+        modelManager.stub { onBlocking { ensureImageCapableModelSelected() } doSuspendableAnswer { ready.await() } }
+        testee.configure("tab-1", true, false, DuckChatLaunch.ImageGeneration())
+
+        testee.setSelectedTool(null)
+        ready.complete(true)
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
+    fun whenImageLaunchPendingThenNewLaunchWins() = runTest {
+        val ready = kotlinx.coroutines.CompletableDeferred<Boolean>()
+        modelManager.stub { onBlocking { ensureImageCapableModelSelected() } doSuspendableAnswer { ready.await() } }
+        testee.configure("tab-1", true, false, DuckChatLaunch.ImageGeneration())
+
+        testee.configure("tab-1", true, false, DuckChatLaunch.Open())
+        ready.complete(true)
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
     fun whenConfigureDuckAiModeAndForceImageGenerationThenImageToolSelectedForTab() = runTest {
         whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(true)
 

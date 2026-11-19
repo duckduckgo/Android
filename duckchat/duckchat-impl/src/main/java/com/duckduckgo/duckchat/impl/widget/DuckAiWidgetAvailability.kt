@@ -78,7 +78,7 @@ class DuckAiWidgetAvailability @Inject constructor(
     }
 
     private fun launchSync() {
-        appCoroutineScope.launch(dispatcherProvider.io()) { sync(duckChatFeatureRepository.isDuckChatUserEnabled()) }
+        appCoroutineScope.launch(dispatcherProvider.io()) { sync() }
     }
 
     // The first emission is the pre-load default, the sync launched alongside already covers the initial state.
@@ -87,11 +87,12 @@ class DuckAiWidgetAvailability @Inject constructor(
             duckChatFeatureRepository.observeDuckChatUserEnabled()
                 .distinctUntilChanged()
                 .drop(1)
-                .collect { sync(userEnabled = it) }
+                .collect { sync() }
         }
     }
 
-    private suspend fun sync(userEnabled: Boolean) = mutex.withLock {
+    private suspend fun sync() = mutex.withLock {
+        val userEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
         val packageManager = context.packageManager
         val receiver = ComponentName(context, DuckAiWidgetProvider::class.java)
         val enable = duckChatFeature.duckAiWidget().isEnabled() &&
