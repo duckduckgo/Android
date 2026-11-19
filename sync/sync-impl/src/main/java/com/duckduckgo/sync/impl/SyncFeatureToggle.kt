@@ -52,8 +52,6 @@ interface SyncFeatureToggle {
 
     fun allowCreateAccountOnNewerVersion(): Boolean
 
-    fun automaticallyUpdateSyncSettings(): Boolean
-
     fun allowAiChatSync(): Boolean
 }
 
@@ -114,10 +112,6 @@ class SyncRemoteFeatureToggle @Inject constructor(
 
     override fun allowCreateAccountOnNewerVersion(): Boolean {
         return isToggleEnabledOnNewerVersion(syncFeature.level3AllowCreateAccount())
-    }
-
-    override fun automaticallyUpdateSyncSettings(): Boolean {
-        return syncFeature.automaticallyUpdateSyncSettings().isEnabled()
     }
 
     override fun allowAiChatSync(): Boolean {

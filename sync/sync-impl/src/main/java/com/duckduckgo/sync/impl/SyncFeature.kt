@@ -42,14 +42,8 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun level3AllowCreateAccount(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun automaticallyUpdateSyncSettings(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSync(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun sendSyncSetupWideEvent(): Toggle
 
     /**
      * Gates writing `device_info`
