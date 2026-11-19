@@ -395,6 +395,7 @@ class SubscriptionSwitchWideEventTest {
             key = eq("activation_latency_ms_bucketed"),
             timeout = eq(10.minutes),
             buckets = any(),
+            rounding = any(),
         )
         verify(wideEventClient).flowStep(
             wideEventId = eq(123L),
@@ -548,6 +549,7 @@ class SubscriptionSwitchWideEventTest {
             key = eq("activation_latency_ms_bucketed"),
             timeout = eq(10.minutes),
             buckets = any(),
+            rounding = any(),
         )
         verify(wideEventClient).flowStep(
             wideEventId = eq(444L),

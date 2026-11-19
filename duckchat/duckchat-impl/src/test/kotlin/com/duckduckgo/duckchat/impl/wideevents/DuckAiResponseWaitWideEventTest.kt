@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.wideevents
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.wideevents.BucketRounding
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -84,7 +85,7 @@ class DuckAiResponseWaitWideEventTest {
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
-        whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
+        whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(Duration.ZERO))
         whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(emptyList()))
 
@@ -197,7 +198,7 @@ class DuckAiResponseWaitWideEventTest {
             samplingProbability = eq(1.0f),
             definition = any(),
         )
-        verify(wideEventClient).intervalStart(eq(1L), eq("prompt_to_leave_ms_bucketed"), isNull(), eq(PROMPT_BUCKETS))
+        verify(wideEventClient).intervalStart(eq(1L), eq("prompt_to_leave_ms_bucketed"), isNull(), eq(PROMPT_BUCKETS), eq(BucketRounding.RoundDown))
     }
 
     @Test
@@ -358,7 +359,7 @@ class DuckAiResponseWaitWideEventTest {
 
         verify(wideEventClient).flowStep(eq(1L), eq("left"), eq(true), eq(mapOf("left_via" to "app_backgrounded")))
         verify(wideEventClient).intervalEnd(eq(1L), eq("prompt_to_leave_ms_bucketed"))
-        verify(wideEventClient).intervalStart(eq(1L), eq("leave_to_return_ms_bucketed"), isNull(), eq(LEAVE_BUCKETS))
+        verify(wideEventClient).intervalStart(eq(1L), eq("leave_to_return_ms_bucketed"), isNull(), eq(LEAVE_BUCKETS), eq(BucketRounding.RoundDown))
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
 
@@ -557,7 +558,7 @@ class DuckAiResponseWaitWideEventTest {
         idle()
 
         verify(wideEventClient).flowStep(eq(1L), eq("response_ready_while_away"), eq(true), eq(emptyMap()))
-        verify(wideEventClient).intervalStart(eq(1L), eq("ready_to_return_ms_bucketed"), isNull(), eq(LEAVE_BUCKETS))
+        verify(wideEventClient).intervalStart(eq(1L), eq("ready_to_return_ms_bucketed"), isNull(), eq(LEAVE_BUCKETS), eq(BucketRounding.RoundDown))
         verify(wideEventClient, never()).intervalEnd(any(), eq("ready_to_return_ms_bucketed"))
 
         onChat(tabId = "t1", chatId = "A")
@@ -647,7 +648,7 @@ class DuckAiResponseWaitWideEventTest {
             eq(mapOf("status_reason" to "returned")),
         )
         verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
-        verify(wideEventClient).intervalStart(eq(2L), eq("prompt_to_leave_ms_bucketed"), isNull(), eq(PROMPT_BUCKETS))
+        verify(wideEventClient).intervalStart(eq(2L), eq("prompt_to_leave_ms_bucketed"), isNull(), eq(PROMPT_BUCKETS), eq(BucketRounding.RoundDown))
     }
 
     @Test

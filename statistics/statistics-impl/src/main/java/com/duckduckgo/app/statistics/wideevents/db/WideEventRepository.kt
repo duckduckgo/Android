@@ -69,6 +69,7 @@ interface WideEventRepository {
         name: String,
         timeout: Duration?,
         buckets: List<Duration>?,
+        rounding: BucketRounding,
     )
 
     suspend fun endInterval(
@@ -128,7 +129,13 @@ interface WideEventRepository {
         val startedAt: Instant,
         val timeout: Duration?,
         val buckets: List<Duration>?,
+        val rounding: BucketRounding,
     )
+
+    enum class BucketRounding {
+        ROUND_DOWN,
+        ROUND_UP,
+    }
 
     data class CleanupDecision(
         val status: WideEventStatus,

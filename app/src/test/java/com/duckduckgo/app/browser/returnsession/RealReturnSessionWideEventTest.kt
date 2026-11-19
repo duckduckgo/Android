@@ -89,7 +89,7 @@ class RealReturnSessionWideEventTest {
         whenever(duckChatInputModeState.getInitialToggleSelection()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
 
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(123L))
-        whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
+        whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
         whenever(wideEventClient.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
