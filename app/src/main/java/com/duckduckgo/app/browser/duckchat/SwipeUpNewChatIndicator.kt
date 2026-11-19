@@ -193,7 +193,7 @@ class SwipeUpNewChatIndicator @JvmOverloads constructor(
         private const val HAPTIC_STEPS = 5
         private const val FADE_IN_PROGRESS = 0.3f
         private const val PROGRESS_MAX = 100
-        private const val COLLAPSED_SCALE = 0.01f
+        private const val COLLAPSED_SCALE = 0f
         private const val SPRING_BACK_DURATION_MS = 350L
         private const val COMMIT_DURATION_MS = 200L
         private const val ARM_DURATION_MS = 250L
