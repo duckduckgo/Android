@@ -964,6 +964,42 @@ class RealEventHubPixelManagerTest {
         verify(repository).deleteAllPixelStates()
     }
 
+    @Test
+    fun `onConfigChanged with unchanged settings does not start periods again`() {
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+
+        manager.onConfigChanged()
+        manager.onConfigChanged()
+
+        verify(repository, times(1)).savePixelState(any())
+    }
+
+    @Test
+    fun `onConfigChanged with changed settings initialises the new pixels`() {
+        whenever(repository.getPixelState(any())).thenReturn(null)
+        manager.onConfigChanged()
+
+        configureFeature(settings = fullConfig.replace("webTelemetry_testPixel1", "webTelemetry_testPixel2"))
+        manager.onConfigChanged()
+
+        val captor = argumentCaptor<PixelState>()
+        verify(repository, times(2)).savePixelState(captor.capture())
+        assertEquals(listOf("webTelemetry_testPixel1", "webTelemetry_testPixel2"), captor.allValues.map { it.pixelName })
+    }
+
+    @Test
+    fun `onConfigChanged initialises pixels again when re-enabled with the same settings`() {
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
+
+        configureFeature(enabled = false)
+        manager.onConfigChanged()
+        configureFeature()
+        manager.onConfigChanged()
+
+        verify(repository, times(2)).savePixelState(any())
+    }
+
     // --- config isolation: live config changes must not affect running pixel lifecycle ---
 
     private fun configWithBuckets(vararg buckets: Pair<String, String>): String {

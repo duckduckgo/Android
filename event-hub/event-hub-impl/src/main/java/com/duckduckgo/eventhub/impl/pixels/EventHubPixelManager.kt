@@ -76,6 +76,10 @@ class RealEventHubPixelManager @Inject constructor(
 
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
 
+    // The persisted callback fires after every privacy config download, including ones that change nothing, and parsing the
+    // settings and every stored pixel state again is costly while the app starts. Only touched on [pixelDispatcher].
+    private var handledSettings: String? = null
+
     private val deduplicator = WebEventDeduplicator()
     private val schedulerJob = ConflatedJob()
 
@@ -233,8 +237,9 @@ class RealEventHubPixelManager @Inject constructor(
 
     override fun onConfigChanged() {
         appCoroutineScope.launch(pixelDispatcher) {
-            cachedTelemetryConfigs = null
             if (!isEnabled()) {
+                cachedTelemetryConfigs = null
+                handledSettings = null
                 logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
                 schedulerJob.cancel()
                 repository.deleteAllPixelStates()
@@ -242,7 +247,11 @@ class RealEventHubPixelManager @Inject constructor(
                 return@launch
             }
 
-            val telemetry = getTelemetryConfigs()
+            val settings = eventHubFeature.self().getSettings()
+            if (settings != null && settings == handledSettings) return@launch
+
+            cachedTelemetryConfigs = settings?.let(EventHubConfigParser::parseTelemetry)
+            val telemetry = cachedTelemetryConfigs.orEmpty()
             logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
 
             var nextDeadline = Long.MAX_VALUE
@@ -259,6 +268,7 @@ class RealEventHubPixelManager @Inject constructor(
             }
 
             scheduleNextCheck(nextDeadline)
+            handledSettings = settings
         }
     }
 
