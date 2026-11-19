@@ -1,9 +1,10 @@
 // WebView renderer process termination, reported from BrowserWebViewClient.onRenderProcessGone.
 // WebViews in the same profile share a renderer process, and Android notifies each WebView it served,
-// so the callbacks of one termination are collected and reported as a single pixel.
+// so the callbacks of one termination are collected and reported as a single pixel, unless the
+// renderProcessGonePixel remote feature is disabled.
 {
     "m_web_view_renderer_gone_crash": {
-        "description": "The WebView renderer process crashed (RenderProcessGoneDetail.didCrash() is true). Fires once per renderer termination. Versions before the parameters existed fired it once for each WebView the renderer served, without parameters.",
+        "description": "The WebView renderer process crashed (RenderProcessGoneDetail.didCrash() is true). Fires once per renderer termination. With the renderProcessGonePixel remote feature disabled, and in versions before the parameters existed, it fires once for each WebView the renderer served, without parameters.",
         "owners": ["marcosholgado"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
@@ -25,7 +26,7 @@
         ]
     },
     "m_web_view_renderer_gone_killed": {
-        "description": "The system killed the WebView renderer process without it crashing (RenderProcessGoneDetail.didCrash() is false), usually to reclaim memory. Fires once per renderer termination. Versions before the parameters existed fired it once for each WebView the renderer served, without parameters.",
+        "description": "The system killed the WebView renderer process without it crashing (RenderProcessGoneDetail.didCrash() is false), usually to reclaim memory. Fires once per renderer termination. With the renderProcessGonePixel remote feature disabled, and in versions before the parameters existed, it fires once for each WebView the renderer served, without parameters.",
         "owners": ["marcosholgado"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],

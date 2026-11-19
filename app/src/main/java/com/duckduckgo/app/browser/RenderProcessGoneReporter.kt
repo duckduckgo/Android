@@ -42,6 +42,7 @@ interface RenderProcessGoneReporter {
  * WebViews in the same profile share a renderer process, and when it dies Android calls onRenderProcessGone on each of
  * them, one after another within a single main-thread message. Firing per callback counted one death once per live tab,
  * so this collects the callbacks delivered before the next main-thread message and fires a single pixel for them.
+ * Disabling [RenderProcessGonePixelFeature] restores the parameterless pixel per callback.
  */
 @ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 @ContributesBinding(AppScope::class, binding = binding<RenderProcessGoneReporter>())
@@ -51,6 +52,7 @@ class RealRenderProcessGoneReporter @Inject constructor(
     private val memoryCollector: MemoryCollector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
+    private val renderProcessGonePixelFeature: RenderProcessGonePixelFeature,
 ) : RenderProcessGoneReporter, BrowserLifecycleObserver {
 
     private var appOpen = false
@@ -69,6 +71,11 @@ class RealRenderProcessGoneReporter @Inject constructor(
             it.affectedWebViews++
             return
         }
+        // Checked only when a death starts, so a remote flip mid-death can't split one death across both reporting modes.
+        if (!renderProcessGonePixelFeature.self().isEnabled()) {
+            pixel.fire(pixelName(didCrash))
+            return
+        }
         pendingDeath = RendererDeath(didCrash = didCrash, appOpen = appOpen)
         // Dispatchers.Main posts rather than running inline, so this runs once the current message has notified every WebView.
         appCoroutineScope.launch(dispatchers.main()) {
@@ -83,8 +90,10 @@ class RealRenderProcessGoneReporter @Inject constructor(
             put(PARAM_AFFECTED_WEBVIEWS, bucketWebViewCount(death.affectedWebViews))
             memoryCollector.collectDeviceRamBucket()?.let { put(PARAM_DEVICE_RAM, it) }
         }
-        pixel.fire(if (death.didCrash) WEB_RENDERER_GONE_CRASH else WEB_RENDERER_GONE_KILLED, params)
+        pixel.fire(pixelName(death.didCrash), params)
     }
+
+    private fun pixelName(didCrash: Boolean) = if (didCrash) WEB_RENDERER_GONE_CRASH else WEB_RENDERER_GONE_KILLED
 
     private class RendererDeath(
         val didCrash: Boolean,

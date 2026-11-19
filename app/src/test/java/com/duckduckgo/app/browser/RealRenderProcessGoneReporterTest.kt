@@ -21,6 +21,8 @@ import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.startup.metrics.MemoryCollector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.StandardTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -34,6 +36,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class RealRenderProcessGoneReporterTest {
@@ -44,6 +47,7 @@ class RealRenderProcessGoneReporterTest {
 
     private val pixel: Pixel = mock()
     private val memoryCollector: MemoryCollector = mock()
+    private val renderProcessGonePixelFeature = FakeFeatureToggleFactory.create(RenderProcessGonePixelFeature::class.java)
 
     private lateinit var testee: RealRenderProcessGoneReporter
 
@@ -55,6 +59,7 @@ class RealRenderProcessGoneReporterTest {
             memoryCollector,
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
+            renderProcessGonePixelFeature,
         )
     }
 
@@ -128,6 +133,53 @@ class RealRenderProcessGoneReporterTest {
         runNextMainMessage()
 
         assertEquals("4GB", firedParams().single()["device_ram_bucket"])
+    }
+
+    @Test
+    fun whenKillSwitchDisabledThenParameterlessPixelFiresImmediatelyForEveryWebView() {
+        setKillSwitch(enabled = false)
+
+        repeat(3) { testee.onRenderProcessGone(didCrash = false) }
+
+        verify(pixel, times(3)).fire(WEB_RENDERER_GONE_KILLED)
+        runNextMainMessage()
+        verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenKillSwitchDisabledAndRendererCrashedThenParameterlessCrashPixelFiredImmediately() {
+        setKillSwitch(enabled = false)
+
+        testee.onRenderProcessGone(didCrash = true)
+
+        verify(pixel).fire(WEB_RENDERER_GONE_CRASH)
+        runNextMainMessage()
+        verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenKillSwitchDisabledMidDeathThenThatDeathStillFiresOneGroupedPixel() {
+        testee.onRenderProcessGone(didCrash = false)
+        setKillSwitch(enabled = false)
+        testee.onRenderProcessGone(didCrash = false)
+        runNextMainMessage()
+
+        assertEquals("2-3", firedParams().single()["affected_webviews"])
+    }
+
+    @Test
+    fun whenKillSwitchDisabledThenNextDeathUsesLegacyPixel() {
+        testee.onRenderProcessGone(didCrash = false)
+        runNextMainMessage()
+        setKillSwitch(enabled = false)
+
+        testee.onRenderProcessGone(didCrash = false)
+
+        verify(pixel).fire(WEB_RENDERER_GONE_KILLED)
+    }
+
+    private fun setKillSwitch(enabled: Boolean) {
+        renderProcessGonePixelFeature.self().setRawStoredState(Toggle.State(enable = enabled))
     }
 
     private fun runNextMainMessage() = coroutineTestRule.testScope.testScheduler.runCurrent()
