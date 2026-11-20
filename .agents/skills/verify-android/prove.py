@@ -283,6 +283,17 @@ def build_label(build):
     return label + (" + uncommitted changes" if build.get("dirty") else "")
 
 
+def side_label(build):
+    """A short build name for image labels: build_label's hashes don't fit beside a phone screenshot."""
+    if not build:
+        return "build not read"
+    if build.get("external"):
+        return f"external APK {build.get('sha256', '?')[:10]}"
+    if build.get("base"):
+        return f"base {build['base']} ({build.get('head', '?')[:10]})"
+    return f"this branch ({build.get('head', '?')[:10]}{' + uncommitted' if build.get('dirty') else ''})"
+
+
 def proof_origin(path):
     """The proof's path in the repo and whether it is committed unchanged; pr-summary includes the source otherwise."""
     path = Path(path).resolve()
@@ -473,12 +484,12 @@ def compare(path, root):
                    "the change fixes")
     else:
         meaning = f"the after run is {after['verdict']}: the change doesn't hold up"
-    labels = (f"Before: {build_label(before['build'])}", f"After: {build_label(after['build'])}")
+    labels = (f"Before: {side_label(before['build'])}", f"After: {side_label(after['build'])}")
     image, problem = ev.draw_before_after(folder, before, after, labels)
     c = {"proof": {"name": name, "doc": after["proof"]["doc"]}, "before": "before/proof.json", "after": "after/proof.json",
          "verdicts": [before["verdict"], after["verdict"]], "meaning": meaning, "rows": rows, "labels": labels,
          "before_after": image, "problems": [problem] if problem else [], "exit": after["exit"]}
-    details = [*labels, f"Device: {ev.device_name(after)}", run_details(after)[0], run_details(after)[3],
+    details = [f"Before: {build_label(before['build'])}", f"After: {build_label(after['build'])}", f"Device: {ev.device_name(after)}", run_details(after)[0], run_details(after)[3],
                "Rerun: " + " ; ".join(rerun_lines(before, after, after["proof"].get("repo_path") or f"proofs/{name}.py"))]
     (folder / "compare.json").write_text(json.dumps(c, indent=2) + "\n")
     (folder / "report.md").write_text(ev.compare_report_md(c, before, after, details))
@@ -690,9 +701,10 @@ def evidence_table(runs, compared, comparison):
     more = [f"{len(names) - 6} more screenshots in the full report"] if len(names) > 6 else []
     if comparison and comparison.get("before_after"):
         url = (comparison["evidence_url"].rsplit("/", 1)[0] + "/" if comparison.get("evidence_url") else "") + comparison["before_after"]
-        lines += [f"Key frames paired by name: [before-after.png]({url})" + "".join(f"; {x}" for x in more) + ".", ""]
+        lines += [f"Key frames paired by name: {thumb(url, 'Before and after key frames')}" + "".join(f"; {x}" for x in more) + ".", ""]
     else:
-        frames = [f"[{label}]({href(r, r[0]['images']['key_frames'])})" for r, label in zip(runs, labels)
+        # auto's PR gate accepts an image link only as a thumbnail.
+        frames = [thumb(href(r, r[0]["images"]["key_frames"]), f"{label}: key frames") for r, label in zip(runs, labels)
                   if (r[0].get("images") or {}).get("key_frames")]
         if frames or more:
             lines += ["; ".join(([f"Key frames: {', '.join(frames)}"] if frames else []) + more) + ".", ""]
@@ -716,7 +728,8 @@ def summarize(before, after, comparison=None):
     if b:
         changed = [(n, x, y) for n, x, y in check_rows(b, a) if x != y]
         outcome_line += (" Changed: " + "; ".join(f"{n}: {x} → {y}" for n, x, y in changed[:5]) + "."
-                         if changed else f" All {len(check_rows(b, a))} checks give the same result on both.")
+                         if changed else " The one check gives the same result on both." if len(check_rows(b, a)) == 1
+                         else f" All {len(check_rows(b, a))} checks give the same result on both.")
     else:
         bad = [c for c in a["checks"] if not c["ok"]]
         outcome_line += (" Failed: " + "; ".join(c["check"] + (f" ({c['detail']})" if c["detail"] else "") for c in bad[:5]) + "."
@@ -918,7 +931,7 @@ def selftest(offline=False, evidence_dir=None):
                 ["pr-summary", folder / "published"], 0,
                 (f"[<img src=\"{served}/sdk_gphone64_arm64/switcher.png\" width=\"200\" alt=\"This branch: switcher\">]"
                  f"({served}/sdk_gphone64_arm64/switcher.png)", f"[▶ Watch video]({served}/sdk_gphone64_arm64/recording-1.mp4)",
-                 f"[Full report]({served}/index.html)", f"Key frames: [This branch]({served}/sdk_gphone64_arm64/key-frames.png)"),
+                 f"[Full report]({served}/index.html)", f"Key frames: [<img src=\"{served}/sdk_gphone64_arm64/key-frames.png\" width=\"200\" alt=\"This branch: key frames\">]"),
                 (*leaks, "NOTE not published"))),
             ("pr-summary of an uncommitted proof that errored carries its source and no local paths", *case(
                 ["pr-summary", folder / "error" / "proof.json"], 0,

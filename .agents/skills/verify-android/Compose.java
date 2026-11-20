@@ -113,7 +113,7 @@ public class Compose {
                 w += scaledWidth(img, height) + GAP;
             }
             images.add(imgs);
-            width = Math.max(width, w);
+            width = Math.max(Math.max(width, w), labelWidth(row.label()) + 2 * GAP);
             total += (row.label().isEmpty() ? 0 : LABEL) + height + CAPTION + GAP;
         }
         BufferedImage canvas = new BufferedImage(width, total, BufferedImage.TYPE_INT_RGB);
@@ -153,6 +153,13 @@ public class Compose {
         }
         g.dispose();
         write(canvas, out);
+    }
+
+    static int labelWidth(String label) {
+        Graphics2D g = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
+        int w = g.getFontMetrics(new Font(Font.SANS_SERIF, Font.BOLD, 24)).stringWidth(label);
+        g.dispose();
+        return w;
     }
 
     static void centered(Graphics2D g, String text, int x, int width, int baseline, Font font) {
