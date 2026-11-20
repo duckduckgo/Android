@@ -48,7 +48,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
-import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
@@ -64,6 +63,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
+import com.duckduckgo.duckchat.impl.pendingresponse.DuckAiPendingResponseTracker
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
@@ -137,7 +137,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     chatStateStore: ChatStateStore,
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
-    private val attentionTracker: DuckAiResponseAttentionTracker,
+    private val pendingResponseTracker: DuckAiPendingResponseTracker,
     private val newChatHintsUsage: NewChatHintsUsage,
     private val newChatHintsPixels: NewChatHintsPixels,
     private val newChatDetector: NewChatDetector,
@@ -358,7 +358,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         inputOutcomeTracker.promptSubmitted(submitMethod)
         activeDuckAiTabId(surface)?.let {
             responseWaitWideEvent.onNativePromptSubmitted(it, browserMode, reasoningEffort, rawTool)
-            attentionTracker.onNativePromptSubmitted(it, browserMode)
+            pendingResponseTracker.onNativePromptSubmitted(it, browserMode)
         }
     }
 
@@ -376,7 +376,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         duckChatPixels.fireStopGenerationTapped(surface)
         activeDuckAiTabId(surface)?.let {
             responseWaitWideEvent.onStopTapped(it)
-            attentionTracker.onStopTapped(it)
+            pendingResponseTracker.onStopTapped(it)
         }
     }
 

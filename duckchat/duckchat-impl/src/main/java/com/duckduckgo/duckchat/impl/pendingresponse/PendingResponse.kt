@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.attention
+package com.duckduckgo.duckchat.impl.pendingresponse
 
 import androidx.core.net.toUri
 import com.duckduckgo.browsermode.api.BrowserMode

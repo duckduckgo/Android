@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.attention
+package com.duckduckgo.duckchat.impl.pendingresponse
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -29,8 +29,8 @@ import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.RealDuckChat
-import com.duckduckgo.duckchat.impl.attention.PendingResponse.ScreenChange
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pendingresponse.PendingResponse.ScreenChange
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.responding.DuckAiRespondingServiceController
@@ -60,11 +60,11 @@ import javax.inject.Inject
  * back through the channel, so they are handled in order with other state calls.
  */
 @SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class, binding = binding<DuckAiResponseAttentionTracker>())
+@ContributesBinding(AppScope::class, binding = binding<DuckAiPendingResponseTracker>())
 @ContributesBinding(AppScope::class, binding = binding<DuckAiNativeStorageDeletionListener>())
 @ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 @ContributesIntoSet(AppScope::class, binding = binding<DataClearingPlugin>())
-class DuckAiResponseAttentionTrackerImpl @Inject constructor(
+class DuckAiPendingResponseTrackerImpl @Inject constructor(
     private val duckChat: DuckChat,
     private val duckChatFeature: Lazy<DuckChatFeature>,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
@@ -76,7 +76,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
     private val pixels: Lazy<DuckChatPixels>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
-) : DuckAiResponseAttentionTracker,
+) : DuckAiPendingResponseTracker,
     BrowserLifecycleObserver,
     DataClearingPlugin,
     DuckAiNativeStorageDeletionListener {
@@ -84,7 +84,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
     private val coroutineScope = CoroutineScope(appCoroutineScope.coroutineContext + dispatchers.io().limitedParallelism(1))
     private val channel = Channel<Action>(capacity = Channel.UNLIMITED)
 
-    private val responses = mutableListOf<AttentionPendingResponse>()
+    private val responses = mutableListOf<TrackedPendingResponse>()
     private val chatVisibility = DuckAiChatVisibility(duckChat)
     private var keepAlive = false
 
@@ -178,7 +178,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         }
     }
 
-    private suspend fun abort(aborted: List<AttentionPendingResponse>) {
+    private suspend fun abort(aborted: List<TrackedPendingResponse>) {
         aborted.forEach { response ->
             responses.remove(response)
             if (response.away) stopWaitAndNotification(response)
@@ -188,14 +188,13 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
     private suspend fun browserModeOf(tabId: String): BrowserMode =
         if (fireTabRepository.value.getTab(tabId) != null) BrowserMode.FIRE else BrowserMode.REGULAR
 
-    private suspend fun startResponse(tabId: String, browserMode: BrowserMode): AttentionPendingResponse {
+    private suspend fun startResponse(tabId: String, browserMode: BrowserMode): TrackedPendingResponse {
         // An address-bar prompt is reported on each page load and again when the page picks it up. This deduplicates them.
         responses.firstOrNull {
             it.tabId == tabId && !it.done && !it.chatSwitchedAway && it.awaitingFirstProgressStatus
         }?.let { return it }
-
         abort(responses.filter { it.isOnScreenIn(tabId) })
-        val response = AttentionPendingResponse(
+        val response = TrackedPendingResponse(
             tabId = tabId,
             browserMode = browserMode,
             canNotify = canNotify(tabId, browserMode),
@@ -248,7 +247,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         tabId: String,
         status: PendingResponseStatus,
         browserMode: BrowserMode,
-    ): AttentionPendingResponse? {
+    ): TrackedPendingResponse? {
         // The page starts streams on its own too, such as an edit or a retry.
         // A reconnection recovers a stream that may already be finished, so it never starts tracking.
         return if (status is PendingResponseStatus.StartStream && !status.isReconnection) {
@@ -258,12 +257,12 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         }
     }
 
-    private fun leave(response: AttentionPendingResponse) {
+    private fun leave(response: TrackedPendingResponse) {
         response.away = true
         if (response.canNotify) startWait(response)
     }
 
-    private fun startWait(response: AttentionPendingResponse) {
+    private fun startWait(response: TrackedPendingResponse) {
         response.wait?.job?.cancel()
         val wait = Wait()
         val tabId = response.tabId
@@ -293,7 +292,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         }
     }
 
-    private suspend fun notifyReady(response: AttentionPendingResponse) {
+    private suspend fun notifyReady(response: TrackedPendingResponse) {
         val chatId = response.chatId
         if (chatId == null) {
             logcat(tag = TAG) { "Duck.ai response ready before its chat ID was known; not notifying" }
@@ -304,7 +303,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         }
     }
 
-    private suspend fun stopWaitAndNotification(response: AttentionPendingResponse) {
+    private suspend fun stopWaitAndNotification(response: TrackedPendingResponse) {
         response.wait?.job?.cancel()
         response.wait = null
         val chatId = response.chatId
@@ -360,11 +359,11 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         /** A null [chatId] means every chat in that mode. */
         data class PageDeletedChats(val chatId: String?, val browserMode: BrowserMode) : Action()
 
-        class ChatIdFound(val response: AttentionPendingResponse, val wait: Wait, val chatId: String) : Action()
-        class WaitFinished(val response: AttentionPendingResponse, val wait: Wait, val result: WaitResult) : Action()
+        class ChatIdFound(val response: TrackedPendingResponse, val wait: Wait, val chatId: String) : Action()
+        class WaitFinished(val response: TrackedPendingResponse, val wait: Wait, val result: WaitResult) : Action()
     }
 
-    private class AttentionPendingResponse(
+    private class TrackedPendingResponse(
         tabId: String,
         browserMode: BrowserMode,
         /** Whether a ready notification applies to it, read once when it starts. Keeps the app alive while it generates on screen. */
@@ -396,6 +395,6 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
     }
 
     private companion object {
-        const val TAG = "DuckAiResponseAttention"
+        const val TAG = "DuckAiPendingResponse"
     }
 }
