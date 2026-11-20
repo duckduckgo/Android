@@ -436,6 +436,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun undoSubscriptionCancellation(): Toggle
 
+    /**
+     * When enabled, the app keeps a backup refresh token and tries it before the Play Store when the backend
+     * rejects the main refresh token.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun backupRefreshToken(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
