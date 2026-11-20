@@ -24,17 +24,18 @@ import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import logcat.LogPriority.WARN
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 import javax.inject.Inject
 
 /**
  * Lets adb drive Sync setup in internal debug builds (registered in the debug manifest only), for example:
  * `adb shell am broadcast -a com.duckduckgo.sync.internal.DEBUG -p <package> --es command status`
- * Each result is logged as `SyncDebugBroadcast: <command>: <result>`. Commands that change the account only run on staging.
+ * Each result is logged as `SyncDebugBroadcast: [<id>:] <command>: <result>`, where `id` is the optional `--es id` extra.
+ * Commands that change the account only run on staging.
  */
 @InjectWith(ReceiverScope::class)
 class SyncDebugBroadcastReceiver : BroadcastReceiver() {
@@ -51,14 +52,15 @@ class SyncDebugBroadcastReceiver : BroadcastReceiver() {
         val command = intent.getStringExtra(EXTRA_COMMAND)
         val on = intent.getBooleanExtra(EXTRA_ON, true)
         val flag = intent.getStringExtra(EXTRA_FLAG)
+        val id = intent.getStringExtra(EXTRA_ID)
         val pendingResult = goAsync()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             try {
-                logcat { "SyncDebugBroadcast: $command: ${commands.run(command, on, flag)}" }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logcat(WARN) { "SyncDebugBroadcast: $command: failed: $e" }
+                // Awaiting in a separate coroutine lets the timeout fire even when the command is stuck in a blocking network call.
+                val work = async { commands.run(command, on, flag) }
+                val result = withTimeoutOrNull(TIMEOUT_MILLIS) { work.await() }
+                    ?: "${SyncDebugCommands.ERROR}timed out after ${TIMEOUT_MILLIS / 1000}s".also { work.cancel() }
+                logcat(tag = LOG_TAG) { SyncDebugCommands.resultLine(id, command, result) }
             } finally {
                 pendingResult.finish()
             }
@@ -70,5 +72,10 @@ class SyncDebugBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_COMMAND = "command"
         const val EXTRA_ON = "on"
         const val EXTRA_FLAG = "flag"
+        const val EXTRA_ID = "id"
+        const val LOG_TAG = "SyncDebugBroadcast"
+
+        // Below the 60s limit Android gives a background broadcast that called goAsync().
+        private const val TIMEOUT_MILLIS = 30_000L
     }
 }

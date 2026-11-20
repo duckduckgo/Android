@@ -32,6 +32,7 @@ import com.duckduckgo.sync.internal.ui.AuditLogCheckDebugControls
 import com.duckduckgo.sync.internal.ui.AuditLogDebugReport
 import com.duckduckgo.sync.internal.ui.OtherDevicesDebugTool
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.CancellationException
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import javax.inject.Inject
@@ -52,9 +53,16 @@ class SyncDebugCommands @Inject constructor(
     private val syncStateRepository: SyncStateRepository,
 ) {
 
-    suspend fun run(command: String?, on: Boolean, flag: String? = null): String = when {
-        command in STAGING_ONLY && !envDataStore.useSyncDevEnvironment -> "refused: $command only runs on staging; send $USE_STAGING first"
-        else -> runCommand(command, on, flag)
+    suspend fun run(command: String?, on: Boolean, flag: String? = null): String = try {
+        when {
+            command.isNullOrEmpty() -> "${ERROR}missing command extra"
+            command in STAGING_ONLY && !envDataStore.useSyncDevEnvironment -> "refused: $command only runs on staging; send $USE_STAGING first"
+            else -> runCommand(command, on, flag)
+        }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        "$ERROR$e"
     }
 
     private suspend fun runCommand(command: String?, on: Boolean, flag: String?): String = when (command) {
@@ -67,7 +75,7 @@ class SyncDebugCommands @Inject constructor(
         DELETE_ACCOUNT -> deleteAccount()
         RUN_BACKGROUND_SYNC -> runBackgroundSync()
         EXPIRE_SYNC_DEBOUNCE -> expireSyncDebounce()
-        else -> "unknown command \"$command\"; known: ${COMMANDS.joinToString()}"
+        else -> "${ERROR}unknown command \"$command\"; known: ${COMMANDS.joinToString()}"
     }
 
     private suspend fun status(): String =
@@ -77,14 +85,24 @@ class SyncDebugCommands @Inject constructor(
             auditLogCheckDebugControls.unseenCount()
 
     private fun useStaging(on: Boolean): String {
+        val switching = envDataStore.useSyncDevEnvironment != on
+        val loggedOut = if (switching && syncStore.isSignedIn()) {
+            when (val result = syncAccountRepository.logout(syncStore.deviceId.orEmpty())) {
+                is Result.Error -> return "${ERROR}could not log out before switching: ${result.reason} (code ${result.code})"
+                is Result.Success -> "logged out; "
+            }
+        } else {
+            ""
+        }
         envDataStore.useSyncDevEnvironment = on
-        return "environment=${envDataStore.syncEnvironmentUrl}"
+        return "${loggedOut}environment=${envDataStore.syncEnvironmentUrl}"
     }
 
     @SuppressLint("DenyListedApi")
     private fun setFlag(name: String?, on: Boolean): String {
+        if (name.isNullOrEmpty()) return "${ERROR}$SET_FLAG needs a flag extra"
         val toggles = syncToggles()
-        val toggle = toggles[name] ?: return "unknown flag \"$name\"; known: ${toggles.keys.sorted().joinToString()}"
+        val toggle = toggles[name] ?: return "${ERROR}unknown flag \"$name\"; known: ${toggles.keys.sorted().joinToString()}"
         val state = toggle.getRawStoredState()?.copy(enable = on, remoteEnableState = on)
             ?: Toggle.State(enable = on, remoteEnableState = on)
         toggle.setRawStoredState(state)
@@ -152,5 +170,11 @@ class SyncDebugCommands @Inject constructor(
         )
         val STAGING_ONLY = setOf(SIMULATE_LOGIN, LOG_OUT_OTHERS, DELETE_ACCOUNT)
         const val NOT_SIGNED_IN = "Not signed in"
+        const val ERROR = "error: "
+
+        fun resultLine(id: String?, command: String?, result: String): String {
+            val idPart = if (id.isNullOrEmpty()) "" else "$id: "
+            return "SyncDebugBroadcast: $idPart$command: $result"
+        }
     }
 }

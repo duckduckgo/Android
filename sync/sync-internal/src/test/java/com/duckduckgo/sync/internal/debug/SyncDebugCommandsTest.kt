@@ -77,7 +77,7 @@ class SyncDebugCommandsTest {
     fun whenCommandUnknownThenListsKnownCommands() = runTest {
         val result = commands.run("nope", on = true)
 
-        assertTrue(result.startsWith("unknown command \"nope\""))
+        assertTrue(result.startsWith("error: unknown command \"nope\""))
         SyncDebugCommands.COMMANDS.forEach { assertTrue(result.contains(it)) }
     }
 
@@ -137,14 +137,71 @@ class SyncDebugCommandsTest {
     fun whenSetFlagWithUnknownNameThenListsTheSyncFlags() = runTest {
         val result = commands.run(SyncDebugCommands.SET_FLAG, on = true, flag = "nope")
 
-        assertTrue(result.startsWith("unknown flag \"nope\"; known: "))
+        assertTrue(result.startsWith("error: unknown flag \"nope\"; known: "))
         assertTrue(result.contains("loginAuditLog"))
         assertTrue(result.contains("loginNotification"))
     }
 
     @Test
-    fun whenSetFlagWithNoNameThenSaysItIsUnknown() = runTest {
-        assertTrue(commands.run(SyncDebugCommands.SET_FLAG, on = true).startsWith("unknown flag \"null\""))
+    fun whenSetFlagWithNoNameThenErrorAsksForTheFlagExtra() = runTest {
+        assertEquals("error: setFlag needs a flag extra", commands.run(SyncDebugCommands.SET_FLAG, on = true))
+    }
+
+    @Test
+    fun whenCommandMissingThenError() = runTest {
+        assertEquals("error: missing command extra", commands.run(null, on = true))
+    }
+
+    @Test
+    fun whenCommandThrowsThenErrorResult() = runTest {
+        envDataStore.useSyncDevEnvironment = true
+        whenever(otherDevicesDebugTool.simulateLogin()).thenThrow(IllegalStateException("boom"))
+
+        assertEquals("error: java.lang.IllegalStateException: boom", commands.run(SyncDebugCommands.SIMULATE_LOGIN, on = true))
+    }
+
+    @Test
+    fun whenUseStagingOnWhileSignedInToProductionThenLogsOutFirst() = runTest {
+        whenever(syncStore.isSignedIn()).thenReturn(true)
+        whenever(syncStore.deviceId).thenReturn("device")
+        whenever(syncAccountRepository.logout("device")).thenReturn(Result.Success(true))
+
+        val result = commands.run(SyncDebugCommands.USE_STAGING, on = true)
+
+        verify(syncAccountRepository).logout("device")
+        assertTrue(envDataStore.useSyncDevEnvironment)
+        assertEquals("logged out; environment=$STAGING", result)
+    }
+
+    @Test
+    fun whenUseStagingLogoutFailsThenStaysOnProduction() = runTest {
+        whenever(syncStore.isSignedIn()).thenReturn(true)
+        whenever(syncStore.deviceId).thenReturn("device")
+        whenever(syncAccountRepository.logout("device")).thenReturn(Result.Error(code = 500, reason = "server"))
+
+        val result = commands.run(SyncDebugCommands.USE_STAGING, on = true)
+
+        assertFalse(envDataStore.useSyncDevEnvironment)
+        assertEquals("error: could not log out before switching: server (code 500)", result)
+    }
+
+    @Test
+    fun whenUseStagingAlreadyOnStagingThenDoesNotLogOut() = runTest {
+        envDataStore.useSyncDevEnvironment = true
+        whenever(syncStore.isSignedIn()).thenReturn(true)
+
+        assertEquals("environment=$STAGING", commands.run(SyncDebugCommands.USE_STAGING, on = true))
+        verify(syncAccountRepository, never()).logout(any())
+    }
+
+    @Test
+    fun whenResultLineHasIdThenIdComesBeforeCommand() {
+        assertEquals("SyncDebugBroadcast: run1: status: ok", SyncDebugCommands.resultLine("run1", "status", "ok"))
+    }
+
+    @Test
+    fun whenResultLineHasNoIdThenOnlyCommandAndResult() {
+        assertEquals("SyncDebugBroadcast: status: ok", SyncDebugCommands.resultLine(null, "status", "ok"))
     }
 
     @Test
