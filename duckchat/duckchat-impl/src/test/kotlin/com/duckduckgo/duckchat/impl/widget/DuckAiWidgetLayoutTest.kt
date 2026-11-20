@@ -119,4 +119,44 @@ class DuckAiWidgetLayoutTest {
     @Test
     @Config(sdk = [30], qualifiers = "night")
     fun whenApi30NightThenColorsMatchCurrentDarkColors() = assertFallbackColors(container = "white9", divider = "white12")
+
+    @Test
+    @Config(sdk = [34], qualifiers = "notnight")
+    fun whenApi34ThenStaticColorsMatchCurrentLightColors() = assertFallbackColors(container = "black9", divider = "black12")
+
+    @Test
+    @Config(sdk = [34], qualifiers = "night")
+    fun whenApi34NightThenStaticColorsMatchCurrentDarkColors() = assertFallbackColors(container = "white9", divider = "white12")
+
+    private fun assertDynamicColors(vararg expected: Pair<String, Int>) {
+        expected.forEach { (name, systemColor) -> assertEquals(name, activity.getColor(systemColor), dynamicColor(name)) }
+    }
+
+    private fun dynamicColor(name: String) = activity.getColor(
+        activity.resources.getIdentifier("duckAiWidgetDynamic${name}Color", "color", activity.packageName),
+    )
+
+    @Test
+    @Config(sdk = [34], qualifiers = "notnight")
+    fun whenApi34ThenDynamicColorsUseLightSystemPalette() = assertDynamicColors(
+        "Background" to android.R.color.system_neutral2_100,
+        "SearchBar" to android.R.color.system_neutral1_0,
+        "Container" to android.R.color.system_accent2_200,
+        "Divider" to android.R.color.system_neutral2_200,
+        "Hint" to android.R.color.system_neutral2_700,
+        "Text" to android.R.color.system_neutral1_900,
+        "OnContainer" to android.R.color.system_accent2_900,
+    )
+
+    @Test
+    @Config(sdk = [34], qualifiers = "night")
+    fun whenApi34NightThenDynamicColorsUseDarkSystemPalette() = assertDynamicColors(
+        "Background" to android.R.color.system_neutral1_900,
+        "SearchBar" to android.R.color.system_neutral2_700,
+        "Container" to android.R.color.system_accent2_700,
+        "Divider" to android.R.color.system_neutral2_700,
+        "Hint" to android.R.color.system_neutral2_200,
+        "Text" to android.R.color.system_neutral1_50,
+        "OnContainer" to android.R.color.system_accent2_100,
+    )
 }
