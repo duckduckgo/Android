@@ -46,6 +46,9 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
+import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.impl.auditlog.RealLoginAuditLogFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
@@ -73,15 +76,18 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -97,6 +103,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.lang.String.format
+import java.time.Instant
 import kotlin.reflect.KClass
 
 @SuppressLint("DenyListedApi")
@@ -123,6 +130,8 @@ class SyncActivityViewModelTest {
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
+    private val auditLogStateStore = FakeStateStore()
+
     private lateinit var testee: SyncActivityViewModel
 
     @Before
@@ -143,6 +152,7 @@ class SyncActivityViewModelTest {
             syncAutoRestore = syncAutoRestore,
             appCoroutineScope = coroutineTestRule.testScope,
             loginAuditLogFeature = RealLoginAuditLogFeature(fakeSyncFeature, coroutineTestRule.testDispatcherProvider),
+            auditLogStateStore = auditLogStateStore,
         )
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
@@ -1314,6 +1324,150 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenSignedInWithPendingLoginsAndNotificationsEnabledThenShowNewDeviceBanner() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertEquals(listOf("Laptop"), expectMostRecentItem().newDeviceBanner?.deviceNames)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNoPendingLoginsThenHideNewDeviceBanner() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoginNotificationFlagOffThenHideNewDeviceBanner() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(false))
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAuditLogFlagOffThenHideNewDeviceBanner() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(false))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(true))
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedOutThenHideNewDeviceBanner() = runViewModelTest {
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignsInWhileOpenThenBannerShowsNewLogins() = runViewModelTest {
+        givenLoginNotificationsEnabled()
+        val syncStates = MutableStateFlow(SyncState.OFF)
+        whenever(syncStateMonitor.syncState()).thenReturn(syncStates)
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+
+            givenAuthenticatedUser()
+            syncStates.value = SyncState.READY
+            auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+            assertEquals(listOf("Laptop"), expectMostRecentItem().newDeviceBanner?.deviceNames)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPendingLoginsAddedWhileOpenThenBannerUpdates() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+
+            auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+            assertEquals(listOf("Laptop"), expectMostRecentItem().newDeviceBanner?.deviceNames)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPendingLoginsClearedElsewhereThenBannerHides() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNotNull(expectMostRecentItem().newDeviceBanner)
+
+            auditLogStateStore.state.value = AuditLogCheckState()
+
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewDeviceBannerReviewClickedThenLaunchDeviceActivity() = runViewModelTest {
+        testee.onNewDeviceBannerReviewClicked()
+
+        testee.commands().test {
+            assertEquals(LaunchDeviceActivity, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewDeviceBannerClosedThenOnlyShownLoginsAreCleared() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(cursor = "after-1", pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNotNull(expectMostRecentItem().newDeviceBanner)
+            auditLogStateStore.foundDuringClose = pendingLogin(2, "Phone")
+
+            testee.onNewDeviceBannerCloseClicked()
+
+            assertEquals(listOf(pendingLogin(2, "Phone")), auditLogStateStore.state.value.pendingLogins)
+            assertEquals("after-1", auditLogStateStore.state.value.cursor)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewDeviceBannerClosedWithNoBannerThenStoreUntouched() = runViewModelTest {
+        testee.onNewDeviceBannerCloseClicked()
+
+        assertEquals(0, auditLogStateStore.updateCount)
+    }
+
+    @Test
     fun whenLearnMoreClickedThenEmitLaunchLearnMoreCommand() = runViewModelTest {
         testee.onLearnMoreClicked()
 
@@ -1777,6 +1931,37 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
+    }
+
+    private fun givenLoginNotificationsEnabled() {
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(true))
+    }
+
+    private fun pendingLogin(n: Int, name: String) = PendingLogin(
+        entryId = "entry-$n",
+        deviceId = "device-$n",
+        deviceName = name,
+        occurredAt = Instant.parse("2026-11-19T10:00:00Z").plusSeconds(n.toLong()),
+    )
+
+    private class FakeStateStore : AuditLogCheckStateStore {
+        val state = MutableStateFlow(AuditLogCheckState())
+        var updateCount = 0
+            private set
+
+        var foundDuringClose: PendingLogin? = null
+
+        override suspend fun read(): AuditLogCheckState = state.value
+
+        override suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?) {
+            updateCount++
+            foundDuringClose?.let { found -> state.value = state.value.copy(pendingLogins = state.value.pendingLogins + found) }
+            foundDuringClose = null
+            transform(state.value)?.let { state.value = it }
+        }
+
+        override fun pendingLogins(): Flow<List<PendingLogin>> = state.map { it.pendingLogins }
     }
 
     private fun givenSetupFlowsAllowed() {

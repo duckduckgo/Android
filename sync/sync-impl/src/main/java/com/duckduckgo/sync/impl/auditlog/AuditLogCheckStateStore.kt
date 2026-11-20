@@ -26,6 +26,10 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -66,6 +70,12 @@ interface AuditLogCheckStateStore {
      */
     suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?)
 
+    /**
+     * Emits the stored pending logins now and again after each [update] that changes them.
+     * Sign-out clears [SyncStore] without an [update], so collect again after the account changes.
+     */
+    fun pendingLogins(): Flow<List<PendingLogin>>
+
     companion object {
         const val MAX_PENDING_LOGINS = 100
     }
@@ -79,6 +89,7 @@ class RealAuditLogCheckStateStore @Inject constructor(
 ) : AuditLogCheckStateStore {
 
     private val mutex = Mutex()
+    private val writeCount = MutableStateFlow(0L)
 
     override suspend fun read(): AuditLogCheckState = withContext(dispatchers.io()) {
         mutex.withLock { readState() }
@@ -96,8 +107,13 @@ class RealAuditLogCheckStateStore @Inject constructor(
             syncStore.auditLogPending = encode(updated.pendingLogins)
             syncStore.auditLogCursor = updated.cursor
             if (updated.lastSeenEntryId != current.lastSeenEntryId) syncStore.auditLogLastSeenEntryId = updated.lastSeenEntryId
+            writeCount.value++
         }
     }
+
+    override fun pendingLogins(): Flow<List<PendingLogin>> = writeCount
+        .map { read().pendingLogins }
+        .distinctUntilChanged()
 
     private fun readState() = AuditLogCheckState(
         cursor = syncStore.auditLogCursor,

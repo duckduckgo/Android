@@ -30,7 +30,9 @@ import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Footer
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Status
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.ViewState
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -426,6 +428,8 @@ class SyncAuditLogViewModelTest {
         override suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?) {
             transform(state)?.let { state = it }
         }
+
+        override fun pendingLogins(): Flow<List<PendingLogin>> = flowOf(state.pendingLogins)
     }
 
     private class FakeLoader : SyncAuditLogLoader {
