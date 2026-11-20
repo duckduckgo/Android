@@ -11,8 +11,8 @@ android {
 dependencies {
     api (KotlinX.coroutines.test) {
         because 'api since TestDispatcher is in the CoroutineTestRule public API'
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 

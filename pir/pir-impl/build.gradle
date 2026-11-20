@@ -68,13 +68,14 @@ dependencies {
     testImplementation AndroidX.work.testing
     testImplementation CashApp.turbine
     testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
 
+    // We don't use Mockito in instrumentation tests; we use real implementations or fakes instead.
     androidTestImplementation project(path: ':common-test')
     androidTestImplementation project(path: ':feature-toggles-test')
     androidTestImplementation AndroidX.test.ext.junit
@@ -82,7 +83,6 @@ dependencies {
     androidTestImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    // AndroidTest dependencies (no mockito - use real implementations or manual fakes for Android instrumentation tests)
     androidTestImplementation Testing.junit4
 
     ksp project(':codegen-ksp')

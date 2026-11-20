@@ -42,7 +42,6 @@ dependencies {
     implementation project(':sync-lib')
     implementation project(':sync-store')
     implementation "com.google.zxing:core:_"
-    // Barcode scanning
     implementation "com.journeyapps:zxing-android-embedded:_"
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.appCompat
@@ -57,7 +56,6 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-    // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.test.ext.junit

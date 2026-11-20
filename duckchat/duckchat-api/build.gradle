@@ -43,8 +43,8 @@ dependencies {
     testImplementation AndroidX.lifecycle.runtime.testing
     testImplementation CashApp.turbine
     testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation Testing.junit4
